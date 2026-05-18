@@ -50,6 +50,22 @@ namespace osu.Game.Localisation
         public static LocalisableString ContinueEditing => new TranslatableString(getKey(@"continue_editing"), @"Oops, continue editing");
 
         /// <summary>
+        /// "This action will replace the beatmap audio, are you sure you want to proceed?"
+        /// </summary>
+        public static LocalisableString BeatmapAudioReplaceDialogHeader =>
+            new TranslatableString(getKey(@"beatmap_audio_replace_dialog_header"), @"This action will replace the beatmap audio, are you sure you want to proceed?");
+
+        /// <summary>
+        /// "Replace Audio"
+        /// </summary>
+        public static LocalisableString ReplaceAudio => new TranslatableString(getKey(@"replace_audio"), @"Replace Audio");
+
+        /// <summary>
+        /// "Keep Existing Audio"
+        /// </summary>
+        public static LocalisableString KeepExistingAudio => new TranslatableString(getKey(@"keep_existing_audio"), @"Keep Existing Audio");
+
+        /// <summary>
         /// "The editor must be reloaded to apply this change. The beatmap will be saved."
         /// </summary>
         public static LocalisableString EditorReloadDialogHeader => new TranslatableString(getKey(@"editor_reload_dialog_header"), @"The editor must be reloaded to apply this change. The beatmap will be saved.");

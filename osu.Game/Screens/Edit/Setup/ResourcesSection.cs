@@ -43,6 +43,9 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private SetupScreen setupScreen { get; set; } = null!;
 
+        [Resolved(canBeNull: true)]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         private SetupScreenHeaderBackground headerBackground = null!;
 
         [BackgroundDependencyLoader]
@@ -256,11 +259,24 @@ namespace osu.Game.Screens.Edit.Setup
             if (rollingBackAudioChange)
                 return;
 
-            if (file.NewValue == null || !ChangeAudioTrack(file.NewValue, audioTrackChooser.ApplyToAllDifficulties.Value))
+            // It shouldn't show the dialog if there is no audio file currently
+            if (file.OldValue != null && dialogOverlay != null)
+                dialogOverlay?.Push(new ConfirmBeatmapAudioReplaceDialog(replaceAudio, rollBackAudioChange));
+            else
+                replaceAudio();
+            return;
+
+            void rollBackAudioChange()
             {
                 rollingBackAudioChange = true;
                 audioTrackChooser.Current.Value = file.OldValue;
                 rollingBackAudioChange = false;
+            }
+
+            void replaceAudio()
+            {
+                if (file.NewValue == null || !ChangeAudioTrack(file.NewValue, audioTrackChooser.ApplyToAllDifficulties.Value))
+                    rollBackAudioChange();
             }
         }
     }
