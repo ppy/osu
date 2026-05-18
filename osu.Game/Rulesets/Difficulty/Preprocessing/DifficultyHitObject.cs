@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// <summary>
         /// Retrieves the full rate-adjusted hit window for a <see cref="HitResult"/>.
         /// </summary>
-        public virtual double HitWindow(HitResult hitResult)
+        public double HitWindow(HitResult hitResult)
         {
             return 2 * RawHitWindow(hitResult) / ClockRate;
         }
