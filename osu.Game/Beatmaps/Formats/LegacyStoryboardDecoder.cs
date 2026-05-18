@@ -194,7 +194,8 @@ namespace osu.Game.Beatmaps.Formats
                         string triggerName = split[1];
                         double startTime = split.Length > 2 ? Parsing.ParseDouble(split[2]) : double.MinValue;
                         double endTime = split.Length > 3 ? Parsing.ParseDouble(split[3]) : double.MaxValue;
-                        int groupNumber = split.Length > 4 ? Parsing.ParseInt(split[4]) : 0;
+                        // negation as per https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L736
+                        int groupNumber = split.Length > 4 ? -Parsing.ParseInt(split[4]) : 0;
                         currentCommandsGroup = storyboardSprite?.AddTriggerGroup(triggerName, startTime, endTime, groupNumber);
                         break;
                     }
