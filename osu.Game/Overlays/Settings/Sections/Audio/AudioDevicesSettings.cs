@@ -17,6 +17,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public partial class AudioDevicesSettings : SettingsSubsection
     {
+        // An example driver name of an ALSA device will look like this: "hw:4,0".
+        // For contrast, Pipewire Server and Default devices will have driver names called respectively "pipewire" and "default".
+        public const string LINUX_ALSA_DEVICE_DRIVER_PREFIX = "hw:";
+
         protected override LocalisableString Header => AudioSettingsStrings.AudioDevicesHeader;
 
         [Resolved]
@@ -27,6 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         private FormCheckBox? wasapiExperimental;
 
         private readonly Bindable<SettingsNote.Data?> wasapiExperimentalNote = new Bindable<SettingsNote.Data?>();
+        private readonly Bindable<SettingsNote.Data?> alsaExclusiveDeviceNote = new Bindable<SettingsNote.Data?>();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -38,9 +43,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Caption = AudioSettingsStrings.OutputDevice,
                 })
                 {
-                    Keywords = new[] { "speaker", "headphone", "output" }
+                    Keywords = new[] { "speakers", "headphones", "output" },
+                    Note = { BindTarget = alsaExclusiveDeviceNote },
                 },
             };
+
+            dropdown.Current.ValueChanged += d => onDeviceSelected(d.NewValue);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
             {
@@ -78,10 +86,24 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             }
         }
 
+        private void onDeviceSelected(string selectedDevice)
+        {
+            string? currentDriver = audio.AudioDeviceNames.Where(d => d.Name == selectedDevice).Select(d => d.Driver).FirstOrDefault();
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux && currentDriver.IsNotNull() && currentDriver.StartsWith(LINUX_ALSA_DEVICE_DRIVER_PREFIX, System.StringComparison.Ordinal))
+            {
+                alsaExclusiveDeviceNote.Value = new SettingsNote.Data(AudioSettingsStrings.AlsaExclusiveNotice, SettingsNote.Type.Warning);
+            }
+            else
+            {
+                alsaExclusiveDeviceNote.Value = null;
+            }
+        }
+
         private void updateItems()
         {
             var deviceItems = new List<string> { string.Empty };
-            deviceItems.AddRange(audio.AudioDeviceNames);
+            deviceItems.AddRange(audio.AudioDeviceNames.Select(d => d.Name));
 
             string preferredDeviceName = audio.AudioDevice.Value;
             if (deviceItems.All(kv => kv != preferredDeviceName))
