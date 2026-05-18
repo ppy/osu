@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public double ComputeAimRating(double aimDifficultyValue)
         {
-            double aimRating = Math.Pow(aimDifficultyValue, 0.63) * 0.02275;
+            double aimRating = Math.Pow(aimDifficultyValue, 0.65) * 0.01422;
 
             double ratingMultiplier = 1.0;
 
