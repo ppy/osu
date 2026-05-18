@@ -307,7 +307,7 @@ namespace osu.Game.Beatmaps.Formats
                 typeAcronym,
                 (int)command.Easing,
                 command.StartTime - relativeToTime,
-                command.StartTime == command.EndTime ? (double?)null : command.EndTime - relativeToTime,
+                command.StartTime == command.EndTime ? null : command.EndTime - relativeToTime,
                 details));
         }
 
