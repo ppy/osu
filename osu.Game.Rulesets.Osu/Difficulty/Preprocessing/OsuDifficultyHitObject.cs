@@ -129,13 +129,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double SmallCircleBonus { get; private set; }
 
         /// <summary>
-        /// Object's immediate OverallDifficulty value calculated from the hitwindow.
+        /// Object's immediate OverallDifficulty value calculated from the raw hitwindow.
         /// </summary>
         public double OverallDifficulty
         {
             get
             {
-                double hitWindowGreat = BaseObject.HitWindows.WindowFor(HitResult.Great) / ClockRate;
+                double hitWindowGreat = RawHitWindow(HitResult.Great) / ClockRate;
 
                 return (79.5 - hitWindowGreat) / 6;
             }
