@@ -500,7 +500,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 if (!Precision.AlmostEquals(1, losingDamageInfo.Multiplier))
                 {
                     damageBreakdowns.Add((
-                        (int)Math.Ceiling(losingDamageInfo.DirectDamage * (losingDamageInfo.Multiplier - 1)),
+                        (int)Math.Ceiling(losingDamageInfo.DirectDamage * losingDamageInfo.Multiplier) - losingDamageInfo.DirectDamage,
                         $"x{losingDamageInfo.Multiplier.ToStandardFormattedString(maxDecimalDigits: 1)}",
                         "multiplier"
                     ));
