@@ -79,7 +79,6 @@ namespace osu.Game.Tests.Visual
         }
 
         [Resolved]
-
         private OsuConfigManager config { get; set; } = null!;
 
         protected override void LoadComplete()
