@@ -237,7 +237,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        LengthLimit = 255,
+                                                                        // Set quite small to avoid hitting rich presence limits.
+                                                                        // Note that we use JSON encoding so this needs to be well below the 128 byte limit discord end.
+                                                                        // See https://github.com/Lachee/discord-rpc-csharp/blob/master/DiscordRPC/Entities/Secrets.cs#L26-L42
+                                                                        //
+                                                                        // Note that we need at least 36 characters for tournament rooms:
+                                                                        // https://github.com/ppy/osu-server-spectator/blob/406ed09d5825f2fe60c9d5ca08e69db94d873e28/osu.Server.Spectator/Hubs/Referee/RefereeHub.cs#L101
+                                                                        LengthLimit = 40,
                                                                     },
                                                                 },
                                                                 new Section("Other")

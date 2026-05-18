@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -57,6 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
             Dependencies.CacheAs<BeatmapStore>(new RealmDetachedBeatmapStore());
+            Dependencies.Cache(new ChannelManager(API));
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
@@ -329,6 +331,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestModSelectOverlayNonDefaultSettings()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods =
+                        [
+                            new APIMod(new OsuModSuddenDeath { FailOnSliderTail = { Value = true } }),
+                        ],
+                        AllowedMods = [],
+                        Freestyle = true
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddAssert("sudden death not visible", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().ChildrenOfType<ModPanel>().Single(m => m.Mod is ModSuddenDeath).Visible == false);
+        }
+
+        [Test]
         public void TestChangeSettingsButtonVisibleForHost()
         {
             AddStep("add playlist item", () =>
@@ -349,6 +378,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
             AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
             AddAssert("button hidden", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestChangeSettingsButtonAlwaysVisibleForReferee()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+            AddStep("setup referee", () => MultiplayerClient.RoomSetupAction = r => r.Host!.Role = MultiplayerRoomUserRole.Referee);
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddUntilStep("button visible", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.GreaterThan(0));
+            AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
+            AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
+            AddAssert("button hidden", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.GreaterThan(0));
         }
 
         [Test]
@@ -437,6 +490,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("countdown started", () => MultiplayerClient.ServerRoom!.ActiveCountdowns.Any());
+        }
+
+        [Test]
+        public void TestRoll()
+        {
+            AddStep("set playlist", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+            AddStep("set channel", () => room.ChannelId = 1);
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            AddStep("roll", () => MultiplayerClient.SendMatchRequest(new RollRequest()));
         }
 
         [Test]

@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -13,11 +14,15 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
-using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Online.Rooms;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -33,21 +38,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             Value = 1_000_000,
         };
 
-        [Resolved]
-        private UserLookupCache users { get; set; } = null!;
+        public HealthBar HealthDisplay { get; private set; } = null!;
 
-        private readonly int userId;
+        private readonly APIUser user;
         private readonly Anchor contentAnchor;
         private readonly RankedPlayColourScheme colourScheme;
 
         private BufferedContainer grayScaleContainer = null!;
+        private OsuSpriteText beatmapState = null!;
+        private OsuSpriteText damageMultiplierText = null!;
+        private OsuSpriteText lastStandText = null!;
+
+        private BeatmapAvailability availability = BeatmapAvailability.Unknown();
+
+        [Resolved]
+        private MultiplayerClient client { get; set; } = null!;
 
         [Resolved]
         private RankedPlayCornerPiece? cornerPiece { get; set; }
 
-        public RankedPlayUserDisplay(int userId, Anchor contentAnchor, RankedPlayColourScheme colourScheme)
+        public RankedPlayUserDisplay(APIUser user, Anchor contentAnchor, RankedPlayColourScheme colourScheme)
         {
-            this.userId = userId;
+            this.user = user;
             this.contentAnchor = contentAnchor;
             this.colourScheme = colourScheme;
         }
@@ -55,11 +67,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            APIUser user = users.GetUserAsync(userId).GetResultSafely()!;
-
             var shear = contentAnchor == Anchor.TopLeft || contentAnchor == Anchor.BottomRight
                 ? -OsuGame.SHEAR
                 : OsuGame.SHEAR;
+
+            var beatmapStateAnchor = (contentAnchor & Anchor.x0) != 0
+                ? Anchor.CentreLeft
+                : Anchor.CentreRight;
+
+            var damageMultiplierAnchor = (contentAnchor & Anchor.x0) != 0
+                ? Anchor.CentreRight
+                : Anchor.CentreLeft;
+
+            var lastStandAnchor = (contentAnchor & Anchor.x0) != 0
+                ? Anchor.CentreLeft
+                : Anchor.CentreRight;
 
             InternalChildren =
             [
@@ -95,6 +117,32 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     Direction = FillDirection.Vertical,
                     Children =
                     [
+                        new Container
+                        {
+                            Anchor = contentAnchor,
+                            Origin = contentAnchor,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 16,
+                            Padding = new MarginPadding { Horizontal = 4, Vertical = 6 },
+                            Children =
+                            [
+                                damageMultiplierText = new OsuSpriteText
+                                {
+                                    Anchor = damageMultiplierAnchor,
+                                    Origin = damageMultiplierAnchor,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                    UseFullGlyphHeight = false,
+                                },
+                                lastStandText = new OsuSpriteText
+                                {
+                                    Anchor = lastStandAnchor,
+                                    Origin = lastStandAnchor,
+                                    Text = "Last Stand!",
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                    Alpha = 0,
+                                }
+                            ]
+                        },
                         HealthDisplay = new HealthBar(colourScheme, (contentAnchor & Anchor.x0) != 0, shear)
                         {
                             Health = { BindTarget = Health },
@@ -103,22 +151,38 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                             Anchor = contentAnchor,
                             Origin = contentAnchor,
                         },
-                        new OsuSpriteText
+                        new FillFlowContainer
                         {
-                            Name = "Username",
-                            Text = user.Username,
+                            Name = "Username/beatmap state container",
+                            AutoSizeAxes = Axes.Both,
                             Anchor = contentAnchor,
                             Origin = contentAnchor,
+                            Direction = FillDirection.Horizontal,
                             Padding = new MarginPadding { Horizontal = 4, Vertical = 6 },
-                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold),
-                            UseFullGlyphHeight = false,
+                            Spacing = new Vector2(5, 0),
+                            Children =
+                            [
+                                new OsuSpriteText
+                                {
+                                    Name = "Username",
+                                    Text = user.Username,
+                                    Anchor = contentAnchor,
+                                    Origin = contentAnchor,
+                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold),
+                                    UseFullGlyphHeight = false,
+                                },
+                                beatmapState = new OsuSpriteText
+                                {
+                                    Anchor = beatmapStateAnchor,
+                                    Origin = beatmapStateAnchor,
+                                    Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                                },
+                            ],
                         },
                     ]
                 }
             ];
         }
-
-        public HealthBar HealthDisplay { get; private set; } = null!;
 
         protected override void LoadComplete()
         {
@@ -128,7 +192,70 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             {
                 grayScaleContainer.GrayscaleTo(e.NewValue <= 0 ? 1 : 0, 300);
                 cornerPiece?.OnHealthChanged(e.NewValue);
+
+                if (e.NewValue == 1)
+                    lastStandText.FadeIn(100).Delay(3000).FadeOut(400);
             });
+
+            client.RoomUpdated += onRoomUpdated;
+            onRoomUpdated();
+        }
+
+        private void onRoomUpdated()
+        {
+            updateBeatmapState();
+            updateDamageMultiplier();
+        }
+
+        private void updateBeatmapState()
+        {
+            var multiplayerUser = client.Room?.Users.SingleOrDefault(u => u.UserID == user.Id);
+
+            if (multiplayerUser == null || availability == multiplayerUser.BeatmapAvailability)
+                return;
+
+            availability = multiplayerUser.BeatmapAvailability;
+
+            if (availability.State is DownloadState.NotDownloaded or DownloadState.Downloading or DownloadState.Importing)
+                beatmapState.FadeIn(50);
+            else
+                beatmapState.FadeOut(50);
+
+            switch (availability.State)
+            {
+                case DownloadState.NotDownloaded:
+                    beatmapState.Text = "Missing Beatmap";
+                    break;
+
+                case DownloadState.Downloading:
+                    double progress = Math.Clamp(availability.DownloadProgress ?? 0, 0, 1);
+                    beatmapState.Text = $"Downloading... ({progress:P0})";
+                    break;
+
+                case DownloadState.Importing:
+                    beatmapState.Text = "Importing...";
+                    break;
+            }
+        }
+
+        private void updateDamageMultiplier()
+        {
+            if (client.Room?.MatchState is not RankedPlayRoomState roomState)
+                return;
+
+            if (!roomState.Users.TryGetValue(user.Id, out var userInfo))
+                return;
+
+            double totalMultiplier = roomState.DamageMultiplier + userInfo.DamageMultiplier;
+            damageMultiplierText.Text = $"{totalMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x damage";
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+                client.RoomUpdated -= onRoomUpdated;
         }
 
         public partial class HealthBar : CompositeDrawable

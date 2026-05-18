@@ -252,7 +252,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                             {
                                                                 new Drawable[]
                                                                 {
-                                                                    new SectionHeader("Chat")
+                                                                    new SectionHeader(OnlinePlayStrings.Chat)
                                                                 },
                                                                 [new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }]
                                                             },
@@ -322,7 +322,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 footerButtons.Insert(-1, new UserModSelectButton
                 {
-                    Text = "Free mods",
+                    Text = OnlinePlayStrings.FooterButtonFreemods,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,

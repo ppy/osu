@@ -48,10 +48,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 BorderThickness = border_thickness,
                                 BorderColour = new ColourInfo
                                 {
-                                    TopLeft = RankedPlayColourScheme.Blue.PrimaryDarkest.Opacity(0.5f),
-                                    BottomLeft = RankedPlayColourScheme.Blue.Primary.Opacity(0.75f),
-                                    TopRight = RankedPlayColourScheme.Red.PrimaryDarkest.Opacity(0.5f),
-                                    BottomRight = RankedPlayColourScheme.Red.Primary.Opacity(0.75f),
+                                    TopLeft = RankedPlayColourScheme.BLUE.PrimaryDarkest.Opacity(0.5f),
+                                    BottomLeft = RankedPlayColourScheme.BLUE.Primary.Opacity(0.75f),
+                                    TopRight = RankedPlayColourScheme.RED.PrimaryDarkest.Opacity(0.5f),
+                                    BottomRight = RankedPlayColourScheme.RED.Primary.Opacity(0.75f),
                                 },
                                 Child = new Box
                                 {
