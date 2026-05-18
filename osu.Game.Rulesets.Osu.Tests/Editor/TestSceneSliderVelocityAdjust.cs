@@ -150,23 +150,31 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             AddAssert("velocity slider at 1x", () => velocitySlider.Current.Value, () => Is.EqualTo(1));
+            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
+            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
 
             AddStep("seek to 5000", () => editorClock.Seek(5000));
             AddStep("set 2x velocity", () => velocitySlider.Current.Value = 2);
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
+            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
+            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 6000", () => editorClock.Seek(6000));
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
+            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
+            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 9000", () => editorClock.Seek(9000));
             AddStep("set 3x velocity", () => velocitySlider.Current.Value = 3);
             placeSlider();
             AddAssert("placed slider has 3x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(3));
+            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
+            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 10000", () => editorClock.Seek(10000));
@@ -174,11 +182,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("use last slider velocity instead", () => useLastSliderButton.TriggerClick());
             placeSlider();
             AddAssert("placed slider has 3x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(3));
+            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
+            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
 
             AddStep("seek back to 7000", () => editorClock.Seek(7000));
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().ElementAt(2).SliderVelocityMultiplier, () => Is.EqualTo(2));
+            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
+            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
 
             void placeSlider()
