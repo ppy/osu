@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -57,6 +58,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            Spacing = new Vector2(5);
             Children = new Drawable[]
             {
                 slider = new ExpandableSlider<double>
@@ -73,7 +75,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                 useLastSliderButton = new ExpandableButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Action = () => useLastSliderVelocity = true,
+                    Action = () =>
+                    {
+                        useLastSliderVelocity = true;
+                        sliderVelocitySourceObject.Invalidate();
+                    },
                 }
             };
         }
@@ -93,6 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 updateContractedText();
             });
             updateContractedText();
+            useLastSliderButton.Expanded.BindValueChanged(_ => sliderVelocitySourceObject.Invalidate());
 
             editorBeatmap.HitObjectAdded += invalidateSliderVelocitySourceObject;
             editorBeatmap.HitObjectUpdated += invalidateSliderVelocitySourceObject;
@@ -137,6 +144,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             useLastSliderVelocity = false;
             sliderVelocity.Value = slider.Current.Value;
             syncingBindables = false;
+            sliderVelocitySourceObject.Invalidate();
         }
 
         private void invalidateSliderVelocitySourceObject(HitObject _) => sliderVelocitySourceObject.Invalidate();
@@ -151,26 +159,34 @@ namespace osu.Game.Rulesets.Osu.Edit
                 lastClockPosition = editorClock.CurrentTime;
             }
 
-            // Two possible causes of invalidation:
-            // - The user seeked the clock, which means we may want a different velocity source object
-            // - Some change to the beatmap was made, which means the previously-used velocity source object may no longer be the most relevant one
+            // Three possible causes of invalidation:
+            // - The user seeked the clock, which means a different velocity source object needs to be used.
+            // - Some change to the beatmap was made, which means the previously-used velocity source object may no longer be the most relevant one.
+            // - The user is interacting with the toolbox in a way that requires a visual state update
+            //   (hovered to expand it, clicked the button to use last slider's velocity, or dragged the manual velocity slider).
+            //   This is a procedural one, because `sliderVelocitySourceObject` will have been pointing at the correct object already,
+            //   but to decrease unnecessary work being done every frame, the invalidation is explicitly re-triggered to update the toolbox state.
             if (!sliderVelocitySourceObject.IsValid)
-                sliderVelocitySourceObject.Value = getLastSlider();
+            {
+                var lastSlider = getLastSlider();
+                sliderVelocitySourceObject.Value = lastSlider;
 
-            // This functions as a null check and allows simplified access later (instead of needing to type `sliderVelocitySourceObject.Value` multiple times)
-            if (sliderVelocitySourceObject.Value is not Slider lastSlider)
-            {
-                useLastSliderButton.Enabled.Value = false;
-                useLastSliderButton.ExpandedLabelText = "No sliders to get velocity from";
-            }
-            else
-            {
-                useLastSliderButton.Enabled.Value = !useLastSliderVelocity;
-                useLastSliderButton.ExpandedLabelText = useLastSliderVelocity
-                    ? "Using last slider's velocity"
-                    : LocalisableString.Interpolate($@"Use last slider's velocity ({lastSlider.SliderVelocityMultiplier.ToLocalisableString("N2")}x)");
-                if (useLastSliderVelocity)
-                    sliderVelocity.Value = lastSlider.SliderVelocityMultiplier;
+                if (lastSlider == null)
+                {
+                    useLastSliderButton.Enabled.Value = false;
+                    useLastSliderButton.ExpandedLabelText = "No sliders to get velocity from";
+                    useLastSliderButton.ContractedLabelText = default;
+                }
+                else
+                {
+                    useLastSliderButton.Enabled.Value = useLastSliderButton.Expanded.Value && !useLastSliderVelocity;
+                    useLastSliderButton.ExpandedLabelText = useLastSliderVelocity
+                        ? "Using last slider's velocity"
+                        : LocalisableString.Interpolate($@"Use last slider's velocity ({lastSlider.SliderVelocityMultiplier.ToLocalisableString("N2")}x)");
+                    useLastSliderButton.ContractedLabelText = $@"current {lastSlider.SliderVelocityMultiplier.ToLocalisableString("N2")}x";
+                    if (useLastSliderVelocity)
+                        sliderVelocity.Value = lastSlider.SliderVelocityMultiplier;
+                }
             }
         }
 
