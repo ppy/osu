@@ -219,6 +219,18 @@ namespace osu.Game.Localisation
         public static LocalisableString ApplyToThisDifficulty => new TranslatableString(getKey(@"apply_to_this_difficulty"), @"Only apply to this difficulty");
 
         /// <summary>
+        /// "Sync metadata with all difficulties"
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficulties =>
+            new TranslatableString(getKey(@"sync_metadata_with_all_difficulties"), @"Sync metadata with all difficulties");
+
+        /// <summary>
+        /// "Copies artist, title, source, and tags to all difficulties."
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficultiesTooltip => new TranslatableString(getKey(@"sync_metadata_with_all_difficulties_tooltip"),
+            @"Copies artist, title, source, and tags to all difficulties.");
+
+        /// <summary>
         /// "Ruleset ({0})"
         /// </summary>
         public static LocalisableString RulesetHeader(string arg0) => new TranslatableString(getKey(@"ruleset"), @"Ruleset ({0})", arg0);

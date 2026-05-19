@@ -3,19 +3,20 @@
 
 using System.ComponentModel;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public partial class OverlinedPlaylistHeader : OverlinedHeader
+    public partial class PlaylistHeader : SectionHeader
     {
         private readonly Room room;
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        public OverlinedPlaylistHeader(Room room)
+        public PlaylistHeader(Room room)
             : base("Playlist")
         {
             this.room = room;
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         }
 
         private void updateDuration()
-            => Details.Value = room.Playlist.GetTotalDuration(rulesets);
+            => DetailsText.Value = $"{room.Playlist.GetTotalDuration(rulesets)}";
 
         protected override void Dispose(bool isDisposing)
         {

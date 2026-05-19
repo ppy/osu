@@ -85,17 +85,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private OsuColour colours = null!;
 
-        public void UpdateStatus(MultiplayerUserState state, BeatmapAvailability availability)
+        public void UpdateStatus(MultiplayerRoomUser user)
         {
             // the only case where the progress bar is used does its own local fade in.
             // starting by fading out is a sane default.
             progressBar.FadeOut(fade_time);
             this.FadeIn(fade_time);
 
-            switch (state)
+            if (user.Role == MultiplayerRoomUserRole.Referee)
+            {
+                text.Text = "referee";
+                icon.Icon = OsuIcon.EditorWhistle;
+                icon.Colour = colours.BlueLight;
+                return;
+            }
+
+            switch (user.State)
             {
                 case MultiplayerUserState.Idle:
-                    showBeatmapAvailability(availability);
+                    showBeatmapAvailability(user.BeatmapAvailability);
                     break;
 
                 case MultiplayerUserState.Ready:
@@ -142,7 +150,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+                    throw new ArgumentOutOfRangeException(nameof(user.State), user.State, null);
             }
         }
 

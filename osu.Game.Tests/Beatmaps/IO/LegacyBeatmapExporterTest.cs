@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -23,6 +25,36 @@ namespace osu.Game.Tests.Beatmaps.IO
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
+
+        [TestCase(96, 32)]
+        [TestCase(32, 32)]
+        [TestCase(24, 32)]
+        [TestCase(23, 16)]
+        [TestCase(15, 16)]
+        [TestCase(12, 16)]
+        [TestCase(11, 8)]
+        [TestCase(6, 8)]
+        [TestCase(2, 4)]
+        public void TestGridSizeClampedToStableValues(int set, int expected)
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"decimal-timing-beatmap.olz"));
+            AddStep("adjust grid", () => beatmap.Beatmap.GridSize = set);
+            AddStep("save", () => beatmaps.Save((beatmap.BeatmapInfo as BeatmapInfo)!, beatmap.Beatmap));
+
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
+            AddAssert("grid clamped", () => beatmap.Beatmap.GridSize, () => Is.EqualTo(expected));
+        }
 
         [Test]
         public void TestObjectsSnappedAfterTruncatingExport()
@@ -128,6 +160,48 @@ namespace osu.Game.Tests.Beatmaps.IO
                 using var archiveReader = new ZipArchiveReader(memoryStream);
                 byte[] fileContent = archiveReader.GetStream(filename).ReadAllBytesToArray();
                 return Encoding.UTF8.GetString(fileContent);
+            }
+        }
+
+        [Test]
+        public void TestExportUsesCarriageReturnLineFeed()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"legacy-export-stability-test.olz"));
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddAssert(".osu file uses CRLF line endings",
+                () => hasBareLineFeed(outStream.GetBuffer()),
+                () => Is.False);
+
+            bool hasBareLineFeed(byte[] archiveBytes)
+            {
+                using var memoryStream = new MemoryStream(archiveBytes);
+                using var archiveReader = new ZipArchiveReader(memoryStream);
+
+                foreach (string filename in archiveReader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.Ordinal)))
+                {
+                    byte[] content = archiveReader.GetStream(filename).ReadAllBytesToArray();
+
+                    for (int i = 0; i < content.Length; i++)
+                    {
+                        if (content[i] != '\n')
+                            continue;
+
+                        if (i == 0 || content[i - 1] != '\r')
+                            return true;
+                    }
+                }
+
+                return false;
             }
         }
 

@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             initialItem = itemToEdit ?? room.Playlist.LastOrDefault();
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
-            LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
+            TopPadding = Header.HEIGHT - 10;
 
             freeModSelect = new FreeModSelectOverlay
             {
