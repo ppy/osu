@@ -489,7 +489,7 @@ namespace osu.Game.Screens.Menu
 
         private void loadRankedPlay() => this.Push(new OnlinePlay.Matchmaking.Intro.ScreenIntro(MatchmakingPoolType.RankedPlay));
 
-        private partial class MobileDisclaimerDialog : PopupDialog
+        private partial class MobileDisclaimerDialog : ButtonPopupDialog
         {
             public MobileDisclaimerDialog(Action confirmed)
             {

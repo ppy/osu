@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestPushBeforeLoad()
         {
-            PopupDialog dialog = null;
+            ButtonPopupDialog dialog = null;
 
             AddStep("create slow loading dialog overlay", () => overlay = new SlowLoadingDialogOverlay());
 
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("dialog is not part of hierarchy", () => testDialog.Parent == null);
         }
 
-        private partial class TestPopupDialog : PopupDialog
+        private partial class TestPopupDialog : ButtonPopupDialog
         {
         }
     }

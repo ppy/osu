@@ -4,12 +4,12 @@
 #nullable disable
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
@@ -129,12 +129,15 @@ namespace osu.Game.Overlays
             if (e.Repeat)
                 return false;
 
+            if (CurrentDialog is not ButtonPopupDialog buttonPopupDialog)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Select:
                     var clickableButton =
-                        CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() ??
-                        CurrentDialog?.Buttons.First();
+                        buttonPopupDialog.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault() ??
+                        buttonPopupDialog.Buttons.First();
 
                     clickableButton?.TriggerClick();
                     return true;
