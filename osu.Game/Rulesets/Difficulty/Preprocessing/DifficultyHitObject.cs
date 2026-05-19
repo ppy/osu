@@ -84,9 +84,17 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         }
 
         /// <summary>
-        /// Retrieves the full hit window for a <see cref="HitResult"/>.
+        /// Retrieves the full rate-adjusted hit window for a <see cref="HitResult"/>.
         /// </summary>
-        public virtual double HitWindow(HitResult hitResult)
+        public double HitWindow(HitResult hitResult)
+        {
+            return 2 * RawHitWindow(hitResult) / ClockRate;
+        }
+
+        /// <summary>
+        /// Retrieves the hit window for a <see cref="HitResult"/>.
+        /// </summary>
+        protected virtual double RawHitWindow(HitResult hitResult)
         {
             // Try to get HitWindows from nested hit objects
             // This is important for objects such as Slider in osu! where the object itself has HitWindows set to Empty, but the nested SliderHead has proper hit windows
@@ -97,11 +105,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
                     if (nestedHitObject.HitWindows == HitWindows.Empty)
                         continue;
 
-                    return 2 * nestedHitObject.HitWindows.WindowFor(hitResult) / ClockRate;
+                    return nestedHitObject.HitWindows.WindowFor(hitResult);
                 }
             }
 
-            return 2 * BaseObject.HitWindows.WindowFor(hitResult) / ClockRate;
+            return BaseObject.HitWindows.WindowFor(hitResult);
         }
     }
 }
