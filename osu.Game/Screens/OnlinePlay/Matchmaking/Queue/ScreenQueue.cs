@@ -441,15 +441,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
         });
 
+        private int historyInsertOrder;
+
         private async Task loadRecentMatches(RankedPlayRoomState[] matches)
         {
+            // matches initial API response.
+            const int max_panels = 50;
+
             await userLookupCache.GetUsersAsync(matches.SelectMany(m => m.Users.Keys).ToArray()).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
                 foreach (var match in matches)
                 {
-                    resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(match)
+                    resultPanelContainer.Insert(historyInsertOrder--, new RankedPlayMatchPanel(match)
                     {
                         RelativeSizeAxes = Axes.X,
                         Width = 0.48f
@@ -461,6 +466,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     resultPanelContainer.LayoutDuration = 400;
                     resultPanelContainer.LayoutEasing = Easing.OutQuint;
                 }
+
+                while (resultPanelContainer.Count > max_panels)
+                    resultPanelContainer.Children.First().RemoveAndDisposeImmediately();
             });
         }
 
