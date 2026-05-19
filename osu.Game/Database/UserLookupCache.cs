@@ -29,7 +29,7 @@ namespace osu.Game.Database
         public Task<APIUser?[]> GetUsersAsync(int[] userIds, CancellationToken token = default) => LookupAsync(userIds, token);
 
         /// <summary>
-        /// Invalidate previously looked up users with <see cref="GetuserAsync"/> or <see cref="GetUsersAsync"/>. Used to clear only a part of the cache, instead of the entire package.
+        /// Invalidate previously looked up users with <see cref="GetUserAsync"/> or <see cref="GetUsersAsync"/>. Used to clear only a part of the cache, instead of the entire package.
         /// </summary>
         /// <param name="userIds"></param>
         public void InvalidateUsers(IEnumerable<int> userIds)
