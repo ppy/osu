@@ -211,6 +211,11 @@ namespace osu.Game.Rulesets
         public ModTouchDevice? GetTouchDeviceMod() => CreateMod<ModTouchDevice>();
 
         /// <summary>
+        /// Creates a <see cref="ScoreMultiplierCalculator"/> relevant to this ruleset.
+        /// </summary>
+        public ScoreMultiplierCalculator CreateScoreMultiplierCalculator() => new ScoreMultiplierCalculator();
+
+        /// <summary>
         /// Create a transformer which adds lookups specific to a ruleset to skin sources.
         /// </summary>
         /// <param name="skin">The source skin.</param>
