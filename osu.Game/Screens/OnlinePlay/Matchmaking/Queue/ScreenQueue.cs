@@ -101,6 +101,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private int? userRating;
 
+        private int resultPanelInsertDepth;
+        private const int max_match_panels = 50;
+
+        private bool initialMatchesLoaded;
+
         private GridContainer mainGrid = null!;
 
         private IBindable<bool> isConnected = null!;
@@ -438,7 +443,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             ratingGraph.SetData(status.RatingDistribution, userRating);
 
-            loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
+            if (status.RecentMatches.Length <= 0)
+                return;
+
+            var newMatches = status.RecentMatches.OfType<RankedPlayRoomState>().ToArray();
+
+            if (!initialMatchesLoaded)
+            {
+                loadRecentMatches(newMatches.TakeLast(max_match_panels).ToArray()).FireAndForget();
+                initialMatchesLoaded = true;
+            }
+            else
+            {
+                loadRecentMatches(newMatches).FireAndForget();
+            }
         });
 
         private async Task loadRecentMatches(RankedPlayRoomState[] matches)
@@ -449,11 +467,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 foreach (var match in matches)
                 {
-                    resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(match)
+                    resultPanelContainer.Insert(--resultPanelInsertDepth, new RankedPlayMatchPanel(match)
                     {
                         RelativeSizeAxes = Axes.X,
                         Width = 0.48f
                     });
+                }
+
+                if (resultPanelContainer.Count > max_match_panels)
+                {
+                    var excess = resultPanelContainer.Children.SkipLast(max_match_panels).ToArray();
+
+                    foreach (var panel in excess)
+                    {
+                        var matchPanel = (RankedPlayMatchPanel)panel;
+                        userLookupCache.InvalidateUsers(matchPanel.UserIds);
+                        resultPanelContainer.Remove(panel, disposeImmediately: false);
+                        panel.FadeOut(300, Easing.OutQuint).Expire();
+                    }
                 }
 
                 if (resultPanelContainer.Any(c => c.Position != Vector2.Zero))
@@ -488,6 +519,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             ratingGraph.SetData([], null);
 
             cloud.Users = Array.Empty<APIUser>();
+            resultPanelInsertDepth = 0;
+            initialMatchesLoaded = false;
+            userLookupCache.Clear();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -726,11 +760,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
             stopWaitingLoopPlayback();
-
+            userLookupCancellation.Cancel();
             if (client.IsNotNull())
                 client.MatchmakingLobbyStatusChanged -= onMatchmakingLobbyStatusChanged;
+            userLookupCache.Clear();
         }
 
         public enum MatchmakingScreenState

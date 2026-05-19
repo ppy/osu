@@ -28,6 +28,16 @@ namespace osu.Game.Database
         /// <returns>The populated users. May include null results for failed retrievals.</returns>
         public Task<APIUser?[]> GetUsersAsync(int[] userIds, CancellationToken token = default) => LookupAsync(userIds, token);
 
+        /// <summary>
+        /// Invalidate previously looked up users with <see cref="GetuserAsync"/> or <see cref="GetUsersAsync"/>. Used to clear only a part of the cache, instead of the entire package.
+        /// </summary>
+        /// <param name="userIds"></param>
+        public void InvalidateUsers(IEnumerable<int> userIds)
+        {
+            var idSet = userIds.ToHashSet();
+            Invalidate(id => idSet.Contains(id));
+        }
+
         protected override LookupUsersRequest CreateRequest(IEnumerable<int> ids) => new LookupUsersRequest(ids.ToArray());
 
         protected override IEnumerable<APIUser>? RetrieveResults(LookupUsersRequest request) => request.Response?.Users;
