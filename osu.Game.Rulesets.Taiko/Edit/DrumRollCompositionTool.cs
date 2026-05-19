@@ -7,14 +7,13 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Taiko.Edit.Blueprints;
-using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
     public class DrumRollCompositionTool : CompositionTool
     {
         public DrumRollCompositionTool()
-            : base(nameof(DrumRoll))
+            : base("Drum roll")
         {
         }
 
