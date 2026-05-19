@@ -27,6 +27,7 @@ namespace osu.Game.Benchmarks
         [
             new ModTestCase("no mods", []),
             new ModTestCase("single mod", [new OsuModHardRock()]),
+            new ModTestCase("single mod 2", [new OsuModEasy()]),
             new ModTestCase("multiple mods", [new OsuModHidden(), new OsuModHardRock(), new OsuModDoubleTime()]),
             new ModTestCase("mods with adjusted settings", [
                 new OsuModDoubleTime { SpeedChange = { Value = 2 } },
