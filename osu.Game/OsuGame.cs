@@ -270,6 +270,30 @@ namespace osu.Game
         private void updateBlockingOverlayFade() =>
             ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
+        private void updateRightFloatingOverlayDim()
+        {
+            var overlays = rightFloatingOverlayContent.Children.OfType<OverlayContainer>().ToList();
+
+            for (int i = 0; i < overlays.Count; i++)
+            {
+                bool shouldDim = overlays.Skip(i + 1).Any(o => o.State.Value == Visibility.Visible);
+                overlays[i].FadeColour(shouldDim ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            }
+
+            bool anyVisible = overlays.Any(o => o.State.Value == Visibility.Visible);
+            overlayContent.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+        }
+
+        private void updateDialogDim()
+        {
+            var overlays = topMostOverlayContent.Children.OfType<DialogOverlay>().ToList();
+
+            bool anyVisible = overlays.Any(o => o.State.Value == Visibility.Visible);
+
+            overlayOffsetContainer.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            Toolbar.FadeColour(anyVisible ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+        }
+
         IDisposable IOverlayManager.RegisterBlockingOverlay(OverlayContainer overlayContainer)
         {
             if (overlayContainer.Parent != null)
@@ -1195,7 +1219,11 @@ namespace osu.Game
             {
                 d.Anchor = Anchor.TopRight;
                 d.Origin = Anchor.TopRight;
-            }), rightFloatingOverlayContent.Add, true);
+            }), d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+            }, true);
 
             loadComponentSingleFile(legacyImportManager, Add);
 
@@ -1225,16 +1253,29 @@ namespace osu.Game
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+            }, d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+            }, true);
 
             loadComponentSingleFile(new NowPlayingOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, rightFloatingOverlayContent.Add, true);
+            }, d =>
+            {
+                rightFloatingOverlayContent.Add(d);
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateRightFloatingOverlayDim());
+            }, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), d =>
+            {
+                topMostOverlayContent.Add(d);
+                ((OverlayContainer)d).State.BindValueChanged(_ => updateDialogDim());
+            }, true);
+
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
