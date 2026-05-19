@@ -62,17 +62,24 @@ namespace osu.Game.Rulesets.Scoring
         public double CalculateFor(IEnumerable<Mod> mods)
         {
             var allModsByType = mods.ToDictionary(m => m.GetType());
+
+            if (allModsByType.Count == 0)
+                return 1;
+
             var remainingModTypes = allModsByType.Keys.ToHashSet();
 
             double result = 1;
 
-            foreach (var (combination, multiplier) in combination_multipliers)
+            if (allModsByType.Count > 1)
             {
-                if (remainingModTypes.IsSupersetOf(combination))
+                foreach (var (combination, multiplier) in combination_multipliers)
                 {
-                    var instances = combination.Select(t => allModsByType[t]).ToArray();
-                    result *= multiplier(instances);
-                    remainingModTypes.ExceptWith(combination);
+                    if (remainingModTypes.IsSupersetOf(combination))
+                    {
+                        var instances = combination.Select(t => allModsByType[t]).ToArray();
+                        result *= multiplier(instances);
+                        remainingModTypes.ExceptWith(combination);
+                    }
                 }
             }
 
