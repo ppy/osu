@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.4;
 
-            difficulty *= 0.99 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 5500;
+            difficulty *= 0.985 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
 
             return difficulty;
         }
@@ -81,8 +81,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double sum = GetCurrentStrainPeaks().Sum();
 
             // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
-            sum *= Math.Sqrt(0.7 + 0.1 * Math.Min(1.0, totalObjects / 200.0) +
-                             (totalObjects > 200 ? 0.2 * Math.Min(1.0, (totalObjects - 200) / 200.0) : 0.0));
+            sum *= 0.7 + 0.1 * Math.Min(1.0, totalObjects / 200.0) +
+                   (totalObjects > 200 ? 0.2 * Math.Min(1.0, (totalObjects - 200) / 200.0) : 0.0);
 
             return sum;
         }
