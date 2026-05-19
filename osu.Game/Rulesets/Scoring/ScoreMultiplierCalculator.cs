@@ -85,10 +85,10 @@ namespace osu.Game.Rulesets.Scoring
 
             foreach (var modType in remainingModTypes)
             {
-                if (single_multipliers_with_context.TryGetValue(modType, out var multiplierWithContext))
-                    result *= multiplierWithContext(allModsByType[modType], this);
-                else if (single_multipliers.TryGetValue(modType, out var multiplier))
+                if (single_multipliers.TryGetValue(modType, out var multiplier))
                     result *= multiplier(allModsByType[modType]);
+                else if (single_multipliers_with_context.TryGetValue(modType, out var multiplierWithContext))
+                    result *= multiplierWithContext(allModsByType[modType], this);
             }
 
             return result;
