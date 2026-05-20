@@ -1345,6 +1345,15 @@ namespace osu.Game
                 if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
                     penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
             }
+
+            if (combined < 20260521 && RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            {
+                // account for users that already had this set on and had adjusted their offset.
+                if (Audio.UseExperimentalWasapi.Value)
+                    LocalConfig.SetValue(OsuSetting.AudioOffset, LocalConfig.Get<double>(OsuSetting.AudioOffset) - FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET);
+
+                Audio.UseExperimentalWasapi.Value = true;
+            }
         }
 
         private void handleBackButton()
