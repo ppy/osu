@@ -1296,7 +1296,7 @@ namespace osu.Game
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
 
-            applyMigrations();
+            applyConfigMigrations();
         }
 
         /// <summary>
@@ -1306,7 +1306,7 @@ namespace osu.Game
         /// For database migrations, see <see cref="RealmAccess.applyMigrationsForVersion"/>.
         /// </remarks>
         /// <exception cref="NotImplementedException"></exception>
-        private void applyMigrations()
+        private void applyConfigMigrations()
         {
             // arrives as 2020.123.0-lazer
             string rawVersion = LocalConfig.Get<string>(OsuSetting.Version);
