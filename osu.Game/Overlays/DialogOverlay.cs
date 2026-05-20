@@ -29,8 +29,13 @@ namespace osu.Game.Overlays
 
         public PopupDialog CurrentDialog { get; private set; }
 
-        public override bool IsPresent => (Scheduler.HasPendingTasks
-                                           || dialogContainer.Children.Count > 0)
+        public override bool IsPresent => (Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0)
+                                          // The following line ensures that dialogs are not presented while the dialog overlay
+                                          // cannot be displayed. This is due to the `Schedule` usage inside `Push()`.
+                                          //
+                                          // Without this, a dialog pushed during disabled overlay activation mode would be presented,
+                                          // but immediately dismissed without ever being seen by the user (see
+                                          // https://github.com/ppy/osu/blob/ce5e54c9d27b17d460d99e774de502f9480fb710/osu.Game/Graphics/Containers/OsuFocusedOverlayContainer.cs#L131-L136).
                                           && OverlayActivationMode.Value == OverlayActivation.All;
 
         [CanBeNull]
