@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
         private class TestScoreMultiplierCalculator : ScoreMultiplierCalculator
         {
-            static TestScoreMultiplierCalculator()
+            public TestScoreMultiplierCalculator()
             {
                 Single<OsuModEasy>(hasMultiplier: 0.15);
                 Single<OsuModDaycore>(hasMultiplier: daycore => (1 + daycore.SpeedChange.Value) / 4);
