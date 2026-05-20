@@ -1087,6 +1087,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     State = { Value = Visibility.Visible },
                     Beatmap = { Value = Beatmap.Value },
                     SelectedMods = { BindTarget = SelectedMods },
+                    Ruleset = { BindTarget = Ruleset },
                     ShowPresets = true,
                 });
             }

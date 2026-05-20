@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Unranked badge not shown", () => footerButtonMods.ChildrenOfType<FooterButtonMods.UnrankedBadge>().Single().Alpha == 0);
         }
 
-        private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Current.Value = mods;
+        private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Mods.Value = mods;
 
         private void assertModsMultiplier(IEnumerable<Mod> mods)
         {

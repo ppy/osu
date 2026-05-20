@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -28,6 +29,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly IBindable<WorkingBeatmap?> Beatmap = new Bindable<WorkingBeatmap?>();
         public readonly IBindable<IReadOnlyList<Mod>> ActiveMods = new Bindable<IReadOnlyList<Mod>>();
+        public readonly IBindable<RulesetInfo?> Ruleset = new Bindable<RulesetInfo?>();
 
         /// <summary>
         /// Whether the effects (on score multiplier, on or beatmap difficulty) of the current selected set of mods should be shown.
@@ -101,6 +103,7 @@ namespace osu.Game.Overlays.Mods
                     beatmapAttributesDisplay.BeatmapInfo.Value = b.NewValue?.BeatmapInfo;
             }, true);
 
+            Ruleset.BindValueChanged(_ => updateInformation());
             ActiveMods.BindValueChanged(m =>
             {
                 updateInformation();
@@ -120,10 +123,8 @@ namespace osu.Game.Overlays.Mods
         {
             if (rankingInformationDisplay != null)
             {
-                double multiplier = 1.0;
-
-                foreach (var mod in ActiveMods.Value)
-                    multiplier *= mod.ScoreMultiplier;
+                var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator();
+                double multiplier = scoreMultiplierCalculator?.CalculateFor(ActiveMods.Value) ?? 1;
 
                 rankingInformationDisplay.ModMultiplier.Value = multiplier;
                 rankingInformationDisplay.Ranked.Value = ActiveMods.Value.All(m => m.Ranked);
