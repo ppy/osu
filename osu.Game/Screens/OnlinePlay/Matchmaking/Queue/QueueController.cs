@@ -89,11 +89,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         public void IssueDuel(MatchmakingPool pool, int userId)
         {
-            // Block any duel requests from going through if the player is already in a ranked match
             if (client.Room?.Settings.MatchType.IsMatchmakingType() == true)
-            {
                 return;
-            }
+
             lastDuelUser = userId;
             lastDuelPool = pool;
 
