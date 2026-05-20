@@ -1340,6 +1340,10 @@ namespace osu.Game
                 if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
                     penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
             }
+
+            // debug / local compilations will reset to a non-release string.
+            // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
+            LocalConfig.SetValue(OsuSetting.Version, Version);
         }
 
         private void handleBackButton()
