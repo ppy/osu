@@ -14,9 +14,9 @@ namespace osu.Game.Overlays.Dialog
     /// </summary>
     /// <remarks>
     /// The default implementation comes with text for a generic deletion operation.
-    /// This can be further customised by specifying custom <see cref="PopupDialog.HeaderText"/>.
+    /// This can be further customised by specifying custom <see cref="ButtonPopupDialog.HeaderText"/>.
     /// </remarks>
-    public abstract partial class DangerousActionDialog : PopupDialog
+    public abstract partial class DangerousActionDialog : ButtonPopupDialog
     {
         /// <summary>
         /// The action which performs the deletion.

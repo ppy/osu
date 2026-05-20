@@ -4,9 +4,7 @@
 using System.Linq;
 using System.Net.Http;
 using NUnit.Framework;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
@@ -15,26 +13,23 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public partial class TestSceneReportPopover : OsuTestScene
+    public partial class TestSceneReportDialog : OsuTestScene
     {
-        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+        private DialogOverlay dialogOverlay = null!;
 
-        private ReportPopoverContainer popover = null!;
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         [SetUpSteps]
         public void SetUp()
         {
-            AddStep("create popover", () =>
+            AddStep("create dialog overlay", () =>
             {
-                Child = new PopoverContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = popover = new ReportPopoverContainer(),
-                };
+                Child = dialogOverlay = new DialogOverlay();
             });
         }
 
@@ -56,16 +51,23 @@ namespace osu.Game.Tests.Visual.Online
                     return false;
                 };
             });
-            AddStep("show popover", () => popover.ShowPopover());
+            AddStep("push dialog", () => dialogOverlay.Push(new TestReportDialog("test")));
+
+            AddStep("try to report", () => dialogOverlay.CurrentDialog.ChildrenOfType<Button>().First().TriggerClick());
+            AddWaitStep("wait", 3);
+            AddAssert("nothing happened", () => this.ChildrenOfType<TestReportDialog>().Any(), () => Is.True);
+
             AddStep("input reason", () => this.ChildrenOfType<OsuTextBox>().First().Text = "reason");
             AddStep("send report", () => this.ChildrenOfType<Button>().First().TriggerClick());
-            AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
+
+            AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
             AddWaitStep("wait some", 3);
             AddStep("complete request", () => pendingRequest.TriggerSuccess());
             AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.False);
+
             AddAssert("ensure form is not present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.False);
-            AddAssert("ensure confirmation is present", () => this.ChildrenOfType<ReportPopover<ChatReportReason>.ReportConfirmation>().First().IsPresent, () => Is.True);
-            AddUntilStep("wait for popover to hide", () => this.ChildrenOfType<ReportPopoverContainer.TestReportPopover>().First().IsPresent, () => Is.False);
+            AddAssert("ensure confirmation is present", () => this.ChildrenOfType<ReportDialog<ChatReportReason>.ReportConfirmation>().First().IsPresent, () => Is.True);
+            AddUntilStep("wait for dialog to hide", () => this.ChildrenOfType<TestReportDialog>().Any(), () => Is.False);
         }
 
         [Test]
@@ -86,33 +88,29 @@ namespace osu.Game.Tests.Visual.Online
                     return false;
                 };
             });
-            AddStep("show popover", () => popover.ShowPopover());
+            AddStep("push dialog", () => dialogOverlay.Push(new TestReportDialog("test")));
+
             AddStep("input reason", () => this.ChildrenOfType<OsuTextBox>().First().Text = "reason");
             AddStep("send report", () => this.ChildrenOfType<Button>().First().TriggerClick());
-            AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
+
+            AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
             AddWaitStep("wait some", 3);
             AddStep("fail request", () => pendingRequest.TriggerFailure(new APIException("test error", new HttpRequestException("test error"))));
             AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.False);
+
             AddAssert("ensure form is present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.True);
             AddAssert("ensure error is present", () => this.ChildrenOfType<ErrorTextFlowContainer>().First().IsPresent, () => Is.True);
-            AddAssert("ensure confirmation is not present", () => this.ChildrenOfType<ReportPopover<ChatReportReason>.ReportConfirmation>().First().IsPresent, () => Is.False);
+            AddAssert("ensure confirmation is not present", () => this.ChildrenOfType<ReportDialog<ChatReportReason>.ReportConfirmation>().First().IsPresent, () => Is.False);
         }
 
-        protected partial class ReportPopoverContainer : Drawable, IHasPopover
+        public partial class TestReportDialog : ReportDialog<ChatReportReason>
         {
-            public Popover GetPopover() => new TestReportPopover("test");
-
-            public partial class TestReportPopover : ReportPopover<ChatReportReason>
+            public TestReportDialog(string name)
+                : base($"Report {name}?")
             {
-                private IAPIProvider api { get; set; } = null!;
-
-                public TestReportPopover(string name)
-                    : base($"Report {name}?")
-                {
-                }
-
-                protected override APIRequest GetRequest(ChatReportReason reason, string comment) => new ChatReportRequest(1, reason, comment);
             }
+
+            protected override APIRequest GetRequest(ChatReportReason reason, string comment) => new ChatReportRequest(1, reason, comment);
         }
     }
 }

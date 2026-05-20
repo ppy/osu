@@ -360,7 +360,7 @@ namespace osu.Game.Tests.Visual.Navigation
             });
             AddAssert("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog is SaveRequiredPopupDialog);
 
-            AddStep("press save", () => Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog!.PerformOkAction());
+            AddStep("press save", () => (Game.ChildrenOfType<DialogOverlay>().Single().CurrentDialog as SaveRequiredPopupDialog)!.PerformOkAction());
             AddUntilStep("wait for editor", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.IsLoaded);
             AddAssert("editor beatmap uses catch ruleset", () => getEditorBeatmap().BeatmapInfo.Ruleset.ShortName == "fruits");
         }

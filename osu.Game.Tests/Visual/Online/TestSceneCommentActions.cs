@@ -260,25 +260,25 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<CommentReportDialog>().Single().ChildrenOfType<RoundedButton>().Single();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
             AddWaitStep("Wait", 3);
-            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentPopover>().Any());
+            AddAssert("Nothing happened", () => this.ChildrenOfType<CommentReportDialog>().Any());
             AddStep("Add comment", () =>
             {
-                var field = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<OsuTextBox>().First();
+                var field = this.ChildrenOfType<CommentReportDialog>().Single().ChildrenOfType<OsuTextBox>().First();
                 field.Current.Value = report_text;
             });
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<CommentReportDialog>().Single().ChildrenOfType<RoundedButton>().Single();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
             AddWaitStep("Wait", 3);
-            AddAssert("Overlay closed", () => !this.ChildrenOfType<ReportCommentPopover>().Any());
+            AddAssert("Overlay closed", () => !this.ChildrenOfType<CommentReportDialog>().Any());
             AddAssert("Loading spinner shown", () => targetComment.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);

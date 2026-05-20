@@ -93,7 +93,7 @@ namespace osu.Game.Online.Chat
                 host.OpenUrlExternally(url);
         }
 
-        public partial class ExternalLinkDialog : PopupDialog
+        public partial class ExternalLinkDialog : ButtonPopupDialog
         {
             public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
             {

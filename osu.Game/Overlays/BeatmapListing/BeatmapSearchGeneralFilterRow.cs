@@ -182,7 +182,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
     }
 
-    internal partial class FeaturedArtistConfirmDialog : PopupDialog
+    internal partial class FeaturedArtistConfirmDialog : ButtonPopupDialog
     {
         public FeaturedArtistConfirmDialog(Action confirm)
         {
