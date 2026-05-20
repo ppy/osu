@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
             currentConfig = null;
         }
 
-        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line)
+        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line, bool isPrimaryStream)
         {
             switch (section)
             {
