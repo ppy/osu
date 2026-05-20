@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -33,6 +34,7 @@ namespace osu.Game.Screens.Select
             private string[] tags = Array.Empty<string>();
 
             private TagsOverflowButton? overflowButton;
+            private readonly Bindable<int> shownText = new Bindable<int>();
 
             public string[] Tags
             {
@@ -93,7 +95,10 @@ namespace osu.Game.Screens.Select
                 }
 
                 if (showOverflow)
+                {
+                    shownText.Value = Children.Count(text => text.IsPresent && text is OsuHoverContainer);
                     overflowButton.Show();
+                }
                 else
                     overflowButton.Hide();
             }
@@ -114,7 +119,7 @@ namespace osu.Game.Screens.Select
                     },
                 });
 
-                Add(overflowButton = new TagsOverflowButton(tags)
+                Add(overflowButton = new TagsOverflowButton(tags, shownText)
                 {
                     Alpha = 0f,
                     PerformSearch = s => PerformSearch?.Invoke(s),
@@ -137,9 +142,12 @@ namespace osu.Game.Screens.Select
 
                 public Action<string>? PerformSearch { get; init; }
 
-                public TagsOverflowButton(string[] tags)
+                private readonly Bindable<int> overflowIndex;
+
+                public TagsOverflowButton(string[] tags, Bindable<int> overflowIndex)
                 {
                     this.tags = tags;
+                    this.overflowIndex = overflowIndex;
                 }
 
                 [BackgroundDependencyLoader]
@@ -188,18 +196,22 @@ namespace osu.Game.Screens.Select
                     return true;
                 }
 
-                public Popover GetPopover() => new TagsOverflowPopover(tags, PerformSearch);
+                public Popover GetPopover() => new TagsOverflowPopover(tags, overflowIndex, PerformSearch);
             }
 
             public partial class TagsOverflowPopover : OsuPopover
             {
                 private readonly string[] tags;
+                private readonly Bindable<int> overflowIndex;
                 private readonly Action<string>? performSearch;
 
-                public TagsOverflowPopover(string[] tags, Action<string>? performSearchAction)
+                public TagsOverflowPopover(string[] tags, Bindable<int> overflowIndex, Action<string>? performSearchAction)
                 {
                     this.tags = tags;
+                    this.overflowIndex = overflowIndex;
                     performSearch = performSearchAction;
+
+                    this.overflowIndex.BindValueChanged(overflowChanged);
                 }
 
                 [BackgroundDependencyLoader]
@@ -213,11 +225,23 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Y,
                     };
 
-                    foreach (string tag in tags)
+                    for (int i = overflowIndex.Value; i < tags.Length; i++)
                     {
+                        string tag = tags[i];
                         textFlow.AddLink(tag, () => performSearch?.Invoke(tag));
                         textFlow.AddText(" ");
                     }
+                }
+
+                private void overflowChanged(ValueChangedEvent<int> e)
+                {
+                    load();
+                }
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    overflowIndex.UnbindEvents();
                 }
             }
         }
