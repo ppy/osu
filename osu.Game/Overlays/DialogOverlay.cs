@@ -13,6 +13,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 
 namespace osu.Game.Overlays
 {
@@ -28,8 +29,9 @@ namespace osu.Game.Overlays
 
         public PopupDialog CurrentDialog { get; private set; }
 
-        public override bool IsPresent => Scheduler.HasPendingTasks
-                                          || dialogContainer.Children.Count > 0;
+        public override bool IsPresent => (Scheduler.HasPendingTasks
+                                           || dialogContainer.Children.Count > 0)
+                                          && OverlayActivationMode.Value == OverlayActivation.All;
 
         [CanBeNull]
         private IDisposable duckOperation;
@@ -77,6 +79,7 @@ namespace osu.Game.Overlays
                     return;
                 }
 
+                Logger.Log($"{nameof(DialogOverlay)}: Showing dialog {dialog}");
                 dialogContainer.Add(dialog);
                 Show();
 
@@ -98,6 +101,7 @@ namespace osu.Game.Overlays
                 // Handle the case where the dialog is the currently displayed dialog.
                 // In this scenario, the overlay itself should also be hidden.
                 Hide();
+                Logger.Log($"{nameof(DialogOverlay)}: Dismissing dialog {dialog}");
                 CurrentDialog = null;
             }
         }
