@@ -69,13 +69,13 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// Whether <paramref name="existing"/> should be removed because <paramref name="placement"/> is being placed on top of it.
+        /// Whether an existing <see cref="Objects.HitObject"/> should be removed because <see cref="HitObject"/> is being placed on top of it.
         /// </summary>
         /// <remarks>
         /// By default, it matches when start times are within ±<see cref="placement_replace_start_time_leniency_ms"/> ms of each other.
         /// </remarks>
-        public virtual bool PlacementReplacesExisting(HitObject existing, HitObject placement)
-            => Precision.AlmostEquals(existing.StartTime, placement.StartTime, placement_replace_start_time_leniency_ms);
+        public virtual bool ReplacesExistingObject(HitObject existing)
+            => Precision.AlmostEquals(existing.StartTime, HitObject.StartTime, placement_replace_start_time_leniency_ms);
 
         [BackgroundDependencyLoader]
         private void load()

@@ -93,12 +93,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             resultPlayfield.ToScreenSpace(new Vector2(DefaultNotePiece.NOTE_HEIGHT)).Y -
             resultPlayfield.ToScreenSpace(Vector2.Zero).Y;
 
-        public override bool PlacementReplacesExisting(HitObject existing, HitObject placement)
-        {
-            if (!base.PlacementReplacesExisting(existing, placement))
-                return false;
-
-            return ((IHasColumn)placement).Column == ((IHasColumn)existing).Column;
-        }
+        public override bool ReplacesExistingObject(HitObject existing)
+            => base.ReplacesExistingObject(existing) && HitObject.Column == ((IHasColumn)existing).Column;
     }
 }
