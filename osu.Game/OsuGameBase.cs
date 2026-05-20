@@ -590,7 +590,7 @@ namespace osu.Game
         /// <param name="path">The path to migrate to.</param>
         /// <returns>Whether migration succeeded to completion. If <c>false</c>, some files were left behind.</returns>
         /// <exception cref="TimeoutException"></exception>
-        public bool Migrate(string path)
+        public bool MigrateUserData(string path)
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
 
