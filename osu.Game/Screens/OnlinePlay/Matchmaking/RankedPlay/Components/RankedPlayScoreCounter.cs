@@ -15,8 +15,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     public partial class RankedPlayScoreCounter : CompositeDrawable
     {
-        private readonly FillFlowContainer digitFlow;
-        private readonly CounterDigit[] digits;
+        private FillFlowContainer digitFlow;
+        private CounterDigit[] digits;
 
         public required FontUsage Font { get; init; }
 
@@ -92,6 +92,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             updateDigits(false);
         }
 
+        private static int numDigits(long value)
+        {
+            if (value <= 0)
+                return 1;
+
+            return (int)Math.Floor(Math.Log10(value)) + 1;
+        }
+
         public void SetValueInstantly(long value)
         {
             ClearTransforms(true);
@@ -99,10 +107,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             updateDigits(false);
         }
 
+        private void rebuildDigits()
+        {
+            digitFlow.Clear();
+            digits = new CounterDigit[numDigits(value)];
+
+            for (int i = 0; i < digits.Length; i++)
+            {
+                digits[i] = new CounterDigit
+                {
+                    Font = Font.With(fixedWidth: true),
+                };
+
+                digitFlow.Add(digits[i]);
+            }
+        }
+
         private void updateDigits(bool animated = true)
         {
             long current = value;
-
+            if (digits.Length != numDigits(value))
+            {
+                rebuildDigits();
+            }
             for (int i = digits.Length - 1; i >= 0; i--)
             {
                 digits[i].Offset = current;
