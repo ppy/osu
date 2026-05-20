@@ -352,7 +352,8 @@ namespace osu.Game.Database
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
-            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+            var modMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator();
+            double modMultiplier = modMultiplierCalculator.CalculateFor(score.Mods);
 
             long convertedTotalScoreWithoutMods;
 

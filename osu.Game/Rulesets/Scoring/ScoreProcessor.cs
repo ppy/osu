@@ -206,10 +206,8 @@ namespace osu.Game.Rulesets.Scoring
 
             Mods.ValueChanged += mods =>
             {
-                scoreMultiplier = 1;
-
-                foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
+                var calculator = ruleset.CreateScoreMultiplierCalculator();
+                scoreMultiplier = calculator.CalculateFor(mods.NewValue);
 
                 updateScore();
                 updateRank();
