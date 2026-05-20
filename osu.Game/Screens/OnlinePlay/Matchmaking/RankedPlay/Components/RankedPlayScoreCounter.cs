@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     public partial class RankedPlayScoreCounter : CompositeDrawable
     {
-        private FillFlowContainer digitFlow;
+        private readonly FillFlowContainer digitFlow;
         private CounterDigit[] digits;
 
         public required FontUsage Font { get; init; }
@@ -126,6 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private void updateDigits(bool animated = true)
         {
             long current = value;
+
             if (digits.Length != numDigits(value))
             {
                 rebuildDigits();
