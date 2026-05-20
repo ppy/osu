@@ -187,10 +187,14 @@ namespace osu.Game.Database
                     break;
             }
 
-            double modMultiplier = 1;
-
-            foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
+            // TODO: When mod multipliers are changed, this is going to break
+            // (and given how old this code is, it actually probably has already been broken at least once at time of writing).
+            // This will need to be addressed somehow.
+            // Given this is a years-old backwards-compatibility code path that dates back to a time when lazer did not have real score submission
+            // the simplest thing to do is probably to remove this method in its entirety.
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator();
+            double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
 
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
 
