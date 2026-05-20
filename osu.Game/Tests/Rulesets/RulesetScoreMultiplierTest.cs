@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 
@@ -21,33 +21,12 @@ namespace osu.Game.Tests.Rulesets
 
         [Test]
         public void TestDefaultMultiplierIsOne()
+            => TestModCombination([], 1);
+
+        protected void TestModCombination(IEnumerable<Mod> mods, double expectedMultiplier)
         {
             var calculator = Ruleset.CreateScoreMultiplierCalculator();
-            Assert.That(calculator.CalculateFor([]), Is.EqualTo(1));
-        }
-
-        [Test]
-        public void TestMultipliersMatchForIndividualMods()
-        {
-            var mods = Ruleset.CreateAllMods();
-            var calculator = Ruleset.CreateScoreMultiplierCalculator();
-
-            Assert.Multiple(() =>
-            {
-                foreach (var mod in mods)
-                    Assert.That(calculator.CalculateFor(mod.Yield()), Is.EqualTo(mod.ScoreMultiplier), message: $"Score multiplier not matching for mod {mod.Name}");
-            });
-        }
-
-        protected void TestModCombination(IEnumerable<Mod> mods)
-        {
-            var calculator = Ruleset.CreateScoreMultiplierCalculator();
-
-            double expected = 1;
-            foreach (var mod in mods)
-                expected *= mod.ScoreMultiplier;
-
-            Assert.That(calculator.CalculateFor(mods), Is.EqualTo(expected));
+            Assert.That(calculator.CalculateFor(mods), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
         }
     }
 }

@@ -46,28 +46,6 @@ namespace osu.Game.Benchmarks
         }
 
         [Benchmark]
-        public double ViaModScoreMultiplier() => viaModScoreMultiplier(Times, Mods);
-
-        [Test]
-        public void ViaModScoreMultiplier([Values(100)] int times, [ValueSource(nameof(ValuesForMods))] ModTestCase mods)
-            => viaModScoreMultiplier(times, mods);
-
-        private double viaModScoreMultiplier(int times, ModTestCase mods)
-        {
-            double scoreMultiplier = 1;
-
-            for (int i = 0; i < times; ++i)
-            {
-                scoreMultiplier = 1;
-
-                foreach (var mod in mods.Mods)
-                    scoreMultiplier *= mod.ScoreMultiplier;
-            }
-
-            return scoreMultiplier;
-        }
-
-        [Benchmark]
         public double ViaCalculator()
             => viaCalculator(Times, Mods);
 
