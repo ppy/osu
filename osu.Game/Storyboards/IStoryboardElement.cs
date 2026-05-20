@@ -31,7 +31,7 @@ namespace osu.Game.Storyboards
         /// <summary>
         /// This element was declared in a beatmapset-shared <c>.osb</c> file.
         /// </summary>
-        SharedStoryboard
+        Shared
     }
 
     public static class StoryboardElementExtensions

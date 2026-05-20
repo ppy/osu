@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps.Formats
         public void EncodeStandaloneStoryboard(TextWriter writer)
         {
             writer.WriteLine(@"[Events]");
-            encodeEvents(writer, StoryboardElementSource.SharedStoryboard);
+            encodeEvents(writer, StoryboardElementSource.Shared);
         }
 
         #endregion

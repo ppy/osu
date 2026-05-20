@@ -116,7 +116,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (!Enum.TryParse(split[0], out LegacyEventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
-                var source = isPrimaryStream ? StoryboardElementSource.Beatmap : StoryboardElementSource.SharedStoryboard;
+                var source = isPrimaryStream ? StoryboardElementSource.Beatmap : StoryboardElementSource.Shared;
 
                 switch (type)
                 {

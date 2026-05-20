@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var initial = createComponents();
 
             initial.Storyboard.GetLayer("Video").Add(new StoryboardVideo(StoryboardElementSource.Beatmap, "video1.avi", 0));
-            initial.Storyboard.GetLayer("Video").Add(new StoryboardVideo(StoryboardElementSource.SharedStoryboard, "video2.mp4", 1234));
+            initial.Storyboard.GetLayer("Video").Add(new StoryboardVideo(StoryboardElementSource.Shared, "video2.mp4", 1234));
 
             var encoded = encode(initial);
             var decodedAfterEncode = decode(encoded);
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(videoLayer.Elements[0].Path, Is.EqualTo("video1.avi"));
                 Assert.That(videoLayer.Elements[0].StartTime, Is.EqualTo(0));
 
-                Assert.That(videoLayer.Elements[1].Source, Is.EqualTo(StoryboardElementSource.SharedStoryboard));
+                Assert.That(videoLayer.Elements[1].Source, Is.EqualTo(StoryboardElementSource.Shared));
                 Assert.That(videoLayer.Elements[1].Path, Is.EqualTo("video2.mp4"));
                 Assert.That(videoLayer.Elements[1].StartTime, Is.EqualTo(1234));
             });
@@ -92,10 +92,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var initial = createComponents();
 
             initial.Storyboard.GetLayer("Background").Add(new StoryboardSprite(StoryboardElementSource.Beatmap, "1.png", Anchor.TopLeft, new Vector2()));
-            initial.Storyboard.GetLayer("Fail").Add(new StoryboardSprite(StoryboardElementSource.SharedStoryboard, "2.png", Anchor.Centre, new Vector2(-3)));
-            initial.Storyboard.GetLayer("Pass").Add(new StoryboardSprite(StoryboardElementSource.SharedStoryboard, "3.png", Anchor.BottomRight, new Vector2(30, -30)));
+            initial.Storyboard.GetLayer("Fail").Add(new StoryboardSprite(StoryboardElementSource.Shared, "2.png", Anchor.Centre, new Vector2(-3)));
+            initial.Storyboard.GetLayer("Pass").Add(new StoryboardSprite(StoryboardElementSource.Shared, "3.png", Anchor.BottomRight, new Vector2(30, -30)));
             initial.Storyboard.GetLayer("Foreground").Add(new StoryboardAnimation(StoryboardElementSource.Beatmap, "anim1", Anchor.CentreLeft, new Vector2(30), frameCount: 10, frameDelay: 30, AnimationLoopType.LoopForever));
-            initial.Storyboard.GetLayer("Overlay").Add(new StoryboardAnimation(StoryboardElementSource.SharedStoryboard, "anim2", Anchor.CentreRight, new Vector2(30), frameCount: 4, frameDelay: 100, AnimationLoopType.LoopOnce));
+            initial.Storyboard.GetLayer("Overlay").Add(new StoryboardAnimation(StoryboardElementSource.Shared, "anim2", Anchor.CentreRight, new Vector2(30), frameCount: 4, frameDelay: 100, AnimationLoopType.LoopOnce));
 
             var encoded = encode(initial);
             var decodedAfterEncode = decode(encoded);
@@ -111,13 +111,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(backgroundSprite.InitialPosition, Is.EqualTo(new Vector2()));
 
                 var failSprite = (StoryboardSprite)sb.GetLayer("Fail").Elements.Single();
-                Assert.That(failSprite.Source, Is.EqualTo(StoryboardElementSource.SharedStoryboard));
+                Assert.That(failSprite.Source, Is.EqualTo(StoryboardElementSource.Shared));
                 Assert.That(failSprite.Path, Is.EqualTo("2.png"));
                 Assert.That(failSprite.Origin, Is.EqualTo(Anchor.Centre));
                 Assert.That(failSprite.InitialPosition, Is.EqualTo(new Vector2(-3)));
 
                 var passSprite = (StoryboardSprite)sb.GetLayer("Pass").Elements.Single();
-                Assert.That(passSprite.Source, Is.EqualTo(StoryboardElementSource.SharedStoryboard));
+                Assert.That(passSprite.Source, Is.EqualTo(StoryboardElementSource.Shared));
                 Assert.That(passSprite.Path, Is.EqualTo("3.png"));
                 Assert.That(passSprite.Origin, Is.EqualTo(Anchor.BottomRight));
                 Assert.That(passSprite.InitialPosition, Is.EqualTo(new Vector2(30, -30)));
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(foregroundAnimation.LoopType, Is.EqualTo(AnimationLoopType.LoopForever));
 
                 var overlayAnimation = (StoryboardAnimation)sb.GetLayer("Overlay").Elements.Single();
-                Assert.That(overlayAnimation.Source, Is.EqualTo(StoryboardElementSource.SharedStoryboard));
+                Assert.That(overlayAnimation.Source, Is.EqualTo(StoryboardElementSource.Shared));
                 Assert.That(overlayAnimation.Path, Is.EqualTo("anim2"));
                 Assert.That(overlayAnimation.Origin, Is.EqualTo(Anchor.CentreRight));
                 Assert.That(overlayAnimation.InitialPosition, Is.EqualTo(new Vector2(30)));
@@ -309,7 +309,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var initial = createComponents();
 
             initial.Storyboard.GetLayer("Pass").Add(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, "pass.wav", 4000, 85));
-            initial.Storyboard.GetLayer("Fail").Add(new StoryboardSampleInfo(StoryboardElementSource.SharedStoryboard, "fail.wav", 4000, 100));
+            initial.Storyboard.GetLayer("Fail").Add(new StoryboardSampleInfo(StoryboardElementSource.Shared, "fail.wav", 4000, 100));
 
             var encoded = encode(initial);
             var decodedAfterEncode = decode(encoded);
@@ -323,7 +323,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(passingSample.Volume, Is.EqualTo(85));
 
                 var failingSample = (StoryboardSampleInfo)decodedAfterEncode.Storyboard.GetLayer("Fail").Elements.Single();
-                Assert.That(failingSample.Source, Is.EqualTo(StoryboardElementSource.SharedStoryboard));
+                Assert.That(failingSample.Source, Is.EqualTo(StoryboardElementSource.Shared));
                 Assert.That(failingSample.Path, Is.EqualTo("fail.wav"));
                 Assert.That(failingSample.StartTime, Is.EqualTo(4000));
                 Assert.That(failingSample.Volume, Is.EqualTo(100));
