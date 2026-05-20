@@ -541,8 +541,8 @@ namespace osu.Game
             Storage ??= host.Storage;
 
             LocalConfig ??= UseDevelopmentServer
-                ? new DevelopmentOsuConfigManager(Storage, host)
-                : new OsuConfigManager(Storage, host);
+                ? new DevelopmentOsuConfigManager(Storage)
+                : new OsuConfigManager(Storage);
 
             host.ExceptionThrown += onExceptionThrown;
         }

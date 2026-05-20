@@ -26,6 +26,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -1293,6 +1295,51 @@ namespace osu.Game
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
+
+            applyMigrations();
+        }
+
+        /// <summary>
+        /// Apply any migrations to configuration.
+        /// </summary>
+        /// <remarks>
+        /// For database migrations, see <see cref="RealmAccess.applyMigrationsForVersion"/>.
+        /// </remarks>
+        /// <exception cref="NotImplementedException"></exception>
+        private void applyMigrations()
+        {
+            // arrives as 2020.123.0-lazer
+            string rawVersion = LocalConfig.Get<string>(OsuSetting.Version);
+
+            if (rawVersion.Length < 6)
+                return;
+
+            string[] pieces = rawVersion.Split('.');
+
+            // on a fresh install or when coming from a non-release build, execution will end here.
+            // we don't want to run migrations in such cases.
+            if (!int.TryParse(pieces[0], out int year)) return;
+            if (!int.TryParse(pieces[1], out int monthDay)) return;
+
+            int combined = year * 10000 + monthDay;
+
+            if (combined < 20250214)
+            {
+                // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
+                if (RuntimeInfo.IsMobile)
+                    LocalConfig.GetBindable<float>(OsuSetting.UIScale).SetDefault();
+            }
+
+            if (combined < 20250428)
+            {
+                // Pen tablet sensitivity is now separated from cursor sensitivity.
+                // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
+                var mouseHandler = Host?.AvailableInputHandlers.OfType<MouseHandler>().SingleOrDefault();
+                var penHandler = Host?.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
+
+                if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
+                    penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
+            }
         }
 
         private void handleBackButton()
