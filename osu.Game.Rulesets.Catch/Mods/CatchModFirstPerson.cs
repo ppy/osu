@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => OsuIcon.ModMovingFast;
-        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModNoScope) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModNoScope) };
 
         [SettingSource("Centred background", "Have the background follow.")] // From the perspective of the player
         public BindableBool CentredBackground { get; } = new BindableBool();
@@ -33,15 +33,15 @@ namespace osu.Game.Rulesets.Catch.Mods
         [SettingSource("Centred storyboard / video", "Have the storyboard / video follow.")] // From the perspective of the player
         public BindableBool CentredStoryboard { get; } = new BindableBool();
 
-        private DimmableStoryboard dimmableStoryboard = null!;
         private Action<float> setBackgroundX = null!;
+        private Action<float> setStoryboardX = null!;
 
         private const float shift_x_factor = 1.6f; // Bruteforced, is magical, todo: may need more intricate calculation
 
         public void ApplyToPlayer(Player player)
         {
-            dimmableStoryboard = player.DimmableStoryboard;
             setBackgroundX = x => player.ApplyToBackground(b => b.X = x);
+            setStoryboardX = x => player.DimmableStoryboard.Children.Where(c => c is DrawableStoryboard).ForEach(ds => ds.X = x);
         }
 
         public void Update(Playfield playfield)
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             if (!CentredBackground.Value)
                 setBackgroundX(miscellaneousXOffset); // TODO: Fix crashing when exiting replay (from Auto) and the leaving background at the same X when exiting until there is a background refresh
             if (!CentredStoryboard.Value)
-                dimmableStoryboard.Children.Where(c => c is DrawableStoryboard).ForEach(ds => ds.X = miscellaneousXOffset);
+                setStoryboardX(miscellaneousXOffset);
         }
     }
 }
