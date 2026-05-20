@@ -13,7 +13,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected override void ParseLine(SkinConfiguration skin, Section section, string line)
+        protected override void ParseLine(SkinConfiguration skin, Section section, string line, bool isPrimaryStream)
         {
             if (section != Section.Colours)
             {
@@ -54,7 +54,7 @@ namespace osu.Game.Skinning
                     skin.ConfigDictionary[pair.Key] = pair.Value;
             }
 
-            base.ParseLine(skin, section, line);
+            base.ParseLine(skin, section, line, isPrimaryStream);
         }
 
         protected override SkinConfiguration CreateTemplateObject()

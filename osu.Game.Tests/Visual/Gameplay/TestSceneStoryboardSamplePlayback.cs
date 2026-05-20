@@ -38,10 +38,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             storyboard = new Storyboard();
             var backgroundLayer = storyboard.GetLayer("Background");
-            backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: -7000, volume: 20));
-            backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: -5000, volume: 20));
-            backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: 0, volume: 20));
-            backgroundLayer.Add(new StoryboardSampleInfo("Intro/welcome.mp3", time: 2000, volume: 20));
+            backgroundLayer.Add(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, "Intro/welcome.mp3", time: -7000, volume: 20));
+            backgroundLayer.Add(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, "Intro/welcome.mp3", time: -5000, volume: 20));
+            backgroundLayer.Add(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, "Intro/welcome.mp3", time: 0, volume: 20));
+            backgroundLayer.Add(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, "Intro/welcome.mp3", time: 2000, volume: 20));
         }
 
         [SetUp]
