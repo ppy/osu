@@ -57,7 +57,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public Action? SettingsApplied;
 
             public OsuTextBox NameField = null!;
-            public OsuTextBox MaxParticipantsField = null!;
+            private FormSliderBar<byte> maximumParticipantsSliderBar = null!;
+            private FormCheckBox maximumParticipantsCheckbox = null!;
             public MatchTypePicker TypePicker = null!;
             public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
             public OsuTextBox PasswordTextBox = null!;
@@ -219,13 +220,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
                                                             Children = new[]
                                                             {
-                                                                new Section("Max participants")
+                                                                new Section("Player count")
                                                                 {
-                                                                    Child = MaxParticipantsField = new OsuNumberBox
+                                                                    Children = new Drawable[]
                                                                     {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        TabbableContentContainer = this,
-                                                                        PlaceholderText = "No limit"
+                                                                        maximumParticipantsCheckbox = new FormCheckBox
+                                                                        {
+                                                                            Caption = "Limited slots",
+                                                                            HintText = "When enabled, total players allowed in a room will be limited. Unlimited when disabled."
+                                                                        },
+                                                                        maximumParticipantsSliderBar = new FormSliderBar<byte>
+                                                                        {
+                                                                            Caption = "Slot count",
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                            Margin = new MarginPadding { Top = 5 },
+                                                                            Current = new BindableNumber<byte>(16)
+                                                                            {
+                                                                                MinValue = 2,
+                                                                                MaxValue = 16,
+                                                                            }
+                                                                        },
                                                                     },
                                                                 },
                                                                 new Section("Password (optional)")
@@ -362,6 +376,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 updateRoomMaxParticipants();
                 updateRoomAutoStartDuration();
                 updateRoomPlaylist();
+
+                maximumParticipantsCheckbox.Current.BindValueChanged(enabled =>
+                {
+                    maximumParticipantsSliderBar.Alpha = enabled.NewValue ? 1 : 0;
+                }, true);
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -418,7 +437,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 => AutoSkipCheckbox.Current.Value = room.AutoSkip;
 
             private void updateRoomMaxParticipants()
-                => MaxParticipantsField.Text = room.MaxParticipants?.ToString();
+            {
+                if (room.MaxParticipants.HasValue)
+                {
+                    maximumParticipantsCheckbox.Current.Value = true;
+                    maximumParticipantsSliderBar.Current.Value = room.MaxParticipants.Value;
+                }
+                else
+                    maximumParticipantsCheckbox.Current.Value = false;
+            }
 
             private void updateRoomAutoStartDuration()
                 => startModeDropdown.Current.Value = (StartMode)room.AutoStartDuration.TotalSeconds;
@@ -439,7 +466,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (!ApplyButton.Enabled.Value)
                     return;
 
-                byte? maxParticipants = !string.IsNullOrWhiteSpace(MaxParticipantsField.Text) && byte.TryParse(MaxParticipantsField.Text, out byte max) ? max : null;
+                byte? maxParticipants = maximumParticipantsCheckbox.Current.Value ? maximumParticipantsSliderBar.Current.Value : null;
 
                 ErrorText.FadeOut(50);
 
