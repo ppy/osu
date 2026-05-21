@@ -49,10 +49,10 @@ namespace osu.Game.Screens.Edit.Setup
             var lookupStore = new DrawableStoryboard.StoryboardResourceLookupStore(working.Value.Storyboard, realmAccess, host);
             dependencies.CacheAs(textureStore = new TextureStore(host.Renderer, host.CreateTextureLoaderStore(lookupStore), false, scaleAdjust: 1));
 
-            UpdateBackground();
+            UpdateVideo();
         }
 
-        public void UpdateBackground()
+        public void UpdateVideo()
         {
             var video = working.Value.Storyboard.PrimaryVideo;
 
