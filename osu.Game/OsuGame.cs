@@ -1335,7 +1335,7 @@ namespace osu.Game
                     LocalConfig.GetBindable<float>(OsuSetting.UIScale).SetDefault();
             }
 
-            if (combined < 20250428)
+            if (combined < 20260520)
             {
                 // Pen tablet sensitivity is now separated from cursor sensitivity.
                 // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
