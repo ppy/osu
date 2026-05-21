@@ -15,6 +15,7 @@ using osu.Game.Models;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Storyboards;
 using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -23,6 +24,7 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private FormBeatmapFileSelector audioTrackChooser = null!;
         private FormBeatmapFileSelector backgroundChooser = null!;
+        private FormBeatmapFileSelector videoChooser = null!;
 
         private readonly Bindable<EditorBeatmapSkin.SampleSet?> currentSampleSet = new Bindable<EditorBeatmapSkin.SampleSet?>();
 
@@ -43,12 +45,18 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private SetupScreen setupScreen { get; set; } = null!;
 
-        private SetupScreenHeaderBackground headerBackground = null!;
+        private SetupScreenBackgroundPreview backgroundPreview = null!;
+        private SetupScreenVideoPreview videoPreview = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            headerBackground = new SetupScreenHeaderBackground
+            backgroundPreview = new SetupScreenBackgroundPreview
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 110,
+            };
+            videoPreview = new SetupScreenVideoPreview
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 110,
@@ -62,6 +70,12 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Caption = GameplaySettingsStrings.BackgroundHeader,
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
+                },
+                videoChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.VIDEO_EXTENSIONS)
+                {
+                    Caption = EditorSetupStrings.Video,
+                    PlaceholderText = EditorSetupStrings.ClickToSelectVideo,
+                    HintText = EditorSetupStrings.VideoHint,
                 },
                 audioTrackChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.AUDIO_EXTENSIONS)
                 {
@@ -91,10 +105,14 @@ namespace osu.Game.Screens.Edit.Setup
                 },
             };
 
-            backgroundChooser.PreviewContainer.Add(headerBackground);
+            backgroundChooser.PreviewContainer.Add(backgroundPreview);
+            videoChooser.PreviewContainer.Add(videoPreview);
 
             if (!string.IsNullOrEmpty(working.Value.Metadata.BackgroundFile))
                 backgroundChooser.Current.Value = new FileInfo(working.Value.Metadata.BackgroundFile);
+
+            if (working.Value.Storyboard.PrimaryVideo is StoryboardVideo video)
+                videoChooser.Current.Value = new FileInfo(video.Path);
 
             if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
                 audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
@@ -112,7 +130,7 @@ namespace osu.Game.Screens.Edit.Setup
                 metadata => metadata.BackgroundFile,
                 (metadata, name) => metadata.BackgroundFile = name);
 
-            headerBackground.UpdateBackground();
+            backgroundPreview.UpdateBackground();
             editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackgroundAsync());
             return true;
         }

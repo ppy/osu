@@ -189,6 +189,17 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioTrack => new TranslatableString(getKey(@"audio_track"), @"Audio Track");
 
         /// <summary>
+        /// "Video"
+        /// </summary>
+        public static LocalisableString Video => new TranslatableString(getKey(@"video"), @"Video");
+
+        /// <summary>
+        /// "The video will be used instead of the static background, if present. Beatmap downloads are offered both with and without video, so it's best to provide both a background and a video."
+        /// </summary>
+        public static LocalisableString VideoHint => new TranslatableString(getKey(@"video_hint"),
+            @"The video will be used instead of the static background, if present. Beatmap downloads are offered both with and without video, so it's best to provide both a background and a video.");
+
+        /// <summary>
         /// "Custom sample sets"
         /// </summary>
         public static LocalisableString CustomSampleSets => new TranslatableString(getKey(@"custom_sample_sets"), @"Custom sample sets");
@@ -197,6 +208,11 @@ namespace osu.Game.Localisation
         /// "Click to select a track"
         /// </summary>
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
+
+        /// <summary>
+        /// "Click to select a video"
+        /// </summary>
+        public static LocalisableString ClickToSelectVideo => new TranslatableString(getKey(@"click_to_select_video"), @"Click to select a video");
 
         /// <summary>
         /// "Click to select a background image"
@@ -259,6 +275,11 @@ namespace osu.Game.Localisation
         /// "Drag image here to set beatmap background!"
         /// </summary>
         public static LocalisableString DragToSetBackground => new TranslatableString(getKey(@"drag_to_set_background"), @"Drag image here to set beatmap background!");
+
+        /// <summary>
+        /// "Drag video here to set beatmap video!"
+        /// </summary>
+        public static LocalisableString DragToSetVideo => new TranslatableString(getKey(@"drag_to_set_video"), @"Drag video here to set beatmap video!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
