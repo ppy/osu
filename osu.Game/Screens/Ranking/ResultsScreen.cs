@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Ranking
     [Cached]
     public abstract partial class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
-        protected const float BACKGROUND_BLUR = 20;
+        protected const float BACKGROUND_BLUR = 10;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -370,7 +370,7 @@ namespace osu.Game.Screens.Ranking
                 }
 
                 // allow a frame for scroll container to adjust its dimensions with the added scores before fetching again.
-                Schedule(() => tcs.SetResult());
+                Schedule(tcs.SetResult);
 
                 if (ScorePanelList.IsEmpty)
                 {

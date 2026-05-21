@@ -287,6 +287,10 @@ namespace osu.Game.Screens.Play
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score, ScoreProcessor, HealthProcessor, Beatmap.Value.Storyboard, PlayingState));
 
             var rulesetSkinProvider = new RulesetSkinProvidingContainer(ruleset, playableBeatmap, Beatmap.Value.Skin);
+            config.BindWith(OsuSetting.BeatmapSkins, rulesetSkinProvider.BeatmapSkins);
+            config.BindWith(OsuSetting.BeatmapColours, rulesetSkinProvider.BeatmapColours);
+            config.BindWith(OsuSetting.BeatmapHitsounds, rulesetSkinProvider.BeatmapHitsounds);
+
             GameplayClockContainer.Add(new GameplayScrollWheelHandling());
 
             // needs to exist in frame stable content, but is used by underlay layers so make sure assigned early.
@@ -311,41 +315,41 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(Beatmap.Value),
-                        createGameplayComponents(Beatmap.Value)
+                        createGameplayComponents()
                     }
                 },
                 FailOverlay = new FailOverlay
                 {
-                    SaveReplay = async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false),
+                    SaveReplay = Configuration.AllowUserInteraction ? async () => await prepareAndImportScoreAsync(true).ConfigureAwait(false) : null,
                     OnRetry = Configuration.AllowUserInteraction ? () => Restart() : null,
                     OnQuit = () => PerformExitWithConfirmation(),
-                },
-                exitOverlay = new HotkeyExitOverlay
-                {
-                    Action = () =>
-                    {
-                        if (!this.IsCurrentScreen()) return;
-
-                        PerformExit(skipTransition: true);
-                    },
                 },
             });
 
             if (cancellationToken.IsCancellationRequested)
                 return;
 
+            GameplayClockContainer.Add(exitOverlay = new HotkeyExitOverlay
+            {
+                Depth = float.MinValue,
+                Action = () =>
+                {
+                    if (!this.IsCurrentScreen()) return;
+
+                    PerformExit(skipTransition: true);
+                },
+            });
+
             if (Configuration.AllowRestart)
             {
-                rulesetSkinProvider.AddRange(new Drawable[]
+                GameplayClockContainer.Add(retryOverlay = new HotkeyRetryOverlay
                 {
-                    retryOverlay = new HotkeyRetryOverlay
+                    Depth = float.MinValue,
+                    Action = () =>
                     {
-                        Action = () =>
-                        {
-                            if (!this.IsCurrentScreen()) return;
+                        if (!this.IsCurrentScreen()) return;
 
-                            Restart(true);
-                        },
+                        Restart(true);
                     },
                 });
             }
@@ -360,6 +364,9 @@ namespace osu.Game.Screens.Play
             // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
             failAnimationContainer.Add(createOverlayComponents());
+
+            // Used by ReplaySettingsOverlay for button positioning.
+            dependencies.CacheAs(HUDOverlay);
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -451,7 +458,7 @@ namespace osu.Game.Screens.Play
             return container;
         }
 
-        private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents() => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {
@@ -474,7 +481,7 @@ namespace osu.Game.Screens.Play
                 Children = new[]
                 {
                     DimmableStoryboard.OverlayLayerContainer.CreateProxy(),
-                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, GameplayState.Mods, Configuration)
                     {
                         HoldToQuit =
                         {
@@ -1191,6 +1198,7 @@ namespace osu.Game.Screens.Play
             // Eagerly clean these up as disposal of child components is asynchronous and may leave sounds playing beyond user expectations.
             failAnimationContainer?.Stop();
             PauseOverlay?.StopAllSamples();
+            FailOverlay?.StopAllSamples();
 
             if (LoadedBeatmapSuccessfully && !GameplayState.HasPassed)
             {

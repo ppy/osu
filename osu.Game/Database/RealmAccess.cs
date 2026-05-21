@@ -1227,7 +1227,7 @@ namespace osu.Game.Database
                         var oldKeyBindingsQuery = migration.NewRealm
                                                            .All<RealmKeyBinding>()
                                                            .Where(kb => kb.RulesetName == @"mania" && kb.Variant == variant);
-                        var oldKeyBindings = oldKeyBindingsQuery.Detach();
+                        var oldKeyBindings = oldKeyBindingsQuery.AsEnumerable().Detach();
 
                         migration.NewRealm.RemoveRange(oldKeyBindingsQuery);
 

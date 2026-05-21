@@ -5,7 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Navigation

@@ -26,6 +26,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -36,7 +38,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -69,9 +70,9 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Seasonal;
 using osu.Game.Skinning;
 using osu.Game.Updater;
@@ -171,7 +172,7 @@ namespace osu.Game
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
-        protected SentryLogger SentryLogger;
+        private SentryLogger sentryLogger;
 
         public virtual StableStorage GetStorageForStableInstall() => null;
 
@@ -193,7 +194,7 @@ namespace osu.Game
 
         protected readonly Bindable<LocalUserPlayingState> UserPlayingState = new Bindable<LocalUserPlayingState>();
 
-        protected OsuScreenStack ScreenStack;
+        public OsuScreenStack ScreenStack { get; private set; }
 
         protected BackButton BackButton => screenStackFooter.BackButton;
         protected ScreenFooter ScreenFooter => screenStackFooter.Footer;
@@ -352,7 +353,7 @@ namespace osu.Game
         public override void SetupLogging(Storage gameStorage, Storage cacheStorage)
         {
             base.SetupLogging(gameStorage, cacheStorage);
-            SentryLogger = new SentryLogger(this, cacheStorage);
+            sentryLogger = new SentryLogger(this, cacheStorage);
         }
 
         public override void SetHost(GameHost host)
@@ -404,7 +405,7 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            SentryLogger.AttachUser(API.LocalUser);
+            sentryLogger.AttachUser(API.LocalUser);
 
             if (SeasonalUIConfig.ENABLED)
                 dependencies.CacheAs(osuLogo = new OsuLogoChristmas { Alpha = 0 });
@@ -762,7 +763,7 @@ namespace osu.Game
                 }
             }, validScreens: new[]
             {
-                typeof(SongSelect), typeof(Screens.SelectV2.SongSelect), typeof(IHandlePresentBeatmap)
+                typeof(SongSelect), typeof(IHandlePresentBeatmap)
             });
         }
 
@@ -865,7 +866,7 @@ namespace osu.Game
             // which may not match the score, and thus crash.
             IEnumerable<Type> validScreens =
                 Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
-                    ? new[] { typeof(SongSelect), typeof(Screens.SelectV2.SongSelect), typeof(DailyChallenge) }
+                    ? new[] { typeof(SongSelect), typeof(DailyChallenge) }
                     : Array.Empty<Type>();
 
             PerformFromScreen(screen =>
@@ -1027,7 +1028,7 @@ namespace osu.Game
 
             base.Dispose(isDisposing);
 
-            SentryLogger.Dispose();
+            sentryLogger.Dispose();
 
             if (Host?.Window != null)
                 Host.Window.DragDrop -= onWindowDragDrop;
@@ -1052,30 +1053,6 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            var languages = Enum.GetValues<Language>();
-
-            var mappings = languages.Select(language =>
-            {
-#if DEBUG
-                if (language == Language.debug)
-                    return new LocaleMapping("debug", new DebugLocalisationStore());
-#endif
-
-                string cultureCode = language.ToCultureCode();
-
-                try
-                {
-                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
-                    return null;
-                }
-            }).Where(m => m != null);
-
-            Localisation.AddLocaleMappings(mappings);
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
@@ -1139,6 +1116,7 @@ namespace osu.Game
                                 },
                                 new PopoverContainer
                                 {
+                                    // Ensure the footer is displayed above any content and/or overlays.
                                     Depth = -1,
                                     RelativeSizeAxes = Axes.Both,
                                     Child = screenStackFooter = new ScreenStackFooter(ScreenStack, backReceptor)
@@ -1317,6 +1295,55 @@ namespace osu.Game
 
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
+
+            applyConfigMigrations();
+
+            // finally, update the version stored to the configuration.
+            // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
+            // debug / local compilations will reset to a non-release string.
+            LocalConfig.SetValue(OsuSetting.Version, Version);
+        }
+
+        /// <summary>
+        /// Apply any migrations to configuration.
+        /// </summary>
+        /// <remarks>
+        /// For database migrations, see <see cref="RealmAccess.applyMigrationsForVersion"/>.
+        /// </remarks>
+        private void applyConfigMigrations()
+        {
+            // arrives as 2020.123.0-lazer
+            string rawVersion = LocalConfig.Get<string>(OsuSetting.Version);
+
+            if (rawVersion.Length < 6)
+                return;
+
+            string[] pieces = rawVersion.Split('.');
+
+            // on a fresh install or when coming from a non-release build, execution will end here.
+            // we don't want to run migrations in such cases.
+            if (!int.TryParse(pieces[0], out int year)) return;
+            if (!int.TryParse(pieces[1], out int monthDay)) return;
+
+            int combined = year * 10000 + monthDay;
+
+            if (combined < 20250214)
+            {
+                // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
+                if (RuntimeInfo.IsMobile)
+                    LocalConfig.GetBindable<float>(OsuSetting.UIScale).SetDefault();
+            }
+
+            if (combined < 20260520)
+            {
+                // Pen tablet sensitivity is now separated from cursor sensitivity.
+                // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
+                var mouseHandler = Host?.AvailableInputHandlers.OfType<MouseHandler>().SingleOrDefault();
+                var penHandler = Host?.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
+
+                if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
+                    penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
+            }
         }
 
         private void handleBackButton()
@@ -1380,10 +1407,17 @@ namespace osu.Game
 
             if (generalLogRecentCount < short_term_display_limit)
             {
+                LocalisableString message;
+
+                if (entry.Exception != null && IsDeployedBuild)
+                    message = LocalisableString.Interpolate($"{entry.Message.Truncate(256)}\n\n{NotificationsStrings.ErrorAutomaticallyReported}");
+                else
+                    message = entry.Message.Truncate(256);
+
                 Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {
                     Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                    Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
+                    Text = message
                 }));
             }
             else if (generalLogRecentCount == short_term_display_limit)
@@ -1577,6 +1611,20 @@ namespace osu.Game
                         return false;
 
                     SkinManager.SelectRandomSkin();
+                    return true;
+
+                case GlobalAction.NextSkin:
+                    if (skinEditor.State.Value == Visibility.Visible)
+                        return false;
+
+                    SkinManager.SelectNextSkin();
+                    return true;
+
+                case GlobalAction.PreviousSkin:
+                    if (skinEditor.State.Value == Visibility.Visible)
+                        return false;
+
+                    SkinManager.SelectPreviousSkin();
                     return true;
             }
 

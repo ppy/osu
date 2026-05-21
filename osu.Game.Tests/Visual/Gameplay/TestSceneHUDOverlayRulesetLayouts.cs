@@ -25,7 +25,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual.Spectator;
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             Children = new Drawable[]
                             {
                                 drawableRuleset,
-                                new HUDOverlay(drawableRuleset, [])
+                                new HUDOverlay(drawableRuleset, [], new PlayerConfiguration())
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }

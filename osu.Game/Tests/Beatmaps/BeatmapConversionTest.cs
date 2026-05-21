@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -133,7 +134,7 @@ namespace osu.Game.Tests.Beatmaps
 
                 string afterConversion = beatmap.Serialize();
 
-                Assert.AreEqual(beforeConversion, afterConversion, "Conversion altered original beatmap");
+                ClassicAssert.AreEqual(beforeConversion, afterConversion, "Conversion altered original beatmap");
 
                 return new ConvertResult
                 {

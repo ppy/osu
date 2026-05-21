@@ -247,7 +247,7 @@ namespace osu.Game.Tests.Beatmaps
 
             AddStep("change all start times", () =>
             {
-                editorBeatmap.HitObjectUpdated += h => updatedObjects.Add(h);
+                editorBeatmap.HitObjectUpdated += updatedObjects.Add;
 
                 for (int i = 0; i < 10; i++)
                     allHitObjects[i].StartTime += 10;
@@ -282,7 +282,7 @@ namespace osu.Game.Tests.Beatmaps
 
             AddStep("change start time twice", () =>
             {
-                editorBeatmap.HitObjectUpdated += h => updatedObjects.Add(h);
+                editorBeatmap.HitObjectUpdated += updatedObjects.Add;
 
                 editorBeatmap.HitObjects[0].StartTime = 10;
                 editorBeatmap.HitObjects[0].StartTime = 20;

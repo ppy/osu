@@ -274,15 +274,22 @@ namespace osu.Game.Users
 
             public InLobby(MultiplayerRoom room)
             {
-                if (room.Settings.MatchType == MatchType.Matchmaking)
+                switch (room.Settings.MatchType)
                 {
-                    RoomID = -1;
-                    RoomName = "Quick Play";
-                }
-                else
-                {
-                    RoomID = room.RoomID;
-                    RoomName = room.Settings.Name;
+                    case MatchType.Matchmaking:
+                        RoomID = -1;
+                        RoomName = "Quick Play";
+                        break;
+
+                    case MatchType.RankedPlay:
+                        RoomID = -1;
+                        RoomName = "Ranked Play";
+                        break;
+
+                    default:
+                        RoomID = room.RoomID;
+                        RoomName = room.Settings.Name;
+                        break;
                 }
             }
 

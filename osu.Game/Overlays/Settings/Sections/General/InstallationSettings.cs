@@ -20,14 +20,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
-            Add(new SettingsButton
+            Add(new SettingsButtonV2
             {
                 Text = GeneralSettingsStrings.OpenOsuFolder,
                 Keywords = new[] { @"logs", @"files", @"access", "directory" },
                 Action = () => storage.PresentExternally(),
             });
 
-            Add(new DangerousSettingsButton
+            Add(new DangerousSettingsButtonV2
             {
                 Text = GeneralSettingsStrings.ChangeFolderLocation,
                 Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))

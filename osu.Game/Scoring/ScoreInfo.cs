@@ -55,6 +55,7 @@ namespace osu.Game.Scoring
         /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
         /// </summary>
+        [Indexed]
         public string BeatmapHash { get; set; } = string.Empty;
 
         public RulesetInfo Ruleset { get; set; } = null!;
@@ -361,7 +362,7 @@ namespace osu.Game.Scoring
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
-            foreach (var r in Ruleset.CreateInstance().GetHitResults())
+            foreach (var r in Ruleset.CreateInstance().GetHitResultsForDisplay())
             {
                 int value = Statistics.GetValueOrDefault(r.result);
 

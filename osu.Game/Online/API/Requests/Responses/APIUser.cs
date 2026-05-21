@@ -247,6 +247,20 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
+        // Only provided via /users/ batch lookups. Usually implicitly comes inside `UserStatistics`.
+        [JsonProperty(@"global_rank")]
+        [CanBeNull]
+        public GlobalRank Rank { get; set; }
+
+        public class GlobalRank
+        {
+            [JsonProperty(@"rank")]
+            public int? Rank;
+
+            [JsonProperty(@"ruleset_id")]
+            public int RulesetId;
+        }
+
         [JsonProperty(@"rank_history")]
         private APIRankHistory rankHistory
         {
@@ -283,6 +297,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("daily_challenge_user_stats")]
         public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
 
+        [JsonProperty("matchmaking_stats")]
+        public APIUserMatchmakingStatistics[] MatchmakingStatistics = [];
+
         public override string ToString() => Username;
 
         /// <summary>
@@ -293,6 +310,12 @@ namespace osu.Game.Online.API.Requests.Responses
             Id = SYSTEM_USER_ID,
             Username = "system",
             Colour = @"9c0101",
+        };
+
+        public static APIUser UnknownUser(int userId) => new APIUser
+        {
+            Id = userId,
+            Username = "Unknown user",
         };
 
         public int OnlineID => Id;

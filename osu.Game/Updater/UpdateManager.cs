@@ -80,10 +80,6 @@ namespace osu.Game.Updater
                 Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
             }
 
-            // debug / local compilations will reset to a non-release string.
-            // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
-            config.SetValue(OsuSetting.Version, version);
-
             config.BindWith(OsuSetting.ReleaseStream, releaseStream);
             releaseStream.BindValueChanged(_ => CheckForUpdate());
 

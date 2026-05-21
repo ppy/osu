@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Replays
 {
     public class OsuAutoGenerator : OsuAutoGeneratorBase
     {
+        public const double MIN_FRAME_SEPARATION_FOR_ALTERNATING = 266;
+
         public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
 
         #region Parameters
@@ -245,7 +247,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
             OsuReplayFrame? lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
 
-            if (timeDifference > 0)
+            if (timeDifference >= 0)
             {
                 // If the last frame is a key-up frame and there has been no wait period, adjust the last frame's position such that it begins eased movement instantaneously.
                 if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited)
@@ -266,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
 
             // Start alternating once the time separation is too small (faster than ~225BPM).
-            if (timeDifference > 0 && timeDifference < 266)
+            if (timeDifference >= 0 && timeDifference < MIN_FRAME_SEPARATION_FOR_ALTERNATING)
                 buttonIndex++;
             else
                 buttonIndex = 0;
