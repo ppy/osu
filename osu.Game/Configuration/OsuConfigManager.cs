@@ -2,15 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
-using osu.Framework.Input.Handlers.Mouse;
-using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Drawables.Cards;
@@ -33,14 +30,9 @@ namespace osu.Game.Configuration
 {
     public class OsuConfigManager : IniConfigManager<OsuSetting>, IGameplaySettings
     {
-        private readonly GameHost? host;
-
-        public OsuConfigManager(Storage storage, GameHost? host = null)
+        public OsuConfigManager(Storage storage)
             : base(storage)
         {
-            this.host = host;
-
-            Migrate();
         }
 
         protected override void InitialiseDefaults()
@@ -256,42 +248,6 @@ namespace osu.Game.Configuration
             }
 
             return false;
-        }
-
-        public void Migrate()
-        {
-            // arrives as 2020.123.0-lazer
-            string rawVersion = Get<string>(OsuSetting.Version);
-
-            if (rawVersion.Length < 6)
-                return;
-
-            string[] pieces = rawVersion.Split('.');
-
-            // on a fresh install or when coming from a non-release build, execution will end here.
-            // we don't want to run migrations in such cases.
-            if (!int.TryParse(pieces[0], out int year)) return;
-            if (!int.TryParse(pieces[1], out int monthDay)) return;
-
-            int combined = year * 10000 + monthDay;
-
-            if (combined < 20250214)
-            {
-                // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
-                if (RuntimeInfo.IsMobile)
-                    GetBindable<float>(OsuSetting.UIScale).SetDefault();
-            }
-
-            if (combined < 20250428)
-            {
-                // Pen tablet sensitivity is now separated from cursor sensitivity.
-                // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
-                var mouseHandler = host?.AvailableInputHandlers.OfType<MouseHandler>().SingleOrDefault();
-                var penHandler = host?.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
-
-                if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
-                    penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
-            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
