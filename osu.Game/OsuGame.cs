@@ -1352,7 +1352,9 @@ namespace osu.Game
             {
                 bool wasAlreadyUsing = Audio.UseExperimentalWasapi.Value;
 
-                // account for users that already had this set on and had adjusted their offset.
+                // see application of FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET in FramedBeatmapClock.
+                // this basically undoes this new offset assuming that users which have been using this setting for a while
+                // already have had things tuned.
                 if (wasAlreadyUsing)
                     LocalConfig.SetValue(OsuSetting.AudioOffset, LocalConfig.Get<double>(OsuSetting.AudioOffset) - FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET);
 
