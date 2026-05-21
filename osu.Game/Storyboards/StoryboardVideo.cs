@@ -9,8 +9,8 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardVideo : StoryboardSprite
     {
-        public StoryboardVideo(string path, double offset)
-            : base(path, Anchor.Centre, Vector2.Zero)
+        public StoryboardVideo(StoryboardElementSource source, string path, double offset)
+            : base(source, path, Anchor.Centre, Vector2.Zero)
         {
             // This is just required to get a valid StartTime based on the incoming offset.
             // Actual fades are handled inside DrawableStoryboardVideo for now.
