@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             base.LoadComplete();
 
-            // Manual two-way binding because we're inversing what the framework exposes.
+            // Manual two-way binding because we're inverting what the framework exposes.
             Current.ValueChanged += legacy =>
             {
                 configExperimentalAudio.Value = !legacy.NewValue;
