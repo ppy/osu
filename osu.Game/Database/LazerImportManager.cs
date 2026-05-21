@@ -62,26 +62,35 @@ namespace osu.Game.Database
 
                     if (shouldImportBeatmaps)
                     {
-                        var beatmaps = sourceRealm.All<BeatmapSetInfo>();
+                        var beatmaps = sourceRealm.All<BeatmapSetInfo>().Where(b => !b.DeletePending);
                         foreach (var b in beatmaps)
                             foreach (var f in b.Files)
-                                filesToImport.Add(f.File.Hash);
+                            {
+                                if (f.File != null)
+                                    filesToImport.Add(f.File.Hash);
+                            }
                     }
 
                     if (shouldImportScores)
                     {
-                        var scores = sourceRealm.All<ScoreInfo>();
+                        var scores = sourceRealm.All<ScoreInfo>().Where(s => !s.DeletePending);
                         foreach (var s in scores)
                             foreach (var f in s.Files)
-                                filesToImport.Add(f.File.Hash);
+                            {
+                                if (f.File != null)
+                                    filesToImport.Add(f.File.Hash);
+                            }
                     }
 
                     if (shouldImportSkins)
                     {
-                        var skins = sourceRealm.All<SkinInfo>();
+                        var skins = sourceRealm.All<SkinInfo>().Where(s => !s.DeletePending && !s.Protected);
                         foreach (var s in skins)
                             foreach (var f in s.Files)
-                                filesToImport.Add(f.File.Hash);
+                            {
+                                if (f.File != null)
+                                    filesToImport.Add(f.File.Hash);
+                            }
                     }
 
                     if (filesToImport.Count > 0)
@@ -165,7 +174,8 @@ namespace osu.Game.Database
             {
                 if (notification.State == ProgressNotificationState.Cancelled) return;
 
-                if (existingIDs.Contains(set.ID))
+                // skip already-imported entries and entries with null file references
+                if (existingIDs.Contains(set.ID) || set.Files.Any(f => f.File == null))
                 {
                     current++;
                     notification.Text = $"Importing beatmaps ({current} of {total})";
@@ -178,6 +188,8 @@ namespace osu.Game.Database
                 newSet.Files.Clear();
                 foreach (var fileUsage in set.Files)
                 {
+                    if (fileUsage.File == null) continue;
+
                     var dbFile = destRealm.Find<RealmFile>(fileUsage.File.Hash);
                     if (dbFile != null)
                     {
@@ -243,6 +255,14 @@ namespace osu.Game.Database
                     continue;
                 }
 
+                // skip entries with null file references
+                if (score.Files.Any(f => f.File == null))
+                {
+                    current++;
+                    notification.Progress = (float)current / total;
+                    continue;
+                }
+
                 var newScore = score.Detach();
                 newScore.BeatmapInfo = targetBeatmap;
 
@@ -252,6 +272,8 @@ namespace osu.Game.Database
                 newScore.Files.Clear();
                 foreach (var fileUsage in score.Files)
                 {
+                    if (fileUsage.File == null) continue;
+
                     var dbFile = destRealm.Find<RealmFile>(fileUsage.File.Hash);
                     if (dbFile != null)
                     {
@@ -290,7 +312,8 @@ namespace osu.Game.Database
             {
                 if (notification.State == ProgressNotificationState.Cancelled) return;
 
-                if (existingIDs.Contains(skin.ID))
+                // skip already-imported, built-in skins, and entries with null file references
+                if (existingIDs.Contains(skin.ID) || skin.Protected || skin.Files.Any(f => f.File == null))
                 {
                     current++;
                     notification.Text = $"Importing skins ({current} of {total})";
@@ -303,6 +326,8 @@ namespace osu.Game.Database
                 newSkin.Files.Clear();
                 foreach (var fileUsage in skin.Files)
                 {
+                    if (fileUsage.File == null) continue;
+
                     var dbFile = destRealm.Find<RealmFile>(fileUsage.File.Hash);
                     if (dbFile != null)
                     {
