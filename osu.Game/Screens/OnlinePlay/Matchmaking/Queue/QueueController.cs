@@ -89,6 +89,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         public void IssueDuel(MatchmakingPool pool, int userId)
         {
+            if (client.Room?.Settings.MatchType.IsMatchmakingType() == true)
+                return;
+
             lastDuelUser = userId;
             lastDuelPool = pool;
 
