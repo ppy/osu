@@ -124,7 +124,8 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.TopCentre,
             });
 
-            AddInternal(new RulesetSkinProvidingContainer(GameplayState.Ruleset, GameplayState.Beatmap, Beatmap.Value.Skin)
+            RulesetSkinProvidingContainer rulesetSkinProvider;
+            AddInternal(rulesetSkinProvider = new RulesetSkinProvidingContainer(GameplayState.Ruleset, GameplayState.Beatmap, Beatmap.Value.Skin)
             {
                 Child = failIndicator = new ReplayFailIndicator(GameplayClockContainer)
                 {
@@ -138,6 +139,9 @@ namespace osu.Game.Screens.Play
                     }
                 }
             });
+            config.BindWith(OsuSetting.BeatmapSkins, rulesetSkinProvider.BeatmapSkins);
+            config.BindWith(OsuSetting.BeatmapColours, rulesetSkinProvider.BeatmapColours);
+            config.BindWith(OsuSetting.BeatmapHitsounds, rulesetSkinProvider.BeatmapHitsounds);
         }
 
         protected override void PrepareReplay()

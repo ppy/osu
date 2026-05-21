@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -29,6 +30,7 @@ using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.Play;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Users
 {
@@ -133,6 +135,16 @@ namespace osu.Game.Users
             Text = User.Username,
         };
 
+        protected OsuSpriteText CreateRank() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
+            Shadow = false,
+            // We can't colour the properly because we don't have the required percentile data.
+
+            Colour = Colours.BlueLighter,
+            Text = (User.Rank?.Rank ?? User.Statistics.GlobalRank)?.ToLocalisableString("\\##,##0") ?? string.Empty,
+        };
+
         protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
 
         protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
@@ -198,9 +210,9 @@ namespace osu.Game.Users
                 return items.ToArray();
 
                 bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
-                bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true;
+                bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true && multiplayerClient?.Room?.Settings.MatchType.IsMatchmakingType() != true;
                 bool isUserBlocked() => api.LocalUserState.Blocks.Any(b => b.TargetID == User.OnlineID);
-                bool canDuelUser() => isUserOnline() && queueController?.SelectedPool.Value != null;
+                bool canDuelUser() => isUserOnline() && queueController?.SelectedPool.Value != null && multiplayerClient?.Room?.Settings.MatchType.IsMatchmakingType() != true;
             }
         }
 
