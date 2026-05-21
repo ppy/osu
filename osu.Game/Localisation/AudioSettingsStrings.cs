@@ -72,12 +72,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Based on the last {0} play, your offset is set correctly!|Based on the last {0} plays, your offset is set correctly!"
         /// </summary>
-        public static LocalisableString SuggestedOffsetCorrect(int plays) => new PluralisableString(new TranslatableString(getKey(@"suggested_offset_correct"), @"Based on the last {0} play, your offset is set correctly!|Based on the last {0} plays, your offset is set correctly!", plays), plays, '|');
+        public static LocalisableString SuggestedOffsetCorrect(int playcount) => new PluralisableString(new TranslatableString(getKey(@"suggested_offset_correct"), @"Based on the last {0} play, your offset is set correctly!|Based on the last {0} plays, your offset is set correctly!", playcount), playcount, '|');
 
         /// <summary>
         /// "Based on the last {0} play, the suggested offset is {1} ms.|Based on the last {0} plays, the suggested offset is {1} ms."
         /// </summary>
-        public static LocalisableString SuggestedOffsetValueReceived(int plays, LocalisableString value) => new PluralisableString(new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play, the suggested offset is {1} ms.|Based on the last {0} plays, the suggested offset is {1} ms.", plays, value), plays, '|');
+        public static LocalisableString SuggestedOffsetValueReceived(int playcount, LocalisableString value) => new PluralisableString(new TranslatableString(getKey(@"suggested_offset_value_received"), @"Based on the last {0} play, the suggested offset is {1} ms.|Based on the last {0} plays, the suggested offset is {1} ms.", playcount, value), playcount, '|');
 
         /// <summary>
         /// "Apply suggested offset"

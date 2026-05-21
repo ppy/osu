@@ -272,7 +272,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "{0:#,0} match|{0:#,0} matches"
         /// </summary>
-        public static LocalisableString MatchUnit(int quantity) => new PluralisableString(new TranslatableString(getKey(@"match_unit"), @"{0:#,0} match|{0:#,0} matches", quantity), quantity, '|');
+        public static LocalisableString MatchUnit(int matchesCount) => new PluralisableString(new TranslatableString(getKey(@"match_unit"), @"{0:#,0} match|{0:#,0} matches", matchesCount), matchesCount, '|');
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

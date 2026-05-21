@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.TimeDisplay";
 
         /// <summary>
-        /// "{0}{1}"
+        /// "{0} {1}"
         /// </summary>
-        public static LocalisableString TimeDisplay(int timeUnit, LocalisableString timeString) => new TranslatableString(getKey(@"time_display"), @"{0}{1}", timeUnit, timeString);
+        public static LocalisableString TimeDisplay(int timeUnit, LocalisableString timeString) => new TranslatableString(getKey(@"time_display"), @"{0} {1}", timeUnit, timeString);
 
         /// <summary>
         /// "dy|dys"
