@@ -234,6 +234,41 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString RulesetNotSupportSaving => new TranslatableString(getKey(@"ruleset_not_support_saving"), @"Saving is not supported for this ruleset yet, sorry!");
 
+        /// <summary>
+        /// "Export failed!"
+        /// </summary>
+        public static LocalisableString ExportFailed => new TranslatableString(getKey(@"export_failed"), @"Export failed!");
+
+        /// <summary>
+        /// "Import failed!"
+        /// </summary>
+        public static LocalisableString ImportFailed => new TranslatableString(getKey(@"import_failed"), @"Import failed!");
+
+        /// <summary>
+        /// "Open folder"
+        /// </summary>
+        public static LocalisableString OpenFolder => new TranslatableString(getKey(@"open_folder"), @"Open folder");
+
+        /// <summary>
+        /// "Cleaning up..."
+        /// </summary>
+        public static LocalisableString CleaningUp => new TranslatableString(getKey(@"cleaning_up"), @"Cleaning up...");
+
+        /// <summary>
+        /// "Exporting for edit..."
+        /// </summary>
+        public static LocalisableString ExternalEditExporting => new TranslatableString(getKey(@"external_edit_exporting"), @"Exporting for edit...");
+
+        /// <summary>
+        /// "Beatmap is mounted externally"
+        /// </summary>
+        public static LocalisableString ExternalEditMounted => new TranslatableString(getKey(@"external_edit_mounted"), @"Beatmap is mounted externally");
+
+        /// <summary>
+        /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
+        /// </summary>
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
