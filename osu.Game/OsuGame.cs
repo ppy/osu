@@ -1350,13 +1350,15 @@ namespace osu.Game
 
             if (combined < 20260521 && RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
             {
+                bool wasAlreadyUsing = Audio.UseExperimentalWasapi.Value;
+
                 // account for users that already had this set on and had adjusted their offset.
-                if (Audio.UseExperimentalWasapi.Value)
+                if (wasAlreadyUsing)
                     LocalConfig.SetValue(OsuSetting.AudioOffset, LocalConfig.Get<double>(OsuSetting.AudioOffset) - FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET);
 
                 Audio.UseExperimentalWasapi.Value = true;
 
-                dialogOverlay.Push(new MigrateNewAudioDialog());
+                dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
             }
         }
 

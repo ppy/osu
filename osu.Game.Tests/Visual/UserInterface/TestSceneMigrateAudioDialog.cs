@@ -19,11 +19,20 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestBasic()
+        public void TestWasUsing()
         {
             AddStep("create dialog", () =>
             {
-                overlay.Push(new MigrateNewAudioDialog());
+                overlay.Push(new MigrateNewAudioDialog(true));
+            });
+        }
+
+        [Test]
+        public void TestNotUsing()
+        {
+            AddStep("create dialog", () =>
+            {
+                overlay.Push(new MigrateNewAudioDialog(false));
             });
         }
     }

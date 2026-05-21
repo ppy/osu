@@ -17,19 +17,45 @@ namespace osu.Game.Configuration
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        public MigrateNewAudioDialog()
+        public MigrateNewAudioDialog(bool wasAlreadyUsing)
         {
             Icon = FontAwesome.Regular.Bell;
 
-            HeaderText = @"New audio engine has been enabled";
-            BodyText =
-                $"""
-                 We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now default mode.
+            if (wasAlreadyUsing)
+            {
+                HeaderText = @"New audio engine is now default!";
+                BodyText =
+                    $"""
+                     We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now default mode.
 
-                 If you were already using this engine, your audio offset has been adjusted to account an internal offset change (no intervention required).
+                     As you were already using this engine, your audio offset has been adjusted to account an internal offset change (no intervention required).
 
-                 If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the "{AudioSettingsStrings.LegacyAudioLabel}" checkbox.
-                 """;
+                     If you have any issues, you can switch back to the legacy engine from settings via the "{AudioSettingsStrings.LegacyAudioLabel}" checkbox.
+                     """;
+            }
+            else
+            {
+                HeaderText = @"New audio engine has been enabled";
+                BodyText =
+                    $"""
+                     We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now default mode.
+
+                     If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the "{AudioSettingsStrings.LegacyAudioLabel}" checkbox.
+                     """;
+
+                MainContent.Add(new Container
+                {
+                    Margin = new MarginPadding { Top = 20 },
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 400,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        new LegacyAudioCheckbox(),
+                    }
+                });
+            }
 
             Buttons = new PopupDialogButton[]
             {
@@ -38,19 +64,6 @@ namespace osu.Game.Configuration
                     Text = BeatmapOverlayStrings.UserContentConfirmButtonText,
                 },
             };
-
-            MainContent.Add(new Container
-            {
-                Margin = new MarginPadding { Top = 20 },
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 400,
-                AutoSizeAxes = Axes.Y,
-                Children = new Drawable[]
-                {
-                    new LegacyAudioCheckbox(),
-                }
-            });
         }
     }
 }
