@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
             });
 
-            Add(new DangerousSettingsButton
+            Add(new DangerousSettingsButtonV2
             {
                 Text = "Merge another osu!lazer install",
                 Action = () => game?.PerformFromScreen(menu => menu.Push(new ScreenImportFromLazer()))
