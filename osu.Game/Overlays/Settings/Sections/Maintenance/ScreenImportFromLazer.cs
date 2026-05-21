@@ -49,13 +49,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private Container contentContainer = null!;
         private DirectorySelector directorySelector = null!;
-        private RoundedButton importButton = null!;
+        private FormButton importButton = null!;
         private TextFlowContainer statusText = null!;
 
-        private SettingsCheckbox checkboxBeatmaps = null!;
-        private SettingsCheckbox checkboxScores = null!;
-        private SettingsCheckbox checkboxSkins = null!;
-        private SettingsCheckbox checkboxCollections = null!;
+        private FillFlowContainer checkboxesContainer = null!;
+        private FormCheckBox checkboxBeatmaps = null!;
+        private FormCheckBox checkboxScores = null!;
+        private FormCheckBox checkboxSkins = null!;
+        private FormCheckBox checkboxCollections = null!;
 
         private string? fullLazerPath;
 
@@ -66,26 +67,15 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [BackgroundDependencyLoader]
         private void load()
         {
-            checkboxBeatmaps = new SettingsCheckbox
+            checkboxesContainer = new FillFlowContainer
             {
-                LabelText = "Beatmaps",
-                Current = { Value = false, Disabled = true }
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 5),
             };
-            checkboxScores = new SettingsCheckbox
-            {
-                LabelText = "Scores",
-                Current = { Value = false, Disabled = true }
-            };
-            checkboxSkins = new SettingsCheckbox
-            {
-                LabelText = "Skins",
-                Current = { Value = false, Disabled = true }
-            };
-            checkboxCollections = new SettingsCheckbox
-            {
-                LabelText = "Collections",
-                Current = { Value = false, Disabled = true }
-            };
+
+            resetLabels();
 
             InternalChild = contentContainer = new Container
             {
@@ -138,10 +128,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                                 Colour = colourProvider.Content1,
                                                 Margin = new MarginPadding { Bottom = 10 }
                                             },
-                                            checkboxBeatmaps,
-                                            checkboxScores,
-                                            checkboxSkins,
-                                            checkboxCollections,
+                                            checkboxesContainer,
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.X,
@@ -159,13 +146,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     }
                                 }
                             },
-                            importButton = new RoundedButton
+                            importButton = new FormButton
                             {
-                                Text = "Start Import",
+                                Caption = "Import selected data from the chosen installation",
+                                ButtonText = "Start Import",
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 RelativeSizeAxes = Axes.X,
-                                Height = button_height,
                                 Width = 0.9f,
                                 Margin = new MarginPadding { Bottom = button_vertical_margin },
                                 Action = startImport,
@@ -233,10 +220,18 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             statusText.Text = "";
 
-                            updateCheckbox(checkboxBeatmaps, "Beatmaps", countMaps);
-                            updateCheckbox(checkboxScores, "Scores", countScores);
-                            updateCheckbox(checkboxSkins, "Skins", countSkins);
-                            updateCheckbox(checkboxCollections, "Collections", countCollections);
+                            checkboxBeatmaps = createCheckbox("Beatmaps", countMaps);
+                            checkboxScores = createCheckbox("Scores", countScores);
+                            checkboxSkins = createCheckbox("Skins", countSkins);
+                            checkboxCollections = createCheckbox("Collections", countCollections);
+
+                            checkboxesContainer.Children = new Drawable[]
+                            {
+                                checkboxBeatmaps,
+                                checkboxScores,
+                                checkboxSkins,
+                                checkboxCollections
+                            };
 
                             fullLazerPath = proposedPath;
                             importButton.Enabled.Value = true;
@@ -253,45 +248,38 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private void resetLabels()
         {
-            checkboxBeatmaps.Current.Disabled = false;
-            checkboxScores.Current.Disabled = false;
-            checkboxSkins.Current.Disabled = false;
-            checkboxCollections.Current.Disabled = false;
+            checkboxBeatmaps = new FormCheckBox { Caption = "Beatmaps", Current = { Value = false, Disabled = true } };
+            checkboxScores = new FormCheckBox { Caption = "Scores", Current = { Value = false, Disabled = true } };
+            checkboxSkins = new FormCheckBox { Caption = "Skins", Current = { Value = false, Disabled = true } };
+            checkboxCollections = new FormCheckBox { Caption = "Collections", Current = { Value = false, Disabled = true } };
 
-            checkboxBeatmaps.LabelText = "Beatmaps";
-            checkboxScores.LabelText = "Scores";
-            checkboxSkins.LabelText = "Skins";
-            checkboxCollections.LabelText = "Collections";
-
-            checkboxBeatmaps.Current.Value = false;
-            checkboxScores.Current.Value = false;
-            checkboxSkins.Current.Value = false;
-            checkboxCollections.Current.Value = false;
-
-            checkboxBeatmaps.Current.Disabled = true;
-            checkboxScores.Current.Disabled = true;
-            checkboxSkins.Current.Disabled = true;
-            checkboxCollections.Current.Disabled = true;
+            checkboxesContainer.Children = new Drawable[]
+            {
+                checkboxBeatmaps,
+                checkboxScores,
+                checkboxSkins,
+                checkboxCollections
+            };
         }
 
-        private void updateCheckbox(SettingsCheckbox checkbox, string name, int count)
+        private FormCheckBox createCheckbox(string name, int count)
         {
-            checkbox.Current.Disabled = false;
-
             if (count > 0)
             {
-                checkbox.LabelText = $"{name} ({count:N0})";
-                checkbox.Current.Value = true;
-                checkbox.Alpha = 1;
+                return new FormCheckBox
+                {
+                    Caption = $"{name} ({count:N0})",
+                    Current = { Value = true, Disabled = false },
+                    Alpha = 1
+                };
             }
-            else
-            {
-                checkbox.LabelText = $"{name} (None found)";
-                checkbox.Current.Value = false;
 
-                checkbox.Current.Disabled = true;
-                checkbox.Alpha = 0.5f;
-            }
+            return new FormCheckBox
+            {
+                Caption = $"{name} (None found)",
+                Current = { Value = false, Disabled = true },
+                Alpha = 0.5f
+            };
         }
 
         private void startImport()
