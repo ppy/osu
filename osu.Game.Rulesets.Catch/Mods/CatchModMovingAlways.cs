@@ -73,18 +73,18 @@ namespace osu.Game.Rulesets.Catch.Mods
                 {
                     case CatchAction.MoveLeft:
                         if (currentDirection == right) // act out an extra left key press to transition to moving left instead of a stop
-                            catcherArea.OnPressed((new KeyBindingPressEvent<CatchAction>(new InputState(), CatchAction.MoveLeft)));
+                            catcherArea.OnPressed(new KeyBindingPressEvent<CatchAction>(new InputState(), CatchAction.MoveLeft));
                         else // act out a neutralizing left key release to stay moving left instead of moving faster left
-                            catcherArea.OnReleased((new KeyBindingReleaseEvent<CatchAction>(new InputState(), CatchAction.MoveLeft)));
+                            catcherArea.OnReleased(new KeyBindingReleaseEvent<CatchAction>(new InputState(), CatchAction.MoveLeft));
 
                         currentDirection = left;
                         break;
 
                     case CatchAction.MoveRight:
                         if (currentDirection == left) // act out an extra right key press to transition to moving right instead of a stop
-                            catcherArea.OnPressed((new KeyBindingPressEvent<CatchAction>(new InputState(), CatchAction.MoveRight)));
+                            catcherArea.OnPressed(new KeyBindingPressEvent<CatchAction>(new InputState(), CatchAction.MoveRight));
                         else // act out a neutralizing right key release to stay moving right instead of moving faster right
-                            catcherArea.OnReleased((new KeyBindingReleaseEvent<CatchAction>(new InputState(), CatchAction.MoveRight)));
+                            catcherArea.OnReleased(new KeyBindingReleaseEvent<CatchAction>(new InputState(), CatchAction.MoveRight));
 
                         currentDirection = right;
                         break;
