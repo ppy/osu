@@ -1310,7 +1310,6 @@ namespace osu.Game
         /// <remarks>
         /// For database migrations, see <see cref="RealmAccess.applyMigrationsForVersion"/>.
         /// </remarks>
-        /// <exception cref="NotImplementedException"></exception>
         private void applyConfigMigrations()
         {
             // arrives as 2020.123.0-lazer
