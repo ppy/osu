@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
-using FFmpeg.AutoGen;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -310,7 +309,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 // this can be moved inside the `MatchFoundNotification` implementation.
                 matchFoundSample?.Play();
 
-                return foundNotification = new MatchFoundNotification(controller)
+                return foundNotification = new MatchFoundNotification
                 {
                     Activated = CompletionClickAction,
                     Text = MultiplayerMatchStrings.MatchIsReady,
