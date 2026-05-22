@@ -333,11 +333,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 [Resolved]
                 private MultiplayerClient client { get; set; } = null!;
 
-                public MatchFoundNotification(QueueController controller)
-                {
-                    this.controller = controller;
-                }
-
                 private void onMatchmakingQueueLeft()
                 {
                     Close(false);
