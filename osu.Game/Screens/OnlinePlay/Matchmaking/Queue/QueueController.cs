@@ -80,7 +80,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             lastDuelPool = null;
             QueueTimer.Restart();
 
-            client.MatchmakingJoinQueue(pool.Id).FireAndForget();
+            client.MatchmakingJoinQueueWithParams(new MatchmakingJoinQueueRequest
+            {
+                PoolId = pool.Id
+            }).FireAndForget();
         }
 
         /// <summary>
