@@ -14,7 +14,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public partial class SetupScreenHeaderBackground : CompositeDrawable
+    public partial class SetupScreenBackgroundPreview : CompositeDrawable
     {
         [Resolved]
         private OsuColour colours { get; set; } = null!;
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private readonly Container content;
 
-        public SetupScreenHeaderBackground()
+        public SetupScreenBackgroundPreview()
         {
             InternalChild = content = new Container
             {
