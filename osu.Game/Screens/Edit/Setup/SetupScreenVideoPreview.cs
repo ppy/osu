@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -107,7 +108,8 @@ namespace osu.Game.Screens.Edit.Setup
         {
             base.Dispose(isDisposing);
 
-            textureStore.Dispose();
+            if (textureStore.IsNotNull())
+                textureStore.Dispose();
         }
     }
 }
