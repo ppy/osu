@@ -342,6 +342,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 protected override void Update()
                 {
                     base.Update();
+
                     if (isValid && controller.CurrentState.Value != ScreenQueue.MatchmakingScreenState.PendingAccept)
                     {
                         Close(false);
