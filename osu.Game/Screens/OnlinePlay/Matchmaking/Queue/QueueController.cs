@@ -247,6 +247,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             [Resolved]
             private MultiplayerClient client { get; set; } = null!;
 
+            [Resolved]
+            private INotificationOverlay? notifications { get; set; }
+
+            private bool isValid = true;
+
             private readonly QueueController controller;
 
             private Notification? foundNotification;
@@ -285,12 +290,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                // This means the user has exited the queue in an abnormal way (Invitation time out etc.)
+                if (isValid && controller.CurrentState.Value == ScreenQueue.MatchmakingScreenState.Idle)
+                {
+                    CloseAll();
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = MultiplayerMatchStrings.MatchInvalid,
+                        Icon = FontAwesome.Solid.InfoCircle,
+                    });
+                    isValid = false;
+                }
+            }
+
             public void Complete(MatchmakingRoomInvitationParams invitation)
             {
                 CompletionClickAction = () =>
                 {
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+                    if (controller.CurrentState.Value == ScreenQueue.MatchmakingScreenState.PendingAccept) controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
 
                     performer?.PerformFromScreen(s => s.Push(new ScreenIntro(invitation.Type)));
 

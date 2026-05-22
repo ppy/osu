@@ -49,6 +49,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString MatchIsReady => new TranslatableString(getKey(@"match_is_ready"), @"Your match is ready! Click to join.");
 
+        /// <summary>
+        /// "Your match has been invalidated, please queue again. (Most common reason: Match timed out)"
+        /// </summary>
+        public static LocalisableString MatchInvalid => new TranslatableString(getKey(@"match_invalid"), @"Your match has been invalidated, please queue again. (Most common reason: Match timed out)");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
