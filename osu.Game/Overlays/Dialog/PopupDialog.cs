@@ -40,6 +40,8 @@ namespace osu.Game.Overlays.Dialog
         private readonly TextFlowContainer header;
         private readonly TextFlowContainer body;
 
+        public Container MainContent { get; private set; }
+
         private bool actionInvoked;
 
         public IconUsage Icon
@@ -220,6 +222,13 @@ namespace osu.Game.Overlays.Dialog
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = 15 },
+                                },
+                                MainContent = new Container
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
                                 },
                                 buttonsContainer = new FillFlowContainer<PopupDialogButton>
                                 {
