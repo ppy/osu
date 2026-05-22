@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using FFmpeg.AutoGen;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -329,39 +330,42 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 [Resolved]
                 private INotificationOverlay? notifications { get; set; }
 
+
+                [Resolved]
+                private MultiplayerClient client { get; set; } = null!;
+
                 private bool isValid = true;
 
                 private readonly QueueController controller;
 
                 public MatchFoundNotification(QueueController controller)
                 {
-                    IsCritical = true;
                     this.controller = controller;
                 }
 
-                protected override void Update()
+                private void onMatchmakingQueueLeft()
                 {
-                    base.Update();
-
-                    if (isValid && controller.CurrentState.Value != ScreenQueue.MatchmakingScreenState.PendingAccept)
+                    Close(false);
+                    notifications?.Post(new SimpleNotification
                     {
-                        Close(false);
-                        notifications?.Post(new SimpleNotification
-                        {
-                            Text = MultiplayerMatchStrings.MatchInvalid,
-                            Icon = FontAwesome.Solid.InfoCircle,
-                            IsCritical = true
-                        });
-                        isValid = false;
-                    }
+                        Text = MultiplayerMatchStrings.MatchInvalid,
+                        Icon = FontAwesome.Solid.InfoCircle,
+                        IsCritical = true
+                    });
                 }
-
 
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
                     Icon = FontAwesome.Solid.Bolt;
                     IconContent.Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.YellowLight);
+                    client.MatchmakingQueueLeft += onMatchmakingQueueLeft;
+                }
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;
                 }
             }
         }
