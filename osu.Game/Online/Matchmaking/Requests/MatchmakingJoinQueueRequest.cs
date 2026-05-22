@@ -3,6 +3,7 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.API;
 
 namespace osu.Game.Online.Matchmaking.Requests
 {
@@ -12,5 +13,8 @@ namespace osu.Game.Online.Matchmaking.Requests
     {
         [Key(0)]
         public int PoolId { get; set; }
+
+        [Key(1)]
+        public APIMod[] Mods { get; set; } = [];
     }
 }
