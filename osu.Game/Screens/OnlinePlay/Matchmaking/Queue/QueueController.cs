@@ -247,11 +247,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             [Resolved]
             private MultiplayerClient client { get; set; } = null!;
 
-            [Resolved]
-            private INotificationOverlay? notifications { get; set; }
-
-            private bool isValid = true;
-
             private readonly QueueController controller;
 
             private Notification? foundNotification;
@@ -290,23 +285,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
             }
 
-            protected override void Update()
-            {
-                base.Update();
-
-                // This means the user has exited the queue in an abnormal way (Invitation time out etc.)
-                if (isValid && controller.CurrentState.Value == ScreenQueue.MatchmakingScreenState.Idle)
-                {
-                    CloseAll();
-                    notifications?.Post(new SimpleNotification
-                    {
-                        Text = MultiplayerMatchStrings.MatchInvalid,
-                        Icon = FontAwesome.Solid.InfoCircle,
-                    });
-                    isValid = false;
-                }
-            }
-
             public void Complete(MatchmakingRoomInvitationParams invitation)
             {
                 CompletionClickAction = () =>
@@ -331,7 +309,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 // this can be moved inside the `MatchFoundNotification` implementation.
                 matchFoundSample?.Play();
 
-                return foundNotification = new MatchFoundNotification
+                return foundNotification = new MatchFoundNotification(controller)
                 {
                     Activated = CompletionClickAction,
                     Text = MultiplayerMatchStrings.MatchIsReady,
@@ -348,10 +326,35 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
 
-                public MatchFoundNotification()
+                [Resolved]
+                private INotificationOverlay? notifications { get; set; }
+
+                private bool isValid = true;
+
+                private readonly QueueController controller;
+
+                public MatchFoundNotification(QueueController controller)
                 {
                     IsCritical = true;
+                    this.controller = controller;
                 }
+
+                protected override void Update()
+                {
+                    base.Update();
+                    if (isValid && controller.CurrentState.Value != ScreenQueue.MatchmakingScreenState.PendingAccept)
+                    {
+                        Close(false);
+                        notifications?.Post(new SimpleNotification
+                        {
+                            Text = MultiplayerMatchStrings.MatchInvalid,
+                            Icon = FontAwesome.Solid.InfoCircle,
+                            IsCritical = true
+                        });
+                        isValid = false;
+                    }
+                }
+
 
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
