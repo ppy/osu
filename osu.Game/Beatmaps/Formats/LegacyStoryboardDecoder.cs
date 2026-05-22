@@ -120,6 +120,20 @@ namespace osu.Game.Beatmaps.Formats
 
                 switch (type)
                 {
+                    case LegacyEventType.Background:
+                    {
+                        // the actual filename is handled in `LegacyBeatmapDecoder`.
+                        // this only handles the background offset, because it does not logically belong in `Beatmap` or related classes.
+                        if (split.Length > 4)
+                        {
+                            float x = Parsing.ParseFloat(split[3]);
+                            float y = Parsing.ParseFloat(split[4]);
+                            storyboard.BackgroundOffset = new Vector2(x, y);
+                        }
+
+                        break;
+                    }
+
                     case LegacyEventType.Video:
                     {
                         int offset = Parsing.ParseInt(split[1]);

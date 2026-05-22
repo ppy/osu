@@ -54,10 +54,9 @@ namespace osu.Game.Beatmaps.Formats
             if (target == StoryboardElementSource.Beatmap)
             {
                 // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1499
-                // TODO: handle nonzero background offset (https://github.com/ppy/osu/issues/14238)
                 writer.WriteLine(string.Format(CultureInfo.InvariantCulture,
                     @"{0},{1},""{2}"",{3},{4}",
-                    (int)LegacyEventType.Background, 0, storyboard.BeatmapInfo.Metadata.BackgroundFile, 0, 0));
+                    (int)LegacyEventType.Background, 0, storyboard.BeatmapInfo.Metadata.BackgroundFile, storyboard.BackgroundOffset.X, storyboard.BackgroundOffset.Y));
             }
 
             // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1496
