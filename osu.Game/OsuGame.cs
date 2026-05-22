@@ -1301,10 +1301,17 @@ namespace osu.Game
 
             applyConfigMigrations();
 
+            string lastVersion = LocalConfig.Get<string>(OsuSetting.Version);
+            string version = Version;
+
+            // only show a notification if we've previously saved a version to the config file (ie. not the first run).
+            if (IsDeployedBuild && !string.IsNullOrEmpty(lastVersion) && version != lastVersion)
+                Notifications.Post(new UpdateCompleteNotification(version));
+
             // finally, update the version stored to the configuration.
             // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
             // debug / local compilations will reset to a non-release string.
-            LocalConfig.SetValue(OsuSetting.Version, Version);
+            LocalConfig.SetValue(OsuSetting.Version, version);
         }
 
         /// <summary>
