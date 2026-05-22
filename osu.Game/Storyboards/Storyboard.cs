@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Storyboards
 {
@@ -97,6 +98,12 @@ namespace osu.Game.Storyboards
                 return GetLayer("Background").Elements.Any(e => string.Equals(e.Path, backgroundPath, StringComparison.OrdinalIgnoreCase));
             }
         }
+
+        /// <summary>
+        /// Offset to be applied to the beatmap background.
+        /// TODO: Unused yet. See https://github.com/ppy/osu/issues/14238.
+        /// </summary>
+        public Vector2 BackgroundOffset { get; set; } = Vector2.Zero;
 
         public virtual DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);
