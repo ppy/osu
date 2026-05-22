@@ -188,6 +188,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                                             Caption = "File selector",
                                             PlaceholderText = "Select a file",
                                         },
+                                        new FormFileSelector
+                                        {
+                                            Caption = "File selector with deselection",
+                                            PlaceholderText = "Select a file",
+                                            AllowClear = true,
+                                        },
                                         new FormBeatmapFileSelector(true)
                                         {
                                             Caption = "File selector with intermediate choice dialog",
