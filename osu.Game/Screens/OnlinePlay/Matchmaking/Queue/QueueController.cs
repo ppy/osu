@@ -330,13 +330,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 [Resolved]
                 private INotificationOverlay? notifications { get; set; }
 
-
                 [Resolved]
                 private MultiplayerClient client { get; set; } = null!;
-
-                private bool isValid = true;
-
-                private readonly QueueController controller;
 
                 public MatchFoundNotification(QueueController controller)
                 {
