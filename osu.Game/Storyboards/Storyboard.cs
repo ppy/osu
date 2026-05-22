@@ -53,6 +53,8 @@ namespace osu.Game.Storyboards
                                                 .Where(e => e is not StoryboardVideo)
                                                 .MaxBy(e => e.GetEndTime())?.GetEndTime();
 
+        public StoryboardVideo? PrimaryVideo => GetLayer(@"Video").Elements.OfType<StoryboardVideo>().FirstOrDefault();
+
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
         /// </summary>
