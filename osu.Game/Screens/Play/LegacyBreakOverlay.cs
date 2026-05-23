@@ -18,11 +18,11 @@ namespace osu.Game.Screens.Play
 {
     public partial class LegacyBreakOverlay : SkinReloadableDrawable
     {
-        private const int pass_blink_duration = 100;
+        private const int pass_blink_interval = 100;
         private const int pass_last_blink_duration = 1000;
         private const int pass_last_fade_out_duration = 200;
 
-        private const int arrows_blink_duration = 100;
+        private const int arrows_blink_interval = 100;
         private const int arrows_blink_times = 7;
 
         private readonly HealthProcessor healthProcessor;
@@ -98,11 +98,11 @@ namespace osu.Game.Screens.Play
             }
 
             double t = Time.Current;
-            double s = lastBreak.Value.Start;
-            double e = lastBreak.Value.End + BreakOverlay.BREAK_FADE_DURATION;
-            double h = s + lastBreak.Value.Duration / 2;
+            double breakStart = lastBreak.Value.Start;
+            double breakEnd = lastBreak.Value.End + BreakOverlay.BREAK_FADE_DURATION;
+            double breakHalf = breakStart + lastBreak.Value.Duration / 2;
 
-            if (t < s || t > e)
+            if (t < breakStart || t > breakEnd)
             {
                 lastBreak = null;
                 return;
@@ -110,13 +110,13 @@ namespace osu.Game.Screens.Play
 
             Sprite resultSprite = healthProcessor.Health.Value >= 0.5 ? sectionPassSprite : sectionFailSprite;
 
-            double vs = h;
-            resultSprite.Alpha = t > vs && t < vs + pass_blink_duration ? 1 : 0;
+            double vs = breakHalf;
+            resultSprite.Alpha = t > vs && t < vs + pass_blink_interval ? 1 : 0;
 
-            vs += pass_blink_duration * 2;
-            resultSprite.Alpha = t > vs && t < vs + pass_blink_duration ? 1 : resultSprite.Alpha;
+            vs += pass_blink_interval * 2;
+            resultSprite.Alpha = t > vs && t < vs + pass_blink_interval ? 1 : resultSprite.Alpha;
 
-            vs += pass_blink_duration * 2;
+            vs += pass_blink_interval * 2;
             resultSprite.Alpha = t > vs && t < vs + pass_last_blink_duration ? 1 : resultSprite.Alpha;
 
             vs += pass_last_blink_duration;
@@ -124,8 +124,8 @@ namespace osu.Game.Screens.Play
             if (t > vs && t < vs + pass_last_fade_out_duration)
                 resultSprite.Alpha = Interpolation.ValueAt(t, 1f, 0f, vs, vs + pass_last_fade_out_duration);
 
-            vs = e - arrows_blink_times * arrows_blink_duration * 2 - arrows_blink_duration;
-            legacyBreakArrows.Alpha = t > vs && t < e && (int)(e - t) / arrows_blink_duration % 2 == 0 ? 1 : 0;
+            vs = breakEnd - arrows_blink_times * arrows_blink_interval * 2 - arrows_blink_interval;
+            legacyBreakArrows.Alpha = t > vs && t < breakEnd && (int)(breakEnd - t) / arrows_blink_interval % 2 == 0 ? 1 : 0;
         }
 
         private void updateDisplay(ValueChangedEvent<Period?> period)
