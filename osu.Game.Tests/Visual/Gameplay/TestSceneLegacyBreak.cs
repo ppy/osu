@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
         [SetUp]
-        public void SetUp()
+        public void SetUp() => Schedule(() =>
         {
             Child = new SkinProvidingContainer(skins.DefaultClassicSkin)
             {
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     },
                 }
             };
-        }
+        });
 
         protected override void Update()
         {
