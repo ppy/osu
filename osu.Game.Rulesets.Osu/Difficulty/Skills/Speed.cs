@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -10,7 +11,10 @@ using osu.Game.Rulesets.Osu.Objects;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -86,6 +90,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 sliderStrains.Add(totalValue);
 
             return totalValue;
+        }
+
+        private double calculateAdjustedDifficulty(DifficultyHitObject current)
+        {
+            double difficulty = SpeedEvaluator.EvaluateDifficultyOf(current);
+
+            if (Mods.Any(m => m is OsuModAutopilot))
+                difficulty *= 0.5;
+
+            return difficulty;
         }
 
         public double RelevantNoteCount()

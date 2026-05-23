@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double smallDistNerf = 1.0;
             double cumulativeStrainTime = 0.0;
 
-            double result = 0.0;
+            double flashlightDifficulty = 0.0;
 
             OsuDifficultyHitObject lastObj = osuCurrent;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Bonus based on how visible the object is.
                     double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value)));
 
-                    result += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
+                    flashlightDifficulty += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
 
                     if (currentObj.Angle != null && osuCurrent.Angle != null)
                     {
@@ -85,14 +85,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 lastObj = currentObj;
             }
 
-            result = Math.Pow(smallDistNerf * result, 2.0);
+            flashlightDifficulty = Math.Pow(smallDistNerf * flashlightDifficulty, 2.0);
 
             // Additional bonus for Hidden due to there being no approach circles.
             if (mods.OfType<OsuModHidden>().Any())
-                result *= 1.0 + hidden_bonus;
+                flashlightDifficulty *= 1.0 + hidden_bonus;
 
             // Nerf patterns with repeated angles.
-            result *= min_angle_multiplier + (1.0 - min_angle_multiplier) / (angleRepeatCount + 1.0);
+            flashlightDifficulty *= min_angle_multiplier + (1.0 - min_angle_multiplier) / (angleRepeatCount + 1.0);
 
             double sliderBonus = 0.0;
 
@@ -112,9 +112,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     sliderBonus /= (osuSlider.RepeatCount + 1);
             }
 
-            result += sliderBonus * slider_multiplier;
+            flashlightDifficulty += sliderBonus * slider_multiplier;
 
-            return result;
+            return flashlightDifficulty;
         }
     }
 }

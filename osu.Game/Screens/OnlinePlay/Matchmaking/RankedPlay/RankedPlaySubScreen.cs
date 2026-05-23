@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
@@ -24,19 +23,30 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public virtual bool ShowBeatmapBackground => false;
 
         /// <summary>
+        /// Whether a fullscreen overlay displaying the current stage (and any additional
+        /// information like the currently picking player and/or the damage multiplier)
+        /// should be displayed upon entering this screen.
+        /// </summary>
+        public virtual bool ShowStageOverlay => false;
+
+        /// <summary>
         /// Heading text to be displayed indicating the purpose of the current stage.
         /// </summary>
-        protected abstract LocalisableString StageHeading { get; }
+        public abstract LocalisableString StageHeading { get; }
 
         /// <summary>
         /// Subtitle text to be displayed indicating the action a user should take in the current stage.
         /// </summary>
-        protected abstract LocalisableString StageCaption { get; }
+        protected LocalisableString StageCaption
+        {
+            get => StageDisplay.Caption;
+            set => StageDisplay.Caption = value;
+        }
 
         /// <summary>
         /// The colour scheme commonly used for components of this screen.
         /// </summary>
-        protected virtual RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Blue;
+        protected virtual RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.BLUE;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
@@ -44,8 +54,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         protected MultiplayerClient Client => client;
 
         protected override Container<Drawable> Content { get; }
+
+        /// <summary>
+        /// Column in the centre of the screen whose width is calculated so its content don't overlap with the <see cref="RankedPlayCornerPiece"/>s
+        /// </summary>
         protected readonly Container CenterColumn;
-        protected readonly FillFlowContainer ButtonsContainer;
+
         protected readonly RankedPlayStageDisplay StageDisplay;
 
         protected RankedPlaySubScreen()
@@ -60,28 +74,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     RelativeSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Padding = new MarginPadding(20),
                 },
                 Content = new Container
                 {
                     Name = "Content",
                     RelativeSizeAxes = Axes.Both,
                 },
-                ButtonsContainer = new FillFlowContainer
-                {
-                    Name = "Buttons",
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    X = 30,
-                    Y = -110,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(8)
-                },
                 StageDisplay = new RankedPlayStageDisplay(ColourScheme)
                 {
                     Heading = StageHeading,
-                    Caption = StageCaption,
                     Margin = new MarginPadding { Top = 60 },
                     State = { BindTarget = CountdownVisibility }
                 },

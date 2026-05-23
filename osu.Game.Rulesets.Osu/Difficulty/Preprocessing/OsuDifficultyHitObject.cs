@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -127,6 +128,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double SmallCircleBonus { get; private set; }
 
+        /// <summary>
+        /// Object's immediate OverallDifficulty value calculated from the raw hitwindow.
+        /// </summary>
+        public double OverallDifficulty
+        {
+            get
+            {
+                double hitWindowGreat = RawHitWindow(HitResult.Great) / ClockRate;
+
+                return (79.5 - hitWindowGreat) / 6;
+            }
+        }
+
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
 
@@ -194,7 +208,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
                 double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
 
-                return 1.0 - Math.Pow(speedRatio, 1 - windowRatio);
+                // Can't doubletap if circles don't intersect
+                double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+
+                return 1.0 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
             }
 
             return 0;

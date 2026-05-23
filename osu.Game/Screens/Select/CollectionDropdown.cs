@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Select
 {
     /// <summary>
     /// A dropdown to select the collection to be used to filter results.
-    /// WARNING: TODO: we have TWO `CollectionDropdowns` with diverging functionality. This is not good.
     /// </summary>
     public partial class CollectionDropdown : ShearedDropdown<CollectionFilterMenuItem> // TODO: partial class under FilterControl?
     {

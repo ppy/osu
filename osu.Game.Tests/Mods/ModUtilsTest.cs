@@ -7,8 +7,10 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -31,6 +33,17 @@ namespace osu.Game.Tests.Mods
             var mod = new Mock<CustomMod1>();
             Assert.That(ModUtils.CheckCompatibleSet(new[] { mod.Object, mod.Object }, out var invalid), Is.False);
             Assert.That(invalid, Is.EquivalentTo(new[] { mod.Object }));
+        }
+
+        [Test]
+        public void TestModIsNotCompatibleWithItselfEvenIfSettingsDiffer()
+        {
+            var mod1 = new Mock<CustomMod3>();
+            var mod2 = new Mock<CustomMod3>();
+            mod2.Setup(m => m.Setting).Returns(new BindableBool(true));
+
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod1.Object, mod2.Object }, out var invalid), Is.False);
+            Assert.That(invalid, Is.EquivalentTo(new[] { mod2.Object }));
         }
 
         [Test]
@@ -395,6 +408,12 @@ namespace osu.Game.Tests.Mods
 
         public abstract class CustomMod2 : Mod, IModCompatibilitySpecification
         {
+        }
+
+        public abstract class CustomMod3 : Mod, IModCompatibilitySpecification
+        {
+            [SettingSource("Setting")]
+            public virtual BindableBool Setting { get; } = new BindableBool();
         }
 
         private class InvalidMultiplayerMod : Mod

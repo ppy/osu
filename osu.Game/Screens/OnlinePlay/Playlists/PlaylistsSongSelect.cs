@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             ShowOsuLogo = false;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
-            LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
+            TopPadding = Header.HEIGHT - 10;
 
             addToPlaylistFooterButton = new AddToPlaylistFooterButton
             {

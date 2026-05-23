@@ -300,7 +300,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("move cursor to right of screen too far", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(10240, 0)));
             AddUntilStep("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
 
-            PlayerSettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PlayerSettingsOverlay>().SingleOrDefault();
+            ReplaySettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<ReplaySettingsOverlay>().SingleOrDefault();
         }
 
         [Test]
