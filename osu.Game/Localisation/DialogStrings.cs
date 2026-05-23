@@ -146,20 +146,21 @@ and {1} other operation(s).", ongoingOperationsText, count);
         public static LocalisableString ConfirmExitMultiplayerMatchBodyText => new TranslatableString(getKey(@"confirm_exit_multiplayer_match_body_text"), @"Are you sure you want to leave this multiplayer match?");
 
         /// <summary>
+        /// "We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode."
+        /// </summary>
+        public static LocalisableString MigrateNewAudioBaseBodyText => new TranslatableString(getKey(@"migrate_new_audio_base_body_text"), @"We recently added a new ""Experimental Audio"" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.");
+
+        /// <summary>
         /// "New audio engine is now default!"
         /// </summary>
         public static LocalisableString MigrateNewAudioAlreadyUsingHeaderText => new TranslatableString(getKey(@"migrate_new_audio_already_using_header_text"), @"New audio engine is now default!");
 
         /// <summary>
-        /// "We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-        ///
-        /// As you were already using this engine, your audio offset has been adjusted to account for an internal offset change (no intervention required).
+        /// "As you were already using this engine, your audio offset has been adjusted to account for an internal offset change (no intervention required).
         ///
         /// If you have any issues, you can switch back to the legacy engine from settings via the "{0}" checkbox."
         /// </summary>
-        public static LocalisableString MigrateNewAudioAlreadyUsingBodyText(LocalisableString checkboxCaption) => new TranslatableString(getKey(@"migrate_new_audio_already_using_body_text"), @"We recently added a new ""Experimental Audio"" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-
-As you were already using this engine, your audio offset has been adjusted to account for an internal offset change (no intervention required).
+        public static LocalisableString MigrateNewAudioAlreadyUsingBodyText(LocalisableString checkboxCaption) => new TranslatableString(getKey(@"migrate_new_audio_already_using_body_text"), @"As you were already using this engine, your audio offset has been adjusted to account for an internal offset change (no intervention required).
 
 If you have any issues, you can switch back to the legacy engine from settings via the ""{0}"" checkbox.", checkboxCaption);
 
@@ -169,13 +170,9 @@ If you have any issues, you can switch back to the legacy engine from settings v
         public static LocalisableString MigrateNewAudioHeaderText => new TranslatableString(getKey(@"migrate_new_audio_header_text"), @"New audio engine has been enabled");
 
         /// <summary>
-        /// "We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-        ///
-        /// If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the "{0}" checkbox."
+        /// "If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the "{0}" checkbox."
         /// </summary>
-        public static LocalisableString MigrateNewAudioBodyText(LocalisableString checkboxCaption) => new TranslatableString(getKey(@"migrate_new_audio_body_text"), @"We recently added a new ""Experimental Audio"" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-
-If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the ""{0}"" checkbox.", checkboxCaption);
+        public static LocalisableString MigrateNewAudioBodyText(LocalisableString checkboxCaption) => new TranslatableString(getKey(@"migrate_new_audio_body_text"), @"If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the ""{0}"" checkbox.", checkboxCaption);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

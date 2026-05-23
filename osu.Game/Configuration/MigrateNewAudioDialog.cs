@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -21,15 +22,17 @@ namespace osu.Game.Configuration
         {
             Icon = FontAwesome.Regular.Bell;
 
+            LocalisableString uniqueBodyTextString;
+
             if (wasAlreadyUsing)
             {
                 HeaderText = DialogStrings.MigrateNewAudioAlreadyUsingHeaderText;
-                BodyText = DialogStrings.MigrateNewAudioAlreadyUsingBodyText(AudioSettingsStrings.LegacyAudioLabel);
+                uniqueBodyTextString = DialogStrings.MigrateNewAudioAlreadyUsingBodyText(AudioSettingsStrings.LegacyAudioLabel);
             }
             else
             {
                 HeaderText = DialogStrings.MigrateNewAudioHeaderText;
-                BodyText = DialogStrings.MigrateNewAudioBodyText(AudioSettingsStrings.LegacyAudioLabel);
+                uniqueBodyTextString = DialogStrings.MigrateNewAudioBodyText(AudioSettingsStrings.LegacyAudioLabel);
 
                 MainContent.Add(new Container
                 {
@@ -45,6 +48,7 @@ namespace osu.Game.Configuration
                 });
             }
 
+            BodyText = LocalisableString.Interpolate($"{DialogStrings.MigrateNewAudioBaseBodyText}\n{uniqueBodyTextString}");
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
