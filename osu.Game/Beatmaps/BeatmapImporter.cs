@@ -432,7 +432,9 @@ namespace osu.Game.Beatmaps
                         Tags = decoded.Metadata.Tags,
                         PreviewTime = decoded.Metadata.PreviewTime,
                         AudioFile = decoded.Metadata.AudioFile,
-                        BackgroundFile = decoded.Metadata.BackgroundFile,
+                        BackgroundFile = !string.IsNullOrEmpty(decoded.Metadata.BackgroundFile) && beatmapSet.Files.Any(f => f.Filename.Equals(decoded.Metadata.BackgroundFile, StringComparison.OrdinalIgnoreCase))
+                            ? decoded.Metadata.BackgroundFile
+                            : string.Empty,
                     };
 
                     var beatmap = new BeatmapInfo(ruleset, difficulty, metadata)
