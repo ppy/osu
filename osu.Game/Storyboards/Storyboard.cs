@@ -18,7 +18,7 @@ namespace osu.Game.Storyboards
         private readonly Dictionary<string, StoryboardLayer> layers = new Dictionary<string, StoryboardLayer>();
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
 
-        public BeatmapInfo BeatmapInfo = new BeatmapInfo();
+        public BeatmapInfo BeatmapInfo { get; set; } = new BeatmapInfo();
         public IBeatmap Beatmap { get; set; } = new Beatmap();
 
         /// <summary>
