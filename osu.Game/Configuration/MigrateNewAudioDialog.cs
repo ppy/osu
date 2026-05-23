@@ -23,25 +23,13 @@ namespace osu.Game.Configuration
 
             if (wasAlreadyUsing)
             {
-                HeaderText = @"New audio engine is now default!";
-                BodyText =
-                    $"""
-                     We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-
-                     As you were already using this engine, your audio offset has been adjusted to account for an internal offset change (no intervention required).
-
-                     If you have any issues, you can switch back to the legacy engine from settings via the "{AudioSettingsStrings.LegacyAudioLabel}" checkbox.
-                     """;
+                HeaderText = DialogStrings.MigrateNewAudioAlreadyUsingHeaderText;
+                BodyText = DialogStrings.MigrateNewAudioAlreadyUsingBodyText(AudioSettingsStrings.LegacyAudioLabel);
             }
             else
             {
-                HeaderText = @"New audio engine has been enabled";
-                BodyText =
-                    $"""
-                     We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-
-                     If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the "{AudioSettingsStrings.LegacyAudioLabel}" checkbox.
-                     """;
+                HeaderText = DialogStrings.MigrateNewAudioHeaderText;
+                BodyText = DialogStrings.MigrateNewAudioBodyText(AudioSettingsStrings.LegacyAudioLabel);
 
                 MainContent.Add(new Container
                 {
