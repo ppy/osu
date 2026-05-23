@@ -92,6 +92,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            Masking = true;
+            CornerRadius = 5;
+            CornerExponent = 2.5f;
+
             InternalChildren = new Drawable[]
             {
                 background = new FormControlBackground(),

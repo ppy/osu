@@ -44,6 +44,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             Masking = true;
             CornerRadius = 5;
+            CornerExponent = 2.5f;
 
             CornerExponent = CORNER_EXPONENT;
             BorderThickness = BORDER_THICKNESS;
