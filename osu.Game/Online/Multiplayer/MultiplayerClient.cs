@@ -1011,6 +1011,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.AutoStartDuration = Room.Settings.AutoStartDuration;
             APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
             APIRoom.AutoSkip = Room.Settings.AutoSkip;
+            APIRoom.MaxParticipants = Room.Settings.MaxParticipants;
 
             SettingsChanged?.Invoke(settings);
             RoomUpdated?.Invoke();
