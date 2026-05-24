@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    polygonButton = new EditorToolButton("Polygon",
+                    polygonButton = new EditorToolButton(EditorComposeStrings.GeneratePolygon,
                         () => new SpriteIcon { Icon = FontAwesome.Solid.Spinner },
                         () => new PolygonGenerationPopover()),
                 }

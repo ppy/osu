@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 
@@ -104,16 +105,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 switch (status)
                 {
                     case MatchmakingStage.WaitingForClientsJoin:
-                        return "Players are joining the match...";
+                        return MatchmakingStrings.WaitingForClientsJoinStatus;
 
                     case MatchmakingStage.WaitingForClientsBeatmapDownload:
-                        return "Players are downloading the beatmap...";
+                        return MatchmakingStrings.WaitingForClientsBeatmapDownloadStatus;
 
                     case MatchmakingStage.Gameplay:
-                        return "Game is in progress...";
+                        return MatchmakingStrings.GameplayStatus;
 
                     case MatchmakingStage.Ended:
-                        return "Thanks for playing! The match will close shortly.";
+                        return MatchmakingStrings.EndedStatus;
 
                     default:
                         return string.Empty;

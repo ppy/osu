@@ -21,6 +21,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -202,7 +203,7 @@ namespace osu.Game.Rulesets.Edit
                                                 {
                                                     new ExpandableSpriteText
                                                     {
-                                                        Text = "Normal",
+                                                        Text = EditorComposeStrings.BankNormalText,
                                                         AlwaysPresent = true,
                                                         AllowMultiline = false,
                                                         RelativePositionAxes = Axes.X,
@@ -213,7 +214,7 @@ namespace osu.Game.Rulesets.Edit
                                                     },
                                                     new ExpandableSpriteText
                                                     {
-                                                        Text = "Addition",
+                                                        Text = EditorComposeStrings.BankAdditionText,
                                                         AlwaysPresent = true,
                                                         AllowMultiline = false,
                                                         RelativePositionAxes = Axes.X,

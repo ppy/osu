@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// </summary>
     public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
-        public override LocalisableString Description => "It never gets boring!";
+        public override LocalisableString Description => ModSelectOverlayStrings.OsuModRandomDescription;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTargetPractice)).ToArray();
 

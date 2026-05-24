@@ -10,6 +10,7 @@ using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "MG";
         public override IconUsage? Icon => OsuIcon.ModMagnetised;
         public override ModType Type => ModType.Fun;
-        public override LocalisableString Description => "No need to chase the circles – your cursor is a magnet!";
+        public override LocalisableString Description => ModSelectOverlayStrings.OsuModMagnetisedDescription;
         public override double ScoreMultiplier => 0.5;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax), typeof(OsuModRepel), typeof(OsuModBubbles), typeof(OsuModDepth) };
 

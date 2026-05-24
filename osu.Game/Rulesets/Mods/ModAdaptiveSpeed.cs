@@ -12,6 +12,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Acronym => "AS";
 
-        public override LocalisableString Description => "Let track speed adapt to you.";
+        public override LocalisableString Description => ModSelectOverlayStrings.ModAdaptativeSpeedDescription;
 
         public override IconUsage? Icon => OsuIcon.ModAdaptiveSpeed;
 

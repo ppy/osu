@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Footer;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Text = "History";
+                Text = MatchmakingStrings.History;
                 Icon = FontAwesome.Solid.Globe;
                 AccentColour = colours.Lime1;
             }

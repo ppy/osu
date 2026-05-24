@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -17,9 +18,9 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => @"Difficulty Adjust";
 
-        public override LocalisableString Description => @"Override a beatmap's difficulty settings.";
-
         public override string Acronym => "DA";
+
+        public override LocalisableString Description => ModSelectOverlayStrings.ModDifficultyAdjustDescription;
 
         public override ModType Type => ModType.Conversion;
 

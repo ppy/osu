@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override LocalisableString Description => "Burn the notes into your memory.";
+        public override LocalisableString Description => ModSelectOverlayStrings.OsuModFreezeFrameDescription;
 
         /// <remarks>
         /// Incompatible with all mods that directly modify or indirectly depend on <see cref="OsuHitObject.TimePreempt"/>, or alter the behaviour of approach circles.

@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 
@@ -77,17 +78,17 @@ namespace osu.Game.Rulesets.Osu.Edit
                 toleranceSlider = new ExpandableSlider<int>
                 {
                     Current = displayTolerance,
-                    ExpandedLabelText = "Control point spacing",
+                    ExpandedLabelText = EditorComposeStrings.FreehandSliderTolerance,
                 },
                 cornerThresholdSlider = new ExpandableSlider<int>
                 {
                     Current = displayCornerThreshold,
-                    ExpandedLabelText = "Corner bias",
+                    ExpandedLabelText = EditorComposeStrings.FreehandSliderCornerThreshold,
                 },
                 circleThresholdSlider = new ExpandableSlider<int>
                 {
                     Current = displayCircleThreshold,
-                    ExpandedLabelText = "Perfect curve bias"
+                    ExpandedLabelText = EditorComposeStrings.FreehandSliderCircleThreshold
                 }
             };
         }

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Barrel Roll";
         public override string Acronym => "BR";
         public override IconUsage? Icon => OsuIcon.ModBarrelRoll;
-        public override LocalisableString Description => "The whole playfield is on a wheel!";
+        public override LocalisableString Description => ModSelectOverlayStrings.ModBarrelRollDescription;
         public override double ScoreMultiplier => 1;
 
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription

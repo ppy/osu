@@ -16,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
 using osu.Game.Overlays;
 using osuTK;
@@ -103,17 +104,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 },
             };
 
-            flow.Add(new StageSegment(null, MatchmakingStage.WaitingForClientsJoin, "Waiting for other users"));
+            flow.Add(new StageSegment(null, MatchmakingStage.WaitingForClientsJoin, MatchmakingStrings.WaitingForClientsJoin));
 
             for (int i = 1; i <= round_count; i++)
             {
-                flow.Add(new StageSegment(i, MatchmakingStage.RoundWarmupTime, "Next Round"));
-                flow.Add(new StageSegment(i, MatchmakingStage.UserBeatmapSelect, "Beatmap Selection"));
-                flow.Add(new StageSegment(i, MatchmakingStage.GameplayWarmupTime, "Get Ready"));
-                flow.Add(new StageSegment(i, MatchmakingStage.ResultsDisplaying, "Results"));
+                flow.Add(new StageSegment(i, MatchmakingStage.RoundWarmupTime, MatchmakingStrings.RoundWarmupTime));
+                flow.Add(new StageSegment(i, MatchmakingStage.UserBeatmapSelect, MatchmakingStrings.BeatmapSelect));
+                flow.Add(new StageSegment(i, MatchmakingStage.GameplayWarmupTime, MatchmakingStrings.GameplayWarmupTime));
+                flow.Add(new StageSegment(i, MatchmakingStage.ResultsDisplaying, MatchmakingStrings.ResultsDisplaying));
             }
 
-            flow.Add(new StageSegment(round_count, MatchmakingStage.Ended, "Match End"));
+            flow.Add(new StageSegment(round_count, MatchmakingStage.Ended, MatchmakingStrings.Ended));
         }
 
         protected override void Update()

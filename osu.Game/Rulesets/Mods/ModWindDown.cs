@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Wind Down";
         public override string Acronym => "WD";
-        public override LocalisableString Description => "Sloooow doooown...";
+        public override LocalisableString Description => ModSelectOverlayStrings.ModWindDownDescription;
         public override IconUsage? Icon => OsuIcon.ModWindDown;
 
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1)

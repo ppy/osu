@@ -201,13 +201,13 @@ namespace osu.Game.Rulesets.Catch
             switch (result)
             {
                 case HitResult.LargeTickHit:
-                    return "Large droplet";
+                    return RankingStatisticsStrings.CatchLargeDroplet;
 
                 case HitResult.SmallTickHit:
-                    return "Small droplet";
+                    return RankingStatisticsStrings.CatchSmallDroplet;
 
                 case HitResult.LargeBonus:
-                    return "Banana";
+                    return RankingStatisticsStrings.CatchBanana;
             }
 
             return base.GetDisplayNameForHitResult(result);
@@ -269,7 +269,7 @@ namespace osu.Game.Rulesets.Catch
         {
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                new StatisticItem(RankingStatisticsStrings.PerformanceBreakdownTitle, () => new PerformanceBreakdownChart(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y

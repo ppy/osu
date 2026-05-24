@@ -20,6 +20,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                    .Append(new DrawableTernaryButton
                    {
                        Current = rectangularGridSnapToggle,
-                       Description = "Grid Snap",
+                       Description = EditorComposeStrings.GridSnapButtonTitle,
                        CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap },
                    })
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
