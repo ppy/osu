@@ -338,40 +338,56 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     this.controller = controller;
                 }
 
-                private void onMatchmakingQueueLeft()
-                {
-                    Close(false);
-                    notifications?.Post(new MatchTimeoutNotification(controller)
-                    {
-                        Text = MultiplayerMatchStrings.MatchTimedout,
-                        Icon = FontAwesome.Solid.InfoCircle,
-                        IsCritical = true
-                    });
-                }
-
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
                     Icon = FontAwesome.Solid.Bolt;
                     IconContent.Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.YellowLight);
                     client.MatchmakingQueueLeft += onMatchmakingQueueLeft;
+                    client.MatchmakingQueueStatusChanged += onMatchmakingStatusChanged;
+                }
+
+                private void onMatchmakingQueueLeft()
+                {
+                    Close(false);
+                    // 99% of situations like this are caused by Timeouts, better just explain like this to players.
+                    notifications?.Post(new MatchInvalidatedNotification(controller));
+                }
+
+
+                private void onMatchmakingStatusChanged(MatchmakingQueueStatus status)
+                {
+                    Close(false);
+                    if (status is MatchmakingQueueStatus.Searching)
+                    {
+                        notifications?.Post(new SimpleNotification
+                        {
+                            Text = MultiplayerMatchStrings.MatchInvalidatedWithRequeue,
+                            Icon = FontAwesome.Solid.Info,
+                            IsCritical = true
+                        });
+                    }
                 }
 
                 protected override void Dispose(bool isDisposing)
                 {
                     base.Dispose(isDisposing);
                     client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;
+                    client.MatchmakingQueueStatusChanged -= onMatchmakingStatusChanged;
                 }
             }
-            private partial class MatchTimeoutNotification : SimpleNotification
+            private partial class MatchInvalidatedNotification : SimpleNotification
             {
                 [Resolved]
                 private IPerformFromScreenRunner? performer { get; set; }
                 private readonly QueueController controller;
 
-                public MatchTimeoutNotification(QueueController controller)
+                public MatchInvalidatedNotification(QueueController controller)
                 {
                     this.controller = controller;
+                    Text = MultiplayerMatchStrings.MatchInvalidated;
+                    Icon = FontAwesome.Solid.Clock;
+                    IsCritical = true;
                 }
 
                 [BackgroundDependencyLoader]

@@ -52,7 +52,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Your match has timed out. Click to queue again."
         /// </summary>
-        public static LocalisableString MatchTimedout => new TranslatableString(getKey(@"match_timed_out"), @"Your match has timed out. Click to queue again.");
+        public static LocalisableString MatchInvalidated => new TranslatableString(getKey(@"match_timed_out"), @"Your match has timed out. Click to queue again.");
+
+        /// <summary>
+        /// "Your match has been invalidated by the server (Your opponent probably left). Automatically queued again for you."
+        /// </summary>
+        public static LocalisableString MatchInvalidatedWithRequeue => new TranslatableString(getKey(@"match_requeued"), @"Your match has been invalidated by the server (Your opponent probably left). Automatically queued again for you.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
