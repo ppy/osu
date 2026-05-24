@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 // TODO: Make background return to default X when leaving gameplay
 
                 bool storyboardReplacesBackground = storyboard.ReplacesBackground && storyboard.HasDrawable; // Based on Player's
-                if (!storyboardReplacesBackground)
+                if (!storyboardReplacesBackground || !showStoryboard.Value)
                     updateBackgroundX(bsb);
             });
 
@@ -83,17 +83,17 @@ namespace osu.Game.Rulesets.Catch.Mods
                     if (!ss.NewValue)
                         return;
 
-                    showStoryboard.UnbindBindings(); // Show storyboard being enabled even briefly during gameplay means the drawable storyboard will load
+                    showStoryboard.UnbindEvents(); // Show storyboard being enabled even briefly during gameplay means the drawable storyboard will load into memory if gameplay continues long enough
 
                     drawableStoryboard = getDrawableStoryboard(player);
 
                     while (drawableStoryboard.IsNull())
                     {
                         await Task.Delay(200).ConfigureAwait(false);
-                        drawableStoryboard = getDrawableStoryboard(player);
-
                         if (!player.IsAlive || !player.IsCurrentScreen())
                             return;
+
+                        drawableStoryboard = getDrawableStoryboard(player);
                     }
 
                     drawableStoryboard.OnUpdate += _ => updateStoryboardX(drawableStoryboard);
