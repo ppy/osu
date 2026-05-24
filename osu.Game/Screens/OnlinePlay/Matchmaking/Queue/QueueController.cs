@@ -331,6 +331,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 [Resolved]
                 private MultiplayerClient client { get; set; } = null!;
+
                 private readonly QueueController controller;
 
                 public MatchFoundNotification(QueueController controller)
@@ -354,10 +355,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     notifications?.Post(new MatchInvalidatedNotification(controller));
                 }
 
-
                 private void onMatchmakingStatusChanged(MatchmakingQueueStatus status)
                 {
                     Close(false);
+
                     if (status is MatchmakingQueueStatus.Searching)
                     {
                         notifications?.Post(new SimpleNotification
@@ -376,6 +377,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     client.MatchmakingQueueStatusChanged -= onMatchmakingStatusChanged;
                 }
             }
+
             private partial class MatchInvalidatedNotification : SimpleNotification
             {
                 [Resolved]
