@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModNoScope : ModNoScope, IUpdatableByPlayfield
     {
         public override LocalisableString Description => "Where's the catcher?";
+        public override Type[] IncompatibleMods => new[] { typeof(CatchModFirstPerson) };
 
         public override BindableInt HiddenComboCount { get; } = new BindableInt(10)
         {
