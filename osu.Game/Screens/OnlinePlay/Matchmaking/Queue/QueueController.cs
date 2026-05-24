@@ -382,6 +382,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 [Resolved]
                 private IPerformFromScreenRunner? performer { get; set; }
+
                 private readonly QueueController controller;
 
                 public MatchInvalidatedNotification(QueueController controller)
