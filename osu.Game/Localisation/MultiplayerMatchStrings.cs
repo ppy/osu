@@ -57,7 +57,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Your match has been invalidated by the server (Your opponent probably left). Automatically queued again for you."
         /// </summary>
-        public static LocalisableString MatchInvalidatedWithRequeue => new TranslatableString(getKey(@"match_requeued"), @"Your match has been invalidated by the server (Your opponent probably left). Automatically queued again for you.");
+        public static LocalisableString MatchInvalidatedWithRequeue => new TranslatableString(getKey(@"match_invalidated_with_requeue"), @"Your match has been invalidated by the server (Your opponent probably left). Automatically queued again for you.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
