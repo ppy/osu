@@ -59,8 +59,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 },
                 flashOverlayLayer = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Colour = Colour4.Transparent,
+                    RelativeSizeAxes = Axes.Both,
                 },
                 sounds = new HoverSounds(),
             };
