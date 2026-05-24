@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             {
                 showStoryboard.BindValueChanged(ss => Task.Run(async () => // Task.Run to not have 'async' lambda with delegate returning 'void'
                 {
-                    if (drawableStoryboard.IsNotNull() || !ss.NewValue) // Using De Morgan's for ease of understanding: if drawable storyboard still is null and show storyboard is enabled, proceed
+                    if (!ss.NewValue)
                         return;
 
                     showStoryboard.UnbindBindings(); // Show storyboard being enabled even briefly during gameplay means the drawable storyboard will load
