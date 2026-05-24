@@ -309,7 +309,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 // this can be moved inside the `MatchFoundNotification` implementation.
                 matchFoundSample?.Play();
 
-                return foundNotification = new MatchFoundNotification
+                return foundNotification = new MatchFoundNotification(controller)
                 {
                     Activated = CompletionClickAction,
                     Text = MultiplayerMatchStrings.MatchIsReady,
@@ -331,13 +331,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 [Resolved]
                 private MultiplayerClient client { get; set; } = null!;
+                private readonly QueueController controller;
+
+                public MatchFoundNotification(QueueController controller)
+                {
+                    this.controller = controller;
+                }
 
                 private void onMatchmakingQueueLeft()
                 {
                     Close(false);
-                    notifications?.Post(new SimpleNotification
+                    notifications?.Post(new MatchTimeoutNotification(controller)
                     {
-                        Text = MultiplayerMatchStrings.MatchInvalid,
+                        Text = MultiplayerMatchStrings.MatchTimedout,
                         Icon = FontAwesome.Solid.InfoCircle,
                         IsCritical = true
                     });
@@ -355,6 +361,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 {
                     base.Dispose(isDisposing);
                     client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;
+                }
+            }
+            private partial class MatchTimeoutNotification : SimpleNotification
+            {
+                [Resolved]
+                private IPerformFromScreenRunner? performer { get; set; }
+                private readonly QueueController controller;
+
+                public MatchTimeoutNotification(QueueController controller)
+                {
+                    this.controller = controller;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    Activated = () =>
+                    {
+                        controller.RejoinQueue();
+                        if (controller.CurrentState.Value == ScreenQueue.MatchmakingScreenState.Idle) controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.Queueing;
+                        performer?.PerformFromScreen(s => s.Push(new ScreenIntro(MatchmakingPoolType.RankedPlay)));
+                        return true;
+                    };
                 }
             }
         }
