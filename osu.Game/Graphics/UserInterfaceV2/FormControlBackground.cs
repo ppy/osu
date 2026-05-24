@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private readonly Box box;
+        private readonly Box flashOverlayLayer;
 
         private readonly HoverSounds sounds;
 
@@ -56,6 +57,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both,
                 },
+                flashOverlayLayer = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.Transparent,
+                },
                 sounds = new HoverSounds(),
             };
         }
@@ -71,6 +77,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public void Flash()
         {
             box.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+        }
+
+        public void FlashOverlay(ColourInfo flashColour, double duration)
+        {
+            flashOverlayLayer.Colour = flashColour;
+            flashOverlayLayer.FadeOutFromOne(duration, Easing.OutQuint);
         }
 
         private void updateStyle()
