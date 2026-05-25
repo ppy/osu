@@ -45,6 +45,16 @@ namespace osu.Game.Localisation
         public static LocalisableString MasterVolumeInactive => new TranslatableString(getKey(@"master_volume_inactive"), @"Master (window inactive)");
 
         /// <summary>
+        /// "Scroll volume step"
+        /// </summary>
+        public static LocalisableString ScrollVolumeAdjustmentStep => new TranslatableString(getKey(@"scroll_volume_adjustment_step"), @"Scroll volume step");
+
+        /// <summary>
+        /// "How much volume changes per wheel notch when adjusting volume with the scroll wheel."
+        /// </summary>
+        public static LocalisableString ScrollVolumeAdjustmentStepTooltip => new TranslatableString(getKey(@"scroll_volume_adjustment_step_tooltip"), @"How much volume changes per wheel notch when adjusting volume with the scroll wheel.");
+
+        /// <summary>
         /// "Effect"
         /// </summary>
         public static LocalisableString EffectVolume => new TranslatableString(getKey(@"effect_volume"), @"Effect");

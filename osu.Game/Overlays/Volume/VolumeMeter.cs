@@ -22,6 +22,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -53,6 +54,7 @@ namespace osu.Game.Overlays.Volume
         private Sample hoverSample;
         private Sample notchSample;
         private double sampleLastPlaybackTime;
+        private OsuConfigManager config = null!;
 
         [CanBeNull]
         public event Action<SelectionState> StateChanged;
@@ -86,11 +88,12 @@ namespace osu.Game.Overlays.Volume
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours, AudioManager audio, OsuConfigManager config)
         {
             hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-hover");
             notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
+            this.config = config;
 
             Color4 backgroundColour = colours.Gray1;
 
@@ -310,8 +313,15 @@ namespace osu.Game.Overlays.Volume
 
         private const double adjust_step = 0.01;
 
-        public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
-        public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
+        public void Increase(double amount = 1) => Increase(amount, false);
+        public void Decrease(double amount = 1) => Decrease(amount, false);
+        public void Increase(double amount, bool isPrecise) => adjust(amount, isPrecise, adjust_step, allowAcceleration: true);
+        public void Decrease(double amount, bool isPrecise) => adjust(-amount, isPrecise, adjust_step, allowAcceleration: true);
+        public void AdjustFromScroll(double amount, bool isPrecise)
+        {
+            double step = config.Get<double>(OsuSetting.ScrollVolumeAdjustmentStep);
+            adjust(amount, isPrecise, step, allowAcceleration: Precision.AlmostEquals(step, adjust_step));
+        }
 
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
         private double scrollAccumulation;
@@ -354,24 +364,32 @@ namespace osu.Game.Overlays.Volume
             dragDelta = 0;
         }
 
-        private void adjust(double delta, bool isPrecise)
+        private void adjust(double delta, bool isPrecise, double step, bool allowAcceleration)
         {
             if (delta == 0)
                 return;
 
-            // every adjust increment increases the rate at which adjustments happen up to a cutoff.
-            // this debounce will reset on inactivity.
-            accelerationDebounce?.Cancel();
-            accelerationDebounce = Scheduler.AddDelayed(resetAcceleration, 150);
+            if (allowAcceleration)
+            {
+                // every adjust increment increases the rate at which adjustments happen up to a cutoff.
+                // this debounce will reset on inactivity.
+                accelerationDebounce?.Cancel();
+                accelerationDebounce = Scheduler.AddDelayed(resetAcceleration, 150);
 
-            delta *= accelerationModifier;
-            accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
+                delta *= accelerationModifier;
+                accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
+            }
+            else
+            {
+                accelerationDebounce?.Cancel();
+                resetAcceleration();
+            }
 
             double precision = Bindable.Precision;
 
             if (isPrecise)
             {
-                scrollAccumulation += delta * adjust_step;
+                scrollAccumulation += delta * step;
 
                 while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
                 {
@@ -381,13 +399,13 @@ namespace osu.Game.Overlays.Volume
             }
             else
             {
-                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * adjust_step));
+                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * step));
             }
         }
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            adjust(e.ScrollDelta.Y, e.IsPrecise);
+            AdjustFromScroll(e.ScrollDelta.Y, e.IsPrecise);
             return true;
         }
 

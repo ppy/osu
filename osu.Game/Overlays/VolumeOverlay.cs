@@ -91,7 +91,7 @@ namespace osu.Game.Overlays
                 volumeMeter.Bindable.ValueChanged += _ => Show();
         }
 
-        public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
+        public bool Adjust(GlobalAction action)
         {
             if (!IsLoaded) return false;
 
@@ -101,14 +101,14 @@ namespace osu.Game.Overlays
                     if (State.Value == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeters.Selected?.Decrease(amount, isPrecise);
+                        volumeMeters.Selected?.Decrease();
                     return true;
 
                 case GlobalAction.IncreaseVolume:
                     if (State.Value == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeters.Selected?.Increase(amount, isPrecise);
+                        volumeMeters.Selected?.Increase();
                     return true;
 
                 case GlobalAction.NextVolumeMeter:
@@ -134,6 +134,33 @@ namespace osu.Game.Overlays
             }
 
             return false;
+        }
+
+        public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
+        {
+            switch (action)
+            {
+                case GlobalAction.DecreaseVolume:
+                case GlobalAction.IncreaseVolume:
+                    return AdjustFromScroll(action == GlobalAction.IncreaseVolume ? amount : -amount, isPrecise);
+            }
+
+            return Adjust(action);
+        }
+
+        public bool AdjustFromScroll(float amount, bool isPrecise)
+        {
+            if (!IsLoaded || amount == 0)
+                return false;
+
+            if (State.Value == Visibility.Hidden)
+            {
+                Show();
+                return true;
+            }
+
+            volumeMeters.Selected?.AdjustFromScroll(amount, isPrecise);
+            return true;
         }
 
         public void FocusMasterVolume()

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
@@ -35,6 +36,17 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 }),
+                new SettingsItemV2(new FormSliderBar<double>
+                {
+                    Caption = AudioSettingsStrings.ScrollVolumeAdjustmentStep,
+                    HintText = AudioSettingsStrings.ScrollVolumeAdjustmentStepTooltip,
+                    Current = config.GetBindable<double>(OsuSetting.ScrollVolumeAdjustmentStep),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true,
+                })
+                {
+                    ApplyClassicDefault = c => ((IHasCurrentValue<double>)c).Current.Value = 0.05,
+                },
                 new SettingsItemV2(new FormSliderBar<double>
                 {
                     Caption = AudioSettingsStrings.EffectVolume,
