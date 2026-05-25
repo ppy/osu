@@ -1,9 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -164,5 +168,55 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCaseSource(nameof(test_cases))]
         public void TestMultipliers(Mod[] mods, double expectedMultiplier)
             => TestModCombination(mods, expectedMultiplier);
+
+        private static readonly object[][] key_mod_multiplier_test_cases =
+        [
+            // score end date, client version, expected multiplier
+
+            // scores verifiably from old clients.
+            [new DateTimeOffset(2024, 1, 31, 11, 0, 0, TimeSpan.Zero), "2024.130.2", 1],
+            [new DateTimeOffset(2024, 12, 9, 11, 0, 0, TimeSpan.Zero), "2024.1208.0", 1],
+            [new DateTimeOffset(2025, 6, 12, 11, 0, 0, TimeSpan.Zero), "2025.605.3", 1],
+            [new DateTimeOffset(2025, 6, 28, 11, 0, 0, TimeSpan.Zero), "2025.625.0-tachyon", 1],
+            [new DateTimeOffset(2025, 7, 11, 11, 0, 0, TimeSpan.Zero), "2025.710.0-lazer", 1],
+            [new DateTimeOffset(2025, 7, 15, 11, 0, 0, TimeSpan.Zero), "2025.711.0-tachyon", 1],
+
+            // scores without explicit client versions, predating the change of multiplier.
+            // those MUST have used the old multiplier.
+            [new DateTimeOffset(2024, 1, 31, 11, 0, 0, TimeSpan.Zero), "", 1],
+            [new DateTimeOffset(2024, 12, 9, 11, 0, 0, TimeSpan.Zero), "", 1],
+            [new DateTimeOffset(2025, 6, 12, 11, 0, 0, TimeSpan.Zero), "", 1],
+            [new DateTimeOffset(2025, 6, 28, 11, 0, 0, TimeSpan.Zero), "", 1],
+            [new DateTimeOffset(2025, 7, 11, 11, 0, 0, TimeSpan.Zero), "", 1],
+            [new DateTimeOffset(2025, 7, 15, 11, 0, 0, TimeSpan.Zero), "", 1],
+
+            // scores without explicit client versions, AFTER the change of multiplier.
+            // there is NO way of verifying whether these scores use the new or old multiplier, therefore GUESS that it's the new one.
+            // "thankfully" the window of opportunity for this occurring *should* be slim
+            // (from client release on July 18, 2025 until spectator server release on August 1, 2025).
+            [new DateTimeOffset(2025, 7, 19, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
+            [new DateTimeOffset(2025, 7, 23, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
+            [new DateTimeOffset(2025, 8, 19, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
+            [new DateTimeOffset(2026, 6, 18, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
+            [new DateTimeOffset(2026, 7, 18, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
+
+            // scores verifiably from new clients.
+            [new DateTimeOffset(2025, 7, 19, 0, 20, 15, 0, TimeSpan.Zero), "2025.718.0-tachyon", 0.9],
+            [new DateTimeOffset(2025, 7, 23, 0, 20, 15, 0, TimeSpan.Zero), "2025.721.0-tachyon", 0.9],
+            [new DateTimeOffset(2025, 8, 19, 0, 20, 15, 0, TimeSpan.Zero), "2025.816.0-lazer", 0.9],
+            [new DateTimeOffset(2026, 6, 18, 0, 20, 15, 0, TimeSpan.Zero), "2026.518.0-lazer", 0.9],
+            [new DateTimeOffset(2026, 7, 18, 0, 20, 15, 0, TimeSpan.Zero), "2026.522.1-tachyon", 0.9],
+        ];
+
+        [TestCaseSource(nameof(key_mod_multiplier_test_cases))]
+        public void TestKeyModMultiplierCompatibility(DateTimeOffset endDate, string clientVersion, double expectedMultiplier)
+        {
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new ScoreInfo
+            {
+                Date = endDate,
+                ClientVersion = clientVersion
+            }));
+            Assert.That(calculator.CalculateFor([new ManiaModKey4()]), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+        }
     }
 }
