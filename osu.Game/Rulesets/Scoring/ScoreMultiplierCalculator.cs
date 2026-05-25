@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -13,9 +14,15 @@ namespace osu.Game.Rulesets.Scoring
     /// </summary>
     public class ScoreMultiplierCalculator
     {
+        protected ScoreMultiplierContext Context { get; }
+
         private readonly List<(Type[] mods, Func<Mod[], double> multiplier)> combinationMultipliers = [];
-        private readonly Dictionary<Type, Func<Mod, ScoreMultiplierCalculator, double>> singleMultipliersWithContext = [];
         private readonly Dictionary<Type, Func<Mod, double>> singleMultipliers = [];
+
+        public ScoreMultiplierCalculator(ScoreMultiplierContext context)
+        {
+            Context = context;
+        }
 
         /// <summary>
         /// Defines a flat, setting-independent score multiplier for the given <typeparamref name="TMod"/>.
@@ -33,17 +40,6 @@ namespace osu.Game.Rulesets.Scoring
             where TMod : Mod
         {
             singleMultipliers[typeof(TMod)] = mod => hasMultiplier.Invoke((TMod)mod);
-        }
-
-        /// <summary>
-        /// Defines a setting-dependent score multiplier for the given <typeparamref name="TMod"/>.
-        /// The multiplier calculation is given additional context to calculate the multiplier via the <typeparamref name="TContext"/> type instance.
-        /// </summary>
-        protected void Single<TMod, TContext>(Func<TMod, TContext, double> hasMultiplier)
-            where TMod : Mod
-            where TContext : ScoreMultiplierCalculator
-        {
-            singleMultipliersWithContext[typeof(TMod)] = (mod, context) => hasMultiplier.Invoke((TMod)mod, (TContext)context);
         }
 
         /// <summary>
@@ -87,11 +83,46 @@ namespace osu.Game.Rulesets.Scoring
             {
                 if (singleMultipliers.TryGetValue(modType, out var multiplier))
                     result *= multiplier(allModsByType[modType]);
-                else if (singleMultipliersWithContext.TryGetValue(modType, out var multiplierWithContext))
-                    result *= multiplierWithContext(allModsByType[modType], this);
             }
 
             return result;
+        }
+    }
+
+    /// <summary>
+    /// Contextual information to pass to a <see cref="ScoreMultiplierContext"/>
+    /// in order for it to calculate the correct multiplier.
+    /// </summary>
+    public class ScoreMultiplierContext
+    {
+        /// <summary>
+        /// The score that the multipliers are calculated for.
+        /// Mostly relevant and present in backwards compatibility scenarios.
+        /// In usages where the current valid score multipliers are required, pass <see langword="null"/> or use a constructor that does not require this.
+        /// </summary>
+        public ScoreInfo? Score { get; }
+
+        /// <summary>
+        /// Constructs a new instance.
+        /// Use this in situations wherein the current valid score multipliers are needed.
+        /// </summary>
+        public ScoreMultiplierContext()
+            : this(null)
+        {
+        }
+
+        /// <summary>
+        /// Constructs a new instance.
+        /// Use this in backwards compatibility scenarios when dealing with a specific <paramref name="score"/>.
+        /// </summary>
+        /// <param name="score">
+        /// The score that the multipliers are calculated for.
+        /// Mostly relevant and present in backwards compatibility scenarios.
+        /// In usages where the current valid score multipliers are required, pass <see langword="null"/> or use a constructor that does not require this.
+        /// </param>
+        public ScoreMultiplierContext(ScoreInfo? score)
+        {
+            Score = score;
         }
     }
 }

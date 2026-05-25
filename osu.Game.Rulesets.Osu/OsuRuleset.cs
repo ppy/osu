@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Osu
             }
         }
 
-        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator() => new OsuScoreMultiplierCalculator();
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new OsuScoreMultiplierCalculator(context);
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
 

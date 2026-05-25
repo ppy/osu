@@ -28,6 +28,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Utils;
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Select
                             new StatisticRow(s.DisplayName.ToUpper(), s.Count.ToLocalisableString("N0"), colours.ForHitResult(s.Result)));
 
                         var ruleset = value.Ruleset.CreateInstance();
-                        var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator();
+                        var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
                         double multiplier = scoreMultiplierCalculator.CalculateFor(value.Mods);
 
                         var generalStatistics = new[]

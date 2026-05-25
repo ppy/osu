@@ -258,13 +258,8 @@ namespace osu.Game.Scoring.Legacy
 
         public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
         {
-            // TODO: When mod multipliers are changed, this is going to break
-            // and lead to old replays potentially being populated with bogus total score without mods.
-            // This will need to be addressed somehow. Two potential routes are:
-            // - Adding score multiplier calculator versioning paired up with replay versions
-            // - Just giving up on backpopulation entirely.
             var ruleset = score.Ruleset.CreateInstance();
-            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score));
             double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
 
             score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);

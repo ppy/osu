@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
@@ -123,7 +124,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculator().CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext()).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -138,7 +139,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculator().CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext()).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);

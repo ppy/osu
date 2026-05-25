@@ -42,7 +42,7 @@ namespace osu.Game.Benchmarks
         public override void SetUp()
         {
             base.SetUp();
-            calculator = new OsuRuleset().CreateScoreMultiplierCalculator();
+            calculator = new OsuRuleset().CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
         }
 
         [Benchmark]

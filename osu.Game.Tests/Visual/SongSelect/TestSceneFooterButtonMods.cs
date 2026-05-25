@@ -15,6 +15,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 
@@ -119,7 +120,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void assertModsMultiplier(Ruleset ruleset, IEnumerable<Mod> mods)
         {
-            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
             double multiplier = scoreMultiplierCalculator.CalculateFor(mods);
             string expectedValue = ModUtils.FormatScoreMultiplier(multiplier).ToString();
 

@@ -23,6 +23,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Utils;
@@ -243,7 +244,7 @@ namespace osu.Game.Screens.Select
                 modDisplay.FadeIn(duration, easing);
             }
 
-            var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator();
+            var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
             double multiplier = scoreMultiplierCalculator?.CalculateFor(Mods.Value) ?? 1;
             multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
 

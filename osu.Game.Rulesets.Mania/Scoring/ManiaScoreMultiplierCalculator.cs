@@ -9,7 +9,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
 {
     public class ManiaScoreMultiplierCalculator : ScoreMultiplierCalculator
     {
-        public ManiaScoreMultiplierCalculator()
+        public ManiaScoreMultiplierCalculator(ScoreMultiplierContext context)
+            : base(context)
         {
             #region Difficulty Reduction
 

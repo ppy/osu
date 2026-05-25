@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                 Mod = doubleTime,
                 PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
                                       && Player.ScoreProcessor.Accuracy.Value == 1
-                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * new ManiaScoreMultiplierCalculator().CalculateFor([doubleTime])),
+                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * new ManiaScoreMultiplierCalculator(new ScoreMultiplierContext()).CalculateFor([doubleTime])),
                 Autoplay = false,
                 CreateBeatmap = () => new Beatmap
                 {

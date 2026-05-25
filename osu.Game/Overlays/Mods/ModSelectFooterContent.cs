@@ -12,6 +12,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Overlays.Mods
@@ -123,7 +124,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (rankingInformationDisplay != null)
             {
-                var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator();
+                var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
                 double multiplier = scoreMultiplierCalculator?.CalculateFor(ActiveMods.Value) ?? 1;
 
                 rankingInformationDisplay.ModMultiplier.Value = multiplier;

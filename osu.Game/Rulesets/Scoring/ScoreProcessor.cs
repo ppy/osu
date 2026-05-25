@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Scoring
 
             Mods.ValueChanged += mods =>
             {
-                var calculator = ruleset.CreateScoreMultiplierCalculator();
+                var calculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
                 scoreMultiplier = calculator.CalculateFor(mods.NewValue);
 
                 updateScore();
