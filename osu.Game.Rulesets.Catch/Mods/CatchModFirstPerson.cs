@@ -62,14 +62,23 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             Storyboard storyboard = player.GameplayState.Storyboard;
 
-            player.ApplyToBackground(bsb => bsb.OnUpdate += _ =>
+            Action<Drawable> backgroundAction = null!;
+            backgroundAction = _ => player.ApplyToBackground(bsb =>
             {
-                // TODO: Make background return to default X when leaving gameplay
+                if (isExited(player)) // Background screen beatmap persists upon exiting gameplay, so manual event removal and its repositioning to x = 0 is necessary
+                {
+                    bsb.OnUpdate -= backgroundAction;
+                    if (!CentredBackground.Value)
+                        bsb.MoveToX(0.0f);
+
+                    return;
+                }
 
                 bool storyboardReplacesBackground = storyboard.ReplacesBackground && storyboard.HasDrawable; // Based on Player's
                 if (!storyboardReplacesBackground || !showStoryboard.Value)
                     updateBackgroundX(bsb);
             });
+            player.ApplyToBackground(bsb => bsb.OnUpdate += backgroundAction);
 
             if (!storyboard.HasDrawable)
                 return;
@@ -90,7 +99,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                     while (drawableStoryboard.IsNull())
                     {
                         await Task.Delay(200).ConfigureAwait(false);
-                        if (!player.IsAlive || !player.IsCurrentScreen())
+                        if (isExited(player))
                             return;
 
                         drawableStoryboard = getDrawableStoryboard(player);
@@ -104,6 +113,8 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             drawableStoryboard.OnUpdate += _ => updateStoryboardX(drawableStoryboard);
         }
+
+        private bool isExited(Player player) => !player.IsCurrentScreen(); // Inspired from TestScenePause's confirmExited
 
         private Drawable? getDrawableStoryboard(Player player) => player.DimmableStoryboard.Children.FirstOrDefault(c => c is DrawableStoryboard);
 
