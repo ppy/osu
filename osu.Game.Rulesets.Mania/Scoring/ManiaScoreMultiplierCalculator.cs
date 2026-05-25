@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
@@ -47,16 +49,16 @@ namespace osu.Game.Rulesets.Mania.Scoring
             // Invert
             Single<ManiaModConstantSpeed>(hasMultiplier: 0.9);
             Single<ManiaModHoldOff>(hasMultiplier: 0.9);
-            Single<ManiaModKey1>(hasMultiplier: 0.9);
-            Single<ManiaModKey2>(hasMultiplier: 0.9);
-            Single<ManiaModKey3>(hasMultiplier: 0.9);
-            Single<ManiaModKey4>(hasMultiplier: 0.9);
-            Single<ManiaModKey5>(hasMultiplier: 0.9);
-            Single<ManiaModKey6>(hasMultiplier: 0.9);
-            Single<ManiaModKey7>(hasMultiplier: 0.9);
-            Single<ManiaModKey8>(hasMultiplier: 0.9);
-            Single<ManiaModKey9>(hasMultiplier: 0.9);
-            Single<ManiaModKey10>(hasMultiplier: 0.9);
+            Single<ManiaModKey1>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey2>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey3>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey4>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey5>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey6>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey7>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey8>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey9>(hasMultiplier: keyModMultiplier(Context.Score));
+            Single<ManiaModKey10>(hasMultiplier: keyModMultiplier(Context.Score));
 
             #endregion
 
@@ -95,6 +97,53 @@ namespace osu.Game.Rulesets.Mania.Scoring
                 return 1 + value / 5;
             else
                 return 0.6 + value;
+        }
+
+        private const double old_key_mod_multiplier = 1;
+        private const double new_key_mod_multiplier = 0.9;
+
+        /// <summary>
+        /// <para>
+        /// The mod multiplier was changed from 1.0x to 0.9x in https://github.com/ppy/osu/pull/30506
+        /// which was included in the https://osu.ppy.sh/home/changelog/tachyon/2025.718.0 release.
+        /// The replay version was not bumped in the change, meaning that the only usable indicator
+        /// of the mod multiplier changing is the client version.
+        /// </para>
+        /// <para>
+        /// Unfortunately not even the client version is available on server-side recorded replays
+        /// recorded prior to https://github.com/ppy/osu-server-spectator/pull/290,
+        /// which does not appear to have been deployed until August 1
+        /// (https://github.com/ppy/osu-server-spectator/releases/tag/2025.801.0).
+        /// </para>
+        /// </summary>
+        private double keyModMultiplier(ScoreInfo? scoreInfo)
+        {
+            if (scoreInfo == null)
+                return new_key_mod_multiplier;
+
+            if (scoreInfo.Date < new DateTimeOffset(2025, 7, 18, 0, 0, 0, TimeSpan.Zero))
+                return old_key_mod_multiplier;
+
+            string clientVersion = scoreInfo.ClientVersion;
+
+            if (string.IsNullOrEmpty(clientVersion))
+                return new_key_mod_multiplier;
+
+            string[] pieces = clientVersion.Split('.');
+
+            if (!int.TryParse(pieces[0], out int year))
+                return new_key_mod_multiplier;
+
+            if (!int.TryParse(pieces[1], out int monthDay))
+                return new_key_mod_multiplier;
+
+            if (year < 2025)
+                return old_key_mod_multiplier;
+
+            if (year == 2025 && monthDay < 718)
+                return old_key_mod_multiplier;
+
+            return new_key_mod_multiplier;
         }
     }
 }
