@@ -26,8 +26,16 @@ namespace osu.Game.Tests.Rulesets
 
         protected void TestModCombination(IEnumerable<Mod> mods, double expectedMultiplier)
         {
-            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
-            Assert.That(calculator.CalculateFor(mods), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+            Assert.Multiple(() =>
+            {
+                double multiplierViaOldAPI = 1;
+                foreach (var mod in mods)
+                    multiplierViaOldAPI *= mod.ScoreMultiplier;
+                Assert.That(multiplierViaOldAPI, Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+
+                var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+                Assert.That(calculator.CalculateFor(mods), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+            });
         }
     }
 }
