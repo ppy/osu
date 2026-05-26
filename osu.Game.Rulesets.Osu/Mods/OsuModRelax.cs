@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
 
         public override Type[] IncompatibleMods =>
-            base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap) }).ToArray();
+            base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModMagnetised), typeof(OsuModAlternate), typeof(OsuModSingleTap), typeof(OsuModCenteredCursor) }).ToArray();
 
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.

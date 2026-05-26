@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
 
         // Compatibility with these seems potentially feasible in the future, blocked for now because they don't work as one would expect
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll), typeof(OsuModMagnetised), typeof(OsuModRepel) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModCenteredCursor) };
 
         private PlayfieldAdjustmentContainer bubbleContainer = null!;
 
