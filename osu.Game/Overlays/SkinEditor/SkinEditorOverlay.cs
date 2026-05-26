@@ -214,17 +214,18 @@ namespace osu.Game.Overlays.SkinEditor
 
                     //first check if the current beatmap set has any other maps that are valid for the current ruleset
                     var activeSet = beatmap.Value.BeatmapSetInfo;
-                    var validBeatmaps = activeSet.Beatmaps.Where((m) => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)).ToArray();
+                    var validBeatmaps = activeSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)).ToArray();
 
                     if (validBeatmaps.Any())
                         targetMap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
                     else
                     {//otherwise get a random beatmap set in the current ruleset
+
                         realm.Run(r =>
                         {
                             var allValidBeatmapSets = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
-                           .AsEnumerable()
-                           .Where(s => s.Beatmaps.Any(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)));
+                                .AsEnumerable()
+                                .Where(s => s.Beatmaps.Any(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)));
 
                             if (allValidBeatmapSets.Any())
                             {

@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Menus
                 InputManager.ReleaseKey(Key.S);
             });
             AddWaitStep("wait for skin editor", 5);
-            AddAssert("ruleset is still taiko", () => Game.Ruleset.Value == taikoRuleset);
+            AddAssert("ruleset is still taiko", () => Game.Ruleset.Value.Equals(taikoRuleset));
         }
     }
 }
