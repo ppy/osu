@@ -232,7 +232,6 @@ namespace osu.Game.Overlays.SkinEditor
                                 targetMap = difficultyRecommender?.GetRecommendedBeatmap(randomSet.Beatmaps) ?? randomSet.Beatmaps.First();
                             }
                         });
- 
                     }
 
                     if (targetMap != null)
