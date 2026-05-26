@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
@@ -96,6 +97,11 @@ namespace osu.Game.Rulesets.Scoring
     public class ScoreMultiplierContext
     {
         /// <summary>
+        /// The difficulty info for the beatmap that the multipliers are calculated for.
+        /// </summary>
+        public IBeatmapDifficultyInfo BeatmapDifficultyInfo { get; }
+
+        /// <summary>
         /// The score that the multipliers are calculated for.
         /// Mostly relevant and present in backwards compatibility scenarios.
         /// In usages where the current valid score multipliers are required, pass <see langword="null"/> or use a constructor that does not require this.
@@ -104,24 +110,19 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// Constructs a new instance.
-        /// Use this in situations wherein the current valid score multipliers are needed.
-        /// </summary>
-        public ScoreMultiplierContext()
-            : this(null)
-        {
-        }
-
-        /// <summary>
-        /// Constructs a new instance.
         /// Use this in backwards compatibility scenarios when dealing with a specific <paramref name="score"/>.
         /// </summary>
+        /// <param name="beatmapDifficultyInfo">
+        /// The difficulty info for the beatmap that the multipliers are calculated for.
+        /// </param>
         /// <param name="score">
         /// The score that the multipliers are calculated for.
         /// Mostly relevant and present in backwards compatibility scenarios.
         /// In usages where the current valid score multipliers are required, pass <see langword="null"/> or use a constructor that does not require this.
         /// </param>
-        public ScoreMultiplierContext(ScoreInfo? score)
+        public ScoreMultiplierContext(IBeatmapDifficultyInfo beatmapDifficultyInfo, ScoreInfo? score = null)
         {
+            BeatmapDifficultyInfo = beatmapDifficultyInfo;
             Score = score;
         }
     }

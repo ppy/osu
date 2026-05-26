@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -120,7 +121,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void assertModsMultiplier(Ruleset ruleset, IEnumerable<Mod> mods)
         {
-            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty()));
             double multiplier = scoreMultiplierCalculator.CalculateFor(mods);
             string expectedValue = ModUtils.FormatScoreMultiplier(multiplier).ToString();
 

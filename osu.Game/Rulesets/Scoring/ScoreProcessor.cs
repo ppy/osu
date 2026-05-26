@@ -92,6 +92,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
+        /// The current beatmap.
+        /// </summary>
+        public readonly Bindable<IBeatmap?> Beatmap = new Bindable<IBeatmap?>();
+
+        /// <summary>
         /// The current rank.
         /// </summary>
         public IBindable<ScoreRank> Rank => rank;
@@ -206,8 +211,20 @@ namespace osu.Game.Rulesets.Scoring
 
             Mods.ValueChanged += mods =>
             {
-                var calculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
-                scoreMultiplier = calculator.CalculateFor(mods.NewValue);
+                if (Beatmap.Value != null)
+                {
+                    var calculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(Beatmap.Value.BeatmapInfo.Difficulty));
+                    scoreMultiplier = calculator.CalculateFor(mods.NewValue);
+                }
+
+                updateScore();
+                updateRank();
+            };
+
+            Beatmap.ValueChanged += beatmap =>
+            {
+                var calculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(beatmap.NewValue!.BeatmapInfo.Difficulty));
+                scoreMultiplier = calculator.CalculateFor(Mods.Value);
 
                 updateScore();
                 updateRank();
@@ -218,6 +235,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyBeatmap(beatmap);
             beatmapApplied = true;
+            Beatmap.Value = beatmap;
         }
 
         protected sealed override void ApplyResultInternal(JudgementResult result)
