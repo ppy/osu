@@ -158,6 +158,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             #endregion
 
+            #region System
+
+            [new Mod[] { new OsuModTouchDevice() }, 1],
+            [new Mod[] { new ModScoreV2() }, 1],
+
+            #endregion
+
             #region Combinations
 
             [new Mod[] { new OsuModHidden(), new OsuModHardRock() }, 1.06 * 1.06],
