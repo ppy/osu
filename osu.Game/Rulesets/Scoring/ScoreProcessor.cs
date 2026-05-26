@@ -225,9 +225,6 @@ namespace osu.Game.Rulesets.Scoring
             {
                 var calculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(beatmap.NewValue!.BeatmapInfo.Difficulty));
                 scoreMultiplier = calculator.CalculateFor(Mods.Value);
-
-                updateScore();
-                updateRank();
             };
         }
 
