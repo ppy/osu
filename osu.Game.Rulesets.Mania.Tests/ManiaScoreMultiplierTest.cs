@@ -193,7 +193,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             // scores without explicit client versions, AFTER the change of multiplier.
             // there is NO way of verifying whether these scores use the new or old multiplier, therefore GUESS that it's the new one.
             // "thankfully" the window of opportunity for this occurring *should* be slim
-            // (from client release on July 18, 2025 until spectator server release on August 1, 2025).
+            // (from client release with new key mod multipliers on July 18, 2025
+            // until spectator server release which added client version writing to server-side replays on August 1, 2025).
             [new DateTimeOffset(2025, 7, 19, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
             [new DateTimeOffset(2025, 7, 23, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
             [new DateTimeOffset(2025, 8, 19, 0, 20, 15, 0, TimeSpan.Zero), "", 0.9],
