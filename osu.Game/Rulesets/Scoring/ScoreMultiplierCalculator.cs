@@ -110,7 +110,6 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// Constructs a new instance.
-        /// Use this in backwards compatibility scenarios when dealing with a specific <paramref name="score"/>.
         /// </summary>
         /// <param name="beatmapDifficultyInfo">
         /// The difficulty info for the beatmap that the multipliers are calculated for.
@@ -118,7 +117,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="score">
         /// The score that the multipliers are calculated for.
         /// Mostly relevant and present in backwards compatibility scenarios.
-        /// In usages where the current valid score multipliers are required, pass <see langword="null"/> or use a constructor that does not require this.
+        /// In usages where the current valid score multipliers are required, pass <see langword="null"/> or omit this parameter entirely.
         /// </param>
         public ScoreMultiplierContext(IBeatmapDifficultyInfo beatmapDifficultyInfo, ScoreInfo? score = null)
         {
