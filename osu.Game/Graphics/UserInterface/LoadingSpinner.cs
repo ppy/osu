@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private float targetRotation;
 
-        private const float spin_duration = 900;
+        private const float spin_duration = 3150;
 
         /// <summary>
         /// Construct a new loading spinner.
@@ -148,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            spinner.Spin(spin_duration * 3.5f, RotationDirection.Clockwise);
+            spinner.Spin(spin_duration, RotationDirection.Clockwise);
             AddInternal(new LoadingSpinnerBeatSyncer(onBeat));
         }
 
@@ -208,6 +208,7 @@ namespace osu.Game.Graphics.UserInterface
                 this.onBeat = onBeat;
                 RelativeSizeAxes = Axes.Both;
                 AllowMistimedEventFiring = false;
+                EarlyActivationMilliseconds = 60;
             }
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
