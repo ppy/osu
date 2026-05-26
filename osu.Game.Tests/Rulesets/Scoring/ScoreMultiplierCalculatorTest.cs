@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Rulesets.Scoring
 {
@@ -12,7 +13,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [Test]
         public void TestFlatMultiplier()
         {
-            var calculator = new TestScoreMultiplierCalculator();
+            var calculator = new TestScoreMultiplierCalculator(new ScoreMultiplierContext());
 
             double multiplier = calculator.CalculateFor([new OsuModEasy()]);
 
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [Test]
         public void TestSettingDependentMultiplier()
         {
-            var calculator = new TestScoreMultiplierCalculator();
+            var calculator = new TestScoreMultiplierCalculator(new ScoreMultiplierContext());
 
             double multiplier = calculator.CalculateFor([new OsuModDaycore { SpeedChange = { Value = 0.6 } }]);
 
@@ -32,17 +33,17 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [Test]
         public void TestContextDependentMultiplier()
         {
-            var calculator = new TestScoreMultiplierCalculator();
+            TestScoreMultiplierCalculator calculator;
 
             double multiplier;
 
             Assert.Multiple(() =>
             {
-                calculator.HardRockPenalty = false;
+                calculator = new TestScoreMultiplierCalculator(new ScoreMultiplierContext());
                 multiplier = calculator.CalculateFor([new OsuModHardRock()]);
                 Assert.That(multiplier, Is.EqualTo(1.4));
 
-                calculator.HardRockPenalty = true;
+                calculator = new TestScoreMultiplierCalculator(new ScoreMultiplierContext(new ScoreInfo { ClientVersion = "2024.123.0" }));
                 multiplier = calculator.CalculateFor([new OsuModHardRock()]);
                 Assert.That(multiplier, Is.EqualTo(1.2));
             });
@@ -51,7 +52,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [Test]
         public void TestCombinationMultiplier()
         {
-            var calculator = new TestScoreMultiplierCalculator();
+            var calculator = new TestScoreMultiplierCalculator(new ScoreMultiplierContext());
 
             double multiplier = calculator.CalculateFor([new OsuModEasy(), new OsuModDaycore()]);
 
@@ -61,7 +62,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [Test]
         public void TestCombinationAndFlatMultipliers()
         {
-            var calculator = new TestScoreMultiplierCalculator();
+            var calculator = new TestScoreMultiplierCalculator(new ScoreMultiplierContext());
 
             double multiplier = calculator.CalculateFor([new OsuModDaycore(), new OsuModHardRock(), new OsuModEasy()]);
 
@@ -70,15 +71,14 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
         private class TestScoreMultiplierCalculator : ScoreMultiplierCalculator
         {
-            static TestScoreMultiplierCalculator()
+            public TestScoreMultiplierCalculator(ScoreMultiplierContext context)
+                : base(context)
             {
                 Single<OsuModEasy>(hasMultiplier: 0.15);
                 Single<OsuModDaycore>(hasMultiplier: daycore => (1 + daycore.SpeedChange.Value) / 4);
-                Single<OsuModHardRock, TestScoreMultiplierCalculator>(hasMultiplier: (_, ctx) => ctx.HardRockPenalty ? 1.2 : 1.4);
+                Single<OsuModHardRock>(hasMultiplier: _ => context.Score?.ClientVersion == "2024.123.0" ? 1.2 : 1.4);
                 Combination<OsuModEasy, OsuModDaycore>(hasMultiplier: (_, _) => 0.003);
             }
-
-            public bool HardRockPenalty { get; set; }
         }
     }
 }

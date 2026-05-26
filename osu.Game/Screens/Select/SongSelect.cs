@@ -351,7 +351,8 @@ namespace osu.Game.Screens.Select
             new FooterButtonMods(modSelectOverlay)
             {
                 Hotkey = GlobalAction.ToggleModSelection,
-                Current = Mods,
+                Mods = Mods,
+                Ruleset = Ruleset,
                 RequestDeselectAllMods = () =>
                 {
                     if (modSelectOverlay.State.Value == Visibility.Visible)
@@ -708,6 +709,7 @@ namespace osu.Game.Screens.Select
         private void onArrivingAtScreen()
         {
             modSelectOverlay.Beatmap.BindTo(Beatmap);
+            modSelectOverlay.Ruleset.BindTo(Ruleset);
             // required due to https://github.com/ppy/osu-framework/issues/3218
             modSelectOverlay.SelectedMods.Disabled = false;
             modSelectOverlay.SelectedMods.BindTo(Mods);
@@ -755,6 +757,7 @@ namespace osu.Game.Screens.Select
             Beatmap.ValueChanged -= updateVariousState;
 
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
+            modSelectOverlay.Ruleset.UnbindFrom(Ruleset);
             modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
 
             updateWedgeVisibility();

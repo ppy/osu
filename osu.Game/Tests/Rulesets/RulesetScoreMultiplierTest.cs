@@ -3,9 +3,10 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Tests.Rulesets
 {
@@ -21,33 +22,20 @@ namespace osu.Game.Tests.Rulesets
 
         [Test]
         public void TestDefaultMultiplierIsOne()
-        {
-            var calculator = Ruleset.CreateScoreMultiplierCalculator();
-            Assert.That(calculator.CalculateFor([]), Is.EqualTo(1));
-        }
+            => TestModCombination([], 1);
 
-        [Test]
-        public void TestMultipliersMatchForIndividualMods()
+        protected void TestModCombination(IEnumerable<Mod> mods, double expectedMultiplier)
         {
-            var mods = Ruleset.CreateAllMods();
-            var calculator = Ruleset.CreateScoreMultiplierCalculator();
-
             Assert.Multiple(() =>
             {
+                double multiplierViaOldAPI = 1;
                 foreach (var mod in mods)
-                    Assert.That(calculator.CalculateFor(mod.Yield()), Is.EqualTo(mod.ScoreMultiplier), message: $"Score multiplier not matching for mod {mod.Name}");
+                    multiplierViaOldAPI *= mod.ScoreMultiplier;
+                Assert.That(multiplierViaOldAPI, Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+
+                var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+                Assert.That(calculator.CalculateFor(mods), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
             });
-        }
-
-        protected void TestModCombination(IEnumerable<Mod> mods)
-        {
-            var calculator = Ruleset.CreateScoreMultiplierCalculator();
-
-            double expected = 1;
-            foreach (var mod in mods)
-                expected *= mod.ScoreMultiplier;
-
-            Assert.That(calculator.CalculateFor(mods), Is.EqualTo(expected));
         }
     }
 }
