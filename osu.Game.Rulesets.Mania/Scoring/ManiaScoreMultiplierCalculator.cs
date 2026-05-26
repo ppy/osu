@@ -121,26 +121,23 @@ namespace osu.Game.Rulesets.Mania.Scoring
             if (scoreInfo == null)
                 return new_key_mod_multiplier;
 
-            if (scoreInfo.Date < new DateTimeOffset(2025, 7, 18, 0, 0, 0, TimeSpan.Zero))
-                return old_key_mod_multiplier;
-
             string clientVersion = scoreInfo.ClientVersion;
 
-            if (string.IsNullOrEmpty(clientVersion))
+            if (!string.IsNullOrEmpty(clientVersion))
+            {
+                string[] pieces = clientVersion.Split('.');
+
+                if (int.TryParse(pieces[0], out int year) && int.TryParse(pieces[1], out int monthDay))
+                {
+                    if (year < 2025 || (year == 2025 && monthDay < 718))
+                        return old_key_mod_multiplier;
+                }
+
                 return new_key_mod_multiplier;
+            }
 
-            string[] pieces = clientVersion.Split('.');
-
-            if (!int.TryParse(pieces[0], out int year))
-                return new_key_mod_multiplier;
-
-            if (!int.TryParse(pieces[1], out int monthDay))
-                return new_key_mod_multiplier;
-
-            if (year < 2025)
-                return old_key_mod_multiplier;
-
-            if (year == 2025 && monthDay < 718)
+            // Client version not available, fallback to doing the best we can with the score's timestamp.
+            if (scoreInfo.Date < new DateTimeOffset(2025, 7, 18, 0, 0, 0, TimeSpan.Zero))
                 return old_key_mod_multiplier;
 
             return new_key_mod_multiplier;
