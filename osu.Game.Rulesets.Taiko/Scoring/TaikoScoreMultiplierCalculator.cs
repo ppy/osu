@@ -9,7 +9,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 {
     public class TaikoScoreMultiplierCalculator : ScoreMultiplierCalculator
     {
-        static TaikoScoreMultiplierCalculator()
+        public TaikoScoreMultiplierCalculator(ScoreMultiplierContext context)
+            : base(context)
         {
             #region Difficulty Reduction
 

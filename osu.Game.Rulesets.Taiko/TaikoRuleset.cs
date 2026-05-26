@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Taiko
             }
         }
 
-        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator() => new TaikoScoreMultiplierCalculator();
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new TaikoScoreMultiplierCalculator(context);
 
         public override string Description => "osu!taiko";
 

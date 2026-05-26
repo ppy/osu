@@ -9,7 +9,8 @@ namespace osu.Game.Rulesets.Catch.Scoring
 {
     public class CatchScoreMultiplierCalculator : ScoreMultiplierCalculator
     {
-        static CatchScoreMultiplierCalculator()
+        public CatchScoreMultiplierCalculator(ScoreMultiplierContext context)
+            : base(context)
         {
             #region Difficulty Reduction
 

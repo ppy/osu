@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Game.Rulesets.Catch.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -14,28 +15,141 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
-        [Test]
-        public void TestFlashlightOnNonDefaultSettings()
-            => TestModCombination([new CatchModFlashlight { ComboBasedSize = { Value = false } }]);
+        private static readonly object[][] test_cases =
+        [
+            #region Difficulty Reduction
 
-        [Test]
-        public void TestHalfTimeSpeeds([Values(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.99)] double speedChange)
-            => TestModCombination([new CatchModHalfTime { SpeedChange = { Value = speedChange } }]);
+            [new Mod[] { new CatchModEasy() }, 0.5],
+            [new Mod[] { new CatchModNoFail() }, 0.5],
 
-        [Test]
-        public void TestDaycoreSpeeds([Values(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.99)] double speedChange)
-            => TestModCombination([new CatchModDaycore { SpeedChange = { Value = speedChange } }]);
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.50 } } }, 0.1],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.55 } } }, 0.1],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.60 } } }, 0.2],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.65 } } }, 0.2],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.70 } } }, 0.3],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.75 } } }, 0.3],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.80 } } }, 0.4],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.85 } } }, 0.4],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.90 } } }, 0.5],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.95 } } }, 0.5],
+            [new Mod[] { new CatchModHalfTime { SpeedChange = { Value = 0.99 } } }, 0.5],
 
-        [Test]
-        public void TestDoubleTimeSpeeds([Values(1.01, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2)] double speedChange)
-            => TestModCombination([new CatchModDoubleTime { SpeedChange = { Value = speedChange } }]);
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.50 } } }, 0.1],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.55 } } }, 0.1],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.60 } } }, 0.2],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.65 } } }, 0.2],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.70 } } }, 0.3],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.75 } } }, 0.3],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.80 } } }, 0.4],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.85 } } }, 0.4],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.90 } } }, 0.5],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.95 } } }, 0.5],
+            [new Mod[] { new CatchModDaycore { SpeedChange = { Value = 0.99 } } }, 0.5],
 
-        [Test]
-        public void TestNightcoreSpeeds([Values(1.01, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2)] double speedChange)
-            => TestModCombination([new CatchModNightcore { SpeedChange = { Value = speedChange } }]);
+            #endregion
 
-        [Test]
-        public void TestMultiplicativeCombination()
-            => TestModCombination([new CatchModHidden(), new CatchModHardRock()]);
+            #region Difficulty Increase
+
+            [new Mod[] { new CatchModHardRock() }, 1.12],
+            [new Mod[] { new CatchModSuddenDeath() }, 1],
+            [new Mod[] { new CatchModPerfect() }, 1],
+
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.01 } } }, 1.00],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.05 } } }, 1.00],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.10 } } }, 1.02],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.15 } } }, 1.02],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.20 } } }, 1.04],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.25 } } }, 1.04],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.30 } } }, 1.06],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.35 } } }, 1.06],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.40 } } }, 1.08],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.45 } } }, 1.08],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.50 } } }, 1.10],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.55 } } }, 1.10],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.60 } } }, 1.12],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.65 } } }, 1.12],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.70 } } }, 1.14],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.75 } } }, 1.14],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.80 } } }, 1.16],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.85 } } }, 1.16],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.90 } } }, 1.18],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 1.95 } } }, 1.18],
+            [new Mod[] { new CatchModDoubleTime { SpeedChange = { Value = 2.00 } } }, 1.20],
+
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.01 } } }, 1.00],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.05 } } }, 1.00],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.10 } } }, 1.02],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.15 } } }, 1.02],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.20 } } }, 1.04],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.25 } } }, 1.04],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.30 } } }, 1.06],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.35 } } }, 1.06],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.40 } } }, 1.08],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.45 } } }, 1.08],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.50 } } }, 1.10],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.55 } } }, 1.10],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.60 } } }, 1.12],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.65 } } }, 1.12],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.70 } } }, 1.14],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.75 } } }, 1.14],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.80 } } }, 1.16],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.85 } } }, 1.16],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.90 } } }, 1.18],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 1.95 } } }, 1.18],
+            [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 2.00 } } }, 1.20],
+
+            [new Mod[] { new CatchModHidden() }, 1.06],
+
+            [new Mod[] { new CatchModFlashlight() }, 1.12],
+            [new Mod[] { new CatchModFlashlight { ComboBasedSize = { Value = false } } }, 1],
+
+            [new Mod[] { new ModAccuracyChallenge() }, 1],
+
+            #endregion
+
+            #region Conversion
+
+            [new Mod[] { new CatchModDifficultyAdjust() }, 0.5],
+            [new Mod[] { new CatchModClassic() }, 0.96],
+            [new Mod[] { new CatchModMirror() }, 1],
+
+            #endregion
+
+            #region Automation
+
+            [new Mod[] { new CatchModAutoplay() }, 1],
+            [new Mod[] { new CatchModCinema() }, 1],
+            [new Mod[] { new CatchModRelax() }, 0.1],
+
+            #endregion
+
+            #region Fun
+
+            [new Mod[] { new ModWindUp() }, 0.5],
+            [new Mod[] { new ModWindDown() }, 0.5],
+            [new Mod[] { new CatchModFloatingFruits() }, 1],
+            [new Mod[] { new CatchModMuted() }, 1],
+            [new Mod[] { new CatchModNoScope() }, 1],
+            [new Mod[] { new CatchModMovingFast() }, 1],
+            [new Mod[] { new CatchModSynesthesia() }, 0.8],
+
+            #endregion
+
+            #region System
+
+            [new Mod[] { new ModScoreV2() }, 1],
+
+            #endregion
+
+            #region Combinations
+
+            [new Mod[] { new CatchModHidden(), new CatchModHardRock() }, 1.06 * 1.12]
+
+            #endregion
+        ];
+
+        [TestCaseSource(nameof(test_cases))]
+        public void TestMultipliers(Mod[] mods, double expectedMultiplier)
+            => TestModCombination(mods, expectedMultiplier);
     }
 }
