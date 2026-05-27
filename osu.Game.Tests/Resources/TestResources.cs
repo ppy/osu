@@ -222,12 +222,10 @@ namespace osu.Game.Tests.Resources
 
         private class TestModHardRock : ModHardRock
         {
-            public override double ScoreMultiplier => 1;
         }
 
         private class TestModDoubleTime : ModDoubleTime
         {
-            public override double ScoreMultiplier => 1;
         }
     }
 }
