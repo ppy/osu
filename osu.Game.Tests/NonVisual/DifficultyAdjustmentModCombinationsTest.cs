@@ -161,7 +161,6 @@ namespace osu.Game.Tests.NonVisual
             public override string Name => nameof(ModA);
             public override string Acronym => nameof(ModA);
             public override LocalisableString Description => string.Empty;
-            public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithA), typeof(ModIncompatibleWithAAndB) };
         }
@@ -171,7 +170,6 @@ namespace osu.Game.Tests.NonVisual
             public override string Name => nameof(ModB);
             public override LocalisableString Description => string.Empty;
             public override string Acronym => nameof(ModB);
-            public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithAAndB) };
         }
@@ -181,7 +179,6 @@ namespace osu.Game.Tests.NonVisual
             public override string Name => nameof(ModC);
             public override string Acronym => nameof(ModC);
             public override LocalisableString Description => string.Empty;
-            public override double ScoreMultiplier => 1;
         }
 
         private class ModIncompatibleWithA : Mod
@@ -189,7 +186,6 @@ namespace osu.Game.Tests.NonVisual
             public override string Name => $"Incompatible With {nameof(ModA)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)}";
             public override LocalisableString Description => string.Empty;
-            public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA) };
         }
@@ -208,7 +204,6 @@ namespace osu.Game.Tests.NonVisual
             public override string Name => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
             public override LocalisableString Description => string.Empty;
-            public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA), typeof(ModB) };
         }
