@@ -41,13 +41,9 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
-        private readonly RateAdjustModHelper rateAdjustHelper;
-
         protected ModNightcore()
         {
-            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
-
-            // intentionally not deferring the speed change handling to `RateAdjustModHelper`
+            // intentionally not using `RateAdjustModHelper`
             // as the expected result of operation is not the same (nightcore should preserve constant pitch).
             SpeedChange.BindValueChanged(val =>
             {
