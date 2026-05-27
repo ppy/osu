@@ -315,6 +315,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 Beatmap = { BindTarget = Beatmap },
                 SelectedMods = { BindTarget = userMods },
+                Ruleset = { BindTarget = Ruleset },
                 IsValidMod = _ => false
             });
 

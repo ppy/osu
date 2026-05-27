@@ -258,10 +258,9 @@ namespace osu.Game.Scoring.Legacy
 
         public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
         {
-            double modMultiplier = 1;
-
-            foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score));
+            double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
 
             score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }

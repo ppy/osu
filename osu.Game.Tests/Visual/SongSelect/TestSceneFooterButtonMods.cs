@@ -11,8 +11,11 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 
@@ -63,37 +66,45 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestIncrementMultiplier()
         {
+            var ruleset = new OsuRuleset();
             var hiddenMod = new Mod[] { new OsuModHidden() };
+
+            AddStep("Set ruleset", () => footerButtonMods.Ruleset.Value = ruleset.RulesetInfo);
+
             AddStep(@"Add Hidden", () => changeMods(hiddenMod));
-            assertModsMultiplier(hiddenMod);
+            assertModsMultiplier(ruleset, hiddenMod);
 
             var hardRockMod = new Mod[] { new OsuModHardRock() };
             AddStep(@"Add HardRock", () => changeMods(hardRockMod));
-            assertModsMultiplier(hardRockMod);
+            assertModsMultiplier(ruleset, hardRockMod);
 
             var doubleTimeMod = new Mod[] { new OsuModDoubleTime() };
             AddStep(@"Add DoubleTime", () => changeMods(doubleTimeMod));
-            assertModsMultiplier(doubleTimeMod);
+            assertModsMultiplier(ruleset, doubleTimeMod);
 
             var multipleIncrementMods = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModHardRock() };
             AddStep(@"Add multiple Mods", () => changeMods(multipleIncrementMods));
-            assertModsMultiplier(multipleIncrementMods);
+            assertModsMultiplier(ruleset, multipleIncrementMods);
         }
 
         [Test]
         public void TestDecrementMultiplier()
         {
+            var ruleset = new OsuRuleset();
             var easyMod = new Mod[] { new OsuModEasy() };
+
+            AddStep("Set ruleset", () => footerButtonMods.Ruleset.Value = ruleset.RulesetInfo);
+
             AddStep(@"Add Easy", () => changeMods(easyMod));
-            assertModsMultiplier(easyMod);
+            assertModsMultiplier(ruleset, easyMod);
 
             var noFailMod = new Mod[] { new OsuModNoFail() };
             AddStep(@"Add NoFail", () => changeMods(noFailMod));
-            assertModsMultiplier(noFailMod);
+            assertModsMultiplier(ruleset, noFailMod);
 
             var multipleDecrementMods = new Mod[] { new OsuModEasy(), new OsuModNoFail() };
             AddStep(@"Add Multiple Mods", () => changeMods(multipleDecrementMods));
-            assertModsMultiplier(multipleDecrementMods);
+            assertModsMultiplier(ruleset, multipleDecrementMods);
         }
 
         [Test]
@@ -105,11 +116,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Unranked badge not shown", () => footerButtonMods.ChildrenOfType<FooterButtonMods.UnrankedBadge>().Single().Alpha == 0);
         }
 
-        private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Current.Value = mods;
+        private void changeMods(IReadOnlyList<Mod> mods) => footerButtonMods.Mods.Value = mods;
 
-        private void assertModsMultiplier(IEnumerable<Mod> mods)
+        private void assertModsMultiplier(Ruleset ruleset, IEnumerable<Mod> mods)
         {
-            double multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+            double multiplier = scoreMultiplierCalculator.CalculateFor(mods);
             string expectedValue = ModUtils.FormatScoreMultiplier(multiplier).ToString();
 
             AddAssert($"Displayed multiplier is {expectedValue}", () => footerButtonMods.ChildrenOfType<OsuSpriteText>().First(t => t.Text.ToString().Contains('x')).Text.ToString(), () => Is.EqualTo(expectedValue));

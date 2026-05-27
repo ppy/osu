@@ -123,6 +123,29 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public void TestBackgroundSpecificationPreserved()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            // Ensure importer encoding is correct
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"241526 Soleily - Renatus.osz"));
+            AddAssert("beatmap background is correct", () => beatmap.BeatmapInfo.Metadata.BackgroundFile, () => Is.EqualTo("machinetop_background.jpg"));
+
+            // Ensure exporter legacy conversion is correct
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
+            AddAssert("beatmap background is still correct", () => beatmap.BeatmapInfo.Metadata.BackgroundFile, () => Is.EqualTo("machinetop_background.jpg"));
+        }
+
+        [Test]
         public void TestExportStability()
         {
             IWorkingBeatmap beatmap = null!;
