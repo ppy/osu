@@ -134,6 +134,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             [new Mod[] { new ModWindDown() }, 0.5],
             [new Mod[] { new TaikoModMuted() }, 1],
             [new Mod[] { new ModAdaptiveSpeed() }, 0.5],
+            [new Mod[] { new ModPitchAdjust() }, 1],
 
             #endregion
 

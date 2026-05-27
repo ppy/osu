@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModNightcore; // Temporary Icon
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Adjust pitch without affecting playback speed.";
-        public override double ScoreMultiplier => 1;
         public override bool ValidForFreestyleAsRequiredMod => true;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed), typeof(ModTimeRamp) };

@@ -149,6 +149,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             [new Mod[] { new ModWindDown() }, 0.5],
             [new Mod[] { new ManiaModMuted() }, 1],
             [new Mod[] { new ModAdaptiveSpeed() }, 0.5],
+            [new Mod[] { new ModPitchAdjust() }, 1],
 
             #endregion
 

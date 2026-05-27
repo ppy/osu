@@ -155,6 +155,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             [new Mod[] { new OsuModSynesthesia() }, 0.8],
             [new Mod[] { new OsuModDepth() }, 1],
             [new Mod[] { new OsuModBloom() }, 1],
+            [new Mod[] { new ModPitchAdjust() }, 1],
 
             #endregion
 
