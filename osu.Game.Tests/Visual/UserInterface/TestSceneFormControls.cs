@@ -68,6 +68,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                                         },
                                         new FormTextBox
                                         {
+                                            Caption = "Length limited text",
+                                            PlaceholderText = "I can only hold 10 characters!",
+                                            LengthLimit = 10,
+                                            TabbableContentContainer = this,
+                                        },
+                                        new FormTextBox
+                                        {
                                             Caption = "Artist",
                                             HintText = "Poot artist here!",
                                             PlaceholderText = "Here is an artist",
