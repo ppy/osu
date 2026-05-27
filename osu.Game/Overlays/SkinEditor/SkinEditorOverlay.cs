@@ -214,7 +214,7 @@ namespace osu.Game.Overlays.SkinEditor
 
                     //first check if the current beatmap set has any other maps that are valid for the current ruleset
                     var activeSet = beatmap.Value.BeatmapSetInfo;
-                    var validBeatmaps = activeSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)).ToArray();
+                    var validBeatmaps = activeSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
 
                     if (validBeatmaps.Any())
                         targetMap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
@@ -230,7 +230,8 @@ namespace osu.Game.Overlays.SkinEditor
                             if (allValidBeatmapSets.Any())
                             {
                                 var randomSet = allValidBeatmapSets.ElementAt(Random.Shared.Next(allValidBeatmapSets.Count()));
-                                targetMap = difficultyRecommender?.GetRecommendedBeatmap(randomSet.Beatmaps) ?? randomSet.Beatmaps.First();
+                                var randomSetValidMaps = randomSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
+                                targetMap = difficultyRecommender?.GetRecommendedBeatmap(randomSetValidMaps) ?? randomSetValidMaps.First();
                             }
                         });
                     }
