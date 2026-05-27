@@ -98,8 +98,9 @@ namespace osu.Game.Rulesets.Scoring
     {
         /// <summary>
         /// The difficulty info for the beatmap that the multipliers are calculated for.
+        /// This must be the difficulty info for the beatmap BEFORE any mod application.
         /// </summary>
-        public IBeatmapDifficultyInfo BeatmapDifficultyInfo { get; }
+        public IBeatmapDifficultyInfo BeatmapDifficultyWithoutMods { get; }
 
         /// <summary>
         /// The score that the multipliers are calculated for.
@@ -111,17 +112,18 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Constructs a new instance.
         /// </summary>
-        /// <param name="beatmapDifficultyInfo">
+        /// <param name="beatmapDifficultyWithoutMods">
         /// The difficulty info for the beatmap that the multipliers are calculated for.
+        /// This must be the difficulty info for the beatmap BEFORE any mod application.
         /// </param>
         /// <param name="score">
         /// The score that the multipliers are calculated for.
         /// Mostly relevant and present in backwards compatibility scenarios.
         /// In usages where the current valid score multipliers are required, pass <see langword="null"/> or omit this parameter entirely.
         /// </param>
-        public ScoreMultiplierContext(IBeatmapDifficultyInfo beatmapDifficultyInfo, ScoreInfo? score = null)
+        public ScoreMultiplierContext(IBeatmapDifficultyInfo beatmapDifficultyWithoutMods, ScoreInfo? score = null)
         {
-            BeatmapDifficultyInfo = beatmapDifficultyInfo;
+            BeatmapDifficultyWithoutMods = beatmapDifficultyWithoutMods;
             Score = score;
         }
     }

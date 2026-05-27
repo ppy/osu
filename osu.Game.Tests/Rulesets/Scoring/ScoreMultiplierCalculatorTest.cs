@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             public TestScoreMultiplierCalculator(ScoreMultiplierContext context)
                 : base(context)
             {
-                Single<OsuModEasy>(hasMultiplier: context.BeatmapDifficultyInfo.ApproachRate == 0 ? 0.1 : 0.15);
+                Single<OsuModEasy>(hasMultiplier: context.BeatmapDifficultyWithoutMods.ApproachRate == 0 ? 0.1 : 0.15);
                 Single<OsuModDaycore>(hasMultiplier: daycore => (1 + daycore.SpeedChange.Value) / 4);
                 Single<OsuModHardRock>(hasMultiplier: _ => context.Score?.ClientVersion == "2024.123.0" ? 1.2 : 1.4);
                 Combination<OsuModEasy, OsuModDaycore>(hasMultiplier: (_, _) => 0.003);
