@@ -291,7 +291,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override ModSelectOverlay CreateModSelectOverlay() => modSelect = new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
-            IsValidMod = isValidRequiredMod
+            IsValidMod = isValidRequiredMod,
         };
 
         public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons()

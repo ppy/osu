@@ -76,11 +76,6 @@ namespace osu.Game.Online.Spectator
         public event Action<int, long>? OnUserScoreProcessed;
 
         /// <summary>
-        /// Invoked just prior to disconnection requested by the server via <see cref="IStatefulUserHubClient.DisconnectRequested"/>.
-        /// </summary>
-        public event Action? Disconnecting;
-
-        /// <summary>
         /// A dictionary containing all users currently being watched, with the number of watching components for each user.
         /// </summary>
         private readonly Dictionary<int, int> watchedUsersRefCounts = new Dictionary<int, int>();
@@ -203,12 +198,6 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        Task IStatefulUserHubClient.DisconnectRequested()
-        {
-            Schedule(() => DisconnectInternal().FireAndForget());
-            return Task.CompletedTask;
-        }
-
         public void BeginPlaying(long? scoreToken, GameplayState state, Score score)
         {
             // This schedule is only here to match the one below in `EndPlaying`.
@@ -232,9 +221,11 @@ namespace osu.Game.Online.Spectator
 
                     if (!success)
                     {
-                        Logger.Log($"Clearing {nameof(SpectatorClient)} state due to failed {nameof(BeginPlayingInternal)} call.");
                         Schedule(() =>
                         {
+                            if (IsConnected.Value)
+                                Logger.Log($"Clearing {nameof(SpectatorClient)} state due to failed {nameof(BeginPlayingInternal)} call.");
+
                             clearScoreState();
 
                             currentState.BeatmapID = null;
@@ -252,7 +243,8 @@ namespace osu.Game.Online.Spectator
         {
             if (!isPlaying)
             {
-                Logger.Log($"Frames arrived at {nameof(SpectatorClient)} outside of gameplay scope and will be ignored.");
+                if (IsConnected.Value)
+                    Logger.Log($"Frames arrived at {nameof(SpectatorClient)} outside of gameplay scope and will be ignored.");
                 return;
             }
 
@@ -370,12 +362,6 @@ namespace osu.Game.Online.Spectator
 
         protected abstract Task StopWatchingUserInternal(int userId);
 
-        protected virtual Task DisconnectInternal()
-        {
-            Disconnecting?.Invoke();
-            return Task.CompletedTask;
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -443,5 +429,34 @@ namespace osu.Game.Online.Spectator
                 });
             });
         }
+
+        #region Disconnection handling
+
+        /// <summary>
+        /// Invoked just prior to disconnection.
+        /// </summary>
+        public event Action? Disconnecting;
+
+        protected abstract Task DisconnectInternal();
+
+        public abstract Task Reconnect();
+
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() =>
+            {
+                Disconnecting?.Invoke();
+                DisconnectInternal().FireAndForget();
+            });
+            return Task.CompletedTask;
+        }
+
+        Task IStatefulUserHubClient.ServerShuttingDown()
+        {
+            this.ReconnectWhenReady(IsConnected, () => watchedUsersRefCounts.Count == 0, Reconnect);
+            return Task.CompletedTask;
+        }
+
+        #endregion
     }
 }

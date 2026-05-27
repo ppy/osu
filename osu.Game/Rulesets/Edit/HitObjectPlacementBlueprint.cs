@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -53,6 +54,12 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IPlacementHandler placementHandler { get; set; } = null!;
 
+        /// <summary>
+        /// Acceptable leniency to account for rounding errors and minor unsnaps that we generally
+        /// don't consider a problem, but still need to account for in certain operations.
+        /// </summary>
+        private const double placement_replace_start_time_leniency_ms = 2;
+
         protected HitObjectPlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
@@ -60,6 +67,15 @@ namespace osu.Game.Rulesets.Edit
             // adding the default hit sample should be the case regardless of the ruleset.
             HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
         }
+
+        /// <summary>
+        /// Whether an existing <see cref="Objects.HitObject"/> should be removed because <see cref="HitObject"/> is being placed on top of it.
+        /// </summary>
+        /// <remarks>
+        /// By default, it matches when start times are within ±<see cref="placement_replace_start_time_leniency_ms"/> ms of each other.
+        /// </remarks>
+        public virtual bool ReplacesExistingObject(HitObject existing)
+            => Precision.AlmostEquals(existing.StartTime, HitObject.StartTime, placement_replace_start_time_leniency_ms);
 
         [BackgroundDependencyLoader]
         private void load()

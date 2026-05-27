@@ -149,17 +149,17 @@ namespace osu.Game.Overlays.Dashboard.UserSearch
                 return;
             }
 
+            queryChangedDebounce = Scheduler.AddDelayed(performSearch, 500);
+        }
+
+        private void performSearch()
+        {
             if (string.IsNullOrEmpty(searchTextBox.Current.Value))
             {
                 loading.Value = false;
                 return;
             }
 
-            queryChangedDebounce = Scheduler.AddDelayed(performSearch, 500);
-        }
-
-        private void performSearch()
-        {
             loading.Value = true;
             var getUsersRequest = new SearchUsersRequest(searchTextBox.Current.Value);
             getUsersRequest.Success += showResults;

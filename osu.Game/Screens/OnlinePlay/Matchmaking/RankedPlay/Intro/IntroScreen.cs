@@ -14,6 +14,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 {
@@ -32,6 +33,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private RankedPlayChatDisplay? chat { get; set; }
 
         private Sample? windupSample;
         private Sample? impactSample;
@@ -60,8 +64,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             var users = await userLookupCache.GetUsersAsync(userIds).ConfigureAwait(false);
 
-            var player = users.OfType<APIUser>().First(it => it.Id == api.LocalUser.Value.Id);
-            var opponent = users.OfType<APIUser>().First(it => it.Id != api.LocalUser.Value.Id);
+            var player = users.OfType<APIUser>().FirstOrDefault(it => it.Id == api.LocalUser.Value.Id)
+                         ?? api.LocalUser.Value;
+            var opponent = users.OfType<APIUser>().FirstOrDefault(it => it.Id != api.LocalUser.Value.Id)
+                           ?? APIUser.UnknownUser(userIds.First(id => id != api.LocalUser.Value.Id));
 
             int playerRating = roomState.Users[player.Id].Rating;
             int opponentRating = roomState.Users[opponent.Id].Rating;
@@ -94,7 +100,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 Scheduler.AddDelayed(() => swooshSample?.Play(), impactDelay + 3200);
             }
 
-            Scheduler.AddDelayed(() => CornerPieceVisibility.Value = Visibility.Visible, delay);
+            Scheduler.AddDelayed(() =>
+            {
+                CornerPieceVisibility.Value = Visibility.Visible;
+                chat?.Show();
+            }, delay);
 
             starRatingAnimation.Play(ref delay, (float)starRating);
         }

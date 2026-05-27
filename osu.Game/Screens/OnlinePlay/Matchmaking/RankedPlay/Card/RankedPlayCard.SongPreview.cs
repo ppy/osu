@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -85,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 {
                     if (!enabled.NewValue)
                     {
-                        previewTrack?.Stop();
+                        stopPreviewIfAvailable();
                         return;
                     }
 
@@ -132,7 +133,44 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                 });
             }
 
-            private void startPreviewIfAvailable() => previewTrack?.Start();
+            // The following weirdness is a workaround for single-threaded crashes when
+            // attempting to start a track before it's fully loaded.
+            //
+            // See https://github.com/ppy/osu-framework/pull/6727
+            //     https://github.com/ppy/osu/pull/37473
+            private ScheduledDelegate? trackStartStopAction;
+
+            private void startPreviewIfAvailable()
+            {
+                if (previewTrack == null)
+                    return;
+
+                trackStartStopAction?.Cancel();
+
+                if (!previewTrack.TrackLoaded)
+                {
+                    trackStartStopAction = Schedule(startPreviewIfAvailable);
+                    return;
+                }
+
+                previewTrack?.Start();
+            }
+
+            private void stopPreviewIfAvailable()
+            {
+                if (previewTrack == null)
+                    return;
+
+                trackStartStopAction?.Cancel();
+
+                if (!previewTrack.TrackLoaded)
+                {
+                    trackStartStopAction = Schedule(stopPreviewIfAvailable);
+                    return;
+                }
+
+                previewTrack?.Stop();
+            }
 
             #region IBeatSyncProvider implementation
 

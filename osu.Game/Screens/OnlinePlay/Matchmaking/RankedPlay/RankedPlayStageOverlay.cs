@@ -24,7 +24,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private readonly RankedPlayColourScheme colourScheme;
 
         public APIUser? PickingUser { get; init; }
-        public double? Multiplier { get; init; }
 
         private FillFlowContainer displayContainer = null!;
         private FillFlowContainer detailsContainer = null!;
@@ -147,18 +146,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                             Colour = colourScheme.Primary,
                         },
                     },
-                });
-            }
-
-            if (Multiplier != null)
-            {
-                detailsContainer.Add(new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    UseFullGlyphHeight = false,
-                    Font = OsuFont.Torus.With(size: 32),
-                    Text = $"{Multiplier:N0}x damage",
                 });
             }
 

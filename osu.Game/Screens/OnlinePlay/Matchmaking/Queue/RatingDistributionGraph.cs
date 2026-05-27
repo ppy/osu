@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     public partial class RatingDistributionGraph : CompositeDrawable, IHasCustomTooltip<RatingDistributionGraph.RatingDistributionGraphTooltipData>
     {
         private const int y_divisions = 4;
-        private const int x_divisions = 16;
+        private const int x_max_divisions = 16;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -49,6 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private int? userRating;
         private (int min, int max, int step) xRange;
         private (int min, int max) yRange;
+        private int xDivisionStep = 1;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -236,9 +238,34 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 data.Zip(data.Skip(1), (a, b) => Math.Abs(b.x - a.x)).DefaultIfEmpty().Min()
             );
 
+            xDivisionStep = Math.Max(xRange.step, 50); // avoid division by zero
+
+            // Keep increasing the division until number of lines is appropriately low
+            while ((xRange.max - xRange.min) / xDivisionStep > x_max_divisions)
+            {
+                xDivisionStep *= 2;
+            }
+
+            xRange.min = (int)floorWithFactor(xRange.min, xDivisionStep);
+            xRange.max = (int)ceilingWithFactor(xRange.max, xDivisionStep);
+
+            if (userRating < xRange.min)
+            {
+                this.data = this.data.Prepend((userRating.Value, 1)).ToArray();
+                xRange.min = userRating.Value;
+            }
+
+            if (userRating > xRange.max)
+            {
+                this.data = this.data.Append((userRating.Value, 1)).ToArray();
+                xRange.max = userRating.Value;
+            }
+
+            int yMax = this.data.Select(d => d.y).DefaultIfEmpty().Max();
+
             yRange = (
                 0,
-                (int)roundToSignificant(data.Select(d => d.y).DefaultIfEmpty().Max())
+                (int)ceilingWithFactor(yMax, significantOfNumber(yMax))
             );
 
             updateGraph();
@@ -261,13 +288,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             barsContainer.Clear();
             userRatingContainer.Clear();
 
-            for (int step = 0; step <= x_divisions; step++)
+            int xDivisions = Math.Max(1, (xRange.max - xRange.min) / xDivisionStep);
+
+            for (int step = 0; step <= xDivisions; step++)
             {
                 gridContainer.Add(new VerticalLine
                 {
                     RelativeSizeAxes = Axes.Y,
                     RelativePositionAxes = Axes.X,
-                    X = (float)step / x_divisions,
+                    X = (float)step / xDivisions,
                     Colour = colourProvider.Background1
                 });
 
@@ -276,10 +305,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.CentreRight,
                     RelativePositionAxes = Axes.X,
-                    X = (float)step / x_divisions,
+                    X = (float)step / xDivisions,
                     Margin = new MarginPadding { Right = -2 },
                     Rotation = -40,
-                    Text = (xRange.min + (xRange.max - xRange.min) / x_divisions * step).ToString(),
+                    Text = (xRange.min + xDivisionStep * step).ToString(),
                     UseFullGlyphHeight = false,
                     Font = OsuFont.Default.With(size: 12),
                     Colour = colourProvider.Foreground1
@@ -324,7 +353,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 barsContainer.Add(new Container
                 {
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativePositionAxes = Axes.X,
                     RelativeSizeAxes = Axes.Both,
@@ -380,7 +409,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 currentCount += d.y;
                 float p = (float)currentCount / totalCount;
                 return new Vector2(pointOnGraph(d.x, 0).X, 1 - p);
-            }).ToArray();
+            }).Append(new Vector2(1, 0)).ToArray();
         });
 
         private Vector2 pointOnGraph(int x, int y)
@@ -390,13 +419,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             return new Vector2(xPos, yPos);
         }
 
-        private static double roundToSignificant(double value)
+        private static double significantOfNumber(double value)
         {
-            if (value == 0)
+            return Math.Pow(10, Math.Floor(Math.Log10(value)));
+        }
+
+        private static double floorWithFactor(double value, double factor)
+        {
+            if (value == 0 || factor == 0)
                 return 0;
 
-            double scale = Math.Pow(10, Math.Floor(Math.Log10(value)));
-            return Math.Ceiling(value / scale) * scale;
+            return Math.Floor(value / factor) * factor;
+        }
+
+        private static double ceilingWithFactor(double value, double factor)
+        {
+            if (value == 0 || factor == 0)
+                return 0;
+
+            return Math.Ceiling(value / factor) * factor;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
@@ -461,7 +502,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             int currentCount = 0;
             int totalCount = data.Sum(p => p.y);
 
-            for (int i = 0; i < cumulativePath.Vertices.Count; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 currentCount += data[i].y;
 
@@ -509,7 +550,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             protected override void Update()
             {
                 base.Update();
-                Width = Parent!.DrawWidth / Parent.ScreenSpaceDrawQuad.Width;
+                if (Precision.DefinitelyBigger(Parent!.ScreenSpaceDrawQuad.Width, 0))
+                    Width = Parent.DrawWidth / Parent.ScreenSpaceDrawQuad.Width;
             }
         }
 
@@ -521,7 +563,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             protected override void Update()
             {
                 base.Update();
-                Height = Parent!.DrawHeight / Parent.ScreenSpaceDrawQuad.Height;
+                if (Precision.DefinitelyBigger(Parent!.ScreenSpaceDrawQuad.Height, 0))
+                    Height = Parent!.DrawHeight / Parent.ScreenSpaceDrawQuad.Height;
             }
         }
 

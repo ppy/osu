@@ -47,7 +47,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 2,
                     Username = "peppy",
                 },
-                Multiplier = 2,
             });
         }
 
@@ -61,7 +60,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 226597,
                     Username = "WWWWWWWWWWWWWWWWWWWW",
                 },
-                Multiplier = 2,
             });
         }
 
@@ -75,7 +73,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 2,
                     Username = "peppy",
                 },
-                Multiplier = 2,
             });
             AddStep("create red", () => Child = new RankedPlayStageOverlay("Pick Phase", RankedPlayColourScheme.RED)
             {
@@ -84,7 +81,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     Id = 2,
                     Username = "peppy",
                 },
-                Multiplier = 2,
             });
         }
     }

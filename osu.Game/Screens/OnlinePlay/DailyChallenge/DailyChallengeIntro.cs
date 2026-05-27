@@ -17,9 +17,11 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.Play.HUD;
@@ -145,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Today's Challenge",
+                                            Text = DailyChallengeStrings.TodaysChallenge,
                                             Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
                                             Shear = -OsuGame.SHEAR,
                                             Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
@@ -254,7 +256,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                 },
                                                 new TruncatingSpriteText
                                                 {
-                                                    Text = $"Difficulty: {beatmap.DifficultyName}",
+                                                    Text = DailyChallengeStrings.DifficultyInfo(beatmap.DifficultyName),
                                                     Font = OsuFont.GetFont(size: 20, italics: true),
                                                     MaxWidth = horizontal_info_size,
                                                     Shear = -OsuGame.SHEAR,
@@ -263,7 +265,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                 },
                                                 new TruncatingSpriteText
                                                 {
-                                                    Text = $"by {beatmap.Metadata.Author.Username}",
+                                                    Text = BeatmappacksStrings.ShowCreatedBy(beatmap.Metadata.Author.Username),
                                                     Font = OsuFont.GetFont(size: 16, italics: true),
                                                     MaxWidth = horizontal_info_size,
                                                     Shear = -OsuGame.SHEAR,

@@ -33,8 +33,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 0.5;
-
         public sealed override bool ValidForMultiplayer => false;
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
