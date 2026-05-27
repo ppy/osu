@@ -20,6 +20,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                                        Vertical = 10
+                                        Vertical = 50
                                     },
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new[]
@@ -131,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(0, 10),
+                                            Spacing = new Vector2(0, 20),
                                             Children = new[]
                                             {
                                                 new Container
@@ -143,20 +144,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                     AutoSizeAxes = Axes.Y,
                                                     Children = new Drawable[]
                                                     {
-                                                        new SectionContainer
+                                                        new FillFlowContainer
                                                         {
                                                             Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
-                                                            Children = new[]
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Width = 0.5f,
+                                                            Spacing = new Vector2(0, 20),
+                                                            Children = new Drawable[]
                                                             {
-                                                                new Section("Room name")
+                                                                new SettingsItemV2(NameField = new FormTextBox
                                                                 {
-                                                                    Child = NameField = new FormTextBox
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        TabbableContentContainer = this,
-                                                                        LengthLimit = 100
-                                                                    },
-                                                                },
+                                                                    Caption = "Room name",
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    TabbableContentContainer = this,
+                                                                    LengthLimit = 100,
+                                                                }),
                                                                 // new Section("Room visibility")
                                                                 // {
                                                                 //     Alpha = disabled_alpha,
@@ -165,106 +168,84 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 //         Enabled = { Value = false }
                                                                 //     },
                                                                 // },
-                                                                new Section("Game type")
+                                                                new FillFlowContainer
                                                                 {
-                                                                    Child = new FillFlowContainer
+                                                                    AutoSizeAxes = Axes.Y,
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    Padding = SettingsPanel.CONTENT_PADDING,
+                                                                    Direction = FillDirection.Vertical,
+                                                                    Spacing = new Vector2(7),
+                                                                    Children = new Drawable[]
                                                                     {
-                                                                        AutoSizeAxes = Axes.Y,
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Direction = FillDirection.Vertical,
-                                                                        Spacing = new Vector2(7),
-                                                                        Children = new Drawable[]
+                                                                        TypePicker = new MatchTypePicker
                                                                         {
-                                                                            TypePicker = new MatchTypePicker
-                                                                            {
-                                                                                RelativeSizeAxes = Axes.X,
-                                                                            },
-                                                                            typeLabel = new OsuSpriteText
-                                                                            {
-                                                                                Font = OsuFont.GetFont(size: 14),
-                                                                                Colour = colours.Yellow
-                                                                            },
+                                                                            RelativeSizeAxes = Axes.X,
+
+                                                                        },
+                                                                        typeLabel = new OsuSpriteText
+                                                                        {
+                                                                            Font = OsuFont.GetFont(size: 14),
+                                                                            Colour = colours.Yellow
                                                                         },
                                                                     },
                                                                 },
-                                                                new Section("Queue mode")
+                                                                new SettingsItemV2(QueueModeDropdown = new FormEnumDropdown<QueueMode>
                                                                 {
-                                                                    Child = new Container
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 40,
-                                                                        Child = QueueModeDropdown = new FormEnumDropdown<QueueMode>
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X
-                                                                        }
-                                                                    }
-                                                                },
-                                                                new Section("Auto start")
+                                                                    Caption = "Queue mode",
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                }),
+                                                                new SettingsItemV2(startModeDropdown = new FormEnumDropdown<StartMode>
                                                                 {
-                                                                    Child = new Container
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 40,
-                                                                        Child = startModeDropdown = new FormEnumDropdown<StartMode>
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X
-                                                                        }
-                                                                    }
+                                                                    Caption = "Auto start",
+                                                                    RelativeSizeAxes = Axes.X,
                                                                 }
+                                                                )
                                                             },
                                                         },
-                                                        new SectionContainer
+                                                        new FillFlowContainer
                                                         {
                                                             Anchor = Anchor.TopRight,
                                                             Origin = Anchor.TopRight,
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Width = 0.5f,
+                                                            Spacing = new Vector2(0, 20),
                                                             Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
                                                             Children = new[]
                                                             {
-                                                                new Section("Player count")
+                                                                new SettingsItemV2(maximumParticipantsCheckbox = new FormCheckBox
                                                                 {
-                                                                    Children = new Drawable[]
+                                                                    Caption = "Limited slots",
+                                                                    HintText = "When enabled, total players allowed in a room will be limited. Unlimited when disabled."
+                                                                }),
+                                                                new SettingsItemV2(maximumParticipantsSliderBar = new FormSliderBar<byte>
+                                                                {
+                                                                    Caption = "Slot count",
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    Margin = new MarginPadding { Top = 5 },
+                                                                    Current = new BindableNumber<byte>(16)
                                                                     {
-                                                                        maximumParticipantsCheckbox = new FormCheckBox
-                                                                        {
-                                                                            Caption = "Limited slots",
-                                                                            HintText = "When enabled, total players allowed in a room will be limited. Unlimited when disabled."
-                                                                        },
-                                                                        maximumParticipantsSliderBar = new FormSliderBar<byte>
-                                                                        {
-                                                                            Caption = "Slot count",
-                                                                            RelativeSizeAxes = Axes.X,
-                                                                            Margin = new MarginPadding { Top = 5 },
-                                                                            Current = new BindableNumber<byte>(16)
-                                                                            {
-                                                                                MinValue = 2,
-                                                                                MaxValue = 16,
-                                                                            }
-                                                                        },
+                                                                        MinValue = 2,
+                                                                        MaxValue = 16,
                                                                     },
-                                                                },
-                                                                new Section("Password (optional)")
+                                                                }),
+                                                                new SettingsItemV2(PasswordTextBox = new FormPasswordTextBox
                                                                 {
-                                                                    Child = PasswordTextBox = new FormPasswordTextBox
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        TabbableContentContainer = this,
-                                                                        // Set quite small to avoid hitting rich presence limits.
-                                                                        // Note that we use JSON encoding so this needs to be well below the 128 byte limit discord end.
-                                                                        // See https://github.com/Lachee/discord-rpc-csharp/blob/master/DiscordRPC/Entities/Secrets.cs#L26-L42
-                                                                        //
-                                                                        // Note that we need at least 36 characters for tournament rooms:
-                                                                        // https://github.com/ppy/osu-server-spectator/blob/406ed09d5825f2fe60c9d5ca08e69db94d873e28/osu.Server.Spectator/Hubs/Referee/RefereeHub.cs#L101
-                                                                        LengthLimit = 40
-                                                                    },
-                                                                },
-                                                                new Section("Other")
+                                                                    Caption = "Password (optional)",
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    TabbableContentContainer = this,
+                                                                    // Set quite small to avoid hitting rich presence limits.
+                                                                    // Note that we use JSON encoding so this needs to be well below the 128 byte limit discord end.
+                                                                    // See https://github.com/Lachee/discord-rpc-csharp/blob/master/DiscordRPC/Entities/Secrets.cs#L26-L42
+                                                                    //
+                                                                    // Note that we need at least 36 characters for tournament rooms:
+                                                                    // https://github.com/ppy/osu-server-spectator/blob/406ed09d5825f2fe60c9d5ca08e69db94d873e28/osu.Server.Spectator/Hubs/Referee/RefereeHub.cs#L101
+                                                                    LengthLimit = 40
+                                                                }),
+                                                                new SettingsItemV2(AutoSkipCheckbox = new FormCheckBox
                                                                 {
-                                                                    Child = AutoSkipCheckbox = new FormCheckBox
-                                                                    {
-                                                                        Caption = "Automatically skip the beatmap intro",
-                                                                        HintText = "When enabled, the intro of all beatmap played will be automatically skipped."
-                                                                    }
-                                                                }
+                                                                    Caption = "Automatically skip the beatmap intro"
+                                                                })
                                                             }
                                                         }
                                                     },

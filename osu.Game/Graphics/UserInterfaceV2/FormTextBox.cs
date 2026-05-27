@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormTextBox : CompositeDrawable, IHasCurrentValue<string>, IFormControl
+    public abstract partial class FormTextBox<T> : CompositeDrawable, IHasCurrentValue<string>, IFormControl where T : OsuTextBox, IInnerTextBox, new()
     {
         public Bindable<string> Current
         {
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private FormControlBackground background = null!;
         private Box flashLayer = null!;
-        private InnerTextBox textBox = null!;
+        private T textBox = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
 
@@ -147,7 +147,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        internal virtual InnerTextBox CreateTextBox() => new InnerTextBox();
+        internal virtual T CreateTextBox() => new T();
 
         protected override void LoadComplete()
         {
@@ -198,51 +198,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 background.VisualStyle = VisualStyle.Normal;
         }
 
-        internal partial class InnerTextBox : OsuTextBox
-        {
-            public BindableBool Focused { get; } = new BindableBool();
-
-            public Action? OnInputError { get; set; }
-
-            protected override float LeftRightPadding => 0;
-
-            public InnerTextBox()
-            {
-                DrawBorder = false;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Height = 16;
-                TextContainer.Height = 1;
-                BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
-            }
-
-            protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
-
-            protected override void OnFocus(FocusEvent e)
-            {
-                base.OnFocus(e);
-
-                Focused.Value = true;
-            }
-
-            protected override void OnFocusLost(FocusLostEvent e)
-            {
-                base.OnFocusLost(e);
-
-                Focused.Value = false;
-            }
-
-            protected override void NotifyInputError()
-            {
-                PlayFeedbackSample(FeedbackSampleType.TextInvalid);
-                // base call intentionally suppressed
-                OnInputError?.Invoke();
-            }
-        }
-
         public event Action? ValueChanged;
 
         public bool IsDefault => current.IsDefault;
@@ -254,5 +209,59 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
 
         public float MainDrawHeight => DrawHeight;
+    }
+
+    public partial class FormTextBox : FormTextBox<InnerTextBox>;
+
+    public partial class InnerTextBox : OsuTextBox, IInnerTextBox
+    {
+        public BindableBool Focused { get; } = new BindableBool();
+
+        public Action? OnInputError { get; set; }
+
+        protected override float LeftRightPadding => 0;
+
+        public InnerTextBox()
+        {
+            DrawBorder = false;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Height = 16;
+            TextContainer.Height = 1;
+            BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
+        }
+
+        protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+
+            Focused.Value = true;
+        }
+
+        protected override void OnFocusLost(FocusLostEvent e)
+        {
+            base.OnFocusLost(e);
+
+            Focused.Value = false;
+        }
+
+        protected override void NotifyInputError()
+        {
+            PlayFeedbackSample(FeedbackSampleType.TextInvalid);
+            // base call intentionally suppressed
+            OnInputError?.Invoke();
+        }
+    }
+
+    public interface IInnerTextBox
+    {
+        BindableBool Focused { get; }
+
+        Action? OnInputError { get; set; }
     }
 }

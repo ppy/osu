@@ -264,12 +264,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class FormDropdownSearchBar : DropdownSearchBar
         {
-            public FormTextBox.InnerTextBox TextBox { get; private set; } = null!;
+            public InnerTextBox TextBox { get; private set; } = null!;
 
             protected override void PopIn() => this.FadeIn();
             protected override void PopOut() => this.FadeOut();
 
-            protected override TextBox CreateTextBox() => TextBox = new FormTextBox.InnerTextBox
+            protected override TextBox CreateTextBox() => TextBox = new InnerTextBox
             {
                 PlaceholderText = HomeStrings.SearchPlaceholder,
             };
