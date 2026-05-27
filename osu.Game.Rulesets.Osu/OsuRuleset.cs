@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModSynesthesia(),
                         new OsuModDepth(),
                         new OsuModBloom(),
-                        new ModPitchAdjust()
+                        new ModPitchAdjust(),
                     };
 
                 case ModType.System:
