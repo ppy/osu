@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
@@ -48,8 +47,8 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private CatchPlayfield catchPlayfield = null!;
 
-        private float miscellaneousXOffset => shift_x_factor * catchPlayfield.X;
-        private const float shift_x_factor = 1.6f; // Brute-forced, is magical, todo: may need more intricate calculation
+        private const float catch_playfield_misc_x_scale = 1.6f; // Brute-forced, is magical, todo: may need more intricate calculation
+        private float miscX => catch_playfield_misc_x_scale * catchPlayfield.X;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
@@ -58,32 +57,39 @@ namespace osu.Game.Rulesets.Catch.Mods
             catchPlayfield.OnUpdate += _ => catchPlayfield.MoveToX(CatchPlayfield.CENTER_X - catchPlayfield.Catcher.X);
         }
 
+        private bool isExited(Player player) => !player.IsCurrentScreen(); // Inspired from TestScenePause's confirmExited
+
+        private Drawable? getDrawableStoryboard(Player player) => player.DimmableStoryboard.Children.FirstOrDefault(c => c is DrawableStoryboard);
+
         public void ApplyToPlayer(Player player)
         {
             Storyboard storyboard = player.GameplayState.Storyboard;
 
-            Action<Drawable> backgroundAction = null!;
-            backgroundAction = _ => player.ApplyToBackground(bsb =>
+            if (!CentredBackground.Value)
             {
-                if (isExited(player)) // Background screen beatmap persists upon exiting gameplay, so manual event removal and its repositioning to x = 0 is necessary
+                Action<Drawable> backgroundAction = null!;
+                backgroundAction = _ => player.ApplyToBackground(bsb =>
                 {
-                    bsb.OnUpdate -= backgroundAction;
-                    if (!CentredBackground.Value)
+                    if (isExited(player)) // Background screen beatmap persists upon exiting the play, so manual event removal and its repositioning to x = 0 is necessary
+                    {
+                        bsb.OnUpdate -= backgroundAction;
                         bsb.MoveToX(0.0f);
 
-                    return;
-                }
+                        return;
+                    }
 
-                bool storyboardReplacesBackground = storyboard.ReplacesBackground && storyboard.HasDrawable; // Based on Player's
-                if (!storyboardReplacesBackground || !showStoryboard.Value)
-                    updateBackgroundX(bsb);
-            });
-            player.ApplyToBackground(bsb => bsb.OnUpdate += backgroundAction);
+                    bool storyboardReplacesBackground = storyboard.ReplacesBackground && storyboard.HasDrawable; // Based on Player's
+                    if (!storyboardReplacesBackground || !showStoryboard.Value)
+                        bsb.MoveToX(miscX);
+                });
 
-            if (!storyboard.HasDrawable)
+                player.ApplyToBackground(bsb => bsb.OnUpdate += backgroundAction);
+            }
+
+            if (CentredStoryboard.Value || !storyboard.HasDrawable)
                 return;
 
-            Drawable? drawableStoryboard = getDrawableStoryboard(player);
+            Drawable? drawableStoryboard = getDrawableStoryboard(player); // The drawable storyboard may already be loaded into memory even if Show storyboard was just disabled while entering the play
 
             if (drawableStoryboard.IsNull())
             {
@@ -92,7 +98,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                     if (!ss.NewValue)
                         return;
 
-                    showStoryboard.UnbindEvents(); // Show storyboard being enabled even briefly during gameplay means the drawable storyboard will load into memory if gameplay continues long enough
+                    showStoryboard.UnbindEvents(); // Show storyboard being enabled even briefly during a play means the drawable storyboard will load into memory if the play continues long enough
 
                     drawableStoryboard = getDrawableStoryboard(player);
 
@@ -105,29 +111,13 @@ namespace osu.Game.Rulesets.Catch.Mods
                         drawableStoryboard = getDrawableStoryboard(player);
                     }
 
-                    drawableStoryboard.OnUpdate += _ => updateStoryboardX(drawableStoryboard);
+                    drawableStoryboard.OnUpdate += _ => drawableStoryboard.MoveToX(miscX);
                 }), true);
 
                 return;
             }
 
-            drawableStoryboard.OnUpdate += _ => updateStoryboardX(drawableStoryboard);
-        }
-
-        private bool isExited(Player player) => !player.IsCurrentScreen(); // Inspired from TestScenePause's confirmExited
-
-        private Drawable? getDrawableStoryboard(Player player) => player.DimmableStoryboard.Children.FirstOrDefault(c => c is DrawableStoryboard);
-
-        private void updateBackgroundX(BackgroundScreenBeatmap backgroundScreenBeatmap)
-        {
-            if (!CentredBackground.Value)
-                backgroundScreenBeatmap.MoveToX(miscellaneousXOffset);
-        }
-
-        private void updateStoryboardX(Drawable drawableStoryboard)
-        {
-            if (!CentredStoryboard.Value)
-                drawableStoryboard.MoveToX(miscellaneousXOffset);
+            drawableStoryboard.OnUpdate += _ => drawableStoryboard.MoveToX(miscX);
         }
     }
 }
