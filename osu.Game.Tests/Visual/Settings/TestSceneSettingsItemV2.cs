@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Settings
                                             HintText = "4 number pin code",
                                             PlaceholderText = "ex. 9487",
                                             LengthLimit = 4,
-                                            Current = { Value = string.Empty, Default = string.Empty }
+                                            Current = { Value = string.Empty }
                                         }),
                                         new SettingsItemV2(new FormPasswordTextBox
                                         {
