@@ -244,7 +244,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public override string Name => string.Empty;
             public override LocalisableString Description => string.Empty;
-            public override double ScoreMultiplier => 1.0;
             public override string Acronym => "Test";
         }
     }

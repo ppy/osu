@@ -543,7 +543,8 @@ namespace osu.Game.Rulesets.Edit
             EditorBeatmap.PlacementObject.Value = null;
 
             EditorBeatmap.BeginChange();
-            foreach (var h in EditorBeatmap.HitObjects.Where(ho => HitObjectPlacementBlueprint.PlacementReplacesExisting(ho, hitObject)).ToArray())
+
+            foreach (var h in EditorBeatmap.HitObjects.Where(ho => blueprintContainer.CurrentHitObjectPlacement?.ReplacesExistingObject(ho) == true).ToArray())
                 EditorBeatmap.Remove(h);
             EditorBeatmap.Add(hitObject);
             EditorBeatmap.EndChange();

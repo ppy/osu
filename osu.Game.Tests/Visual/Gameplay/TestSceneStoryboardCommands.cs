@@ -201,7 +201,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var layer = storyboard.GetLayer("Background");
 
-            var sprite = new StoryboardSprite(lookup_name, Anchor.Centre, new Vector2(320, 240));
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, lookup_name, Anchor.Centre, new Vector2(320, 240));
             sprite.Commands.AddScale(Easing.None, 0, clock_limit, 0.5f, 0.5f);
             sprite.Commands.AddAlpha(Easing.None, 0, clock_limit, 1, 1);
             addCommands?.Invoke(sprite);
