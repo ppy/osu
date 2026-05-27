@@ -193,6 +193,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 OnInputError?.Invoke();
             }
         }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
