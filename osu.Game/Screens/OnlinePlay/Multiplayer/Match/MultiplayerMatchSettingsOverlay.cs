@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public MatchTypePicker TypePicker = null!;
             public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
             public OsuTextBox PasswordTextBox = null!;
-            public OsuCheckbox AutoSkipCheckbox = null!;
+            public FormCheckBox AutoSkipCheckbox = null!;
             public RoundedButton ApplyButton = null!;
             public OsuSpriteText ErrorText = null!;
 
@@ -259,9 +259,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Other")
                                                                 {
-                                                                    Child = AutoSkipCheckbox = new OsuCheckbox
+                                                                    Child = AutoSkipCheckbox = new FormCheckBox
                                                                     {
-                                                                        LabelText = "Automatically skip the beatmap intro"
+                                                                        Caption = "Automatically skip the beatmap intro",
+                                                                        HintText = "When enabled, the intro of all beatmap played will be automatically skipped."
                                                                     }
                                                                 }
                                                             }
