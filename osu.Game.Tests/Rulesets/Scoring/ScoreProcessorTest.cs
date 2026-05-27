@@ -500,6 +500,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             };
             scoreProcessor.ApplyResult(judgementResult);
 
+            Assert.That(scoreProcessor.MaximumTotalScore, Is.EqualTo(1_000_000 * 1.1).Within(0.5d));
             Assert.That(scoreProcessor.GetDisplayScore(ScoringMode.Standardised), Is.EqualTo(1_000_000 * 1.1).Within(0.5d));
         }
 

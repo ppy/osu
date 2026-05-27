@@ -230,9 +230,10 @@ namespace osu.Game.Rulesets.Scoring
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
+            Beatmap.Value = beatmap;
+
             base.ApplyBeatmap(beatmap);
             beatmapApplied = true;
-            Beatmap.Value = beatmap;
         }
 
         protected sealed override void ApplyResultInternal(JudgementResult result)
