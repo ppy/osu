@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Acronym => "FP";
         public override LocalisableString Description => "Catch, from the catcher's perspective!";
         public override ModType Type => ModType.Fun;
-        public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => OsuIcon.ModMovingFast;
         public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModNoScope) };
 
