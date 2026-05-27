@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        public int LengthLimit { get; set; } = int.MaxValue;
+        public int? LengthLimit { get; init; }
 
         private CompositeDrawable? tabbableContentContainer;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         },
                         textBox = CreateTextBox().With(t =>
                         {
-                            t.LengthLimit = LengthLimit;
+                            t.LengthLimit = LengthLimit == null ? int.MaxValue : LengthLimit;
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;

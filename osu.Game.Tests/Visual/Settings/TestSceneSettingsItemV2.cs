@@ -102,14 +102,14 @@ namespace osu.Game.Tests.Visual.Settings
                                             Caption = "2*3*7",
                                             HintText = "42",
                                             PlaceholderText = "Secret",
-                                            Current = { Value = string.Empty, Default = string.Empty }
+                                            Current = { Value = string.Empty }
                                         }),
                                         new SettingsItemV2(new FormNumberBox(allowDecimals: true)
                                         {
                                             Caption = "Number",
                                             HintText = "Insert your favourite number",
                                             PlaceholderText = "Mine is 42!",
-                                            Current = { Value = string.Empty, Default = string.Empty }
+                                            Current = { Value = string.Empty }
                                         }),
                                         new SettingsItemV2(new FormCheckBox
                                         {
