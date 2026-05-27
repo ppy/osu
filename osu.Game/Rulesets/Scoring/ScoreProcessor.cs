@@ -211,20 +211,14 @@ namespace osu.Game.Rulesets.Scoring
 
             Mods.ValueChanged += mods =>
             {
-                if (Beatmap.Value != null)
-                {
-                    var calculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(Beatmap.Value.BeatmapInfo.Difficulty));
-                    scoreMultiplier = calculator.CalculateFor(mods.NewValue);
-                }
-
+                updateScoreMultiplier();
                 updateScore();
                 updateRank();
             };
 
             Beatmap.ValueChanged += beatmap =>
             {
-                var calculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(beatmap.NewValue!.BeatmapInfo.Difficulty));
-                scoreMultiplier = calculator.CalculateFor(Mods.Value);
+                updateScoreMultiplier();
             };
         }
 
@@ -413,6 +407,15 @@ namespace osu.Game.Rulesets.Scoring
                 newRank = mod.AdjustRank(newRank, Accuracy.Value);
 
             rank.Value = newRank;
+        }
+
+        private void updateScoreMultiplier()
+        {
+            if (Beatmap.Value == null)
+                return;
+
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(Beatmap.Value.BeatmapInfo.Difficulty));
+            scoreMultiplier = calculator.CalculateFor(Mods.Value);
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
