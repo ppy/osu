@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormTextBox : CompositeDrawable, IHasCurrentValue<string>, IFormControl
+    public partial class FormPasswordTextBox : CompositeDrawable, IHasCurrentValue<string>, IFormControl
     {
         public Bindable<string> Current
         {
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private FormControlBackground background = null!;
         private Box flashLayer = null!;
-        private InnerTextBox textBox = null!;
+        private InnerPasswordTextBox textBox = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
 
@@ -147,8 +147,52 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        internal virtual InnerTextBox CreateTextBox() => new InnerTextBox();
+        internal InnerPasswordTextBox CreateTextBox() => new InnerPasswordTextBox();
 
+        internal partial class InnerPasswordTextBox : OsuPasswordTextBox
+        {
+            public BindableBool Focused { get; } = new BindableBool();
+
+            public Action? OnInputError { get; set; }
+
+            protected override float LeftRightPadding => 0;
+
+            public InnerPasswordTextBox()
+            {
+                DrawBorder = false;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Height = 16;
+                TextContainer.Height = 1;
+                BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
+            }
+
+            protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
+
+            protected override void OnFocus(FocusEvent e)
+            {
+                base.OnFocus(e);
+
+                Focused.Value = true;
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                base.OnFocusLost(e);
+
+                Focused.Value = false;
+            }
+
+            protected override void NotifyInputError()
+            {
+                PlayFeedbackSample(FeedbackSampleType.TextInvalid);
+                // base call intentionally suppressed
+                OnInputError?.Invoke();
+            }
+        }
         protected override void LoadComplete()
         {
             base.LoadComplete();

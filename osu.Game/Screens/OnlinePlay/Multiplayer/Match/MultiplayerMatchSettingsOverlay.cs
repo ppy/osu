@@ -56,17 +56,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public Action? SettingsApplied;
 
-            public OsuTextBox NameField = null!;
+            public FormTextBox NameField = null!;
             private FormSliderBar<byte> maximumParticipantsSliderBar = null!;
             private FormCheckBox maximumParticipantsCheckbox = null!;
             public MatchTypePicker TypePicker = null!;
-            public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
-            public OsuTextBox PasswordTextBox = null!;
+            public FormEnumDropdown<QueueMode> QueueModeDropdown = null!;
+            public FormPasswordTextBox PasswordTextBox = null!;
             public FormCheckBox AutoSkipCheckbox = null!;
             public RoundedButton ApplyButton = null!;
             public OsuSpriteText ErrorText = null!;
 
-            private OsuEnumDropdown<StartMode> startModeDropdown = null!;
+            private FormEnumDropdown<StartMode> startModeDropdown = null!;
             private OsuSpriteText typeLabel = null!;
             private LoadingLayer loadingLayer = null!;
 
@@ -150,11 +150,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             {
                                                                 new Section("Room name")
                                                                 {
-                                                                    Child = NameField = new OsuTextBox
+                                                                    Child = NameField = new FormTextBox
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        LengthLimit = 100,
+                                                                        LengthLimit = 100
                                                                     },
                                                                 },
                                                                 // new Section("Room visibility")
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         Height = 40,
-                                                                        Child = QueueModeDropdown = new OsuEnumDropdown<QueueMode>
+                                                                        Child = QueueModeDropdown = new FormEnumDropdown<QueueMode>
                                                                         {
                                                                             RelativeSizeAxes = Axes.X
                                                                         }
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         Height = 40,
-                                                                        Child = startModeDropdown = new OsuEnumDropdown<StartMode>
+                                                                        Child = startModeDropdown = new FormEnumDropdown<StartMode>
                                                                         {
                                                                             RelativeSizeAxes = Axes.X
                                                                         }
@@ -244,7 +244,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Password (optional)")
                                                                 {
-                                                                    Child = PasswordTextBox = new OsuPasswordTextBox
+                                                                    Child = PasswordTextBox = new FormPasswordTextBox
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
@@ -254,7 +254,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         //
                                                                         // Note that we need at least 36 characters for tournament rooms:
                                                                         // https://github.com/ppy/osu-server-spectator/blob/406ed09d5825f2fe60c9d5ca08e69db94d873e28/osu.Server.Spectator/Hubs/Referee/RefereeHub.cs#L101
-                                                                        LengthLimit = 40,
+                                                                        LengthLimit = 40
                                                                     },
                                                                 },
                                                                 new Section("Other")
@@ -423,7 +423,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
 
             private void updateRoomName()
-                => NameField.Text = room.Name;
+                => NameField.Current.Value = room.Name;
 
             private void updateRoomType()
                 => TypePicker.Current.Value = room.Type;
@@ -432,7 +432,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 => QueueModeDropdown.Current.Value = room.QueueMode;
 
             private void updateRoomPassword()
-                => PasswordTextBox.Text = room.Password ?? string.Empty;
+                => PasswordTextBox.Current.Value = room.Password ?? string.Empty;
 
             private void updateRoomAutoSkip()
                 => AutoSkipCheckbox.Current.Value = room.AutoSkip;
@@ -458,7 +458,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 base.Update();
 
-                ApplyButton.Enabled.Value = room.Playlist.Count > 0 && NameField.Text.Length > 0 && !operationInProgress.Value;
+                ApplyButton.Enabled.Value = room.Playlist.Count > 0 && NameField.Current.Value.Length > 0 && !operationInProgress.Value;
                 playlistContainer.Alpha = room.RoomID == null ? 1 : 0;
             }
 
@@ -479,8 +479,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (client.Room != null)
                 {
                     client.ChangeSettings(
-                              name: NameField.Text,
-                              password: PasswordTextBox.Text,
+                              name: NameField.Current.Value,
+                              password: PasswordTextBox.Current.Value,
                               matchType: TypePicker.Current.Value,
                               queueMode: QueueModeDropdown.Current.Value,
                               autoStartDuration: TimeSpan.FromSeconds((int)startModeDropdown.Current.Value),
@@ -496,8 +496,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 }
                 else
                 {
-                    room.Name = NameField.Text;
-                    room.Password = PasswordTextBox.Text;
+                    room.Name = NameField.Current.Value;
+                    room.Password = PasswordTextBox.Current.Value;
                     room.Type = TypePicker.Current.Value;
                     room.QueueMode = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
