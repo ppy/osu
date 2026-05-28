@@ -342,8 +342,6 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Breaks = value;
             }
 
-            public List<string> UnhandledEventLines => baseBeatmap.UnhandledEventLines;
-
             public double TotalBreakTime => baseBeatmap.TotalBreakTime;
             public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
             public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();

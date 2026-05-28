@@ -187,10 +187,9 @@ namespace osu.Game.Database
                     break;
             }
 
-            double modMultiplier = 1;
-
-            foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score));
+            double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
 
             return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
 
@@ -352,7 +351,8 @@ namespace osu.Game.Database
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
-            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+            var modMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+            double modMultiplier = modMultiplierCalculator.CalculateFor(score.Mods);
 
             long convertedTotalScoreWithoutMods;
 

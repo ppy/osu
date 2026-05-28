@@ -65,8 +65,6 @@ namespace osu.Game.Beatmaps
 
         public SortedList<BreakPeriod> Breaks { get; set; } = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
 
-        public List<string> UnhandledEventLines { get; set; } = new List<string>();
-
         [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
 

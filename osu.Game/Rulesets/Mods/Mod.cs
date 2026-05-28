@@ -84,7 +84,8 @@ namespace osu.Game.Rulesets.Mods
         /// The score multiplier of this mod.
         /// </summary>
         [JsonIgnore]
-        public abstract double ScoreMultiplier { get; }
+        [Obsolete("This property is no longer used to calculate the score multiplier. Use `Ruleset.CreateScoreMultiplierCalculator()` instead.")]
+        public virtual double ScoreMultiplier => 1;
 
         /// <summary>
         /// Returns true if this mod is implemented (and playable).
