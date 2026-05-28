@@ -180,7 +180,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         TypePicker = new MatchTypePicker
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
-
                                                                         },
                                                                         typeLabel = new OsuSpriteText
                                                                         {
@@ -198,8 +197,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 {
                                                                     Caption = "Auto start",
                                                                     RelativeSizeAxes = Axes.X,
-                                                                }
-                                                                )
+                                                                })
                                                             },
                                                         },
                                                         new FillFlowContainer

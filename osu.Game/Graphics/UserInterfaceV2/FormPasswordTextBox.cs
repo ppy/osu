@@ -57,6 +57,5 @@ namespace osu.Game.Graphics.UserInterfaceV2
             OnInputError?.Invoke();
         }
     }
-
 }
 
