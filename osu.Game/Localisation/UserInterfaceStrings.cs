@@ -35,9 +35,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Parallax => new TranslatableString(getKey(@"parallax"), @"Parallax");
 
         /// <summary>
-        /// "Hide toolbar on startup of the game"
+        /// "Hide toolbar on startup"
         /// </summary>
-        public static LocalisableString HideToolbarOnStartup => new TranslatableString(getKey(@"hide_toolbar_on_startup"), @"Hide toolbar on startup of the game");
+        public static LocalisableString HideToolbarOnStartup => new TranslatableString(getKey(@"hide_toolbar_on_startup"), @"Hide toolbar on startup");
 
         /// <summary>
         /// "Hold-to-confirm activation time"
