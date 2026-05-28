@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Select
                             new StatisticRow(s.DisplayName.ToUpper(), s.Count.ToLocalisableString("N0"), colours.ForHitResult(s.Result)));
 
                         var ruleset = value.Ruleset.CreateInstance();
-                        var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+                        var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score.BeatmapInfo!.Difficulty));
                         double multiplier = scoreMultiplierCalculator.CalculateFor(value.Mods);
 
                         var generalStatistics = new[]

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using NUnit.Framework;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -42,7 +43,7 @@ namespace osu.Game.Benchmarks
         public override void SetUp()
         {
             base.SetUp();
-            calculator = new OsuRuleset().CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+            calculator = new OsuRuleset().CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty()));
         }
 
         [Benchmark]

@@ -15,6 +15,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -124,7 +125,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext()).CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -139,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext()).CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
