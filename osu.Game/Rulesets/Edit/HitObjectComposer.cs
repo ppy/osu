@@ -6,21 +6,27 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
+using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -87,7 +93,7 @@ namespace osu.Game.Rulesets.Edit
 
         private EditorRadioButtonCollection toolboxCollection;
         private FillFlowContainer togglesCollection;
-        private FillFlowContainer sampleBankTogglesCollection;
+        private FillFlowContainer<SampleBankTernaryButton> sampleBankTogglesCollection;
 
         private IBindable<bool> hasTiming;
         private Bindable<bool> autoSeekOnPlacement;
@@ -224,7 +230,7 @@ namespace osu.Game.Rulesets.Edit
                                                     },
                                                 }
                                             },
-                                            sampleBankTogglesCollection = new FillFlowContainer
+                                            sampleBankTogglesCollection = new FillFlowContainer<SampleBankTernaryButton>
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
@@ -268,7 +274,7 @@ namespace osu.Game.Rulesets.Edit
 
             togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates);
+            sampleBankTogglesCollection.AddRange(createSampleBankTernaryButtons().ToArray());
 
             SetSelectTool();
 
@@ -320,6 +326,11 @@ namespace osu.Game.Rulesets.Edit
                     rightToolboxBackground.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
                 }
             }, true);
+
+            newCombo.BindTo(BlueprintContainer.SelectionHandler.SelectionNewComboState);
+
+            autoSelectionBankEnabled.BindTo(BlueprintContainer.SelectionHandler.AutoSelectionBankEnabled);
+            autoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip());
         }
 
         protected override void Update()
@@ -364,10 +375,81 @@ namespace osu.Game.Rulesets.Edit
         /// </remarks>
         protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
 
+        private readonly BindableBool autoSelectionBankEnabled = new BindableBool();
+        private readonly Bindable<TernaryState> newCombo = new Bindable<TernaryState> { Description = "New Combo" };
+
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
-        protected virtual IEnumerable<Drawable> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
+        protected virtual IEnumerable<Drawable> CreateTernaryButtons()
+        {
+            var firstToolIcon = CompositionTools.First().CreateIcon();
+            Debug.Assert(firstToolIcon != null);
+
+            //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
+            yield return new NewComboTernaryButton
+            {
+                Current = newCombo,
+                CreateIcon = () => new Container
+                {
+                    firstToolIcon.With(i =>
+                    {
+                        i.Anchor = Anchor.BottomLeft;
+                        i.Origin = Anchor.BottomLeft;
+                        i.Size = new Vector2(15);
+                    }),
+                    new SpriteIcon
+                    {
+                        Icon = OsuIcon.EditorNewComboSparkles,
+                        Size = new Vector2(20),
+                    },
+                },
+            };
+
+            foreach (var kvp in BlueprintContainer.SelectionHandler.SelectionSampleStates)
+            {
+                yield return new DrawableTernaryButton
+                {
+                    Current = kvp.Value,
+                    Description = kvp.Key.Replace(@"hit", string.Empty).Titleize(),
+                    CreateIcon = () => GetIconForSample(kvp.Key),
+                };
+            }
+        }
+
+        private IEnumerable<SampleBankTernaryButton> createSampleBankTernaryButtons()
+        {
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(EditorSelectionHandler.HIT_BANK_AUTO))
+            {
+                yield return new SampleBankTernaryButton(bankName)
+                {
+                    NormalState = { Current = BlueprintContainer.SelectionHandler.SelectionBankStates[bankName], },
+                    AdditionsState = { Current = BlueprintContainer.SelectionHandler.SelectionAdditionBankStates[bankName], },
+                    CreateIcon = () => getIconForBank(bankName)
+                };
+            }
+        }
+
+        private Drawable getIconForBank(string sampleName)
+        {
+            return new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Y = -1,
+                Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
+                Text = $"{char.ToUpperInvariant(sampleName.First())}"
+            };
+        }
+
+        private void updateAutoBankTernaryButtonTooltip()
+        {
+            bool enabled = autoSelectionBankEnabled.Value;
+
+            var autoBankButton = sampleBankTogglesCollection.Single(t => t.BankName == EditorSelectionHandler.HIT_BANK_AUTO);
+            autoBankButton.NormalButton.Enabled.Value = enabled;
+            autoBankButton.NormalButton.TooltipText = !enabled ? "Auto normal bank can only be used during hit object placement" : string.Empty;
+        }
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
@@ -619,5 +701,23 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="timestamp">The time instant to seek to, in milliseconds.</param>
         /// <param name="objectDescription">The ruleset-specific description of objects to select at the given timestamp.</param>
         public virtual void SelectFromTimestamp(double timestamp, string objectDescription) { }
+
+        public static Drawable GetIconForSample(string sampleName)
+        {
+            switch (sampleName)
+            {
+                case HitSampleInfo.HIT_CLAP:
+                    return new SpriteIcon { Icon = OsuIcon.EditorClap };
+
+                case HitSampleInfo.HIT_WHISTLE:
+                    return new SpriteIcon { Icon = OsuIcon.EditorWhistle };
+
+                case HitSampleInfo.HIT_FINISH:
+                    return new SpriteIcon { Icon = OsuIcon.EditorFinish };
+
+                default:
+                    return Empty();
+            }
+        }
     }
 }
