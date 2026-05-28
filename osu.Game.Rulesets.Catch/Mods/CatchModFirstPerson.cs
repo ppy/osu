@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private bool isExited(Player player) => !player.IsCurrentScreen(); // Inspired from TestScenePause's confirmExited
 
-        private Drawable? getDrawableStoryboard(Player player) => player.DimmableStoryboard.Children.FirstOrDefault(c => c is DrawableStoryboard);
+        private Drawable? getDrawableStoryboard(Player player) => player.DimmableStoryboard.Children.FirstOrDefault(d => d is DrawableStoryboard);
 
         public void ApplyToPlayer(Player player)
         {
