@@ -224,6 +224,12 @@ namespace osu.Game.Rulesets.Scoring
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
+            // NOTE: The ordering of operations here is significant.
+            // `Beatmap.Value` must be set before `base.ApplyBeatmap()` because changes to `Beatmap.Value`
+            // trigger recalculation of `scoreMultiplier`,
+            // and `base.ApplyBeatmap()` calls `SimulateAutoplay()` then `Reset(storeResults: true)`.
+            // failing to calculate the correct score multiplier *before* autoplay simulation would result in
+            // storing the incorrect value of `MaximumTotalScore`.
             Beatmap.Value = beatmap;
 
             base.ApplyBeatmap(beatmap);
