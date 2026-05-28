@@ -210,33 +210,7 @@ namespace osu.Game.Overlays.SkinEditor
                 // if we're anywhere else, the state is unknown and may not make sense, so forcibly set something that does.
                 if (screen is not SoloSongSelect && !beatmap.Value.BeatmapInfo.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value))
                 {
-                    BeatmapInfo? targetMap = null;
-
-                    //first check if the current beatmap set has any other maps that are valid for the current ruleset
-                    var activeSet = beatmap.Value.BeatmapSetInfo;
-                    var validBeatmaps = activeSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
-
-                    if (validBeatmaps.Any())
-                        targetMap = difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
-                    else
-                    {
-                        //otherwise get a random beatmap set in the current ruleset
-                        realm.Run(r =>
-                        {
-                            var allValidBeatmapSets = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
-                           .AsEnumerable()
-                           .Where(s => s.Beatmaps.Any(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)));
-
-                            if (allValidBeatmapSets.Any())
-                            {
-                                var randomSet = allValidBeatmapSets.ElementAt(Random.Shared.Next(allValidBeatmapSets.Count()));
-                                var randomSetValidMaps = randomSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
-                                targetMap = difficultyRecommender?.GetRecommendedBeatmap(randomSetValidMaps) ?? randomSetValidMaps.First();
-                            }
-                        });
-                    }
-
-                    if (targetMap != null)
+                    if (getBeatmapForCurrentRuleset() is BeatmapInfo targetMap)
                         beatmap.Value = beatmapManager.GetWorkingBeatmap(targetMap);
                     else
                         ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
@@ -256,6 +230,29 @@ namespace osu.Game.Overlays.SkinEditor
             }, new[] { typeof(Player), typeof(SoloSongSelect) });
         }
 
+        private BeatmapInfo? getBeatmapForCurrentRuleset()
+        {
+            //first check if the current beatmap set has any other maps that are valid for the current ruleset
+            var activeSet = beatmap.Value.BeatmapSetInfo;
+            var validBeatmaps = activeSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
+
+            if (validBeatmaps.Any())
+                return difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+
+            //otherwise get a random beatmap set in the current ruleset
+            var allValidBeatmapSets = realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
+                .AsEnumerable()
+                .Where(s => s.Beatmaps.Any(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)));
+
+            if (allValidBeatmapSets.Any())
+            {
+                var randomSet = allValidBeatmapSets.ElementAt(Random.Shared.Next(allValidBeatmapSets.Count()));
+                var randomSetValidMaps = randomSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
+                return difficultyRecommender?.GetRecommendedBeatmap(randomSetValidMaps) ?? randomSetValidMaps.First();
+            }
+
+            return null;
+        }
         protected override void Update()
         {
             base.Update();
