@@ -53,8 +53,8 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
-                    Caption = UserInterfaceStrings.HideToolbarWhenLaunching,
-                    Current = config.GetBindable<bool>(OsuSetting.HideToolbarWhenLaunching)
+                    Caption = UserInterfaceStrings.HideToolbarOnStartup,
+                    Current = config.GetBindable<bool>(OsuSetting.HideToolbarOnStartup)
                 }),
             };
         }

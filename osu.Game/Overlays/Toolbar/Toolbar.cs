@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Toolbar
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
-            hiddenByUser = config.Get<bool>(OsuSetting.HideToolbarWhenLaunching);
+            hiddenByUser = config.Get<bool>(OsuSetting.HideToolbarOnStartup);
         }
 
         protected override void LoadComplete()

@@ -133,7 +133,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.CursorRotation, true);
 
             SetDefault(OsuSetting.MenuParallax, true);
-            SetDefault(OsuSetting.HideToolbarWhenLaunching, false);
+            SetDefault(OsuSetting.HideToolbarOnStartup, false);
 
             // See https://stackoverflow.com/a/63307411 for default sourcing.
             SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
@@ -384,7 +384,7 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         BeatmapListingCardSize,
         ToolbarClockDisplayMode,
-        HideToolbarWhenLaunching,
+        HideToolbarOnStartup,
         SongSelectBackgroundBlur,
         Version,
         ShowFirstRunSetup,
