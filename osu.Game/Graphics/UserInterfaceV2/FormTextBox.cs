@@ -119,7 +119,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         },
                         textBox = CreateTextBox().With(t =>
                         {
-                            t.LengthLimit = LengthLimit ?? int.MaxValue;
+                            t.LengthLimit = LengthLimit;
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;

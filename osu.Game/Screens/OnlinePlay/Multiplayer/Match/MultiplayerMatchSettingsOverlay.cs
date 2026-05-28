@@ -20,7 +20,6 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Settings;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -150,16 +149,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             RelativeSizeAxes = Axes.X,
                                                             AutoSizeAxes = Axes.Y,
                                                             Width = 0.5f,
-                                                            Spacing = new Vector2(0, 20),
+                                                            Spacing = new Vector2(0, 5),
                                                             Children = new Drawable[]
                                                             {
-                                                                new SettingsItemV2(NameField = new FormTextBox
+                                                                NameField = new FormTextBox
                                                                 {
                                                                     Caption = "Room name",
                                                                     RelativeSizeAxes = Axes.X,
                                                                     TabbableContentContainer = this,
                                                                     LengthLimit = 100,
-                                                                }),
+                                                                },
                                                                 // new Section("Room visibility")
                                                                 // {
                                                                 //     Alpha = disabled_alpha,
@@ -177,6 +176,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     Spacing = new Vector2(7),
                                                                     Children = new Drawable[]
                                                                     {
+                                                                        new OsuSpriteText
+                                                                        {
+                                                                            Font = OsuFont.GetFont(size: 16),
+                                                                            Text = "Game Type"
+                                                                        },
                                                                         TypePicker = new MatchTypePicker
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
@@ -188,16 +192,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         },
                                                                     },
                                                                 },
-                                                                new SettingsItemV2(QueueModeDropdown = new FormEnumDropdown<QueueMode>
+                                                                QueueModeDropdown = new FormEnumDropdown<QueueMode>
                                                                 {
                                                                     Caption = "Queue mode",
                                                                     RelativeSizeAxes = Axes.X,
-                                                                }),
-                                                                new SettingsItemV2(startModeDropdown = new FormEnumDropdown<StartMode>
+                                                                },
+                                                                startModeDropdown = new FormEnumDropdown<StartMode>
                                                                 {
                                                                     Caption = "Auto start",
                                                                     RelativeSizeAxes = Axes.X,
-                                                                })
+                                                                }
                                                             },
                                                         },
                                                         new FillFlowContainer
@@ -207,27 +211,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                             RelativeSizeAxes = Axes.X,
                                                             AutoSizeAxes = Axes.Y,
                                                             Width = 0.5f,
-                                                            Spacing = new Vector2(0, 20),
+                                                            Spacing = new Vector2(0, 5),
                                                             Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
-                                                            Children = new[]
+                                                            Children = new Drawable[]
                                                             {
-                                                                new SettingsItemV2(maximumParticipantsCheckbox = new FormCheckBox
+                                                                maximumParticipantsCheckbox = new FormCheckBox
                                                                 {
                                                                     Caption = "Limited slots",
                                                                     HintText = "When enabled, total players allowed in a room will be limited. Unlimited when disabled."
-                                                                }),
-                                                                new SettingsItemV2(maximumParticipantsSliderBar = new FormSliderBar<byte>
+                                                                },
+                                                                maximumParticipantsSliderBar = new FormSliderBar<byte>
                                                                 {
                                                                     Caption = "Slot count",
                                                                     RelativeSizeAxes = Axes.X,
-                                                                    Margin = new MarginPadding { Top = 5 },
                                                                     Current = new BindableNumber<byte>(16)
                                                                     {
                                                                         MinValue = 2,
                                                                         MaxValue = 16,
                                                                     },
-                                                                }),
-                                                                new SettingsItemV2(PasswordTextBox = new FormPasswordTextBox
+                                                                },
+                                                                PasswordTextBox = new FormPasswordTextBox
                                                                 {
                                                                     Caption = "Password (optional)",
                                                                     RelativeSizeAxes = Axes.X,
@@ -239,11 +242,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     // Note that we need at least 36 characters for tournament rooms:
                                                                     // https://github.com/ppy/osu-server-spectator/blob/406ed09d5825f2fe60c9d5ca08e69db94d873e28/osu.Server.Spectator/Hubs/Referee/RefereeHub.cs#L101
                                                                     LengthLimit = 40
-                                                                }),
-                                                                new SettingsItemV2(AutoSkipCheckbox = new FormCheckBox
+                                                                },
+                                                                AutoSkipCheckbox = new FormCheckBox
                                                                 {
                                                                     Caption = "Automatically skip the beatmap intro"
-                                                                })
+                                                                }
                                                             }
                                                         }
                                                     },
