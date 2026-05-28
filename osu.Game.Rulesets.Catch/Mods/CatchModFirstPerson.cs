@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private bool isExited(Player player) => !player.IsCurrentScreen(); // Inspired from TestScenePause's confirmExited
 
-        private Drawable? getDrawableStoryboard(Player player) => player.DimmableStoryboard.Children.FirstOrDefault(d => d is DrawableStoryboard);
+        private Drawable? getDrawableStoryboard(Player player) => player.DimmableStoryboard.Children.FirstOrDefault(c => c is DrawableStoryboard);
 
         public void ApplyToPlayer(Player player)
         {
@@ -85,13 +85,17 @@ namespace osu.Game.Rulesets.Catch.Mods
                 player.ApplyToBackground(bsb => bsb.OnUpdate += backgroundAction);
             }
 
-            if (CentredStoryboard.Value || !storyboard.HasDrawable)
-                return;
-
-            Drawable? drawableStoryboard = getDrawableStoryboard(player); // The drawable storyboard may already be loaded into memory even if Show storyboard was just disabled while entering the play
-
-            if (drawableStoryboard.IsNull())
+            if (storyboard.HasDrawable && !CentredStoryboard.Value)
             {
+                Drawable? drawableStoryboard = getDrawableStoryboard(player); // The drawable storyboard may still be loaded even if Show storyboard was just disabled while entering the play
+
+                if (drawableStoryboard.IsNotNull())
+                {
+                    drawableStoryboard.OnUpdate += _ => drawableStoryboard.MoveToX(miscX);
+
+                    return;
+                }
+
                 showStoryboard.BindValueChanged(ss => Task.Run(async () => // Task.Run to not have 'async' lambda with delegate returning 'void'
                 {
                     if (!ss.NewValue)
@@ -112,11 +116,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
                     drawableStoryboard.OnUpdate += _ => drawableStoryboard.MoveToX(miscX);
                 }), true);
-
-                return;
             }
-
-            drawableStoryboard.OnUpdate += _ => drawableStoryboard.MoveToX(miscX);
         }
     }
 }
