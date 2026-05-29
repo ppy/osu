@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
             // Dual Stages
             // Mirror
             Single<ManiaModDifficultyAdjust>(hasMultiplier: 0.5);
-            Single<ManiaModClassic>(hasMultiplier: 0.96);
+            Single<ManiaModClassic>(hasMultiplier: 1.0);
             // Invert
             Single<ManiaModConstantSpeed>(hasMultiplier: 0.9);
             Single<ManiaModHoldOff>(hasMultiplier: 0.9);

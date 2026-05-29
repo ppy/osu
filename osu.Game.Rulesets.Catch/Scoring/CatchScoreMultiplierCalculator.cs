@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             #region Conversion
 
             Single<CatchModDifficultyAdjust>(hasMultiplier: 0.5);
-            Single<CatchModClassic>(hasMultiplier: 0.96);
+            Single<CatchModClassic>(hasMultiplier: 1.0);
             // Mirror
 
             #endregion

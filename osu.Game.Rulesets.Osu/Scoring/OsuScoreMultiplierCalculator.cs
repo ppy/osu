@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -14,24 +16,39 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             #region Difficulty Reduction
 
-            Single<OsuModEasy>(hasMultiplier: 0.5);
+            Single<OsuModEasy>(hasMultiplier: easy => easyMultiplier(easy.Retries.Value, easy.Retries.Default));
             Single<OsuModNoFail>(hasMultiplier: 0.5);
-            Single<OsuModHalfTime>(hasMultiplier: halfTime => rateAdjustMultiplier(halfTime.SpeedChange.Value));
-            Single<OsuModDaycore>(hasMultiplier: daycore => rateAdjustMultiplier(daycore.SpeedChange.Value));
+            Single<OsuModHalfTime>(hasMultiplier: halfTime => halfTimeMultiplier(halfTime.SpeedChange.Value));
+            Single<OsuModDaycore>(hasMultiplier: daycore => halfTimeMultiplier(daycore.SpeedChange.Value));
 
             #endregion
 
             #region Difficulty Increase
 
-            Single<OsuModHardRock>(hasMultiplier: hardRock => hardRock.UsesDefaultConfiguration ? 1.06 : 1);
+            Single<OsuModHardRock>(hasMultiplier: hardRock => hardRock.UsesDefaultConfiguration ? 1.09 : 1);
             // Sudden Death
             // Perfect
-            Single<OsuModDoubleTime>(hasMultiplier: doubleTime => rateAdjustMultiplier(doubleTime.SpeedChange.Value));
-            Single<OsuModNightcore>(hasMultiplier: nightcore => rateAdjustMultiplier(nightcore.SpeedChange.Value));
-            Single<OsuModHidden>(hasMultiplier: hidden => hidden.UsesDefaultConfiguration ? 1.06 : 1);
-            // Traceable
-            Single<OsuModFlashlight>(hasMultiplier: flashlight => flashlight.UsesDefaultConfiguration ? 1.12 : 1);
-            Single<OsuModBlinds>(hasMultiplier: blinds => blinds.UsesDefaultConfiguration ? 1.12 : 1);
+            Single<OsuModDoubleTime>(hasMultiplier: doubleTime => doubleTimeMultiplier(doubleTime.SpeedChange.Value));
+            Single<OsuModNightcore>(hasMultiplier: nightcore => doubleTimeMultiplier(nightcore.SpeedChange.Value));
+
+            const double blinds_multiplier = 1.24;
+
+            Combination<OsuModHidden, OsuModBlinds>(hasMultiplier: (_, _) => blinds_multiplier);
+
+            Combination<OsuModHidden, OsuModWiggle>(hasMultiplier: (hidden, _) => hiddenMultiplier(hidden.OnlyFadeApproachCircles.Value, hasReductionMod: true));
+            Combination<OsuModHidden, OsuModGrow>(hasMultiplier: (hidden, _) => hiddenMultiplier(hidden.OnlyFadeApproachCircles.Value, hasReductionMod: true));
+            Combination<OsuModHidden, OsuModDeflate>(hasMultiplier: (hidden, deflate) => hiddenMultiplier(hidden.OnlyFadeApproachCircles.Value, hasReductionMod: true, deflate));
+            Combination<OsuModHidden, OsuModRepel>(hasMultiplier: (hidden, _) => hiddenMultiplier(hidden.OnlyFadeApproachCircles.Value, hasReductionMod: true));
+            Combination<OsuModHidden, OsuModDepth>(hasMultiplier: (hidden, _) => hiddenMultiplier(hidden.OnlyFadeApproachCircles.Value, hasReductionMod: true));
+
+            Single<OsuModHidden>(hasMultiplier: hidden => hiddenMultiplier(hidden.OnlyFadeApproachCircles.Value, hasReductionMod: false));
+
+            Single<OsuModTraceable>(hasMultiplier: 1.02);
+
+            Combination<OsuModFlashlight, OsuModFreezeFrame>(hasMultiplier: (flashlight, _) => flashlightMultiplier(flashlight, hasFreezeFrameMod: true));
+            Single<OsuModFlashlight>(hasMultiplier: flashlight => flashlightMultiplier(flashlight, hasFreezeFrameMod: false));
+
+            Single<OsuModBlinds>(hasMultiplier: blinds => blinds.UsesDefaultConfiguration ? blinds_multiplier : 1);
             // Strict Tracking
             // Accuracy Challenge
 
@@ -39,10 +56,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             #region Conversion
 
-            Single<OsuModTargetPractice>(hasMultiplier: 0.1);
-            Single<OsuModDifficultyAdjust>(hasMultiplier: 0.5);
-            Single<OsuModClassic>(hasMultiplier: 0.96);
-            // Random
+            Single<OsuModTargetPractice>(hasMultiplier: 0.01);
+            Single<OsuModDifficultyAdjust>(hasMultiplier: difficultyAdjust => difficultyAdjustMultiplier(difficultyAdjust, Context.BeatmapDifficultyWithoutMods));
+            Single<OsuModClassic>(hasMultiplier: classic => classic.ClassicNoteLock.Value ? 0.985 : 0.96);
+            Single<OsuModRandom>(hasMultiplier: 0.7);
             // Mirror
             // Alternate
             // Single Tap
@@ -55,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             // Cinema
             Single<OsuModRelax>(hasMultiplier: 0.1);
             Single<OsuModAutopilot>(hasMultiplier: 0.1);
-            Single<OsuModSpunOut>(hasMultiplier: 0.9);
+            Single<OsuModSpunOut>(hasMultiplier: 0.95);
 
             #endregion
 
@@ -65,37 +82,113 @@ namespace osu.Game.Rulesets.Osu.Scoring
             // Wiggle
             // Spin In
             // Grow
-            // Deflate
-            Single<ModWindUp>(hasMultiplier: 0.5);
-            Single<ModWindDown>(hasMultiplier: 0.5);
+            Single<OsuModDeflate>(hasMultiplier: deflate => deflateMultiplier(deflate.StartScale.Value, deflate.StartScale.Default));
+            Single<ModWindUp>(hasMultiplier: windUp => windMultiplier(windUp.InitialRate.Value, windUp.FinalRate.Value));
+            Single<ModWindDown>(hasMultiplier: windDown => windMultiplier(windDown.FinalRate.Value, windDown.InitialRate.Value));
             // Barrel Roll
-            // Approach Different
+            Single<OsuModApproachDifferent>(hasMultiplier: 0.7);
             // Muted
             // No Scope
-            Single<OsuModMagnetised>(hasMultiplier: 0.5);
+            Single<OsuModMagnetised>(hasMultiplier: magnetised => 0.7 - magnetised.AttractionStrength.Value * 0.6);
             // Repel
-            Single<ModAdaptiveSpeed>(hasMultiplier: 0.5);
+            Single<ModAdaptiveSpeed>(hasMultiplier: 0.1);
             // Freeze Frame
             // Bubbles
-            Single<OsuModSynesthesia>(hasMultiplier: 0.8);
+            Single<OsuModSynesthesia>(hasMultiplier: 0.99);
             // Depth
             // Bloom
 
             #endregion
         }
 
-        private static double rateAdjustMultiplier(double speedChange)
+        private static double easyMultiplier(int extraLives, int defaultExtraLives)
+        {
+            // 0.8x base multiplier
+            // Reduce by 0.1x per extra life
+            double value = 0.8 - Math.Max(0, 0.1 * (extraLives - defaultExtraLives));
+
+            return Math.Max(0.4, value);
+        }
+
+        private static double halfTimeMultiplier(double speedChange)
+        {
+            // 0.2x at 0.5x speed, +0.07x per 0.05x speed increment.
+            // Default HT (0.75x) = 0.55
+            return (int)(speedChange * 20) / 20.0 * 1.4 - 0.5;
+        }
+
+        private static double doubleTimeMultiplier(double speedChange)
         {
             // Round to the nearest multiple of 0.1.
             double value = (int)(speedChange * 10) / 10.0;
 
-            // Offset back to 0.
-            value -= 1;
+            // 0.01 penalty for non-default rates.
+            double penalty = value != 1.5 && value != 1.0 ? 0.01 : 0.0;
 
-            if (speedChange >= 1)
-                return 1 + value / 5;
-            else
-                return 0.6 + value;
+            // Linear from 1.0 to 1.46, minus the penalty.
+            // Default DT (1.5x) = 1.23
+            return (value - 1) * 0.46 + 1 - penalty;
         }
+
+        private static double hiddenMultiplier(bool onlyFadeApproachCircles, bool hasReductionMod, OsuModDeflate? deflate = null)
+        {
+            double value = 1.04;
+
+            if (onlyFadeApproachCircles)
+                value -= 0.02;
+
+            if (hasReductionMod)
+                value -= 0.02;
+
+            // In the case of deflate, we want to reduce the HD multiplier but also ensure it still receives penalty for start scale changes.
+            if (deflate is not null)
+            {
+                double deflateValue = deflateMultiplier(deflate.StartScale.Value, deflate.StartScale.Default);
+                value -= 1.0 - deflateValue;
+            }
+
+            return value;
+        }
+
+        private static double flashlightMultiplier(OsuModFlashlight flashlight, bool hasFreezeFrameMod)
+        {
+            // Multiplier of 1.2x, reduced by 0.02 per 0.1 increase in flashlight size.
+            double value = Math.Max(1.02, Math.Min(1.2, 1.2 - 0.2 * (1 - flashlight.SizeMultiplier.Value)));
+
+            if (!flashlight.ComboBasedSize.Value)
+                value = 1 + (value - 1) / 5;
+
+            if (hasFreezeFrameMod)
+                value = 1 + (value - 1) / 2;
+
+            return value;
+        }
+
+        private static double difficultyAdjustMultiplier(OsuModDifficultyAdjust difficultyAdjust, IBeatmapDifficultyInfo beatmapDifficulty)
+        {
+            double selectedCircleSize = difficultyAdjust.CircleSize.Value ?? beatmapDifficulty.CircleSize;
+            double selectedDrainRate = difficultyAdjust.DrainRate.Value ?? beatmapDifficulty.DrainRate;
+            double selectedOverallDifficulty = difficultyAdjust.OverallDifficulty.Value ?? beatmapDifficulty.OverallDifficulty;
+            double selectedApproachRate = difficultyAdjust.ApproachRate.Value ?? beatmapDifficulty.ApproachRate;
+
+            double csDifference = Math.Abs(selectedCircleSize - beatmapDifficulty.CircleSize);
+            double hpDifference = Math.Abs(selectedDrainRate - beatmapDifficulty.DrainRate);
+            double odDifference = Math.Abs(selectedOverallDifficulty - beatmapDifficulty.OverallDifficulty);
+            double arDifference = Math.Abs(selectedApproachRate - beatmapDifficulty.ApproachRate);
+
+            // Per parameter, reduce multiplier by 0.05x per 0.1 change.
+            double csMultiplier = Math.Max(0.1, 1.0 - csDifference * 0.5);
+            double hpMultiplier = Math.Max(0.1, 1.0 - hpDifference * 0.5);
+            double odMultiplier = Math.Max(0.1, 1.0 - odDifference * 0.5);
+            double arMultiplier = Math.Max(0.1, 1.0 - arDifference * 0.5);
+
+            return Math.Max(0.1, csMultiplier * hpMultiplier * odMultiplier * arMultiplier);
+        }
+
+        private static double windMultiplier(double minSpeed, double maxSpeed)
+            => 0.8 * minSpeed + 0.2 * maxSpeed;
+
+        private static double deflateMultiplier(double startScale, double defaultStartScale)
+            => 1.0 - Math.Max(0, 0.02 * (startScale - defaultStartScale));
     }
 }

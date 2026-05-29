@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
             // Random
             Single<TaikoModDifficultyAdjust>(hasMultiplier: 0.5);
-            Single<TaikoModClassic>(hasMultiplier: 0.96);
+            Single<TaikoModClassic>(hasMultiplier: 1.0);
             // Swap
             // Single Tap
             Single<TaikoModConstantSpeed>(hasMultiplier: 0.9);
