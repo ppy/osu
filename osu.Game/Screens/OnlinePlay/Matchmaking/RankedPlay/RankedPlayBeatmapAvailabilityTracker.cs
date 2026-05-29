@@ -9,7 +9,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -30,17 +29,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        [Resolved]
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
         private CancellationTokenSource? downloadCheckCancellation;
         private int? lastDownloadCheckedBeatmapId;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs(beatmapDownloader = new BeatmapModelDownloader(parent.Get<BeatmapManager>(), parent.Get<IAPIProvider>()));
-            return dependencies;
-        }
 
         protected override void LoadComplete()
         {
