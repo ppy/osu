@@ -292,10 +292,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 CompletionClickAction = () =>
                 {
-                    client.MatchmakingAcceptInvitation().FireAndForget();
-                    controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+                    performer?.PerformFromScreen(s =>
+                    {
+                        client.MatchmakingAcceptInvitation().FireAndForget();
+                        controller.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
 
-                    performer?.PerformFromScreen(s => s.Push(new ScreenIntro(invitation.Type)));
+                        if (s is ScreenIntro || s is ScreenQueue)
+                            return;
+
+                        s.Push(new ScreenIntro(invitation.Type));
+                    }, [typeof(ScreenIntro), typeof(ScreenQueue)]);
 
                     Close(false);
                     return true;
