@@ -163,8 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private void onMatchmakingQueueLeft() => Scheduler.Add(() =>
         {
-            if (CurrentState.Value != ScreenQueue.MatchmakingScreenState.InRoom)
-                CurrentState.Value = ScreenQueue.MatchmakingScreenState.Idle;
+            CurrentState.Value = ScreenQueue.MatchmakingScreenState.Idle;
 
             closeNotification();
         });
@@ -175,6 +174,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             postNotification();
             backgroundNotification?.Complete(invitation);
+        });
+
+        private void onMatchmakingRoomReady(long roomId, string password) => Scheduler.Add(() =>
+        {
+            CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom;
+
+            client.JoinRoom(new Room { RoomID = roomId }, password).FireAndForget();
         });
 
         private void onMatchmakingDuelIssued(MatchmakingDuelIssuedParams duel)
@@ -191,15 +197,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Scheduler.Add(() => notifications?.Post(new DuelNotification(this, user, duel)));
             }
         }
-
-        private void onMatchmakingRoomReady(long roomId, string password) => Scheduler.Add(() =>
-        {
-            client.JoinRoom(new Room { RoomID = roomId }, password)
-                  .FireAndForget(() => Scheduler.Add(() =>
-                  {
-                      CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom;
-                  }));
-        });
 
         private void postNotification()
         {
