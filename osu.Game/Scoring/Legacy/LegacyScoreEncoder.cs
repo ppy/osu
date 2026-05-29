@@ -61,9 +61,10 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000014: Fix edge cases in conversion for osu! scores on selected beatmaps. Reconvert all scores.</description></item>
         /// <item><description>30000015: Fix osu! standardised score estimation algorithm violating basic invariants. Reconvert all scores.</description></item>
         /// <item><description>30000016: Fix taiko standardised score estimation algorithm not including swell tick score gain into bonus portion. Reconvert all scores.</description></item>
+        /// <item><description>30000017: Mod score multiplier rebalance. Recalculates the <see cref="ScoreInfo.TotalScore"/> of all scores with <see cref="ScoreInfo.TotalScoreWithoutMods"/> present.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000016;
+        public const int LATEST_VERSION = 30000017;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
