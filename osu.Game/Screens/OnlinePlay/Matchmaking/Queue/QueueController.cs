@@ -185,9 +185,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private void onMatchmakingDuelIssued(MatchmakingDuelIssuedParams duel)
         {
-            handleDuelRequestAsync().FireAndForget();
-
-            async Task handleDuelRequestAsync()
+            Task.Run(async () =>
             {
                 APIUser? user = await users.GetUserAsync(duel.UserId).ConfigureAwait(false);
 
@@ -195,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     return;
 
                 Scheduler.Add(() => notifications?.Post(new DuelNotification(this, user, duel)));
-            }
+            }).FireAndForget();
         }
 
         private void postNotification()
