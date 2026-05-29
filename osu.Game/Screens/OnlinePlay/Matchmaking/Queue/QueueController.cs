@@ -60,8 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             client.MatchmakingQueueJoined += onMatchmakingQueueJoined;
             client.MatchmakingQueueLeft += onMatchmakingQueueLeft;
             client.MatchmakingRoomInvited += onMatchmakingRoomInvited;
-            client.MatchmakingDuelIssued += onMatchmakingDuelIssued;
             client.MatchmakingRoomReady += onMatchmakingRoomReady;
+            client.MatchmakingDuelIssued += onMatchmakingDuelIssued;
         }
 
         /// <summary>
@@ -235,6 +235,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;
                 client.MatchmakingRoomInvited -= onMatchmakingRoomInvited;
                 client.MatchmakingRoomReady -= onMatchmakingRoomReady;
+                client.MatchmakingDuelIssued -= onMatchmakingDuelIssued;
             }
         }
 
