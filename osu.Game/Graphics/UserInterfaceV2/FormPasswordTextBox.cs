@@ -1,60 +1,69 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormPasswordTextBox : FormTextBox<InnerPasswordTextBox>;
-
-    public partial class InnerPasswordTextBox : OsuPasswordTextBox, IInnerTextBox
+    public partial class FormPasswordTextBox : FormTextBox
     {
-        public BindableBool Focused { get; } = new BindableBool();
-
-        public Action? OnInputError { get; set; }
-
-        protected override float LeftRightPadding => 0;
-
-        public InnerPasswordTextBox()
+        internal override InnerTextBox CreateTextBox() => new InnerPasswordBox();
+        internal partial class InnerPasswordBox : InnerTextBox
         {
-            DrawBorder = false;
-        }
+            private readonly OsuPasswordTextBox.CapsWarning warning;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Height = 16;
-            TextContainer.Height = 1;
-            BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
-        }
+            protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Child = new OsuPasswordTextBox.PasswordMaskChar(FontSize),
+            };
 
-        protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
+            protected override bool AllowUniqueCharacterSamples => false;
 
-        protected override void OnFocus(FocusEvent e)
-        {
-            base.OnFocus(e);
+            [Resolved]
+            private GameHost host { get; set; } = null!;
 
-            Focused.Value = true;
-        }
+            public InnerPasswordBox()
+            {
+                InputProperties = new TextInputProperties(TextInputType.Password, false);
 
-        protected override void OnFocusLost(FocusLostEvent e)
-        {
-            base.OnFocusLost(e);
+                Add(warning = new OsuPasswordTextBox.CapsWarning
+                {
+                    Size = new Vector2(16),
+                    Origin = Anchor.CentreRight,
+                    Anchor = Anchor.CentreRight,
+                    Margin = new MarginPadding { Right = 10 },
+                    Alpha = 0,
+                });
+            }
 
-            Focused.Value = false;
-        }
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (e.Key == Key.CapsLock)
+                    updateCapsWarning(host.CapsLockEnabled);
+                return base.OnKeyDown(e);
+            }
 
-        protected override void NotifyInputError()
-        {
-            PlayFeedbackSample(FeedbackSampleType.TextInvalid);
-            // base call intentionally suppressed
-            OnInputError?.Invoke();
+            protected override void OnFocus(FocusEvent e)
+            {
+                updateCapsWarning(host.CapsLockEnabled);
+                base.OnFocus(e);
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                updateCapsWarning(false);
+                base.OnFocusLost(e);
+            }
+
+            private void updateCapsWarning(bool visible) => warning.FadeTo(visible ? 1 : 0, 250, Easing.OutQuint);
         }
     }
 }

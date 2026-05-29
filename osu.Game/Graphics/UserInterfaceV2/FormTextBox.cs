@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public abstract partial class FormTextBox<T> : CompositeDrawable, IHasCurrentValue<string>, IFormControl where T : OsuTextBox, IInnerTextBox, new()
+    public partial class FormTextBox : CompositeDrawable, IHasCurrentValue<string>, IFormControl
     {
         public Bindable<string> Current
         {
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private FormControlBackground background = null!;
         private Box flashLayer = null!;
-        private T textBox = null!;
+        private InnerTextBox textBox = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
 
@@ -147,7 +147,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        internal virtual T CreateTextBox() => new T();
+        internal virtual InnerTextBox CreateTextBox() => new InnerTextBox();
 
         protected override void LoadComplete()
         {
@@ -211,9 +211,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public float MainDrawHeight => DrawHeight;
     }
 
-    public partial class FormTextBox : FormTextBox<InnerTextBox>;
-
-    public partial class InnerTextBox : OsuTextBox, IInnerTextBox
+    public partial class InnerTextBox : OsuTextBox
     {
         public BindableBool Focused { get; } = new BindableBool();
 
@@ -256,12 +254,5 @@ namespace osu.Game.Graphics.UserInterfaceV2
             // base call intentionally suppressed
             OnInputError?.Invoke();
         }
-    }
-
-    public interface IInnerTextBox
-    {
-        BindableBool Focused { get; }
-
-        Action? OnInputError { get; set; }
     }
 }

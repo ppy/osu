@@ -105,7 +105,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private partial class CapsWarning : SpriteIcon, IHasTooltip
+        public partial class CapsWarning : SpriteIcon, IHasTooltip
         {
             public LocalisableString TooltipText => CommonStrings.CapsLockIsActive;
 
