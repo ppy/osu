@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -212,7 +213,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCaseSource(nameof(key_mod_multiplier_test_cases))]
         public void TestKeyModMultiplierCompatibility(DateTimeOffset endDate, string clientVersion, double expectedMultiplier)
         {
-            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new ScoreInfo
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty(), new ScoreInfo
             {
                 Date = endDate,
                 ClientVersion = clientVersion
