@@ -15,6 +15,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public partial class FormPasswordTextBox : FormTextBox
     {
         internal override InnerTextBox CreateTextBox() => new InnerPasswordBox();
+
         internal partial class InnerPasswordBox : InnerTextBox
         {
             private readonly OsuPasswordTextBox.CapsWarning warning;
