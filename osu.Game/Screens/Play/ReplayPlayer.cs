@@ -50,6 +50,16 @@ namespace osu.Game.Screens.Play
 
         public ReplayOverlay ReplayOverlay { get; private set; } = null!;
 
+        [Cached]
+        private readonly ReplayBookmarkController bookmarkController = new ReplayBookmarkController();
+
+        private ReplaySeekController seekController = null!;
+
+        private DependencyContainer dependencies = null!;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
         protected override bool CheckModsAllowFailure()
         {
             // autoplay should be able to fail if the beatmap is not humanly beatable
@@ -92,6 +102,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             AddInternal(leaderboardProvider);
+
+            dependencies.CacheAs(seekController = new ReplaySeekController(GameplayClockContainer));
+            AddInternal(seekController);
+
+            dependencies.CacheAs(Score.ScoreInfo);
+            AddInternal(bookmarkController);
 
             GameplayClockContainer.Add(ReplayOverlay = new ReplayOverlay());
 
@@ -190,6 +206,22 @@ namespace osu.Game.Screens.Play
                         GameplayClockContainer.Start();
                     else
                         GameplayClockContainer.Stop();
+                    return true;
+
+                case GlobalAction.ReplayAddBookmark:
+                    bookmarkController.AddBookmarkAtCurrentTime();
+                    return true;
+
+                case GlobalAction.ReplaySeekToPreviousBookmark:
+                    bookmarkController.SeekBookmark(-1);
+                    return true;
+
+                case GlobalAction.ReplaySeekToNextBookmark:
+                    bookmarkController.SeekBookmark(1);
+                    return true;
+
+                case GlobalAction.ReplayRemoveClosestBookmark:
+                    bookmarkController.RemoveClosestBookmark();
                     return true;
             }
 

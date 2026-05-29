@@ -65,6 +65,13 @@ namespace osu.Game.Skinning
             };
         }
 
+        protected override Drawable CreateBookmarkOverlay() => new LegacySongProgressBookmarkOverlay
+        {
+            RelativeSizeAxes = Axes.Both,
+            StartTime = FirstHitTime,
+            EndTime = LastHitTime,
+        };
+
         protected override void UpdateProgress(double progress, bool isIntro)
         {
             if (isIntro)

@@ -365,6 +365,26 @@ namespace osu.Game.Localisation
         public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
 
         /// <summary>
+        /// "Add bookmark to timeline"
+        /// </summary>
+        public static LocalisableString ReplayAddBookmark => new TranslatableString(getKey(@"add_replay_bookmark"), @"Add bookmark to timeline");
+        
+        /// <summary>
+        /// "Remove closest bookmark from timeline"
+        /// </summary>
+        public static LocalisableString ReplayRemoveClosestBookmark => new TranslatableString(getKey(@"remove_replay_closest_bookmark"), @"Remove closest bookmark from timeline");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString ReplaySeekToPreviousBookmark => new TranslatableString(getKey(@"seek_replay_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString ReplaySeekToNextBookmark => new TranslatableString(getKey(@"seek_replay_to_next_bookmark"), @"Seek to next bookmark");
+        
+        /// <summary>
         /// "Toggle chat focus"
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");

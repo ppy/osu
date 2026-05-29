@@ -23,9 +23,9 @@ namespace osu.Game.Screens.Play
 {
     public partial class SquareGraph : Container
     {
-        private BufferedContainer<Column> columns;
+        protected BufferedContainer<Column> Columns;
 
-        public int ColumnCount => columns?.Children.Count ?? 0;
+        public int ColumnCount => Columns?.Children.Count ?? 0;
 
         private int progress;
 
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Play
 
             if (!layout.IsValid)
             {
-                columns?.FadeOut(500, Easing.OutQuint).Expire();
+                Columns?.FadeOut(500, Easing.OutQuint).Expire();
 
                 scheduledCreate?.Cancel();
                 scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
@@ -124,14 +124,17 @@ namespace osu.Game.Screens.Play
 
             LoadComponentAsync(newColumns, c =>
             {
-                Child = columns = c;
-                columns.FadeInFromZero(500, Easing.OutQuint);
+                Child = Columns = c;
+                Columns.FadeInFromZero(500, Easing.OutQuint);
 
                 recalculateValues();
                 redrawFilled();
                 redrawProgress();
+                RedrawBookmarks();
             }, (cts = new CancellationTokenSource()).Token);
         }
+
+        protected virtual void RedrawBookmarks() { }
 
         /// <summary>
         /// Redraws all the columns to match their lit/dimmed state.
@@ -139,8 +142,8 @@ namespace osu.Game.Screens.Play
         private void redrawProgress()
         {
             for (int i = 0; i < ColumnCount; i++)
-                columns[i].State = i <= progress ? ColumnState.Lit : ColumnState.Dimmed;
-            columns?.ForceRedraw();
+                Columns[i].State = i <= progress ? ColumnState.Lit : ColumnState.Dimmed;
+            Columns?.ForceRedraw();
         }
 
         /// <summary>
@@ -149,8 +152,8 @@ namespace osu.Game.Screens.Play
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
-                columns[i].Filled = calculatedValues.ElementAtOrDefault(i);
-            columns?.ForceRedraw();
+                Columns[i].Filled = calculatedValues.ElementAtOrDefault(i);
+            Columns?.ForceRedraw();
         }
 
         /// <summary>
@@ -185,6 +188,21 @@ namespace osu.Game.Screens.Play
             protected readonly Color4 EmptyColour = Color4.White.Opacity(20);
             public Color4 LitColour = Color4.LightBlue;
             protected readonly Color4 DimmedColour = Color4.White.Opacity(140);
+            public Color4 BookmarkColour = Color4.Red;
+
+            private bool isBookmarked;
+
+            public bool IsBookmarked
+            {
+                get => isBookmarked;
+                set
+                {
+                    if (value == isBookmarked) return;
+
+                    isBookmarked = value;
+                    if (IsLoaded) fillActive();
+                }
+            }
 
             private float cubeCount => DrawHeight / WIDTH;
             private const float cube_size = 4;
@@ -256,9 +274,16 @@ namespace osu.Game.Screens.Play
 
             private void fillActive()
             {
-                Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
-
                 int countFilled = (int)Math.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+
+                if (isBookmarked)
+                {
+                    for (int i = 0; i < drawableRows.Count; i++)
+                        drawableRows[i].Colour = i < countFilled ? BookmarkColour : EmptyColour;
+                    return;
+                }
+
+                Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;

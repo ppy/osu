@@ -38,6 +38,9 @@ namespace osu.Game.Screens.Play.HUD
         protected IGameplayClock GameplayClock { get; private set; } = null!;
 
         [Resolved]
+        protected ReplayBookmarkController? BookmarkController { get; private set; }
+
+        [Resolved]
         private IFrameStableClock? frameStableClock { get; set; }
 
         /// <summary>
@@ -64,8 +67,17 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
+            if (BookmarkController != null)
+            {
+                var overlay = CreateBookmarkOverlay();
+                if (overlay != null)
+                    AddInternal(overlay);
+            }
+
             Show();
         }
+
+        protected virtual Drawable? CreateBookmarkOverlay() => null;
 
         protected double FirstHitTime { get; private set; }
 
