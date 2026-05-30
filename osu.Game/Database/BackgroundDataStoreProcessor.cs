@@ -661,23 +661,22 @@ namespace osu.Game.Database
                 return;
             }
 
-            Logger.Log(@"Querying for beatmaps that do not have user tags");
+            Logger.Log(@"Updating user tags");
 
-            // it is not an abnormal situation for a map not to have user tags.
             // while this is constrained to run every month or so (every time a new online.db cache is retrieved), there's some chance that this will still run much too often and be annoying to users.
             // if that turns out to be the case we may need a better way to debounce this (or just delete the backpopulation logic after some time has passed?)
             HashSet<Guid> beatmapIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<BeatmapInfo>()
-                 .Filter($"{nameof(BeatmapInfo.Metadata)}.{nameof(BeatmapMetadata.UserTags)}.@count == 0 AND {nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
+                 .Filter($"{nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
                  .AsEnumerable()
                  .Select(b => b.ID)));
 
             if (beatmapIds.Count == 0)
                 return;
 
-            Logger.Log($@"Found {beatmapIds.Count} beatmaps with missing user tags.");
+            Logger.Log($@"Checking for tag updates for {beatmapIds.Count} beatmaps.");
 
-            var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags",
+            var notification = showProgressNotification(beatmapIds.Count, @"Updating user tags",
                 @"beatmaps have had their tags updated. This runs once a month to allow searching user tags.");
 
             int processedCount = 0;

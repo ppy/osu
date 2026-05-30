@@ -15,6 +15,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -25,6 +26,8 @@ using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
@@ -122,7 +125,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
+                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -137,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = SelectedMods.Value.Aggregate(1d, (m, mod) => m * mod.ScoreMultiplier);
+                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -1087,6 +1090,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     State = { Value = Visibility.Visible },
                     Beatmap = { Value = Beatmap.Value },
                     SelectedMods = { BindTarget = SelectedMods },
+                    Ruleset = { BindTarget = Ruleset },
                     ShowPresets = true,
                 });
             }
@@ -1143,7 +1147,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             public override string Name => "Unimplemented mod";
             public override string Acronym => "UM";
             public override LocalisableString Description => "A mod that is not implemented.";
-            public override double ScoreMultiplier => 1;
             public override ModType Type => ModType.Conversion;
         }
 
