@@ -48,7 +48,10 @@ namespace osu.Game.Screens.Edit
 
         private Task? fileMountOperation;
 
-        public ExternalEditOperation<BeatmapSetInfo>? EditOperation;
+        public ExternalEditOperation<BeatmapSetInfo>? EditOperation { get; private set; }
+
+        private bool operationFinishStarted;
+        private bool operationFinished;
 
         private FillFlowContainer flow = null!;
 
@@ -98,9 +101,13 @@ namespace osu.Game.Screens.Edit
             if (fileMountOperation?.IsCompleted == false)
                 return true;
 
+            // Similarly do not allow interrupting an ongoing finish.
+            if (operationFinishStarted && !operationFinished)
+                return true;
+
             // If the operation completed successfully, ensure that we finish the operation before exiting.
             // The finish() call will subsequently call Exit() when done.
-            if (EditOperation != null)
+            if (EditOperation != null && !operationFinishStarted)
             {
                 finish().FireAndForget();
                 return true;
@@ -185,6 +192,12 @@ namespace osu.Game.Screens.Edit
 
         private async Task finish()
         {
+            if (operationFinishStarted)
+                return;
+
+            operationFinishStarted = true;
+
+            BackButtonVisibility.Value = false;
             string originalDifficulty = editor.Beatmap.Value.Beatmap.BeatmapInfo.DifficultyName;
 
             showSpinner("Cleaning up...");
@@ -206,7 +219,11 @@ namespace osu.Game.Screens.Edit
             EditOperation = null;
 
             if (beatmap == null)
+            {
+                // has to be set before `Exit()` call to ensure the exit isn't blocked in `OnExiting()`
+                operationFinished = true;
                 this.Exit();
+            }
             else
             {
                 // the `ImportAsUpdate()` flow will yield beatmap(sets) with online status of `None` if online lookup fails.
@@ -223,6 +240,8 @@ namespace osu.Game.Screens.Edit
                     beatmap.Value.Beatmaps.FirstOrDefault(b => b.DifficultyName == originalDifficulty)
                     ?? beatmap.Value.Beatmaps.First();
 
+                // has to be set before `SwitchToDifficulty()` call to ensure the exit isn't blocked in `OnExiting()`
+                operationFinished = true;
                 editor.SwitchToDifficulty(closestMatchingBeatmap);
             }
         }

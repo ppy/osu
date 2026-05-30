@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
 {
@@ -46,6 +47,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly double EndTime;
 
         /// <summary>
+        /// Beatmap playback rate.
+        /// </summary>
+        public readonly double ClockRate;
+
+        /// <summary>
         /// Creates a new <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
@@ -62,18 +68,48 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
             StartTime = hitObject.StartTime / clockRate;
             EndTime = hitObject.GetEndTime() / clockRate;
+            ClockRate = clockRate;
         }
 
         public DifficultyHitObject Previous(int backwardsIndex)
         {
             int index = Index - (backwardsIndex + 1);
-            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : default;
+            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
 
         public DifficultyHitObject Next(int forwardsIndex)
         {
             int index = Index + (forwardsIndex + 1);
-            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : default;
+            return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
+        }
+
+        /// <summary>
+        /// Retrieves the full rate-adjusted hit window for a <see cref="HitResult"/>.
+        /// </summary>
+        public double HitWindow(HitResult hitResult)
+        {
+            return 2 * RawHitWindow(hitResult) / ClockRate;
+        }
+
+        /// <summary>
+        /// Retrieves the hit window for a <see cref="HitResult"/>.
+        /// </summary>
+        protected virtual double RawHitWindow(HitResult hitResult)
+        {
+            // Try to get HitWindows from nested hit objects
+            // This is important for objects such as Slider in osu! where the object itself has HitWindows set to Empty, but the nested SliderHead has proper hit windows
+            if (BaseObject.HitWindows == HitWindows.Empty)
+            {
+                foreach (var nestedHitObject in BaseObject.NestedHitObjects)
+                {
+                    if (nestedHitObject.HitWindows == HitWindows.Empty)
+                        continue;
+
+                    return nestedHitObject.HitWindows.WindowFor(hitResult);
+                }
+            }
+
+            return BaseObject.HitWindows.WindowFor(hitResult);
         }
     }
 }

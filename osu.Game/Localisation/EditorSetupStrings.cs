@@ -189,6 +189,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioTrack => new TranslatableString(getKey(@"audio_track"), @"Audio Track");
 
         /// <summary>
+        /// "Custom sample sets"
+        /// </summary>
+        public static LocalisableString CustomSampleSets => new TranslatableString(getKey(@"custom_sample_sets"), @"Custom sample sets");
+
+        /// <summary>
         /// "Click to select a track"
         /// </summary>
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
@@ -212,6 +217,18 @@ namespace osu.Game.Localisation
         /// "Only apply to this difficulty"
         /// </summary>
         public static LocalisableString ApplyToThisDifficulty => new TranslatableString(getKey(@"apply_to_this_difficulty"), @"Only apply to this difficulty");
+
+        /// <summary>
+        /// "Sync metadata with all difficulties"
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficulties =>
+            new TranslatableString(getKey(@"sync_metadata_with_all_difficulties"), @"Sync metadata with all difficulties");
+
+        /// <summary>
+        /// "Copies artist, title, source, and tags to all difficulties."
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficultiesTooltip => new TranslatableString(getKey(@"sync_metadata_with_all_difficulties_tooltip"),
+            @"Copies artist, title, source, and tags to all difficulties.");
 
         /// <summary>
         /// "Ruleset ({0})"

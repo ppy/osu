@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly IncrementalBSplineBuilder bSplineBuilder = new IncrementalBSplineBuilder { Degree = 4 };
 
-        protected override bool IsValidForPlacement => HitObject.Path.HasValidLengthForPlacement;
+        protected override bool IsValidForPlacement => base.IsValidForPlacement && (PlacementActive == PlacementState.Waiting || HitObject.Path.HasValidLengthForPlacement);
 
         public SliderPlacementBlueprint()
             : base(new Slider())

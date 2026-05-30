@@ -10,23 +10,30 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.OSD
 {
     public abstract partial class Toast : Container
     {
+        /// <summary>
+        /// Extra text to be shown at the bottom of the toast. Usually a key binding if available.
+        /// </summary>
+        public LocalisableString ExtraText
+        {
+            get => extraText.Text;
+            set => extraText.Text = value.ToUpper();
+        }
+
         private const int toast_minimum_width = 240;
 
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
 
-        protected readonly OsuSpriteText ValueText;
+        protected readonly OsuSpriteText ValueSpriteText;
+        private readonly OsuSpriteText extraText;
 
-        protected readonly OsuSpriteText ShortcutText;
-
-        protected Toast(LocalisableString description, LocalisableString value, LocalisableString shortcut)
+        protected Toast(LocalisableString description, LocalisableString value)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -65,7 +72,7 @@ namespace osu.Game.Overlays.OSD
                     Origin = Anchor.TopCentre,
                     Text = description.ToUpper()
                 },
-                ValueText = new OsuSpriteText
+                ValueSpriteText = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                     Padding = new MarginPadding { Horizontal = 10 },
@@ -74,15 +81,14 @@ namespace osu.Game.Overlays.OSD
                     Origin = Anchor.Centre,
                     Text = value
                 },
-                ShortcutText = new OsuSpriteText
+                extraText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Name = "Shortcut",
+                    Name = "Extra Text",
                     Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15, Horizontal = 10 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = string.IsNullOrEmpty(shortcut.ToString()) ? ToastStrings.NoKeyBound.ToUpper() : shortcut.ToUpper()
                 },
             };
         }

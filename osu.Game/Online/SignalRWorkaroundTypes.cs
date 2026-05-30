@@ -8,7 +8,9 @@ using osu.Game.Online.Matchmaking.Events;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.Matchmaking;
+using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.RankedPlay;
 using osu.Game.Users;
 
 namespace osu.Game.Online
@@ -25,8 +27,11 @@ namespace osu.Game.Online
             (typeof(ChangeTeamRequest), typeof(MatchUserRequest)),
             (typeof(StartMatchCountdownRequest), typeof(MatchUserRequest)),
             (typeof(StopCountdownRequest), typeof(MatchUserRequest)),
+            (typeof(SetLockStateRequest), typeof(MatchUserRequest)),
+            (typeof(RollRequest), typeof(MatchUserRequest)),
             (typeof(CountdownStartedEvent), typeof(MatchServerEvent)),
             (typeof(CountdownStoppedEvent), typeof(MatchServerEvent)),
+            (typeof(RollEvent), typeof(MatchServerEvent)),
             (typeof(TeamVersusRoomState), typeof(MatchRoomState)),
             (typeof(TeamVersusUserState), typeof(MatchUserState)),
             (typeof(MatchStartCountdown), typeof(MultiplayerCountdown)),
@@ -57,6 +62,12 @@ namespace osu.Game.Online
             (typeof(MatchmakingStageCountdown), typeof(MultiplayerCountdown)),
             (typeof(MatchmakingAvatarActionRequest), typeof(MatchUserRequest)),
             (typeof(MatchmakingAvatarActionEvent), typeof(MatchServerEvent)),
+
+            // ranked play
+            (typeof(RankedPlayRoomState), typeof(MatchRoomState)),
+            (typeof(RankedPlayStageCountdown), typeof(MultiplayerCountdown)),
+            (typeof(RankedPlayCardHandReplayRequest), typeof(MatchUserRequest)),
+            (typeof(RankedPlayCardHandReplayEvent), typeof(MatchServerEvent)),
         };
     }
 }

@@ -30,7 +30,6 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    [Cached(typeof(IPreviewTrackOwner))]
     public partial class SoloSpectatorScreen : SpectatorScreen, IPreviewTrackOwner
     {
         [Resolved]
@@ -275,6 +274,12 @@ namespace osu.Game.Screens.Play
         {
             previewTrackManager.StopAnyPlaying(this);
             return base.OnExiting(e);
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            previewTrackManager.StopAnyPlaying(this);
+            base.OnSuspending(e);
         }
     }
 }

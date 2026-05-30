@@ -188,7 +188,7 @@ namespace osu.Game.Scoring.Legacy
 
                 long compressedSize = replayInStream.Length - replayInStream.Position;
 
-                using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
+                using (var lzma = LzmaStream.Create(properties, replayInStream, compressedSize, outSize))
                 using (var reader = new StreamReader(lzma))
                     readFunc(reader);
             }
@@ -211,7 +211,7 @@ namespace osu.Game.Scoring.Legacy
             var scoreProcessor = rulesetInstance.CreateScoreProcessor();
 
             // Populate the maximum statistics.
-            HitResult maxBasicResult = rulesetInstance.GetHitResults()
+            HitResult maxBasicResult = rulesetInstance.GetHitResultsForDisplay()
                                                       .Select(h => h.result)
                                                       .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetBaseScoreForResult);
 

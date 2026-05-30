@@ -27,7 +27,6 @@ namespace osu.Game.Overlays.Mods
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         public AddPresetButton()
-            : base(1)
         {
             RelativeSizeAxes = Axes.X;
             Height = ModSelectPanel.HEIGHT;

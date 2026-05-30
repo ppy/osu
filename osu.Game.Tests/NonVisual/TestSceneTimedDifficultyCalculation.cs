@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
 {
@@ -172,12 +173,14 @@ namespace osu.Game.Tests.NonVisual
             {
             }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
                 => new TestDifficultyAttributes { Objects = beatmap.HitObjects.ToArray() };
 
-            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
             {
                 List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+
+                double clockRate = ModUtils.CalculateRateWithMods(mods);
 
                 foreach (var obj in beatmap.HitObjects.OfType<TestHitObject>())
                 {
@@ -191,7 +194,7 @@ namespace osu.Game.Tests.NonVisual
                 return objects;
             }
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[] { new PassThroughSkill(mods) };
+            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[] { new PassThroughSkill(mods) };
 
             private class PassThroughSkill : Skill
             {

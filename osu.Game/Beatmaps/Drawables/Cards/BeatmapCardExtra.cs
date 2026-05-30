@@ -296,20 +296,20 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 return original;
             }
 
-            statisticsContainer.Content[0][0] = withMargin(new FavouritesStatistic(BeatmapSet)
-            {
-                Current = FavouriteState,
-            });
-
-            statisticsContainer.Content[1][0] = withMargin(new PlayCountStatistic(BeatmapSet));
-
             var hypesStatistic = HypesStatistic.CreateFor(BeatmapSet);
             if (hypesStatistic != null)
-                statisticsContainer.Content[0][1] = withMargin(hypesStatistic);
+                statisticsContainer.Content[0][0] = withMargin(hypesStatistic);
 
             var nominationsStatistic = NominationsStatistic.CreateFor(BeatmapSet);
             if (nominationsStatistic != null)
-                statisticsContainer.Content[1][1] = withMargin(nominationsStatistic);
+                statisticsContainer.Content[1][0] = withMargin(nominationsStatistic);
+
+            statisticsContainer.Content[0][1] = withMargin(new PlayCountStatistic(BeatmapSet));
+
+            statisticsContainer.Content[1][1] = withMargin(new FavouritesStatistic(BeatmapSet)
+            {
+                Current = FavouriteState,
+            });
 
             var dateStatistic = BeatmapCardDateStatistic.CreateFor(BeatmapSet);
             if (dateStatistic != null)

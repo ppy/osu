@@ -14,9 +14,11 @@ namespace osu.Game.Online.API
 
         protected override void PrePerform()
         {
-            AddParameter("user[username]", Username);
-            AddParameter("user[user_email]", Email);
-            AddParameter("user[password]", Password);
+            AddParameter(@"user[username]", Username);
+            AddParameter(@"user[user_email]", Email);
+            AddParameter(@"user[password]", Password);
+
+            AddHeader(@"Accept", @"application/json");
 
             base.PrePerform();
         }

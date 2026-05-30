@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Online
                 if (supportLevel > 3)
                     supportLevel = 0;
 
-                ((DummyAPIAccess)API).Friends.Add(new APIRelation
+                ((DummyAPIAccess)API).LocalUserState.Friends.Add(new APIRelation
                 {
                     TargetID = 2,
                     RelationType = RelationType.Friend,

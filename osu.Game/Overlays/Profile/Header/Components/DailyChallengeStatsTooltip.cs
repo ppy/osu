@@ -36,9 +36,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private Box topBackground = null!;
         private Box background = null!;
 
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -117,19 +114,19 @@ namespace osu.Game.Overlays.Profile.Header.Components
             topBackground.Colour = colourProvider.Background5;
 
             totalParticipation.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.PlayCount.ToLocalisableString(@"N0"));
-            totalParticipation.ValueColour = colours.ForRankingTier(TierForPlayCount(statistics.PlayCount));
+            totalParticipation.ValueColour = OsuColour.ForRankingTier(TierForPlayCount(statistics.PlayCount));
 
             currentDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(content.Statistics.DailyStreakCurrent.ToLocalisableString(@"N0"));
-            currentDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
+            currentDaily.ValueColour = OsuColour.ForRankingTier(TierForDaily(statistics.DailyStreakCurrent));
 
             currentWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakCurrent.ToLocalisableString(@"N0"));
-            currentWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
+            currentWeekly.ValueColour = OsuColour.ForRankingTier(TierForWeekly(statistics.WeeklyStreakCurrent));
 
             bestDaily.Value = DailyChallengeStatsDisplayStrings.UnitDay(statistics.DailyStreakBest.ToLocalisableString(@"N0"));
-            bestDaily.ValueColour = colours.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
+            bestDaily.ValueColour = OsuColour.ForRankingTier(TierForDaily(statistics.DailyStreakBest));
 
             bestWeekly.Value = DailyChallengeStatsDisplayStrings.UnitWeek(statistics.WeeklyStreakBest.ToLocalisableString(@"N0"));
-            bestWeekly.ValueColour = colours.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
+            bestWeekly.ValueColour = OsuColour.ForRankingTier(TierForWeekly(statistics.WeeklyStreakBest));
 
             topTen.Value = statistics.Top10PercentPlacements.ToLocalisableString(@"N0");
             topTen.ValueColour = colourProvider.Content2;

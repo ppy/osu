@@ -58,6 +58,7 @@ namespace osu.Desktop
         private readonly RichPresence presence = new RichPresence
         {
             Assets = new Assets { LargeImageKey = "osu_logo_lazer" },
+            Timestamps = Timestamps.Now,
             Secrets = new Secrets
             {
                 JoinSecret = null,
@@ -189,7 +190,7 @@ namespace osu.Desktop
             }
 
             // user party
-            if (!hideIdentifiableInformation && multiplayerClient.Room != null)
+            if (!hideIdentifiableInformation && multiplayerClient.Room != null && !multiplayerClient.Room.Settings.MatchType.IsMatchmakingType())
             {
                 MultiplayerRoom room = multiplayerClient.Room;
 

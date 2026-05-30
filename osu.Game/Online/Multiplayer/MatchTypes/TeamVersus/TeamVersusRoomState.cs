@@ -12,6 +12,9 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
         [Key(0)]
         public List<MultiplayerTeam> Teams { get; set; } = new List<MultiplayerTeam>();
 
+        [Key(1)]
+        public bool Locked { get; set; }
+
         public static TeamVersusRoomState CreateDefault() =>
             new TeamVersusRoomState
             {

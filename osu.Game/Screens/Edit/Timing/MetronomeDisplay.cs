@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -414,14 +415,7 @@ namespace osu.Game.Screens.Edit.Timing
                 if (!IsBeatSyncedWithTrack || !EnableClicking)
                     return;
 
-                var channel = beatIndex % timingPoint.TimeSignature.Numerator == 0 ? sampleTickDownbeat?.GetChannel() : sampleTick?.GetChannel();
-
-                if (channel == null)
-                    return;
-
-                channel.Frequency.Value = RNG.NextDouble(0.98f, 1.02f);
-                channel.Play();
-
+                SamplePlaybackHelper.PlayWithRandomPitch(beatIndex % timingPoint.TimeSignature.Numerator == 0 ? sampleTickDownbeat : sampleTick, 0.02f);
                 Ticked?.Invoke();
             }
         }

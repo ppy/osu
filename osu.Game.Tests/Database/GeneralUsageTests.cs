@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -143,7 +144,7 @@ namespace osu.Game.Tests.Database
                     return null;
                 });
 
-                Assert.IsTrue(callbackRan);
+                ClassicAssert.True(callbackRan);
             });
         }
 

@@ -22,11 +22,11 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 {
                     Value =
                     [
-                        new MatchmakingPool { Id = 0, RulesetId = 0 },
-                        new MatchmakingPool { Id = 1, RulesetId = 1 },
-                        new MatchmakingPool { Id = 2, RulesetId = 2 },
-                        new MatchmakingPool { Id = 3, RulesetId = 3, Variant = 4 },
-                        new MatchmakingPool { Id = 4, RulesetId = 3, Variant = 7 },
+                        new MatchmakingPool { Id = 0, RulesetId = 0, Name = "Free-for-all" },
+                        new MatchmakingPool { Id = 1, RulesetId = 1, Name = "1v1" },
+                        new MatchmakingPool { Id = 2, RulesetId = 2, Name = "1v1" },
+                        new MatchmakingPool { Id = 3, RulesetId = 3, Variant = 4, Name = "1v1" },
+                        new MatchmakingPool { Id = 4, RulesetId = 3, Variant = 7, Name = "1v1" },
                     ]
                 }
             });

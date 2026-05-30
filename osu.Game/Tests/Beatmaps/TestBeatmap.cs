@@ -47,6 +47,8 @@ namespace osu.Game.Tests.Beatmaps
 
             BeatmapInfo.Ruleset = ruleset;
             BeatmapInfo.Length = 75000;
+            BeatmapInfo.BPM = 123;
+            BeatmapInfo.StarRating = 4.32;
             BeatmapInfo.OnlineInfo = new APIBeatmap();
             BeatmapInfo.OnlineID = Interlocked.Increment(ref onlineBeatmapID);
             BeatmapInfo.Status = BeatmapOnlineStatus.Ranked;

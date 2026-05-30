@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterface
                         spinner = new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Origin = Anchor.Custom,
                             Colour = inverted ? Color4.Black : Color4.White,
                             Scale = new Vector2(0.6f),
                             RelativeSizeAxes = Axes.Both,
@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.UserInterface
                             spinner = new SpriteIcon
                             {
                                 Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Origin = Anchor.Custom,
                                 Colour = inverted ? Color4.Black : Color4.White,
                                 RelativeSizeAxes = Axes.Both,
                                 Icon = FontAwesome.Solid.CircleNotch
@@ -149,6 +149,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.UpdateAfterChildren();
 
+            // Font awesome icon isn't centered perfectly.
+            spinner.OriginPosition = spinner.DrawSize * 0.4963333333f;
+
             if (withBox)
             {
                 MainContents.CornerRadius = MainContents.DrawWidth / 4;
@@ -168,7 +171,12 @@ namespace osu.Game.Graphics.UserInterface
                 rotate();
 
             MainContents.ScaleTo(1, TRANSITION_DURATION, Easing.OutQuint);
-            this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
+
+            // Very slight delay to avoid spinner flickering briefly during minimal loads.
+            // Note that we still use fade in here because it is important for input blocking cases (see `LoadingLayer`).
+            this.FadeTo(0.01f, 50)
+                .Then()
+                .FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()

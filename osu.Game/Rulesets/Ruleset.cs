@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
@@ -312,11 +313,22 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => Array.Empty<KeyBinding>();
 
         /// <summary>
+        /// Text that describes what variants in a ruleset are.
+        /// Override this to provide better copy than the generic "Variant" text which may not tell users much.
+        /// </summary>
+        public virtual LocalisableString VariantDescription => "Variant";
+
+        /// <summary>
         /// Gets the name for a key binding variant. This is used for display in the settings overlay.
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual LocalisableString GetVariantName(int variant) => string.Empty;
+
+        /// <summary>
+        /// Returns the ID of the variant that is applicable for the given <paramref name="beatmapInfo"/>, given the current active <paramref name="mods"/>.
+        /// </summary>
+        public virtual int GetVariantForBeatmap(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null) => 0;
 
         /// <summary>
         /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
@@ -334,13 +346,17 @@ namespace osu.Game.Rulesets
         public virtual StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticItem>();
 
         /// <summary>
-        /// Get all valid <see cref="HitResult"/>s for this ruleset.
-        /// Generally used for results display purposes, where it can't be determined if zero-count means the user has not achieved any or the type is not used by this ruleset.
+        /// Get all <see cref="HitResult"/>s for this ruleset which are important enough to displayed to the end user.
+        /// Used for results display purposes, where it can't be determined if zero-count means the user has not achieved any or the type is not used by this ruleset.
         /// </summary>
+        /// <remarks>
+        /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are not returned by this method.
+        /// Values are returned as ordered by <see cref="OrderAttribute"/>.
+        /// </remarks>
         /// <returns>
-        /// All valid <see cref="HitResult"/>s along with a display-friendly name.
+        /// All relevant <see cref="HitResult"/>s along with a display-friendly name.
         /// </returns>
-        public IEnumerable<(HitResult result, LocalisableString displayName)> GetHitResults()
+        public IEnumerable<(HitResult result, LocalisableString displayName)> GetHitResultsForDisplay()
         {
             var validResults = GetValidHitResults();
 
@@ -353,6 +369,7 @@ namespace osu.Game.Rulesets
                     case HitResult.None:
                     case HitResult.IgnoreHit:
                     case HitResult.IgnoreMiss:
+                    case HitResult.ComboBreak:
                     // display is handled as a completion count with corresponding "hit" type.
                     case HitResult.LargeTickMiss:
                     case HitResult.SmallTickMiss:
@@ -366,12 +383,10 @@ namespace osu.Game.Rulesets
 
         /// <summary>
         /// Get all valid <see cref="HitResult"/>s for this ruleset.
-        /// Generally used for results display purposes, where it can't be determined if zero-count means the user has not achieved any or the type is not used by this ruleset.
+        /// Used for strict validation purposes. The ruleset should return ALL applicable <see cref="HitResult"/> types here
+        /// (except <see cref="HitResult.None"/> and obsolete types).
         /// </summary>
-        /// <remarks>
-        /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are ignored even when specified.
-        /// </remarks>
-        protected virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
+        public virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
 
         /// <summary>
         /// Get a display friendly name for the specified result type.
@@ -414,6 +429,12 @@ namespace osu.Game.Rulesets
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
         }
+
+        /// <summary>
+        /// Overload of <see cref="GetAdjustedDisplayDifficulty"/> for display on Ranked Cards
+        /// </summary>
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods) =>
+            GetBeatmapAttributesForDisplay(beatmapInfo, mods);
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
