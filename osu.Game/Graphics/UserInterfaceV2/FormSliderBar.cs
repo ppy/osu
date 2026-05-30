@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private FormControlBackground background = null!;
         private Box flashLayer = null!;
-        private InnerTextBox textBox = null!;
+        private FormTextBox.InnerTextBox textBox = null!;
         private OsuSpriteText valueLabel = null!;
         private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;

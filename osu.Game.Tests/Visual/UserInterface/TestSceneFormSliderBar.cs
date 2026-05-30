@@ -159,10 +159,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click on textbox part", () =>
             {
-                InputManager.MoveMouseTo(slider.ChildrenOfType<InnerTextBox>().Single());
+                InputManager.MoveMouseTo(slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("no text selected", () => slider.ChildrenOfType<InnerTextBox>().Single().SelectedText, () => Is.Empty);
+            AddAssert("no text selected", () => slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single().SelectedText, () => Is.Empty);
             AddStep("attempt to input text", () =>
             {
                 InputManager.Key(Key.Number4);
@@ -218,10 +218,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click on textbox part", () =>
             {
-                InputManager.MoveMouseTo(slider.ChildrenOfType<InnerTextBox>().Single());
+                InputManager.MoveMouseTo(slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("no text selected", () => slider.ChildrenOfType<InnerTextBox>().Single().SelectedText, () => Is.Empty);
+            AddAssert("no text selected", () => slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single().SelectedText, () => Is.Empty);
         }
 
         [Test]
@@ -263,13 +263,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click on textbox part", () =>
             {
-                InputManager.MoveMouseTo(slider.ChildrenOfType<InnerTextBox>().Single());
+                InputManager.MoveMouseTo(slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("text selected", () => slider.ChildrenOfType<InnerTextBox>().Single().SelectedText, () => Is.EqualTo("50"));
+            AddAssert("text selected", () => slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single().SelectedText, () => Is.EqualTo("50"));
             AddStep("input 9%", () =>
             {
-                slider.ChildrenOfType<InnerTextBox>().Single().Text = "9";
+                slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single().Text = "9";
                 InputManager.Key(Key.Enter);
             });
             AddAssert("slider is at 0.09", () => slider.Current.Value, () => Is.EqualTo(0.09f));
@@ -327,13 +327,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click on textbox part", () =>
             {
-                InputManager.MoveMouseTo(slider.ChildrenOfType<InnerTextBox>().Single());
+                InputManager.MoveMouseTo(slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single());
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("text selected", () => slider.ChildrenOfType<InnerTextBox>().Single().SelectedText, () => Is.EqualTo("50"));
+            AddAssert("text selected", () => slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single().SelectedText, () => Is.EqualTo("50"));
             AddStep("input 9%", () =>
             {
-                slider.ChildrenOfType<InnerTextBox>().Single().Text = "9";
+                slider.ChildrenOfType<FormTextBox.InnerTextBox>().Single().Text = "9";
                 InputManager.Key(Key.Enter);
             });
             AddAssert("slider is at 9", () => slider.Current.Value, () => Is.EqualTo(9));

@@ -209,50 +209,50 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
 
         public float MainDrawHeight => DrawHeight;
-    }
 
-    public partial class InnerTextBox : OsuTextBox
-    {
-        public BindableBool Focused { get; } = new BindableBool();
-
-        public Action? OnInputError { get; set; }
-
-        protected override float LeftRightPadding => 0;
-
-        public InnerTextBox()
+        internal partial class InnerTextBox : OsuTextBox
         {
-            DrawBorder = false;
-        }
+            public BindableBool Focused { get; } = new BindableBool();
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Height = 16;
-            TextContainer.Height = 1;
-            BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
-        }
+            public Action? OnInputError { get; set; }
 
-        protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
+            protected override float LeftRightPadding => 0;
 
-        protected override void OnFocus(FocusEvent e)
-        {
-            base.OnFocus(e);
+            public InnerTextBox()
+            {
+                DrawBorder = false;
+            }
 
-            Focused.Value = true;
-        }
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Height = 16;
+                TextContainer.Height = 1;
+                BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
+            }
 
-        protected override void OnFocusLost(FocusLostEvent e)
-        {
-            base.OnFocusLost(e);
+            protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
 
-            Focused.Value = false;
-        }
+            protected override void OnFocus(FocusEvent e)
+            {
+                base.OnFocus(e);
 
-        protected override void NotifyInputError()
-        {
-            PlayFeedbackSample(FeedbackSampleType.TextInvalid);
-            // base call intentionally suppressed
-            OnInputError?.Invoke();
+                Focused.Value = true;
+            }
+
+            protected override void OnFocusLost(FocusLostEvent e)
+            {
+                base.OnFocusLost(e);
+
+                Focused.Value = false;
+            }
+
+            protected override void NotifyInputError()
+            {
+                PlayFeedbackSample(FeedbackSampleType.TextInvalid);
+                // base call intentionally suppressed
+                OnInputError?.Invoke();
+            }
         }
     }
 }
