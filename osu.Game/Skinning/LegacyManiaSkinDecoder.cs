@@ -74,6 +74,10 @@ namespace osu.Game.Skinning
 
                 switch (pair.Key)
                 {
+                    case "ColumnStart":
+                        currentConfig.ColumnStart = float.Parse(pair.Value);
+                        break;
+
                     case "ColumnLineWidth":
                         parseArrayValue(pair.Value, currentConfig.ColumnLineWidth, false);
                         break;

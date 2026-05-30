@@ -31,6 +31,12 @@ namespace osu.Game.Skinning
 
         public float WidthForNoteHeightScale;
 
+        /// <summary>
+        /// This should originally be 136, as same in stable client. However in lazer the stage is centered by default,
+        /// thus using <see langword="null"/> to represent the centered stage (backward compatibility)
+        /// </summary>
+        public float? ColumnStart = null;
+
         public readonly float[] ColumnLineWidth;
         public readonly float[] ColumnSpacing;
         public readonly float[] ColumnWidth;
