@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModHidden : ModHidden, IApplicableToDrawableRuleset<CatchHitObject>
     {
         public override LocalisableString Description => @"Play with fading fruits.";
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(CatchModReverseHidden) };
 
         private const double fade_out_offset_multiplier = 0.6;

@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Name => "Reverse Hidden";
         public override string Acronym => "RH";
         public override LocalisableString Description => "Reduce reaction time.";
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(CatchModHidden), typeof(CatchModFlashlight) };
 
         private const double fade_in_duration_multiplier = 0.16;
