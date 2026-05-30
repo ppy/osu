@@ -50,6 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                     Size = new Vector2(32),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Rotation = 180
                 },
             };
         }
