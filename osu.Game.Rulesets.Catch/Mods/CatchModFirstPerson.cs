@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override LocalisableString Description => "Catch, from the catcher's perspective!";
         public override ModType Type => ModType.Fun;
         public override IconUsage? Icon => OsuIcon.ModMovingFast;
-        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModNoScope) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax) };
 
         [SettingSource("Centred background", "Have the background follow.")] // From the perspective of the player w.r.t. catcher. Less ambiguous than e.g. "(un)adjusted"
         public BindableBool CentredBackground { get; } = new BindableBool();
