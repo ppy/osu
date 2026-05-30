@@ -75,7 +75,7 @@ namespace osu.Game.Skinning
                 switch (pair.Key)
                 {
                     case "ColumnStart":
-                        currentConfig.ColumnStart = float.Parse(pair.Value);
+                        currentConfig.ColumnStart = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "ColumnLineWidth":
