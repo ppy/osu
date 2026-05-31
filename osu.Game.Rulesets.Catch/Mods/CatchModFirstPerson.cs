@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Acronym => "FP";
         public override LocalisableString Description => "Catch, from the catcher's perspective!";
         public override ModType Type => ModType.Fun;
-        public override IconUsage? Icon => OsuIcon.ModMovingFast;
+        public override IconUsage? Icon => OsuIcon.ModMovingFast; // TODO: Mod icon
         public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax) };
 
         [SettingSource("Centred background", "Have the background follow.")] // From the perspective of the player w.r.t. catcher. Less ambiguous than e.g. "(un)adjusted"
@@ -44,16 +44,18 @@ namespace osu.Game.Rulesets.Catch.Mods
             config.BindWith(OsuSetting.ShowStoryboard, showStoryboard);
         }
 
-        private CatchPlayfield catchPlayfield = null!;
+        // Input manager variable not required
+        // Drawable ruleset variable not required
 
-        private const float catch_playfield_misc_x_scale = 1.6f; // Brute-forced, is magical, todo: may need more intricate calculation
-        private float miscX => catch_playfield_misc_x_scale * catchPlayfield.X;
+        private CatchPlayfield playfield = null!;
+
+        // osu!(catch) is one dimension in note hitting, X, so position adjustment logic is for float X
+        private const float playfield_misc_x_scale = 1.6f; // Brute-forced, is magical, todo: may need more intricate calculation
+        private float miscX => playfield.X * playfield_misc_x_scale;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            catchPlayfield = (CatchPlayfield)drawableRuleset.Playfield;
-
-            catchPlayfield.OnUpdate += _ => catchPlayfield.MoveToX(CatchPlayfield.CENTER_X - catchPlayfield.Catcher.X);
+            playfield = (CatchPlayfield)drawableRuleset.Playfield;
         }
 
         private bool isExited(Player player) => !player.IsCurrentScreen(); // Inspired from TestScenePause's confirmExited
@@ -62,6 +64,12 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToPlayer(Player player)
         {
+            // Playfield position adjusting
+
+            playfield.OnUpdate += _ => playfield.MoveToX(CatchPlayfield.CENTER_X - playfield.Catcher.X);
+
+            // Background and storyboard position adjusting
+
             Storyboard storyboard = player.GameplayState.Storyboard;
 
             if (!CentredBackground.Value)
