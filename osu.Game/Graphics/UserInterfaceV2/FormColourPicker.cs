@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormColourPicker : CompositeDrawable, IHasCurrentValue<Colour4>, IFormControl
+    public partial class FormColourPicker : CompositeDrawable, IFormControl<Colour4>
     {
         public Bindable<Colour4> Current
         {
@@ -64,20 +64,44 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
+        private LocalisableString caption;
+
         /// <summary>
         /// Caption describing this color picker, displayed on top of the controls.
         /// </summary>
-        public LocalisableString Caption { get; init; }
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+
+                if (IsLoaded)
+                    captionText.Caption = value;
+            }
+        }
+
+        private LocalisableString hintText;
 
         /// <summary>
         /// Hint text containing an extended description of this color picker, displayed in a tooltip when hovering the caption.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString HintText
+        {
+            get => hintText;
+            set
+            {
+                hintText = value;
+
+                if (IsLoaded)
+                    captionText.TooltipText = value;
+            }
+        }
 
         private FormControlBackground background = null!;
         private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
-        private FormFieldCaption caption = null!;
+        private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;
 
         [Resolved]
@@ -133,7 +157,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 },
                                 Children = new Drawable[]
                                 {
-                                    caption = new FormFieldCaption
+                                    captionText = new FormFieldCaption
                                     {
                                         Anchor = Anchor.TopLeft,
                                         Origin = Anchor.TopLeft,
@@ -221,7 +245,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void textCommitted(TextBox t, bool isNew)
         {
             tryUpdateColourFromTextBox();
-            // If the attempted update above failed, restore text box to match the slider.
+            // If the attempted update above failed, restore text box to match the colour display.
             currentColourInstantaneous.TriggerChange();
             current.Value = currentColourInstantaneous.Value;
 
@@ -268,7 +292,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.ReadOnly = currentColourInstantaneous.Disabled;
             textBox.Colour = currentColourInstantaneous.Disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            caption.Colour = currentColourInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+            captionText.Colour = currentColourInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = currentColourInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content2;
 
             if (Current.Disabled)

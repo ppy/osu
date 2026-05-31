@@ -27,7 +27,7 @@ using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormSliderBar<T> : CompositeDrawable, IHasCurrentValue<T>, IFormControl
+    public partial class FormSliderBar<T> : CompositeDrawable, IFormControl<T>
         where T : struct, INumber<T>, IMinMaxValue<T>
     {
         public Bindable<T> Current
@@ -87,10 +87,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
+        private LocalisableString hintText;
+
         /// <summary>
         /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString HintText
+        {
+            get => hintText;
+            set
+            {
+                hintText = value;
+
+                if (IsLoaded)
+                    captionText.TooltipText = value;
+            }
+        }
 
         /// <summary>
         /// A custom step value for each key press which actuates a change on this control.

@@ -8,14 +8,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormCheckBox : CompositeDrawable, IHasCurrentValue<bool>, IFormControl
+    public partial class FormCheckBox : CompositeDrawable, IFormControl<bool>
     {
         public Bindable<bool> Current
         {
@@ -25,18 +24,42 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly BindableWithCurrent<bool> current = new BindableWithCurrent<bool>();
 
-        /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
-        /// </summary>
-        public LocalisableString Caption { get; init; }
+        private LocalisableString caption;
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Caption describing this check box, displayed on top of the controls.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+
+                if (IsLoaded)
+                    captionText.Caption = value;
+            }
+        }
+
+        private LocalisableString hintText;
+
+        /// <summary>
+        /// Hint text containing an extended description of this check box, displayed in a tooltip when hovering the caption.
+        /// </summary>
+        public LocalisableString HintText
+        {
+            get => hintText;
+            set
+            {
+                hintText = value;
+
+                if (IsLoaded)
+                    captionText.TooltipText = value;
+            }
+        }
 
         private FormControlBackground background = null!;
-        private FormFieldCaption caption = null!;
+        private FormFieldCaption captionText = null!;
 
         private SwitchButton switchButton = null!;
 
@@ -68,7 +91,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             Padding = new MarginPadding { Right = SwitchButton.WIDTH + 5 },
                             Children = new Drawable[]
                             {
-                                caption = new FormFieldCaption
+                                captionText = new FormFieldCaption
                                 {
                                     Caption = Caption,
                                     TooltipText = HintText,
@@ -120,7 +143,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void updateState()
         {
-            caption.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+            captionText.Colour = Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
 
             if (IsDisabled)
                 background.VisualStyle = VisualStyle.Disabled;
