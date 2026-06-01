@@ -134,11 +134,16 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
 
-            if (IsSimulating && !result.Type.IsBonus())
+            if (IsSimulating)
             {
-                healthIncreases.Add(new HealthIncrease(
-                    result.HitObject.GetEndTime() + result.TimeOffset,
-                    GetHealthIncreaseFor(result)));
+                if (result.Type.IsBonus())
+                {
+                    // Bonus objects are treated as if they don't award any health - they are optional.
+                    // However, they still need to be tracked in order for drain to start at the correct point in time after a break.
+                    healthIncreases.Add(new HealthIncrease(result.HitObject.GetEndTime() + result.TimeOffset, 0));
+                }
+                else
+                    healthIncreases.Add(new HealthIncrease(result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
             }
         }
 
