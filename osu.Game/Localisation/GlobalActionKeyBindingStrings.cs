@@ -368,7 +368,7 @@ namespace osu.Game.Localisation
         /// "Add bookmark to timeline"
         /// </summary>
         public static LocalisableString ReplayAddBookmark => new TranslatableString(getKey(@"add_replay_bookmark"), @"Add bookmark to timeline");
-        
+
         /// <summary>
         /// "Remove closest bookmark from timeline"
         /// </summary>
@@ -383,7 +383,7 @@ namespace osu.Game.Localisation
         /// "Seek to next bookmark"
         /// </summary>
         public static LocalisableString ReplaySeekToNextBookmark => new TranslatableString(getKey(@"seek_replay_to_next_bookmark"), @"Seek to next bookmark");
-        
+
         /// <summary>
         /// "Toggle chat focus"
         /// </summary>

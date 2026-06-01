@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {

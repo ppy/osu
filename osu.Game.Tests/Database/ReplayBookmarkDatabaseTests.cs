@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 
