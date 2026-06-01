@@ -311,6 +311,35 @@ namespace osu.Game.Tests.Gameplay
             Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
         }
 
+        [Test]
+        public void TestDrainRateAroundBreaks()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(0);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    // Normal hit circle.
+                    new JudgeableHitObject { StartTime = 0 },
+
+                    // Spinner ticks.
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 6000 },
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 7000 },
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 8000 },
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 9000 },
+
+                    // Spinner end. This is the first object with a non-zero health increase after the break.
+                    new JudgeableHitObject { StartTime = 10000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(1000, 5000)
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(2.2E-5).Within(0.1E-5));
+        }
+
         private Beatmap createBeatmap(double startTime, double endTime, params BreakPeriod[] breaks)
         {
             var beatmap = new Beatmap
