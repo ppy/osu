@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private CatchPlayfield playfield = null!;
 
-        // osu!(catch) is one dimension in note hitting, X, so position adjustment logic is for float X
+        // osu!catch is one dimension in note hitting, X, so position adjustment logic is for float X
         private const float playfield_misc_x_scale = 1.6f; // Brute-forced, is magical, todo: may need more intricate calculation
         private float miscX => playfield.X * playfield_misc_x_scale;
 
