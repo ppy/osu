@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             [new Mod[] { new TaikoModRandom() }, 1],
             [new Mod[] { new TaikoModDifficultyAdjust() }, 0.5],
-            [new Mod[] { new TaikoModClassic() }, 0.96],
+            [new Mod[] { new TaikoModClassic() }, 1],
             [new Mod[] { new TaikoModSwap() }, 1],
             [new Mod[] { new TaikoModSingleTap() }, 1],
             [new Mod[] { new TaikoModConstantSpeed() }, 0.9],
