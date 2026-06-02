@@ -107,6 +107,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public FormColourPicker()
+        {
+            // IMPORTANT: bindable value change logic is in constructor intentionally to support
+            // "CreateSettingsControls" being used in a context it is never loaded, but requires bindable storage.
+            current.BindValueChanged(_ => ValueChanged?.Invoke());
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -201,7 +208,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             current.ValueChanged += e =>
             {
                 currentColourInstantaneous.Value = e.NewValue;
-                ValueChanged?.Invoke();
             };
 
             current.DisabledChanged += disabled =>

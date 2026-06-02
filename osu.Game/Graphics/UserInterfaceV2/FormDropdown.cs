@@ -59,9 +59,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             header.HintText = HintText;
         }
 
-        protected override void LoadComplete()
+        public FormDropdown()
         {
-            base.LoadComplete();
+            // IMPORTANT: bindable value change logic is in constructor intentionally to support
+            // "CreateSettingsControls" being used in a context it is never loaded, but requires bindable storage.
             Current.BindValueChanged(_ => ValueChanged?.Invoke());
         }
 

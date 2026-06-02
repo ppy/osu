@@ -66,6 +66,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        public FormCheckBox()
+        {
+            // IMPORTANT: bindable value change logic is in constructor intentionally to support
+            // "CreateSettingsControls" being used in a context it is never loaded, but requires bindable storage.
+            current.BindValueChanged(_ => ValueChanged?.Invoke());
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -117,8 +124,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 updateState();
                 background.Flash();
-
-                ValueChanged?.Invoke();
             });
             current.BindDisabledChanged(_ => updateState(), true);
         }
