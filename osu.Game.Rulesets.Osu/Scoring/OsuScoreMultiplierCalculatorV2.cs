@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             Single<OsuModHidden>(hasMultiplier: hidden => hiddenMultiplier(hidden, otherModsProvideTimingInfo: false));
 
+            Combination<OsuModTraceable, OsuModBlinds>(hasMultiplier: (_, _) => blinds_multiplier);
             Single<OsuModTraceable>(hasMultiplier: 1.02);
 
             Combination<OsuModFlashlight, OsuModFreezeFrame>(hasMultiplier: (flashlight, _) => 1 + (flashlightMultiplier(flashlight) - 1) / 2);

@@ -215,6 +215,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             [new Mod[] { new OsuModHidden(), new OsuModBlinds() }, 1.24],
             [new Mod[] { new OsuModHidden(), new OsuModBlinds(), new OsuModHardRock() }, 1.24 * 1.09],
 
+            [new Mod[] { new OsuModTraceable(), new OsuModBlinds() }, 1.24],
+            [new Mod[] { new OsuModTraceable(), new OsuModBlinds(), new OsuModHardRock() }, 1.24 * 1.09],
+
             [new Mod[] { new OsuModFlashlight(), new OsuModFreezeFrame() }, 1.1],
 
             #endregion
