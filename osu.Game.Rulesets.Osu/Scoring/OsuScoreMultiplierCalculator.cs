@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             #region Difficulty Increase
 
-            Single<OsuModHardRock>(hasMultiplier: hardRock => hardRock.UsesDefaultConfiguration ? 1.09 : 1);
+            Single<OsuModHardRock>(hasMultiplier: 1.09);
             // Sudden Death
             // Perfect
             Single<OsuModDoubleTime>(hasMultiplier: doubleTime => doubleTimeMultiplier(doubleTime.SpeedChange.Value));
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             Combination<OsuModFlashlight, OsuModFreezeFrame>(hasMultiplier: (flashlight, _) => flashlightMultiplier(flashlight, hasFreezeFrameMod: true));
             Single<OsuModFlashlight>(hasMultiplier: flashlight => flashlightMultiplier(flashlight, hasFreezeFrameMod: false));
 
-            Single<OsuModBlinds>(hasMultiplier: blinds => blinds.UsesDefaultConfiguration ? blinds_multiplier : 1);
+            Single<OsuModBlinds>(hasMultiplier: blinds_multiplier);
             // Strict Tracking
             // Accuracy Challenge
 
