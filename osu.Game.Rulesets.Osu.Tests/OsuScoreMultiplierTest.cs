@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             #region Difficulty Reduction
 
             [new Mod[] { new OsuModEasy() }, 0.8],
+            [new Mod[] { new OsuModEasy { Retries = { Value = 1 } } }, 0.8],
             [new Mod[] { new OsuModEasy { Retries = { Value = 3 } } }, 0.7],
             [new Mod[] { new OsuModEasy { Retries = { Value = 5 } } }, 0.5],
             [new Mod[] { new OsuModEasy { Retries = { Value = 8 } } }, 0.4],
