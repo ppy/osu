@@ -234,7 +234,13 @@ namespace osu.Game.Rulesets.Osu
             }
         }
 
-        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new OsuScoreMultiplierCalculator(context);
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context)
+        {
+            if (context.Score?.TotalScoreVersion <= 30000016)
+                return new OsuScoreMultiplierCalculatorV1(context);
+
+            return new OsuScoreMultiplierCalculatorV2(context);
+        }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
 

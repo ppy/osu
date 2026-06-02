@@ -9,9 +9,9 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    public class OsuScoreMultiplierCalculator : ScoreMultiplierCalculator
+    public class OsuScoreMultiplierCalculatorV2 : ScoreMultiplierCalculator
     {
-        public OsuScoreMultiplierCalculator(ScoreMultiplierContext context)
+        public OsuScoreMultiplierCalculatorV2(ScoreMultiplierContext context)
             : base(context)
         {
             #region Difficulty Reduction
