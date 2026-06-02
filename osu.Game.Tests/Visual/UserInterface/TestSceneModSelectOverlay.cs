@@ -1032,6 +1032,51 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("OsuModPerfect panel active", () => getPanelForMod(typeof(OsuModPerfect)).Active.Value);
         }
 
+        [Test]
+        public void TestDifficultyAdjustModMultiplierIsCalculatedCorrectly()
+        {
+            createScreen();
+            AddStep("set mods", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+            AddUntilStep("one panel active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value), () => Is.EqualTo(1));
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(1).Within(Precision.FLOAT_EPSILON));
+            assertCustomisationToggleState(disabled: false, active: false);
+            AddAssert("setting items created", () => modSelectOverlay.ChildrenOfType<ISettingsItem>().Any());
+
+            AddStep("modify DA", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value = 3.9f);
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(0.95).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("replace DA completely", () =>
+            {
+                SelectedMods.Value = new Mod[]
+                {
+                    new OsuModDifficultyAdjust
+                    {
+                        ApproachRate = { Value = 6.8f },
+                        OverallDifficulty = { Value = 6.2f }
+                    }
+                };
+            });
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(0.81).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("change beatmap", () =>
+            {
+                var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                beatmap.BeatmapInfo.Difficulty = new BeatmapDifficulty
+                {
+                    ApproachRate = 6,
+                    OverallDifficulty = 5,
+                    CircleSize = 5,
+                    DrainRate = 5,
+                };
+                modSelectOverlay.Beatmap.Value = beatmap;
+            });
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(0.24).Within(Precision.FLOAT_EPSILON));
+        }
+
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>
             modSelectOverlay.ChildrenOfType<ModColumn>().Any()
             && modSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded)
