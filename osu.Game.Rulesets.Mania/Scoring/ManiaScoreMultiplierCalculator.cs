@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
             // Dual Stages
             // Mirror
             Single<ManiaModDifficultyAdjust>(hasMultiplier: 0.5);
-            Single<ManiaModClassic>(hasMultiplier: 1.0);
+            Single<ManiaModClassic>(hasMultiplier: _ => classicMultiplier(Context.Score));
             // Invert
             Single<ManiaModConstantSpeed>(hasMultiplier: 0.9);
             Single<ManiaModHoldOff>(hasMultiplier: 0.9);
@@ -141,6 +141,14 @@ namespace osu.Game.Rulesets.Mania.Scoring
                 return old_key_mod_multiplier;
 
             return new_key_mod_multiplier;
+        }
+
+        private static double classicMultiplier(ScoreInfo? score)
+        {
+            if (score?.TotalScoreVersion <= 30000016)
+                return 0.96;
+
+            return 1;
         }
     }
 }
