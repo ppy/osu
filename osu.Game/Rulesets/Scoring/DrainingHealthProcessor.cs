@@ -167,7 +167,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual double ComputeDrainRate()
         {
-            if (healthIncreases.Count <= 1)
+            // Drain requires there to be at least two objects in general.
+            if (healthIncreases.Count < 2)
                 return 0;
 
             int adjustment = 1;
@@ -207,14 +208,15 @@ namespace osu.Game.Rulesets.Scoring
 
                 // Stop if the resulting health is within a reasonable offset from the target
                 if (Math.Abs(lowestHealth - targetMinimumHealth) <= minimum_health_error)
-                    break;
+                    return result;
 
                 // This effectively works like a binary search - each iteration the search space moves closer to the target, but may exceed it.
                 adjustment *= 2;
                 result += 1.0 / adjustment * Math.Sign(lowestHealth - targetMinimumHealth);
             }
 
-            return result;
+            // The target health couldn't be reached.
+            return 0;
         }
 
         private record struct HealthIncrease(double Time, double Amount);
