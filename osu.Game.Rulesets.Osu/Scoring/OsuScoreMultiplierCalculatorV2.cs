@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private static double doubleTimeMultiplier(double speedChange)
         {
-            // Round to the nearest multiple of 0.1.
+            // Floor to the nearest multiple of 0.1.
             double value = (int)(speedChange * 10) / 10.0;
 
             // 0.01 penalty for non-default rates.
