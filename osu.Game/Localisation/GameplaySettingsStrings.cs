@@ -149,6 +149,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ClassicScoreDisplay => new TranslatableString(getKey(@"classic_score_display"), @"Classic");
 
+        /// <summary>
+        /// "Auto switch to local leaderboard when online leaderboards are unavailable"
+        /// </summary>
+        public static LocalisableString AutoSwitchToLocalLeaderboardWhenUnavailable => new TranslatableString(getKey(@"auto_switch_to_local_leaderboard_when_unavailable"), @"Auto switch to local leaderboard when online leaderboards are unavailable");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

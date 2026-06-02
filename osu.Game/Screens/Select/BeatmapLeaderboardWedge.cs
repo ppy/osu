@@ -49,6 +49,12 @@ namespace osu.Game.Screens.Select
 
         public IBindable<bool> FilterBySelectedMods { get; } = new BindableBool();
 
+        public IBindable<int> ManualScopeChangeCounter { get; } = new Bindable<int>();
+
+        public IBindable<BeatmapLeaderboardScope?> DisplayedScopeOverride => displayedScopeOverride;
+
+        private readonly Bindable<BeatmapLeaderboardScope?> displayedScopeOverride = new Bindable<BeatmapLeaderboardScope?>();
+
         [Resolved]
         private LeaderboardManager leaderboardManager { get; set; } = null!;
 
@@ -195,11 +201,32 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            Scope.BindValueChanged(_ => RefetchScores());
+            Scope.BindValueChanged(_ =>
+            {
+                displayedScopeOverride.Value = null;
+                RefetchScores();
+            });
+            ManualScopeChangeCounter.BindValueChanged(_ =>
+            {
+                displayedScopeOverride.Value = null;
+                RefetchScores(allowUnavailableFallback: false);
+            });
             Sorting.BindValueChanged(_ => RefetchScores());
-            FilterBySelectedMods.BindValueChanged(_ => RefetchScores());
-            beatmap.BindValueChanged(_ => RefetchScores());
-            ruleset.BindValueChanged(_ => RefetchScores());
+            FilterBySelectedMods.BindValueChanged(_ =>
+            {
+                displayedScopeOverride.Value = null;
+                RefetchScores();
+            });
+            beatmap.BindValueChanged(_ =>
+            {
+                displayedScopeOverride.Value = null;
+                RefetchScores();
+            });
+            ruleset.BindValueChanged(_ =>
+            {
+                displayedScopeOverride.Value = null;
+                RefetchScores();
+            });
             mods.BindValueChanged(_ => refetchScoresFromMods());
 
             RefetchScores();
@@ -218,14 +245,17 @@ namespace osu.Game.Screens.Select
         private void refetchScoresFromMods()
         {
             if (FilterBySelectedMods.Value)
+            {
+                displayedScopeOverride.Value = null;
                 RefetchScores();
+            }
         }
 
         private bool initialFetchComplete;
 
         private ScheduledDelegate? refetchOperation;
 
-        public void RefetchScores()
+        public void RefetchScores(bool allowUnavailableFallback = true)
         {
             SetScores(Array.Empty<ScoreInfo>());
 
@@ -244,13 +274,17 @@ namespace osu.Game.Screens.Select
             {
                 var fetchBeatmapInfo = beatmap.Value.BeatmapInfo;
                 var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
-                var fetchSorting = fetchScope == BeatmapLeaderboardScope.Local ? Sorting.Value : LeaderboardSortMode.Score;
+                var fetchSorting = fetchScope == BeatmapLeaderboardScope.Local
+                    ? Sorting.Value
+                    : LeaderboardSortMode.Score;
 
                 // For now, we forcefully refresh to keep things simple.
                 // In the future, removing this requirement may be deemed useful, but will need ample testing of edge case scenarios
                 // (like returning from gameplay after setting a new score, returning to song select after main menu).
-                leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, fetchScope, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, fetchSorting),
-                    forceRefresh: true);
+                leaderboardManager.FetchWithCriteria(
+                    new LeaderboardCriteria(fetchBeatmapInfo, fetchRuleset, fetchScope, FilterBySelectedMods.Value ? mods.Value.ToArray() : null, fetchSorting),
+                    forceRefresh: true,
+                    allowUnavailableFallback: allowUnavailableFallback);
 
                 if (!initialFetchComplete)
                 {
@@ -275,6 +309,8 @@ namespace osu.Game.Screens.Select
             // in this case, ignore the incoming scores to avoid briefly flashing the wrong leaderboard.
             if (leaderboardManager.CurrentCriteria?.Beatmap?.Equals(beatmap.Value.BeatmapInfo) != true)
                 return;
+
+            displayedScopeOverride.Value = leaderboardManager.CurrentCriteria.Scope != Scope.Value ? leaderboardManager.CurrentCriteria.Scope : null;
 
             if (scores.FailState != null)
                 SetState((LeaderboardState)scores.FailState);
@@ -511,7 +547,7 @@ namespace osu.Game.Screens.Select
                 case LeaderboardState.NetworkFailure:
                     return new ClickablePlaceholder(LeaderboardStrings.CouldntFetchScores, FontAwesome.Solid.Sync)
                     {
-                        Action = RefetchScores
+                        Action = () => RefetchScores()
                     };
 
                 case LeaderboardState.NoneSelected:
@@ -544,6 +580,13 @@ namespace osu.Game.Screens.Select
                 default:
                     throw new ArgumentOutOfRangeException(nameof(state));
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            displayedScopeOverride.Value = null;
+
+            base.Dispose(isDisposing);
         }
     }
 }
