@@ -34,6 +34,8 @@ namespace osu.Game.Skinning.Select
             {
                 new Sprite
                 {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                     Texture = skin.GetTexture($"selection-{kind}"),
                     // to match stable, the button input area should not be taken from this sprite. it should be taken from the hover sprite below.
                     // see: https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameModes/Select/SongSelection.cs#L340-L349
@@ -41,6 +43,8 @@ namespace osu.Game.Skinning.Select
                 },
                 hoverSprite = new Sprite
                 {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                     Texture = skin.GetTexture($"selection-{kind}-over"),
                     Alpha = 0f,
                     AlwaysPresent = true,
@@ -54,7 +58,7 @@ namespace osu.Game.Skinning.Select
         {
             hoverSprite.FadeIn(100);
             hoverSound.Play();
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
