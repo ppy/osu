@@ -31,6 +31,7 @@ namespace osu.Game.Skinning.Select
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.Centre,
+                BypassAutoSizeAxes = Axes.Both,
                 X = 57.6f / 2 * 1.6f,
                 Y = -35 * 1.6f,
             });
