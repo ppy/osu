@@ -206,7 +206,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             [new Mod[] { new OsuModHidden(), new OsuModWiggle() }, 1.02],
             [new Mod[] { new OsuModHidden(), new OsuModGrow() }, 1.02],
             [new Mod[] { new OsuModHidden(), new OsuModDeflate() }, 1.02],
+            [new Mod[] { new OsuModHidden(), new OsuModDeflate { StartScale = { Value = 4 } } }, 1.02 * 0.96],
             [new Mod[] { new OsuModHidden(), new OsuModRepel() }, 1.02],
+            [new Mod[] { new OsuModHidden { OnlyFadeApproachCircles = { Value = true } }, new OsuModRepel() }, 1],
             [new Mod[] { new OsuModHidden(), new OsuModDepth() }, 1.02],
             [new Mod[] { new OsuModHidden(), new OsuModDepth(), new OsuModHardRock() }, 1.02 * 1.09],
 
