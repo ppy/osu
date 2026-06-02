@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculatorV1(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculatorV2(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculatorV1(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculatorV2(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -899,7 +899,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("difficulty multiplier display shows correct value",
-                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.1).Within(Precision.DOUBLE_EPSILON));
+                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.2).Within(Precision.DOUBLE_EPSILON));
 
             // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
             // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
@@ -909,7 +909,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single()
                                                                               .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
             AddUntilStep("difficulty multiplier display shows correct value",
-                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.3).Within(Precision.DOUBLE_EPSILON));
+                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.55).Within(Precision.DOUBLE_EPSILON));
         }
 
         [Test]
