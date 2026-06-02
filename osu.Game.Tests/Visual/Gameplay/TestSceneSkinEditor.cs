@@ -17,8 +17,8 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -335,7 +335,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 InputManager.MoveMouseTo(
                     skinEditor.ChildrenOfType<SkinSettingsToolbox>().First()
-                              .ChildrenOfType<SettingsSlider<float>>().First()
+                              .ChildrenOfType<FormSliderBar<float>>().First()
                               .ChildrenOfType<SliderBar<float>>().First()
                 );
             });

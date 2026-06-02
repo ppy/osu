@@ -17,8 +17,8 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 InputManager.MoveMouseTo(
                     skinEditor.ChildrenOfType<SkinSettingsToolbox>().First()
-                              .ChildrenOfType<SettingsSlider<float>>().First()
+                              .ChildrenOfType<FormSliderBar<float>>().First()
                               .ChildrenOfType<SliderBar<float>>().First()
                 );
             });
