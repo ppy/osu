@@ -275,5 +275,23 @@ namespace osu.Game.Rulesets.Osu.Tests
             var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty(), scoreInfo));
             Assert.That(calculator.CalculateFor([new OsuModClassic()]), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
         }
+
+        [Test]
+        public void VerySmallModMultiplier()
+        {
+            var mods = new Mod[]
+            {
+                new OsuModEasy { Retries = { Value = 10 } },
+                new OsuModNoFail(),
+                new OsuModHalfTime { SpeedChange = { Value = 0.5 } },
+                new OsuModTargetPractice(),
+                new OsuModClassic { ClassicNoteLock = { Value = false } },
+                new OsuModDeflate { StartScale = { Value = 25 } },
+                new OsuModMagnetised { AttractionStrength = { Value = 1 } },
+                new OsuModSynesthesia(),
+            };
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty()));
+            Assert.That(calculator.CalculateFor(mods), Is.GreaterThan(0));
+        }
     }
 }
