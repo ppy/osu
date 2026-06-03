@@ -2,8 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Scoring;
 using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Rulesets.Taiko.Tests
@@ -153,5 +157,17 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCaseSource(nameof(test_cases))]
         public void TestMultipliers(Mod[] mods, double expectedMultiplier)
             => TestModCombination(mods, expectedMultiplier);
+
+        [TestCase(30000001, 0.96)]
+        [TestCase(30000009, 0.96)]
+        [TestCase(30000016, 0.96)]
+        [TestCase(30000017, 1)]
+        [TestCase(null, 1)]
+        public void TestClassicMultiplierVersioning(int? totalScoreVersion, double expectedMultiplier)
+        {
+            var scoreInfo = totalScoreVersion != null ? new ScoreInfo { TotalScoreVersion = totalScoreVersion.Value } : null;
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty(), scoreInfo));
+            Assert.That(calculator.CalculateFor([new TaikoModClassic()]), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+        }
     }
 }

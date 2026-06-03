@@ -220,5 +220,17 @@ namespace osu.Game.Rulesets.Mania.Tests
             }));
             Assert.That(calculator.CalculateFor([new ManiaModKey4()]), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
         }
+
+        [TestCase(30000001, 0.96)]
+        [TestCase(30000009, 0.96)]
+        [TestCase(30000016, 0.96)]
+        [TestCase(30000017, 1)]
+        [TestCase(null, 1)]
+        public void TestClassicMultiplierVersioning(int? totalScoreVersion, double expectedMultiplier)
+        {
+            var scoreInfo = totalScoreVersion != null ? new ScoreInfo { TotalScoreVersion = totalScoreVersion.Value } : null;
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty(), scoreInfo));
+            Assert.That(calculator.CalculateFor([new ManiaModClassic()]), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+        }
     }
 }
