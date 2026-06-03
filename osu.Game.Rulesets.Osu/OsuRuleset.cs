@@ -236,7 +236,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context)
         {
-            if (context.Score?.TotalScoreVersion <= 30000016)
+            if (context.Score != null && context.Score.TotalScoreVersion <= 30000016)
                 return new OsuScoreMultiplierCalculatorV1(context);
 
             return new OsuScoreMultiplierCalculatorV2(context);
