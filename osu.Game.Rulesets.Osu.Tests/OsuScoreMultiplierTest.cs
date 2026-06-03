@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             [new Mod[] { new OsuModFlashlight { SizeMultiplier = { Value = 1.9f } } }, 1.02],
             [new Mod[] { new OsuModFlashlight { SizeMultiplier = { Value = 2f } } }, 1.02],
             [new Mod[] { new OsuModFlashlight { ComboBasedSize = { Value = false } } }, 1.04],
+            [new Mod[] { new OsuModFlashlight { SizeMultiplier = { Value = 1.9f }, ComboBasedSize = { Value = false } } }, 1.004],
 
             [new Mod[] { new OsuModBlinds() }, 1.24],
             [new Mod[] { new OsuModStrictTracking() }, 1],
