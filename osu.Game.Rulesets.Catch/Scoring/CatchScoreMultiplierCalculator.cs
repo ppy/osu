@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
         private static double classicMultiplier(ScoreInfo? score)
         {
-            if (score != null && score.TotalScoreVersion <= 30000016)
+            if (score != null && score.TotalScoreVersion < 30000017)
                 return 0.96;
 
             return 1;
