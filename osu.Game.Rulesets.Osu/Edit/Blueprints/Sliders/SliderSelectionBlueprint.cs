@@ -482,11 +482,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // Snap the slider to the current beat divisor before checking length validity.
             HitObject.SnapTo(distanceSnapProvider);
 
-            // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
-            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLengthForPlacement)
+            // If there are 0 or 1 remaining control points, the slider is in a degenerate form and should be deleted.
+            if (controlPoints.Count <= 1)
             {
                 placementHandler?.Delete(HitObject);
                 return;
+            }
+
+            // If the snap length is invalid use CalculatedDistance.
+            if (!HitObject.Path.HasValidLengthForPlacement)
+            {
+                HitObject.Path.ExpectedDistance.Value = null;
             }
 
             // The path will have a non-zero offset if the head is removed, but sliders don't support this behaviour since the head is positioned at the slider's position
