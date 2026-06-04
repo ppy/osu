@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
             #region Difficulty Increase
 
             Single<OsuModHardRock>(hasMultiplier: 1.09);
-            // Sudden Death
-            // Perfect
+            // Sudden Death (1.0x)
+            // Perfect (1.0x)
             Single<OsuModDoubleTime>(hasMultiplier: doubleTime => doubleTimeMultiplier(doubleTime.SpeedChange.Value));
             Single<OsuModNightcore>(hasMultiplier: nightcore => doubleTimeMultiplier(nightcore.SpeedChange.Value));
 
@@ -50,8 +50,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
             Single<OsuModFlashlight>(hasMultiplier: flashlightMultiplier);
 
             Single<OsuModBlinds>(hasMultiplier: blinds_multiplier);
-            // Strict Tracking
-            // Accuracy Challenge
+            // Strict Tracking (1.0x)
+            // Accuracy Challenge (1.0x)
 
             #endregion
 
@@ -61,16 +61,16 @@ namespace osu.Game.Rulesets.Osu.Scoring
             Single<OsuModDifficultyAdjust>(hasMultiplier: difficultyAdjust => difficultyAdjustMultiplier(difficultyAdjust, Context.BeatmapDifficultyWithoutMods));
             Single<OsuModClassic>(hasMultiplier: classic => classic.ClassicNoteLock.Value ? 0.985 : 0.96);
             Single<OsuModRandom>(hasMultiplier: 0.7);
-            // Mirror
-            // Alternate
-            // Single Tap
+            // Mirror (1.0x)
+            // Alternate (1.0x)
+            // Single Tap (1.0x)
 
             #endregion
 
             #region Automation
 
-            // Autoplay
-            // Cinema
+            // Autoplay (1.0x)
+            // Cinema (1.0x)
             Single<OsuModRelax>(hasMultiplier: 0.1);
             Single<OsuModAutopilot>(hasMultiplier: 0.1);
             Single<OsuModSpunOut>(hasMultiplier: 0.95);
@@ -79,25 +79,32 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             #region Fun
 
-            // Transform
-            // Wiggle
-            // Spin In
-            // Grow
+            // Transform (1.0x)
+            // Wiggle (1.0x)
+            // Spin In (1.0x)
+            // Grow (1.0x)
             Single<OsuModDeflate>(hasMultiplier: deflateMultiplier);
             Single<ModWindUp>(hasMultiplier: timeRampMultiplier);
             Single<ModWindDown>(hasMultiplier: timeRampMultiplier);
-            // Barrel Roll
+            // Barrel Roll (1.0x)
             Single<OsuModApproachDifferent>(hasMultiplier: 0.7);
-            // Muted
-            // No Scope
+            // Muted (1.0x)
+            // No Scope (1.0x)
             Single<OsuModMagnetised>(hasMultiplier: magnetised => 0.7 - magnetised.AttractionStrength.Value * 0.6);
-            // Repel
+            // Repel (1.0x)
             Single<ModAdaptiveSpeed>(hasMultiplier: 0.1);
-            // Freeze Frame
-            // Bubbles
+            // Freeze Frame (1.0x)
+            // Bubbles (1.0x)
             Single<OsuModSynesthesia>(hasMultiplier: 0.99);
-            // Depth
-            // Bloom
+            // Depth (1.0x)
+            // Bloom (1.0x)
+
+            #endregion
+
+            #region System
+
+            // Touch Device (1.0x)
+            // Score V2 (1.0x)
 
             #endregion
         }
