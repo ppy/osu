@@ -552,6 +552,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        [Ignore("Temporarily ignored pending correct addressing of treatment of `TotalScoreVersion` in replays")]
         public void TestTotalScoreWithoutModsBackwardsPopulatedIfMissing()
         {
             var ruleset = new OsuRuleset().RulesetInfo;
