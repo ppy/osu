@@ -4,6 +4,7 @@
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Scoring
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
             // Random
             Single<TaikoModDifficultyAdjust>(hasMultiplier: 0.5);
-            Single<TaikoModClassic>(hasMultiplier: 0.96);
+            Single<TaikoModClassic>(hasMultiplier: _ => classicMultiplier(Context.Score));
             // Swap
             // Single Tap
             Single<TaikoModConstantSpeed>(hasMultiplier: 0.9);
@@ -82,6 +83,14 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                 return 1 + value / 5;
             else
                 return 0.6 + value;
+        }
+
+        private static double classicMultiplier(ScoreInfo? score)
+        {
+            if (score != null && score.TotalScoreVersion < 30000017)
+                return 0.96;
+
+            return 1;
         }
     }
 }
