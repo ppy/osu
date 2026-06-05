@@ -194,6 +194,7 @@ namespace osu.Game.Screens.Select
                                         {
                                             Origin = Anchor.CentreLeft,
                                             Anchor = Anchor.CentreLeft,
+                                            Selected = { BindTarget = Selected },
                                         }
                                     },
                                 }
@@ -214,7 +215,6 @@ namespace osu.Game.Screens.Select
             Selected.BindValueChanged(s =>
             {
                 Expanded.Value = s.NewValue;
-                spreadDisplay.Enabled.Value = s.NewValue;
             }, true);
         }
 
