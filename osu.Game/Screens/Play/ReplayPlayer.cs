@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play
 
         private double originalPlaybackRate;
 
-        private bool isHolding = false;
+        private bool isHolding;
 
         private ReplayFailIndicator? failIndicator;
         private PlaybackSettings? playbackSettings;
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
-                    if (e.Repeat == true)
+                    if (e.Repeat)
                     {
                         if (isHolding) return true;
 
