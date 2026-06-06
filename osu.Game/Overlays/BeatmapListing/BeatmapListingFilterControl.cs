@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -46,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// True when pagination has reached the end of available results.
         /// </summary>
-        private bool noMoreResults;
+        public bool NoMoreResults { get; private set; }
 
         /// <summary>
         /// The current page fetched of results (zero index).
@@ -60,7 +61,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private readonly Bindable<BeatmapCardSize> cardSize = new Bindable<BeatmapCardSize>();
 
-        private readonly BeatmapListingSearchControl searchControl;
+        public readonly BeatmapListingSearchControl SearchControl;
         private readonly BeatmapListingSortTabControl sortControl;
         private readonly Box sortControlBackground;
 
@@ -71,6 +72,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
 
         private IBindable<APIUser> apiUser;
 
@@ -99,7 +103,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             Radius = 3,
                             Offset = new Vector2(0f, 1f),
                         },
-                        Child = searchControl = new BeatmapListingSearchControl
+                        Child = SearchControl = new BeatmapListingSearchControl
                         {
                             TypingStarted = () => TypingStarted?.Invoke()
                         }
@@ -143,13 +147,13 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         public void Search(string query)
-            => Schedule(() => searchControl.Query.Value = query);
+            => Schedule(() => SearchControl.Query.Value = query);
 
         public void FilterGenre(SearchGenre genre)
-            => Schedule(() => searchControl.Genre.Value = genre);
+            => Schedule(() => SearchControl.Genre.Value = genre);
 
         public void FilterLanguage(SearchLanguage language)
-            => Schedule(() => searchControl.Language.Value = language);
+            => Schedule(() => SearchControl.Language.Value = language);
 
         protected override void LoadComplete()
         {
@@ -157,26 +161,27 @@ namespace osu.Game.Overlays.BeatmapListing
 
             config.BindWith(OsuSetting.BeatmapListingCardSize, cardSize);
 
-            searchControl.Query.BindValueChanged(_ =>
+            SearchControl.Query.BindValueChanged(_ =>
             {
                 resetSortControl();
                 queueUpdateSearch(true);
             });
 
-            searchControl.Category.BindValueChanged(_ =>
+            SearchControl.Category.BindValueChanged(_ =>
             {
                 resetSortControl();
                 queueUpdateSearch();
             });
 
-            searchControl.General.CollectionChanged += (_, _) => queueUpdateSearch();
-            searchControl.Ruleset.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.Language.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.Extra.CollectionChanged += (_, _) => queueUpdateSearch();
-            searchControl.Ranks.CollectionChanged += (_, _) => queueUpdateSearch();
-            searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
-            searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
+            SearchControl.General.CollectionChanged += (_, _) => queueUpdateSearch();
+            SearchControl.Ruleset.BindValueChanged(_ => queueUpdateSearch());
+            SearchControl.Genre.BindValueChanged(_ => queueUpdateSearch());
+            SearchControl.Language.BindValueChanged(_ => queueUpdateSearch());
+            SearchControl.Extra.CollectionChanged += (_, _) => queueUpdateSearch();
+            SearchControl.Ranks.CollectionChanged += (_, _) => queueUpdateSearch();
+            SearchControl.Played.BindValueChanged(_ => queueUpdateSearch());
+            SearchControl.Downloaded.BindValueChanged(_ => queueUpdateSearch());
+            SearchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
 
             sortControl.Current.BindValueChanged(_ => queueUpdateSearch());
             sortControl.SortDirection.BindValueChanged(_ => queueUpdateSearch());
@@ -185,7 +190,7 @@ namespace osu.Game.Overlays.BeatmapListing
             apiUser.BindValueChanged(_ => queueUpdateSearch());
         }
 
-        public void TakeFocus() => searchControl.TakeFocus();
+        public void TakeFocus() => SearchControl.TakeFocus();
 
         /// <summary>
         /// Fetch the next page of results. May result in a no-op if a fetch is already in progress, or if there are no results left.
@@ -193,7 +198,7 @@ namespace osu.Game.Overlays.BeatmapListing
         public void FetchNextPage()
         {
             // there may be no results left.
-            if (noMoreResults)
+            if (NoMoreResults)
                 return;
 
             // there may already be an active request.
@@ -206,7 +211,7 @@ namespace osu.Game.Overlays.BeatmapListing
             performRequest();
         }
 
-        private void resetSortControl() => sortControl.Reset(searchControl.Category.Value, !string.IsNullOrEmpty(searchControl.Query.Value));
+        private void resetSortControl() => sortControl.Reset(SearchControl.Category.Value, !string.IsNullOrEmpty(SearchControl.Query.Value));
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
@@ -227,19 +232,19 @@ namespace osu.Game.Overlays.BeatmapListing
         private void performRequest()
         {
             getSetsRequest = new SearchBeatmapSetsRequest(
-                searchControl.Query.Value,
-                searchControl.Ruleset.Value,
+                SearchControl.Query.Value,
+                SearchControl.Ruleset.Value,
                 lastResponse?.Cursor,
-                searchControl.General,
-                searchControl.Category.Value,
+                SearchControl.General,
+                SearchControl.Category.Value,
                 sortControl.Current.Value,
                 sortControl.SortDirection.Value,
-                searchControl.Genre.Value,
-                searchControl.Language.Value,
-                searchControl.Extra,
-                searchControl.Ranks,
-                searchControl.Played.Value,
-                searchControl.ExplicitContent.Value);
+                SearchControl.Genre.Value,
+                SearchControl.Language.Value,
+                SearchControl.Extra,
+                SearchControl.Ranks,
+                SearchControl.Played.Value,
+                SearchControl.ExplicitContent.Value);
 
             getSetsRequest.Success += response =>
             {
@@ -247,10 +252,10 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
                 if (sets.Count == 0 || response.Cursor == null)
-                    noMoreResults = true;
+                    NoMoreResults = true;
 
                 if (CurrentPage == 0)
-                    searchControl.BeatmapSet = sets.FirstOrDefault();
+                    SearchControl.BeatmapSet = sets.FirstOrDefault();
 
                 lastResponse = response;
                 getSetsRequest = null;
@@ -260,10 +265,10 @@ namespace osu.Game.Overlays.BeatmapListing
                 {
                     List<LocalisableString> filters = new List<LocalisableString>();
 
-                    if (searchControl.Played.Value != SearchPlayed.Any)
+                    if (SearchControl.Played.Value != SearchPlayed.Any)
                         filters.Add(BeatmapsStrings.ListingSearchFiltersPlayed);
 
-                    if (searchControl.Ranks.Any())
+                    if (SearchControl.Ranks.Any())
                         filters.Add(BeatmapsStrings.ListingSearchFiltersRank);
 
                     if (filters.Any())
@@ -272,6 +277,16 @@ namespace osu.Game.Overlays.BeatmapListing
                         SearchFinished?.Invoke(supporterOnlyFilters);
                         return;
                     }
+                }
+
+                if (SearchControl.Downloaded.Value == SearchDownloaded.NotDownloaded)
+                {
+                    sets.RemoveAll(
+                        set =>
+                        {
+                            return beatmapManager.IsAvailableLocally(set.Beatmaps.First());
+                        }
+                    );
                 }
 
                 var resultsReturned = SearchResult.ResultsReturned(sets);
@@ -283,7 +298,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void resetSearch()
         {
-            noMoreResults = false;
+            NoMoreResults = false;
             CurrentPage = 0;
 
             lastResponse = null;

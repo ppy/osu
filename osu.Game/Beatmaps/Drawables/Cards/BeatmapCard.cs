@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected abstract Drawable IdleContent { get; }
         protected abstract Drawable DownloadInProgressContent { get; }
 
-        protected readonly BeatmapDownloadTracker DownloadTracker;
+        public readonly BeatmapDownloadTracker DownloadTracker;
 
         private readonly Bindable<bool> preferNoVideo = new BindableBool();
         private InputManager? containingInputManager;

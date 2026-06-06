@@ -28,6 +28,7 @@ using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -194,11 +195,27 @@ namespace osu.Game.Overlays
             }
         }
 
-        private IEnumerable<BeatmapCard> createCardsFor(IEnumerable<APIBeatmapSet> beatmapSets) => beatmapSets.Select(set => BeatmapCard.Create(set, filterControl.CardSize.Value).With(c =>
+        private IEnumerable<BeatmapCard> createCardsFor(IEnumerable<APIBeatmapSet> beatmapSets) => beatmapSets.Select(set => 
         {
-            c.Anchor = Anchor.TopCentre;
-            c.Origin = Anchor.TopCentre;
-        })).ToArray();
+            var card = BeatmapCard.Create(set, filterControl.CardSize.Value).With(c =>
+            {
+                c.Anchor = Anchor.TopCentre;
+                c.Origin = Anchor.TopCentre;
+            });
+
+            if (filterControl.SearchControl.Downloaded.Value == SearchDownloaded.NotDownloaded)
+            {
+                card.DownloadTracker.State.BindValueChanged(state =>
+                {
+                    if (state.NewValue == Online.DownloadState.LocallyAvailable)
+                    {
+                        Schedule(() => foundContent.Remove(card, false));
+                    }
+                });
+            }
+
+            return card;
+        }).ToArray();
 
         private static ReverseChildIDFillFlowContainer<BeatmapCard> createCardContainerFor(IEnumerable<BeatmapCard> newCards)
         {
@@ -371,7 +388,8 @@ namespace osu.Game.Overlays
 
             bool shouldShowMore = panelLoadTask?.IsCompleted != false
                                   && Time.Current - lastFetchDisplayedTime > time_between_fetches
-                                  && (ScrollFlow.ScrollableExtent > 0 && ScrollFlow.IsScrolledToEnd(pagination_scroll_distance));
+                                  && ScrollFlow.IsScrolledToEnd(pagination_scroll_distance)
+                                  && !filterControl.NoMoreResults;
 
             if (shouldShowMore)
                 filterControl.FetchNextPage();
