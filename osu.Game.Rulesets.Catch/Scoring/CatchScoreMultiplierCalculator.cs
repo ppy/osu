@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             Single<CatchModDoubleTime>(hasMultiplier: doubleTime => rateAdjustMultiplier(doubleTime.SpeedChange.Value));
             Single<CatchModNightcore>(hasMultiplier: nightcore => rateAdjustMultiplier(nightcore.SpeedChange.Value));
             Single<CatchModHidden>(hasMultiplier: hidden => hidden.UsesDefaultConfiguration ? 1.06 : 1);
-            Single<CatchModReverseHidden>(hasMultiplier: reverseHidden => reverseHidden.UsesDefaultConfiguration ? 1.06 : 1);
+            Single<CatchModFadein>(hasMultiplier: fadein => fadein.UsesDefaultConfiguration ? 1.06 : 1);
             Single<CatchModFlashlight>(hasMultiplier: flashlight => flashlight.UsesDefaultConfiguration ? 1.12 : 1);
             // Accuracy Challenge
 

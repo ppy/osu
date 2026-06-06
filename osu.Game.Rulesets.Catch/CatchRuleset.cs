@@ -127,10 +127,9 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModHardRock(),
                         new MultiMod(new CatchModSuddenDeath(), new CatchModPerfect()),
                         new MultiMod(new CatchModDoubleTime(), new CatchModNightcore()),
-                        new CatchModHidden(),
+                        new MultiMod(new CatchModHidden(), new CatchModFadein()),
                         new CatchModFlashlight(),
                         new ModAccuracyChallenge(),
-                        new CatchModReverseHidden(),
                     };
 
                 case ModType.Conversion:

@@ -3,46 +3,28 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModReverseHidden : ModHidden, IApplicableToDrawableRuleset<CatchHitObject>
+    public class CatchModFadein : ModHidden
     {
-        public override string Name => "Reverse Hidden";
-        public override string Acronym => "RH";
+        public override string Name => "Fade In";
+        public override string Acronym => "FI";
+        public override IconUsage? Icon => OsuIcon.ModHidden;
         public override LocalisableString Description => "Reduce reaction time.";
-        public override Type[] IncompatibleMods => new[] { typeof(CatchModHidden), typeof(CatchModFlashlight) };
+        public override Type[] IncompatibleMods => [typeof(CatchModHidden), typeof(CatchModFlashlight)];
 
-        private const double fade_in_duration_multiplier = 0.16;
+        private const double fade_in_duration_multiplier = 0.5;
 
         private readonly Dictionary<DrawableHitObject, HitObject> nestedHitObjects = new Dictionary<DrawableHitObject, HitObject>();
-
-        [SettingSource("Reveal height", "How far down the playfield fruits should begin fading in.")]
-        public BindableDouble RevealHeight { get; } = new BindableDouble(5)
-        {
-            MinValue = 3,
-            MaxValue = 7,
-            Precision = 1,
-        };
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
-        {
-            var drawableCatchRuleset = (DrawableCatchRuleset)drawableRuleset;
-            var catchPlayfield = (CatchPlayfield)drawableCatchRuleset.Playfield;
-
-            catchPlayfield.Catcher.CatchFruitOnPlate = true;
-        }
 
         public override void ApplyToDrawableHitObject(DrawableHitObject drawableHitObject)
         {
@@ -85,15 +67,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             var hitObject = drawable.HitObject;
 
-            double offset = hitObject.TimePreempt * (1 - RevealHeight.Value / 10);
-            double duration = Math.Min(hitObject.TimePreempt * fade_in_duration_multiplier, offset);
+            double duration = hitObject.TimePreempt * fade_in_duration_multiplier;
 
             drawable.Hide();
 
-            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                drawable.Hide();
-
-            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - offset))
+            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - duration))
                 drawable.FadeIn(duration);
         }
 
