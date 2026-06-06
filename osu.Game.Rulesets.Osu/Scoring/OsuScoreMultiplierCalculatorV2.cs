@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             Single<OsuModApproachDifferent>(hasMultiplier: 0.7);
             // Muted (1.0x)
             // No Scope (1.0x)
-            Single<OsuModMagnetised>(hasMultiplier: magnetised => 0.7 - magnetised.AttractionStrength.Value * 0.6);
+            Single<OsuModMagnetised>(hasMultiplier: magnetised => 0.7 - convertFloatToDouble(magnetised.AttractionStrength.Value) * 0.6);
             // Repel (1.0x)
             Single<ModAdaptiveSpeed>(hasMultiplier: 0.1);
             // Freeze Frame (1.0x)
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private static double flashlightMultiplier(OsuModFlashlight flashlight)
         {
             // Multiplier of 1.2x, reduced by 0.02 per 0.1 increase in flashlight size.
-            double value = Math.Max(1.02, Math.Min(1.2, 1.2 - 0.2 * (flashlight.SizeMultiplier.Value - 1)));
+            double value = Math.Max(1.02, Math.Min(1.2, 1.2 - 0.2 * (convertFloatToDouble(flashlight.SizeMultiplier.Value) - 1)));
 
             if (!flashlight.ComboBasedSize.Value)
                 value = 1 + (value - 1) / 5;
@@ -164,10 +164,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private static double difficultyAdjustMultiplier(OsuModDifficultyAdjust difficultyAdjust, IBeatmapDifficultyInfo beatmapDifficulty)
         {
-            double selectedCircleSize = difficultyAdjust.CircleSize.Value ?? beatmapDifficulty.CircleSize;
-            double selectedDrainRate = difficultyAdjust.DrainRate.Value ?? beatmapDifficulty.DrainRate;
-            double selectedOverallDifficulty = difficultyAdjust.OverallDifficulty.Value ?? beatmapDifficulty.OverallDifficulty;
-            double selectedApproachRate = difficultyAdjust.ApproachRate.Value ?? beatmapDifficulty.ApproachRate;
+            double selectedCircleSize = convertFloatToDouble(difficultyAdjust.CircleSize.Value ?? beatmapDifficulty.CircleSize);
+            double selectedDrainRate = convertFloatToDouble(difficultyAdjust.DrainRate.Value ?? beatmapDifficulty.DrainRate);
+            double selectedOverallDifficulty = convertFloatToDouble(difficultyAdjust.OverallDifficulty.Value ?? beatmapDifficulty.OverallDifficulty);
+            double selectedApproachRate = convertFloatToDouble(difficultyAdjust.ApproachRate.Value ?? beatmapDifficulty.ApproachRate);
 
             double csDifference = Math.Abs(selectedCircleSize - beatmapDifficulty.CircleSize);
             double hpDifference = Math.Abs(selectedDrainRate - beatmapDifficulty.DrainRate);
@@ -195,6 +195,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         private static double deflateMultiplier(OsuModDeflate deflate)
-            => 1.0 - Math.Max(0, 0.02 * (deflate.StartScale.Value - deflate.StartScale.Default));
+            => 1.0 - Math.Max(0, 0.02 * (convertFloatToDouble(deflate.StartScale.Value) - convertFloatToDouble(deflate.StartScale.Default)));
+
+        /// <summary>
+        /// Converts a float to a double. The value is floored to two decimal places.
+        /// </summary>
+        /// <param name="f">The float value to convert.</param>
+        /// <returns>The converted double value.</returns>
+        private static double convertFloatToDouble(float f)
+            => (int)(f * 100) / 100.0;
     }
 }
