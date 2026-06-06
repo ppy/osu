@@ -195,7 +195,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private IEnumerable<BeatmapCard> createCardsFor(IEnumerable<APIBeatmapSet> beatmapSets) => beatmapSets.Select(set => 
+        private IEnumerable<BeatmapCard> createCardsFor(IEnumerable<APIBeatmapSet> beatmapSets) => beatmapSets.Select(set =>
         {
             var card = BeatmapCard.Create(set, filterControl.CardSize.Value).With(c =>
             {
