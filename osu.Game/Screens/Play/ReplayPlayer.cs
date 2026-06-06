@@ -45,6 +45,10 @@ namespace osu.Game.Screens.Play
 
         private double? lastFrameTime;
 
+        private double originalPlaybackRate;
+
+        private bool isHolding = false;
+
         private ReplayFailIndicator? failIndicator;
         private PlaybackSettings? playbackSettings;
 
@@ -186,10 +190,24 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
-                    if (GameplayClockContainer.IsPaused.Value)
-                        GameplayClockContainer.Start();
+                    if (e.Repeat == true)
+                    {
+                        if (isHolding) return true;
+
+                        originalPlaybackRate = playbackSettings!.UserPlaybackRate.Value;
+                        playbackSettings!.UserPlaybackRate.Value *= 2;
+                        isHolding = true;
+                        if (GameplayClockContainer.IsPaused.Value)
+                            GameplayClockContainer.Start();
+                    }
                     else
-                        GameplayClockContainer.Stop();
+                    {
+                        if (GameplayClockContainer.IsPaused.Value)
+                            GameplayClockContainer.Start();
+                        else
+                            GameplayClockContainer.Stop();
+                    }
+
                     return true;
             }
 
@@ -220,6 +238,16 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
+            switch (e.Action)
+            {
+                case GlobalAction.TogglePauseReplay:
+                    isHolding = false;
+                    playbackSettings!.UserPlaybackRate.Value = originalPlaybackRate;
+                    return;
+            }
         }
 
         protected override void PerformFail()
