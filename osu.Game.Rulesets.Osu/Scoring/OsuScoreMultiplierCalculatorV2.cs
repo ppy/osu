@@ -169,10 +169,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
             double selectedOverallDifficulty = convertFloatToDouble(difficultyAdjust.OverallDifficulty.Value ?? beatmapDifficulty.OverallDifficulty);
             double selectedApproachRate = convertFloatToDouble(difficultyAdjust.ApproachRate.Value ?? beatmapDifficulty.ApproachRate);
 
-            double csDifference = Math.Abs(selectedCircleSize - beatmapDifficulty.CircleSize);
-            double hpDifference = Math.Abs(selectedDrainRate - beatmapDifficulty.DrainRate);
-            double odDifference = Math.Abs(selectedOverallDifficulty - beatmapDifficulty.OverallDifficulty);
-            double arDifference = Math.Abs(selectedApproachRate - beatmapDifficulty.ApproachRate);
+            double csDifference = Math.Abs(selectedCircleSize - convertFloatToDouble(beatmapDifficulty.CircleSize));
+            double hpDifference = Math.Abs(selectedDrainRate - convertFloatToDouble(beatmapDifficulty.DrainRate));
+            double odDifference = Math.Abs(selectedOverallDifficulty - convertFloatToDouble(beatmapDifficulty.OverallDifficulty));
+            double arDifference = Math.Abs(selectedApproachRate - convertFloatToDouble(beatmapDifficulty.ApproachRate));
 
             // Per parameter, reduce multiplier by 0.05x per 0.1 change.
             double csMultiplier = Math.Max(0.1, 1.0 - csDifference * 0.5);
