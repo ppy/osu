@@ -19,11 +19,21 @@ namespace osu.Game.Tests.Storyboards
         private const string test_image_path = "Textures/test-image.png";
 
         [Test]
+        public void TestOsu27627MultiFlashSpriteLifetime()
+        {
+            var sprite = decodeSingleSprite("osu27627-multi-flash-sprite.osb");
+
+            // ppy/osu#27627: must not truncate at the first fade-out (55447); survive until the last flash ends.
+            Assert.That(sprite.EndTimeForDisplay, Is.EqualTo(285_564));
+            Assert.That(sprite.EndTimeForDisplay, Is.Not.EqualTo(55_447));
+        }
+
+        [Test]
         public void TestMultiFlashSpriteLifetimeIsNotTruncatedAtFirstFadeOut()
         {
             var sprite = decodeSingleSprite("multi-flash-sprite-lifetime.osb");
 
-            // ppy/osu#27627: repeated fade cycles must survive until the last visible alpha ends.
+            // Minimal repro of ppy/osu#27627: repeated fade cycles must survive until the last visible alpha ends.
             Assert.Multiple(() =>
             {
                 Assert.That(sprite.EndTime, Is.EqualTo(20_000));
@@ -76,6 +86,16 @@ namespace osu.Game.Tests.Storyboards
         }
 
         [Test]
+        public void TestVisibleAlphaEndRetainsConservativeEndTime()
+        {
+            var sprite = decodeSingleSprite("visible-alpha-end-retains-conservative-end-time.osb");
+
+            // When the last alpha command still ends visible, do not truncate before trailing transforms.
+            Assert.That(sprite.EndTimeForDisplay, Is.EqualTo(sprite.EndTime));
+            Assert.That(sprite.EndTimeForDisplay, Is.EqualTo(10_000));
+        }
+
+        [Test]
         public void TestDrawableLifetimeEndUsesEndTimeForDisplay()
         {
             var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, test_image_path, Anchor.Centre, Vector2.Zero);
@@ -86,6 +106,17 @@ namespace osu.Game.Tests.Storyboards
             var drawable = new DrawableStoryboardSprite(sprite);
 
             Assert.That(drawable.LifetimeEnd, Is.EqualTo(sprite.EndTimeForDisplay));
+        }
+
+        [Test]
+        public void TestDrawableAnimationLifetimeEndUsesEndTimeForDisplay()
+        {
+            var animation = decodeSingleAnimation("animation-loop-no-explicit-end-time.osb");
+
+            var drawable = new DrawableStoryboardAnimation(animation);
+
+            Assert.That(drawable.LifetimeEnd, Is.EqualTo(animation.EndTimeForDisplay));
+            Assert.That(drawable.LifetimeEnd, Is.EqualTo(12_000));
         }
 
         private static StoryboardSprite decodeSingleSprite(string resourceName)
@@ -101,6 +132,21 @@ namespace osu.Game.Tests.Storyboards
             Assert.That(background.Elements, Has.Count.EqualTo(1));
 
             return (StoryboardSprite)background.Elements.Single();
+        }
+
+        private static StoryboardAnimation decodeSingleAnimation(string resourceName)
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using var resStream = TestResources.OpenResource(resourceName);
+            using var stream = new LineBufferedReader(resStream);
+
+            var storyboard = decoder.Decode(stream);
+            var background = storyboard.Layers.Single(l => l.Depth == 3);
+
+            Assert.That(background.Elements, Has.Count.EqualTo(1));
+
+            return (StoryboardAnimation)background.Elements.Single();
         }
     }
 }
