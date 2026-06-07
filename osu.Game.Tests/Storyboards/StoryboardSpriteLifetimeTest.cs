@@ -19,6 +19,32 @@ namespace osu.Game.Tests.Storyboards
         private const string test_image_path = "Textures/test-image.png";
 
         [Test]
+        public void TestMultiFlashSpriteLifetimeIsNotTruncatedAtFirstFadeOut()
+        {
+            var sprite = decodeSingleSprite("multi-flash-sprite-lifetime.osb");
+
+            // ppy/osu#27627: repeated fade cycles must survive until the last visible alpha ends.
+            Assert.Multiple(() =>
+            {
+                Assert.That(sprite.EndTime, Is.EqualTo(20_000));
+                Assert.That(sprite.EndTimeForDisplay, Is.EqualTo(8_000));
+            });
+        }
+
+        [Test]
+        public void TestFadeStartValueExtendsDisplayEnd()
+        {
+            var sprite = decodeSingleSprite("fade-start-value-extends-display-end.osb");
+
+            // ppy/osu#27753: a later fade with non-zero StartValue must not be ignored after an earlier fade-out.
+            Assert.Multiple(() =>
+            {
+                Assert.That(sprite.EndTime, Is.EqualTo(15_000));
+                Assert.That(sprite.EndTimeForDisplay, Is.EqualTo(6_000));
+            });
+        }
+
+        [Test]
         public void TestTrailingInvisibleTransformsIgnoredForDisplayEnd()
         {
             var sprite = decodeSingleSprite("trailing-invisible-transforms-ignored-for-display-end.osb");
