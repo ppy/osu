@@ -143,21 +143,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.XOffset,
-                            KeyboardStep = 0.0001f,
+                            KeyboardStep = 0.01f,
                             Current = offsetX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.YOffset,
-                            KeyboardStep = 0.0001f,
+                            KeyboardStep = 0.01f,
                             Current = offsetY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.Rotation,
-                            KeyboardStep = 0.0001f,
+                            KeyboardStep = 0.01f,
                             Current = rotation,
                         }),
                         new RotationPresetButtons(tabletHandler)
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.AspectRatio,
-                            KeyboardStep = 0.0001f,
+                            KeyboardStep = 0.01f,
                             Current = aspectRatio,
                         }),
                         new SettingsItemV2(new FormCheckBox
@@ -180,14 +180,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Width,
-                            KeyboardStep = 0.0001f,
+                            KeyboardStep = 0.01f,
                             Current = sizeX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Height,
-                            KeyboardStep = 0.0001f,
+                            KeyboardStep = 0.01f,
                             Current = sizeY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
