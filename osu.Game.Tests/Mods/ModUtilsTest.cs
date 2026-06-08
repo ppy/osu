@@ -228,21 +228,29 @@ namespace osu.Game.Tests.Mods
         [Test]
         public void TestFormatScoreMultiplier()
         {
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.9999).ToString(), "0.99x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.0).ToString(), "1.00x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.0001).ToString(), "1.01x");
+            Assert.Multiple(() =>
+            {
+                Assert.That(ModUtils.FormatScoreMultiplier(0.9999).ToString(), Is.EqualTo("0.99x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.0).ToString(), Is.EqualTo("1.00x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.0001).ToString(), Is.EqualTo("1.01x"));
 
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.899999999999999).ToString(), "0.90x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.9).ToString(), "0.90x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(0.900000000000001).ToString(), "0.90x");
+                Assert.That(ModUtils.FormatScoreMultiplier(0.899999999999999).ToString(), Is.EqualTo("0.90x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(0.9).ToString(), Is.EqualTo("0.90x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(0.900000000000001).ToString(), Is.EqualTo("0.90x"));
 
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.099999999999999).ToString(), "1.10x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.1).ToString(), "1.10x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.100000000000001).ToString(), "1.10x");
+                Assert.That(ModUtils.FormatScoreMultiplier(1.099999999999999).ToString(), Is.EqualTo("1.10x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.1).ToString(), Is.EqualTo("1.10x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.100000000000001).ToString(), Is.EqualTo("1.10x"));
 
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.045).ToString(), "1.05x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.05).ToString(), "1.05x");
-            ClassicAssert.AreEqual(ModUtils.FormatScoreMultiplier(1.055).ToString(), "1.06x");
+                Assert.That(ModUtils.FormatScoreMultiplier(1.045).ToString(), Is.EqualTo("1.05x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.05).ToString(), Is.EqualTo("1.05x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.055).ToString(), Is.EqualTo("1.06x"));
+
+                Assert.That(ModUtils.FormatScoreMultiplier(1.1799999952316285).ToString(), Is.EqualTo("1.18x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.1599999904632567).ToString(), Is.EqualTo("1.16x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.1400000095367431).ToString(), Is.EqualTo("1.14x"));
+                Assert.That(ModUtils.FormatScoreMultiplier(1.1200000047683716).ToString(), Is.EqualTo("1.12x"));
+            });
         }
 
         private static readonly object[] multiplayer_mod_test_scenarios =
