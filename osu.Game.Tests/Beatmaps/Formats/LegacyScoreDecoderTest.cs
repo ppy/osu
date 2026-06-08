@@ -636,7 +636,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
             scoreInfo.Mods = new Mod[]
             {
-                new OsuModDifficultyAdjust() { CircleSize = { Value = 3.5f } }
+                new OsuModDifficultyAdjust { CircleSize = { Value = 3.5f } }
             };
             scoreInfo.OnlineID = 123123;
             scoreInfo.ClientVersion = "2026.522.1-tachyon";
