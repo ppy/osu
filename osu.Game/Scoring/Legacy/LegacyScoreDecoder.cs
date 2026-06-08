@@ -152,7 +152,7 @@ namespace osu.Game.Scoring.Legacy
             if (score.ScoreInfo.IsLegacyScore)
                 score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
 
-            StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
+            StandardisedScoreMigrationTools.UpdateToLatestScoring(score.ScoreInfo, workingBeatmap);
 
             if (decodedRank != null)
                 score.ScoreInfo.Rank = decodedRank.Value;

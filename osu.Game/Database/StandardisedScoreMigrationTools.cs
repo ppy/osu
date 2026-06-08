@@ -14,11 +14,39 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Database
 {
     public static class StandardisedScoreMigrationTools
     {
+        /// <summary>
+        /// Updates <paramref name="score"/>'s <see cref="ScoreInfo.TotalScore"/> to the latest applicable version.
+        /// </summary>
+        /// <param name="score">The score to update.</param>
+        /// <param name="beatmap">The <see cref="WorkingBeatmap"/> applicable for this score.</param>
+        public static void UpdateToLatestScoring(ScoreInfo score, WorkingBeatmap beatmap)
+        {
+            if (score.IsLegacyScore)
+                UpdateFromLegacy(score, beatmap);
+            else
+            {
+                var ruleset = score.Ruleset.CreateInstance();
+                var scoreProcessor = ruleset.CreateScoreProcessor();
+
+                // accuracy and rank may not be populated on old lazer scores - ensure they're always there.
+                // warning: ordering is important here - rank is dependent on accuracy!
+                score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+                score.Rank = ComputeRank(score, scoreProcessor);
+
+                // update score to latest multipliers too, if possible.
+                if (score.TotalScoreWithoutMods > 0)
+                    UpdateToLatestScoreMultipliers(score, beatmap.BeatmapInfo.Difficulty);
+            }
+
+            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+        }
+
         /// <summary>
         /// Updates a <see cref="ScoreInfo"/> to standardised scoring.
         /// This will recompite the score's <see cref="ScoreInfo.Accuracy"/> (always), <see cref="ScoreInfo.Rank"/> (always),
@@ -437,6 +465,28 @@ namespace osu.Game.Database
                 rank = mod.AdjustRank(rank, accuracy);
 
             return rank;
+        }
+
+        /// <summary>
+        /// Updates <paramref name="scoreInfo"/>'s <see cref="ScoreInfo.TotalScore"/> to the newest score multipliers
+        /// using <see cref="ScoreInfo.TotalScoreWithoutMods"/> and <see cref="ScoreInfo.Mods"/>.
+        /// </summary>
+        /// <param name="scoreInfo">The score to update.</param>
+        /// <param name="beatmapDifficultyWithoutMods">The difficulty parameters of the beatmap applicable for the score, before application of mods.</param>
+        /// <exception cref="InvalidOperationException"><paramref name="scoreInfo"/> does not have <see cref="ScoreInfo.TotalScoreWithoutMods"/> correctly populated.</exception>
+        public static void UpdateToLatestScoreMultipliers(ScoreInfo scoreInfo, IBeatmapDifficultyInfo beatmapDifficultyWithoutMods)
+        {
+            // do nothing if the score multiplier is already up to date.
+            if (scoreInfo.TotalScoreVersion >= 30000017)
+                return;
+
+            if (scoreInfo.TotalScoreWithoutMods == 0 && scoreInfo.TotalScore > 0)
+                throw new InvalidOperationException($"Cannot recalculate score multiplier as {nameof(scoreInfo.TotalScoreWithoutMods)} is missing.");
+
+            var ruleset = scoreInfo.Ruleset.CreateInstance();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(beatmapDifficultyWithoutMods));
+            double scoreMultiplier = scoreMultiplierCalculator.CalculateFor(scoreInfo.Mods);
+            scoreInfo.TotalScore = (long)Math.Round(scoreInfo.TotalScoreWithoutMods * scoreMultiplier);
         }
 
         /// <summary>
