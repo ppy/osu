@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osuTK;
 
@@ -16,6 +18,9 @@ namespace osu.Game.Tests.Visual.Settings
     [TestFixture]
     public partial class TestSceneSettingsSource : OsuTestScene
     {
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         public TestSceneSettingsSource()
         {
             Children = new Drawable[]
@@ -69,10 +74,13 @@ namespace osu.Game.Tests.Visual.Settings
                 Value = "Sample text"
             };
 
+            [SettingSource("Sample slider bar", "Slider bar component")]
+            public BindableNumber<float> FloatSliderBarBindable { get; } = new BindableNumber<float> { MinValue = 0, MaxValue = 10, Value = 5, Precision = 0.1f };
+
             [SettingSource("Sample number textbox", "Textbox number entry", SettingControlType = typeof(SettingsNumberBox))]
             public Bindable<int?> IntTextBoxBindable { get; } = new Bindable<int?>();
 
-            [SettingSource("Sample colour", "Change the colour", SettingControlType = typeof(SettingsColour))]
+            [SettingSource("Sample colour", "Change the colour")]
             public BindableColour4 ColourBindable { get; } = new BindableColour4
             {
                 Default = Colour4.White,

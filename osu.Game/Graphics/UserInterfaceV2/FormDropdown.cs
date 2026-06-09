@@ -20,15 +20,19 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormDropdown<T> : OsuDropdown<T>, IFormControl
+    public partial class FormDropdown<T> : OsuDropdown<T>, IFormControl<T>
     {
         /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
+        /// Caption describing this dropdown, displayed on top of the controls.
         /// </summary>
-        public LocalisableString Caption { get; init; }
+        public LocalisableString Caption
+        {
+            get => header.Caption;
+            set => header.Caption = value;
+        }
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Hint text containing an extended description of this dropdown, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText
         {
@@ -55,9 +59,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             header.HintText = HintText;
         }
 
-        protected override void LoadComplete()
+        public FormDropdown()
         {
-            base.LoadComplete();
+            // IMPORTANT: bindable value change logic is in constructor intentionally to support
+            // "CreateSettingsControls" being used in a context it is never loaded, but requires bindable storage.
             Current.BindValueChanged(_ => ValueChanged?.Invoke());
         }
 

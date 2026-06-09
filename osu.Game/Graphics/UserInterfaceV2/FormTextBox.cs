@@ -23,7 +23,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public partial class FormTextBox : CompositeDrawable, IHasCurrentValue<string>, IFormControl
+    public partial class FormTextBox : CompositeDrawable, IFormControl<string>
     {
         public Bindable<string> Current
         {
@@ -62,15 +62,39 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
 
-        /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
-        /// </summary>
-        public LocalisableString Caption { get; init; }
+        private LocalisableString caption;
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Caption describing this text box, displayed on top of the controls.
         /// </summary>
-        public LocalisableString HintText { get; init; }
+        public LocalisableString Caption
+        {
+            get => caption;
+            set
+            {
+                caption = value;
+
+                if (IsLoaded)
+                    captionText.Caption = value;
+            }
+        }
+
+        private LocalisableString hintText;
+
+        /// <summary>
+        /// Hint text containing an extended description of this text box, displayed in a tooltip when hovering the caption.
+        /// </summary>
+        public LocalisableString HintText
+        {
+            get => hintText;
+            set
+            {
+                hintText = value;
+
+                if (IsLoaded)
+                    captionText.TooltipText = value;
+            }
+        }
 
         /// <summary>
         /// Text displayed in the text box when its contents are empty.
@@ -80,11 +104,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private FormControlBackground background = null!;
         private Box flashLayer = null!;
         private InnerTextBox textBox = null!;
-        private FormFieldCaption caption = null!;
+        private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        public FormTextBox()
+        {
+            // IMPORTANT: bindable value change logic is in constructor intentionally to support
+            // "CreateSettingsControls" being used in a context it is never loaded, but requires bindable storage.
+            current.BindValueChanged(_ => ValueChanged?.Invoke());
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -108,7 +139,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Spacing = new Vector2(0, 4),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        captionText = new FormFieldCaption
                         {
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
@@ -153,7 +184,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             focusManager = GetContainingFocusManager()!;
             textBox.Focused.BindValueChanged(_ => updateState());
 
-            current.BindValueChanged(_ => ValueChanged?.Invoke());
             current.BindDisabledChanged(_ => updateState(), true);
         }
 
@@ -182,7 +212,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             textBox.ReadOnly = disabled;
             textBox.Alpha = 1;
 
-            caption.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
+            captionText.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
             if (Current.Disabled)
