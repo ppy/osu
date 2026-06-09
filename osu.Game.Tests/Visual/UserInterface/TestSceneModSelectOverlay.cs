@@ -15,6 +15,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -124,7 +125,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext()).CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculatorV2(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -139,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
             AddAssert("mod multiplier correct", () =>
             {
-                double multiplier = new OsuScoreMultiplierCalculator(new ScoreMultiplierContext()).CalculateFor(SelectedMods.Value);
+                double multiplier = new OsuScoreMultiplierCalculatorV2(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor(SelectedMods.Value);
                 return Precision.AlmostEquals(multiplier, this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
@@ -898,7 +899,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
             AddAssert("difficulty multiplier display shows correct value",
-                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.1).Within(Precision.DOUBLE_EPSILON));
+                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.2).Within(Precision.DOUBLE_EPSILON));
 
             // this is highly unorthodox in a test, but because the `ModSettingChangeTracker` machinery heavily leans on events and object disposal and re-creation,
             // it is instrumental in the reproduction of the failure scenario that this test is supposed to cover.
@@ -908,7 +909,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("reset half time speed to default", () => modSelectOverlay.ChildrenOfType<ModCustomisationPanel>().Single()
                                                                               .ChildrenOfType<RevertToDefaultButton<double>>().Single().TriggerClick());
             AddUntilStep("difficulty multiplier display shows correct value",
-                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.3).Within(Precision.DOUBLE_EPSILON));
+                () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(0.55).Within(Precision.DOUBLE_EPSILON));
         }
 
         [Test]
@@ -1029,6 +1030,51 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             changeRuleset(0);
             AddAssert("OsuModPerfect panel active", () => getPanelForMod(typeof(OsuModPerfect)).Active.Value);
+        }
+
+        [Test]
+        public void TestDifficultyAdjustModMultiplierIsCalculatedCorrectly()
+        {
+            createScreen();
+            AddStep("set mods", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+            AddUntilStep("one panel active", () => modSelectOverlay.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value), () => Is.EqualTo(1));
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(1).Within(Precision.FLOAT_EPSILON));
+            assertCustomisationToggleState(disabled: false, active: false);
+            AddAssert("setting items created", () => modSelectOverlay.ChildrenOfType<ISettingsItem>().Any());
+
+            AddStep("modify DA", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value = 3.9f);
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(0.95).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("replace DA completely", () =>
+            {
+                SelectedMods.Value = new Mod[]
+                {
+                    new OsuModDifficultyAdjust
+                    {
+                        ApproachRate = { Value = 6.8f },
+                        OverallDifficulty = { Value = 6.2f }
+                    }
+                };
+            });
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(0.81).Within(Precision.FLOAT_EPSILON));
+
+            AddStep("change beatmap", () =>
+            {
+                var beatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                beatmap.BeatmapInfo.Difficulty = new BeatmapDifficulty
+                {
+                    ApproachRate = 6,
+                    OverallDifficulty = 5,
+                    CircleSize = 5,
+                    DrainRate = 5,
+                };
+                modSelectOverlay.Beatmap.Value = beatmap;
+            });
+            AddAssert("mod multiplier is correct", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value,
+                () => Is.EqualTo(0.24).Within(Precision.FLOAT_EPSILON));
         }
 
         private void waitForColumnLoad() => AddUntilStep("all column content loaded", () =>

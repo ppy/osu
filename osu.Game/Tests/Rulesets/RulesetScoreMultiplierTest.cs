@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -26,7 +27,7 @@ namespace osu.Game.Tests.Rulesets
 
         protected void TestModCombination(IEnumerable<Mod> mods, double expectedMultiplier)
         {
-            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty()));
             Assert.That(calculator.CalculateFor(mods), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
         }
     }

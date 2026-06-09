@@ -102,6 +102,8 @@ namespace osu.Game.Overlays.Mods
             {
                 if (beatmapAttributesDisplay != null)
                     beatmapAttributesDisplay.BeatmapInfo.Value = b.NewValue?.BeatmapInfo;
+
+                updateInformation();
             }, true);
 
             Ruleset.BindValueChanged(_ => updateInformation());
@@ -122,9 +124,11 @@ namespace osu.Game.Overlays.Mods
 
         private void updateInformation()
         {
-            if (rankingInformationDisplay != null)
+            WorkingBeatmap? workingBeatmap = Beatmap.Value;
+
+            if (rankingInformationDisplay != null && workingBeatmap != null)
             {
-                var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator(new ScoreMultiplierContext());
+                var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator(new ScoreMultiplierContext(workingBeatmap.BeatmapInfo.Difficulty));
                 double multiplier = scoreMultiplierCalculator?.CalculateFor(ActiveMods.Value) ?? 1;
 
                 rankingInformationDisplay.ModMultiplier.Value = multiplier;

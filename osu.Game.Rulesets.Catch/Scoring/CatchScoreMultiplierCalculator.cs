@@ -4,6 +4,7 @@
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Scoring
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             #region Conversion
 
             Single<CatchModDifficultyAdjust>(hasMultiplier: 0.5);
-            Single<CatchModClassic>(hasMultiplier: 0.96);
+            Single<CatchModClassic>(hasMultiplier: _ => classicMultiplier(context.Score));
             // Mirror
 
             #endregion
@@ -82,6 +83,14 @@ namespace osu.Game.Rulesets.Catch.Scoring
                 return 1 + value / 5;
             else
                 return 0.6 + value;
+        }
+
+        private static double classicMultiplier(ScoreInfo? score)
+        {
+            if (score != null && score.TotalScoreVersion < 30000017)
+                return 0.96;
+
+            return 1;
         }
     }
 }
