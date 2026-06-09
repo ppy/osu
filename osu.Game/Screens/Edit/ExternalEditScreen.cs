@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Edit
             {
                 new OsuSpriteText
                 {
-                    Text = EditorStrings.ExternalEditMounted,
+                    Text = EditorStrings.BeatmapMountedExternally,
                     Font = OsuFont.Default.With(size: 30),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Edit
             BackButtonVisibility.Value = false;
             string originalDifficulty = editor.Beatmap.Value.Beatmap.BeatmapInfo.DifficultyName;
 
-            showSpinner(EditorStrings.CleaningUp);
+            showSpinner(EditorStrings.ExternalEditCleaningUp);
 
             Live<BeatmapSetInfo>? beatmap = null;
 

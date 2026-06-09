@@ -252,7 +252,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Cleaning up..."
         /// </summary>
-        public static LocalisableString CleaningUp => new TranslatableString(getKey(@"cleaning_up"), @"Cleaning up...");
+        public static LocalisableString ExternalEditCleaningUp => new TranslatableString(getKey(@"external_edit_cleaning_up"), @"Cleaning up...");
 
         /// <summary>
         /// "Exporting for edit..."
@@ -262,7 +262,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Beatmap is mounted externally"
         /// </summary>
-        public static LocalisableString ExternalEditMounted => new TranslatableString(getKey(@"external_edit_mounted"), @"Beatmap is mounted externally");
+        public static LocalisableString BeatmapMountedExternally => new TranslatableString(getKey(@"beatmap_mounted_externally"), @"Beatmap is mounted externally");
 
         /// <summary>
         /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."

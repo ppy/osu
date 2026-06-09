@@ -105,14 +105,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ReturnToGame => new TranslatableString(getKey(@"return_to_game"), @"Return to game");
 
         /// <summary>
-        /// "Mounting external skin..."
-        /// </summary>
-        public static LocalisableString ExternalEditMounting => new TranslatableString(getKey(@"external_edit_mounting"), @"Mounting external skin...");
-
-        /// <summary>
         /// "Skin is mounted externally"
         /// </summary>
-        public static LocalisableString ExternalEditMounted => new TranslatableString(getKey(@"external_edit_mounted"), @"Skin is mounted externally");
+        public static LocalisableString SkinMountedExternally => new TranslatableString(getKey(@"skin_mounted_externally"), @"Skin is mounted externally");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

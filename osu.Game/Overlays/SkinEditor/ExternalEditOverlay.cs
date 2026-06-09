@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.SkinEditor
                 throw new InvalidOperationException("Cannot start multiple concurrent external edits!");
 
             Show();
-            showSpinner(SkinEditorStrings.ExternalEditMounting);
+            showSpinner(EditorStrings.ExternalEditExporting);
             setGlobalSkinDisabled(true);
 
             await Task.Delay(500).ConfigureAwait(true);
@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     new OsuSpriteText
                     {
-                        Text = SkinEditorStrings.ExternalEditMounted,
+                        Text = SkinEditorStrings.SkinMountedExternally,
                         Font = OsuFont.Default.With(size: 30),
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             Debug.Assert(taskCompletionSource != null);
 
-            showSpinner(EditorStrings.CleaningUp);
+            showSpinner(EditorStrings.ExternalEditCleaningUp);
             await Task.Delay(500).ConfigureAwait(true);
 
             try
