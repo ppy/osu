@@ -99,7 +99,7 @@ namespace osu.Game.Beatmaps
                 userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
 
                 experimentalAudio = audioManager.UseExperimentalWasapi.GetBoundCopy();
-                experimentalAudio.BindValueChanged(_ => updatePlatformOffset());
+                experimentalAudio.BindValueChanged(_ => updatePlatformOffset(), true);
 
                 // TODO: this doesn't update when using ChangeSource() to change beatmap.
                 beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
