@@ -585,13 +585,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual IEnumerable<SelectionBlueprint<T>> SortForMovement(IReadOnlyList<SelectionBlueprint<T>> blueprints) => blueprints;
 
         /// <summary>
+        /// Indicates whether the selected blueprint can be moved.
+        /// </summary>
+        protected virtual bool AllowSelectionMovement => true;
+
+        /// <summary>
         /// Moves the current selected blueprints.
         /// </summary>
         /// <param name="e">The <see cref="DragEvent"/> defining the movement event.</param>
         /// <returns>Whether a movement was active.</returns>
         private bool moveCurrentSelection(DragEvent e)
         {
-            if (movementBlueprints == null)
+            if (movementBlueprints == null || !AllowSelectionMovement)
                 return false;
 
             return TryMoveBlueprints(e, movementBlueprints);
