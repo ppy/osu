@@ -77,6 +77,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
+        /// <summary>
+        /// Maximum allowed length of text.
+        /// </summary>
+        public int? LengthLimit { get; init; }
+
         private FormControlBackground background = null!;
         private Box flashLayer = null!;
         private InnerTextBox textBox = null!;
@@ -120,6 +125,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
+                            t.LengthLimit = LengthLimit;
                             t.Current = Current;
                             t.CommitOnFocusLost = true;
                             t.OnCommit += (textBox, newText) =>
