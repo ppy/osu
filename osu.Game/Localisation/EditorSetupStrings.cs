@@ -42,8 +42,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "If enabled, an &quot;Are you ready? 3, 2, 1, GO!&quot; countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so."
         /// </summary>
-        public static LocalisableString CountdownDescription => new TranslatableString(getKey(@"countdown_description"),
-            @"If enabled, an ""Are you ready? 3, 2, 1, GO!"" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so.");
+        public static LocalisableString CountdownDescription => new TranslatableString(getKey(@"countdown_description"), @"If enabled, an ""Are you ready? 3, 2, 1, GO!"" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so.");
 
         /// <summary>
         /// "Countdown speed"
@@ -53,8 +52,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "If the countdown sounds off-time, use this to make it appear one or more beats early."
         /// </summary>
-        public static LocalisableString CountdownOffsetDescription =>
-            new TranslatableString(getKey(@"countdown_offset_description"), @"If the countdown sounds off-time, use this to make it appear one or more beats early.");
+        public static LocalisableString CountdownOffsetDescription => new TranslatableString(getKey(@"countdown_offset_description"), @"If the countdown sounds off-time, use this to make it appear one or more beats early.");
 
         /// <summary>
         /// "Countdown offset"
@@ -69,8 +67,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Allows storyboards to use the full screen space, rather than be confined to a 4:3 area."
         /// </summary>
-        public static LocalisableString WidescreenSupportDescription =>
-            new TranslatableString(getKey(@"widescreen_support_description"), @"Allows storyboards to use the full screen space, rather than be confined to a 4:3 area.");
+        public static LocalisableString WidescreenSupportDescription => new TranslatableString(getKey(@"widescreen_support_description"), @"Allows storyboards to use the full screen space, rather than be confined to a 4:3 area.");
 
         /// <summary>
         /// "Epilepsy warning"
@@ -80,8 +77,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Recommended if the storyboard or video contain scenes with rapidly flashing colours."
         /// </summary>
-        public static LocalisableString EpilepsyWarningDescription =>
-            new TranslatableString(getKey(@"epilepsy_warning_description"), @"Recommended if the storyboard or video contain scenes with rapidly flashing colours.");
+        public static LocalisableString EpilepsyWarningDescription => new TranslatableString(getKey(@"epilepsy_warning_description"), @"Recommended if the storyboard or video contain scenes with rapidly flashing colours.");
 
         /// <summary>
         /// "Letterbox during breaks"
@@ -91,8 +87,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Adds horizontal letterboxing to give a cinematic look during breaks."
         /// </summary>
-        public static LocalisableString LetterboxDuringBreaksDescription =>
-            new TranslatableString(getKey(@"letterbox_during_breaks_description"), @"Adds horizontal letterboxing to give a cinematic look during breaks.");
+        public static LocalisableString LetterboxDuringBreaksDescription => new TranslatableString(getKey(@"letterbox_during_breaks_description"), @"Adds horizontal letterboxing to give a cinematic look during breaks.");
 
         /// <summary>
         /// "Samples match playback rate"
@@ -102,8 +97,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "When enabled, all samples will speed up or slow down when rate-changing mods are enabled."
         /// </summary>
-        public static LocalisableString SamplesMatchPlaybackRateDescription => new TranslatableString(getKey(@"samples_match_playback_rate_description"),
-            @"When enabled, all samples will speed up or slow down when rate-changing mods are enabled.");
+        public static LocalisableString SamplesMatchPlaybackRateDescription => new TranslatableString(getKey(@"samples_match_playback_rate_description"), @"When enabled, all samples will speed up or slow down when rate-changing mods are enabled.");
 
         /// <summary>
         /// "The size of all hit objects"
@@ -123,8 +117,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "The harshness of hit windows and difficulty of special objects (ie. spinners)"
         /// </summary>
-        public static LocalisableString OverallDifficultyDescription =>
-            new TranslatableString(getKey(@"overall_difficulty_description"), @"The harshness of hit windows and difficulty of special objects (ie. spinners)");
+        public static LocalisableString OverallDifficultyDescription => new TranslatableString(getKey(@"overall_difficulty_description"), @"The harshness of hit windows and difficulty of special objects (ie. spinners)");
 
         /// <summary>
         /// "Tick Rate"
@@ -134,8 +127,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Determines how many &quot;ticks&quot; are generated within long hit objects. A tick rate of 1 will generate ticks on each beat, 2 would be twice per beat, etc."
         /// </summary>
-        public static LocalisableString TickRateDescription => new TranslatableString(getKey(@"tick_rate_description"),
-            @"Determines how many ""ticks"" are generated within long hit objects. A tick rate of 1 will generate ticks on each beat, 2 would be twice per beat, etc.");
+        public static LocalisableString TickRateDescription => new TranslatableString(getKey(@"tick_rate_description"), @"Determines how many ""ticks"" are generated within long hit objects. A tick rate of 1 will generate ticks on each beat, 2 would be twice per beat, etc.");
 
         /// <summary>
         /// "Base Velocity"
@@ -145,8 +137,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "The base velocity of the beatmap, affecting things like slider velocity and scroll speed in some rulesets."
         /// </summary>
-        public static LocalisableString BaseVelocityDescription => new TranslatableString(getKey(@"base_velocity_description"),
-            @"The base velocity of the beatmap, affecting things like slider velocity and scroll speed in some rulesets.");
+        public static LocalisableString BaseVelocityDescription => new TranslatableString(getKey(@"base_velocity_description"), @"The base velocity of the beatmap, affecting things like slider velocity and scroll speed in some rulesets.");
 
         /// <summary>
         /// "Metadata"
@@ -189,6 +180,16 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioTrack => new TranslatableString(getKey(@"audio_track"), @"Audio Track");
 
         /// <summary>
+        /// "Video"
+        /// </summary>
+        public static LocalisableString Video => new TranslatableString(getKey(@"video"), @"Video");
+
+        /// <summary>
+        /// "The video will be used instead of the static background, if present. Beatmap downloads are offered both with and without video, so if adding a video, a matching background should also be provided."
+        /// </summary>
+        public static LocalisableString VideoHint => new TranslatableString(getKey(@"video_hint"), @"The video will be used instead of the static background, if present. Beatmap downloads are offered both with and without video, so if adding a video, a matching background should also be provided.");
+
+        /// <summary>
         /// "Custom sample sets"
         /// </summary>
         public static LocalisableString CustomSampleSets => new TranslatableString(getKey(@"custom_sample_sets"), @"Custom sample sets");
@@ -197,6 +198,11 @@ namespace osu.Game.Localisation
         /// "Click to select a track"
         /// </summary>
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
+
+        /// <summary>
+        /// "Click to select a video"
+        /// </summary>
+        public static LocalisableString ClickToSelectVideo => new TranslatableString(getKey(@"click_to_select_video"), @"Click to select a video");
 
         /// <summary>
         /// "Click to select a background image"
@@ -217,6 +223,16 @@ namespace osu.Game.Localisation
         /// "Only apply to this difficulty"
         /// </summary>
         public static LocalisableString ApplyToThisDifficulty => new TranslatableString(getKey(@"apply_to_this_difficulty"), @"Only apply to this difficulty");
+
+        /// <summary>
+        /// "Sync metadata with all difficulties"
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficulties => new TranslatableString(getKey(@"sync_metadata_with_all_difficulties"), @"Sync metadata with all difficulties");
+
+        /// <summary>
+        /// "Copies artist, title, source, and tags to all difficulties."
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficultiesTooltip => new TranslatableString(getKey(@"sync_metadata_with_all_difficulties_tooltip"), @"Copies artist, title, source, and tags to all difficulties.");
 
         /// <summary>
         /// "Ruleset ({0})"
@@ -247,6 +263,11 @@ namespace osu.Game.Localisation
         /// "Drag image here to set beatmap background!"
         /// </summary>
         public static LocalisableString DragToSetBackground => new TranslatableString(getKey(@"drag_to_set_background"), @"Drag image here to set beatmap background!");
+
+        /// <summary>
+        /// "Drag video here to set beatmap video!"
+        /// </summary>
+        public static LocalisableString DragToSetVideo => new TranslatableString(getKey(@"drag_to_set_video"), @"Drag video here to set beatmap video!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

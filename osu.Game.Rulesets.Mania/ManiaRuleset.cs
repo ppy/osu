@@ -307,6 +307,8 @@ namespace osu.Game.Rulesets.Mania
             }
         }
 
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new ManiaScoreMultiplierCalculator(context);
+
         public override string Description => "osu!mania";
 
         public override string ShortName => SHORT_NAME;
@@ -483,6 +485,22 @@ namespace osu.Game.Rulesets.Mania
             {
                 Description = "Affects the harshness of health drain and the health penalties for missing."
             };
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var attributes = GetBeatmapAttributesForDisplay(beatmapInfo, mods).ToList();
+
+            // Key count attribute isn't relevant to ranked play (it's decided by the pool).
+            attributes.RemoveAll(a => a.Acronym == "KC");
+
+            float holdNoteRatio = beatmapInfo.TotalObjectCount == 0 ? 0 : (float)beatmapInfo.EndTimeObjectCount / beatmapInfo.TotalObjectCount;
+            attributes.Insert(0, new RulesetBeatmapAttribute("Hold notes", @"HN", holdNoteRatio, holdNoteRatio, 1)
+            {
+                ValueFormat = "P0"
+            });
+
+            return attributes;
         }
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
