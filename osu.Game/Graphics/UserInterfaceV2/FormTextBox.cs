@@ -88,6 +88,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
 
+        protected Container CaptionContainer = null!;
+
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
@@ -113,12 +115,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Spacing = new Vector2(0, 4),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        CaptionContainer = new Container
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
-                            Caption = Caption,
-                            TooltipText = HintText,
+                            Children = new Drawable[]
+                            {
+                                caption = new FormFieldCaption
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Caption = Caption,
+                                    TooltipText = HintText,
+                                },
+                            },
                         },
                         textBox = CreateTextBox().With(t =>
                         {

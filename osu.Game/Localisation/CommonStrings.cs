@@ -170,9 +170,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
 
         /// <summary>
-        /// "Caps lock is active"
+        /// "Caps Lock is active"
         /// </summary>
-        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"Caps lock is active");
+        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"Caps Lock is active");
 
         /// <summary>
         /// "Revert to default"
