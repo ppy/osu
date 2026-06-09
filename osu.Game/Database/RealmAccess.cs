@@ -1041,7 +1041,7 @@ namespace osu.Game.Database
                             score.LegacyTotalScore = score.TotalScore;
                         }
                         else
-                            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                            score.TotalScoreVersion = 30000003; // `LATEST_VERSION` at time of migration
                     }
 
                     break;
