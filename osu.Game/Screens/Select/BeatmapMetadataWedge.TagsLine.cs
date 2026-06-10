@@ -208,6 +208,7 @@ namespace osu.Game.Screens.Select
                 private readonly string[] tags;
                 private readonly Bindable<int> overflowIndex;
                 private readonly Action<string>? performSearch;
+                private readonly LinkFlowContainer textFlow;
 
                 public TagsOverflowPopover(string[] tags, Bindable<int> overflowIndex, Action<string>? performSearchAction)
                 {
@@ -215,20 +216,18 @@ namespace osu.Game.Screens.Select
                     this.overflowIndex = overflowIndex;
                     performSearch = performSearchAction;
 
-                    this.overflowIndex.BindValueChanged(overflowChanged);
-                }
-
-                [BackgroundDependencyLoader]
-                private void load()
-                {
-                    LinkFlowContainer textFlow;
-
                     Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
                     {
                         Width = 200,
                         AutoSizeAxes = Axes.Y,
                     };
 
+                    this.overflowIndex.BindValueChanged(overflowChanged);
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
                     for (int i = overflowIndex.Value; i < tags.Length; i++)
                     {
                         string tag = tags[i];
@@ -239,6 +238,7 @@ namespace osu.Game.Screens.Select
 
                 private void overflowChanged(ValueChangedEvent<int> e)
                 {
+                    textFlow.Clear();
                     load();
                 }
             }
