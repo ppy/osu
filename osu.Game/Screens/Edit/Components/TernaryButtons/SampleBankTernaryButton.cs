@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
     public partial class SampleBankTernaryButton : CompositeDrawable
     {
         public string BankName { get; }
-        public Func<Drawable>? CreateIcon { get; init; }
+        public required Func<Drawable> CreateIcon { get; init; }
 
-        public Func<Drawable>? CreateCompactIcon { get; init; }
+        public required Func<Drawable> CreateCompactIcon { get; init; }
 
         public readonly BindableWithCurrent<TernaryState> NormalState = new BindableWithCurrent<TernaryState>();
         public readonly BindableWithCurrent<TernaryState> AdditionsState = new BindableWithCurrent<TernaryState>();
@@ -77,9 +77,9 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
         private partial class InlineDrawableTernaryButton : DrawableTernaryButton, IExpandable
         {
-            public new Func<Drawable>? CreateIcon { get; init; }
+            public new required Func<Drawable> CreateIcon { get; init; }
 
-            public Func<Drawable>? CreateCompactIcon { get; init; }
+            public required Func<Drawable> CreateCompactIcon { get; init; }
 
             private Drawable icon = null!;
             private Drawable iconCompact = null!;
@@ -94,22 +94,16 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 base.CreateIcon = createBaseIcon;
             }
 
-            private Drawable createBaseIcon()
+            private Drawable createBaseIcon() => new Container
             {
-                var container = new Container
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                };
-
-                if (CreateIcon != null)
-                    container.Add(icon = CreateIcon.Invoke());
-
-                if (CreateCompactIcon != null)
-                    container.Add(iconCompact = CreateCompactIcon.Invoke());
-
-                return container;
-            }
+                    icon = CreateIcon(),
+                    iconCompact = CreateCompactIcon(),
+                }
+            };
 
             [BackgroundDependencyLoader]
             private void load()
