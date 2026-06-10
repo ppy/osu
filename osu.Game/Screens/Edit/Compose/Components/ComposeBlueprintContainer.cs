@@ -100,7 +100,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
 
             SelectionHandler.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
-            SelectionHandler.SelectionAdditionBanksEnabled.BindValueChanged(_ => updateAdditionBankTernaryButtonTooltips(), true);
         }
 
         protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
@@ -183,12 +182,49 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public SampleBankTernaryButton[] SampleBankTernaryStates { get; private set; }
 
         /// <summary>
+        /// Create the new combo ternary button. Mainly used to customize the displayed icon
+        /// depending on the ruleset. Can be overriden to return null if a ruleset does not
+        /// provide combo-supporting HitObjects.
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
+        protected virtual Drawable CreateNewComboButton() => new NewComboTernaryButton
+        {
+            Current = NewCombo,
+            CreateIcon = () => new Container
+            {
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        // This is currently using the osu! hitcircle icon as a default in order
+                        // not to break any custom rulesets that depend on there being a defined
+                        // new combo button.
+                        // Could consider removing it and let rulesets specify their own buttons/icons.
+                        Icon = OsuIcon.EditorHitCircle,
+                        Size = new Vector2(15),
+                    },
+                    new SpriteIcon
+                    {
+                        Icon = OsuIcon.EditorNewComboSparkles,
+                        Size = new Vector2(20),
+                    }
+                },
+            },
+        };
+
+        /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
         protected virtual IEnumerable<Drawable> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            yield return new NewComboTernaryButton { Current = NewCombo };
+            var newComboButton = CreateNewComboButton();
+
+            if (newComboButton != null)
+                yield return newComboButton;
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
             {
@@ -231,7 +267,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (sampleName)
             {
                 case HitSampleInfo.HIT_CLAP:
-                    return new SpriteIcon { Icon = FontAwesome.Solid.Hands };
+                    return new SpriteIcon { Icon = OsuIcon.EditorClap };
 
                 case HitSampleInfo.HIT_WHISTLE:
                     return new SpriteIcon { Icon = OsuIcon.EditorWhistle };
@@ -250,17 +286,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var autoBankButton = SampleBankTernaryStates.Single(t => t.BankName == EditorSelectionHandler.HIT_BANK_AUTO);
             autoBankButton.NormalButton.Enabled.Value = enabled;
             autoBankButton.NormalButton.TooltipText = !enabled ? "Auto normal bank can only be used during hit object placement" : string.Empty;
-        }
-
-        private void updateAdditionBankTernaryButtonTooltips()
-        {
-            bool enabled = SelectionHandler.SelectionAdditionBanksEnabled.Value;
-
-            foreach (var ternaryButton in SampleBankTernaryStates)
-            {
-                ternaryButton.AdditionsButton.Enabled.Value = enabled;
-                ternaryButton.AdditionsButton.TooltipText = !enabled ? "Add an addition sample first to be able to set a bank" : string.Empty;
-            }
         }
 
         #region Placement

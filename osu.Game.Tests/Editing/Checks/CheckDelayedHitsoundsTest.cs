@@ -6,6 +6,7 @@ using System.Linq;
 using ManagedBass;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Models;
 using osu.Game.Rulesets.Edit;
@@ -49,7 +50,7 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestNoDelayedHitsounds()
         {
             using var resourceStream = TestResources.OpenResource("Samples/hitsound-no-delay.wav");
-            Assert.IsEmpty(check.Run(getContext(resourceStream)));
+            ClassicAssert.IsEmpty(check.Run(getContext(resourceStream)));
         }
 
         [Test]
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(Stream? resourceStream)
         {
-            var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null, null);
+            var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null!, null!);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);
 
             return new BeatmapVerifierContext(beatmap, mockWorkingBeatmap.Object);

@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModMuted;
         public override LocalisableString Description => "Can you still feel the rhythm without music?";
         public override ModType Type => ModType.Fun;
-        public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override bool ValidForFreestyleAsRequiredMod => true;
     }
@@ -108,6 +107,11 @@ namespace osu.Game.Rulesets.Mods
 
     public partial class MuteComboSlider : RoundedSliderBar<int>
     {
+        public MuteComboSlider()
+        {
+            KeyboardStep = 1;
+        }
+
         public override LocalisableString TooltipText => FormatMuteComboValue(Current.Value);
 
         public static LocalisableString FormatMuteComboValue(int value)

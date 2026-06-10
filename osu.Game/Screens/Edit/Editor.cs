@@ -188,15 +188,14 @@ namespace osu.Game.Screens.Edit
 
         private bool isNewBeatmap;
 
-        protected override UserActivity InitialActivity
-        {
-            get
-            {
-                if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
-                    return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+        protected override UserActivity InitialActivity => getCurrentUserActivity();
 
-                return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
-            }
+        private UserActivity getCurrentUserActivity()
+        {
+            if (Beatmap.Value.Metadata.Author.OnlineID == api.LocalUser.Value.OnlineID)
+                return new UserActivity.EditingBeatmap(Beatmap.Value.BeatmapInfo);
+
+            return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
         }
 
         protected override bool InitialBackButtonVisibility => false;
@@ -297,7 +296,7 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.Storyboard, loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
 
             editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
@@ -473,8 +472,6 @@ namespace osu.Game.Screens.Edit
 
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
-
-            editorBackgroundDim.BindValueChanged(_ => setUpBackground());
         }
 
         [Resolved]
@@ -516,6 +513,7 @@ namespace osu.Game.Screens.Edit
         /// </param>
         public EditorState GetState([CanBeNull] RulesetInfo nextRuleset = null) => new EditorState
         {
+            Mode = Mode.Value,
             Time = clock.CurrentTimeAccurate,
             ClipboardContent = nextRuleset == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextRuleset.ShortName ? Clipboard.Content.Value : string.Empty
         };
@@ -526,6 +524,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="state">The state to restore.</param>
         public void RestoreState([NotNull] EditorState state) => Schedule(() =>
         {
+            Mode.Value = state.Mode;
             clock.Seek(state.Time);
             Clipboard.Content.Value = state.ClipboardContent;
         });
@@ -583,14 +582,14 @@ namespace osu.Game.Screens.Edit
         {
             if (!canSave)
             {
-                notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
+                notifications?.Post(new SimpleErrorNotification { Text = EditorStrings.RulesetNotSupportSaving });
                 return false;
             }
 
             try
             {
                 // save the loaded beatmap's data stream.
-                beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
+                beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin, editorBeatmap.Storyboard);
             }
             catch (Exception ex)
             {
@@ -604,6 +603,9 @@ namespace osu.Game.Screens.Edit
             updateLastSavedHash();
             onScreenDisplay?.Display(new BeatmapEditorToast(ToastStrings.BeatmapSaved, editorBeatmap.BeatmapInfo.GetDisplayTitle()));
             Saved?.Invoke();
+
+            // This triggers an update to the window title post-save (ie if the difficulty name changed).
+            Activity.Value = getCurrentUserActivity();
             return true;
         }
 
@@ -831,6 +833,14 @@ namespace osu.Game.Screens.Edit
                 case GlobalAction.EditorDiscardUnsavedChanges:
                     DiscardUnsavedChanges();
                     return true;
+
+                case GlobalAction.EditorEditExternally:
+                    editExternally();
+                    return true;
+
+                case GlobalAction.EditorSubmitBeatmap:
+                    submitBeatmap();
+                    return true;
             }
 
             return false;
@@ -843,24 +853,13 @@ namespace osu.Game.Screens.Edit
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
-            setUpBackground();
             setUpTrack(seekToStart: true);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
-            setUpBackground();
             setUpTrack();
-        }
-
-        private void setUpBackground()
-        {
-            ApplyToBackground(b =>
-            {
-                var editorBackground = (EditorBackgroundScreen)b;
-                editorBackground.ChangeClockSource(clock);
-            });
         }
 
         public override bool OnExiting(ScreenExitEvent e)
@@ -1287,16 +1286,16 @@ namespace osu.Game.Screens.Edit
                 Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
             };
 
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
-            {
-                var export = createExportMenu();
-                saveRelatedMenuItems.AddRange(export.Items);
-                yield return export;
-            }
+            var export = createExportMenu();
+            saveRelatedMenuItems.AddRange(export.Items);
+            yield return export;
 
             if (RuntimeInfo.IsDesktop)
             {
-                var externalEdit = new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, editExternally);
+                var externalEdit = new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, editExternally)
+                {
+                    Hotkey = new Hotkey(GlobalAction.EditorEditExternally)
+                };
                 saveRelatedMenuItems.Add(externalEdit);
                 yield return externalEdit;
             }
@@ -1307,7 +1306,10 @@ namespace osu.Game.Screens.Edit
 
             if (isSetMadeOfLegacyRulesetBeatmaps && submissionAvailable)
             {
-                var upload = new EditorMenuItem(EditorStrings.SubmitBeatmap, MenuItemType.Standard, submitBeatmap);
+                var upload = new EditorMenuItem(EditorStrings.SubmitBeatmap, MenuItemType.Standard, submitBeatmap)
+                {
+                    Hotkey = new Hotkey(GlobalAction.EditorSubmitBeatmap)
+                };
                 saveRelatedMenuItems.Add(upload);
                 yield return upload;
             }
@@ -1318,7 +1320,8 @@ namespace osu.Game.Screens.Edit
                 yield return new EditorMenuItem(EditorStrings.OpenInfoPage, MenuItemType.Standard,
                     () => (Game as OsuGame)?.OpenUrlExternally(editorBeatmap.BeatmapInfo.GetOnlineURL(api, editorBeatmap.BeatmapInfo.Ruleset)));
                 yield return new EditorMenuItem(EditorStrings.OpenDiscussionPage, MenuItemType.Standard,
-                    () => (Game as OsuGame)?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/beatmapsets/{editorBeatmap.BeatmapInfo.BeatmapSet!.OnlineID}/discussion/{editorBeatmap.BeatmapInfo.OnlineID}"));
+                    () => (Game as OsuGame)?.OpenUrlExternally(
+                        $@"{api.Endpoints.WebsiteUrl}/beatmapsets/{editorBeatmap.BeatmapInfo.BeatmapSet!.OnlineID}/discussion/{editorBeatmap.BeatmapInfo.OnlineID}"));
             }
 
             yield return new OsuMenuItemSpacer();
@@ -1428,7 +1431,7 @@ namespace osu.Game.Screens.Edit
             if (dialogOverlay == null)
                 delete();
             else
-                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(Beatmap.Value.BeatmapInfo, delete));
+                dialogOverlay.Push(new DeleteDifficultyConfirmationDialog(playableBeatmap.BeatmapInfo.DifficultyName, editorBeatmap.HitObjects.Count, delete));
 
             void delete()
             {
@@ -1542,24 +1545,33 @@ namespace osu.Game.Screens.Edit
             loader?.CancelPendingDifficultySwitch();
         }
 
-        public Task<bool> SaveAndReload()
+        public Task<bool> SaveAndReload(bool withDialog = true)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            dialogOverlay.Push(new SaveAndReloadEditorDialog(
-                reload: () =>
+            void performReload()
+            {
+                bool reloadedSuccessfully = attemptMutationOperation(() =>
                 {
-                    bool reloadedSuccessfully = attemptMutationOperation(() =>
-                    {
-                        if (!Save())
-                            return false;
+                    if (!Save()) return false;
 
-                        SwitchToDifficulty(editorBeatmap.BeatmapInfo);
-                        return true;
-                    });
-                    tcs.SetResult(reloadedSuccessfully);
-                },
-                cancel: () => tcs.SetResult(false)));
+                    SwitchToDifficulty(editorBeatmap.BeatmapInfo);
+                    return true;
+                });
+                tcs.SetResult(reloadedSuccessfully);
+            }
+
+            if (withDialog)
+            {
+                dialogOverlay.Push(new SaveAndReloadEditorDialog(
+                    reload: performReload,
+                    cancel: () => tcs.SetResult(false)));
+            }
+            else
+            {
+                performReload();
+            }
+
             return tcs.Task;
         }
 

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -64,6 +65,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         [Test]
+        [FlakyTest] // one fix attempted in https://github.com/ppy/osu/pull/37178, didn't work
         public void TestInvalidationFlow()
         {
             BeatmapInfo postEditBeatmapInfo = null;
@@ -112,6 +114,30 @@ namespace osu.Game.Tests.Beatmaps
 
             AddStep("change selected mod to NC", () => SelectedMods.Value = new[] { new OsuModNightcore { SpeedChange = { Value = 1.75 } } });
             AddUntilStep($"star difficulty -> {BASE_STARS + 1.75}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.75);
+        }
+
+        [Test]
+        public void TestStarDifficultyChangesOnModSettingsCorrectlyTrackAcrossReferenceChanges()
+        {
+            OsuModDoubleTime dt = null;
+
+            AddStep("set computation function", () => difficultyCache.ComputeDifficulty = lookup =>
+            {
+                var modRateAdjust = (ModRateAdjust)lookup.OrderedMods.SingleOrDefault(mod => mod is ModRateAdjust);
+                return new StarDifficulty(BASE_STARS + modRateAdjust?.SpeedChange.Value ?? 0, 0);
+            });
+
+            AddStep("change selected mod to DT", () => SelectedMods.Value = new[] { dt = new OsuModDoubleTime { SpeedChange = { Value = 1.5 } } });
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.5}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.5);
+
+            AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 1.25);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.25);
+
+            AddStep("reconstruct DT mod with same settings", () => SelectedMods.Value = new[] { dt = (OsuModDoubleTime)dt.DeepClone() });
+            AddUntilStep($"star difficulty -> {BASE_STARS + 1.25}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 1.25);
+
+            AddStep("change DT speed to 1.25", () => dt.SpeedChange.Value = 2);
+            AddUntilStep($"star difficulty -> {BASE_STARS + 2}", () => starDifficultyBindable.Value.Stars == BASE_STARS + 2);
         }
 
         [Test]
@@ -201,7 +227,7 @@ namespace osu.Game.Tests.Beatmaps
         {
             var actualBracket = StarDifficulty.GetDifficultyRating(starRating);
 
-            Assert.AreEqual(expectedBracket, actualBracket);
+            ClassicAssert.AreEqual(expectedBracket, actualBracket);
         }
 
         private partial class TestBeatmapDifficultyCache : BeatmapDifficultyCache

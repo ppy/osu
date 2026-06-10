@@ -198,7 +198,7 @@ namespace osu.Game.Screens.Footer
             for (int i = 0; i < oldButtons.Length; i++)
             {
                 var oldButton = oldButtons[i];
-                oldButton.Enabled.Value = false;
+                oldButton.State.Value = Visibility.Hidden;
 
                 buttonsFlow.Remove(oldButton, false);
                 hiddenButtonsContainer.Add(oldButton);
@@ -262,6 +262,7 @@ namespace osu.Game.Screens.Footer
             for (int i = temporarilyHiddenButtons.Count - 1; i >= 0; i--)
             {
                 var button = temporarilyHiddenButtons[i];
+                button.State.Value = Visibility.Hidden;
                 buttonsFlow.Remove(button, false);
                 hiddenButtonsContainer.Add(button);
 
@@ -300,6 +301,7 @@ namespace osu.Game.Screens.Footer
             for (int i = 0; i < temporarilyHiddenButtons.Count; i++)
             {
                 var button = temporarilyHiddenButtons[i];
+                button.State.Value = Visibility.Visible;
                 hiddenButtonsContainer.Remove(button, false);
 
                 // temporarily bypass autosize on the X axis to prevent the buttons taking space

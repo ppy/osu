@@ -11,6 +11,7 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Screens.OnlinePlay.DailyChallenge.Events;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             InternalChildren = new Drawable[]
             {
-                new SectionHeader("Events"),
+                new SectionHeader(DailyChallengeStrings.SectionEvents),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,

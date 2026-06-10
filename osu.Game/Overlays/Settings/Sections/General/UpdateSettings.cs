@@ -127,10 +127,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
             finally
             {
-                // This sequence allows the notification to be immediately dismissed without posting a continuation message.
-                checkingNotification.CompletionTarget = null;
-                checkingNotification.State = ProgressNotificationState.Completed;
-                checkingNotification.Close(false);
+                checkingNotification.CompleteSilently();
                 checkForUpdatesButton.Enabled.Value = true;
             }
         }

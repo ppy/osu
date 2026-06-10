@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override IconUsage? Icon => OsuIcon.ModFreezeFrame;
 
-        public override double ScoreMultiplier => 1;
-
         public override LocalisableString Description => "Burn the notes into your memory.";
 
         /// <remarks>
@@ -62,14 +60,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (osuObject is not Spinner)
                     osuObject.TimePreempt += osuObject.StartTime - lastNewComboTime;
 
+                int repeatCount = 0;
+
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                 {
                     switch (nested)
                     {
-                        //Freezing the SliderTicks doesnt play well with snaking sliders
+                        // Freezing the SliderTicks doesnt play well with snaking sliders
                         case SliderTick:
-                        //SliderRepeat wont layer correctly if preempt is changed.
+                            break;
+
                         case SliderRepeat:
+                            if (repeatCount > 2)
+                                break;
+
+                            applyFadeInAdjustment(nested);
+                            repeatCount++;
                             break;
 
                         default:

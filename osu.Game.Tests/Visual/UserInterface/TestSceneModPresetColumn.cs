@@ -90,6 +90,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Origin = Anchor.Centre,
             });
 
+            AddUntilStep("3 panels visible", () => this.ChildrenOfType<ModPresetPanel>().Count() == 3);
+
             AddStep("select first preset", () => InputManager.Key(Key.Number1));
             AddAssert("first panel selected", () => this.ChildrenOfType<ModPresetPanel>().ElementAt(0).Active.Value);
 

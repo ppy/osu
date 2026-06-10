@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -11,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -27,6 +29,7 @@ namespace osu.Game.Overlays.Login
         private LoadingLayer loading = null!;
         private FillFlowContainer contentFlow = null!;
         private OsuTextBox codeTextBox = null!;
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -70,13 +73,43 @@ namespace osu.Game.Overlays.Login
                 }
             };
 
+            updateLastError();
+
+            showContent(api.SessionVerificationMethod!.Value);
+            apiState.BindTo(api.State);
+        }
+
+        private void updateLastError()
+        {
             if (api.LastLoginError?.Message is string error)
             {
                 errorText.Alpha = 1;
                 errorText.AddErrors(new[] { error });
             }
+        }
 
-            showContent(api.SessionVerificationMethod!.Value);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            apiState.BindValueChanged(val =>
+            {
+                // this handles failed verifications.
+                // in the case of failed verifications, `apiState` will briefly change to `Connecting` and then revert to `RequiresSecondFactorAuth`.
+                // the login overlay doesn't need this logic as it will construct a new instance of this screen anyway,
+                // but the *registration* overlay has no such logic and thus needs special handling.
+                if (val.NewValue == APIState.RequiresSecondFactorAuth)
+                {
+                    // scheduling required as `APIAccess.State` value can be changed from threads that aren't update
+                    // see: `APIAccess.run()` (which is given a dedicated thread) calls `APIAccess.attemptConnect()` which mutates `APIAccess.State`
+                    Schedule(() =>
+                    {
+                        codeTextBox.Current.Disabled = false;
+                        codeTextBox.Current.Value = string.Empty;
+                        updateLastError();
+                    });
+                }
+            });
         }
 
         private void showContent(SessionVerificationMethod sessionVerificationMethod)
@@ -104,12 +137,12 @@ namespace osu.Game.Overlays.Login
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Text = "An email has been sent to you with a verification code. Enter the code.",
+                    Text = LoginPanelStrings.CodeSent,
                 },
                 codeTextBox = new OsuTextBox
                 {
                     InputProperties = new TextInputProperties(TextInputType.Code),
-                    PlaceholderText = "Enter code",
+                    PlaceholderText = LoginPanelStrings.EnterCode,
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },
@@ -169,12 +202,12 @@ namespace osu.Game.Overlays.Login
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Text = "Please enter the code from your authenticator app.",
+                    Text = UserVerificationStrings.BoxTotpHeading,
                 },
                 codeTextBox = new OsuNumberBox
                 {
                     InputProperties = new TextInputProperties(TextInputType.NumericalPassword),
-                    PlaceholderText = "Enter code",
+                    PlaceholderText = LoginPanelStrings.EnterCode,
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },

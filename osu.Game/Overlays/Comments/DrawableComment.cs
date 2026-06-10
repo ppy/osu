@@ -21,11 +21,12 @@ using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Resources.Localisation.Web;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -324,13 +325,13 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
-            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, () => game?.CopyToClipboard($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}"));
+            actionsContainer.AddLink(WebCommonStrings.ButtonsPermalink, () => game?.CopyToClipboard($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}"));
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
-            actionsContainer.AddLink(CommonStrings.ButtonsReply.ToLower(), toggleReply);
+            actionsContainer.AddLink(WebCommonStrings.ButtonsReply.ToLower(), toggleReply);
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
-                actionsContainer.AddLink(CommonStrings.ButtonsDelete.ToLower(), deleteComment);
+                actionsContainer.AddLink(WebCommonStrings.ButtonsDelete.ToLower(), deleteComment);
             else
                 actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
@@ -384,7 +385,7 @@ namespace osu.Game.Overlays.Comments
             if (dialogOverlay == null)
                 deleteCommentRequest();
             else
-                dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", deleteCommentRequest));
+                dialogOverlay.Push(new ConfirmDialog(DialogStrings.DeleteCommentBodyText, deleteCommentRequest));
         }
 
         /// <summary>

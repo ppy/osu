@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -17,6 +16,8 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers.Zip;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
@@ -58,20 +59,15 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
             });
 
-            bool supportsExport = RuntimeInfo.OS != RuntimeInfo.Platform.Android;
-
-            if (supportsExport)
+            Add(new SettingsButtonV2
             {
-                Add(new SettingsButtonV2
-                {
-                    Text = GeneralSettingsStrings.ExportLogs,
-                    BackgroundColour = colours.YellowDarker.Darken(0.5f),
-                    Keywords = new[] { @"bug", "report", "logs", "files" },
-                    Action = () => Task.Run(exportLogs),
-                });
+                Text = GeneralSettingsStrings.ExportLogs,
+                BackgroundColour = colours.YellowDarker.Darken(0.5f),
+                Keywords = new[] { @"bug", "report", "logs", "files" },
+                Action = () => Task.Run(exportLogs),
+            });
 
-                exportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
-            }
+            exportStorage = (storage as OsuStorage)?.GetExportStorage() ?? storage.GetStorageForDirectory(@"exports");
         }
 
         [Resolved]
@@ -99,12 +95,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 var logStorage = Logger.Storage;
 
                 using (var outStream = exportStorage.CreateFileSafely(archive_filename))
-                using (var zip = ZipArchive.Create())
+                using (var zip = ZipArchive.CreateArchive())
                 {
                     foreach (string? f in logStorage.GetFiles(string.Empty, "*.log"))
                         FileUtils.AttemptOperation(z => z.AddEntry(f, logStorage.GetStream(f), closeStream: true), zip, throwOnFailure: false);
 
-                    zip.SaveTo(outStream);
+                    zip.SaveTo(outStream, new ZipWriterOptions(CompressionType.Deflate));
                 }
             }
             catch

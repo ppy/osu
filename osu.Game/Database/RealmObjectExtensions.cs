@@ -299,7 +299,7 @@ namespace osu.Game.Database
                 throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
 
             bool initial = true;
-            return collection.SubscribeForNotifications(((sender, changes) =>
+            return collection.SubscribeForNotifications((sender, changes) =>
             {
                 if (initial)
                 {
@@ -315,7 +315,7 @@ namespace osu.Game.Database
                 }
 
                 callback(sender, changes);
-            }));
+            });
         }
 
         /// <summary>

@@ -159,14 +159,15 @@ namespace osu.Game.Tests.Visual.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
+        protected override async Task<bool> BeginPlayingInternal(long? scoreToken, SpectatorState state)
         {
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);
             userBeatmapDictionary[api.LocalUser.Value.Id] = state.BeatmapID.Value;
             userModsDictionary[api.LocalUser.Value.Id] = state.Mods.ToArray();
 
-            return ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
+            await ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state).ConfigureAwait(false);
+            return true;
         }
 
         protected override Task SendFramesInternal(FrameDataBundle bundle)
@@ -203,10 +204,16 @@ namespace osu.Game.Tests.Visual.Spectator
             });
         }
 
-        protected override async Task DisconnectInternal()
+        protected override Task DisconnectInternal()
         {
-            await base.DisconnectInternal().ConfigureAwait(false);
             isConnected.Value = false;
+            return Task.CompletedTask;
+        }
+
+        public override Task Reconnect()
+        {
+            isConnected.Value = true;
+            return Task.CompletedTask;
         }
     }
 }

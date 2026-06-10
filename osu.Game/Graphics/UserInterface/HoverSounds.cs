@@ -9,7 +9,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
+using osu.Game.Audio;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -43,8 +43,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!Enabled.Value)
                 return;
 
-            sampleHover.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
-            sampleHover.Play();
+            SamplePlaybackHelper.PlayWithRandomPitch(sampleHover, pitchVariation: 0.02);
         }
     }
 }

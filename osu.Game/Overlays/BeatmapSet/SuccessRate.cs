@@ -14,7 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
