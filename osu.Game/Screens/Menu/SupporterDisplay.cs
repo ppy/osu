@@ -80,52 +80,16 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
 
-            const float font_size = 14;
-
-            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold);
-
             currentUser.BindTo(api.LocalUser);
             currentUser.BindValueChanged(e =>
             {
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
 
-                currentLanguage.BindValueChanged(_ =>
-                    // schedule required because `LocalisationManager` won't have new language set correctly yet.
-                    Schedule(() =>
-                    {
-                        supportFlow.Clear();
-
-                        if (e.NewValue.IsSupporter)
-                        {
-                            supportFlow.AddText(ButtonSystemStrings.SupporterDisplayThanks, formatSemiBold);
-
-                            backgroundBox.FadeColour(colours.Pink, 250);
-                        }
-                        else
-                        {
-                            const string url = @"https://osu.ppy.sh/home/support";
-                            var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(ButtonSystemStrings.SupporterDisplayConsider(url)));
-
-                            supportFlow.AddLinks(formattedSource.Text, formattedSource.Links, formatSemiBold);
-
-                            backgroundBox.FadeColour(colours.Pink4, 250);
-                        }
-
-                        supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
-                        {
-                            heart = t;
-
-                            t.Padding = new MarginPadding { Left = 5, Top = 1 };
-                            t.Font = t.Font.With(size: font_size);
-                            t.Colour = colours.Pink;
-
-                            Schedule(() =>
-                            {
-                                heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
-                            });
-                        });
-                    }), true);
+                updateDisplayedText(e.NewValue);
             }, true);
+
+            // schedule required because `LocalisationManager` won't have new language set correctly yet.
+            currentLanguage.BindValueChanged(_ => Schedule(() => updateDisplayedText(currentUser.Value)));
 
             this
                 .FadeOut()
@@ -133,6 +97,45 @@ namespace osu.Game.Screens.Menu
                 .FadeInFromZero(800, Easing.OutQuint);
 
             scheduleDismissal();
+        }
+
+        private void updateDisplayedText(APIUser user)
+        {
+            const float font_size = 14;
+
+            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold);
+
+            supportFlow.Clear();
+
+            if (user.IsSupporter)
+            {
+                supportFlow.AddText(SupporterDisplayStrings.ThankYouForSupporting, formatSemiBold);
+
+                backgroundBox.FadeColour(colours.Pink, 250);
+            }
+            else
+            {
+                const string url = @"https://osu.ppy.sh/home/support";
+                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(SupporterDisplayStrings.ConsiderBecomingAnSupporter(url)));
+
+                supportFlow.AddLinks(formattedSource.Text, formattedSource.Links, formatSemiBold);
+
+                backgroundBox.FadeColour(colours.Pink4, 250);
+            }
+
+            supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+            {
+                heart = t;
+
+                t.Padding = new MarginPadding { Left = 5, Top = 1 };
+                t.Font = t.Font.With(size: font_size);
+                t.Colour = colours.Pink;
+
+                Schedule(() =>
+                {
+                    heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
+                });
+            });
         }
 
         protected override bool OnClick(ClickEvent e)
