@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
             private string[] tags = Array.Empty<string>();
 
             private TagsOverflowButton? overflowButton;
-            private readonly Bindable<int> shownText = new Bindable<int>();
+            private readonly Bindable<int> tagsShownCount = new Bindable<int>();
 
             public string[] Tags
             {
@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Select
 
                 if (showOverflow)
                 {
-                    shownText.Value = Children.Count(text => text.IsPresent && text is OsuHoverContainer);
+                    tagsShownCount.Value = Children.Count(text => text.IsPresent && text is OsuHoverContainer);
                     overflowButton.Show();
                 }
                 else
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Select
                     },
                 });
 
-                Add(overflowButton = new TagsOverflowButton(tags, shownText)
+                Add(overflowButton = new TagsOverflowButton(tags, tagsShownCount)
                 {
                     Alpha = 0f,
                     PerformSearch = s => PerformSearch?.Invoke(s),
