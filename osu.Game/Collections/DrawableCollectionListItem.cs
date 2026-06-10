@@ -92,10 +92,19 @@ namespace osu.Game.Collections
                             IsTextBoxHovered = v => TextBox.ReceivePositionalInputAt(v)
                         }
                         : Empty(),
+                    collection.IsManaged
+                        ? new BatchAddToCollectionButton(collection)
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            X = -button_width,
+                            IsTextBoxHovered = v => TextBox.ReceivePositionalInputAt(v),
+                        }
+                        : Empty(),
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Right = collection.IsManaged ? button_width : 0 },
+                        Padding = new MarginPadding { Right = collection.IsManaged ? button_width * 2 : 0 },
                         Children = new Drawable[]
                         {
                             TextBox = new ItemTextBox(collection)
@@ -134,6 +143,10 @@ namespace osu.Game.Collections
             private readonly Live<BeatmapCollection> collection;
 
             private OsuSpriteText countText = null!;
+            private OsuSpriteText actionText = null!;
+
+            private Color4 addedTextColour;
+            private Color4 removedTextColour;
 
             public ItemTextBox(Live<BeatmapCollection> collection)
             {
@@ -164,6 +177,19 @@ namespace osu.Game.Collections
                         Colour = colours.Yellow
                     });
 
+                    TextContainer.Add(actionText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopLeft,
+                        Depth = float.MinValue,
+                        Font = OsuFont.Default.With(size: count_text_size, weight: FontWeight.SemiBold),
+                        Margin = new MarginPadding { Top = 2, Left = 2 },
+                        Alpha = 0,
+                    });
+
+                    addedTextColour = colours.Lime;
+                    removedTextColour = colours.Pink;
+
                     // interestingly, it is not required to subscribe to change notifications on this collection at all for this to work correctly.
                     // the reasoning for this is that `DrawableCollectionList` already takes out a subscription on the set of all `BeatmapCollection`s -
                     // but that subscription does not only cover *changes to the set of collections* (i.e. addition/removal/rearrangement of collections),
@@ -181,6 +207,57 @@ namespace osu.Game.Collections
                 {
                     PlaceholderText = CollectionsStrings.CreateNew;
                 }
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (collection.IsManaged)
+                {
+                    BatchAddToCollectionHandler.OperationCompleted += onBatchOperationCompleted;
+
+                    var collectionId = collection.PerformRead(c => c.ID);
+
+                    if (BatchAddToCollectionHandler.TryGetRecentResult(collectionId, out var recentResult))
+                        Schedule(() => showActionFeedback(recentResult));
+                }
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (collection.IsManaged)
+                    BatchAddToCollectionHandler.OperationCompleted -= onBatchOperationCompleted;
+            }
+
+            private void onBatchOperationCompleted(BatchAddToCollectionHandler.BatchAddResult result)
+            {
+                if (!collection.IsManaged)
+                    return;
+
+                if (collection.PerformRead(c => c.ID) != result.CollectionId)
+                    return;
+
+                Schedule(() => showActionFeedback(result));
+            }
+
+            private void showActionFeedback(BatchAddToCollectionHandler.BatchAddResult result)
+            {
+                actionText.Colour = result.Operation == BatchAddToCollectionHandler.BatchAddOperation.Added
+                    ? addedTextColour
+                    : removedTextColour;
+
+                actionText.Text = result.Operation == BatchAddToCollectionHandler.BatchAddOperation.Added
+                    ? $"{result.Count:#,0} items added"
+                    : $"{result.Count:#,0} items removed";
+
+                actionText.X = countText.DrawWidth + 8;
+                actionText.ClearTransforms();
+                actionText.FadeIn(120, Easing.OutQuint)
+                          .Delay(2000)
+                          .FadeOut(350, Easing.OutQuint);
             }
         }
 
@@ -201,7 +278,7 @@ namespace osu.Game.Collections
                 this.collection = collection;
                 RelativeSizeAxes = Axes.Y;
 
-                Width = button_width + item_height / 2; // add corner radius to cover with fill
+                Width = button_width + item_height / 4; // add corner radius to cover with fill
             }
 
             [BackgroundDependencyLoader]
@@ -238,7 +315,14 @@ namespace osu.Game.Collections
                 };
             }
 
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && !IsTextBoxHovered(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            {
+                if (!base.ReceivePositionalInputAt(screenSpacePos) || IsTextBoxHovered(screenSpacePos))
+                    return false;
+
+                float localX = ToLocalSpace(screenSpacePos).X;
+                return localX > item_height / 4;
+            }
 
             protected override bool OnHover(HoverEvent e)
             {
@@ -259,6 +343,77 @@ namespace osu.Game.Collections
             }
 
             private void deleteCollection() => collection.PerformWrite(c => c.Realm!.Remove(c));
+        }
+
+        public partial class BatchAddToCollectionButton : OsuClickableContainer
+        {
+            public Func<Vector2, bool> IsTextBoxHovered = null!;
+
+            private readonly Live<BeatmapCollection> collection;
+            private Color4 darkenedColour;
+            private Color4 normalColour;
+
+            private Drawable background = null!;
+
+            public BatchAddToCollectionButton(Live<BeatmapCollection> collection)
+            {
+                this.collection = collection;
+
+                RelativeSizeAxes = Axes.Y;
+                Width = button_width + item_height / 4;
+                TooltipText = "Add all visible beatmaps to collection";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                normalColour = colours.Yellow;
+                darkenedColour = normalColour.Darken(0.9f);
+
+                Child = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 10,
+                    Children = new[]
+                    {
+                        background = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = darkenedColour,
+                        },
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.Centre,
+                            X = -button_width * 0.6f,
+                            Size = new Vector2(10),
+                            Icon = FontAwesome.Solid.Plus,
+                        }
+                    }
+                };
+
+                Action = () => this.FindClosestParent<ManageCollectionsDialog>()?.RequestBatchAddToCollection(collection);
+            }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) && !IsTextBoxHovered(screenSpacePos);
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                background.FadeColour(normalColour, 100, Easing.Out);
+                return false;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                background.FadeColour(darkenedColour, 100, Easing.Out);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                background.FlashColour(Color4.White, 150);
+                return base.OnClick(e);
+            }
         }
 
         public IEnumerable<LocalisableString> FilterTerms => Model.PerformRead(m => m.IsValid ? new[] { (LocalisableString)m.Name } : []);
