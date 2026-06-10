@@ -307,7 +307,7 @@ namespace osu.Game.Rulesets.Mania
             }
         }
 
-        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator() => new ManiaScoreMultiplierCalculator();
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new ManiaScoreMultiplierCalculator(context);
 
         public override string Description => "osu!mania";
 
