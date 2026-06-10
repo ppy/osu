@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -245,7 +244,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             AlwaysPresent = true,
                                             CommitOnFocusLost = true,
                                             SelectAllOnFocus = true,
-                                            OnInputError = () => background.FlashOverlay(ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3), 200),
+                                            OnInputError = background.FlashOnInputError,
                                             TabbableContentContainer = tabbableContentContainer,
                                         },
                                         valueLabel = new TruncatingSpriteText
@@ -313,7 +312,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             currentNumberInstantaneous.TriggerChange();
             current.Value = currentNumberInstantaneous.Value;
 
-            background.Flash();
+            background.FlashOnCommit();
         }
 
         private void tryUpdateSliderFromTextBox()

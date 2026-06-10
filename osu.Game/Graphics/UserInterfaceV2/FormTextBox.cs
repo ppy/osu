@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -120,9 +118,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 OnCommit?.Invoke(textBox, newText);
 
                                 if (!current.Disabled && !ReadOnly)
-                                    background.FlashOverlay(ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2), 800);
+                                    background.FlashOnCommit();
                             };
-                            t.OnInputError = () => background.FlashOverlay(ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3), 200);
+                            t.OnInputError = () => background.FlashOnInputError();
                             t.TabbableContentContainer = tabbableContentContainer;
                         }),
                     },
