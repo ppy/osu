@@ -88,6 +88,7 @@ namespace osu.Game.Screens.Select
 
                     if (text.X + text.DrawWidth < limit)
                     {
+                        text.AlwaysPresent = true;
                         text.Show();
                         totalTagsShown += 1;
                     }
