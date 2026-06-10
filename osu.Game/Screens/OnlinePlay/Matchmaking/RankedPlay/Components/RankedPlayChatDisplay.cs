@@ -7,20 +7,27 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -28,7 +35,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public partial class RankedPlayChatDisplay : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public partial class RankedPlayChatDisplay : VisibilityContainer, IKeyBindingHandler<GlobalAction>, IFocusManager
     {
         [Resolved]
         private ChannelManager? channelManager { get; set; }
@@ -38,54 +45,71 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private readonly MultiplayerRoom room;
 
+        private Container content = null!;
         private ChatTextBox textbox = null!;
         private BubbleChatHistory chatHistory = null!;
 
         private Channel? channel;
 
+        private IFocusManager parentFocusManager = null!;
+
         private const float width = 320;
 
         public RankedPlayChatDisplay(MultiplayerRoom room)
         {
-            Size = new Vector2(width, 160);
+            AutoSizeAxes = Axes.Both;
             this.room = room;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new ChatContextMenuContainer
             {
-                textbox = new ChatTextBox
+                AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Child = content = new Container
                 {
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 30,
-                    CornerRadius = 10,
-                    ReleaseFocusOnCommit = true,
-                    HoldFocus = false,
-                    Focus = onFocusGained,
-                    FocusLost = onFocusLost
-                },
-                new Container
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Bottom = 35 },
-                    Child = chatHistory = new BubbleChatHistory
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X
+                        textbox = new ChatTextBox
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Width = width,
+                            Height = 30,
+                            CornerRadius = 10,
+                            ReleaseFocusOnCommit = true,
+                            HoldFocus = false,
+                            Focus = onFocusGained,
+                            FocusLost = onFocusLost
+                        },
+                        new Container
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            AutoSizeAxes = Axes.Y,
+                            Width = width * 1.5f,
+                            Padding = new MarginPadding { Bottom = 35 },
+                            Child = chatHistory = new BubbleChatHistory
+                            {
+                                RelativeSizeAxes = Axes.X
+                            }
+                        }
                     }
-                }
+                },
             };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            parentFocusManager = GetContainingFocusManager()!;
 
             resetPlaceholderText();
             textbox.OnCommit += onCommit;
@@ -118,7 +142,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private void onNewMessagesArrived(IEnumerable<Message> bundle)
         {
             foreach (var message in bundle)
-                chatHistory.PostMessage(message.Sender, message.Content);
+                chatHistory.PostMessage(message);
         }
 
         private void onFocusGained()
@@ -168,6 +192,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
         }
 
+        public void TriggerFocusContention(Drawable? triggerSource)
+        {
+            if (triggerSource == null || triggerSource.IsRootedAt(content))
+                parentFocusManager.TriggerFocusContention(triggerSource);
+        }
+
+        public bool ChangeFocus(Drawable? potentialFocusTarget)
+        {
+            if (potentialFocusTarget == null || potentialFocusTarget.IsRootedAt(content))
+                return parentFocusManager.ChangeFocus(potentialFocusTarget);
+
+            return false;
+        }
+
         protected override void PopIn()
         {
             FinishTransforms();
@@ -194,6 +232,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             {
                 channel.NewMessagesArrived -= onNewMessagesArrived;
                 textbox.Current.UnbindFrom(channel.TextBoxMessage);
+            }
+        }
+
+        private partial class ChatContextMenuContainer : OsuContextMenuContainer
+        {
+            public ChatContextMenuContainer()
+            {
+                Content.Anchor = Anchor.BottomRight;
+                Content.Origin = Anchor.BottomRight;
             }
         }
 
@@ -228,7 +275,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             private readonly Container<MessageBubble> messageContainer;
 
-            private bool expanded;
+            private readonly BindableBool expanded = new BindableBool();
 
             private Sample messageReceivedSample = null!;
             private double? lastSamplePlayback;
@@ -255,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             /// </summary>
             public void Collapse()
             {
-                expanded = false;
+                expanded.Value = false;
 
                 foreach (var child in messageContainer.Reverse().Take(max_length).Reverse())
                 {
@@ -273,7 +320,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             /// </summary>
             public void Expand()
             {
-                expanded = true;
+                expanded.Value = true;
 
                 foreach (var child in messageContainer.Reverse().Take(max_length))
                     child.Show();
@@ -282,15 +329,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             /// <summary>
             /// Posts a message.
             /// </summary>
-            /// <param name="user">The user that posted the message.</param>
-            /// <param name="content">The message content.</param>
-            public void PostMessage(APIUser user, string content)
+            /// <param name="message">The message.</param>
+            public void PostMessage(Message message)
             {
-                var newMessage = new MessageBubble(user, content)
+                var newMessage = new MessageBubble(message)
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    PostTime = Time.Current
+                    PostTime = Time.Current,
+                    Expanded = { BindTarget = expanded },
                 };
 
                 messageContainer.Add(newMessage);
@@ -322,7 +369,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 playSample();
 
                 // If not in the expanded state, hide the new message after a short while.
-                if (!expanded)
+                if (!expanded.Value)
                 {
                     using (BeginDelayedSequence(time_before_disappear))
                         newMessage.Hide();
@@ -338,19 +385,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 lastSamplePlayback = Time.Current;
             }
 
-            private partial class MessageBubble : CompositeDrawable
+            private partial class MessageBubble : CompositeDrawable, IHasContextMenu, IHasPopover
             {
-                private readonly APIUser user;
-                private readonly string message;
+                private readonly Message message;
 
                 /// <summary>
                 /// The time at which this message was posted.
                 /// </summary>
                 public required double PostTime { get; init; }
 
-                public MessageBubble(APIUser user, string message)
+                /// <summary>
+                /// Whether the message history is currently in an expanded state.
+                /// </summary>
+                public readonly IBindable<bool> Expanded = new BindableBool();
+
+                private const int text_offset = 20;
+                private const int padding = 8;
+
+                public MessageBubble(Message message)
                 {
-                    this.user = user;
                     this.message = message;
                     AutoSizeAxes = Axes.Both;
 
@@ -376,14 +429,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = api.LocalUser.Value.Id == user.Id
+                                    Colour = api.LocalUser.Value.Id == message.SenderId
                                         ? RankedPlayColourScheme.BLUE.PrimaryDarkest
                                         : RankedPlayColourScheme.RED.PrimaryDarkest,
                                 },
                                 new Container
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding(8),
+                                    Padding = new MarginPadding(padding),
                                     Children = new Drawable[]
                                     {
                                         new CircularContainer
@@ -392,7 +445,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                             Origin = Anchor.CentreLeft,
                                             Size = new Vector2(16),
                                             Masking = true,
-                                            Child = new UpdateableAvatar(user)
+                                            Child = new UpdateableAvatar(message.Sender)
                                             {
                                                 DelayedLoad = false,
                                                 RelativeSizeAxes = Axes.Both
@@ -400,12 +453,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                         },
                                         new OsuTextFlowContainer
                                         {
-                                            X = 20,
-                                            MaximumSize = new Vector2(width * 1.5f, 0),
+                                            X = text_offset,
+                                            MaximumSize = new Vector2(width * 1.5f - text_offset - padding * 2, 0),
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             AutoSizeAxes = Axes.Both,
-                                            Text = message,
+                                            Text = message.Content,
                                         }
                                     }
                                 }
@@ -423,6 +476,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 public override void Hide()
                 {
                     this.FadeOut(200, Easing.OutQuint);
+                }
+
+                public MenuItem[]? ContextMenuItems
+                {
+                    get
+                    {
+                        if (!Expanded.Value)
+                            return null;
+
+                        if (message.Sender.Equals(APIUser.SYSTEM_USER))
+                            return null;
+
+                        if (message.Sender.Equals(api.LocalUser.Value))
+                            return null;
+
+                        return [new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, this.ShowPopover)];
+                    }
+                }
+
+                public Popover? GetPopover()
+                {
+                    if (message.Sender.Equals(api.LocalUser.Value))
+                        return null;
+
+                    return new ReportChatPopover(message);
                 }
             }
         }
