@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("click button", () => accountCreation.ChildrenOfType<ScreenEntry>().Single()
                                                          .ChildrenOfType<SettingsButton>().Single().TriggerClick());
-            AddUntilStep("verification screen is present",() => accountCreation.ChildrenOfType<ScreenEmailVerification>().SingleOrDefault()?.IsPresent, () => Is.True);
+            AddUntilStep("verification screen is present", () => accountCreation.ChildrenOfType<ScreenEmailVerification>().SingleOrDefault()?.IsPresent, () => Is.True);
 
             AddStep("fail to verify", () =>
                 accountCreation.ChildrenOfType<ScreenEmailVerification>().Single().ChildrenOfType<TextBox>().Single().Current.Value = "abcdefff");
