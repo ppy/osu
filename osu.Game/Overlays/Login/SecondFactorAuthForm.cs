@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -28,6 +29,7 @@ namespace osu.Game.Overlays.Login
         private LoadingLayer loading = null!;
         private FillFlowContainer contentFlow = null!;
         private OsuTextBox codeTextBox = null!;
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -71,13 +73,43 @@ namespace osu.Game.Overlays.Login
                 }
             };
 
+            updateLastError();
+
+            showContent(api.SessionVerificationMethod!.Value);
+            apiState.BindTo(api.State);
+        }
+
+        private void updateLastError()
+        {
             if (api.LastLoginError?.Message is string error)
             {
                 errorText.Alpha = 1;
                 errorText.AddErrors(new[] { error });
             }
+        }
 
-            showContent(api.SessionVerificationMethod!.Value);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            apiState.BindValueChanged(val =>
+            {
+                // this handles failed verifications.
+                // in the case of failed verifications, `apiState` will briefly change to `Connecting` and then revert to `RequiresSecondFactorAuth`.
+                // the login overlay doesn't need this logic as it will construct a new instance of this screen anyway,
+                // but the *registration* overlay has no such logic and thus needs special handling.
+                if (val.NewValue == APIState.RequiresSecondFactorAuth)
+                {
+                    // scheduling required as `APIAccess.State` value can be changed from threads that aren't update
+                    // see: `APIAccess.run()` (which is given a dedicated thread) calls `APIAccess.attemptConnect()` which mutates `APIAccess.State`
+                    Schedule(() =>
+                    {
+                        codeTextBox.Current.Disabled = false;
+                        codeTextBox.Current.Value = string.Empty;
+                        updateLastError();
+                    });
+                }
+            });
         }
 
         private void showContent(SessionVerificationMethod sessionVerificationMethod)
