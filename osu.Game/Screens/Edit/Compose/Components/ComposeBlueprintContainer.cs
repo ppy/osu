@@ -181,12 +181,49 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public SampleBankTernaryButton[] SampleBankTernaryStates { get; private set; }
 
         /// <summary>
+        /// Create the new combo ternary button. Mainly used to customize the displayed icon
+        /// depending on the ruleset. Can be overriden to return null if a ruleset does not
+        /// provide combo-supporting HitObjects.
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
+        protected virtual Drawable CreateNewComboButton() => new NewComboTernaryButton
+        {
+            Current = NewCombo,
+            CreateIcon = () => new Container
+            {
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        // This is currently using the osu! hitcircle icon as a default in order
+                        // not to break any custom rulesets that depend on there being a defined
+                        // new combo button.
+                        // Could consider removing it and let rulesets specify their own buttons/icons.
+                        Icon = OsuIcon.EditorHitCircle,
+                        Size = new Vector2(15),
+                    },
+                    new SpriteIcon
+                    {
+                        Icon = OsuIcon.EditorNewComboSparkles,
+                        Size = new Vector2(20),
+                    }
+                },
+            },
+        };
+
+        /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
         protected virtual IEnumerable<Drawable> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            yield return new NewComboTernaryButton { Current = NewCombo };
+            var newComboButton = CreateNewComboButton();
+
+            if (newComboButton != null)
+                yield return newComboButton;
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
             {

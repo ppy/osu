@@ -107,7 +107,7 @@ namespace osu.Game.Graphics
         public static IconUsage EditorDistanceSnap => get(OsuIconMapping.EditorDistanceSnap);
         public static IconUsage EditorFinish => get(OsuIconMapping.EditorFinish);
         public static IconUsage EditorGridSnap => get(OsuIconMapping.EditorGridSnap);
-        public static IconUsage EditorNewCombo => get(OsuIconMapping.EditorNewCombo);
+        public static IconUsage EditorNewComboSparkles => get(OsuIconMapping.EditorNewComboSparkles);
         public static IconUsage EditorSelect => get(OsuIconMapping.EditorSelect);
         public static IconUsage EditorSound => get(OsuIconMapping.EditorSound);
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
@@ -467,8 +467,8 @@ namespace osu.Game.Graphics
             [Description(@"Editor/grid-snap")]
             EditorGridSnap,
 
-            [Description(@"Editor/new-combo")]
-            EditorNewCombo,
+            [Description(@"Editor/new-combo-sparkles")]
+            EditorNewComboSparkles,
 
             [Description(@"Editor/select")]
             EditorSelect,

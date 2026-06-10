@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModBlinds;
         public override ModType Type => ModType.DifficultyIncrease;
 
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
         public override bool Ranked => true;
 

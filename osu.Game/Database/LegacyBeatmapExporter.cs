@@ -74,6 +74,8 @@ namespace osu.Game.Database
 
             using var storyboardStreamReader = new LineBufferedReader(storyboardStream);
             var beatmapStoryboard = new LegacyStoryboardDecoder().Decode(storyboardStreamReader);
+            beatmapStoryboard.Beatmap = beatmapContent;
+            beatmapStoryboard.BeatmapInfo = beatmapInfo;
 
             MutateBeatmap(model, playableBeatmap);
 
