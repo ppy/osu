@@ -80,25 +80,28 @@ namespace osu.Game.Screens.Select
                 Debug.Assert(overflowButton != null);
 
                 float limit = DrawWidth - overflowButton.DrawWidth - 5;
-                bool showOverflow = false;
+                int totalTagsShown = 0;
 
                 foreach (var text in Children)
                 {
+                    if (text is not OsuHoverContainer) continue;
+
                     if (text.X + text.DrawWidth < limit)
+                    {
                         text.Show();
+                        totalTagsShown += 1;
+                    }
                     else
                     {
-                        showOverflow = true;
                         text.AlwaysPresent = false;
                         text.Hide();
                     }
                 }
 
-                if (showOverflow)
-                {
-                    tagsShownCount.Value = Children.Count(text => text.IsPresent && text is OsuHoverContainer);
+                tagsShownCount.Value = totalTagsShown;
+
+                if (totalTagsShown < tags.Length)
                     overflowButton.Show();
-                }
                 else
                     overflowButton.Hide();
             }
