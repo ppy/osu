@@ -237,12 +237,6 @@ namespace osu.Game.Screens.Select
                 {
                     load();
                 }
-
-                protected override void Dispose(bool isDisposing)
-                {
-                    base.Dispose(isDisposing);
-                    overflowIndex.UnbindEvents();
-                }
             }
         }
     }
