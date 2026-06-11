@@ -112,13 +112,13 @@ namespace osu.Game.Screens.Import
 
                             importAllButton = new RoundedButton
                             {
-                                Text = DebugSettingsStrings.ImportFilesFromDirectory,
+                                Text = DebugSettingsStrings.ImportAllFilesFromDirectory,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 RelativeSizeAxes = Axes.X,
                                 Height = button_height,
                                 Width = 0.9f,
-                                TooltipText = DebugSettingsStrings.ImportFilesFromDirectoryTooltip,
+                                TooltipText = DebugSettingsStrings.ImportAllFilesFromDirectoryTooltip,
                                 Margin = new MarginPadding { Vertical = button_vertical_margin },
                                 Action = () => startDirectoryImport(fileSelector.CurrentPath.Value?.FullName)
                             }

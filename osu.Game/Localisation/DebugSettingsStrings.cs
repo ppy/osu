@@ -22,12 +22,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Import all files from directory"
         /// </summary>
-        public static LocalisableString ImportFilesFromDirectory => new TranslatableString(getKey(@"import_files_from_directory"), @"Import all files from directory");
+        public static LocalisableString ImportAllFilesFromDirectory => new TranslatableString(getKey(@"import_all_files_from_directory"), @"Import all files from directory");
 
         /// <summary>
         /// "Imports all osu! files from selected directory"
         /// </summary>
-        public static LocalisableString ImportFilesFromDirectoryTooltip => new TranslatableString(getKey(@"import_files_from_directory_tooltip"), @"Imports all osu! files from selected directory");
+        public static LocalisableString ImportAllFilesFromDirectoryTooltip => new TranslatableString(getKey(@"import_all_files_from_directory_tooltip"), @"Imports all osu! files from selected directory");
 
         /// <summary>
         /// "Select a file"
