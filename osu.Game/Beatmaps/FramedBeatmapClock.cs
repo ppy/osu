@@ -55,6 +55,8 @@ namespace osu.Game.Beatmaps
 
         private Bindable<bool> experimentalAudio = null!;
 
+        private double? initialSeek;
+
         public bool IsRewinding { get; private set; }
 
         public FramedBeatmapClock(bool applyOffsets, bool requireDecoupling, IClock? source = null)
@@ -110,6 +112,9 @@ namespace osu.Game.Beatmaps
                         userBeatmapOffsetClock.Offset = val;
                     });
             }
+
+            if (initialSeek != null)
+                Seek(initialSeek.Value);
         }
 
         /// <summary>
@@ -196,6 +201,13 @@ namespace osu.Game.Beatmaps
 
         public bool Seek(double position)
         {
+            // TotalAppliedOffset will not be correct until fully loaded.
+            if (applyOffsets && !IsLoaded)
+            {
+                initialSeek = position;
+                return true;
+            }
+
             bool success = decoupledTrack.Seek(position - TotalAppliedOffset);
             finalClockSource.ProcessFrame();
 
