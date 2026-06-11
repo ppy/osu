@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
         /// </summary>
         protected virtual bool UseCustomSampleBanks => false;
 
-        private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
+        internal readonly Dictionary<int, LegacyManiaSkinConfiguration> ManiaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
                 var maniaList = new LegacyManiaSkinDecoder().Decode(reader);
 
                 foreach (var config in maniaList)
-                    maniaConfigurations[config.Keys] = config;
+                    ManiaConfigurations[config.Keys] = config;
             }
         }
 
@@ -135,8 +135,8 @@ namespace osu.Game.Skinning
 
         private IBindable<TValue>? lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
         {
-            if (!maniaConfigurations.TryGetValue(maniaLookup.TotalColumns, out var existing))
-                maniaConfigurations[maniaLookup.TotalColumns] = existing = new LegacyManiaSkinConfiguration(maniaLookup.TotalColumns);
+            if (!ManiaConfigurations.TryGetValue(maniaLookup.TotalColumns, out var existing))
+                ManiaConfigurations[maniaLookup.TotalColumns] = existing = new LegacyManiaSkinConfiguration(maniaLookup.TotalColumns);
 
             switch (maniaLookup.Lookup)
             {

@@ -136,6 +136,40 @@ namespace osu.Game.Skinning
                         currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
                         break;
 
+                    case @"SpecialStyle":
+                        if (Enum.TryParse<LegacySpecialStyle>(pair.Value, out var specialStyle))
+                            currentConfig.SpecialStyle = specialStyle;
+                        break;
+
+                    case @"ColumnStart":
+                        currentConfig.ColumnStart = float.Parse(pair.Value, CultureInfo.InvariantCulture); // TODO: likely needs POSITION_SCALE_FACTOR
+                        break;
+
+                    case @"ColumnRight":
+                        currentConfig.ColumnRight = float.Parse(pair.Value, CultureInfo.InvariantCulture); // TODO: likely needs POSITION_SCALE_FACTOR
+                        break;
+
+                    case @"UpsideDown":
+                        currentConfig.UpsideDown = pair.Value == "1";
+                        break;
+
+                    case @"SeparateScore":
+                        currentConfig.SeparateScore = pair.Value == "1";
+                        break;
+
+                    case @"SplitStages":
+                        currentConfig.SplitStages = pair.Value == "1";
+                        break;
+
+                    case @"StageSeparation":
+                        currentConfig.StageSeparation = float.Parse(pair.Value, CultureInfo.InvariantCulture);
+                        break;
+
+                    case @"ComboBurstStyle":
+                        if (Enum.TryParse<LegacyComboBurstStyle>(pair.Value, out var comboBurstStyle))
+                            currentConfig.ComboBurstStyle = comboBurstStyle;
+                        break;
+
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
                         HandleColours(currentConfig, line, true);
                         break;
@@ -146,7 +180,13 @@ namespace osu.Game.Skinning
                     case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
                     case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
                     case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                    case @"WarningArrow":
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
+                        break;
+
+                    case string when pair.Key.StartsWith(@"KeyFlipWhenUpsideDown", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith(@"NoteFlipWhenUpsideDown", StringComparison.Ordinal):
+                        currentConfig.FlipSettings[pair.Key] = pair.Value;
                         break;
                 }
             }

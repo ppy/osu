@@ -41,12 +41,28 @@ namespace osu.Game.Skinning
         public float LightPosition = (480 - 413) * POSITION_SCALE_FACTOR;
         public float ComboPosition = 111 * POSITION_SCALE_FACTOR;
         public float ScorePosition = 300 * POSITION_SCALE_FACTOR;
-        public float BarLineHeight = 1;
+        public float BarLineHeight = 1.2f;
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;
         public int LightFramePerSecond = 60;
 
         public LegacyNoteBodyStyle? NoteBodyStyle;
+
+        #region Unimplemented properties, at this time present primarily for encode-decode stability
+
+        public LegacySpecialStyle? SpecialStyle;
+        public float ColumnStart = 136; // TODO: likely needs POSITION_SCALE_FACTOR
+        public float ColumnRight = 19; // TODO: likely needs POSITION_SCALE_FACTOR
+        public bool UpsideDown;
+        public bool SeparateScore = true;
+        public bool SplitStages;
+        public float StageSeparation = 40;
+        public LegacyComboBurstStyle? ComboBurstStyle;
+
+        public Dictionary<string, string> FlipSettings { get; } = new Dictionary<string, string>();
+        public LegacyNoteBodyStyle?[] ColumnNoteBodyStyles;
+
+        #endregion
 
         public LegacyManiaSkinConfiguration(int keys)
         {
@@ -57,6 +73,7 @@ namespace osu.Game.Skinning
             ColumnWidth = new float[keys];
             ExplosionWidth = new float[keys];
             HoldNoteLightWidth = new float[keys];
+            ColumnNoteBodyStyles = new LegacyNoteBodyStyle?[keys];
 
             ColumnLineWidth.AsSpan().Fill(2);
             ColumnWidth.AsSpan().Fill(DEFAULT_COLUMN_SIZE);
