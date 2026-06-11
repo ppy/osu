@@ -146,12 +146,12 @@ namespace osu.Game.Screens.Select
 
                 public Action<string>? PerformSearch { get; init; }
 
-                private readonly Bindable<int> overflowIndex;
+                private readonly Bindable<int> tagsShownCount;
 
-                public TagsOverflowButton(string[] tags, Bindable<int> overflowIndex)
+                public TagsOverflowButton(string[] tags, Bindable<int> tagsShownCount)
                 {
                     this.tags = tags;
-                    this.overflowIndex = overflowIndex;
+                    this.tagsShownCount = tagsShownCount;
                 }
 
                 [BackgroundDependencyLoader]
@@ -200,20 +200,20 @@ namespace osu.Game.Screens.Select
                     return true;
                 }
 
-                public Popover GetPopover() => new TagsOverflowPopover(tags, overflowIndex, PerformSearch);
+                public Popover GetPopover() => new TagsOverflowPopover(tags, tagsShownCount, PerformSearch);
             }
 
             public partial class TagsOverflowPopover : OsuPopover
             {
                 private readonly string[] tags;
-                private readonly Bindable<int> overflowIndex;
+                private readonly Bindable<int> tagsShownCount;
                 private readonly Action<string>? performSearch;
                 private readonly LinkFlowContainer textFlow;
 
-                public TagsOverflowPopover(string[] tags, Bindable<int> overflowIndex, Action<string>? performSearchAction)
+                public TagsOverflowPopover(string[] tags, Bindable<int> tagsShownCount, Action<string>? performSearchAction)
                 {
                     this.tags = tags;
-                    this.overflowIndex = overflowIndex;
+                    this.tagsShownCount = tagsShownCount;
                     performSearch = performSearchAction;
 
                     Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
@@ -222,13 +222,13 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Y,
                     };
 
-                    this.overflowIndex.BindValueChanged(overflowChanged);
+                    this.tagsShownCount.BindValueChanged(overflowChanged);
                 }
 
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    for (int i = overflowIndex.Value; i < tags.Length; i++)
+                    for (int i = tagsShownCount.Value; i < tags.Length; i++)
                     {
                         string tag = tags[i];
                         textFlow.AddLink(tag, () => performSearch?.Invoke(tag));
