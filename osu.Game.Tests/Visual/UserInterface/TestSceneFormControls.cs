@@ -235,6 +235,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     Padding = new MarginPadding(10),
                                     Children = new Drawable[]
                                     {
+                                        new FormPasswordTextBox
+                                        {
+                                            Caption = "Password",
+                                            TabbableContentContainer = this,
+                                        },
                                         new FormNumberBox(allowDecimals: true)
                                         {
                                             Caption = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
