@@ -254,7 +254,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
-            speedValue *= speedHighDeviationMultiplier;
+
+            // Punish high deviation only if score isn't an SS
+            if (accuracy < 1)
+                speedValue *= speedHighDeviationMultiplier;
 
             // An effective hit window is created based on the speed SR. The higher the speed difficulty, the shorter the hit window.
             // For example, a speed SR of 4.0 leads to an effective hit window of 20ms, which is OD 10.
@@ -263,8 +266,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Find the proportion of 300s on speed notes assuming the hit window was the effective hit window.
             double effectiveAccuracy = DifficultyCalculationUtils.Erf(effectiveHitWindow / (double)speedDeviation);
 
-            // Scale speed value by normalized accuracy.
-            speedValue *= Math.Pow(effectiveAccuracy, 2);
+            // Scale speed value by normalized accuracy if score isn't an SS
+            if (accuracy < 1)
+                speedValue *= Math.Pow(effectiveAccuracy, 2);
 
             return speedValue;
         }
@@ -288,6 +292,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // It is possible to reach a negative accuracy with this formula. Cap it at zero - zero points.
             if (betterAccuracyPercentage < 0)
                 betterAccuracyPercentage = 0;
+
+            // Explicitly set accuracy percentage to 100% if it's an ss
+            if (accuracy == 1)
+                betterAccuracyPercentage = 1;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
