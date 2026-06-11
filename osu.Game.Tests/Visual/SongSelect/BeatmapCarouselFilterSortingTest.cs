@@ -99,8 +99,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             const int diff_count = 1;
             {
                 var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+                set.DateAdded = new DateTimeOffset(2025, 6, 11, 10, 0, 0, TimeSpan.Zero);
                 set.Beatmaps.ForEach(b =>
                 {
+                    b.ID = Guid.Parse("00000000-0000-0000-0000-000000000000");
                     b.BPM = 175;
                     b.Metadata.Title = "ZZZ";
                 });
@@ -108,8 +110,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
             {
                 var set = TestResources.CreateTestBeatmapSetInfo(diff_count);
+                set.DateAdded = new DateTimeOffset(2025, 6, 10, 10, 0, 0, TimeSpan.Zero);
                 set.Beatmaps.ForEach(b =>
                 {
+                    b.ID = Guid.Parse("ffffffff-ffff-ffff-ffff-ffffffffffff");
                     b.BPM = 175;
                     b.Metadata.Title = "AAA";
                 });
