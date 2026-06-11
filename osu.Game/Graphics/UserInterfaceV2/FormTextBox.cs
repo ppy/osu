@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
 
-        protected Container CaptionContainer = null!;
+        protected Container CaptionContainer { get; private set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
