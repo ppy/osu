@@ -55,6 +55,14 @@ namespace osu.Game.Beatmaps
 
         private Bindable<bool> experimentalAudio = null!;
 
+        /// <summary>
+        /// Store seek target for any <see cref="Seek"/> performed before <see cref="LoadState.Loaded"/>.
+        /// </summary>
+        /// <remarks>
+        /// Initial seeks must be delayed until the <see cref="FramedBeatmapClock"/> instance is fully loaded.
+        ///
+        /// If not, <see cref="TotalAppliedOffset"/> will not be in a correct state and result in a potentially
+        /// incorrect seek target.</remarks>
         private double? initialSeek;
 
         public bool IsRewinding { get; private set; }
@@ -114,7 +122,10 @@ namespace osu.Game.Beatmaps
             }
 
             if (initialSeek != null)
+            {
                 Seek(initialSeek.Value);
+                initialSeek = null;
+            }
         }
 
         /// <summary>
@@ -226,7 +237,7 @@ namespace osu.Game.Beatmaps
 
         #region Delegation of IFrameBasedClock to clock with all offsets applied
 
-        public double CurrentTime => finalClockSource.CurrentTime;
+        public double CurrentTime => initialSeek ?? finalClockSource.CurrentTime;
 
         public bool IsRunning => finalClockSource.IsRunning;
 
