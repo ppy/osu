@@ -167,7 +167,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         scroll.ScrollToStart(animated: false);
                     ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
-                    Scheduler.AddDelayed(() => text.Text = OnlinePlayStrings.PlaylistTrayItems(room.Playlist.Count), 100);
+                    Scheduler.AddDelayed(() => text.Text = CommonStrings.ItemUnit(room.Playlist.Count), 100);
                 }
 
                 this.FadeIn(200)

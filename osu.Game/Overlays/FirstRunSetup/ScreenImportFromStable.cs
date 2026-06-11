@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
                     int count = task.GetResultSafely();
 
-                    LabelText = LocalisableString.Interpolate($"{title} ({FirstRunOverlayImportFromStableScreenStrings.Items(count)})");
+                    LabelText = LocalisableString.Interpolate($"{title} ({CommonStrings.ItemUnit(count)})");
                 }));
             }
         }

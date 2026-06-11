@@ -214,6 +214,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
 
+        /// <summary>
+        /// "{0:#,0} item|{0:#,0} items"
+        /// </summary>
+        public static LocalisableString ItemUnit(int itemsCount) => new PluralisableString(new TranslatableString(getKey(@"item_unit"), @"{0:#,0} item|{0:#,0} items", itemsCount), itemsCount, '|');
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
