@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Menu
         private Drawable heart = null!;
 
         private readonly IBindable<APIUser> currentUser = new Bindable<APIUser>();
-        private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+        private IBindable<string> considerBecomingASupporterText = new Bindable<string>();
 
         private Box backgroundBox = null!;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Menu
         private LocalisationManager localisation { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load()
         {
             Height = 40;
 
@@ -73,7 +73,8 @@ namespace osu.Game.Screens.Menu
                 },
             };
 
-            currentLanguage.BindTo(game.CurrentLanguage);
+            const string url = @"https://osu.ppy.sh/home/support";
+            considerBecomingASupporterText = localisation.GetLocalisedBindableString(SupporterDisplayStrings.ConsiderBecomingASupporter(url));
         }
 
         protected override void LoadComplete()
@@ -88,8 +89,7 @@ namespace osu.Game.Screens.Menu
                 updateDisplayedText(e.NewValue);
             }, true);
 
-            // schedule required because `LocalisationManager` won't have new language set correctly yet.
-            currentLanguage.BindValueChanged(_ => Schedule(() => updateDisplayedText(currentUser.Value)));
+            considerBecomingASupporterText.BindValueChanged(_ => updateDisplayedText(currentUser.Value));
 
             this
                 .FadeOut()
@@ -115,8 +115,7 @@ namespace osu.Game.Screens.Menu
             }
             else
             {
-                const string url = @"https://osu.ppy.sh/home/support";
-                var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(SupporterDisplayStrings.ConsiderBecomingAnSupporter(url)));
+                var formattedSource = MessageFormatter.FormatText(considerBecomingASupporterText.Value);
 
                 supportFlow.AddLinks(formattedSource.Text, formattedSource.Links, formatSemiBold);
 
