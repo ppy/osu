@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
@@ -23,6 +24,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 using BeatmapCarousel = osu.Game.Screens.Select.BeatmapCarousel;
@@ -428,6 +430,31 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
             AddAssert("osu! cookie visible", () => this.ChildrenOfType<OsuLogo>().Single().Alpha, () => Is.Not.Zero);
+        }
+
+        [Test]
+        public void TestDropdownKeyboardNavigation()
+        {
+            ImportBeatmapForRuleset(0);
+
+            LoadSongSelect();
+
+            BeatmapInfo? firstBeatmap = null;
+            AddStep("store first difficulty", () => firstBeatmap = Beatmap.Value.BeatmapInfo);
+
+            AddStep("click sort dropdown", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ShearedDropdown<SortMode>>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("press up arrow", () => InputManager.Key(Key.Up));
+            AddStep("press up arrow", () => InputManager.Key(Key.Up));
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddAssert("sort mode is length", () => this.ChildrenOfType<ShearedDropdown<SortMode>>().Single().Current.Value, () => Is.EqualTo(SortMode.Length));
+            AddAssert("beatmap not changed", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(firstBeatmap));
         }
 
         #endregion

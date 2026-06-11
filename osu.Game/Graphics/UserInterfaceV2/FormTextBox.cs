@@ -5,13 +5,10 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -77,8 +74,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
+        /// <summary>
+        /// Maximum allowed length of text.
+        /// </summary>
+        public int? LengthLimit { get; init; }
+
         private FormControlBackground background = null!;
-        private Box flashLayer = null!;
         private InnerTextBox textBox = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
@@ -95,11 +96,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             InternalChildren = new Drawable[]
             {
                 background = new FormControlBackground(),
-                flashLayer = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Transparent,
-                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -120,6 +116,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
+                            t.LengthLimit = LengthLimit;
                             t.Current = Current;
                             t.CommitOnFocusLost = true;
                             t.OnCommit += (textBox, newText) =>
@@ -127,16 +124,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 OnCommit?.Invoke(textBox, newText);
 
                                 if (!current.Disabled && !ReadOnly)
-                                {
-                                    flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
-                                    flashLayer.FadeOutFromOne(800, Easing.OutQuint);
-                                }
+                                    background.FlashOnCommit();
                             };
-                            t.OnInputError = () =>
-                            {
-                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
-                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
-                            };
+                            t.OnInputError = () => background.FlashOnInputError();
                             t.TabbableContentContainer = tabbableContentContainer;
                         }),
                     },

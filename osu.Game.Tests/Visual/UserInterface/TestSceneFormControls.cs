@@ -68,6 +68,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                                         },
                                         new FormTextBox
                                         {
+                                            Caption = "Length limited text",
+                                            PlaceholderText = "I can only hold 10 characters!",
+                                            LengthLimit = 10,
+                                            TabbableContentContainer = this,
+                                        },
+                                        new FormTextBox
+                                        {
                                             Caption = "Artist",
                                             HintText = "Poot artist here!",
                                             PlaceholderText = "Here is an artist",
@@ -187,6 +194,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                                         {
                                             Caption = "File selector",
                                             PlaceholderText = "Select a file",
+                                        },
+                                        new FormFileSelector
+                                        {
+                                            Caption = "File selector with deselection",
+                                            PlaceholderText = "Select a file",
+                                            AllowClear = true,
                                         },
                                         new FormBeatmapFileSelector(true)
                                         {

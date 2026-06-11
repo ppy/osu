@@ -118,8 +118,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             var results = (await runSorting(SortMode.BPM, beatmapSets)).ToList();
 
-            Assert.AreEqual("AAA", results[0].Metadata.Title);
-            Assert.AreEqual("ZZZ", results[1].Metadata.Title);
+            Assert.That(results[0].Metadata.Title, Is.EqualTo("AAA"));
+            Assert.That(results[1].Metadata.Title, Is.EqualTo("ZZZ"));
         }
 
         [Test]

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Screens.Select;
@@ -18,19 +19,19 @@ namespace osu.Game.Rulesets.Mania.Tests
             var criteria = new ManiaFilterCriteria();
             criteria.TryParseCustomKeywordCriteria("keys", Operator.Equal, "1");
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 1 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 2 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 3 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
@@ -44,19 +45,19 @@ namespace osu.Game.Rulesets.Mania.Tests
             var criteria = new ManiaFilterCriteria();
             criteria.TryParseCustomKeywordCriteria("keys", Operator.Equal, "1,3,5,7");
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 1 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 2 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 3 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
@@ -70,19 +71,19 @@ namespace osu.Game.Rulesets.Mania.Tests
             var criteria = new ManiaFilterCriteria();
             criteria.TryParseCustomKeywordCriteria("keys", Operator.NotEqual, "1");
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 1 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 2 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 3 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
@@ -96,19 +97,19 @@ namespace osu.Game.Rulesets.Mania.Tests
             var criteria = new ManiaFilterCriteria();
             criteria.TryParseCustomKeywordCriteria("keys", Operator.NotEqual, "1,3,5,7");
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 1 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 2 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 3 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria
                 {
@@ -122,23 +123,23 @@ namespace osu.Game.Rulesets.Mania.Tests
             var criteria = new ManiaFilterCriteria();
             criteria.TryParseCustomKeywordCriteria("keys", Operator.GreaterOrEqual, "4");
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 1 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 2 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 5 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new RulesetInfo { OnlineID = 0 }, new BeatmapDifficulty { CircleSize = 3 }),
                 new FilterCriteria
                 {
@@ -153,23 +154,23 @@ namespace osu.Game.Rulesets.Mania.Tests
             criteria.TryParseCustomKeywordCriteria("keys", Operator.Greater, "4");
             criteria.TryParseCustomKeywordCriteria("keys", Operator.NotEqual, "7");
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 3 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 4 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 5 }),
                 new FilterCriteria()));
 
-            Assert.False(criteria.Matches(
+            ClassicAssert.False(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 7 }),
                 new FilterCriteria()));
 
-            Assert.True(criteria.Matches(
+            ClassicAssert.True(criteria.Matches(
                 new BeatmapInfo(new ManiaRuleset().RulesetInfo, new BeatmapDifficulty { CircleSize = 9 }),
                 new FilterCriteria()));
         }
@@ -179,9 +180,9 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var criteria = new ManiaFilterCriteria();
 
-            Assert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.Equal, "some text"));
-            Assert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.NotEqual, "4,some text"));
-            Assert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.GreaterOrEqual, "4,5,6"));
+            ClassicAssert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.Equal, "some text"));
+            ClassicAssert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.NotEqual, "4,some text"));
+            ClassicAssert.False(criteria.TryParseCustomKeywordCriteria("keys", Operator.GreaterOrEqual, "4,5,6"));
         }
 
         [TestCase]
@@ -199,7 +200,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 0,
                 EndTimeObjectCount = 0
             };
-            Assert.True(criteria.Matches(beatmapInfo1, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo1, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "0");
             BeatmapInfo beatmapInfo2 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -207,7 +208,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 100,
                 EndTimeObjectCount = 0
             };
-            Assert.True(criteria.Matches(beatmapInfo2, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo2, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "100");
             BeatmapInfo beatmapInfo3 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -215,7 +216,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 100,
                 EndTimeObjectCount = 100
             };
-            Assert.True(criteria.Matches(beatmapInfo3, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo3, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "1");
             BeatmapInfo beatmapInfo4 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -223,7 +224,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 100,
                 EndTimeObjectCount = 1
             };
-            Assert.True(criteria.Matches(beatmapInfo4, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo4, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "0.1");
             BeatmapInfo beatmapInfo5 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -231,7 +232,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 1000,
                 EndTimeObjectCount = 1
             };
-            Assert.True(criteria.Matches(beatmapInfo5, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo5, filterCriteria));
         }
 
         [TestCase]
@@ -249,7 +250,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 0,
                 EndTimeObjectCount = 0
             };
-            Assert.True(criteria.Matches(beatmapInfo1, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo1, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "0");
             BeatmapInfo beatmapInfo2 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -257,7 +258,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 100,
                 EndTimeObjectCount = 0
             };
-            Assert.True(criteria.Matches(beatmapInfo2, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo2, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "100");
             BeatmapInfo beatmapInfo3 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -265,7 +266,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 100,
                 EndTimeObjectCount = 100
             };
-            Assert.True(criteria.Matches(beatmapInfo3, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo3, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "1");
             BeatmapInfo beatmapInfo4 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -273,7 +274,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 100,
                 EndTimeObjectCount = 1
             };
-            Assert.True(criteria.Matches(beatmapInfo4, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo4, filterCriteria));
 
             criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "0.1");
             BeatmapInfo beatmapInfo5 = new BeatmapInfo(new ManiaRuleset().RulesetInfo)
@@ -281,7 +282,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 1000,
                 EndTimeObjectCount = 1
             };
-            Assert.True(criteria.Matches(beatmapInfo5, filterCriteria));
+            ClassicAssert.True(criteria.Matches(beatmapInfo5, filterCriteria));
         }
 
         [TestCase]
@@ -299,7 +300,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TotalObjectCount = 100,
                 EndTimeObjectCount = 50
             };
-            Assert.False(criteria.Matches(beatmapInfo, filterCriteria));
+            ClassicAssert.False(criteria.Matches(beatmapInfo, filterCriteria));
         }
 
         [TestCase]
@@ -307,8 +308,8 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var criteria = new ManiaFilterCriteria();
 
-            Assert.False(criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "some text"));
-            Assert.False(criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "1some text"));
+            ClassicAssert.False(criteria.TryParseCustomKeywordCriteria("lns", Operator.Equal, "some text"));
+            ClassicAssert.False(criteria.TryParseCustomKeywordCriteria("lns", Operator.GreaterOrEqual, "1some text"));
         }
     }
 }
