@@ -19,6 +19,7 @@ using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -582,7 +583,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Current = bindable,
                         Description = string.Empty,
-                        CreateIcon = () => ComposeBlueprintContainer.GetIconForSample(sampleName),
+                        CreateIcon = () => HitObjectComposer.GetIconForSample(sampleName),
                         RelativeSizeAxes = Axes.None,
                         Size = new Vector2(40, 40),
                     };

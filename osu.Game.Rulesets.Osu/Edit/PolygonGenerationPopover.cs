@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -55,8 +54,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
-            newComboState = selectionHandler.SelectionNewComboState.GetBoundCopy();
+            newComboState = composer.BlueprintContainer.SelectionHandler.SelectionNewComboState.GetBoundCopy();
 
             AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
 
