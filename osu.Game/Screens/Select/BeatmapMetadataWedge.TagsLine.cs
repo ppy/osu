@@ -123,10 +123,11 @@ namespace osu.Game.Screens.Select
                     },
                 });
 
-                Add(overflowButton = new TagsOverflowButton(tags, tagsShownCount)
+                Add(overflowButton = new TagsOverflowButton(tags)
                 {
                     Alpha = 0f,
                     PerformSearch = s => PerformSearch?.Invoke(s),
+                    TagsShownCount = { BindTarget = tagsShownCount },
                 });
 
                 drawSizeLayout.Invalidate();
@@ -146,12 +147,11 @@ namespace osu.Game.Screens.Select
 
                 public Action<string>? PerformSearch { get; init; }
 
-                private readonly Bindable<int> tagsShownCount;
+                public readonly Bindable<int> TagsShownCount = new Bindable<int>();
 
-                public TagsOverflowButton(string[] tags, Bindable<int> tagsShownCount)
+                public TagsOverflowButton(string[] tags)
                 {
                     this.tags = tags;
-                    this.tagsShownCount = tagsShownCount;
                 }
 
                 [BackgroundDependencyLoader]
@@ -200,20 +200,22 @@ namespace osu.Game.Screens.Select
                     return true;
                 }
 
-                public Popover GetPopover() => new TagsOverflowPopover(tags, tagsShownCount, PerformSearch);
+                public Popover GetPopover() => new TagsOverflowPopover(tags, PerformSearch)
+                {
+                    TagsShownCount = { BindTarget = TagsShownCount },
+                };
             }
 
             public partial class TagsOverflowPopover : OsuPopover
             {
                 private readonly string[] tags;
-                private readonly Bindable<int> tagsShownCount;
+                public readonly Bindable<int> TagsShownCount = new Bindable<int>();
                 private readonly Action<string>? performSearch;
                 private readonly LinkFlowContainer textFlow;
 
-                public TagsOverflowPopover(string[] tags, Bindable<int> tagsShownCount, Action<string>? performSearchAction)
+                public TagsOverflowPopover(string[] tags, Action<string>? performSearchAction)
                 {
                     this.tags = tags;
-                    this.tagsShownCount = tagsShownCount;
                     performSearch = performSearchAction;
 
                     Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
@@ -221,19 +223,24 @@ namespace osu.Game.Screens.Select
                         Width = 200,
                         AutoSizeAxes = Axes.Y,
                     };
-
-                    this.tagsShownCount.BindValueChanged(overflowChanged);
                 }
 
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    for (int i = tagsShownCount.Value; i < tags.Length; i++)
+                    for (int i = TagsShownCount.Value; i < tags.Length; i++)
                     {
                         string tag = tags[i];
                         textFlow.AddLink(tag, () => performSearch?.Invoke(tag));
                         textFlow.AddText(" ");
                     }
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    TagsShownCount.BindValueChanged(overflowChanged);
                 }
 
                 private void overflowChanged(ValueChangedEvent<int> e)
