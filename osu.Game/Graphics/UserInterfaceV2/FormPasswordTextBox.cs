@@ -99,7 +99,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Margin = new MarginPadding { Right = 2 },
                     Y = 1f,
                 });
-                AddText(CommonStrings.CapsLockIsActive);
+                AddText(CommonStrings.CapsLock);
             }
         }
     }
