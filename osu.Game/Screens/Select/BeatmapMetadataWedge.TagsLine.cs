@@ -208,26 +208,35 @@ namespace osu.Game.Screens.Select
 
             public partial class TagsOverflowPopover : OsuPopover
             {
-                private readonly string[] tags;
                 public readonly Bindable<int> TagsShownCount = new Bindable<int>();
+
+                private readonly string[] tags;
                 private readonly Action<string>? performSearch;
-                private readonly LinkFlowContainer textFlow;
+
+                private LinkFlowContainer textFlow = null!;
 
                 public TagsOverflowPopover(string[] tags, Action<string>? performSearchAction)
                 {
                     this.tags = tags;
                     performSearch = performSearchAction;
-
-                    Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
-                    {
-                        Width = 200,
-                        AutoSizeAxes = Axes.Y,
-                    };
                 }
 
                 [BackgroundDependencyLoader]
                 private void load()
                 {
+                    Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
+                    {
+                        Width = 200,
+                        AutoSizeAxes = Axes.Y,
+                    };
+
+                    updateTags();
+                }
+
+                private void updateTags()
+                {
+                    textFlow.Clear();
+
                     for (int i = TagsShownCount.Value; i < tags.Length; i++)
                     {
                         string tag = tags[i];
@@ -240,13 +249,7 @@ namespace osu.Game.Screens.Select
                 {
                     base.LoadComplete();
 
-                    TagsShownCount.BindValueChanged(overflowChanged);
-                }
-
-                private void overflowChanged(ValueChangedEvent<int> e)
-                {
-                    textFlow.Clear();
-                    load();
+                    TagsShownCount.BindValueChanged(_ => updateTags());
                 }
             }
         }
