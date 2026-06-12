@@ -42,8 +42,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        public int? LengthLimit { get; init; }
-
         private CompositeDrawable? tabbableContentContainer;
 
         public CompositeDrawable? TabbableContentContainer
