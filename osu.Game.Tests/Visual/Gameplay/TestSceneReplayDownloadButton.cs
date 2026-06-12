@@ -3,6 +3,8 @@
 
 #nullable disable
 
+using System;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -14,8 +16,10 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
@@ -163,13 +167,66 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestImportedOsrFileWithoutReplayData()
+        {
+            ScoreInfo importedScore = null;
+            MemoryStream scoreStream = null;
+
+            AddStep("import score from .osr without replay data", () =>
+            {
+                var scoreInfo = getScoreInfo(false, false);
+                var score = new Score
+                {
+                    ScoreInfo = scoreInfo,
+                    Replay = new Replay()
+                };
+
+                scoreStream = new MemoryStream();
+                var beatmap = beatmapManager.GetWorkingBeatmap(scoreInfo.BeatmapInfo).GetPlayableBeatmap(scoreInfo.Ruleset);
+                var encoder = new LegacyScoreEncoder(score, beatmap);
+                encoder.Encode(scoreStream, leaveOpen: true);
+
+                scoreStream.Seek(0, SeekOrigin.Begin);
+
+                var importTask = new ImportTask(scoreStream, "test_score.osr");
+                scoreManager.Import(new[] { importTask });
+            });
+
+            AddUntilStep("wait for import", () =>
+            {
+                importedScore = scoreManager.Query(s => true);
+                return importedScore != null;
+            });
+
+            AddAssert("score has .osr file", () => importedScore.Files.Any(f => f.Filename.EndsWith(".osr", StringComparison.OrdinalIgnoreCase)));
+            AddAssert("score has no online replay flag", () => !importedScore.HasOnlineReplay);
+            AddAssert("score has no local replay flag", () => importedScore.HasLocalReplay == false);
+
+            AddStep("create button with imported score", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(importedScore)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            checkState(DownloadState.LocallyAvailable);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+
+            AddStep("cleanup stream", () => scoreStream?.Dispose());
+        }
+
+        [Test]
         public void TestScoreImportThenDelete()
         {
             Live<ScoreInfo> imported = null;
 
-            AddStep("create button without replay", () =>
+            AddStep("create button with online replay", () =>
             {
-                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(false))
+                Child = downloadButton = new TestReplayDownloadButton(getScoreInfo(true))
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -187,7 +244,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("delete score", () => scoreManager.Delete(imported.Value));
 
             checkState(DownloadState.NotDownloaded);
-            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+            AddAssert("button is enabled", () => downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
         [Test]
