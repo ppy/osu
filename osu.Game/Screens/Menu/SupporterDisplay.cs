@@ -86,10 +86,10 @@ namespace osu.Game.Screens.Menu
             {
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
 
-                updateDisplayedText(e.NewValue);
+                updateDisplay(e.NewValue);
             }, true);
 
-            considerBecomingASupporterText.BindValueChanged(_ => updateDisplayedText(currentUser.Value));
+            considerBecomingASupporterText.BindValueChanged(_ => updateDisplay(currentUser.Value));
 
             this
                 .FadeOut()
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Menu
             scheduleDismissal();
         }
 
-        private void updateDisplayedText(APIUser user)
+        private void updateDisplay(APIUser user)
         {
             const float font_size = 14;
 
@@ -116,7 +116,6 @@ namespace osu.Game.Screens.Menu
             else
             {
                 var formattedSource = MessageFormatter.FormatText(considerBecomingASupporterText.Value);
-
                 supportFlow.AddLinks(formattedSource.Text, formattedSource.Links, formatSemiBold);
 
                 backgroundBox.FadeColour(colours.Pink4, 250);
