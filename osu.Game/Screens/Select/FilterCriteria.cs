@@ -13,6 +13,7 @@ using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -42,6 +43,7 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter DifficultyName;
         public OptionalTextFilter Source;
         public List<OptionalTextFilter> UserTags = [];
+        public OptionalSet<ScoreRank> Rank = new OptionalSet<ScoreRank>();
 
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {

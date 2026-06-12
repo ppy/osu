@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -455,6 +456,36 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        [TestCase("rank=None", 0)]
+        [TestCase("rank=X", 1)]
+        [TestCase("rank=A")]
+        public void TestRankFilter(string query, params int[] expectedBeatmapIndexes)
+        {
+            var carouselBeatmaps = new[]
+            {
+                Guid.NewGuid(),
+                Guid.Empty
+            }.Select(info => new CarouselBeatmap(new BeatmapInfo
+            {
+                ID = info
+            })).ToList();
+
+            Dictionary<Guid, ScoreRank> localUserTopRanks = new Dictionary<Guid, ScoreRank>
+            {
+                { Guid.Empty, ScoreRank.X }
+            };
+
+            var criteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(criteria, query);
+            carouselBeatmaps.ForEach(b => b.Filter(criteria, localUserTopRanks));
+
+            int[] visibleBeatmaps = carouselBeatmaps
+                                    .Where(b => !b.Filtered.Value)
+                                    .Select(b => carouselBeatmaps.IndexOf(b)).ToArray();
+            Assert.That(visibleBeatmaps, Is.EqualTo(expectedBeatmapIndexes));
+        }
+
+        [Test]
         public void TestCustomRulesetCriteria([Values(null, true, false)] bool? matchCustomCriteria)
         {
             var beatmap = getExampleBeatmap();
@@ -642,9 +673,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 BeatmapInfo = beatmapInfo;
             }
 
-            public void Filter(FilterCriteria criteria)
+            public void Filter(FilterCriteria criteria, IReadOnlyDictionary<Guid, ScoreRank>? localUserTopRanks = null)
             {
-                Filtered.Value = !BeatmapCarouselFilterMatching.CheckCriteriaMatch(BeatmapInfo, criteria);
+                Filtered.Value = !BeatmapCarouselFilterMatching.CheckCriteriaMatch(BeatmapInfo, criteria, localUserTopRanks ?? new Dictionary<Guid, ScoreRank>());
             }
         }
 
