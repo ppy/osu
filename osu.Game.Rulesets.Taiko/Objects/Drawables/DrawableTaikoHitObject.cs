@@ -88,6 +88,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
+        /// <summary>
+        /// Adds a drawable above skin content in <see cref="Content"/> so it scrolls and proxies with hit visuals (e.g. mod overlays).
+        /// </summary>
+        internal void AddModContentOverlay(Drawable drawable)
+        {
+            drawable.Depth = 1;
+            Content.Add(drawable);
+        }
+
         public abstract bool OnPressed(KeyBindingPressEvent<TaikoAction> e);
 
         public virtual void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
