@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
@@ -146,6 +147,61 @@ namespace osu.Game.Rulesets.Difficulty
             }
 
             return attribs;
+        }
+
+        /// <summary>
+        /// Calculates the difficulty of the beatmap using a specific mod combination and returns
+        /// a lazy-evaluated enumerable of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The returned task represents the operations related to the initialisation of the difficulty calculation (pre-processing).
+        /// The task will block the calling thread; use <see cref="Task.Run(System.Action)"/> if this is not desired.
+        /// The task can be cancelled via <paramref name="cancellationToken"/>.
+        /// </para>
+        /// <para>
+        /// Once the pre-processing is done, the returned enumerable no longer respects the <paramref name="cancellationToken"/>.
+        /// Enumeration will be lazy and blocking; callers are expected to stop enumerating if they no longer wish to receive timed difficulty attributes.
+        /// </para>
+        /// </remarks>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <param name="cancellationToken">The cancellation token for pre-processing.</param>
+        /// <returns>The enumerable <see cref="TimedDifficultyAttributes"/>.</returns>
+        public Task<IEnumerable<TimedDifficultyAttributes>> CalculateTimedLazy([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            preProcess(mods, cancellationToken);
+
+            if (!Beatmap.HitObjects.Any())
+                return Task.FromResult(Enumerable.Empty<TimedDifficultyAttributes>());
+
+            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
+            var difficultyObjects = getDifficultyHitObjects().ToArray();
+
+            return Task.FromResult(enumerate());
+
+            IEnumerable<TimedDifficultyAttributes> enumerate()
+            {
+                int currentIndex = 0;
+
+                foreach (var obj in Beatmap.HitObjects)
+                {
+                    progressiveBeatmap.HitObjects.Add(obj);
+
+                    while (currentIndex < difficultyObjects.Length && difficultyObjects[currentIndex].BaseObject.GetEndTime() <= obj.GetEndTime())
+                    {
+                        foreach (var skill in skills)
+                        {
+                            skill.Process(difficultyObjects[currentIndex]);
+                        }
+
+                        currentIndex++;
+                    }
+
+                    yield return new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate));
+                }
+            }
         }
 
         /// <summary>
