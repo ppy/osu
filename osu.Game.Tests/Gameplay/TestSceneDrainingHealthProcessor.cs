@@ -3,18 +3,15 @@
 
 #nullable disable
 
-using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
@@ -215,22 +212,43 @@ namespace osu.Game.Tests.Gameplay
             assertHealthNotEqualTo(0);
         }
 
+        /// <summary>
+        /// Tests an edge case where a single judgement should result in no drain,
+        /// but the simulation instead overflows and keeps drain at a high value.
+        /// </summary>
         [Test]
-        public void TestSingleLongObjectDoesNotDrain()
+        public void TestSingleJudgementDoesNotImmediatelyKill()
         {
-            var beatmap = new Beatmap
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(0);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
             {
-                HitObjects = { new JudgeableLongHitObject() }
-            };
+                HitObjects =
+                {
+                    new JudgeableHitObject(),
+                }
+            });
 
-            beatmap.HitObjects[0].ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            Assert.That(hp.DrainRate, Is.Zero);
+        }
 
-            createProcessor(beatmap);
-            setTime(0);
-            assertHealthEqualTo(1);
+        /// <summary>
+        /// Similar to <see cref="TestSingleJudgementDoesNotImmediatelyKill"/>,
+        /// but forces an effective zero drain length through multiple immediate judgements.
+        /// </summary>
+        [Test]
+        public void TestZeroEffectiveLengthDoesNotImmediatelyKill()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(0);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    new JudgeableHitObject(),
+                    new JudgeableHitObject()
+                }
+            });
 
-            setTime(5000);
-            assertHealthEqualTo(1);
+            Assert.That(hp.DrainRate, Is.Zero);
         }
 
         [Test]
@@ -311,6 +329,35 @@ namespace osu.Game.Tests.Gameplay
             Assert.That(hp.DrainRate, Is.EqualTo(9.1E-5).Within(0.1E-5));
         }
 
+        [Test]
+        public void TestDrainRateAroundBreaks()
+        {
+            DrainingHealthProcessor hp = new DrainingHealthProcessor(0);
+            hp.ApplyBeatmap(new Beatmap<JudgeableHitObject>
+            {
+                HitObjects =
+                {
+                    // Normal hit circle.
+                    new JudgeableHitObject { StartTime = 0 },
+
+                    // Spinner ticks.
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 6000 },
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 7000 },
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 8000 },
+                    new JudgeableHitObject(HitResult.SmallBonus) { StartTime = 9000 },
+
+                    // Spinner end. This is the first object with a non-zero health increase after the break.
+                    new JudgeableHitObject { StartTime = 10000 }
+                },
+                Breaks =
+                {
+                    new BreakPeriod(1000, 5000)
+                }
+            });
+
+            Assert.That(hp.DrainRate, Is.EqualTo(2.2E-5).Within(0.1E-5));
+        }
+
         private Beatmap createBeatmap(double startTime, double endTime, params BreakPeriod[] breaks)
         {
             var beatmap = new Beatmap
@@ -369,24 +416,6 @@ namespace osu.Game.Tests.Gameplay
                 {
                     MaxResult = maxResult;
                 }
-            }
-        }
-
-        private class JudgeableLongHitObject : JudgeableHitObject, IHasDuration
-        {
-            public double EndTime => StartTime + Duration;
-            public double Duration { get; set; } = 5000;
-
-            public JudgeableLongHitObject()
-                : base(HitResult.LargeBonus)
-            {
-            }
-
-            protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
-            {
-                base.CreateNestedHitObjects(cancellationToken);
-
-                AddNested(new JudgeableHitObject());
             }
         }
     }
