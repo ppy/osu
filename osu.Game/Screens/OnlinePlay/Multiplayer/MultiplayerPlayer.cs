@@ -40,9 +40,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private LoadingLayer loadingDisplay = null!;
 
         [Cached(typeof(IGameplayLeaderboardProvider))]
-        private readonly MultiplayerLeaderboardProvider leaderboardProvider;
+        protected readonly MultiplayerLeaderboardProvider LeaderboardProvider;
 
-        private GameplayMatchScoreDisplay teamScoreDisplay = null!;
+        protected GameplayMatchScoreDisplay ScoreDisplay { get; private set; } = null!;
         private GameplayChatDisplay chat = null!;
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 ShowFailingOverlay = showFailingOverlay
             })
         {
-            leaderboardProvider = new MultiplayerLeaderboardProvider(users);
+            LeaderboardProvider = new MultiplayerLeaderboardProvider(users);
         }
 
         [BackgroundDependencyLoader]
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Children = new Drawable[]
                 {
                     chat = new GameplayChatDisplay(Room),
-                    teamScoreDisplay = new GameplayMatchScoreDisplay
+                    ScoreDisplay = new GameplayMatchScoreDisplay
                     {
                         Expanded = { BindTarget = HUDOverlay.ShowHud },
                         Alpha = 0,
@@ -95,15 +95,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Origin = Anchor.BottomRight,
             }, d => HUDOverlay.BottomRightElements.Insert(-1, d));
 
-            LoadComponentAsync(leaderboardProvider, loaded =>
+            LoadComponentAsync(LeaderboardProvider, loaded =>
             {
                 AddInternal(loaded);
 
                 if (loaded.HasTeams)
                 {
-                    teamScoreDisplay.Alpha = 1;
-                    teamScoreDisplay.Team1Score.BindTarget = leaderboardProvider.TeamScores.First().Value;
-                    teamScoreDisplay.Team2Score.BindTarget = leaderboardProvider.TeamScores.Last().Value;
+                    ScoreDisplay.Alpha = 1;
+                    ScoreDisplay.Team1Score.BindTarget = LeaderboardProvider.TeamScores.First().Value;
+                    ScoreDisplay.Team2Score.BindTarget = LeaderboardProvider.TeamScores.Last().Value;
                 }
             });
 
@@ -245,8 +245,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Debug.Assert(Room.RoomID != null);
 
-            return leaderboardProvider.TeamScores.Count == 2
-                ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value, PlaylistItem, leaderboardProvider.TeamScores)
+            return LeaderboardProvider.TeamScores.Count == 2
+                ? new MultiplayerTeamResultsScreen(score, Room.RoomID.Value, PlaylistItem, LeaderboardProvider.TeamScores)
                 {
                     IsLocalPlay = true,
                 }
