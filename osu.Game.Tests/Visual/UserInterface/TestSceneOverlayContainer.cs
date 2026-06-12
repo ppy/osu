@@ -28,6 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         };
 
         private void loadOverlay() => Schedule(() => Child = createOverlay());
+
         private void loadBlockingOverlay() => Schedule(() => Child = createOverlay().With(d =>
         {
             d.Child = new BlockingContainer
@@ -41,7 +42,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             OsuScrollContainer scroll = null!;
 
-            AddStep("load overlay", () => loadOverlay());
+            AddStep("load overlay", loadOverlay);
             AddStep("add scroll container", () =>
             {
                 Add(scroll = new OsuScrollContainer
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             TestGlobalAltScrollAdjustsVolume volumeAdjust = null!;
 
-            AddStep("load overlay", () => loadOverlay());
+            AddStep("load overlay", loadOverlay);
             AddStep("add volume control receptor", () => Add(volumeAdjust = new TestGlobalAltScrollAdjustsVolume
             {
                 RelativeSizeAxes = Axes.Both,
@@ -102,7 +103,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Depth = float.MaxValue,
                 });
             });
-            AddStep("load blocking overlay", () => loadBlockingOverlay());
+            AddStep("load blocking overlay", loadBlockingOverlay);
 
             AddStep("hold alt", () => InputManager.PressKey(Key.AltLeft));
             AddStep("perform scroll", () =>
@@ -126,12 +127,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private partial class BlockingContainer : Container, IBlockGlobalAltScrollVolume
-        {
-            public BlockingContainer()
-            {
-            }
-        }
+        private partial class BlockingContainer : Container, IBlockGlobalAltScrollVolume;
 
         private partial class TestOverlay : OsuFocusedOverlayContainer
         {
