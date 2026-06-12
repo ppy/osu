@@ -1279,7 +1279,10 @@ namespace osu.Game.Screens.Select
                 return;
 
             if (beforeScopedSelection != null)
-                queueBeatmapSelection(beforeScopedSelection);
+            {
+                var beatmapToSwitchTo = carousel.CurrentGroupedBeatmap ?? beforeScopedSelection;
+                queueBeatmapSelection(beatmapToSwitchTo);
+            }
 
             scopedBeatmapSet.Value = null;
             beforeScopedSelection = null;
