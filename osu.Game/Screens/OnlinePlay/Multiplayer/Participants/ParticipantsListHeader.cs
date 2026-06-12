@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             if (room == null)
                 return;
 
-            DetailsText.Value = $"{room.Users.Count}";
+            DetailsText.Value = room.Settings.MaxParticipants == null ? $@"{room.Users.Count}" : $@"{room.Users.Count} / {room.Settings.MaxParticipants}";
         }
     }
 }

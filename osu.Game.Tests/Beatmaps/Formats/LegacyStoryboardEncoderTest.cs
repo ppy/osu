@@ -31,6 +31,23 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestBackgroundOffset()
+        {
+            var initial = createComponents();
+            initial.Beatmap.BeatmapInfo.Metadata.BackgroundFile = "bg_offset.jpg";
+            initial.Storyboard.BackgroundOffset = new Vector2(0, 45);
+
+            var encoded = encode(initial);
+            var decodedAfterEncode = decode(encoded);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decodedAfterEncode.Beatmap.BeatmapInfo.Metadata.BackgroundFile, Is.EqualTo("bg_offset.jpg"));
+                Assert.That(decodedAfterEncode.Storyboard.BackgroundOffset, Is.EqualTo(new Vector2(0, 45)));
+            });
+        }
+
+        [Test]
         public void TestVideos()
         {
             var initial = createComponents();

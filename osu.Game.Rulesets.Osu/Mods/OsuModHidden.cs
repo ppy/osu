@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
 
         public override LocalisableString Description => @"Play with no approach circles and fading circles/sliders.";
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModDepth), typeof(OsuModFreezeFrame) };
 

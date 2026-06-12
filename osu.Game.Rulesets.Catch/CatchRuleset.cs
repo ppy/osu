@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Catch
             }
         }
 
-        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator() => new CatchScoreMultiplierCalculator();
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new CatchScoreMultiplierCalculator(context);
 
         public override string Description => "osu!catch";
 
