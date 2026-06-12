@@ -125,7 +125,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         },
                         textBox = CreateTextBox().With(t =>
                         {
-                            t.LengthLimit = LengthLimit;
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
@@ -198,18 +197,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 background.VisualStyle = VisualStyle.Normal;
         }
 
-        public event Action? ValueChanged;
-
-        public bool IsDefault => current.IsDefault;
-
-        public void SetDefault() => current.SetDefault();
-
-        public bool IsDisabled => current.Disabled;
-
-        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
-
-        public float MainDrawHeight => DrawHeight;
-
         internal partial class InnerTextBox : OsuTextBox
         {
             public BindableBool Focused { get; } = new BindableBool();
@@ -254,5 +241,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 OnInputError?.Invoke();
             }
         }
+
+        public event Action? ValueChanged;
+
+        public bool IsDefault => current.IsDefault;
+
+        public void SetDefault() => current.SetDefault();
+
+        public bool IsDisabled => current.Disabled;
+
+        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+
+        public float MainDrawHeight => DrawHeight;
     }
 }
