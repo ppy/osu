@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osuTK.Input;
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.Utility
         public new LocalisableString Text
         {
             get => base.Text;
-            set => base.Text = $"{value} (Press {key.ToString().Replace("Number", string.Empty)})";
+            set => base.Text = LatencyCertifierStrings.ButtonWithKeyBindText(value, key.ToString().Replace("Number", string.Empty));
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
