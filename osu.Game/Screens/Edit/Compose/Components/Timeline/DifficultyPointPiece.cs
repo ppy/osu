@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
-                                Text = "Hold shift while dragging the end of an object to adjust velocity while snapping."
+                                Text = "Hold shift while dragging the end of an object to adjust velocity while snapping.\nDouble-clicking the end point of an object with a path to adjust velocity to make it land on the intended position."
                             },
                             new SliderVelocityInspector(sliderVelocitySlider.Current),
                         }
