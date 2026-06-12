@@ -305,7 +305,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     RelativeSizeAxes = Axes.X,
                     Height = 50,
                 },
-                new AverageHitError(hitEvents) { FontSize = OsuFont.Style.Caption1.Size },
+                new MedianHitError(hitEvents) { FontSize = OsuFont.Style.Caption1.Size },
                 calibrateFromLastPlayButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
