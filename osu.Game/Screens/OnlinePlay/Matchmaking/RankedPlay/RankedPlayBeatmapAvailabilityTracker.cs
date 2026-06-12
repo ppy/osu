@@ -30,10 +30,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
+        [Resolved]
+        private BeatmapModelDownloader beatmapDownloaderResolved { get; set; } = null!;
 
-        private CancellationTokenSource? downloadCheckCancellation;
-        private int? lastDownloadCheckedBeatmapId;
+        private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -41,6 +41,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             dependencies.CacheAs(beatmapDownloader = new BeatmapModelDownloader(parent.Get<BeatmapManager>(), parent.Get<IAPIProvider>()));
             return dependencies;
         }
+
+        private CancellationTokenSource? downloadCheckCancellation;
+        private int? lastDownloadCheckedBeatmapId;
 
         protected override void LoadComplete()
         {
@@ -90,6 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     if (beatmapSet == null)
                         return;
 
+                    beatmapDownloaderResolved.GetExistingDownload(beatmapSet)?.Cancel();
                     beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
                 }));
         }
