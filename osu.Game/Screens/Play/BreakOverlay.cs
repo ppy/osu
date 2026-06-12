@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -9,8 +12,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -43,6 +48,7 @@ namespace osu.Game.Screens.Play
         private readonly BreakInfo info;
 
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
+        private Bindable<HUDVisibilityMode> configVisibilityMode;
 
         public BreakOverlay(ScoreProcessor scoreProcessor)
         {
@@ -116,10 +122,17 @@ namespace osu.Game.Screens.Play
             };
         }
 
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config)
+        {
+            configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            configVisibilityMode.BindValueChanged(_ => updateInfoVisibility(), true);
             info.AccuracyDisplay.Current.BindTo(scoreProcessor.Accuracy);
             ((IBindable<ScoreRank>)info.GradeDisplay.Current).BindTo(scoreProcessor.Rank);
 
@@ -127,6 +140,19 @@ namespace osu.Game.Screens.Play
             currentPeriod.BindValueChanged(updateDisplay, true);
         }
 
+        private void updateInfoVisibility()
+        {
+            // Logger.Log($"configVisibilityMode = {configVisibilityMode.Value:G}");
+            if (configVisibilityMode.Value == HUDVisibilityMode.Never)
+            {
+                Logger.Log("configVisibilityMode = Never, hiding break info");
+                info.Hide();
+            }
+            else
+            {
+                info.Show();
+            }
+        }
         private float remainingTimeForCurrentPeriod =>
             currentPeriod.Value == null ? 0 : (float)Math.Max(0, (currentPeriod.Value.Value.End - Time.Current - BREAK_FADE_DURATION) / currentPeriod.Value.Value.Duration);
 
