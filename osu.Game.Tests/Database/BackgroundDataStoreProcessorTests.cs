@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
@@ -212,6 +213,34 @@ namespace osu.Game.Tests.Database
 
             AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
             AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000001));
+        }
+
+        [Test]
+        public void TestModMultiplierUpgrade()
+        {
+            ScoreInfo scoreInfo = null!;
+
+            AddStep("Add score which requires upgrade (and has beatmap)", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(scoreInfo = new ScoreInfo(ruleset: r.All<RulesetInfo>().First(), beatmap: r.All<BeatmapInfo>().First())
+                    {
+                        TotalScoreVersion = 30000016,
+                        TotalScore = 1_040_000,
+                        TotalScoreWithoutMods = 1_000_000,
+                        Mods = [new OsuModDoubleTime { SpeedChange = { Value = 1.25 } }]
+                    });
+                });
+            });
+
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
+
+            AddAssert("Score version upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(LegacyScoreEncoder.LATEST_VERSION));
+            AddAssert("Total score corrected", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScore), () => Is.EqualTo(1_082_000));
+            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
