@@ -53,6 +53,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             if (e.Button != MouseButton.Left)
                 return false;
 
+            if (!IsValidForPlacement)
+                return false;
+
             if (Column == null)
                 return false;
 
