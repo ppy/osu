@@ -7,7 +7,7 @@ namespace osu.Game.Screens.Play
     {
         /// <summary>
         /// The local player is not currently in gameplay or has failed but still at the gameplay screen.
-		/// If watching a replay, gameplay always remains in this state.
+        /// If watching a replay, gameplay always remains in this state.
         /// </summary>
         NotPlaying,
 
