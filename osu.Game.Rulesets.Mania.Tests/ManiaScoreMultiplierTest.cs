@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -119,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             [new Mod[] { new ManiaModDualStages() }, 1],
             [new Mod[] { new ManiaModMirror() }, 1],
             [new Mod[] { new ManiaModDifficultyAdjust() }, 0.5],
-            [new Mod[] { new ManiaModClassic() }, 0.96],
+            [new Mod[] { new ManiaModClassic() }, 1],
             [new Mod[] { new ManiaModInvert() }, 1],
             [new Mod[] { new ManiaModConstantSpeed() }, 0.9],
             [new Mod[] { new ManiaModHoldOff() }, 0.9],
@@ -212,12 +213,24 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCaseSource(nameof(key_mod_multiplier_test_cases))]
         public void TestKeyModMultiplierCompatibility(DateTimeOffset endDate, string clientVersion, double expectedMultiplier)
         {
-            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new ScoreInfo
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty(), new ScoreInfo
             {
                 Date = endDate,
                 ClientVersion = clientVersion
             }));
             Assert.That(calculator.CalculateFor([new ManiaModKey4()]), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
+        }
+
+        [TestCase(30000001, 0.96)]
+        [TestCase(30000009, 0.96)]
+        [TestCase(30000016, 0.96)]
+        [TestCase(30000017, 1)]
+        [TestCase(null, 1)]
+        public void TestClassicMultiplierVersioning(int? totalScoreVersion, double expectedMultiplier)
+        {
+            var scoreInfo = totalScoreVersion != null ? new ScoreInfo { TotalScoreVersion = totalScoreVersion.Value } : null;
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty(), scoreInfo));
+            Assert.That(calculator.CalculateFor([new ManiaModClassic()]), Is.EqualTo(expectedMultiplier).Within(Precision.DOUBLE_EPSILON));
         }
     }
 }

@@ -128,14 +128,12 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void assertOnScreenAt(EditorScreenMode screen, double time)
         {
-            AddAssert($"stayed on {screen} at {time}", () =>
-                editor!.Mode.Value == screen
-                && editorClock.CurrentTime == time
-            );
+            AddAssert("screen is correct", () => editor!.Mode.Value, () => Is.EqualTo(screen));
+            AddAssert("time is correct", () => editorClock.CurrentTime, () => Is.EqualTo(time));
         }
 
-        private void assertMovedScreenTo(EditorScreenMode screen, string text = "moved to") =>
-            AddAssert($"{text} {screen}", () => editor!.Mode.Value == screen);
+        private void assertMovedScreenTo(EditorScreenMode screen) =>
+            AddAssert("screen is correct", () => editor!.Mode.Value, () => Is.EqualTo(screen));
 
         private void setUpEditor(RulesetInfo ruleset)
         {
