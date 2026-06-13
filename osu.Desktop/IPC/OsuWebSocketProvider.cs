@@ -10,11 +10,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IPC;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
+using osu.Game.Users;
+using osu.Game.Utils;
+using BeatmapDifficulty = osu.Desktop.IPC.Messages.BeatmapDifficulty;
+using BeatmapMetadata = osu.Desktop.IPC.Messages.BeatmapMetadata;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace osu.Desktop.IPC
@@ -22,7 +25,10 @@ namespace osu.Desktop.IPC
     public partial class OsuWebSocketProvider : Component
     {
         private WebSocketServer? server;
-        private readonly Bindable<ScoreInfo> lastLocalScore = new Bindable<ScoreInfo>();
+        private readonly Bindable<UserActivity?> userActivity = new Bindable<UserActivity?>();
+
+        [Resolved]
+        private Bindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics)
@@ -30,14 +36,14 @@ namespace osu.Desktop.IPC
             server = new WebSocketServer(49727);
             server.StartAsync().FireAndForget(onError: ex => Logger.Error(ex, "Failed to start websocket"));
 
-            sessionStatics.BindWith(Static.LastLocalUserScore, lastLocalScore);
+            sessionStatics.BindWith(Static.UserOnlineActivity, userActivity);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            lastLocalScore.BindValueChanged(val =>
+            userActivity.BindValueChanged(val =>
             {
                 if (val.NewValue == null)
                     return;
@@ -45,9 +51,58 @@ namespace osu.Desktop.IPC
                 if (server?.IsRunning != true)
                     return;
 
-                var msg = new HitCountMessage { NewHits = val.NewValue.Statistics.Where(kv => kv.Key.IsBasic() && kv.Key.IsHit()).Sum(kv => kv.Value) };
+                var msg = new UserActivityMessage
+                {
+                    Status = val.NewValue.GetType().Name,
+                };
+
                 broadcast(msg);
-            });
+            }, true);
+
+            workingBeatmap.BindValueChanged(val =>
+            {
+                // default beatmap on load
+                if (val.NewValue is DummyWorkingBeatmap)
+                    return;
+
+                if (val.NewValue.BeatmapInfo.OnlineID == val.OldValue.BeatmapInfo.OnlineID)
+                    return;
+
+                if (server?.IsRunning != true)
+                    return;
+
+                var msg = new BeatmapMessage
+                {
+                    BeatmapId = val.NewValue.BeatmapInfo.OnlineID,
+                    BeatmapSetId = val.NewValue.BeatmapSetInfo.OnlineID,
+                    BeatmapHash = val.NewValue.BeatmapInfo.OnlineMD5Hash,
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = val.NewValue.BeatmapInfo.Metadata.Artist,
+                        ArtistUnicode = val.NewValue.BeatmapInfo.Metadata.ArtistUnicode,
+                        Title = val.NewValue.BeatmapInfo.Metadata.Title,
+                        TitleUnicode = val.NewValue.BeatmapInfo.Metadata.TitleUnicode,
+                        Author = val.NewValue.BeatmapInfo.Metadata.Author.Username,
+                        Source = val.NewValue.BeatmapInfo.Metadata.Source,
+                        Tags = val.NewValue.BeatmapInfo.Metadata.Tags,
+                        UserTags = val.NewValue.BeatmapInfo.Metadata.UserTags.ToArray(),
+                    },
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        ApproachRate = val.NewValue.BeatmapInfo.Difficulty.ApproachRate,
+                        CircleSize = val.NewValue.BeatmapInfo.Difficulty.CircleSize,
+                        DrainRate = val.NewValue.BeatmapInfo.Difficulty.DrainRate,
+                        OverallDifficulty = val.NewValue.BeatmapInfo.Difficulty.OverallDifficulty,
+                    },
+                    DifficultyName = val.NewValue.BeatmapInfo.DifficultyName,
+                    RulesetId = val.NewValue.BeatmapInfo.Ruleset.OnlineID,
+                    BPM = Math.Round(val.NewValue.BeatmapInfo.BPM, 2),
+                    StarRating = val.NewValue.BeatmapInfo.StarRating.FloorToDecimalDigits(2),
+                    Status = val.NewValue.BeatmapInfo.Status,
+                };
+
+                broadcast(msg);
+            }, true);
         }
 
         private void broadcast(OsuWebSocketMessage message)

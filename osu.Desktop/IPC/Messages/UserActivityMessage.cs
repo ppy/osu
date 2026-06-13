@@ -5,9 +5,9 @@ using Newtonsoft.Json;
 
 namespace osu.Desktop.IPC.Messages
 {
-    public class HitCountMessage : OsuWebSocketMessage
+    public class UserActivityMessage : OsuWebSocketMessage
     {
-        [JsonProperty("new_hits")]
-        public long NewHits { get; init; }
+        [JsonProperty("status")]
+        public required string Status { get; init; }
     }
 }
