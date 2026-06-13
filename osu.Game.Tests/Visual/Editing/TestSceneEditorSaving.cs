@@ -145,7 +145,6 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Get working beatmap", () => working = Game.BeatmapManager.GetWorkingBeatmap(EditorBeatmap.BeatmapInfo, true));
 
             AddAssert("Beatmap length is zero", () => working.BeatmapInfo.Length == 0);
-            checkDifficultyIncreased();
 
             AddStep("Move forward", () => InputManager.Key(Key.Right));
             AddStep("Place another hitcircle", () => InputManager.Click(MouseButton.Left));
