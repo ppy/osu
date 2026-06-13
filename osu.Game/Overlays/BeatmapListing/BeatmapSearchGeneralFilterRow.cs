@@ -55,10 +55,23 @@ namespace osu.Game.Overlays.BeatmapListing
                     case SearchGeneral.FeaturedArtists:
                         return new FeaturedArtistsTabItem();
 
+                    case SearchGeneral.HideAlreadyDownloaded:
+                        return new HideDownloadedTabItem();
+
                     default:
                         return new MultipleSelectionFilterTabItem(value);
                 }
             }
+        }
+
+        private partial class HideDownloadedTabItem : MultipleSelectionFilterTabItem
+        {
+            public HideDownloadedTabItem()
+                : base(SearchGeneral.HideAlreadyDownloaded)
+            {
+            }
+
+            protected override LocalisableString LabelFor(SearchGeneral value) => "Hide already downloaded";
         }
 
         private partial class RecommendedDifficultyTabItem : MultipleSelectionFilterTabItem

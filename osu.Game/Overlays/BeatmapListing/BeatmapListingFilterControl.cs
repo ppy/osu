@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
@@ -68,9 +69,15 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private SearchBeatmapSetsRequest getSetsRequest;
         private SearchBeatmapSetsResponse lastResponse;
+        private int filteredEmptyAutoFetchCount;
+
+        private const int max_filtered_empty_auto_fetch_pages = 5;
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         private IBindable<APIUser> apiUser;
 
@@ -206,6 +213,16 @@ namespace osu.Game.Overlays.BeatmapListing
             performRequest();
         }
 
+        public void FetchMoreAfterFilteredLimit()
+        {
+            if (lastResponse?.Cursor == null)
+                return;
+
+            noMoreResults = false;
+            filteredEmptyAutoFetchCount = 0;
+            FetchNextPage();
+        }
+
         private void resetSortControl() => sortControl.Reset(searchControl.Category.Value, !string.IsNullOrEmpty(searchControl.Query.Value));
 
         private void queueUpdateSearch(bool queryTextChanged = false)
@@ -226,11 +243,13 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void performRequest()
         {
+            var requestGeneralFilters = searchControl.General.Where(g => g != SearchGeneral.HideAlreadyDownloaded).ToList();
+
             getSetsRequest = new SearchBeatmapSetsRequest(
                 searchControl.Query.Value,
                 searchControl.Ruleset.Value,
                 lastResponse?.Cursor,
-                searchControl.General,
+                requestGeneralFilters,
                 searchControl.Category.Value,
                 sortControl.Current.Value,
                 sortControl.SortDirection.Value,
@@ -243,17 +262,42 @@ namespace osu.Game.Overlays.BeatmapListing
 
             getSetsRequest.Success += response =>
             {
-                var sets = response.BeatmapSets.ToList();
+                var returnedSets = response.BeatmapSets.ToList();
+                var sets = returnedSets;
+
+                if (searchControl.General.Contains(SearchGeneral.HideAlreadyDownloaded))
+                    sets = sets.Where(s => !beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = s.OnlineID })).ToList();
 
                 // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
-                if (sets.Count == 0 || response.Cursor == null)
+                if (returnedSets.Count == 0 || response.Cursor == null)
                     noMoreResults = true;
-
-                if (CurrentPage == 0)
-                    searchControl.BeatmapSet = sets.FirstOrDefault();
 
                 lastResponse = response;
                 getSetsRequest = null;
+
+                if (sets.Count == 0 && returnedSets.Count > 0 && response.Cursor != null)
+                {
+                    filteredEmptyAutoFetchCount++;
+
+                    if (filteredEmptyAutoFetchCount >= max_filtered_empty_auto_fetch_pages)
+                    {
+                        noMoreResults = true;
+                        SearchFinished?.Invoke(SearchResult.FilteredResultsLimitReached(sets));
+                        return;
+                    }
+                    else
+                    {
+                        FetchNextPage();
+                        return;
+                    }
+                }
+                else
+                {
+                    filteredEmptyAutoFetchCount = 0;
+                }
+
+                if (CurrentPage == 0)
+                    searchControl.BeatmapSet = sets.FirstOrDefault();
 
                 // check if a non-supporter used supporter-only filters
                 if (!api.LocalUser.Value.IsSupporter)
@@ -285,6 +329,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             noMoreResults = false;
             CurrentPage = 0;
+            filteredEmptyAutoFetchCount = 0;
 
             lastResponse = null;
 
@@ -314,7 +359,12 @@ namespace osu.Game.Overlays.BeatmapListing
             /// <summary>
             /// The user is not a supporter, but used supporter-only search filters.
             /// </summary>
-            SupporterOnlyFilters
+            SupporterOnlyFilters,
+
+            /// <summary>
+            /// Downloaded-filtered empty pages hit the automatic continuation limit.
+            /// </summary>
+            FilteredResultsLimitReached
         }
 
         /// <summary>
@@ -346,6 +396,12 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 Type = SearchResultType.SupporterOnlyFilters,
                 SupporterOnlyFiltersUsed = filters
+            };
+
+            public static SearchResult FilteredResultsLimitReached(List<APIBeatmapSet> results) => new SearchResult
+            {
+                Type = SearchResultType.FilteredResultsLimitReached,
+                Results = results,
             };
         }
     }
