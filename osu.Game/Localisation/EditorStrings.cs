@@ -275,6 +275,11 @@ namespace osu.Game.Localisation
         public static LocalisableString NewCombo => new TranslatableString(getKey(@"new_combo"), @"New combo");
 
         /// <summary>
+        /// "Bank"
+        /// </summary>
+        public static LocalisableString Bank => new TranslatableString(getKey(@"bank"), @"Bank");
+
+        /// <summary>
         /// "Normal Bank"
         /// </summary>
         public static LocalisableString NormalBank => new TranslatableString(getKey(@"normal_bank"), @"Normal Bank");
@@ -288,6 +293,11 @@ namespace osu.Game.Localisation
         /// "Volume"
         /// </summary>
         public static LocalisableString SampleVolume => new TranslatableString(getKey(@"sample_volume"), @"Volume");
+
+        /// <summary>
+        /// "Sample"
+        /// </summary>
+        public static LocalisableString Sample => new TranslatableString(getKey(@"sample"), @"Sample");
 
         /// <summary>
         /// "Sample Set"

@@ -8,6 +8,7 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -544,8 +545,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 };
             }
 
-            yield return new OsuMenuItem("Sample") { Items = getSampleSubmenuItems().ToArray(), };
-            yield return new OsuMenuItem("Bank") { Items = getBankSubmenuItems().ToArray(), };
+            yield return new OsuMenuItem(EditorStrings.Sample) { Items = getSampleSubmenuItems().ToArray(), };
+            yield return new OsuMenuItem(EditorStrings.Bank) { Items = getBankSubmenuItems().ToArray(), };
         }
 
         private IEnumerable<MenuItem> getSampleSubmenuItems()
@@ -602,7 +603,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.R))
             };
 
-            yield return new OsuMenuItem("Addition bank")
+            yield return new OsuMenuItem(EditorStrings.AdditionBank.ToSentence())
             {
                 Items = SelectionAdditionBankStates.Select(kvp =>
                     new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
