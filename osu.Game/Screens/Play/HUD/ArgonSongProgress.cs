@@ -122,16 +122,33 @@ namespace osu.Game.Screens.Play.HUD
             graph.FadeTo(ShowGraph.Value ? 1 : 0, 200, Easing.In);
         }
 
+        private ReplayBookmarkOverlayBar? bookmarkOverlay;
+
         protected override void Update()
         {
             base.Update();
             content.Height = bar.Height + bar_height + info.Height;
             graphContainer.Height = bar.Height;
+            if (bookmarkOverlay != null)
+                bookmarkOverlay.Height = bar.Height;
         }
 
         protected override void UpdateProgress(double progress, bool isIntro)
         {
             bar.Progress = isIntro ? 0 : progress;
+        }
+
+        protected override Drawable CreateBookmarkOverlay()
+        {
+            return bookmarkOverlay = new ReplayBookmarkOverlayBar
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.X,
+                Height = bar_height,
+                StartTime = FirstHitTime,
+                EndTime = LastHitTime,
+            };
         }
     }
 }
