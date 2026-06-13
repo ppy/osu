@@ -269,6 +269,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
 
+        /// <summary>
+        /// "New combo"
+        /// </summary>
+        public static LocalisableString NewCombo => new TranslatableString(getKey(@"new_combo"), @"New combo");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
