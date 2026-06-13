@@ -281,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 Origin = Anchor.Centre,
                                 Children =
                                 [
-                                    damageCounter = new RankedPlayScoreCounter(numDigits(losingDamageInfo.Damage))
+                                    damageCounter = new RankedPlayScoreCounter(numDigits(losingDamageInfo.RawDamage))
                                     {
                                         Font = OsuFont.GetFont(size: 36, weight: FontWeight.SemiBold, fixedWidth: true),
                                         Spacing = new Vector2(-2),
