@@ -27,7 +27,7 @@ namespace osu.Desktop.IPC
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics)
         {
-            server = new WebSocketServer(49727);
+            server = new WebSocketServer(48727);
             server.StartAsync().FireAndForget(onError: ex => Logger.Error(ex, "Failed to start websocket"));
 
             sessionStatics.BindWith(Static.LastLocalUserScore, lastLocalScore);
