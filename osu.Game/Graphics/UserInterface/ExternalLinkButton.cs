@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -67,7 +68,7 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        public LocalisableString TooltipText => "view in browser";
+        public LocalisableString TooltipText => CommonStrings.ViewInBrowser.ToLower();
 
         public MenuItem[] ContextMenuItems
         {

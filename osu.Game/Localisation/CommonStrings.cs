@@ -224,6 +224,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString GoToBeatmap => new TranslatableString(getKey(@"go_to_beatmap"), @"Go to beatmap");
 
+        /// <summary>
+        /// "View in browser"
+        /// </summary>
+        public static LocalisableString ViewInBrowser => new TranslatableString(getKey(@"view_in_browser"), @"View in browser");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
