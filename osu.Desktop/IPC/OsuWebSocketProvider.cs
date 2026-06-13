@@ -27,6 +27,8 @@ namespace osu.Desktop.IPC
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics)
         {
+            // This port should not be between 49152 and 65535 as it will likely result in errors for Windows users.
+            // See https://github.com/dotnet/runtime/issues/115088#issuecomment-2887081086 for additional context.
             server = new WebSocketServer(48727);
             server.StartAsync().FireAndForget(onError: ex => Logger.Error(ex, "Failed to start websocket"));
 
