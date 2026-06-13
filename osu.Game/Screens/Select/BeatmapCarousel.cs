@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -62,6 +62,15 @@ namespace osu.Game.Screens.Select
         /// Total number of beatmap difficulties displayed with the filter.
         /// </summary>
         public int MatchedBeatmapsCount => Filters.Last().BeatmapItemsCount;
+
+        /// <summary>
+        /// Retrieves all beatmap sets which are currently contained within the specified <see cref="GroupDefinition"/>.
+        /// </summary>
+        /// <param name="group">The group to retrieve beatmap sets for.</param>
+        public IEnumerable<BeatmapSetInfo> GetBeatmapSetsForGroup(GroupDefinition group)
+            => grouping.SetItems.Keys
+                       .Where(set => EqualityComparer<GroupDefinition?>.Default.Equals(set.Group, group))
+                       .Select(set => set.BeatmapSet);
 
         protected override float GetSpacingBetweenPanels(CarouselItem top, CarouselItem bottom)
         {
