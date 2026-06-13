@@ -19,6 +19,7 @@ using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -259,16 +260,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             },
                             bank = new LabelledDropdown<string>(padded: false)
                             {
-                                Label = "Normal Bank",
+                                Label = EditorStrings.NormalBank,
                                 Items = HitSampleInfo.ALL_BANKS,
                             },
                             additionBank = new LabelledDropdown<string>(padded: false)
                             {
-                                Label = "Addition Bank",
+                                Label = EditorStrings.AdditionBank,
                                 Items = HitSampleInfo.ALL_BANKS,
                             },
                             createSampleSetContent(),
-                            volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
+                            volume = new IndeterminateSliderWithTextBoxInput<int>(EditorStrings.SampleVolume, new BindableInt(100)
                             {
                                 MinValue = DrawableHitObject.MINIMUM_SAMPLE_VOLUME,
                                 MaxValue = 100,
@@ -367,7 +368,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 sampleSetDropdown = new LabelledDropdown<EditorBeatmapSkin.SampleSet>(padded: false)
                 {
-                    Label = "Sample Set",
+                    Label = EditorStrings.SampleSet,
                     Items = sampleSets,
                 };
                 sampleSetDropdown.Current.BindValueChanged(val =>

@@ -74,6 +74,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Chat => new TranslatableString(getKey(@"chat"), @"Chat");
 
+        /// <summary>
+        /// "Create copy"
+        /// </summary>
+        public static LocalisableString CreatePlaylistCopy => new TranslatableString(getKey(@"create_playlist_copy"), @"Create copy");
+
+        /// <summary>
+        /// "Close playlist"
+        /// </summary>
+        public static LocalisableString ClosePlaylist => new TranslatableString(getKey(@"close_playlist"), @"Close playlist");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
