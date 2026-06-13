@@ -111,6 +111,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             for (int i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
                 var point = beatmap.ControlPointInfo.TimingPoints[i];
+
+                // Do not display ticks if BPM > 10000
+                if (point.BeatLength < 6)
+                    continue;
+
                 double until = i + 1 < beatmap.ControlPointInfo.TimingPoints.Count ? beatmap.ControlPointInfo.TimingPoints[i + 1].Time : working.Value.Track.Length;
 
                 int beat = 0;
