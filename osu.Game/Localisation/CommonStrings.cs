@@ -214,6 +214,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
 
+        /// <summary>
+        /// "Go to beatmap"
+        /// </summary>
+        public static LocalisableString GoToBeatmap => new TranslatableString(getKey(@"go_to_beatmap"), @"Go to beatmap");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
