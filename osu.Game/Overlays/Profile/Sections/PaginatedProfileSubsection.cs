@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -82,7 +83,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Font = OsuFont.GetFont(size: 15),
                     Text = missingText ?? string.Empty,
                     Alpha = 0,
-                }
+                },
             }
         };
 
@@ -102,9 +103,26 @@ namespace osu.Game.Overlays.Profile.Sections
 
             if (e.NewValue?.User != null)
             {
-                showMore();
+                showMoreWhenOnScreen();
                 SetCount(GetCount(e.NewValue.User));
             }
+        }
+
+        private DelayedLoadWrapper? onScreenWrapper;
+
+        /// <summary>
+        /// Invokes <see cref="showMore"/> when the subsection is visible to the user for enough time.
+        /// This works by adding a temporary <see cref="DelayedLoadWrapper"/> with a component that, once loaded, invokes the <see cref="showMore"/> method.
+        /// </summary>
+        private void showMoreWhenOnScreen()
+        {
+            onScreenWrapper?.RemoveAndDisposeImmediately();
+            onScreenWrapper = new DelayedLoadWrapper(() => new OnScreenIndicator
+            {
+                BecameOnScreen = showMore,
+            });
+
+            AddInternal(onScreenWrapper);
         }
 
         private void showMore()
@@ -168,6 +186,21 @@ namespace osu.Game.Overlays.Profile.Sections
             retrievalRequest?.Cancel();
             loadCancellation?.Cancel();
             base.Dispose(isDisposing);
+        }
+
+        /// <summary>
+        /// Temporary component that should be wrapped inside a <see cref="DelayedLoadWrapper"/>
+        /// so that the given action is invoked when this subsection is visible to the user.
+        /// </summary>
+        private partial class OnScreenIndicator : Component
+        {
+            public required Action BecameOnScreen { get; init; }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                BecameOnScreen();
+            }
         }
     }
 }
