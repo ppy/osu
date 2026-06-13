@@ -445,6 +445,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 SelectedItem = { BindTarget = SelectedItem },
                 SelectedMods = { BindTarget = UserMods },
                 Beatmap = { BindTarget = Beatmap },
+                Ruleset = { BindTarget = Ruleset },
                 IsValidMod = _ => false
             });
         }

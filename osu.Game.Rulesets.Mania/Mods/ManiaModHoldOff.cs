@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override string Acronym => "HO";
 
-        public override double ScoreMultiplier => 0.9;
-
         public override LocalisableString Description => @"Replaces all hold notes with normal notes.";
 
         public override IconUsage? Icon => OsuIcon.ModHoldOff;
