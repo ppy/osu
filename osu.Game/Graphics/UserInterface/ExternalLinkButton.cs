@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (Link != null)
                 {
-                    items.Add(new OsuMenuItem("Open", MenuItemType.Highlighted, () => game?.OpenUrlExternally(Link)));
+                    items.Add(new OsuMenuItem(CommonStrings.OpenLink, MenuItemType.Highlighted, () => game?.OpenUrlExternally(Link)));
                     items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, copyUrl));
                 }
 

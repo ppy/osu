@@ -190,6 +190,11 @@ namespace osu.Game.Localisation
         public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
 
         /// <summary>
+        /// "Open"
+        /// </summary>
+        public static LocalisableString OpenLink => new TranslatableString(getKey(@"open_link"), @"Open");
+
+        /// <summary>
         /// "Copy link"
         /// </summary>
         public static LocalisableString CopyLink => new TranslatableString(getKey(@"copy_link"), @"Copy link");
