@@ -261,7 +261,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // It shouldn't show the dialog if there is no audio file currently
             if (file.OldValue != null && dialogOverlay != null)
-                dialogOverlay?.Push(new ConfirmBeatmapAudioReplaceDialog(replaceAudio, rollBackAudioChange));
+                dialogOverlay?.Push(new ReplaceBeatmapAudioConfirmationDialog(replaceAudio, rollBackAudioChange));
             else
                 replaceAudio();
             return;

@@ -7,9 +7,9 @@ using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public partial class ConfirmBeatmapAudioReplaceDialog : DangerousActionDialog
+    public partial class ReplaceBeatmapAudioConfirmationDialog : DangerousActionDialog
     {
-        public ConfirmBeatmapAudioReplaceDialog(Action replaceAudio, Action keepExistingAudio)
+        public ReplaceBeatmapAudioConfirmationDialog(Action replaceAudio, Action keepExistingAudio)
         {
             BodyText = EditorDialogsStrings.ReplaceBeatmapAudioDialogBody;
             DangerousAction = replaceAudio;
