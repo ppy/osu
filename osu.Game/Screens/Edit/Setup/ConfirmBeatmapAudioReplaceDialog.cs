@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
@@ -13,9 +12,6 @@ namespace osu.Game.Screens.Edit.Setup
         public ConfirmBeatmapAudioReplaceDialog(Action replaceAudio, Action keepExistingAudio)
         {
             HeaderText = EditorDialogsStrings.BeatmapAudioReplaceDialogHeader;
-
-            // TODO: which icon makes more sense here?
-            Icon = FontAwesome.Regular.Save;
 
             Buttons = new PopupDialogButton[]
             {
