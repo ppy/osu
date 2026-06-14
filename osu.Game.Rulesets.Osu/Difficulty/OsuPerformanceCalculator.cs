@@ -293,10 +293,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (betterAccuracyPercentage < 0)
                 betterAccuracyPercentage = 0;
 
-            // Explicitly set accuracy percentage to 100% if it's an ss
-            if (accuracy == 1)
-                betterAccuracyPercentage = 1;
-
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution.
             double accuracyValue = Math.Pow(1.52163, overallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
