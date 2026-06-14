@@ -38,17 +38,17 @@ namespace osu.Game.Screens.Utility
         private FrameSync previousFrameSyncMode;
         private double previousActiveHz;
 
-        private readonly OsuTextFlowContainer statusText;
+        private OsuTextFlowContainer statusText = null!;
 
         public override bool HideOverlaysOnEnter => true;
 
         public override float BackgroundParallaxAmount => 0;
 
-        private readonly LinkFlowContainer explanatoryText;
+        private LinkFlowContainer explanatoryText = null!;
 
-        private readonly Container<LatencyArea> mainArea;
+        private Container<LatencyArea> mainArea = null!;
 
-        private readonly Container resultsArea;
+        private Container resultsArea = null!;
 
         public readonly BindableDouble SampleBPM = new BindableDouble(120) { MinValue = 60, MaxValue = 300, Precision = 1 };
         public readonly BindableDouble SampleApproachRate = new BindableDouble(9) { MinValue = 5, MaxValue = 12, Precision = 0.1 };
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Utility
         [Resolved]
         private LocalisationManager localisation { get; set; } = null!;
 
-        private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+        private IBindable<string> latencyCertifierMethodologyText = new Bindable<string>();
 
         public readonly Bindable<LatencyVisualMode> VisualMode = new Bindable<LatencyVisualMode>();
 
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Utility
         private double lastPoll;
         private int pollingMax;
 
-        private readonly FillFlowContainer settings;
+        private FillFlowContainer settings = null!;
 
         [Resolved]
         private GameHost host { get; set; } = null!;
@@ -102,7 +102,8 @@ namespace osu.Game.Screens.Utility
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
-        public LatencyCertifierScreen()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -197,12 +198,9 @@ namespace osu.Game.Screens.Utility
                     AutoSizeAxes = Axes.Y,
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
-        {
-            currentLanguage.BindTo(game.CurrentLanguage);
+            const string url = @"https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology";
+            latencyCertifierMethodologyText = localisation.GetLocalisedBindableString(LatencyCertifierStrings.LatencyCertifierMethodology(url));
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -238,22 +236,16 @@ namespace osu.Game.Screens.Utility
         {
             base.LoadComplete();
 
-            currentLanguage.BindValueChanged(_ =>
-                // schedule required because `LocalisationManager` won't have new language set correctly yet.
-                Schedule(() =>
-                {
-                    explanatoryText.Clear();
+            latencyCertifierMethodologyText.BindValueChanged(_ =>
+            {
+                explanatoryText.Clear();
 
-                    explanatoryText.AddParagraph(LatencyCertifierStrings.ExplanatoryTextWelcome);
-                    explanatoryText.NewParagraph();
-
-                    const string url = @"https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology";
-                    var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(LatencyCertifierStrings.ExplanatoryTextMethodology(url)));
-
-                    explanatoryText.AddLinks(formattedSource.Text, formattedSource.Links);
-                    explanatoryText.AddParagraph(LatencyCertifierStrings.ExplanatoryTextControlDisplay);
-                    explanatoryText.AddParagraph(LatencyCertifierStrings.ExplanatoryTextDisplayMode);
-                }), true);
+                explanatoryText.AddParagraph(LatencyCertifierStrings.WelcomeToLatencyCertifier);
+                explanatoryText.NewParagraph();
+                var formattedSource = MessageFormatter.FormatText(latencyCertifierMethodologyText.Value);
+                explanatoryText.AddLinks(formattedSource.Text, formattedSource.Links);
+                explanatoryText.AddParagraph(LatencyCertifierStrings.DisplayControls);
+            }, true);
 
             loadNextRound();
         }
@@ -285,7 +277,8 @@ namespace osu.Game.Screens.Utility
 
             var displayMode = host.Window?.CurrentDisplayMode.Value;
 
-            LocalisableString exclusive = (host.Renderer as IWindowsRenderer)?.FullscreenCapability.ToString() ?? LatencyCertifierStrings.ExclusiveUnknown;
+            LocalisableString exclusive = (host.Renderer as IWindowsRenderer)?.FullscreenCapability.ToString()
+                                          ?? LatencyCertifierStrings.ExclusiveFullscreenCapabilityUnknown;
 
             statusText.Clear();
 
@@ -293,11 +286,18 @@ namespace osu.Game.Screens.Utility
             bool isPass = successRate == 1;
 
             statusText.AddParagraph(
-                LatencyCertifierStrings.StatusTextScore(correctAtCurrentDifficulty, attemptsAtCurrentDifficulty, successRate),
+                LatencyCertifierStrings.ScoreInfo(
+                    correctAtCurrentDifficulty,
+                    attemptsAtCurrentDifficulty,
+                    successRate
+                ),
                 cp => cp.Colour = isPass ? colours.Green : colours.Red
             );
             statusText.AddParagraph(
-                LatencyCertifierStrings.StatusTextLevel(DifficultyLevel, mapDifficultyToTargetFrameRate(DifficultyLevel)),
+                LatencyCertifierStrings.LevelInfo(
+                    DifficultyLevel,
+                    mapDifficultyToTargetFrameRate(DifficultyLevel)
+                ),
                 cp => cp.Font = OsuFont.Default.With(size: 24)
             );
 
@@ -309,22 +309,20 @@ namespace osu.Game.Screens.Utility
             if (!isPass && DifficultyLevel > 1)
             {
                 statusText.AddParagraph(
-                    LatencyCertifierStrings.StatusTextCertification(rounds_to_complete_certified),
+                    LatencyCertifierStrings.CertificationRequirements(rounds_to_complete_certified),
                     cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold)
                 );
                 statusText.AddParagraph(string.Empty);
             }
 
             statusText.AddParagraph(
-                LatencyCertifierStrings.StatusTextMonitor(pollingMax, displayMode?.RefreshRate ?? 0, exclusive),
-                cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold)
-            );
-
-            statusText.AddParagraph(
-                LatencyCertifierStrings.StatusTextRendering(
-                    host.InputThread.Clock.FramesPerSecond,
-                    host.UpdateThread.Clock.FramesPerSecond,
-                    host.DrawThread.Clock.FramesPerSecond
+                LatencyCertifierStrings.RefreshRatesInfo(
+                    pollingMax,
+                    (int)(displayMode?.RefreshRate ?? 0),
+                    exclusive,
+                    (int)host.InputThread.Clock.FramesPerSecond,
+                    (int)host.UpdateThread.Clock.FramesPerSecond,
+                    (int)host.DrawThread.Clock.FramesPerSecond
                 ),
                 cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold)
             );
@@ -338,9 +336,9 @@ namespace osu.Game.Screens.Utility
             LocalisableString? cannotIncreaseReason = null;
 
             if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > target_host_update_frames)
-                cannotIncreaseReason = LatencyCertifierStrings.MaximumLevel;
+                cannotIncreaseReason = LatencyCertifierStrings.CannotIncreaseLevelDueToMaximumLevel;
             else if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > Clock.FramesPerSecond)
-                cannotIncreaseReason = LatencyCertifierStrings.LowPerformance;
+                cannotIncreaseReason = LatencyCertifierStrings.CannotIncreaseLevelDueToLowPerformance;
 
             FillFlowContainer buttonFlow;
 
@@ -356,17 +354,17 @@ namespace osu.Game.Screens.Utility
 
             if (isPass)
             {
-                var bind = new ButtonWithKeyBind(Key.Enter);
-                bind.Text = LatencyCertifierStrings.ButtonNextLevelText;
-                bind.BackgroundColour = colours.Green;
-                bind.Anchor = Anchor.Centre;
-                bind.Origin = Anchor.Centre;
-                bind.Action = () => changeDifficulty(DifficultyLevel + 1);
-                bind.Enabled.Value = !cannotIncreaseReason.HasValue;
+                var button = new ButtonWithKeyBind(Key.Enter);
+                button.Text = LatencyCertifierStrings.ContinueToNextLevel;
+                button.BackgroundColour = colours.Green;
+                button.Anchor = Anchor.Centre;
+                button.Origin = Anchor.Centre;
+                button.Action = () => changeDifficulty(DifficultyLevel + 1);
+                button.Enabled.Value = !cannotIncreaseReason.HasValue;
                 if (cannotIncreaseReason.HasValue)
-                    bind.TooltipText = cannotIncreaseReason.Value;
+                    button.TooltipText = cannotIncreaseReason.Value;
 
-                buttonFlow.Add(bind);
+                buttonFlow.Add(button);
             }
             else
             {
@@ -374,8 +372,8 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = LatencyCertifierStrings.ButtonRetryText,
-                        TooltipText = LatencyCertifierStrings.ButtonRetryTooltip,
+                        Text = LatencyCertifierStrings.Retry,
+                        TooltipText = LatencyCertifierStrings.AreYouEvenTrying,
                         BackgroundColour = colours.Pink2,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -390,7 +388,7 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = LatencyCertifierStrings.ButtonCertifyText,
+                        Text = LatencyCertifierStrings.BeginCertificationAtLastLevel,
                         BackgroundColour = colours.Yellow,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -400,8 +398,8 @@ namespace osu.Game.Screens.Utility
                             changeDifficulty(DifficultyLevel - 1);
                         },
                         TooltipText = isPass
-                            ? LatencyCertifierStrings.ButtonCertifyTooltipConfirm(rounds_to_complete_certified)
-                            : LatencyCertifierStrings.ButtonCertifyTooltipComplete,
+                            ? LatencyCertifierStrings.ChainRoundsToConfirmYourPerception(rounds_to_complete_certified)
+                            : LatencyCertifierStrings.GoToPreviousLevelToCompleteCertification,
                     });
                 }
             }
@@ -436,7 +434,7 @@ namespace osu.Game.Screens.Utility
                 }),
                 new OsuSpriteText
                 {
-                    Text = LatencyCertifierStrings.Results(mapDifficultyToTargetFrameRate(DifficultyLevel + 1)),
+                    Text = LatencyCertifierStrings.ResultsWithRecommendedRefreshRate(mapDifficultyToTargetFrameRate(DifficultyLevel + 1)),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
@@ -477,7 +475,7 @@ namespace osu.Game.Screens.Utility
             settings.Show();
 
             attemptsAtCurrentDifficulty++;
-            statusText.Text = LatencyCertifierStrings.StatusTextLevelWithRound(DifficultyLevel, attemptsAtCurrentDifficulty, totalRoundForNextResultsScreen);
+            statusText.Text = LatencyCertifierStrings.LevelAndRoundInfo(DifficultyLevel, attemptsAtCurrentDifficulty, totalRoundForNextResultsScreen);
 
             mainArea.Clear();
 

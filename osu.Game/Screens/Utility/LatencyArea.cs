@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Utility
                 },
                 new ButtonWithKeyBind(key)
                 {
-                    Text = LatencyCertifierStrings.ButtonFeelsBetter,
+                    Text = LatencyCertifierStrings.FeelsBetter,
                     Y = 20,
                     Width = 0.8f,
                     Anchor = Anchor.TopCentre,

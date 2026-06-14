@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Utility
         public new LocalisableString Text
         {
             get => base.Text;
-            set => base.Text = LatencyCertifierStrings.ButtonWithKeyBindText(value, key.ToString().Replace("Number", string.Empty));
+            set => base.Text = LatencyCertifierStrings.PressButtonToPerformAction(value, key.ToString().Replace("Number", string.Empty));
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
