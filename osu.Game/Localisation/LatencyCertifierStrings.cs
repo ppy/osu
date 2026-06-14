@@ -71,19 +71,19 @@ Round {1} of {2}", difficultyLevel, currentRound, totalRounds);
 Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclusiveStatus, inputRate, updateRate, drawRate);
 
         /// <summary>
-        /// "You've reached the maximum level."
+        /// "You&#39;ve reached the maximum level."
         /// </summary>
         public static LocalisableString CannotIncreaseLevelDueToMaximumLevel => new TranslatableString(getKey(@"cannot_increase_level_due_to_maximum_level"), @"You've reached the maximum level.");
 
         /// <summary>
-        /// "Game is not running fast enough to test this level."
+        /// "Game is not running fast enough to test this level!"
         /// </summary>
-        public static LocalisableString CannotIncreaseLevelDueToLowPerformance => new TranslatableString(getKey(@"cannot_increase_level_due_to_low_performance"), @"Game is not running fast enough to test this level.");
+        public static LocalisableString CannotIncreaseLevelDueToLowPerformance => new TranslatableString(getKey(@"cannot_increase_level_due_to_low_performance"), @"Game is not running fast enough to test this level!");
 
         /// <summary>
-        /// "Continue to next level"
+        /// "Continue to the next level"
         /// </summary>
-        public static LocalisableString ContinueToNextLevel => new TranslatableString(getKey(@"continue_to_next_level"), @"Continue to next level");
+        public static LocalisableString ContinueToNextLevel => new TranslatableString(getKey(@"continue_to_next_level"), @"Continue to the next level");
 
         /// <summary>
         /// "Retry"
@@ -106,7 +106,7 @@ Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclus
         public static LocalisableString ChainRoundsToConfirmYourPerception(int roundsCount) => new TranslatableString(getKey(@"chain_rounds_to_confirm_your_perception"), @"Chain {0} rounds to confirm your perception!", roundsCount);
 
         /// <summary>
-        /// "You've reached your limits. Go to the previous level to complete certification!"
+        /// "You&#39;ve reached your limits. Go to the previous level to complete certification!"
         /// </summary>
         public static LocalisableString GoToPreviousLevelToCompleteCertification => new TranslatableString(getKey(@"go_to_previous_level_to_complete_certification"), @"You've reached your limits. Go to the previous level to complete certification!");
 
@@ -116,9 +116,9 @@ Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclus
         public static LocalisableString Certified => new TranslatableString(getKey(@"certified"), @"Certified!");
 
         /// <summary>
-        /// "You should use a frame limiter with update rate of {0} Hz (or fps) for best results!"
+        /// "You should use a frame limiter with update rate of {0} Hz (or FPS) for best results!"
         /// </summary>
-        public static LocalisableString ResultsWithRecommendedRefreshRate(int recommendedRefreshRate) => new TranslatableString(getKey(@"results_with_recommended_refresh_rate"), @"You should use a frame limiter with update rate of {0} Hz (or fps) for best results!", recommendedRefreshRate);
+        public static LocalisableString ResultsWithRecommendedRefreshRate(int recommendedRefreshRate) => new TranslatableString(getKey(@"results_with_recommended_refresh_rate"), @"You should use a frame limiter with update rate of {0} Hz (or FPS) for best results!", recommendedRefreshRate);
 
         /// <summary>
         /// "Feels better"
