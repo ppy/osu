@@ -160,7 +160,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         double doubletapness = prevObj.GetDoubletapness(currObj);
                         effectiveRatio *= 1 - doubletapness * 0.75;
 
-                        rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
+                        if (island.DeltaCount > 1)
+                        {
+                            rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
+                        }
+                        else
+                        {
+                            // constant difficulty for single-note islands
+                            rhythmComplexitySum += 0.7 * currHistoricalDecay;
+                        }
 
                         startRatio = effectiveRatio;
 
