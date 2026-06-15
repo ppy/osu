@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using osu.Desktop.IPC.Messages;
 using osu.Framework.Allocation;
@@ -18,7 +19,6 @@ using osu.Game.Users;
 using osu.Game.Utils;
 using BeatmapDifficulty = osu.Desktop.IPC.Messages.BeatmapDifficulty;
 using BeatmapMetadata = osu.Desktop.IPC.Messages.BeatmapMetadata;
-using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace osu.Desktop.IPC
 {
@@ -110,7 +110,7 @@ namespace osu.Desktop.IPC
             if (server?.IsRunning != true)
                 return;
 
-            string messageString = JsonConvert.SerializeObject(message);
+            string messageString = JsonSerializer.Serialize(message, message.GetType());
             server.BroadcastAsync(messageString).FireAndForget();
         }
 
