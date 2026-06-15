@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         else
                         {
                             // constant difficulty for single-note islands
-                            rhythmComplexitySum += 0.4;
+                            rhythmComplexitySum += 0.7 * currHistoricalDecay;
                         }
 
                         startRatio = effectiveRatio;
