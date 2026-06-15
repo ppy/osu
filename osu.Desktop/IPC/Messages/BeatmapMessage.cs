@@ -11,7 +11,7 @@ namespace osu.Desktop.IPC.Messages
         [JsonPropertyName("beatmap_id")]
         public required int BeatmapId { get; init; }
 
-        [JsonPropertyName("beatmap_set_id")]
+        [JsonPropertyName("beatmapset_id")]
         public required int BeatmapSetId { get; init; }
 
         [JsonPropertyName("beatmap_hash")]
