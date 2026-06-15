@@ -48,6 +48,9 @@ namespace osu.Desktop.IPC.Messages
         [JsonPropertyName("star_rating")]
         public required double StarRating { get; init; }
 
+        [JsonPropertyName("max_combo")]
+        public required int MaxCombo { get; init; }
+
         [JsonPropertyName("status")]
         [JsonConverter(typeof(JsonStringEnumConverter<BeatmapOnlineStatus>))]
         public required BeatmapOnlineStatus Status { get; init; }
