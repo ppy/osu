@@ -89,10 +89,10 @@ namespace osu.Desktop.IPC
                     },
                     Difficulty = new BeatmapDifficulty
                     {
-                        ApproachRate = val.NewValue.BeatmapInfo.Difficulty.ApproachRate,
-                        CircleSize = val.NewValue.BeatmapInfo.Difficulty.CircleSize,
-                        DrainRate = val.NewValue.BeatmapInfo.Difficulty.DrainRate,
-                        OverallDifficulty = val.NewValue.BeatmapInfo.Difficulty.OverallDifficulty,
+                        ApproachRate = Math.Round(val.NewValue.BeatmapInfo.Difficulty.ApproachRate, 2),
+                        CircleSize = Math.Round(val.NewValue.BeatmapInfo.Difficulty.CircleSize, 2),
+                        DrainRate = Math.Round(val.NewValue.BeatmapInfo.Difficulty.DrainRate, 2),
+                        OverallDifficulty = Math.Round(val.NewValue.BeatmapInfo.Difficulty.OverallDifficulty, 2),
                     },
                     DifficultyName = val.NewValue.BeatmapInfo.DifficultyName,
                     RulesetId = val.NewValue.BeatmapInfo.Ruleset.OnlineID,
