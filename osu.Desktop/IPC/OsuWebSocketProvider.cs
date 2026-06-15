@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Desktop.IPC.Messages;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -56,7 +57,7 @@ namespace osu.Desktop.IPC
                     Status = val.NewValue.GetType().Name,
                 };
 
-                broadcast(msg);
+                broadcast(msg).FireAndForget();
             }, true);
 
             workingBeatmap.BindValueChanged(val =>
@@ -101,18 +102,18 @@ namespace osu.Desktop.IPC
                     Status = val.NewValue.BeatmapInfo.Status,
                 };
 
-                broadcast(msg);
+                broadcast(msg).FireAndForget();
             }, true);
         }
 
-        private void broadcast(OsuWebSocketMessage message)
+        private Task broadcast(OsuWebSocketMessage message) => Task.Run(async () =>
         {
             if (server?.IsRunning != true)
                 return;
 
             string messageString = JsonSerializer.Serialize(message, message.GetType());
-            server.BroadcastAsync(messageString).FireAndForget();
-        }
+            await server.BroadcastAsync(messageString).ConfigureAwait(false);
+        });
 
         protected override void Dispose(bool isDisposing)
         {
