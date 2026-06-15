@@ -62,7 +62,6 @@ namespace osu.Desktop.IPC
 
             workingBeatmap.BindValueChanged(val =>
             {
-                // default beatmap on load
                 if (val.NewValue is DummyWorkingBeatmap)
                     return;
 
