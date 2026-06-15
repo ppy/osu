@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -36,6 +37,8 @@ namespace osu.Game.Overlays
         /// Point in time after which the current track will be restarted on triggering a "previous track" action.
         /// </summary>
         private const double restart_cutoff_point = 5000;
+
+        public const double DELAY_BEFORE_FADE = 30;
 
         /// <summary>
         /// Whether the user has requested the track to be paused. Use <see cref="IsPlaying"/> to determine whether the track is still playing.
@@ -511,32 +514,22 @@ namespace osu.Game.Overlays
 
         private void changeTrack()
         {
-            var queuedTrack = getQueuedTrack();
+            Debug.Assert(ThreadSafety.IsUpdateThread);
 
+            const double track_fade_in_time = 220;
+            const double track_fade_out_time = 150;
+
+            var queuedTrack = getQueuedTrack();
             var lastTrack = CurrentTrack;
+
             lastTrack.Completed -= onTrackCompleted;
+            lastTrack.VolumeTo(0, track_fade_out_time, Easing.Out).Expire();
 
             CurrentTrack = queuedTrack;
 
-            // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
-            // CurrentTrack is immediately updated above for situations where a immediate knowledge about the new track is required,
-            // but the mutation of the hierarchy is scheduled to avoid exceptions.
-            Schedule(() =>
-            {
-                lastTrack.VolumeTo(0, 500, Easing.Out).Expire();
-
-                if (queuedTrack == CurrentTrack)
-                {
-                    AddInternal(queuedTrack);
-                    queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
-                }
-                else
-                {
-                    // If the track has changed since the call to changeTrack, it is safe to dispose the
-                    // queued track rather than consume it.
-                    queuedTrack.Dispose();
-                }
-            });
+            queuedTrack.Volume.Value = 0;
+            AddInternal(queuedTrack);
+            queuedTrack.Delay(DELAY_BEFORE_FADE).VolumeTo(1, track_fade_in_time);
         }
 
         private DrawableTrack getQueuedTrack()

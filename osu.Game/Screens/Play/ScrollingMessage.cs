@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            this.FadeInFromZero(2000, Easing.OutQuint);
+            messageContent.FadeInFromZero(2000, Easing.OutQuint);
             resetMessagePosition();
         }
 

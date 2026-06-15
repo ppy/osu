@@ -5,6 +5,7 @@
 
 using System;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Tests.NonVisual
@@ -23,7 +24,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestEmptyQueue()
         {
-            Assert.AreEqual(0, queue.Count);
+            ClassicAssert.AreEqual(0, queue.Count);
 
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
@@ -34,7 +35,7 @@ namespace osu.Game.Tests.NonVisual
             foreach (char unused in queue)
                 count++;
 
-            Assert.AreEqual(0, count);
+            ClassicAssert.AreEqual(0, count);
         }
 
         [Test]
@@ -45,21 +46,21 @@ namespace osu.Game.Tests.NonVisual
             queue.Enqueue('b');
             queue.Enqueue('c');
 
-            Assert.AreEqual('c', queue[0]);
-            Assert.AreEqual('b', queue[1]);
-            Assert.AreEqual('a', queue[2]);
+            ClassicAssert.AreEqual('c', queue[0]);
+            ClassicAssert.AreEqual('b', queue[1]);
+            ClassicAssert.AreEqual('a', queue[2]);
 
             // Assert correct values and reverse index after enqueueing beyond initial capacity of 4
             queue.Enqueue('d');
             queue.Enqueue('e');
             queue.Enqueue('f');
 
-            Assert.AreEqual('f', queue[0]);
-            Assert.AreEqual('e', queue[1]);
-            Assert.AreEqual('d', queue[2]);
-            Assert.AreEqual('c', queue[3]);
-            Assert.AreEqual('b', queue[4]);
-            Assert.AreEqual('a', queue[5]);
+            ClassicAssert.AreEqual('f', queue[0]);
+            ClassicAssert.AreEqual('e', queue[1]);
+            ClassicAssert.AreEqual('d', queue[2]);
+            ClassicAssert.AreEqual('c', queue[3]);
+            ClassicAssert.AreEqual('b', queue[4]);
+            ClassicAssert.AreEqual('a', queue[5]);
         }
 
         [Test]
@@ -73,13 +74,13 @@ namespace osu.Game.Tests.NonVisual
             queue.Enqueue('f');
 
             // Assert correct item return and no longer in queue after dequeueing
-            Assert.AreEqual('a', queue[5]);
+            ClassicAssert.AreEqual('a', queue[5]);
             char dequeuedItem = queue.Dequeue();
 
-            Assert.AreEqual('a', dequeuedItem);
-            Assert.AreEqual(5, queue.Count);
-            Assert.AreEqual('f', queue[0]);
-            Assert.AreEqual('b', queue[4]);
+            ClassicAssert.AreEqual('a', dequeuedItem);
+            ClassicAssert.AreEqual(5, queue.Count);
+            ClassicAssert.AreEqual('f', queue[0]);
+            ClassicAssert.AreEqual('b', queue[4]);
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 char unused = queue[5];
@@ -97,8 +98,8 @@ namespace osu.Game.Tests.NonVisual
             queue.Dequeue();
             queue.Dequeue();
 
-            Assert.AreEqual(1, queue.Count);
-            Assert.AreEqual('i', queue[0]);
+            ClassicAssert.AreEqual(1, queue.Count);
+            ClassicAssert.AreEqual('i', queue[0]);
         }
 
         [Test]
@@ -114,7 +115,7 @@ namespace osu.Game.Tests.NonVisual
             // Assert queue is empty after clearing
             queue.Clear();
 
-            Assert.AreEqual(0, queue.Count);
+            ClassicAssert.AreEqual(0, queue.Count);
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 char unused = queue[0];
@@ -137,7 +138,7 @@ namespace osu.Game.Tests.NonVisual
             // Assert items are enumerated in correct order
             foreach (char item in queue)
             {
-                Assert.AreEqual(expectedValues[expectedValueIndex], item);
+                ClassicAssert.AreEqual(expectedValues[expectedValueIndex], item);
                 expectedValueIndex++;
             }
         }

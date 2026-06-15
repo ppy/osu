@@ -331,7 +331,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 p.RequestResults = _ => resultsRequested = true;
             });
 
-            AddUntilStep("wait for load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any() && playlist.ChildrenOfType<BeatmapCardThumbnail>().First().DrawWidth > 0);
+            AddUntilStep("wait for load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any()
+                                                && playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().Any()
+                                                && playlist.ChildrenOfType<BeatmapCardThumbnail>().First().DrawWidth > 0);
 
             AddStep("move mouse to first item title", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First()));
             AddAssert("first item title not hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.False);

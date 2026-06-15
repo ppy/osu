@@ -33,6 +33,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             public required Action<PlayerHandCard> Clicked;
 
+            public required Action<PlayerHandCard, Vector2> Dragged;
+
             public required IBindable<bool> AllowSelection;
 
             private readonly Drawable cardInputArea;
@@ -165,6 +167,35 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
                 CardHovered = false;
             }
+
+            #region Drag/Drop
+
+            private Vector2 dragOffset;
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                dragOffset = DrawPosition + AnchorPosition - e.MouseDownPosition;
+
+                CardDragged = true;
+
+                return true;
+            }
+
+            protected override void OnDrag(DragEvent e)
+            {
+                DragPosition = e.MousePosition - AnchorPosition + dragOffset;
+
+                Dragged(this, e.ScreenSpaceMousePosition);
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                base.OnDragEnd(e);
+
+                CardDragged = false;
+            }
+
+            #endregion
         }
     }
 }

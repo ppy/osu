@@ -662,7 +662,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("invoke on back button", () => multiplayerComponents.OnBackButton());
 
-            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
+            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().All(o => o.State.Value == Visibility.Hidden));
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
@@ -1204,6 +1204,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("selected beatmap changed", () => Beatmap.Value.BeatmapInfo.Equals(importedSet2.Beatmaps.First()));
             AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
+        }
+
+        [Test]
+        public void TestMaxParticipantsAndSlots()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                Password = "password",
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ],
+                MaxParticipants = 10
+            });
+
+            AddStep("turn max participants off", () => multiplayerClient.ChangeSettings(maxParticipants: null));
+            AddStep("turn max participants back on", () => multiplayerClient.ChangeSettings(maxParticipants: 8));
         }
 
         private void enterGameplay()
