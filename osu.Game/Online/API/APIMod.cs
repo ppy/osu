@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -19,15 +20,17 @@ namespace osu.Game.Online.API
     public class APIMod : IEquatable<APIMod>
     {
         [JsonProperty("acronym")]
+        [JsonPropertyName("acronym")]
         [Key(0)]
         public string Acronym { get; set; } = string.Empty;
 
         [JsonProperty("settings")]
+        [JsonPropertyName("settings")]
         [Key(1)]
         [MessagePackFormatter(typeof(ModSettingsDictionaryFormatter))]
         public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
 
-        [JsonConstructor]
+        [Newtonsoft.Json.JsonConstructor]
         [SerializationConstructor]
         public APIMod()
         {

@@ -3,10 +3,23 @@
 
 using System.Text.Json.Serialization;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 
 namespace osu.Desktop.IPC.Messages
 {
-    public class BeatmapMessage : OsuWebSocketMessage
+    public class PlayerStateMessage : OsuWebSocketMessage
+    {
+        [JsonPropertyName("beatmap")]
+        public required Beatmap Beatmap { get; init; }
+
+        [JsonPropertyName("ruleset_id")]
+        public required int RulesetId { get; init; }
+
+        [JsonPropertyName("mods")]
+        public required APIMod[] Mods { get; init; }
+    }
+
+    public class Beatmap
     {
         [JsonPropertyName("beatmap_id")]
         public required int BeatmapId { get; init; }
