@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         private const int history_time_max = 5 * 1000; // 5 seconds
         private const int history_objects_max = 32;
         private const double rhythm_overall_multiplier = 0.95;
-        private const double rhythm_ratio_multiplier = 26.0;
+        private const double rhythm_ratio_multiplier = 30.0;
 
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
@@ -160,7 +160,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         double doubletapness = prevObj.GetDoubletapness(currObj);
                         effectiveRatio *= 1 - doubletapness * 0.75;
 
-                        rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
+                        if (island.DeltaCount > 1)
+                            rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay;
 
                         startRatio = effectiveRatio;
 
