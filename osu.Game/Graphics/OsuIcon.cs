@@ -107,11 +107,19 @@ namespace osu.Game.Graphics
         public static IconUsage EditorDistanceSnap => get(OsuIconMapping.EditorDistanceSnap);
         public static IconUsage EditorFinish => get(OsuIconMapping.EditorFinish);
         public static IconUsage EditorGridSnap => get(OsuIconMapping.EditorGridSnap);
-        public static IconUsage EditorNewCombo => get(OsuIconMapping.EditorNewCombo);
+        public static IconUsage EditorNewComboSparkles => get(OsuIconMapping.EditorNewComboSparkles);
         public static IconUsage EditorSelect => get(OsuIconMapping.EditorSelect);
         public static IconUsage EditorSound => get(OsuIconMapping.EditorSound);
         public static IconUsage EditorWhistle => get(OsuIconMapping.EditorWhistle);
         public static IconUsage EditorClap => get(OsuIconMapping.EditorClap);
+        public static IconUsage EditorBankAuto => get(OsuIconMapping.EditorBankAuto);
+        public static IconUsage EditorBankAutoCompact => get(OsuIconMapping.EditorBankAutoCompact);
+        public static IconUsage EditorBankNormal => get(OsuIconMapping.EditorBankNormal);
+        public static IconUsage EditorBankNormalCompact => get(OsuIconMapping.EditorBankNormalCompact);
+        public static IconUsage EditorBankSoft => get(OsuIconMapping.EditorBankSoft);
+        public static IconUsage EditorBankSoftCompact => get(OsuIconMapping.EditorBankSoftCompact);
+        public static IconUsage EditorBankDrum => get(OsuIconMapping.EditorBankDrum);
+        public static IconUsage EditorBankDrumCompact => get(OsuIconMapping.EditorBankDrumCompact);
         public static IconUsage Tortoise => get(OsuIconMapping.Tortoise);
         public static IconUsage Hare => get(OsuIconMapping.Hare);
 
@@ -459,8 +467,8 @@ namespace osu.Game.Graphics
             [Description(@"Editor/grid-snap")]
             EditorGridSnap,
 
-            [Description(@"Editor/new-combo")]
-            EditorNewCombo,
+            [Description(@"Editor/new-combo-sparkles")]
+            EditorNewComboSparkles,
 
             [Description(@"Editor/select")]
             EditorSelect,
@@ -473,6 +481,30 @@ namespace osu.Game.Graphics
 
             [Description(@"Editor/clap")]
             EditorClap,
+
+            [Description(@"Editor/bank-auto")]
+            EditorBankAuto,
+
+            [Description(@"Editor/bank-auto-compact")]
+            EditorBankAutoCompact,
+
+            [Description(@"Editor/bank-normal")]
+            EditorBankNormal,
+
+            [Description(@"Editor/bank-normal-compact")]
+            EditorBankNormalCompact,
+
+            [Description(@"Editor/bank-soft")]
+            EditorBankSoft,
+
+            [Description(@"Editor/bank-soft-compact")]
+            EditorBankSoftCompact,
+
+            [Description(@"Editor/bank-drum")]
+            EditorBankDrum,
+
+            [Description(@"Editor/bank-drum-compact")]
+            EditorBankDrumCompact,
 
             [Description(@"tortoise")]
             Tortoise,

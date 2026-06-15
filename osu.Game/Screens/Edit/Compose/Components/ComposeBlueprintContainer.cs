@@ -17,7 +17,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -182,12 +181,49 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public SampleBankTernaryButton[] SampleBankTernaryStates { get; private set; }
 
         /// <summary>
+        /// Create the new combo ternary button. Mainly used to customize the displayed icon
+        /// depending on the ruleset. Can be overriden to return null if a ruleset does not
+        /// provide combo-supporting HitObjects.
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
+        protected virtual Drawable CreateNewComboButton() => new NewComboTernaryButton
+        {
+            Current = NewCombo,
+            CreateIcon = () => new Container
+            {
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        // This is currently using the osu! hitcircle icon as a default in order
+                        // not to break any custom rulesets that depend on there being a defined
+                        // new combo button.
+                        // Could consider removing it and let rulesets specify their own buttons/icons.
+                        Icon = OsuIcon.EditorHitCircle,
+                        Size = new Vector2(15),
+                    },
+                    new SpriteIcon
+                    {
+                        Icon = OsuIcon.EditorNewComboSparkles,
+                        Size = new Vector2(20),
+                    }
+                },
+            },
+        };
+
+        /// <summary>
         /// Create all ternary states required to be displayed to the user.
         /// </summary>
         protected virtual IEnumerable<Drawable> CreateTernaryButtons()
         {
             //TODO: this should only be enabled (visible?) for rulesets that provide combo-supporting HitObjects.
-            yield return new NewComboTernaryButton { Current = NewCombo };
+            var newComboButton = CreateNewComboButton();
+
+            if (newComboButton != null)
+                yield return newComboButton;
 
             foreach (var kvp in SelectionHandler.SelectionSampleStates)
             {
@@ -208,20 +244,41 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     NormalState = { Current = SelectionHandler.SelectionBankStates[bankName], },
                     AdditionsState = { Current = SelectionHandler.SelectionAdditionBankStates[bankName], },
-                    CreateIcon = () => getIconForBank(bankName)
+                    CreateIcon = () => getIconForBank(bankName),
+                    CreateCompactIcon = () => getCompactIconForBank(bankName),
                 };
             }
         }
 
         private Drawable getIconForBank(string sampleName)
         {
-            return new OsuSpriteText
+            return new SpriteIcon
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Y = -1,
-                Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 20),
-                Text = $"{char.ToUpperInvariant(sampleName.First())}"
+                Size = new Vector2(20, 20),
+                Icon = sampleName switch
+                {
+                    EditorSelectionHandler.HIT_BANK_AUTO => OsuIcon.EditorBankAuto,
+                    HitSampleInfo.BANK_NORMAL => OsuIcon.EditorBankNormal,
+                    HitSampleInfo.BANK_SOFT => OsuIcon.EditorBankSoft,
+                    HitSampleInfo.BANK_DRUM => OsuIcon.EditorBankDrum,
+                    _ => throw new ArgumentOutOfRangeException(nameof(sampleName), sampleName, null)
+                },
+            };
+        }
+
+        private Drawable getCompactIconForBank(string sampleName)
+        {
+            return new SpriteIcon
+            {
+                Size = new Vector2(10, 20),
+                Icon = sampleName switch
+                {
+                    EditorSelectionHandler.HIT_BANK_AUTO => OsuIcon.EditorBankAutoCompact,
+                    HitSampleInfo.BANK_NORMAL => OsuIcon.EditorBankNormalCompact,
+                    HitSampleInfo.BANK_SOFT => OsuIcon.EditorBankSoftCompact,
+                    HitSampleInfo.BANK_DRUM => OsuIcon.EditorBankDrumCompact,
+                    _ => throw new ArgumentOutOfRangeException(nameof(sampleName), sampleName, null)
+                },
             };
         }
 
