@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.IO.Serialization;
+using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Replays;
@@ -20,6 +21,19 @@ using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
 {
+    /// <summary>
+    /// Encodes replays.
+    /// </summary>
+    /// <remarks>
+    /// <b>When making <i>ANY</i> changes to the replay format to add new data, consider if:</b>
+    /// <list type="bullet">
+    /// <item><see cref="LATEST_VERSION"/> should be bumped accordingly,</item>
+    /// <item>
+    /// changes need to be made to <see cref="SpectatorClient"/> so that spectator server receives the new data being stored,
+    /// as <b><i>spectator server</i> is responsible for the content of server-stored replays, <i>NOT</i> the client</b>.
+    /// </item>
+    /// </list>
+    /// </remarks>
     public class LegacyScoreEncoder
     {
         /// <summary>
@@ -47,9 +61,10 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000014: Fix edge cases in conversion for osu! scores on selected beatmaps. Reconvert all scores.</description></item>
         /// <item><description>30000015: Fix osu! standardised score estimation algorithm violating basic invariants. Reconvert all scores.</description></item>
         /// <item><description>30000016: Fix taiko standardised score estimation algorithm not including swell tick score gain into bonus portion. Reconvert all scores.</description></item>
+        /// <item><description>30000017: Mod score multiplier rebalance. Recalculates the <see cref="ScoreInfo.TotalScore"/> of all scores with <see cref="ScoreInfo.TotalScoreWithoutMods"/> present.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000016;
+        public const int LATEST_VERSION = 30000017;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.
@@ -82,7 +97,7 @@ namespace osu.Game.Scoring.Legacy
             using (SerializationWriter sw = new SerializationWriter(stream, leaveOpen))
             {
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
-                sw.Write(LATEST_VERSION);
+                sw.Write(score.ScoreInfo.TotalScoreVersion);
                 sw.Write(score.ScoreInfo.BeatmapInfo!.MD5Hash);
                 sw.Write(score.ScoreInfo.User.Username);
                 sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.User.Username}-{score.ScoreInfo.Date}").ComputeMD5Hash());
