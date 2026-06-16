@@ -40,7 +40,7 @@
     </PackageReference>
     <PackageReference Include="Realm" Version="20.1.0" />
     <PackageReference Include="ppy.osu.Framework" Version="2026.527.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2026.523.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2026.615.0" />
     <PackageReference Include="Sentry" Version="6.6.0" />
     <PackageReference Include="SharpCompress" Version="0.49.1" />
     <PackageReference Include="NUnit" Version="4.5.1" />
