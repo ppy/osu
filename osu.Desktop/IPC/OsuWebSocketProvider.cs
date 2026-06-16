@@ -23,9 +23,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Game.Utils;
-using Beatmap = osu.Desktop.IPC.Messages.Beatmap;
-using BeatmapDifficulty = osu.Desktop.IPC.Messages.BeatmapDifficulty;
-using BeatmapMetadata = osu.Desktop.IPC.Messages.BeatmapMetadata;
 
 namespace osu.Desktop.IPC
 {
@@ -72,7 +69,7 @@ namespace osu.Desktop.IPC
                 if (server?.IsRunning != true)
                     return;
 
-                var msg = new UserActivityMessage
+                var msg = new UserActivityWebSocketMessage
                 {
                     Status = val.NewValue.GetType().Name,
                 };
@@ -128,14 +125,14 @@ namespace osu.Desktop.IPC
 
             var starDifficulty = await difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, rulesetInfo.Value, mods.Value).ConfigureAwait(false);
 
-            var msg = new PlayerStateMessage
+            var msg = new PlayerStateWebSocketMessage
             {
-                Beatmap = new Beatmap
+                Beatmap = new WebSocketBeatmap
                 {
                     BeatmapId = workingBeatmap.Value.BeatmapInfo.OnlineID,
                     BeatmapSetId = workingBeatmap.Value.BeatmapSetInfo.OnlineID,
                     BeatmapHash = workingBeatmap.Value.BeatmapInfo.OnlineMD5Hash,
-                    Metadata = new BeatmapMetadata
+                    Metadata = new WebSocketBeatmapMetadata
                     {
                         Artist = workingBeatmap.Value.BeatmapInfo.Metadata.Artist,
                         ArtistUnicode = workingBeatmap.Value.BeatmapInfo.Metadata.ArtistUnicode,
@@ -146,7 +143,7 @@ namespace osu.Desktop.IPC
                         Tags = workingBeatmap.Value.BeatmapInfo.Metadata.Tags,
                         UserTags = workingBeatmap.Value.BeatmapInfo.Metadata.UserTags.ToArray(),
                     },
-                    Difficulty = new BeatmapDifficulty
+                    Difficulty = new WebSocketBeatmapDifficulty
                     {
                         ApproachRate = Math.Round(adjustedDifficulty.ApproachRate, 2),
                         CircleSize = Math.Round(adjustedDifficulty.CircleSize, 2),

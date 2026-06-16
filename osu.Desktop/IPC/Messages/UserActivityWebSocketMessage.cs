@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace osu.Desktop.IPC.Messages
 {
-    public class UserActivityMessage : OsuWebSocketMessage
+    public class UserActivityWebSocketMessage : OsuWebSocketMessage
     {
         [JsonPropertyName("status")]
         public required string Status { get; init; }
