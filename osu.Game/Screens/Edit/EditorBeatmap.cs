@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
+using osuTK;
 
 namespace osu.Game.Screens.Edit
 {
