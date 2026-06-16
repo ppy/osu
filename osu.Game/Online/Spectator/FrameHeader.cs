@@ -66,7 +66,7 @@ namespace osu.Game.Online.Spectator
         /// is the automatic activation of Touch Device mod when usage of touch devices is detected.
         /// </remarks>
         [Key(7)]
-        public APIMod[] Mods { get; set; } = [];
+        public APIMod[] Mods { get; set; }
 
         /// <summary>
         /// The current total score without mod multipliers active.
