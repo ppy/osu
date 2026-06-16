@@ -27,6 +27,7 @@ using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
+using Realms;
 
 namespace osu.Game.Tests.Online
 {
@@ -166,6 +167,27 @@ namespace osu.Game.Tests.Online
             addAvailabilityCheckStep("locally available after re-import", BeatmapAvailability.LocallyAvailable);
         }
 
+        [Test]
+        public void TestManualExternalImportDuringDownload()
+        {
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
+
+            AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
+            addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
+
+            AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
+            addAvailabilityCheckStep("state downloading", () => BeatmapAvailability.Downloading(0.0f));
+
+            AddStep("import beatmap externally", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).SetProgress(0.4f));
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+
+            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).TriggerSuccess(testBeatmapFile));
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+        }
+
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
             AddUntilStep(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
@@ -228,6 +250,14 @@ namespace osu.Game.Tests.Online
                         throw new TimeoutException("Timeout waiting for import to be allowed.");
 
                     return testBeatmapManager.CurrentImport = base.ImportModel(item, archive, parameters, cancellationToken);
+                }
+
+                protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)
+                {
+                    foreach (var beatmap in model.Beatmaps)
+                        beatmap.OnlineMD5Hash = beatmap.MD5Hash;
+
+                    base.PostImport(model, realm, parameters);
                 }
             }
         }

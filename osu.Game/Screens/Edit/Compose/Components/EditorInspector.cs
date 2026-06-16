@@ -35,14 +35,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected void AddHeader(string header) => InspectorText.AddParagraph($"{header}: ", s =>
         {
-            s.Padding = new MarginPadding { Top = 2 };
-            s.Font = s.Font.With(size: 12);
+            s.Font = OsuFont.Style.Caption1;
             s.Colour = colourProvider.Content2;
         });
 
         protected void AddValue(string value) => InspectorText.AddParagraph(value, s =>
         {
-            s.Font = s.Font.With(weight: FontWeight.SemiBold);
+            s.Padding = new MarginPadding { Top = -5 };
+            s.Font = OsuFont.Style.Body;
             s.Colour = colourProvider.Content1;
         });
     }

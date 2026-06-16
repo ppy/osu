@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public partial class CatchModFlashlight : ModFlashlight<CatchHitObject>
     {
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
-
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
@@ -24,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public override BindableBool ComboBasedSize { get; } = new BindableBool(true);
 
-        public override float DefaultFlashlightSize => 325;
+        public override float DefaultFlashlightSize => 203.125f;
 
         protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield);
 

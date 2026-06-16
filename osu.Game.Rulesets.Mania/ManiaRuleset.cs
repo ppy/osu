@@ -79,6 +79,7 @@ namespace osu.Game.Rulesets.Mania
                     return new ManiaArgonSkinTransformer(skin, beatmap);
 
                 case DefaultLegacySkin:
+                case RetroSkin:
                     return new ManiaClassicSkinTransformer(skin, beatmap);
 
                 case LegacySkin:
@@ -306,6 +307,8 @@ namespace osu.Game.Rulesets.Mania
             }
         }
 
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new ManiaScoreMultiplierCalculator(context);
+
         public override string Description => "osu!mania";
 
         public override string ShortName => SHORT_NAME;
@@ -325,6 +328,8 @@ namespace osu.Game.Rulesets.Mania
         public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
+
+        public override LocalisableString VariantDescription => "Keys";
 
         public override IEnumerable<int> AvailableVariants
         {
@@ -382,7 +387,7 @@ namespace osu.Game.Rulesets.Mania
             return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderDescending().First(v => variant >= v);
         }
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
@@ -391,9 +396,11 @@ namespace osu.Game.Rulesets.Mania
                 HitResult.Good,
                 HitResult.Ok,
                 HitResult.Meh,
+                HitResult.Miss,
 
-                // HitResult.SmallBonus is used for awarding perfect bonus score but is not included here as
-                // it would be a bit redundant to show this to the user.
+                HitResult.IgnoreHit,
+                HitResult.ComboBreak,
+                HitResult.IgnoreMiss,
             };
         }
 
@@ -480,6 +487,22 @@ namespace osu.Game.Rulesets.Mania
             };
         }
 
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var attributes = GetBeatmapAttributesForDisplay(beatmapInfo, mods).ToList();
+
+            // Key count attribute isn't relevant to ranked play (it's decided by the pool).
+            attributes.RemoveAll(a => a.Acronym == "KC");
+
+            float holdNoteRatio = beatmapInfo.TotalObjectCount == 0 ? 0 : (float)beatmapInfo.EndTimeObjectCount / beatmapInfo.TotalObjectCount;
+            attributes.Insert(0, new RulesetBeatmapAttribute("Hold notes", @"HN", holdNoteRatio, holdNoteRatio, 1)
+            {
+                ValueFormat = "P0"
+            });
+
+            return attributes;
+        }
+
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
         {
             return new ManiaFilterCriteria();
@@ -495,6 +518,9 @@ namespace osu.Game.Rulesets.Mania
 
         public int GetKeyCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
             => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
+
+        public override int GetVariantForBeatmap(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
+            => GetKeyCount(beatmapInfo, mods);
     }
 
     public enum PlayfieldType

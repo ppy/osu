@@ -99,6 +99,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString AdjustBeatmapOffsetAutomaticallyTooltip => new TranslatableString(getKey(@"adjust_beatmap_offset_automatically_tooltip"), @"If enabled, the offset suggested from last play on a beatmap is automatically applied.");
 
+        /// <summary>
+        /// "Use legacy audio mode"
+        /// </summary>
+        public static LocalisableString LegacyAudioLabel => new TranslatableString(getKey(@"legacy_audio_label"), @"Use legacy audio mode");
+
+        /// <summary>
+        /// "Use this if you are experiencing audio issues. Note that audio latency will be higher when this is toggled on."
+        /// </summary>
+        public static LocalisableString LegacyAudioTooltip => new TranslatableString(getKey(@"legacy_audio_tooltip"), @"Use this if you are experiencing audio issues. Note that audio latency will be higher when this is toggled on.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -92,6 +93,9 @@ namespace osu.Game.Database
                 // Note that the previous method will also update these on a fresh run.
                 processBeatmapsWithMissingObjectCounts();
                 processScoresWithMissingStatistics();
+                // ordering significant, `upgradeModMultipliers()` should run first as it will handle all scores
+                // (rather than only lazer scores, if it was called after `convertLegacyTotalScoreToStandardised()`)
+                upgradeModMultipliers();
                 convertLegacyTotalScoreToStandardised();
                 upgradeScoreRanks();
                 backpopulateMissingSubmissionAndRankDates();
@@ -411,6 +415,72 @@ namespace osu.Game.Database
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
         }
 
+        private void upgradeModMultipliers()
+        {
+            Logger.Log("Querying for scores that need mod multiplier upgrade...");
+
+            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
+                r.All<ScoreInfo>()
+                 .Where(s => !s.BackgroundReprocessingFailed
+                             && s.BeatmapInfo != null
+                             && s.TotalScoreVersion < 30000017 // version number represents version with latest mod multiplier change
+                             && s.TotalScoreWithoutMods > 0)
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't want to support
+                 // nested property predicates
+                 .Where(s => s.Ruleset.IsLegacyRuleset())
+                 .Select(s => s.ID)));
+
+            Logger.Log($"Found {scoreIds.Count} scores which require mod multiplier upgrade.");
+
+            if (scoreIds.Count == 0)
+                return;
+
+            var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new mod multipliers", "scores have been upgraded to the new mod multipliers");
+
+            int processedCount = 0;
+            int failedCount = 0;
+
+            foreach (var id in scoreIds)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
+                sleepIfRequired();
+
+                try
+                {
+                    // Can't use async overload because we're not on the update thread.
+                    // ReSharper disable once MethodHasAsyncOverload
+                    realmAccess.Write(r =>
+                    {
+                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
+                        if (s.BeatmapInfo == null)
+                            return;
+
+                        StandardisedScoreMigrationTools.UpdateToLatestScoreMultipliers(s, s.BeatmapInfo.Difficulty);
+                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    });
+
+                    ++processedCount;
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Failed to upgrade mod multipliers for {id}: {e}");
+                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
+                }
+            }
+
+            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+        }
+
         private void convertLegacyTotalScoreToStandardised()
         {
             Logger.Log("Querying for scores that need total score conversion...");
@@ -655,29 +725,31 @@ namespace osu.Game.Database
 
             if (metadataSourceFetchDate <= lastPopulation)
             {
-                Logger.Log($@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value:d})");
+                Logger.Log(
+                    $@"Skipping user tag population because the local metadata source hasn't been updated since the last time user tags were checked ({lastPopulation.Value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)})");
                 return;
             }
 
-            Logger.Log(@"Querying for beatmaps that do not have user tags");
+            Logger.Log(@"Updating user tags");
 
-            // it is not an abnormal situation for a map not to have user tags.
             // while this is constrained to run every month or so (every time a new online.db cache is retrieved), there's some chance that this will still run much too often and be annoying to users.
             // if that turns out to be the case we may need a better way to debounce this (or just delete the backpopulation logic after some time has passed?)
             HashSet<Guid> beatmapIds = realmAccess.Run(r => new HashSet<Guid>(
                 r.All<BeatmapInfo>()
-                 .Filter($"{nameof(BeatmapInfo.Metadata)}.{nameof(BeatmapMetadata.UserTags)}.@count == 0 AND {nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
+                 .Filter($"{nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
                  .AsEnumerable()
                  .Select(b => b.ID)));
 
             if (beatmapIds.Count == 0)
                 return;
 
-            Logger.Log($@"Found {beatmapIds.Count} beatmaps with missing user tags.");
+            Logger.Log($@"Checking for tag updates for {beatmapIds.Count} beatmaps.");
 
-            var notification = showProgressNotification(beatmapIds.Count, @"Populating missing user tags", @"beatmaps have had their tags updated.");
+            var notification = showProgressNotification(beatmapIds.Count, @"Updating user tags",
+                @"beatmaps have had their tags updated. This runs once a month to allow searching user tags.");
 
             int processedCount = 0;
+            int updatedCount = 0;
             int failedCount = 0;
 
             foreach (var id in beatmapIds)
@@ -691,33 +763,37 @@ namespace osu.Game.Database
 
                 try
                 {
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
+                    var beatmap = realmAccess.Run(r => r.Find<BeatmapInfo>(id)?.Detach());
+
+                    if (beatmap == null) continue;
+
+                    bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+
+                    if (lookupSucceeded)
                     {
-                        BeatmapInfo beatmap = r.Find<BeatmapInfo>(id)!;
+                        Debug.Assert(result != null);
 
-                        bool lookupSucceeded = localMetadataSource.TryLookup(beatmap, out var result);
+                        HashSet<string> userTags = result.UserTags.ToHashSet();
 
-                        if (lookupSucceeded)
+                        if (!userTags.SetEquals(beatmap.Metadata.UserTags))
                         {
-                            Debug.Assert(result != null);
-
-                            var userTags = result.UserTags.ToHashSet();
-
-                            if (!userTags.SetEquals(beatmap.Metadata.UserTags))
+                            ++updatedCount;
+                            realmAccess.Write(r =>
                             {
+                                beatmap = r.Find<BeatmapInfo>(id);
+
+                                if (beatmap == null)
+                                    return;
+
                                 beatmap.Metadata.UserTags.Clear();
                                 beatmap.Metadata.UserTags.AddRange(userTags);
-                                return true;
-                            }
-
-                            return false;
+                            });
                         }
-
+                    }
+                    else
+                    {
                         Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
-                        return false;
-                    });
+                    }
 
                     ++processedCount;
                 }
@@ -727,12 +803,14 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Log(@$"Failed to update ranked/submitted dates for beatmap set {id}: {e}");
+                    Logger.Log(@$"Failed to update user tags for beatmap {id}: {e}");
                     ++failedCount;
                 }
             }
 
-            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
+            // Report the updated item count rather than the total processed. Users don't really care about noops here.
+            completeNotification(notification, updatedCount, updatedCount, failedCount);
+
             config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
         }
 
@@ -753,7 +831,11 @@ namespace osu.Game.Database
             if (notification == null)
                 return;
 
-            if (processedCount == totalCount)
+            if (totalCount == 0)
+            {
+                notification.CompleteSilently();
+            }
+            else if (processedCount == totalCount)
             {
                 notification.CompletionText = $"{processedCount} {notification.CompletionText}";
                 notification.Progress = 1;

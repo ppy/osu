@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,8 +25,8 @@ namespace osu.Game.Beatmaps.Formats
         public const int FIRST_LAZER_VERSION = 128;
 
         private readonly IBeatmap beatmap;
-
         private readonly ISkin? skin;
+        private readonly LegacyStoryboardEncoder? storyboardEncoder;
 
         private readonly int onlineRulesetID;
 
@@ -34,10 +35,17 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
+        /// <param name="storyboard">
+        /// The combined storyboard, loaded from both the <c>.osu</c> and the <c>.osz</c>.
+        /// Only elements from the <c>.osu</c> (marked via <see cref="StoryboardElementSource.Beatmap"/>) will be encoded to the beatmap.
+        /// </param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin, Storyboard? storyboard)
         {
             this.beatmap = beatmap;
             this.skin = skin;
+
+            if (storyboard != null)
+                storyboardEncoder = new LegacyStoryboardEncoder(storyboard);
 
             onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
@@ -101,7 +109,12 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.CountdownOffset}"));
             if (onlineRulesetID == 3)
                 writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.SpecialStyle ? '1' : '0')}"));
-            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+
+            if (storyboardEncoder != null)
+                storyboardEncoder.EncodeGeneralToBeatmap(writer);
+            else
+                writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+
             if (beatmap.SamplesMatchPlaybackRate)
                 writer.WriteLine(@"SamplesMatchPlaybackRate: 1");
         }
@@ -156,14 +169,19 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Events]");
 
-            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            if (storyboardEncoder != null)
+            {
+                storyboardEncoder.EncodeEventsToBeatmap(writer);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                    writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            }
 
+            writer.WriteLine("// Break Periods");
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
-
-            foreach (string l in beatmap.UnhandledEventLines)
-                writer.WriteLine(l);
         }
 
         private void handleControlPoints(TextWriter writer)
@@ -326,9 +344,21 @@ namespace osu.Game.Beatmaps.Formats
                     int volume = samples.Max(o => o.Volume);
                     string bank = samples.Where(s => s.Name == HitSampleInfo.HIT_NORMAL).Select(s => s.Bank).FirstOrDefault()
                                   ?? samples.Select(s => s.Bank).First();
-                    int customIndex = samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
-                        ? samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
-                        : -1;
+
+                    int customIndex = samples.Max(s =>
+                    {
+                        switch (s)
+                        {
+                            case ConvertHitObjectParser.LegacyHitSampleInfo legacy:
+                                return legacy.CustomSampleBank;
+
+                            default:
+                                if (int.TryParse(s.Suffix, out int index))
+                                    return index;
+
+                                return s.UseBeatmapSamples ? 1 : -1;
+                        }
+                    });
 
                     return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, SampleBank = bank, CustomSampleBank = customIndex };
                 }
@@ -393,7 +423,8 @@ namespace osu.Game.Beatmaps.Formats
 
                 case 3:
                     int totalColumns = (int)Math.Max(1, beatmap.Difficulty.CircleSize);
-                    position.X = (int)Math.Ceiling(((IHasXPosition)hitObject).X * (512f / totalColumns));
+                    // compare: https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameModes/Play/Rulesets/Mania/Stage/StageMania_Calculations.cs#L159
+                    position.X = (int)Math.Floor((((IHasXPosition)hitObject).X + 0.5f) * (512f / totalColumns));
                     break;
             }
 
@@ -537,7 +568,7 @@ namespace osu.Game.Beatmaps.Formats
             if (!banksOnly)
             {
                 int customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name)));
-                string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
+                string sampleFilename = samples.FirstOrDefault(s => s is ConvertHitObjectParser.FileHitSampleInfo)?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
                 // We want to ignore custom sample banks and volume when not encoding to the mania game mode,

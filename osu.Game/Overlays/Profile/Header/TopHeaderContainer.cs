@@ -48,7 +48,8 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText teamText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
-        private PreviousUsernamesDisplay previousUsernamesDisplay = null!;
+
+        public PreviousUsernamesDisplay PreviousUsernamesDisplay { get; } = new PreviousUsernamesDisplay();
 
         private Bindable<bool> coverExpanded = null!;
 
@@ -149,7 +150,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                         new Container
                                                         {
                                                             // Intentionally use a zero-size container, else the fill flow will adjust to (and cancel) the upwards animation.
-                                                            Child = previousUsernamesDisplay = new PreviousUsernamesDisplay(),
+                                                            Child = PreviousUsernamesDisplay,
                                                         }
                                                     }
                                                 },
@@ -254,7 +255,7 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
             groupBadgeFlow.User.Value = user;
-            previousUsernamesDisplay.User.Value = user;
+            PreviousUsernamesDisplay.User.Value = user;
         }
 
         private void updateCoverState()

@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.General
@@ -19,22 +20,22 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             Children = new Drawable[]
             {
-                new SettingsEnumDropdown<Language>
+                new SettingsItemV2(new FormEnumDropdown<Language>
                 {
-                    LabelText = GeneralSettingsStrings.LanguageDropdown,
+                    Caption = GeneralSettingsStrings.LanguageDropdown,
                     Current = game.CurrentLanguage,
                     AlwaysShowSearchBar = true,
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
+                    Caption = GeneralSettingsStrings.PreferOriginalMetadataLanguage,
                     Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GeneralSettingsStrings.Prefer24HourTimeDisplay,
+                    Caption = GeneralSettingsStrings.Prefer24HourTimeDisplay,
                     Current = config.GetBindable<bool>(OsuSetting.Prefer24HourTime)
-                },
+                }),
             };
         }
     }

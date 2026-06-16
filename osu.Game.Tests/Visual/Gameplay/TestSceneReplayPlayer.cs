@@ -25,6 +25,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected TestReplayPlayer Player = null!;
 
         [Test]
+        public void TestFailedBeatmapLoad()
+        {
+            loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo, withHitObjects: false));
+
+            AddUntilStep("wait for exit", () => Player.IsCurrentScreen());
+        }
+
+        [Test]
         public void TestPauseViaSpace()
         {
             loadPlayerWithBeatmap();
@@ -203,7 +211,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("move mouse to centre of screen", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for settings overlay hidden", () => settingsOverlay().Expanded.Value, () => Is.False);
 
-            PlayerSettingsOverlay settingsOverlay() => Player.ChildrenOfType<PlayerSettingsOverlay>().Single();
+            ReplaySettingsOverlay settingsOverlay() => Player.ChildrenOfType<ReplaySettingsOverlay>().Single();
         }
 
         private void loadPlayerWithBeatmap(IBeatmap? beatmap = null)

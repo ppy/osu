@@ -274,8 +274,23 @@ namespace osu.Game.Users
 
             public InLobby(MultiplayerRoom room)
             {
-                RoomID = room.RoomID;
-                RoomName = room.Settings.Name;
+                switch (room.Settings.MatchType)
+                {
+                    case MatchType.Matchmaking:
+                        RoomID = -1;
+                        RoomName = "Quick Play";
+                        break;
+
+                    case MatchType.RankedPlay:
+                        RoomID = -1;
+                        RoomName = "Ranked Play";
+                        break;
+
+                    default:
+                        RoomID = room.RoomID;
+                        RoomName = room.Settings.Name;
+                        break;
+                }
             }
 
             [SerializationConstructor]

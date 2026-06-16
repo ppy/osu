@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Users;
@@ -21,6 +22,10 @@ namespace osu.Game.Screens.OnlinePlay
     {
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+
+        // Without this, the beatmap / menu background will be displayed behind the online play overlays.
+        // This adds needless load, and in some cases is visible when everything in front is transparent momentarily (song select).
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack(WaveContainer.APPEAR_DURATION);
 
         public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
@@ -106,6 +111,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnEntering(ScreenTransitionEvent e)
         {
+            base.OnEntering(e);
+
             this.FadeIn();
             waves.Show();
 
@@ -119,6 +126,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override void OnResuming(ScreenTransitionEvent e)
         {
+            base.OnResuming(e);
+
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
@@ -129,12 +138,12 @@ namespace osu.Game.Screens.OnlinePlay
             // to work around this, do not proxy resume to screens that haven't loaded yet.
             if ((screenStack.CurrentScreen as Drawable)?.IsLoaded == true)
                 screenStack.CurrentScreen.OnResuming(e);
-
-            base.OnResuming(e);
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
+            base.OnSuspending(e);
+
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
@@ -152,18 +161,19 @@ namespace osu.Game.Screens.OnlinePlay
             while (screenStack.CurrentScreen != null && screenStack.CurrentScreen is not LoungeSubScreen)
             {
                 var subScreen = (Screen)screenStack.CurrentScreen;
-                if (subScreen.IsLoaded && subScreen.OnExiting(e))
-                    return true;
 
                 subScreen.Exit();
+
+                // If it's still current after calling Exit(), it must have blocked OnExiting().
+                if (subScreen.IsCurrentScreen())
+                    return true;
             }
 
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            base.OnExiting(e);
-            return false;
+            return base.OnExiting(e);
         }
 
         public override bool OnBackButton()

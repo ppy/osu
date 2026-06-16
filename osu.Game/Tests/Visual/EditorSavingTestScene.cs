@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("set ruleset", () => Game.Ruleset.Value = CreateRuleset()?.RulesetInfo ?? Game.Ruleset.Value);
 
             if (CreateInitialBeatmap == null)
                 AddStep("set default beatmap", () => Game.Beatmap.SetDefault());
@@ -77,7 +79,7 @@ namespace osu.Game.Tests.Visual
             SoloSongSelect songSelect = null;
 
             PushAndConfirm(() => songSelect = new SoloSongSelect());
-            AddUntilStep("wait for carousel load", () => songSelect.CarouselItemsPresented);
+            AddUntilStep("wait for carousel load", () => songSelect.CarouselItemsPresented && !songSelect.IsFiltering);
 
             AddStep("Present same beatmap", () => Game.PresentBeatmap(Game.BeatmapManager.QueryBeatmapSet(set => set.ID == beatmapSetGuid)!.Value, beatmap => beatmap.ID == beatmapGuid));
             AddUntilStep("Wait for beatmap selected", () => Game.Beatmap.Value.BeatmapInfo.ID == beatmapGuid);

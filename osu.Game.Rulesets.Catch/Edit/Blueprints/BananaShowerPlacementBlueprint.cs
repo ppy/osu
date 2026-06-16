@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private double placementStartTime;
         private double placementEndTime;
 
-        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
+        protected override bool IsValidForPlacement => base.IsValidForPlacement && (PlacementActive == PlacementState.Waiting || Precision.DefinitelyBigger(HitObject.Duration, 0));
 
         public BananaShowerPlacementBlueprint()
         {

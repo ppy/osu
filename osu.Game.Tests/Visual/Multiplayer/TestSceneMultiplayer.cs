@@ -51,6 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayer : ScreenTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
         private BeatmapSetInfo importedSet2 = null!;
@@ -67,7 +68,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             BeatmapStore beatmapStore;
 
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
@@ -227,7 +228,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // edit playlist item
             AddStep("Press select", () => InputManager.Key(Key.Enter));
-            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             // select beatmap
             AddStep("Press select", () => InputManager.Key(Key.Enter));
@@ -450,7 +451,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Beatmap matches current item", () => Beatmap.Value.BeatmapInfo.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().BeatmapID);
 
@@ -491,7 +492,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Ruleset matches current item", () => Ruleset.Value.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().RulesetID);
 
@@ -532,7 +533,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Mods match current item",
                 () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.ClientRoom.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
@@ -661,7 +662,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("invoke on back button", () => multiplayerComponents.OnBackButton());
 
-            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().State.Value == Visibility.Hidden);
+            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().All(o => o.State.Value == Visibility.Hidden));
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
@@ -1050,7 +1051,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press edit on second item", () => this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(i => i.Item.RulesetID == 1)
                                                            .ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single().TriggerClick());
 
-            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
             AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID == 1);
 
             AddStep("start match", () => multiplayerClient.StartMatch().WaitSafely());
@@ -1205,6 +1206,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
         }
 
+        [Test]
+        public void TestMaxParticipantsAndSlots()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                Password = "password",
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ],
+                MaxParticipants = 10
+            });
+
+            AddStep("turn max participants off", () => multiplayerClient.ChangeSettings(maxParticipants: null));
+            AddStep("turn max participants back on", () => multiplayerClient.ChangeSettings(maxParticipants: 8));
+        }
+
         private void enterGameplay()
         {
             pressReadyButton();
@@ -1246,6 +1268,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
+        }
+
+        private void waitForSongSelect()
+        {
+            AddUntilStep("wait for song select", () =>
+            {
+                var songSelect = InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault();
+                return songSelect != null && songSelect.IsCurrentScreen() && !songSelect.IsFiltering;
+            });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
     }
 }

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
@@ -22,12 +23,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
     [TestFixture]
     public partial class TestSceneSliderDrawing : TestSceneOsuEditor
     {
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
+        {
+            var beatmap = new TestBeatmap(ruleset, false);
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint());
+            return beatmap;
+        }
 
         [Test]
         public void TestTouchInputPlaceHitCircleDirectly()
         {
-            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "HitCircle")));
+            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "Hit circle")));
 
             AddStep("tap to place circle", () => tap(this.ChildrenOfType<Playfield>().Single()));
             AddAssert("circle placed correctly", () =>
@@ -46,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestTouchInputPlaceCircleAfterTouchingComposeArea()
         {
-            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "HitCircle")));
+            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Button.Label == "Hit circle")));
 
             AddStep("tap playfield", () => tap(this.ChildrenOfType<Playfield>().Single()));
             AddAssert("circle placed", () => EditorBeatmap.HitObjects.Single(h => h.StartTime == EditorClock.CurrentTimeAccurate) is HitCircle);

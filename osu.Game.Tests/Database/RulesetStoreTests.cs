@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -24,10 +26,10 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realm, storage);
+                using var rulesets = new RealmRulesetStore(realm, storage);
 
-                Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
-                Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
+                ClassicAssert.AreEqual(4, rulesets.AvailableRulesets.Count());
+                ClassicAssert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
             });
         }
 
@@ -36,14 +38,14 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realm, storage);
-                var rulesets2 = new RealmRulesetStore(realm, storage);
+                using var rulesets = new RealmRulesetStore(realm, storage);
+                using var rulesets2 = new RealmRulesetStore(realm, storage);
 
-                Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
-                Assert.AreEqual(4, rulesets2.AvailableRulesets.Count());
+                ClassicAssert.AreEqual(4, rulesets.AvailableRulesets.Count());
+                ClassicAssert.AreEqual(4, rulesets2.AvailableRulesets.Count());
 
-                Assert.AreEqual(rulesets.AvailableRulesets.First(), rulesets2.AvailableRulesets.First());
-                Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
+                ClassicAssert.AreEqual(rulesets.AvailableRulesets.First(), rulesets2.AvailableRulesets.First());
+                ClassicAssert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
             });
         }
 
@@ -52,11 +54,11 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realm, storage);
+                using var rulesets = new RealmRulesetStore(realm, storage);
 
-                Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
-                Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);
-                Assert.IsFalse(rulesets.GetRuleset("mania")?.IsManaged);
+                ClassicAssert.False(rulesets.AvailableRulesets.First().IsManaged);
+                ClassicAssert.False(rulesets.GetRuleset(0)?.IsManaged);
+                ClassicAssert.False(rulesets.GetRuleset("mania")?.IsManaged);
             });
         }
 
@@ -79,7 +81,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
 
                 // Availability is updated on construction of a RealmRulesetStore
-                _ = new RealmRulesetStore(realm, storage);
+                using var _ = new RealmRulesetStore(realm, storage);
 
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.False);
             });
@@ -104,15 +106,78 @@ namespace osu.Game.Tests.Database
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
 
                 // Availability is updated on construction of a RealmRulesetStore
-                _ = new RealmRulesetStore(realm, storage);
+                using var _ = new RealmRulesetStore(realm, storage);
 
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.False);
 
                 // Simulate the ruleset getting updated
                 LoadTestRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
-                _ = new RealmRulesetStore(realm, storage);
+                using var __ = new RealmRulesetStore(realm, storage);
 
                 Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
+            });
+        }
+
+        [Test]
+        public void TestFakedRulesetIdIsDetected()
+        {
+            RunTestWithRealm((realm, storage) =>
+            {
+                LoadTestRuleset.HasImplementations = true;
+                LoadTestRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
+
+                var ruleset = new LoadTestRuleset();
+                string rulesetShortName = ruleset.RulesetInfo.ShortName;
+
+                realm.Write(r => r.Add(new RulesetInfo(rulesetShortName, ruleset.RulesetInfo.Name, ruleset.RulesetInfo.InstantiationInfo, 0)
+                {
+                    Available = true,
+                }));
+
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.True);
+
+                // Availability is updated on construction of a RealmRulesetStore
+                using var _ = new RealmRulesetStore(realm, storage);
+
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(rulesetShortName)!.Available), Is.False);
+            });
+        }
+
+        [Test]
+        public void TestMultipleRulesetWithSameOnlineIdsAreDetected()
+        {
+            RunTestWithRealm((realm, storage) =>
+            {
+                LoadTestRuleset.HasImplementations = true;
+                LoadTestRuleset.Version = Ruleset.CURRENT_RULESET_API_VERSION;
+                LoadTestRuleset.OnlineID = 2;
+
+                var first = new LoadTestRuleset();
+                var second = new CatchRuleset();
+
+                realm.Write(r => r.Add(new RulesetInfo(first.ShortName, first.RulesetInfo.Name, first.RulesetInfo.InstantiationInfo, first.RulesetInfo.OnlineID)
+                {
+                    Available = true,
+                }));
+                realm.Write(r => r.Add(new RulesetInfo(second.ShortName, second.RulesetInfo.Name, second.RulesetInfo.InstantiationInfo, second.RulesetInfo.OnlineID)
+                {
+                    Available = true,
+                }));
+
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(first.ShortName)!.Available), Is.True);
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(second.ShortName)!.Available), Is.True);
+
+                // Availability is updated on construction of a RealmRulesetStore
+                using var _ = new RealmRulesetStore(realm, storage);
+
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(first.ShortName)!.Available), Is.False);
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(second.ShortName)!.Available), Is.False);
+
+                realm.Write(r => r.Remove(r.Find<RulesetInfo>(first.ShortName)!));
+
+                using var __ = new RealmRulesetStore(realm, storage);
+
+                Assert.That(realm.Run(r => r.Find<RulesetInfo>(second.ShortName)!.Available), Is.True);
             });
         }
 
@@ -123,6 +188,13 @@ namespace osu.Game.Tests.Database
             public static bool HasImplementations = true;
 
             public static string Version { get; set; } = CURRENT_RULESET_API_VERSION;
+
+            public static int OnlineID { get; set; } = -1;
+
+            public LoadTestRuleset()
+            {
+                RulesetInfo.OnlineID = OnlineID;
+            }
 
             public override IEnumerable<Mod> GetModsFor(ModType type)
             {

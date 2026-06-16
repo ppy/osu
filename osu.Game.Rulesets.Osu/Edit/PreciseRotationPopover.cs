@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, EditorOrigin.GridCentre));
 
-        private SliderWithTextBoxInput<float> angleInput = null!;
+        private FormSliderBar<float> angleInput { get; set; } = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
 
         private RadioButton gridCentreButton = null!;
@@ -54,11 +54,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 Width = 220,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(20),
+                Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    angleInput = new SliderWithTextBoxInput<float>("Angle (degrees):")
+                    angleInput = new FormSliderBar<float>
                     {
+                        Caption = "Angle (degrees)",
                         Current = new BindableNumber<float>
                         {
                             MinValue = -360,
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Precision = 1
                         },
                         KeyboardStep = 1f,
-                        Instantaneous = true
+                        TabbableContentContainer = this
                     },
                     rotationOrigin = new EditorRadioButtonCollection
                     {
@@ -157,6 +158,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             rotationInfo.BindValueChanged(rotation =>
             {
+                // can happen if the popover is dismissed by a keyboard key press while dragging UI controls
+                if (!rotationHandler.OperationInProgress.Value)
+                    return;
+
                 rotationHandler.Update(rotation.NewValue.Degrees, getOriginPosition(rotation.NewValue));
             });
         }

@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private IconButton pausePlay = null!;
 
         public PlaybackSettings()
-            : base("playback")
+            : base(PlayerSettingsOverlayStrings.PlaybackTitle)
         {
         }
 
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                             {
                                 rateSlider = new PlayerSliderBar<double>
                                 {
-                                    LabelText = "Playback speed",
+                                    LabelText = PlayerSettingsOverlayStrings.PlaybackSpeed,
                                     Current = UserPlaybackRate,
                                 },
                                 multiplierText = new OsuSpriteText

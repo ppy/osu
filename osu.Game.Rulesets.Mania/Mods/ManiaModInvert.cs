@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
@@ -19,11 +20,10 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "Invert";
 
         public override string Acronym => "IN";
-        public override double ScoreMultiplier => 1;
 
         public override LocalisableString Description => "Hold the keys. To the beat.";
 
-        public override IconUsage? Icon => FontAwesome.Solid.YinYang;
+        public override IconUsage? Icon => OsuIcon.ModInvert;
 
         public override ModType Type => ModType.Conversion;
 

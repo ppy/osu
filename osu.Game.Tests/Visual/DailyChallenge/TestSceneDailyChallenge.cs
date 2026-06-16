@@ -15,7 +15,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual.Metadata;
 using osu.Game.Tests.Visual.OnlinePlay;

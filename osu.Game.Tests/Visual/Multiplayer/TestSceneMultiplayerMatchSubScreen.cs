@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
@@ -16,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -44,6 +46,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public partial class TestSceneMultiplayerMatchSubScreen : MultiplayerTestScene
     {
         private MultiplayerMatchSubScreen screen = null!;
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
         private Room room = null!;
@@ -51,10 +54,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
             Dependencies.CacheAs<BeatmapStore>(new RealmDetachedBeatmapStore());
+            Dependencies.Cache(new ChannelManager(API));
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
@@ -317,13 +321,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<UserModSelectButton>();
             AddUntilStep("mod select shows unranked", () => this.ChildrenOfType<RankingInformationDisplay>().Single().Ranked.Value == false);
-            AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
+            AddAssert("score multiplier = 1.45", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.45).Within(0.01));
 
             AddStep("select flashlight", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().ChildrenOfType<ModPanel>().Single(m => m.Mod is ModFlashlight).TriggerClick());
-            AddAssert("score multiplier = 1.35", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.35).Within(0.01));
+            AddAssert("score multiplier = 1.74", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.74).Within(0.01));
 
-            AddStep("change flashlight setting", () => ((OsuModFlashlight)this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().SelectedMods.Value.Single()).FollowDelay.Value = 1200);
-            AddAssert("score multiplier = 1.20", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.2).Within(0.01));
+            AddStep("change flashlight setting", () => ((OsuModFlashlight)this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().SelectedMods.Value.Single()).ComboBasedSize.Value = false);
+            AddAssert("score multiplier = 1.51", () => this.ChildrenOfType<RankingInformationDisplay>().Single().ModMultiplier.Value, () => Is.EqualTo(1.51).Within(0.01));
+        }
+
+        [Test]
+        public void TestModSelectOverlayNonDefaultSettings()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods =
+                        [
+                            new APIMod(new OsuModSuddenDeath { FailOnSliderTail = { Value = true } }),
+                        ],
+                        AllowedMods = [],
+                        Freestyle = true
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<UserModSelectButton>();
+            AddAssert("sudden death not visible", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().Single().ChildrenOfType<ModPanel>().Single(m => m.Mod is ModSuddenDeath).Visible == false);
         }
 
         [Test]
@@ -347,6 +378,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
             AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
             AddAssert("button hidden", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestChangeSettingsButtonAlwaysVisibleForReferee()
+        {
+            AddStep("add playlist item", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+            AddStep("setup referee", () => MultiplayerClient.RoomSetupAction = r => r.Host!.Role = MultiplayerRoomUserRole.Referee);
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddUntilStep("button visible", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.GreaterThan(0));
+            AddStep("join other user", void () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
+            AddStep("make other user host", () => MultiplayerClient.TransferHost(PLAYER_1_ID));
+            AddAssert("button hidden", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().ChangeSettingsButton.Alpha, () => Is.GreaterThan(0));
         }
 
         [Test]
@@ -438,6 +493,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestRoll()
+        {
+            AddStep("set playlist", () =>
+            {
+                room.Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ];
+            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+            AddStep("set channel", () => room.ChannelId = 1);
+
+            AddUntilStep("wait for room join", () => RoomJoined);
+
+            AddStep("roll", () => MultiplayerClient.SendMatchRequest(new RollRequest()));
+        }
+
+        [Test]
         public void TestSettingsRemainsOpenOnRoomUpdate()
         {
             AddStep("set playlist", () =>
@@ -460,6 +536,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("trigger room update", () => MultiplayerClient.AddPlaylistItem(MultiplayerClient.ServerRoom!.Playlist[0].Clone()));
             AddAssert("settings still open", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private partial class TestMultiplayerMatchSubScreen : MultiplayerMatchSubScreen

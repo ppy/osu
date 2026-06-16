@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +12,17 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Skinning;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -31,17 +34,21 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
-        private PlaybackSettings playbackSettings;
-
         [Cached(typeof(IGameplayLeaderboardProvider))]
         private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
-        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+        protected override UserActivity? InitialActivity =>
+            // score may be null if LoadedBeatmapSuccessfully is false.
+            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo);
 
         private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
 
         private double? lastFrameTime;
-        private ReplayFailIndicator failIndicator;
+
+        private ReplayFailIndicator? failIndicator;
+        private PlaybackSettings? playbackSettings;
+
+        public ReplayOverlay ReplayOverlay { get; private set; } = null!;
 
         protected override bool CheckModsAllowFailure()
         {
@@ -60,12 +67,12 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Score score, PlayerConfiguration? configuration = null)
             : this((_, _) => score, configuration)
         {
         }
 
-        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
@@ -76,11 +83,7 @@ namespace osu.Game.Screens.Play
         /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
         /// </summary>
         /// <param name="settings">The settings group to be shown.</param>
-        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() =>
-        {
-            settings.Expanded.Value = false;
-            HUDOverlay.PlayerSettingsOverlay.Add(settings);
-        });
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => ReplayOverlay.Settings.Add(settings));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -89,6 +92,8 @@ namespace osu.Game.Screens.Play
                 return;
 
             AddInternal(leaderboardProvider);
+
+            GameplayClockContainer.Add(ReplayOverlay = new ReplayOverlay());
 
             playbackSettings = new PlaybackSettings
             {
@@ -99,18 +104,44 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
-            HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
-            AddInternal(failIndicator = new ReplayFailIndicator(GameplayClockContainer)
-            {
-                GoToResults = () =>
-                {
-                    if (!this.IsCurrentScreen())
-                        return;
+            ReplayOverlay.Settings.AddAtStart(playbackSettings);
 
-                    ValidForResume = false;
-                    this.Push(new SoloResultsScreen(Score.ScoreInfo));
+            OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
+            message.AddText("Watching ");
+            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" play ");
+            message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" on ");
+            message.AddArbitraryDrawable(new PlayedOnText(Score.ScoreInfo.Date, false)
+            {
+                Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
+            });
+
+            ReplayOverlay.SetMessage(new ScrollingMessage(message)
+            {
+                Y = 96,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            });
+
+            RulesetSkinProvidingContainer rulesetSkinProvider;
+            AddInternal(rulesetSkinProvider = new RulesetSkinProvidingContainer(GameplayState.Ruleset, GameplayState.Beatmap, Beatmap.Value.Skin)
+            {
+                Child = failIndicator = new ReplayFailIndicator(GameplayClockContainer)
+                {
+                    GoToResults = () =>
+                    {
+                        if (!this.IsCurrentScreen())
+                            return;
+
+                        ValidForResume = false;
+                        this.Push(new SoloResultsScreen(Score.ScoreInfo));
+                    }
                 }
             });
+            config.BindWith(OsuSetting.BeatmapSkins, rulesetSkinProvider.BeatmapSkins);
+            config.BindWith(OsuSetting.BeatmapColours, rulesetSkinProvider.BeatmapColours);
+            config.BindWith(OsuSetting.BeatmapHitsounds, rulesetSkinProvider.BeatmapHitsounds);
         }
 
         protected override void PrepareReplay()
@@ -133,6 +164,9 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!LoadedBeatmapSuccessfully)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.StepReplayBackward:
@@ -144,11 +178,11 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.SeekReplayBackward:
-                    SeekInDirection(-5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(-5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    SeekInDirection(5 * (float)playbackSettings.UserPlaybackRate.Value);
+                    SeekInDirection(5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
@@ -192,7 +226,7 @@ namespace osu.Game.Screens.Play
         {
             // base logic intentionally suppressed - we have our own custom fail interaction
             ScoreProcessor.FailScore(Score.ScoreInfo);
-            failIndicator.Display();
+            failIndicator!.Display();
         }
 
         public override void OnSuspending(ScreenTransitionEvent e)
@@ -204,18 +238,18 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(ScreenExitEvent e)
         {
             // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
+            failIndicator?.RemoveAndDisposeImmediately();
             return base.OnExiting(e);
         }
 
         private void stopAllAudioEffects()
         {
             // safety against filters or samples from the indicator playing long after the screen is exited
-            failIndicator.RemoveAndDisposeImmediately();
+            failIndicator?.RemoveAndDisposeImmediately();
 
             if (GameplayClockContainer is MasterGameplayClockContainer master)
             {
-                playbackSettings.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
+                playbackSettings?.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
                 master.UserPlaybackRate.SetDefault();
             }
         }

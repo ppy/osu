@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -181,7 +181,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("beatmap in song select", () =>
             {
                 var songSelect = (SoloSongSelect)Game.ScreenStack.CurrentScreen;
-                return songSelect.ChildrenOfType<BeatmapCarousel>().Single().GetCarouselItems()!.Any(i => i.Model is BeatmapSetInfo bsi && bsi.MatchesOnlineID(getImport()));
+                return songSelect.ChildrenOfType<BeatmapCarousel>().Single().GetCarouselItems()!.Any(i => i.Model is GroupedBeatmapSet gbs && gbs.BeatmapSet.MatchesOnlineID(getImport()));
             });
         }
 

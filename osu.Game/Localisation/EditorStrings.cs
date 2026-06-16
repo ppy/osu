@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
 
         /// <summary>
+        /// "Show storyboard"
+        /// </summary>
+        public static LocalisableString ShowStoryboard => new TranslatableString(getKey(@"show_storyboard"), @"Show storyboard");
+
+        /// <summary>
         /// "Show hit markers"
         /// </summary>
         public static LocalisableString ShowHitMarkers => new TranslatableString(getKey(@"show_hit_markers"), @"Show hit markers");
@@ -53,6 +58,11 @@ namespace osu.Game.Localisation
         /// "For compatibility (.osz)"
         /// </summary>
         public static LocalisableString ExportForCompatibility => new TranslatableString(getKey(@"export_for_compatibility"), @"For compatibility (.osz)");
+
+        /// <summary>
+        /// "Guest difficulty (.osu)"
+        /// </summary>
+        public static LocalisableString ExportGuestDifficulty => new TranslatableString(getKey(@"export_guest_difficulty"), @"Guest difficulty (.osu)");
 
         /// <summary>
         /// "Create new difficulty"
@@ -218,6 +228,46 @@ namespace osu.Game.Localisation
         /// "Entire beatmap set"
         /// </summary>
         public static LocalisableString CheckEntireBeatmapSet => new TranslatableString(getKey(@"check_entire_beatmap_set"), @"Entire beatmap set");
+
+        /// <summary>
+        /// "Saving is not supported for this ruleset yet, sorry!"
+        /// </summary>
+        public static LocalisableString RulesetNotSupportSaving => new TranslatableString(getKey(@"ruleset_not_support_saving"), @"Saving is not supported for this ruleset yet, sorry!");
+
+        /// <summary>
+        /// "Export failed!"
+        /// </summary>
+        public static LocalisableString ExportFailed => new TranslatableString(getKey(@"export_failed"), @"Export failed!");
+
+        /// <summary>
+        /// "Import failed!"
+        /// </summary>
+        public static LocalisableString ImportFailed => new TranslatableString(getKey(@"import_failed"), @"Import failed!");
+
+        /// <summary>
+        /// "Open folder"
+        /// </summary>
+        public static LocalisableString OpenFolder => new TranslatableString(getKey(@"open_folder"), @"Open folder");
+
+        /// <summary>
+        /// "Cleaning up..."
+        /// </summary>
+        public static LocalisableString ExternalEditCleaningUp => new TranslatableString(getKey(@"external_edit_cleaning_up"), @"Cleaning up...");
+
+        /// <summary>
+        /// "Exporting for edit..."
+        /// </summary>
+        public static LocalisableString ExternalEditExporting => new TranslatableString(getKey(@"external_edit_exporting"), @"Exporting for edit...");
+
+        /// <summary>
+        /// "Beatmap is mounted externally"
+        /// </summary>
+        public static LocalisableString BeatmapMountedExternally => new TranslatableString(getKey(@"beatmap_mounted_externally"), @"Beatmap is mounted externally");
+
+        /// <summary>
+        /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
+        /// </summary>
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -15,6 +15,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         public bool GameplayPassed => player?.GameplayState.HasPassed == true;
 
+        public override bool AllowUserExit => false;
+
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; } = null!;
 

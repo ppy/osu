@@ -32,14 +32,11 @@ namespace osu.Game.Screens.Footer
             return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
         }
 
-        public ScreenBackButton()
-            : base(BUTTON_WIDTH)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
+            Width = BUTTON_WIDTH;
+
             ButtonContent.Child = new FillFlowContainer
             {
                 X = -10f,

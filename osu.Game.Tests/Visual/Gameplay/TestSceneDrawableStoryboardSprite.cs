@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -51,6 +52,45 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestSpriteFadeOverflowBehaviour()
+        {
+            ManualClock manualClock = new ManualClock();
+
+            AddStep("allow storyboard lookup", () =>
+            {
+                storyboard.UseSkinSprites = false;
+                storyboard.ProvideResources = true;
+            });
+
+            AddStep("create sprite", () => SetContents(_ =>
+            {
+                var layer = storyboard.GetLayer("Background");
+
+                var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, lookup_name, Anchor.TopLeft, new Vector2(256, 192));
+                sprite.Commands.AddAlpha(Easing.None, 0, 2000, 0, 2);
+
+                layer.Elements.Clear();
+                layer.Add(sprite);
+
+                return new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        storyboard.CreateDrawable().With(d => d.Clock = new FramedClock(manualClock))
+                    }
+                };
+            }));
+
+            AddStep("seek to 1000 ms", () => manualClock.CurrentTime = 900);
+            AddUntilStep("sprite reached high opacity once", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha > 0.8f)));
+            AddStep("seek to 2000 ms", () => manualClock.CurrentTime = 1100);
+            AddUntilStep("sprite reset to low opacity", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha < 0.2f)));
+            AddStep("seek to 2000 ms", () => manualClock.CurrentTime = 1900);
+            AddUntilStep("sprite reached high opacity twice", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha > 0.8f)));
+        }
+
+        [Test]
         public void TestLookupFromStoryboard()
         {
             AddStep("allow storyboard lookup", () =>
@@ -81,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var layer = storyboard.GetLayer("Video");
 
-                var sprite = new StoryboardVideo("Videos/test-video.mp4", Time.Current);
+                var sprite = new StoryboardVideo(StoryboardElementSource.Beatmap, "Videos/test-video.mp4", Time.Current);
 
                 if (scaleTransformProvided)
                 {
@@ -210,7 +250,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var layer = storyboard.GetLayer("Background");
 
-            var sprite = new StoryboardSprite(lookupName, origin, initialPosition);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, lookupName, origin, initialPosition);
             var loop = sprite.AddLoopingGroup(Time.Current, 100);
             loop.AddAlpha(Easing.None, 0, 10000, 1, 1);
 

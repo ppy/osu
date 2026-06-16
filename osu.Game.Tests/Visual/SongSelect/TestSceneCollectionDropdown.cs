@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -23,11 +24,16 @@ using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 using Realms;
+using CollectionDropdown = osu.Game.Screens.Select.CollectionDropdown;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
+    /// <summary>
+    /// WARNING: TODO: we have TWO `CollectionDropdowns` with diverging functionality. This is not good.
+    /// </summary>
     public partial class TestSceneCollectionDropdown : OsuManualInputManagerTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
         private CollectionDropdown dropdown = null!;
 
@@ -37,7 +43,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
@@ -86,11 +92,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "2"))));
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "3"))));
 
-            AddAssert("check count 5", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
+            AddUntilStep("check count 5", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(5));
 
             AddStep("delete all collections", () => writeAndRefresh(r => r.RemoveAll<BeatmapCollection>()));
 
-            AddAssert("check count 2", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
+            AddUntilStep("check count 2", () => dropdown.ChildrenOfType<CollectionDropdown>().Single().ChildrenOfType<Menu.DrawableMenuItem>().Count(), () => Is.EqualTo(2));
         }
 
         [Test]
@@ -185,19 +191,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection contains beatmap", () => getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddUntilStep("collection contains beatmap", () => getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             assertFirstButtonIs(FontAwesome.Solid.MinusSquare);
 
             addClickAddOrRemoveButtonStep(1);
-            AddAssert("collection does not contain beatmap", () => !getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
+            AddUntilStep("collection does not contain beatmap", () => !getFirstCollection().BeatmapMD5Hashes.Contains(Beatmap.Value.BeatmapInfo.MD5Hash));
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
         }
 
         [Test]
         public void TestManageCollectionsFilterIsNotSelected()
         {
-            bool received = false;
-
             addExpandHeaderStep();
 
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1", new List<string> { "abc" }))));
@@ -211,12 +215,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             addExpandHeaderStep();
 
-            AddStep("watch for filter requests", () =>
-            {
-                received = false;
-                dropdown.ChildrenOfType<CollectionDropdown>().First().RequestFilter = () => received = true;
-            });
-
             AddStep("click manage collections filter", () =>
             {
                 int lastItemIndex = dropdown.ChildrenOfType<CollectionDropdown>().Single().Items.Count() - 1;
@@ -225,8 +223,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("collection filter still selected", () => dropdown.Current.Value.CollectionName == "1");
-
-            AddAssert("filter request not fired", () => !received);
         }
 
         private void writeAndRefresh(Action<Realm> action) => Realm.Write(r =>
@@ -239,7 +235,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void assertCollectionHeaderDisplays(LocalisableString collectionName, bool shouldDisplay = true)
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
-                () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
+                () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
 
         private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
@@ -253,7 +249,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void addExpandHeaderStep() => AddStep("expand header", () =>
         {
-            InputManager.MoveMouseTo(dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Single());
+            InputManager.MoveMouseTo(dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Single());
             InputManager.Click(MouseButton.Left);
         });
 
@@ -268,6 +264,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             // todo: we should be able to use Items, but apparently that's not guaranteed to be ordered... see: https://github.com/ppy/osu-framework/pull/6079
             CollectionFilterMenuItem item = dropdown.ChildrenOfType<CollectionDropdown>().Single().ItemSource.ElementAt(index);
             return dropdown.ChildrenOfType<Menu.DrawableMenuItem>().Single(i => i.Item.Text.Value == item.CollectionName);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
     }
 }

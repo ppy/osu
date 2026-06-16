@@ -18,8 +18,8 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.SelectV2;
-using FilterControl = osu.Game.Screens.SelectV2.FilterControl;
+using osu.Game.Screens.Select;
+using FilterControl = osu.Game.Screens.Select.FilterControl;
 
 namespace osu.Game.Tests.Visual.Navigation
 {

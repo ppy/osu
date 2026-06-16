@@ -30,7 +30,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             set
             {
                 buttonsExpandedWidth = value;
-                buttonArea.Width = value;
                 if (IsLoaded)
                     updateState();
             }
@@ -67,7 +66,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public CollapsibleButtonContainer(APIBeatmapSet beatmapSet)
+        public CollapsibleButtonContainer(APIBeatmapSet beatmapSet, bool allowNavigationToBeatmap = true, bool keepBackgroundLoaded = false)
         {
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
 
@@ -116,14 +115,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                             },
-                            new GoToBeatmapButton(beatmapSet)
-                            {
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State },
-                                RelativeSizeAxes = Axes.Both,
-                                Height = 0.5f,
-                            }
                         }
                     }
                 },
@@ -135,7 +126,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new BeatmapCardContentBackground(beatmapSet)
+                        new BeatmapCardContentBackground(beatmapSet, keepBackgroundLoaded)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Dimmed = { BindTarget = ShowDetails }
@@ -152,6 +143,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     }
                 }
             };
+
+            buttons.Add(new GoToBeatmapButton(beatmapSet, allowNavigationToBeatmap)
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                State = { BindTarget = downloadTracker.State },
+                RelativeSizeAxes = Axes.Both,
+                Height = 0.5f,
+            });
         }
 
         protected override void LoadComplete()
@@ -165,6 +165,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
+            buttonArea.Width = buttonsExpandedWidth;
+
             float buttonAreaWidth = ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth;
             float mainAreaWidth = Width - buttonAreaWidth;
 
@@ -172,6 +174,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             // By limiting the width we avoid this box showing up as an outline around the drawables that are on top of it.
             background.ResizeWidthTo(buttonAreaWidth + BeatmapCard.CORNER_RADIUS, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            if (ButtonsCollapsedWidth == 0)
+                background.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
 
             background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             buttons.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);

@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -93,8 +94,8 @@ namespace osu.Game.Tests.Database
 
                     var importedSet = realm.Realm.All<BeatmapSetInfo>().Single();
 
-                    Assert.NotNull(importedSet);
-                    Assert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), importedSet.DateAdded);
+                    ClassicAssert.NotNull(importedSet);
+                    ClassicAssert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), importedSet.DateAdded);
                 }
             });
         }
