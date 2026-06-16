@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
         }
 
-        private double calculateAimDifficultyRating(double difficultyValue) => Math.Pow(difficultyValue, 0.63) * 0.02275;
+        private double calculateAimDifficultyRating(double difficultyValue) => Math.Pow(difficultyValue, 0.65) * 0.01422;
 
         private double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * 0.0675;
 
