@@ -167,6 +167,27 @@ namespace osu.Game.Tests.Online
             addAvailabilityCheckStep("locally available after re-import", BeatmapAvailability.LocallyAvailable);
         }
 
+        [Test]
+        public void TestManualExternalImportDuringDownload()
+        {
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
+
+            AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
+            addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
+
+            AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
+            addAvailabilityCheckStep("state downloading", () => BeatmapAvailability.Downloading(0.0f));
+
+            AddStep("import beatmap externally", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).SetProgress(0.4f));
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+
+            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).TriggerSuccess(testBeatmapFile));
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+        }
+
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
             AddUntilStep(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
