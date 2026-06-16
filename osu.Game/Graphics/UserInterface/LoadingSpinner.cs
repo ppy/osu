@@ -198,7 +198,6 @@ namespace osu.Game.Graphics.UserInterface
         private void onBeat(double beatLength)
         {
             targetRotation += 90;
-
             MainContents.RotateTo(targetRotation, beatLength, Easing.InOutQuart);
         }
 
@@ -208,10 +207,9 @@ namespace osu.Game.Graphics.UserInterface
 
             public LoadingSpinnerBeatSyncer(Action<double> onBeat)
             {
-                this.onBeat = onBeat;
-                RelativeSizeAxes = Axes.Both;
                 AllowMistimedEventFiring = false;
-                EarlyActivationMilliseconds = 60;
+
+                this.onBeat = onBeat;
             }
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -227,6 +225,8 @@ namespace osu.Game.Graphics.UserInterface
                     beatLength *= 2;
                     beatsPerStep *= 2;
                 }
+
+                EarlyActivationMilliseconds = beatLength / 3;
 
                 // Skip beats that don't align with the current step.
                 if (beatIndex % beatsPerStep != 0)
