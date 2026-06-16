@@ -28,19 +28,6 @@ namespace osu.Desktop.IPC
             server.StartAsync().FireAndForget(onError: ex => Logger.Error(ex, "Failed to start websocket"));
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (server?.IsRunning == true)
-            {
-                var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(10));
-                server.StopAsync(cts.Token).WaitSafely();
-                server = null;
-            }
-        }
-
         public void Register(WebSocketDataSource dataSource)
         {
             dataSources.Add(dataSource);
@@ -63,5 +50,18 @@ namespace osu.Desktop.IPC
                     await server.BroadcastAsync(messageString).ConfigureAwait(false);
                 })
                 .FireAndForget();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (server?.IsRunning == true)
+            {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(10));
+                server.StopAsync(cts.Token).WaitSafely();
+                server = null;
+            }
+        }
     }
 }
