@@ -5,7 +5,7 @@ using System;
 using System.Text.Json.Serialization;
 using osu.Framework.Extensions.TypeExtensions;
 
-namespace osu.Desktop.IPC.Messages
+namespace osu.Game.IPC.Messages
 {
     [Serializable]
     public abstract class OsuWebSocketMessage

@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace osu.Desktop.IPC.Messages
+namespace osu.Game.IPC.Messages
 {
     public class WebSocketBeatmapDifficulty
     {

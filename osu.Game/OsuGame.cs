@@ -44,6 +44,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.IPC;
+using osu.Game.IPC.DataSources;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests;
@@ -344,10 +346,10 @@ namespace osu.Game
             return userInputManager;
         }
 
-        private DependencyContainer dependencies;
+        protected new DependencyContainer Dependencies { get; private set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         private readonly List<string> dragDropFiles = new List<string>();
         private ScheduledDelegate dragDropImportSchedule;
@@ -410,9 +412,9 @@ namespace osu.Game
             sentryLogger.AttachUser(API.LocalUser);
 
             if (SeasonalUIConfig.ENABLED)
-                dependencies.CacheAs(osuLogo = new OsuLogoChristmas { Alpha = 0 });
+                Dependencies.CacheAs(osuLogo = new OsuLogoChristmas { Alpha = 0 });
             else
-                dependencies.CacheAs(osuLogo = new OsuLogo { Alpha = 0 });
+                Dependencies.CacheAs(osuLogo = new OsuLogo { Alpha = 0 });
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
@@ -560,7 +562,7 @@ namespace osu.Game
 
         public void CopyToClipboard(string value) => waitForReady(() => onScreenDisplay, _ =>
         {
-            dependencies.Get<Clipboard>().SetText(value);
+            Dependencies.Get<Clipboard>().SetText(value);
             onScreenDisplay.Display(new CopiedToClipboardToast());
         });
 
@@ -1028,6 +1030,9 @@ namespace osu.Game
             // To reproduce, run `TestSceneButtonSystemNavigation` ensuring `TestConstructor` runs before `TestFastShortcutKeys`.
             detachedBeatmapStore?.Dispose();
 
+            playerStateWebSocketDataSource?.Dispose();
+            userActivityWebSocketDataSource?.Dispose();
+
             base.Dispose(isDisposing);
 
             sentryLogger.Dispose();
@@ -1052,6 +1057,12 @@ namespace osu.Game
                 { FrameworkSetting.AudioUseExperimentalWasapi, true },
             };
         }
+
+        [CanBeNull]
+        private PlayerStateWebSocketDataSource playerStateWebSocketDataSource;
+
+        [CanBeNull]
+        private UserActivityWebSocketDataSource userActivityWebSocketDataSource;
 
         protected override void LoadComplete()
         {
@@ -1080,7 +1091,7 @@ namespace osu.Game
 
             ScreenFooter.BackReceptor backReceptor;
 
-            dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
+            Dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
             var sessionIdleTracker = new GameIdleTracker(300000);
             sessionIdleTracker.IsIdle.BindValueChanged(idle =>
@@ -1148,7 +1159,7 @@ namespace osu.Game
                 new ConfineMouseTracker()
             });
 
-            dependencies.Cache(ScreenFooter);
+            Dependencies.Cache(ScreenFooter);
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
@@ -1312,6 +1323,14 @@ namespace osu.Game
             // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
             // debug / local compilations will reset to a non-release string.
             LocalConfig.SetValue(OsuSetting.Version, version);
+
+            var webSocketProvider = Dependencies.Get<IWebSocketProvider>();
+
+            if (webSocketProvider != null)
+            {
+                userActivityWebSocketDataSource = new UserActivityWebSocketDataSource(webSocketProvider, SessionStatics);
+                playerStateWebSocketDataSource = new PlayerStateWebSocketDataSource(webSocketProvider, Beatmap, Ruleset, SelectedMods, DifficultyCache, Host);
+            }
         }
 
         /// <summary>
@@ -1527,7 +1546,7 @@ namespace osu.Game
             where T : class
         {
             if (cache)
-                dependencies.CacheAs(component);
+                Dependencies.CacheAs(component);
 
             var drawableComponent = component as Drawable ?? throw new ArgumentException($"Component must be a {nameof(Drawable)}", nameof(component));
 
