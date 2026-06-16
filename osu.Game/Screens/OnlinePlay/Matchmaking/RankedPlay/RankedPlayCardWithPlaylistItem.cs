@@ -13,6 +13,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         public readonly Bindable<MultiplayerPlaylistItem?> PlaylistItem = new Bindable<MultiplayerPlaylistItem?>();
         public readonly RankedPlayCardItem Card;
 
+        /// <summary>
+        /// The player's preferred display order for this card
+        /// </summary>
+        public int? DisplayOrder { get; set; }
+
         public RankedPlayCardWithPlaylistItem(RankedPlayCardItem card)
         {
             Card = card;

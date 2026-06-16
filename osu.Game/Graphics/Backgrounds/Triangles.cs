@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// <summary>
         /// The amount of triangles we want compared to the default distribution.
         /// </summary>
-        protected virtual float SpawnRatio => 1;
+        public float SpawnRatio { get; set; } = 1;
 
         private readonly BindableFloat triangleScale = new BindableFloat(1f);
 

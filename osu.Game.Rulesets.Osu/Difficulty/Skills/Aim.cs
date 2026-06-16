@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
 
             currentStrain *= decay;
-            currentStrain += calculateModAdjustedDifficulty(current) * (1 - decay);
+            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay);
 
             if (current.BaseObject is Slider)
                 sliderStrains.Add(currentStrain);
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return currentStrain;
         }
 
-        private double calculateModAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierSnap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skillMultiplierAgility;
@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 float magnetisedStrength = Mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
                 totalDifficulty *= 1.0 - magnetisedStrength;
             }
+
+            totalDifficulty *= 0.985 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
 
             return totalDifficulty;
         }

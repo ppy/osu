@@ -10,6 +10,8 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics.Carousel;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Utils;
@@ -230,6 +232,16 @@ namespace osu.Game.Screens.Select
                 {
                     var favouriteBeatmapSets = GetFavouriteBeatmapSets();
                     return getGroupsBy(b => defineGroupByFavourites(b, favouriteBeatmapSets), items);
+                }
+
+                case GroupMode.Variant:
+                {
+                    var rulesetInstance = criteria.Ruleset?.CreateInstance();
+
+                    if (rulesetInstance == null || rulesetInstance.AvailableVariants.Count() <= 1)
+                        goto case GroupMode.None;
+
+                    return getGroupsBy(b => defineGroupByVariant(rulesetInstance, b, criteria.Mods), items);
                 }
 
                 default:
@@ -478,6 +490,13 @@ namespace osu.Game.Screens.Select
                 return new GroupDefinition(0, "Favourites").Yield();
 
             return [];
+        }
+
+        private IEnumerable<GroupDefinition> defineGroupByVariant(Ruleset rulesetInstance, BeatmapInfo beatmap, IReadOnlyList<Mod>? mods = null)
+        {
+            int variant = rulesetInstance.GetVariantForBeatmap(beatmap, mods);
+            var name = rulesetInstance.GetVariantName(variant);
+            return new GroupDefinition(variant, name).Yield();
         }
 
         private record GroupMapping(GroupDefinition? Group, List<CarouselItem> ItemsInGroup);
