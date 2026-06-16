@@ -660,8 +660,6 @@ namespace osu.Game.Beatmaps
             remove => workingBeatmapCache.OnInvalidated -= value;
         }
 
-        public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID && !s.DeletePending));
-
         public bool IsAvailableLocally(IBeatmapInfo model)
         {
             return Realm.Run(r => r.All<BeatmapInfo>()
