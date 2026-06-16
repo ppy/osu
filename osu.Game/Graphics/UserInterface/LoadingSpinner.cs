@@ -174,8 +174,11 @@ namespace osu.Game.Graphics.UserInterface
         protected override void PopIn()
         {
             if (Alpha < 0.5f)
+            {
                 // reset animation if the user can't see us.
-                targetRotation = MainContents.Rotation;
+                targetRotation = 0;
+                MainContents.RotateTo(0);
+            }
 
             MainContents.ScaleTo(1, TRANSITION_DURATION, Easing.OutQuint);
 
