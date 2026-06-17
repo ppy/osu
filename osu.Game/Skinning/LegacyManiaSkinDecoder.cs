@@ -99,11 +99,11 @@ namespace osu.Game.Skinning
                         break;
 
                     case "ComboPosition":
-                        currentConfig.ComboPosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.ComboPosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "ScorePosition":
-                        currentConfig.ScorePosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.ScorePosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "JudgementLine":
@@ -128,7 +128,7 @@ namespace osu.Game.Skinning
                         break;
 
                     case "WidthForNoteHeightScale":
-                        currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.WidthForNoteHeightScale = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightFramePerSecond":
