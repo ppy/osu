@@ -2,11 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
 using osu.Game.IPC.Messages;
 
 namespace osu.Game.IPC
 {
-    public class WebSocketDataSource : IDisposable
+    public partial class WebSocketDataSource : Component
     {
         private readonly IWebSocketProvider provider;
 
@@ -21,8 +22,10 @@ namespace osu.Game.IPC
         public void BroadcastMessage(OsuWebSocketMessage message)
             => MessageReceived?.Invoke(message);
 
-        public void Dispose()
+        protected override void Dispose(bool isDisposing)
         {
+            base.Dispose(isDisposing);
+
             provider.Unregister(this);
         }
     }

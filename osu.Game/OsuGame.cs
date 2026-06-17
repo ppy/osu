@@ -1030,9 +1030,6 @@ namespace osu.Game
             // To reproduce, run `TestSceneButtonSystemNavigation` ensuring `TestConstructor` runs before `TestFastShortcutKeys`.
             detachedBeatmapStore?.Dispose();
 
-            playerStateWebSocketDataSource?.Dispose();
-            userActivityWebSocketDataSource?.Dispose();
-
             base.Dispose(isDisposing);
 
             sentryLogger.Dispose();
@@ -1057,12 +1054,6 @@ namespace osu.Game
                 { FrameworkSetting.AudioUseExperimentalWasapi, true },
             };
         }
-
-        [CanBeNull]
-        private PlayerStateWebSocketDataSource playerStateWebSocketDataSource;
-
-        [CanBeNull]
-        private UserActivityWebSocketDataSource userActivityWebSocketDataSource;
 
         protected override void LoadComplete()
         {
@@ -1328,8 +1319,10 @@ namespace osu.Game
 
             if (webSocketProvider != null)
             {
-                userActivityWebSocketDataSource = new UserActivityWebSocketDataSource(webSocketProvider, SessionStatics);
-                playerStateWebSocketDataSource = new PlayerStateWebSocketDataSource(webSocketProvider, Beatmap, Ruleset, SelectedMods, DifficultyCache, Host);
+                AddRange([
+                    new UserActivityWebSocketDataSource(webSocketProvider),
+                    new PlayerStateWebSocketDataSource(webSocketProvider)
+                ]);
             }
         }
 

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.IPC.Messages;
@@ -12,10 +13,19 @@ namespace osu.Game.IPC.DataSources
     {
         private readonly Bindable<UserActivity?> userActivity = new Bindable<UserActivity?>();
 
-        public UserActivityWebSocketDataSource(IWebSocketProvider provider, SessionStatics sessionStatics)
-            : base(provider)
+        public UserActivityWebSocketDataSource(IWebSocketProvider provider)
+            : base(provider) { }
+
+        [BackgroundDependencyLoader]
+        private void load(SessionStatics sessionStatics)
         {
             sessionStatics.BindWith(Static.UserOnlineActivity, userActivity);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             userActivity.BindValueChanged(onUserActivityChange);
         }
 

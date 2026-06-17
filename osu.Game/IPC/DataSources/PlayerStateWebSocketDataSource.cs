@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -19,25 +19,29 @@ using osu.Game.Utils;
 
 namespace osu.Game.IPC.DataSources
 {
-    public class PlayerStateWebSocketDataSource : WebSocketDataSource
+    public partial class PlayerStateWebSocketDataSource : WebSocketDataSource
     {
-        private readonly Bindable<WorkingBeatmap> workingBeatmap;
-        private readonly IBindable<RulesetInfo> rulesetInfo;
-        private readonly IBindable<IReadOnlyList<Mod>> mods;
-        private readonly BeatmapDifficultyCache difficultyCache;
+        [Resolved]
+        private Bindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<RulesetInfo> rulesetInfo { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         private ModSettingChangeTracker? modSettingChangeTracker;
         private ScheduledDelegate? debouncedModSettingsChange;
 
-        public PlayerStateWebSocketDataSource(IWebSocketProvider provider, Bindable<WorkingBeatmap> workingBeatmap,
-                                              IBindable<RulesetInfo> rulesetInfo, IBindable<IReadOnlyList<Mod>> mods,
-                                              BeatmapDifficultyCache difficultyCache, GameHost gameHost)
-            : base(provider)
+        public PlayerStateWebSocketDataSource(IWebSocketProvider provider)
+            : base(provider) { }
+
+        protected override void LoadComplete()
         {
-            this.workingBeatmap = workingBeatmap;
-            this.rulesetInfo = rulesetInfo;
-            this.mods = mods;
-            this.difficultyCache = difficultyCache;
+            base.LoadComplete();
 
             workingBeatmap.BindValueChanged(val =>
             {
@@ -68,7 +72,7 @@ namespace osu.Game.IPC.DataSources
                 modSettingChangeTracker.SettingChanged += _ =>
                 {
                     debouncedModSettingsChange?.Cancel();
-                    debouncedModSettingsChange = gameHost.UpdateThread.Scheduler.AddDelayed(() => updatePlayerState().FireAndForget(), 100);
+                    debouncedModSettingsChange = Scheduler.AddDelayed(() => updatePlayerState().FireAndForget(), 100);
                 };
             });
         }
