@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
@@ -29,6 +31,9 @@ namespace osu.Game.Screens.Play
 
         private ISample? sectionFailSample;
         private ISample? sectionPassSample;
+
+        private Texture? sectionFailTextureFallback;
+        private Texture? sectionPassTextureFallback;
 
         private readonly Sprite sectionFailSprite;
         private readonly Sprite sectionPassSprite;
@@ -65,16 +70,25 @@ namespace osu.Game.Screens.Play
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(SkinManager skins)
+        {
+            var defaultLegacySkin = skins.DefaultClassicSkin;
+
+            sectionFailTextureFallback = defaultLegacySkin.GetTexture(@"section-fail");
+            sectionPassTextureFallback = defaultLegacySkin.GetTexture(@"section-pass");
+        }
+
         protected override void SkinChanged(ISkinSource skin)
         {
             sectionFailSample = skin.GetSample(new SampleInfo(@"Gameplay/sectionfail"));
             sectionPassSample = skin.GetSample(new SampleInfo(@"Gameplay/sectionpass"));
 
-            sectionFailSprite.Size = Vector2.Zero;
-            sectionFailSprite.Texture = skin.GetTexture(@"section-fail");
+            sectionFailSprite.Texture = skin.GetTexture(@"section-fail") ?? sectionFailTextureFallback;
+            sectionFailSprite.Size = sectionFailSprite.Texture?.DisplaySize ?? Vector2.Zero;
 
-            sectionPassSprite.Size = Vector2.Zero;
-            sectionPassSprite.Texture = skin.GetTexture(@"section-pass");
+            sectionPassSprite.Texture = skin.GetTexture(@"section-pass") ?? sectionPassTextureFallback;
+            sectionPassSprite.Size = sectionPassSprite.Texture?.DisplaySize ?? Vector2.Zero;
         }
 
         protected override void LoadComplete()

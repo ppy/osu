@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -11,6 +12,8 @@ namespace osu.Game.Screens.Play.Break
 {
     public partial class LegacyBreakArrows : SkinReloadableDrawable
     {
+        private Texture? playWarningArrowTextureFallback;
+
         private readonly Sprite[] sprites;
 
         public LegacyBreakArrows()
@@ -54,6 +57,14 @@ namespace osu.Game.Screens.Play.Break
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(SkinManager skins)
+        {
+            var defaultLegacySkin = skins.DefaultClassicSkin;
+
+            playWarningArrowTextureFallback = defaultLegacySkin.GetTexture(@"play-warningarrow");
+        }
+
         protected override void SkinChanged(ISkinSource skin)
         {
             Texture? arrowWarningTexture = skin.GetTexture(@"arrow-warning");
@@ -62,12 +73,18 @@ namespace osu.Game.Screens.Play.Break
 
             bool newerTextureAvailable = arrowWarningTexture != null;
             var arrowColour = !newerTextureAvailable && skinVersion >= 2.0m ? Colour4.Red : Colour4.White;
-            Texture arrowTexture = newerTextureAvailable ? arrowWarningTexture! : playWarningArrowTexture!;
+            Texture? arrowTexture = newerTextureAvailable ? arrowWarningTexture : playWarningArrowTexture;
+
+            if (arrowTexture == null)
+            {
+                arrowColour = Colour4.Red;
+                arrowTexture = playWarningArrowTextureFallback;
+            }
 
             foreach (var sprite in sprites)
             {
-                sprite.Size = Vector2.Zero;
                 sprite.Texture = arrowTexture;
+                sprite.Size = arrowTexture?.DisplaySize ?? Vector2.Zero;
                 sprite.Colour = arrowColour;
             }
         }
