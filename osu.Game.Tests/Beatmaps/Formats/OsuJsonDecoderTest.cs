@@ -79,6 +79,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
             ClassicAssert.AreEqual(1.8, beatmap.DistanceSpacing);
             ClassicAssert.AreEqual(4, beatmapInfo.BeatDivisor);
             ClassicAssert.AreEqual(4, beatmap.GridSize);
+            ClassicAssert.AreEqual(PositionSnapGridType.Square, beatmap.GridType);
+            ClassicAssert.AreEqual(0, beatmap.GridRotation);
+            ClassicAssert.AreEqual(null, beatmap.GridOffset);
             ClassicAssert.AreEqual(2, beatmap.TimelineZoom);
         }
 

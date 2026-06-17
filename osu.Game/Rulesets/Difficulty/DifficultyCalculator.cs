@@ -398,7 +398,7 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.DistanceSpacing = value;
             }
 
-            public float GridSize
+            public int GridSize
             {
                 get => baseBeatmap.GridSize;
                 set => baseBeatmap.GridSize = value;

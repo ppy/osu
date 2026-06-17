@@ -185,6 +185,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             };
 
             GridLineSpacing.Value = editorBeatmap.GridSize;
+
+            if (editorBeatmap.GridOffset != null)
+            {
+                StartPositionX.Value = editorBeatmap.GridOffset.Value.X;
+                StartPositionY.Value = editorBeatmap.GridOffset.Value.Y;
+            }
         }
 
         protected override void LoadComplete()
@@ -228,17 +234,19 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 spacingSlider.ContractedLabelText = $"S: {spacing.NewValue:#,0.##}";
                 SpacingVector.Value = new Vector2(spacing.NewValue);
-                editorBeatmap.GridSize = spacing.NewValue;
+                editorBeatmap.GridSize = (int)spacing.NewValue;
             }, true);
 
             GridLinesRotation.BindValueChanged(rotation =>
             {
                 gridLinesRotationSlider.ContractedLabelText = $"R: {rotation.NewValue:#,0.##}";
+                editorBeatmap.GridRotation = rotation.NewValue;
             }, true);
 
             GridType.BindValueChanged(v =>
             {
-                GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
+                // Line bellow is crashing the game for some reason
+                // GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
 
                 gridTypeButtons.Items[(int)v.NewValue].Select();
                 editorBeatmap.GridType = v.NewValue;

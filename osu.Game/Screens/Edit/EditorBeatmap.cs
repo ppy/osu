@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.DistanceSpacing = value;
         }
 
-        public float GridSize
+        public int GridSize
         {
             get => PlayableBeatmap.GridSize;
             set => PlayableBeatmap.GridSize = value;
