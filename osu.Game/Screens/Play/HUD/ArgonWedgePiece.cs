@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Skinning;
 using osuTK;
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Inverted shear")]
+        [SettingSource(typeof(ArgonWedgePieceStrings), nameof(ArgonWedgePieceStrings.InvertedShear))]
         public BindableBool InvertShear { get; } = new BindableBool();
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour))]
