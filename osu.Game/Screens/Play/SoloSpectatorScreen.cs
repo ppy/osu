@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
 
         private ScheduledDelegate? beatmapFetchCallback;
 
-        private APIBeatmapSet? beatmapSet;
+        private APIBeatmap? beatmap;
 
         public SoloSpectatorScreen(APIUser targetUser)
             : base(targetUser.Id)
@@ -245,29 +245,28 @@ namespace osu.Game.Screens.Play
 
             beatmapLookupCache.GetBeatmapAsync(state.BeatmapID.Value).ContinueWith(t => beatmapFetchCallback = Schedule(() =>
             {
-                var beatmap = t.GetResultSafely();
+                beatmap = t.GetResultSafely();
 
                 if (beatmap?.BeatmapSet == null)
                     return;
 
-                beatmapSet = beatmap.BeatmapSet;
-                beatmapPanelContainer.Child = new BeatmapCardNormal(beatmapSet, allowExpansion: false);
+                beatmapPanelContainer.Child = new BeatmapCardNormal(beatmap.BeatmapSet, allowExpansion: false);
                 checkForAutomaticDownload();
             }));
         }
 
         private void checkForAutomaticDownload()
         {
-            if (beatmapSet == null)
+            if (beatmap?.BeatmapSet == null)
                 return;
 
             if (!automaticDownload.Current.Value)
                 return;
 
-            if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
+            if (beatmaps.IsAvailableLocally(beatmap))
                 return;
 
-            beatmapDownloader.Download(beatmapSet);
+            beatmapDownloader.Download(beatmap.BeatmapSet);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
