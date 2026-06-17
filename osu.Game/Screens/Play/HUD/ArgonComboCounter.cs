@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Scoring;
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual bool DisplayXSymbol => true;
 
-        [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
+        [SettingSource(typeof(ArgonComponentsStrings), nameof(ArgonComponentsStrings.WireframeOpacity), nameof(ArgonComponentsStrings.WireframeOpacityDescription))]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
             Precision = 0.01f,
