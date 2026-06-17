@@ -13,6 +13,7 @@ using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Localisation.HUD;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts;
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Bar height")]
+        [SettingSource(typeof(ArgonHealthDisplayStrings), nameof(ArgonHealthDisplayStrings.BarHeight))]
         public BindableFloat BarHeight { get; } = new BindableFloat(20)
         {
             MinValue = 0,
