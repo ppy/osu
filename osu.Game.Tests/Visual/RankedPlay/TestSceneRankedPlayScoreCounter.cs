@@ -11,11 +11,11 @@ namespace osu.Game.Tests.Visual.RankedPlay
     public partial class TestSceneRankedPlayScoreCounter : OsuTestScene
     {
         [Test]
-        public void TestBasic()
+        public void TestSimpleIncrementDecrement()
         {
             RankedPlayScoreCounter counter = null!;
 
-            AddStep("add counter", () => Child = counter = new RankedPlayScoreCounter(5)
+            AddStep("add counter", () => Child = counter = new RankedPlayScoreCounter
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -29,6 +29,37 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddWaitStep("wait for animations", 3);
 
             AddStep("set value to 1_000_000", () => counter.Value = 1_000_000);
+            AddWaitStep("wait for animations", 3);
+
+            AddStep("set value to 100_000", () => counter.Value = 100_000);
+            AddWaitStep("wait for animations", 3);
+
+            AddStep("set value to 10_000", () => counter.Value = 10_000);
+            AddWaitStep("wait for animations", 3);
+
+            AddStep("set value to 0", () => counter.Value = 0);
+            AddWaitStep("wait for animations", 3);
+        }
+
+        [Test]
+        public void TestDigitBoundaryIncrementDecrement()
+        {
+            RankedPlayScoreCounter counter = null!;
+
+            AddStep("add counter", () => Child = counter = new RankedPlayScoreCounter
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.Default.With(size: 72),
+            });
+
+            AddStep("set value to 99_999", () => counter.Value = 99_999);
+            AddWaitStep("wait for animations", 3);
+
+            AddStep("set value to 100_000", () => counter.Value = 100_000);
+            AddWaitStep("wait for animations", 3);
+
+            AddStep("set value to 99_999", () => counter.Value = 99_999);
             AddWaitStep("wait for animations", 3);
         }
     }
