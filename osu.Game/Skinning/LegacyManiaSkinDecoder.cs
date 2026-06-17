@@ -123,7 +123,7 @@ namespace osu.Game.Skinning
                         break;
 
                     case "NoteBodyStyle":
-                        if (Enum.TryParse<LegacyNoteBodyStyle>(pair.Value, out var style))
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacyNoteBodyStyle>(pair.Value, out var style))
                             currentConfig.NoteBodyStyle = style;
                         break;
 
@@ -137,7 +137,7 @@ namespace osu.Game.Skinning
                         break;
 
                     case @"SpecialStyle":
-                        if (Enum.TryParse<LegacySpecialStyle>(pair.Value, out var specialStyle))
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacySpecialStyle>(pair.Value, out var specialStyle))
                             currentConfig.SpecialStyle = specialStyle;
                         break;
 
@@ -166,7 +166,7 @@ namespace osu.Game.Skinning
                         break;
 
                     case @"ComboBurstStyle":
-                        if (Enum.TryParse<LegacyComboBurstStyle>(pair.Value, out var comboBurstStyle))
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacyComboBurstStyle>(pair.Value, out var comboBurstStyle))
                             currentConfig.ComboBurstStyle = comboBurstStyle;
                         break;
 
