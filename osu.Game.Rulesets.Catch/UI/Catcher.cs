@@ -237,8 +237,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Drop();
             }
 
-            // tiny droplet or banana doesn't affect hyperdash state.
-            // banana is relevant in special "2b" cases.
+            // tiny droplet or banana doesn't affect hyperdash state
             if (hitObject is TinyDroplet or Banana) return;
 
             // if a hyper fruit was already handled this frame, just go where it says to go.
