@@ -97,7 +97,7 @@ namespace osu.Game.Scoring.Legacy
             using (SerializationWriter sw = new SerializationWriter(stream, leaveOpen))
             {
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
-                sw.Write(LATEST_VERSION);
+                sw.Write(score.ScoreInfo.TotalScoreVersion);
                 sw.Write(score.ScoreInfo.BeatmapInfo!.MD5Hash);
                 sw.Write(score.ScoreInfo.User.Username);
                 sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.User.Username}-{score.ScoreInfo.Date}").ComputeMD5Hash());

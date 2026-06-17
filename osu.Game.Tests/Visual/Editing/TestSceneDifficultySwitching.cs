@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -33,6 +34,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         private BeatmapSetInfo importedBeatmapSet;
 
@@ -62,17 +66,21 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestClockPositionPreservedBetweenSwitches()
         {
+            AddStep("Set user audio offset", () => config.SetValue(OsuSetting.AudioOffset, 500.0));
+
             BeatmapInfo targetDifficulty = null;
             AddStep("seek editor to 00:05:00", () => EditorClock.Seek(5000));
 
             AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
             switchToDifficulty(() => targetDifficulty);
             confirmEditingBeatmap(() => targetDifficulty);
-            AddAssert("editor clock at 00:05:00", () => EditorClock.CurrentTime == 5000);
+            AddAssert("editor clock at 00:05:00", () => EditorClock.CurrentTime, () => Is.EqualTo(5000));
 
             AddStep("exit editor", () => Stack.Exit());
             // ensure editor loader didn't resume.
             AddAssert("stack empty", () => Stack.CurrentScreen == null);
+
+            AddStep("Revert user audio offset", () => config.SetValue(OsuSetting.AudioOffset, 0.0));
         }
 
         [Test]
