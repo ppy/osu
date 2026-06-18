@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Select
 
             public IBindable<bool> FilterBySelectedMods => selectedModsToggle.Active;
 
+            public bool ControlHovered => scopeDropdown.IsHovered || sortDropdown.IsHovered || selectedModsToggle.IsHovered;
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {

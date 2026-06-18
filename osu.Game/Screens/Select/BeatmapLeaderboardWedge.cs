@@ -16,7 +16,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -88,16 +87,11 @@ namespace osu.Game.Screens.Select
 
         private const float personal_best_height = 112;
 
-        // Blocking mouse down is required to avoid song select's background reveal logic happening while hovering scores.
-        // Our horizontal alignment doesn't really align with the rest of the sheared components (protrudes a touch to the right) which makes
-        // it complicated to handle this at a higher level.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => scoresScroll.ReceivePositionalInputAt(screenSpacePos);
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-
         private Sample? swishSample;
 
         private readonly List<ScheduledDelegate> scoreSfxDelegates = new List<ScheduledDelegate>();
+
+        public bool ScoreHovered => scoresContainer.Any(score => score.IsHovered);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
