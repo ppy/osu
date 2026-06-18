@@ -110,10 +110,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public bool PlaySamplesOnAdjust { get; init; } = true;
 
+        private Func<T, LocalisableString> labelFormat;
+
         /// <summary>
         /// The string formatting function to use for the value label.
         /// </summary>
-        public Func<T, LocalisableString> LabelFormat { get; init; }
+        public Func<T, LocalisableString> LabelFormat
+        {
+            get => labelFormat;
+            set
+            {
+                labelFormat = value;
+
+                if (IsLoaded)
+                    updateValueDisplay();
+            }
+        }
 
         /// <summary>
         /// The string formatting function to use for the slider's tooltip text.
@@ -136,7 +148,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public FormSliderBar()
         {
-            LabelFormat ??= defaultLabelFormat;
+            labelFormat ??= DefaultLabelFormat;
             TooltipFormat ??= v => LabelFormat(v);
 
             // the reason why this slider is created in constructor rather than in BDL like the rest of drawable hierarchy is as follows:
@@ -422,7 +434,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
-        private LocalisableString defaultLabelFormat(T value) => currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
+        public LocalisableString DefaultLabelFormat(T value) => value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
 
         public partial class InnerSlider : OsuSliderBar<T>
         {
