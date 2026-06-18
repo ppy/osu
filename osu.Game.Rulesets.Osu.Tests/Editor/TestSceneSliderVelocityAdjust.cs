@@ -7,7 +7,6 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
@@ -137,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestVelocityToolbox()
         {
-            ExpandableSlider<double> velocitySlider = null!;
+            OsuSliderVelocityToolboxGroup.ExpandableSliderVelocityControl velocitySlider = null!;
             ExpandableButton useLastSliderButton = null!;
 
             AddStep("enter editor", () => Game.ScreenStack.Push(new EditorLoader()));
@@ -145,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("retrieve controls", () =>
             {
                 var toolbox = this.ChildrenOfType<OsuSliderVelocityToolboxGroup>().Single();
-                velocitySlider = toolbox.ChildrenOfType<ExpandableSlider<double>>().Single();
+                velocitySlider = toolbox.ChildrenOfType<OsuSliderVelocityToolboxGroup.ExpandableSliderVelocityControl>().Single();
                 useLastSliderButton = toolbox.ChildrenOfType<ExpandableButton>().Single();
             });
 
@@ -192,6 +191,25 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
             AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
+
+            AddStep("select fourth slider", () => editorBeatmap.SelectedHitObjects.Add(editorBeatmap.HitObjects[3]));
+            AddAssert("velocity slider at 3x", () => velocitySlider.Current.Value, () => Is.EqualTo(3));
+            AddStep("set 1.5x velocity", () => velocitySlider.Current.Value = 1.5);
+            AddAssert("fourth slider has 1.5x velocity", () => ((Slider)editorBeatmap.HitObjects[3]).SliderVelocityMultiplier, () => Is.EqualTo(1.5));
+
+            AddStep("select first and last slider", () =>
+            {
+                editorBeatmap.SelectedHitObjects.Clear();
+                editorBeatmap.SelectedHitObjects.Add(editorBeatmap.HitObjects[0]);
+                editorBeatmap.SelectedHitObjects.Add(editorBeatmap.HitObjects[^1]);
+            });
+            AddAssert("velocity slider at 1x", () => velocitySlider.Current.Value, () => Is.EqualTo(1));
+            AddStep("set 5x velocity", () => velocitySlider.Current.Value = 5);
+            AddAssert("first slider has 5x velocity", () => ((Slider)editorBeatmap.HitObjects[0]).SliderVelocityMultiplier, () => Is.EqualTo(5));
+            AddAssert("last slider has 5x velocity", () => ((Slider)editorBeatmap.HitObjects[^1]).SliderVelocityMultiplier, () => Is.EqualTo(5));
+
+            AddStep("clear selection", () => editorBeatmap.SelectedHitObjects.Clear());
+            AddAssert("velocity slider at 2x", () => velocitySlider.Current.Value, () => Is.EqualTo(2));
 
             void placeSlider()
             {
