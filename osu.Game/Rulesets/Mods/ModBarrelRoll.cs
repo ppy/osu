@@ -40,7 +40,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "BR";
         public override IconUsage? Icon => OsuIcon.ModBarrelRoll;
         public override LocalisableString Description => "The whole playfield is on a wheel!";
-        public override double ScoreMultiplier => 1;
 
         public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
