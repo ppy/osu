@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -40,7 +39,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
 
             HoverColour = colourProvider.Light1;
 
-            TooltipText = CommonStrings.ViewInBrowser.ToLower();
+            TooltipText = CommonStrings.ViewInBrowser;
             Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
         }
     }

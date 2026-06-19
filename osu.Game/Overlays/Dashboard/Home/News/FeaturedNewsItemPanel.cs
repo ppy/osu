@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     RelativeSizeAxes = Axes.Both
                 };
 
-                TooltipText = CommonStrings.ViewInBrowser.ToLower();
+                TooltipText = CommonStrings.ViewInBrowser;
                 Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
 
                 HoverColour = Color4.White;

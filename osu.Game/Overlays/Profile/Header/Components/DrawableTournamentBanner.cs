@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -50,6 +49,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Height = DrawWidth * banner_aspect_ratio;
         }
 
-        public override LocalisableString TooltipText => CommonStrings.ViewInBrowser.ToLower();
+        public override LocalisableString TooltipText => CommonStrings.ViewInBrowser;
     }
 }
