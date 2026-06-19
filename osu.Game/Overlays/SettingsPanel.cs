@@ -200,6 +200,10 @@ namespace osu.Game.Overlays
             SectionsContainer.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
             ContentContainer.MoveToX(-WIDTH + ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
 
+            // Required for the transformation to be completed correctly, though the panel will be hidden earlier
+            AlwaysPresent = true;
+            Scheduler.AddDelayed(() => AlwaysPresent = false, TRANSITION_LENGTH);
+
             Sidebar?.MoveToX(-sidebar_width, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH / 2, Easing.OutQuint);
 
