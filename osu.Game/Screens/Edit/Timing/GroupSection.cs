@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
@@ -16,7 +17,7 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class GroupSection : CompositeDrawable
     {
-        private LabelledTextBox textBox = null!;
+        private FormDiscreteAdjustmentControl<double> adjustmentControl = null!;
 
         private OsuButton button = null!;
 
@@ -53,10 +54,10 @@ namespace osu.Game.Screens.Edit.Timing
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        textBox = new LabelledTextBox
+                        adjustmentControl = new FormDiscreteAdjustmentControl<double>(1)
                         {
-                            Label = "Time",
-                            SelectAllOnFocus = true,
+                            Caption = "Time",
+                            LabelFormat = v => v.ToLocalisableString(@"N0"),
                         },
                         button = new RoundedButton
                         {
@@ -68,38 +69,22 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             };
 
-            textBox.OnCommit += (sender, isNew) =>
-            {
-                if (!isNew)
-                    return;
-
-                if (double.TryParse(sender.Text, out double newTime))
-                {
-                    changeSelectedGroupTime(newTime);
-                }
-                else
-                {
-                    SelectedGroup.TriggerChange();
-                }
-            };
-
             SelectedGroup.BindValueChanged(group =>
             {
                 if (group.NewValue == null)
                 {
-                    textBox.Text = string.Empty;
-
-                    // cannot use textBox.Current.Disabled due to https://github.com/ppy/osu-framework/issues/3919
-                    textBox.ReadOnly = true;
+                    adjustmentControl.Current.Disabled = true;
                     button.Enabled.Value = false;
                     return;
                 }
 
-                textBox.ReadOnly = false;
+                adjustmentControl.Current.Disabled = false;
                 button.Enabled.Value = true;
 
-                textBox.Text = $"{group.NewValue.Time:n0}";
+                adjustmentControl.Current.Value = group.NewValue.Time;
             }, true);
+
+            adjustmentControl.Current.BindValueChanged(_ => changeSelectedGroupTime(adjustmentControl.Current.Value));
         }
 
         private void changeSelectedGroupTime(in double time)

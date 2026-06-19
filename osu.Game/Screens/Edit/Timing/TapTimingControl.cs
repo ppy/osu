@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.Edit.Timing
         private MetronomeDisplay metronome = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             const float padding = 10;
 
@@ -62,7 +61,6 @@ namespace osu.Game.Screens.Edit.Timing
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 200),
-                        new Dimension(GridSizeMode.Absolute, 50),
                         new Dimension(GridSizeMode.Absolute, TapButton.SIZE + padding),
                     },
                     Content = new[]
@@ -91,33 +89,6 @@ namespace osu.Game.Screens.Edit.Timing
                                     }
                                 },
                             }
-                        },
-                        new Drawable[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Bottom = padding, Horizontal = padding },
-                                Children = new Drawable[]
-                                {
-                                    new TimingAdjustButton(1)
-                                    {
-                                        Text = "Offset",
-                                        RelativeSizeAxes = Axes.Both,
-                                        Size = new Vector2(0.48f, 1),
-                                        Action = adjustOffset,
-                                    },
-                                    new TimingAdjustButton(0.1)
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Text = "BPM",
-                                        RelativeSizeAxes = Axes.Both,
-                                        Size = new Vector2(0.48f, 1),
-                                        Action = adjustBpm,
-                                    }
-                                }
-                            },
                         },
                         new Drawable[]
                         {

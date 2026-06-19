@@ -3,12 +3,14 @@
 
 using System;
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -18,11 +20,12 @@ namespace osu.Game.Screens.Edit.Timing
     /// <summary>
     /// A button with variable constant output based on hold position and length.
     /// </summary>
-    public partial class TimingAdjustButton : CompositeDrawable
+    public partial class DiscreteAdjustmentControl<T> : CompositeDrawable
+        where T : struct, INumber<T>, IMinMaxValue<T>, IMultiplyOperators<T, T, T>
     {
-        public Action<double>? Action;
+        public Action<T>? Action;
 
-        private readonly double adjustAmount;
+        private readonly T baseIncrement;
 
         private const int max_multiplier = 10;
         private const int adjust_levels = 4;
@@ -47,12 +50,13 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
-        public TimingAdjustButton(double adjustAmount)
+        public DiscreteAdjustmentControl(T baseIncrement)
         {
-            this.adjustAmount = adjustAmount;
+            this.baseIncrement = baseIncrement;
 
             CornerRadius = 5;
             Masking = true;
+            RelativeSizeAxes = Axes.Both;
 
             AddInternal(Content = new Container
             {
@@ -85,12 +89,12 @@ namespace osu.Game.Screens.Edit.Timing
         [BackgroundDependencyLoader]
         private void load()
         {
-            background.Colour = colourProvider.Background3;
+            background.Colour = colourProvider.Dark2;
 
             for (int i = 1; i <= adjust_levels; i++)
             {
-                Content.Add(new IncrementBox(i, adjustAmount));
-                Content.Add(new IncrementBox(-i, adjustAmount));
+                Content.Add(new IncrementBox(i, baseIncrement));
+                Content.Add(new IncrementBox(-i, baseIncrement));
             }
         }
 
@@ -102,17 +106,17 @@ namespace osu.Game.Screens.Edit.Timing
             if (hoveredBox == null)
                 return false;
 
-            Action?.Invoke(adjustAmount * hoveredBox.Multiplier);
+            Action?.Invoke(baseIncrement * T.CreateTruncating(hoveredBox.Multiplier));
 
             hoveredBox.Flash();
 
-            repeatBehaviour.SampleFrequencyModifier = (hoveredBox.Multiplier / max_multiplier) * 0.2;
+            repeatBehaviour.SampleFrequencyModifier = ((double)hoveredBox.Multiplier / max_multiplier) * 0.2;
             return true;
         }
 
         private partial class IncrementBox : CompositeDrawable
         {
-            public readonly float Multiplier;
+            public readonly int Multiplier;
 
             private readonly Box box;
             private readonly OsuSpriteText text;
@@ -120,7 +124,7 @@ namespace osu.Game.Screens.Edit.Timing
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
-            public IncrementBox(int index, double amount)
+            public IncrementBox(int index, T amount)
             {
                 Multiplier = Math.Sign(index) * convertMultiplier(index);
 
@@ -147,10 +151,10 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                     text = new OsuSpriteText
                     {
-                        Anchor = direction,
-                        Origin = direction,
+                        Anchor = direction | Anchor.y1,
+                        Origin = direction | Anchor.y1,
                         Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
-                        Text = $"{(index > 0 ? "+" : "-")}{Math.Abs(Multiplier * amount)}",
+                        Text = $"{(Multiplier > 0 ? "+" : "")}{(amount * T.CreateTruncating(Multiplier)).ToStandardFormattedString(maxDecimalDigits: 2)}",
                         Padding = new MarginPadding(2),
                         Alpha = 0,
                     }
@@ -165,7 +169,7 @@ namespace osu.Game.Screens.Edit.Timing
                 box.Alpha = 0.1f;
             }
 
-            private float convertMultiplier(int m)
+            private int convertMultiplier(int m)
             {
                 switch (Math.Abs(m))
                 {

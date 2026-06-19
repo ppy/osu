@@ -145,20 +145,6 @@ namespace osu.Game.Tests.Visual.Editing
                        .First()
                        .TriggerClick();
             });
-
-            AddStep("adjust offset", () =>
-            {
-                var adjustOffsetButton = control.ChildrenOfType<TimingAdjustButton>().First();
-                InputManager.MoveMouseTo(adjustOffsetButton);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddStep("adjust BPM", () =>
-            {
-                var adjustBPMButton = control.ChildrenOfType<TimingAdjustButton>().Last();
-                InputManager.MoveMouseTo(adjustBPMButton);
-                InputManager.Click(MouseButton.Left);
-            });
         }
 
         protected override void Dispose(bool isDisposing)
