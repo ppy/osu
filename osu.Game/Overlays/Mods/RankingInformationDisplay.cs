@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Mods
         private readonly BindableWithCurrent<double> current = new BindableWithCurrent<double>();
 
         private const float transition_duration = 200;
+        private const Easing transition_easing = Easing.OutQuint;
 
         private RollingCounter<double> counter = null!;
 
@@ -69,9 +70,11 @@ namespace osu.Game.Overlays.Mods
             {
                 new Container
                 {
-                    Width = 50,
                     RelativeSizeAxes = Axes.Y,
-                    Margin = new MarginPadding(10),
+                    AutoSizeAxes = Axes.X,
+                    AutoSizeDuration = transition_duration,
+                    AutoSizeEasing = transition_easing,
+                    Margin = new MarginPadding { Horizontal = 9, Vertical = 10 },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Child = rankedText = new TextWithTooltip
