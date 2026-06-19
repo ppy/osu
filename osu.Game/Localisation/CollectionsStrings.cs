@@ -44,11 +44,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString AddSelectedBeatmap => new TranslatableString(getKey(@"add_selected_beatmap"), @"Add selected beatmap");
 
-        /// <summary>
-        /// "{0:#,0} item|{0:#,0} items"
-        /// </summary>
-        public static LocalisableString ItemsCount(int quantity) => new PluralisableString(new TranslatableString(getKey(@"items_count"), @"{0:#,0} item|{0:#,0} items", quantity), quantity, '|');
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

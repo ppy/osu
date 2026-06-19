@@ -169,7 +169,7 @@ namespace osu.Game.Collections
                     // but that subscription does not only cover *changes to the set of collections* (i.e. addition/removal/rearrangement of collections),
                     // but also covers *changes to the properties of collections*, which `BeatmapMD5Hashes` is one.
                     // when a collection item changes due to `BeatmapMD5Hashes` changing, the list item is deleted and re-inserted, thus guaranteeing this to work correctly.
-                    countText.Text = CollectionsStrings.ItemsCount(collection.PerformRead(c => c.BeatmapMD5Hashes.Count));
+                    countText.Text = CommonStrings.ItemsCount(collection.PerformRead(c => c.BeatmapMD5Hashes.Count));
                 }
                 else
                 {
