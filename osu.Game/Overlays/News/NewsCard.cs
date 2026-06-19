@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.News
         {
             if (post.Slug != null)
             {
-                TooltipText = CommonStrings.ViewInBrowser.ToLower();
+                TooltipText = CommonStrings.ViewInBrowser;
                 Action = () => game?.OpenUrlExternally(@"/home/news/" + post.Slug);
             }
 
