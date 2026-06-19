@@ -175,7 +175,6 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
-
             SectionsContainer.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
             // delay load enough to ensure it doesn't overlap with the initial animation.
@@ -197,8 +196,8 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            SectionsContainer.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
             ContentContainer.MoveToX(-WIDTH + ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
+            SectionsContainer.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
 
             // Required for the transformation to be completed correctly, though the panel will be hidden earlier
             AlwaysPresent = true;
