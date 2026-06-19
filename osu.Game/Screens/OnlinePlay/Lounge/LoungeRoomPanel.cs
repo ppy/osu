@@ -166,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 items.AddRange(base.ContextMenuItems);
 
                 items.Add(new OsuMenuItemSpacer());
-                items.Add(new OsuMenuItem(OnlinePlayStrings.CreatePlaylistCopy, MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
+                items.Add(new OsuMenuItem(CommonStrings.CreateCopy, MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
 
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
                 {

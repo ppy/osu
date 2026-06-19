@@ -8,7 +8,6 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -603,7 +602,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.R))
             };
 
-            yield return new OsuMenuItem(EditorStrings.AdditionBank.ToSentence())
+            yield return new OsuMenuItem(EditorStrings.AdditionBank)
             {
                 Items = SelectionAdditionBankStates.Select(kvp =>
                     new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()

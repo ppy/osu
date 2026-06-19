@@ -280,14 +280,14 @@ namespace osu.Game.Localisation
         public static LocalisableString Bank => new TranslatableString(getKey(@"bank"), @"Bank");
 
         /// <summary>
-        /// "Normal Bank"
+        /// "Normal bank"
         /// </summary>
-        public static LocalisableString NormalBank => new TranslatableString(getKey(@"normal_bank"), @"Normal Bank");
+        public static LocalisableString NormalBank => new TranslatableString(getKey(@"normal_bank"), @"Normal bank");
 
         /// <summary>
-        /// "Addition Bank"
+        /// "Addition bank"
         /// </summary>
-        public static LocalisableString AdditionBank => new TranslatableString(getKey(@"addition_bank"), @"Addition Bank");
+        public static LocalisableString AdditionBank => new TranslatableString(getKey(@"addition_bank"), @"Addition bank");
 
         /// <summary>
         /// "Volume"

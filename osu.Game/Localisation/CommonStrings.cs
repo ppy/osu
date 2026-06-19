@@ -229,6 +229,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ViewInBrowser => new TranslatableString(getKey(@"view_in_browser"), @"View in browser");
 
+        /// <summary>
+        /// "Create copy"
+        /// </summary>
+        public static LocalisableString CreateCopy => new TranslatableString(getKey(@"create_copy"), @"Create copy");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
