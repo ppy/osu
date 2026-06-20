@@ -1,8 +1,9 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -72,6 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         };
 
         private readonly BindableBool aspectLock = new BindableBool();
+        private readonly BindableBool lockToUsableArea = new BindableBool(true);
 
         private ScheduledDelegate aspectRatioApplication;
 
@@ -161,6 +163,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             Padding = SettingsPanel.CONTENT_PADDING,
                         },
+                        new SettingsItemV2(new FormCheckBox
+                        {
+                            Caption = TabletSettingsStrings.LockToUsableArea,
+                            Current = lockToUsableArea,
+                        }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
@@ -200,14 +207,39 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
+            AreaSelection.LockToUsableArea.BindTo(lockToUsableArea);
+
+            lockToUsableArea.BindValueChanged(val => Schedule(() =>
+            {
+                if (val.NewValue)
+                {
+                    var clampedOffset = clampOffset(areaOffset.Value);
+                    if (clampedOffset != areaOffset.Value)
+                        areaOffset.Value = clampedOffset;
+                }
+            }));
+
             enabled.BindTo(tabletHandler.Enabled);
             enabled.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             rotation.BindTo(tabletHandler.Rotation);
+            rotation.BindValueChanged(val => Schedule(() =>
+            {
+                var clampedOffset = clampOffset(areaOffset.Value);
+                if (clampedOffset != areaOffset.Value)
+                    areaOffset.Value = clampedOffset;
+            }), true);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
             areaOffset.BindValueChanged(val => Schedule(() =>
             {
+                var clamped = clampOffset(val.NewValue);
+                if (clamped != val.NewValue)
+                {
+                    areaOffset.Value = clamped;
+                    return;
+                }
+
                 offsetX.Value = val.NewValue.X;
                 offsetY.Value = val.NewValue.Y;
             }), true);
@@ -218,6 +250,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             areaSize.BindTo(tabletHandler.AreaSize);
             areaSize.BindValueChanged(val => Schedule(() =>
             {
+                var clampedOffset = clampOffset(areaOffset.Value);
+                if (clampedOffset != areaOffset.Value)
+                    areaOffset.Value = clampedOffset;
+
                 sizeX.Value = val.NewValue.X;
                 sizeY.Value = val.NewValue.Y;
             }), true);
@@ -333,6 +369,32 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             aspectRatioApplication?.Cancel();
             aspectLock.Value = true;
+        }
+
+        private Vector2 clampOffset(Vector2 offset)
+        {
+            if (tablet.Value == null || !lockToUsableArea.Value)
+                return offset;
+
+            var size = areaSize.Value;
+            var tabletSize = tablet.Value.Size;
+
+            float rad = float.DegreesToRadians(rotation.Value);
+            float cos = MathF.Abs(MathF.Cos(rad));
+            float sin = MathF.Abs(MathF.Sin(rad));
+
+            float maxX = (size.X / 2) * cos + (size.Y / 2) * sin;
+            float maxY = (size.X / 2) * sin + (size.Y / 2) * cos;
+
+            float minX = MathF.Min(maxX, tabletSize.X / 2);
+            float maxXRange = MathF.Max(tabletSize.X - maxX, tabletSize.X / 2);
+            float minY = MathF.Min(maxY, tabletSize.Y / 2);
+            float maxYRange = MathF.Max(tabletSize.Y - maxY, tabletSize.Y / 2);
+
+            return new Vector2(
+                Math.Clamp(offset.X, minX, maxXRange),
+                Math.Clamp(offset.Y, minY, maxYRange)
+            );
         }
 
         private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;

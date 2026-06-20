@@ -60,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString LockAspectRatio => new TranslatableString(getKey(@"lock_aspect_ratio"), @"Lock aspect ratio");
 
         /// <summary>
+        /// "Lock to usable area"
+        /// </summary>
+        public static LocalisableString LockToUsableArea => new TranslatableString(getKey(@"lock_to_usable_area"), @"Lock to usable area");
+
+        /// <summary>
         /// "Tip pressure for click"
         /// </summary>
         public static LocalisableString TipPressureForClick => new TranslatableString(getKey(@"tip_pressure_for_click"), "Tip pressure for click");
