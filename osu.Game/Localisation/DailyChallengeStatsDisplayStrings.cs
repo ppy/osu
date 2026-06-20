@@ -19,6 +19,13 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString UnitWeek(LocalisableString count) => new TranslatableString(getKey(@"unit_week"), @"{0}w", count);
 
+        /// <summary>
+        /// "Daily
+        /// Challenge"
+        /// </summary>
+        public static LocalisableString DailyChallengeTitle => new TranslatableString(getKey(@"daily_challenge_title"), @"Daily
+Challenge");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

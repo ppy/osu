@@ -129,9 +129,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 },
             };
 
-            // can't use this because osu-web does weird stuff with \\n.
-            // Text = UsersStrings.ShowDailyChallengeTitle.,
-            label.AddParagraph("Daily\nChallenge");
+            label.AddParagraph(DailyChallengeStatsDisplayStrings.DailyChallengeTitle);
         }
 
         protected override void LoadComplete()
