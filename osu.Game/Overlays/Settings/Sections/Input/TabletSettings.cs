@@ -373,28 +373,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Vector2 clampOffset(Vector2 offset)
         {
-            if (tablet.Value == null || !lockToUsableArea.Value)
+            if (!lockToUsableArea.Value)
                 return offset;
 
-            var size = areaSize.Value;
-            var tabletSize = tablet.Value.Size;
-
-            float rad = float.DegreesToRadians(rotation.Value);
-            float cos = MathF.Abs(MathF.Cos(rad));
-            float sin = MathF.Abs(MathF.Sin(rad));
-
-            float maxX = (size.X / 2) * cos + (size.Y / 2) * sin;
-            float maxY = (size.X / 2) * sin + (size.Y / 2) * cos;
-
-            float minX = MathF.Min(maxX, tabletSize.X / 2);
-            float maxXRange = MathF.Max(tabletSize.X - maxX, tabletSize.X / 2);
-            float minY = MathF.Min(maxY, tabletSize.Y / 2);
-            float maxYRange = MathF.Max(tabletSize.Y - maxY, tabletSize.Y / 2);
-
-            return new Vector2(
-                Math.Clamp(offset.X, minX, maxXRange),
-                Math.Clamp(offset.Y, minY, maxYRange)
-            );
+            return tabletHandler.ClampOffset(offset);
         }
 
         private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;

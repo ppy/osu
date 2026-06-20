@@ -264,35 +264,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void OnDrag(DragEvent e)
         {
             var newPos = Position + e.Delta;
-
-            if (lockToUsableArea.Value && tabletHandler.Tablet.Value is TabletInfo tablet)
-            {
-                var size = tabletHandler.AreaSize.Value;
-                var tabletSize = tablet.Size;
-                float rotation = tabletHandler.Rotation.Value;
-
-                float rad = float.DegreesToRadians(rotation);
-                float cos = MathF.Abs(MathF.Cos(rad));
-                float sin = MathF.Abs(MathF.Sin(rad));
-
-                float maxX = (size.X / 2) * cos + (size.Y / 2) * sin;
-                float maxY = (size.X / 2) * sin + (size.Y / 2) * cos;
-
-                float minX = MathF.Min(maxX, tabletSize.X / 2);
-                float maxXRange = MathF.Max(tabletSize.X - maxX, tabletSize.X / 2);
-                float minY = MathF.Min(maxY, tabletSize.Y / 2);
-                float maxYRange = MathF.Max(tabletSize.Y - maxY, tabletSize.Y / 2);
-
-                newPos = new Vector2(
-                    Math.Clamp(newPos.X, minX, maxXRange),
-                    Math.Clamp(newPos.Y, minY, maxYRange)
-                );
-            }
-            else
-            {
-                newPos = Vector2.Clamp(newPos, Vector2.Zero, Parent!.Size);
-            }
-
+            newPos = lockToUsableArea.Value ? tabletHandler.ClampOffset(newPos) : Vector2.Clamp(newPos, Vector2.Zero, Parent!.Size);
             this.MoveTo(newPos);
         }
 
