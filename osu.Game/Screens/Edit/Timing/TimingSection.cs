@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -69,6 +70,14 @@ namespace osu.Game.Screens.Edit.Timing
 
         private bool isRebinding;
 
+        protected override void OnSelectedGroupChanged(ValueChangedEvent<ControlPointGroup?> group)
+        {
+            Checkbox.Current.Disabled = false;
+            base.OnSelectedGroupChanged(group);
+            // The first control point group is expected to contain timing information at all times.
+            Checkbox.Current.Disabled = group.NewValue?.Equals(Beatmap.ControlPointInfo.Groups.FirstOrDefault()) == true;
+        }
+
         protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint?> point)
         {
             if (point.NewValue != null)
@@ -83,9 +92,9 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override TimingControlPoint CreatePoint()
+        protected override TimingControlPoint CreatePoint(ControlPointGroup selectedGroup)
         {
-            var reference = Beatmap.ControlPointInfo.TimingPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.TimingPointAt(selectedGroup.Time);
 
             return new TimingControlPoint
             {
