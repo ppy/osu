@@ -99,11 +99,11 @@ namespace osu.Game.Skinning
                         break;
 
                     case "ComboPosition":
-                        currentConfig.ComboPosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.ComboPosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "ScorePosition":
-                        currentConfig.ScorePosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.ScorePosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "JudgementLine":
@@ -123,17 +123,51 @@ namespace osu.Game.Skinning
                         break;
 
                     case "NoteBodyStyle":
-                        if (Enum.TryParse<LegacyNoteBodyStyle>(pair.Value, out var style))
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacyNoteBodyStyle>(pair.Value, out var style))
                             currentConfig.NoteBodyStyle = style;
                         break;
 
                     case "WidthForNoteHeightScale":
-                        currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.WidthForNoteHeightScale = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightFramePerSecond":
                         int lightFramePerSecond = int.Parse(pair.Value, CultureInfo.InvariantCulture);
                         currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
+                        break;
+
+                    case @"SpecialStyle":
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacySpecialStyle>(pair.Value, out var specialStyle))
+                            currentConfig.SpecialStyle = specialStyle;
+                        break;
+
+                    case @"ColumnStart":
+                        currentConfig.ColumnStart = float.Parse(pair.Value, CultureInfo.InvariantCulture); // TODO: likely needs POSITION_SCALE_FACTOR
+                        break;
+
+                    case @"ColumnRight":
+                        currentConfig.ColumnRight = float.Parse(pair.Value, CultureInfo.InvariantCulture); // TODO: likely needs POSITION_SCALE_FACTOR
+                        break;
+
+                    case @"UpsideDown":
+                        currentConfig.UpsideDown = pair.Value == "1";
+                        break;
+
+                    case @"SeparateScore":
+                        currentConfig.SeparateScore = pair.Value == "1";
+                        break;
+
+                    case @"SplitStages":
+                        currentConfig.SplitStages = pair.Value == "1";
+                        break;
+
+                    case @"StageSeparation":
+                        currentConfig.StageSeparation = float.Parse(pair.Value, CultureInfo.InvariantCulture);
+                        break;
+
+                    case @"ComboBurstStyle":
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacyComboBurstStyle>(pair.Value, out var comboBurstStyle))
+                            currentConfig.ComboBurstStyle = comboBurstStyle;
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
@@ -146,7 +180,13 @@ namespace osu.Game.Skinning
                     case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
                     case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
                     case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                    case @"WarningArrow":
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
+                        break;
+
+                    case string when pair.Key.StartsWith(@"KeyFlipWhenUpsideDown", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith(@"NoteFlipWhenUpsideDown", StringComparison.Ordinal):
+                        currentConfig.FlipSettings[pair.Key] = pair.Value;
                         break;
                 }
             }
