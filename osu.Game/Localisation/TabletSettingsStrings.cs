@@ -35,6 +35,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ConformToCurrentGameAspectRatio => new TranslatableString(getKey(@"conform_to_current_game_aspect_ratio"), @"Conform to current game aspect ratio");
 
         /// <summary>
+        /// "Lock to usable area"
+        /// </summary>
+        public static LocalisableString LockToUsableArea => new TranslatableString(getKey(@"lock_to_usable_area"), @"Lock to usable area");
+
+        /// <summary>
         /// "X Offset"
         /// </summary>
         public static LocalisableString XOffset => new TranslatableString(getKey(@"x_offset"), @"X Offset");
@@ -58,11 +63,6 @@ namespace osu.Game.Localisation
         /// "Lock aspect ratio"
         /// </summary>
         public static LocalisableString LockAspectRatio => new TranslatableString(getKey(@"lock_aspect_ratio"), @"Lock aspect ratio");
-
-        /// <summary>
-        /// "Lock to usable area"
-        /// </summary>
-        public static LocalisableString LockToUsableArea => new TranslatableString(getKey(@"lock_to_usable_area"), @"Lock to usable area");
 
         /// <summary>
         /// "Tip pressure for click"

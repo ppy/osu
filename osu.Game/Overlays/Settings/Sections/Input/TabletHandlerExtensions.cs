@@ -34,5 +34,24 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 Math.Clamp(offset.Y, minY, maxYRange)
             );
         }
+
+        public static bool CanFit(this ITabletHandler handler)
+        {
+            if (handler.Tablet.Value == null)
+                return true;
+
+            var size = handler.AreaSize.Value;
+            var tabletSize = handler.Tablet.Value.Size;
+
+            float rad = float.DegreesToRadians(handler.Rotation.Value);
+            float cos = MathF.Abs(MathF.Cos(rad));
+            float sin = MathF.Abs(MathF.Sin(rad));
+
+            float maxX = (size.X / 2) * cos + (size.Y / 2) * sin;
+            float maxY = (size.X / 2) * sin + (size.Y / 2) * cos;
+
+            const float lenience = 0.5f;
+            return maxX <= tabletSize.X / 2 + lenience && maxY <= tabletSize.Y / 2 + lenience;
+        }
     }
 }

@@ -213,9 +213,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (val.NewValue)
                 {
-                    var clampedOffset = clampOffset(areaOffset.Value);
-                    if (clampedOffset != areaOffset.Value)
-                        areaOffset.Value = clampedOffset;
+                    if (tabletHandler.CanFit())
+                    {
+                        var clampedOffset = clampOffset(areaOffset.Value);
+                        if (clampedOffset != areaOffset.Value)
+                            areaOffset.Value = clampedOffset;
+                    }
+                    else
+                    {
+                        lockToUsableArea.Value = false;
+                    }
                 }
             }));
 
@@ -225,9 +232,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rotation.BindTo(tabletHandler.Rotation);
             rotation.BindValueChanged(val => Schedule(() =>
             {
-                var clampedOffset = clampOffset(areaOffset.Value);
-                if (clampedOffset != areaOffset.Value)
-                    areaOffset.Value = clampedOffset;
+                if (lockToUsableArea.Value)
+                {
+                    if (tabletHandler.CanFit())
+                    {
+                        var clampedOffset = clampOffset(areaOffset.Value);
+                        if (clampedOffset != areaOffset.Value)
+                            areaOffset.Value = clampedOffset;
+                    }
+                    else
+                    {
+                        lockToUsableArea.Value = false;
+                    }
+                }
             }), true);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
@@ -250,9 +267,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             areaSize.BindTo(tabletHandler.AreaSize);
             areaSize.BindValueChanged(val => Schedule(() =>
             {
-                var clampedOffset = clampOffset(areaOffset.Value);
-                if (clampedOffset != areaOffset.Value)
-                    areaOffset.Value = clampedOffset;
+                if (lockToUsableArea.Value)
+                {
+                    if (tabletHandler.CanFit())
+                    {
+                        var clampedOffset = clampOffset(areaOffset.Value);
+                        if (clampedOffset != areaOffset.Value)
+                            areaOffset.Value = clampedOffset;
+                    }
+                    else
+                    {
+                        lockToUsableArea.Value = false;
+                    }
+                }
 
                 sizeX.Value = val.NewValue.X;
                 sizeY.Value = val.NewValue.Y;
