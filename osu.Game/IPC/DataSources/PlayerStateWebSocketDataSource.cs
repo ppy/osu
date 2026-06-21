@@ -10,8 +10,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.IPC.Messages;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -122,10 +122,25 @@ namespace osu.Game.IPC.DataSources
                     Status = workingBeatmap.Value.BeatmapInfo.Status,
                 },
                 RulesetId = rulesetInfo.Value.OnlineID,
-                Mods = mods.Value.Select(m => new APIMod(m)).ToArray(),
+                Mods = mods.Value.Select(modToWebSocketMod).ToArray(),
             };
 
             BroadcastMessage(msg);
+        }
+
+        private static WebSocketMod modToWebSocketMod(Mod mod)
+        {
+            var settings = new Dictionary<string, object>();
+
+            foreach (var (_, property) in mod.GetSettingsSourceProperties())
+            {
+                var bindable = (IBindable)property.GetValue(mod)!;
+
+                if (!bindable.IsDefault)
+                    settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
+            }
+
+            return new WebSocketMod { Acronym = mod.Acronym, Settings = settings };
         }
     }
 }

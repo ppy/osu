@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Text.Json.Serialization;
-using osu.Game.Online.API;
 
 namespace osu.Game.IPC.Messages
 {
@@ -15,6 +14,6 @@ namespace osu.Game.IPC.Messages
         public required int RulesetId { get; init; }
 
         [JsonPropertyName("mods")]
-        public required APIMod[] Mods { get; init; }
+        public required WebSocketMod[] Mods { get; init; }
     }
 }
