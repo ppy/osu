@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -89,5 +90,13 @@ namespace osu.Game.Rulesets.Difficulty
         {
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
         }
+
+        public virtual SkillValue[] GetSkillValues() => [];
+    }
+
+    public struct SkillValue
+    {
+        public double Value;
+        public LocalisableString SkillName;
     }
 }
