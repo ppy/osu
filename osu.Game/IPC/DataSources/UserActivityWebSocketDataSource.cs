@@ -37,9 +37,47 @@ namespace osu.Game.IPC.DataSources
             var msg = new UserActivityWebSocketMessage
             {
                 Status = change.NewValue.GetType().Name,
+                Data = getUserActivityData(change.NewValue),
             };
 
             BroadcastMessage(msg);
+        }
+
+        private static object? getUserActivityData(UserActivity userActivity)
+        {
+            switch (userActivity)
+            {
+                case UserActivity.InGame inGame:
+                    return new WebSocketInGameUserActivityData
+                    {
+                        BeatmapId = inGame.BeatmapID,
+                        RulesetId = inGame.RulesetID,
+                    };
+
+                case UserActivity.InLobby inLobby:
+                    return new WebSocketInLobbyUserActivityData
+                    {
+                        RoomId = inLobby.RoomID,
+                        RoomName = inLobby.RoomName,
+                    };
+
+                case UserActivity.WatchingReplay watchingReplay:
+                    return new WebSocketWatchingReplayUserActivityData
+                    {
+                        ScoreId = watchingReplay.ScoreID,
+                        PlayerName = watchingReplay.PlayerName,
+                        BeatmapId = watchingReplay.BeatmapID,
+                    };
+
+                case UserActivity.EditingBeatmap editingBeatmap:
+                    return new WebSocketEditingBeatmapUserActivityData
+                    {
+                        BeatmapId = editingBeatmap.BeatmapID,
+                    };
+
+                default:
+                    return null;
+            }
         }
     }
 }

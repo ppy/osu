@@ -9,5 +9,9 @@ namespace osu.Game.IPC.Messages
     {
         [JsonPropertyName("status")]
         public required string Status { get; init; }
+
+        [JsonPropertyName("data")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public object? Data { get; init; }
     }
 }
