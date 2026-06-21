@@ -122,6 +122,8 @@ namespace osu.Game.IPC.DataSources
                     MaximumPP = Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, 2),
                     MaxCombo = starDifficulty?.MaxCombo ?? 0,
                     Status = workingBeatmap.Value.BeatmapInfo.Status,
+                    TotalLength = (int)Math.Round(workingBeatmap.Value.BeatmapInfo.Length / rate),
+                    DrainLength = (int)Math.Round(workingBeatmap.Value.Beatmap.CalculateDrainLength() / rate),
                 },
                 RulesetId = rulesetInfo.Value.OnlineID,
                 Mods = mods.Value.Select(modToWebSocketMod).ToArray(),

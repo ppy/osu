@@ -44,5 +44,11 @@ namespace osu.Game.IPC.Models
         [JsonPropertyName("status")]
         [JsonConverter(typeof(JsonStringEnumConverter<BeatmapOnlineStatus>))]
         public required BeatmapOnlineStatus Status { get; init; }
+
+        [JsonPropertyName("total_length")]
+        public required int TotalLength { get; init; }
+
+        [JsonPropertyName("drain_length")]
+        public required int DrainLength { get; init; }
     }
 }
