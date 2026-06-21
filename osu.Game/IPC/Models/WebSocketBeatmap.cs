@@ -4,7 +4,7 @@
 using System.Text.Json.Serialization;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.IPC.Messages
+namespace osu.Game.IPC.Models
 {
     public class WebSocketBeatmap
     {

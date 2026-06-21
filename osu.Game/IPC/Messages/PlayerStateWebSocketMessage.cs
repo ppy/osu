@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Text.Json.Serialization;
+using osu.Game.IPC.Models;
 
 namespace osu.Game.IPC.Messages
 {

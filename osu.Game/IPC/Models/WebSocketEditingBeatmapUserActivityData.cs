@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace osu.Game.IPC.Messages
+namespace osu.Game.IPC.Models
 {
     public class WebSocketEditingBeatmapUserActivityData
     {

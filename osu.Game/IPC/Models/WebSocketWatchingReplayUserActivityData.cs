@@ -3,14 +3,17 @@
 
 using System.Text.Json.Serialization;
 
-namespace osu.Game.IPC.Messages
+namespace osu.Game.IPC.Models
 {
-    public class WebSocketInGameUserActivityData
+    public class WebSocketWatchingReplayUserActivityData
     {
+        [JsonPropertyName("score_id")]
+        public required long ScoreId { get; init; }
+
+        [JsonPropertyName("player_name")]
+        public required string PlayerName { get; init; }
+
         [JsonPropertyName("beatmap_id")]
         public required int BeatmapId { get; init; }
-
-        [JsonPropertyName("ruleset_id")]
-        public required int RulesetId { get; init; }
     }
 }

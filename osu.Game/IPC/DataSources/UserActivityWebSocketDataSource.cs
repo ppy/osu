@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.IPC.Messages;
+using osu.Game.IPC.Models;
 using osu.Game.Users;
 
 namespace osu.Game.IPC.DataSources
