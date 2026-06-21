@@ -119,6 +119,7 @@ namespace osu.Game.IPC.DataSources
                     RulesetId = workingBeatmap.Value.BeatmapInfo.Ruleset.OnlineID,
                     BPM = FormatUtils.RoundBPM(workingBeatmap.Value.BeatmapInfo.BPM, rate),
                     StarRating = starDifficulty?.Stars.FloorToDecimalDigits(2) ?? workingBeatmap.Value.BeatmapInfo.StarRating.FloorToDecimalDigits(2),
+                    MaximumPP = Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, 2),
                     MaxCombo = starDifficulty?.MaxCombo ?? 0,
                     Status = workingBeatmap.Value.BeatmapInfo.Status,
                 },

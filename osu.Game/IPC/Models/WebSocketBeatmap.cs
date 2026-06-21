@@ -35,6 +35,9 @@ namespace osu.Game.IPC.Models
         [JsonPropertyName("star_rating")]
         public required double StarRating { get; init; }
 
+        [JsonPropertyName("maximum_pp")]
+        public required double MaximumPP { get; init; }
+
         [JsonPropertyName("max_combo")]
         public required int MaxCombo { get; init; }
 
