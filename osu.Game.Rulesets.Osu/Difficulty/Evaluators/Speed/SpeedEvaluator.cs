@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             // Base difficulty with all bonuses
             double speedDifficulty = (1 + speedBonus) * 1000 / strainTime;
 
-            speedDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            //difficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
             // Apply penalty if there's doubletappable doubles
             return speedDifficulty * doubletapness;
