@@ -50,5 +50,8 @@ namespace osu.Game.IPC.Models
 
         [JsonPropertyName("drain_length")]
         public required int DrainLength { get; init; }
+
+        [JsonPropertyName("object_count")]
+        public required int ObjectCount { get; init; }
     }
 }

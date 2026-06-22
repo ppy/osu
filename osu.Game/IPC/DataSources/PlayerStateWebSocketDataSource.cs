@@ -124,6 +124,7 @@ namespace osu.Game.IPC.DataSources
                     Status = workingBeatmap.Value.BeatmapInfo.Status,
                     TotalLength = (int)Math.Round(workingBeatmap.Value.BeatmapInfo.Length / rate),
                     DrainLength = (int)Math.Round(workingBeatmap.Value.Beatmap.CalculateDrainLength() / rate),
+                    ObjectCount = workingBeatmap.Value.BeatmapInfo.TotalObjectCount,
                 },
                 RulesetId = rulesetInfo.Value.OnlineID,
                 Mods = mods.Value.Select(modToWebSocketMod).ToArray(),
