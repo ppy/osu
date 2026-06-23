@@ -42,8 +42,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             public readonly ShearedButton PlayButton;
 
-            public PlayerHandCard(RankedPlayCard card)
-                : base(card)
+            public PlayerHandCard(RankedPlayCard card, bool flipped)
+                : base(card, flipped)
             {
                 AddRangeInternal(new Drawable[]
                 {
