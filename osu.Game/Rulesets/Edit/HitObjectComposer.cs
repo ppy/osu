@@ -349,6 +349,16 @@ namespace osu.Game.Rulesets.Edit
                                       && !RightToolbox.Contains(InputManager.CurrentState.Mouse.Position);
         }
 
+        /// <summary>
+        /// Whether the cursor is over the main compose playfield area (excluding toolboxes).
+        /// </summary>
+        public override bool IsMouseOverComposePlayfield =>
+            InputManager != null
+            && Playfield.ReceivePositionalInputAt(InputManager.CurrentState.Mouse.Position)
+            && PlayfieldContentContainer.Contains(InputManager.CurrentState.Mouse.Position)
+            && !LeftToolbox.Contains(InputManager.CurrentState.Mouse.Position)
+            && !RightToolbox.Contains(InputManager.CurrentState.Mouse.Position);
+
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
@@ -605,6 +615,11 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
+
+        /// <summary>
+        /// Whether the cursor is over the main compose playfield area (excluding toolboxes).
+        /// </summary>
+        public abstract bool IsMouseOverComposePlayfield { get; }
 
         /// <summary>
         /// Returns a string representing the current selection.

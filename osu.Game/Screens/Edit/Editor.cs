@@ -215,6 +215,9 @@ namespace osu.Game.Screens.Edit
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private VolumeOverlay volumeOverlay { get; set; }
+
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorShowStoryboard;
         private Bindable<bool> editorHitMarkers;
@@ -738,7 +741,15 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+            if (e.AltPressed)
+            {
+                if (shouldAdjustVolumeOnScroll(e))
+                    return volumeOverlay?.Adjust(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise) ?? false;
+
+                return false;
+            }
+
+            if (e.ControlPressed || e.SuperPressed)
                 return false;
 
             const double precision = 1;
@@ -767,6 +778,22 @@ namespace osu.Game.Screens.Edit
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Whether an alt-scroll should adjust the global volume.
+        /// In compose mode, this is only allowed when the cursor is outside of the playfield (where distance snap is adjusted instead in stable).
+        /// </summary>
+        private bool shouldAdjustVolumeOnScroll(ScrollEvent e)
+        {
+            if (e.ScrollDelta.Y == 0)
+                return false;
+
+            if (Mode.Value != EditorScreenMode.Compose || currentScreen == null)
+                return true;
+
+            var composer = currentScreen.Dependencies.Get<HitObjectComposer>();
+            return composer is not { IsLoaded: true } || !composer.IsMouseOverComposePlayfield;
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

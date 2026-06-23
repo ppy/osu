@@ -60,6 +60,9 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private OnScreenDisplay? onScreenDisplay { get; set; }
 
+        [Resolved]
+        private HitObjectComposer hitObjectComposer { get; set; } = null!;
+
         public readonly Bindable<TernaryState> DistanceSnapToggle = new Bindable<TernaryState>();
 
         private bool distanceSnapMomentary;
@@ -209,6 +212,9 @@ namespace osu.Game.Rulesets.Edit
 
             if (altPressed && !distanceSnapMomentary)
             {
+                if (!isMouseOverPlayfield())
+                    return;
+
                 distanceSnapStateBeforeMomentaryToggle = DistanceSnapToggle.Value;
                 DistanceSnapToggle.Value = DistanceSnapToggle.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
                 distanceSnapMomentary = true;
@@ -222,6 +228,8 @@ namespace osu.Game.Rulesets.Edit
                 distanceSnapMomentary = false;
             }
         }
+
+        private bool isMouseOverPlayfield() => hitObjectComposer.IsMouseOverComposePlayfield;
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
