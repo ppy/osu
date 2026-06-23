@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         public bool IsMultipleValues { get; private set; }
 
-        private bool applyingStateFromBeatmap;
+        private bool applyingState;
 
         private FormDiscreteAdjustmentControl<double> control = null!;
         private FillFlowContainer presetsFlow = null!;
@@ -105,7 +105,11 @@ namespace osu.Game.Screens.Edit.Timing
             ObjectsToAdjust.BindCollectionChanged((_, _) => updateState(), true);
             presets.BindCollectionChanged((_, _) => updatePresets(), true);
 
-            Current.BindValueChanged(val => applyVelocity(val.NewValue));
+            Current.BindValueChanged(val =>
+            {
+                applyVelocity(val.NewValue);
+                updateState();
+            });
         }
 
         private void updateState()
@@ -113,9 +117,9 @@ namespace osu.Game.Screens.Edit.Timing
             HashSet<double> velocities = ObjectsToAdjust.OfType<IHasSliderVelocity>().Select(point => Math.Round(point.SliderVelocityMultiplier, 2)).Distinct().ToHashSet();
             IsMultipleValues = velocities.Count > 1;
 
-            applyingStateFromBeatmap = true;
+            applyingState = true;
 
-            control.Current.Value = velocities.FirstOrDefault(defaultValue: 1);
+            control.Current.Value = velocities.FirstOrDefault(defaultValue: control.Current.Value);
 
             control.LabelFormat = IsMultipleValues
                 ? static _ => "(multiple)"
@@ -124,15 +128,17 @@ namespace osu.Game.Screens.Edit.Timing
 
             foreach (var preset in presetsFlow.OfType<SliderVelocityPresetTernaryButton>())
             {
-                if (velocities.Contains(preset.Velocity))
+                if (velocities.Count > 0 && velocities.Contains(preset.Velocity))
                     preset.Current.Value = IsMultipleValues ? TernaryState.Indeterminate : TernaryState.True;
+                else if (velocities.Count == 0 && preset.Velocity == control.Current.Value)
+                    preset.Current.Value = TernaryState.True;
                 else
                     preset.Current.Value = TernaryState.False;
             }
 
-            addPresetButton.Enabled.Value = velocities.Count == 1 && !presets.Contains(velocities.Single());
+            addPresetButton.Enabled.Value = (velocities.Count == 0 && !presets.Contains(Current.Value)) || (velocities.Count == 1 && !presets.Contains(velocities.Single()));
 
-            applyingStateFromBeatmap = false;
+            applyingState = false;
         }
 
         private void updatePresets()
@@ -156,7 +162,10 @@ namespace osu.Game.Screens.Edit.Timing
                 };
                 presetButton.Current.BindValueChanged(val =>
                 {
-                    if (applyingStateFromBeatmap)
+                    if (val.NewValue != TernaryState.True)
+                        return;
+
+                    if (applyingState)
                         return;
 
                     if (val.NewValue == TernaryState.True)
@@ -174,8 +183,14 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void applyVelocity(double velocity)
         {
-            if (applyingStateFromBeatmap)
+            if (applyingState)
                 return;
+
+            if (ObjectsToAdjust.Count == 0)
+            {
+                Current.Value = velocity;
+                return;
+            }
 
             beatmap.BeginChange();
 
