@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -111,10 +110,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public bool PlaySamplesOnAdjust { get; init; } = true;
 
+        private Func<T, LocalisableString> labelFormat;
+
         /// <summary>
         /// The string formatting function to use for the value label.
         /// </summary>
-        public Func<T, LocalisableString> LabelFormat { get; init; }
+        public Func<T, LocalisableString> LabelFormat
+        {
+            get => labelFormat;
+            set
+            {
+                labelFormat = value;
+
+                if (IsLoaded)
+                    updateValueDisplay();
+            }
+        }
 
         /// <summary>
         /// The string formatting function to use for the slider's tooltip text.
@@ -123,7 +134,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public Func<T, LocalisableString> TooltipFormat { get; init; }
 
         private FormControlBackground background = null!;
-        private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
         private OsuSpriteText valueLabel = null!;
         private FormFieldCaption captionText = null!;
@@ -138,7 +148,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public FormSliderBar()
         {
-            LabelFormat ??= defaultLabelFormat;
+            labelFormat ??= DefaultLabelFormat;
             TooltipFormat ??= v => LabelFormat(v);
 
             // the reason why this slider is created in constructor rather than in BDL like the rest of drawable hierarchy is as follows:
@@ -198,18 +208,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
-
             InternalChildren = new Drawable[]
             {
                 background = new FormControlBackground(),
-                flashLayer = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Transparent,
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -255,11 +256,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             AlwaysPresent = true,
                                             CommitOnFocusLost = true,
                                             SelectAllOnFocus = true,
-                                            OnInputError = () =>
-                                            {
-                                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
-                                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
-                                            },
+                                            OnInputError = background.FlashOnInputError,
                                             TabbableContentContainer = tabbableContentContainer,
                                         },
                                         valueLabel = new TruncatingSpriteText
@@ -327,7 +324,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             currentNumberInstantaneous.TriggerChange();
             current.Value = currentNumberInstantaneous.Value;
 
-            background.Flash();
+            background.FlashOnCommit();
         }
 
         private void tryUpdateSliderFromTextBox()
@@ -437,7 +434,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
-        private LocalisableString defaultLabelFormat(T value) => currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
+        public LocalisableString DefaultLabelFormat(T value) => value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
 
         public partial class InnerSlider : OsuSliderBar<T>
         {

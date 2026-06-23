@@ -170,9 +170,14 @@ namespace osu.Game.Localisation
         public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
 
         /// <summary>
-        /// "Caps lock is active"
+        /// "Caps Lock"
         /// </summary>
-        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"Caps lock is active");
+        public static LocalisableString CapsLock => new TranslatableString(getKey(@"caps_lock"), @"Caps Lock");
+
+        /// <summary>
+        /// "Caps Lock is active"
+        /// </summary>
+        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"Caps Lock is active");
 
         /// <summary>
         /// "Revert to default"
@@ -208,6 +213,16 @@ namespace osu.Game.Localisation
         /// "Delete..."
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
+
+        /// <summary>
+        /// "{0} item|{0} items"
+        /// </summary>
+        public static LocalisableString ItemsCount(int quantity) => new PluralisableString(new TranslatableString(getKey(@"items_count"), @"{0} item|{0} items", quantity), quantity, '|');
+
+        /// <summary>
+        /// "{0} beatmap|{0} beatmaps"
+        /// </summary>
+        public static LocalisableString BeatmapsCount(int quantity) => new PluralisableString(new TranslatableString(getKey(@"beatmaps_count"), @"{0} beatmap|{0} beatmaps", quantity), quantity, '|');
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
