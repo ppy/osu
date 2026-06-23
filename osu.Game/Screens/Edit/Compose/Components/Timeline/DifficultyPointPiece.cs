@@ -98,37 +98,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
                 var relevantObjects = (beatmap.SelectedHitObjects.Contains(hitObject) ? beatmap.SelectedHitObjects : hitObject.Yield()).Where(o => o is IHasSliderVelocity).ToArray();
 
-                // even if there are multiple objects selected, we can still display a value if they all have the same value.
-                var selectedPointBindable = relevantObjects.Select(point => ((IHasSliderVelocity)point).SliderVelocityMultiplier).Distinct().Count() == 1
-                    ? ((IHasSliderVelocity)relevantObjects.First()).SliderVelocityMultiplierBindable
-                    : null;
-
-                if (selectedPointBindable != null)
-                {
-                    // there may be legacy control points, which contain infinite precision for compatibility reasons (see LegacyDifficultyControlPoint).
-                    // generally that level of precision could only be set by externally editing the .osu file, so at the point
-                    // a user is looking to update this within the editor it should be safe to obliterate this additional precision.
-                    adjustmentControl.Current.Value = selectedPointBindable.Value;
-                }
-                else
-                {
-                    adjustmentControl.IsMultipleValues = true;
-                }
-
-                adjustmentControl.Current.BindValueChanged(val =>
-                {
-                    beatmap.BeginChange();
-
-                    foreach (var h in relevantObjects)
-                    {
-                        ((IHasSliderVelocity)h).SliderVelocityMultiplier = val.NewValue;
-                        beatmap.Update(h);
-                    }
-
-                    beatmap.EndChange();
-
-                    adjustmentControl.IsMultipleValues = false;
-                });
+                adjustmentControl.ObjectsToAdjust.Clear();
+                adjustmentControl.ObjectsToAdjust.AddRange(relevantObjects);
             }
 
             protected override void LoadComplete()
@@ -141,9 +112,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
     internal partial class SliderVelocityInspector : EditorInspector
     {
-        private readonly Bindable<double> current;
+        private readonly IBindable<double> current;
 
-        public SliderVelocityInspector(Bindable<double> current)
+        public SliderVelocityInspector(IBindable<double> current)
         {
             this.current = current;
         }

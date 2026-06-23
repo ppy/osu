@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -142,6 +143,75 @@ namespace osu.Game.Tests.Visual.Editing
             setVelocityViaPopover(3);
             hitObjectHasVelocity(0, 3);
             hitObjectHasVelocity(1, 3);
+        }
+
+        [Test]
+        public void TestPresetInteractions()
+        {
+            clickDifficultyPiece(0);
+            AddAssert("three presets displayed",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1d, 1.5d]));
+            AddAssert("one preset selected",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Count(b => b.Current.Value == TernaryState.True),
+                () => Is.EqualTo(1));
+            AddAssert("selected preset is 1.0x",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Single(b => b.Current.Value == TernaryState.True).Velocity,
+                () => Is.EqualTo(1));
+
+            AddStep("press first preset", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            hitObjectHasVelocity(0, 0.75);
+
+            dismissPopover();
+
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickDifficultyPiece(0);
+            AddAssert("three presets displayed",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1d, 1.5d]));
+            AddAssert("no preset fully selected",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Count(b => b.Current.Value == TernaryState.True),
+                () => Is.EqualTo(0));
+            AddAssert("one preset indeterminate",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Count(b => b.Current.Value == TernaryState.Indeterminate),
+                () => Is.EqualTo(1));
+
+            AddStep("remove second preset", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().ElementAt(1));
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddAssert("two presets displayed",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1.5d]));
+            hitObjectHasVelocity(0, 0.75);
+            hitObjectHasVelocity(1, 2);
+
+            AddStep("press last preset", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+            hitObjectHasVelocity(0, 1.5);
+            hitObjectHasVelocity(1, 1.5);
+
+            setVelocityViaPopover(2);
+            hitObjectHasVelocity(0, 2);
+            hitObjectHasVelocity(1, 2);
+
+            AddStep("add preset", () =>
+            {
+                var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
+                InputManager.MoveMouseTo(popover.ChildrenOfType<RoundedButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("three presets displayed",
+                () => this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1.5d, 2d]));
         }
 
         private void clickDifficultyPiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
