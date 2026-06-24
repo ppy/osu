@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -16,7 +15,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private const double acute_angle_multiplier = 2.41;
         private const double slider_multiplier = 1.5;
         private const double velocity_change_multiplier = 0.9;
-        private const double wiggle_multiplier = 1.02; // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+
+        // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
+        private const double wiggle_multiplier = 1.02;
+
         private const double maximum_repetition_nerf = 0.15;
         private const double maximum_vector_influence = 0.5;
 
@@ -181,18 +183,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             for (int index = 0; index < note_limit; index++)
             {
-                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
+                OsuDifficultyHitObject? prevObj = (OsuDifficultyHitObject)current.Previous(index);
 
-                if (loopObj.IsNull())
+                if (prevObj == null)
                     break;
 
                 // Only consider vectors in the same jump section, stopping to change rhythm ruins momentum
-                if (Math.Max(current.AdjustedDeltaTime, loopObj.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, loopObj.AdjustedDeltaTime))
+                if (Math.Max(current.AdjustedDeltaTime, prevObj.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, prevObj.AdjustedDeltaTime))
                     break;
 
-                if (loopObj.NormalisedVectorAngle.IsNotNull() && current.NormalisedVectorAngle.IsNotNull())
+                if (prevObj.NormalisedVectorAngle != null && current.NormalisedVectorAngle != null)
                 {
-                    double angleDifference = Math.Abs(current.NormalisedVectorAngle.Value - loopObj.NormalisedVectorAngle.Value);
+                    double angleDifference = Math.Abs(current.NormalisedVectorAngle.Value - prevObj.NormalisedVectorAngle.Value);
                     // Refer to this desmos for tuning, constants need to be precise so that values stay within the range of 0 and 1.
                     // https://www.desmos.com/calculator/a8jesv5sv2
                     constantAngleCount += Math.Cos(8 * Math.Min(double.DegreesToRadians(11.25), angleDifference));
