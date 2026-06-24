@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -169,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
 
-                if (hitObject.IsNull() ||
+                if (hitObject == null ||
                     current.StartTime - hitObject.StartTime > reading_window_size ||
                     hitObject.StartTime < current.StartTime - current.Preempt) // Current object not visible at the time object needs to be clicked
                     break;
@@ -219,13 +218,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             {
                 var loopObj = (OsuDifficultyHitObject)current.Previous(index);
 
-                if (loopObj.IsNull())
+                if (loopObj == null)
                     break;
 
                 // Account less for objects that are close to the time limit.
                 double longIntervalFactor = 1 - DifficultyCalculationUtils.ReverseLerp(loopObj.AdjustedDeltaTime, maximum_angle_relevancy_time, minimum_angle_relevancy_time);
 
-                if (loopObj.Angle.IsNotNull() && current.Angle.IsNotNull())
+                if (loopObj.Angle != null && current.Angle != null)
                 {
                     double angleDifference = Math.Abs(current.Angle.Value - loopObj.Angle.Value);
                     double angleDifferenceAlternating = Math.PI;
