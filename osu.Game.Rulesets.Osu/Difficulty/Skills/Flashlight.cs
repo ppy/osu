@@ -26,12 +26,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.totalObjects = totalObjects;
         }
 
-        private double skillMultiplier => 0.058;
-        private double strainDecayBase => 0.15;
+        private const double skill_multiplier = 0.058;
+        private const double strain_decay_base = 0.15;
 
         private double currentStrain;
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        private double strainDecay(double ms) => Math.Pow(strain_decay_base, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
 
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += calculateAdjustedDifficulty(current) * skillMultiplier;
+            currentStrain += calculateAdjustedDifficulty(current) * skill_multiplier;
 
             return currentStrain;
         }
