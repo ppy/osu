@@ -16,6 +16,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -87,11 +88,17 @@ namespace osu.Game.Screens.Select
 
         private const float personal_best_height = 112;
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (scoresContainer.Any(score => score.IsHovered))
+                return true;
+
+            return base.OnMouseDown(e);
+        }
+
         private Sample? swishSample;
 
         private readonly List<ScheduledDelegate> scoreSfxDelegates = new List<ScheduledDelegate>();
-
-        public bool ScoreHovered => scoresContainer.Any(score => score.IsHovered);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

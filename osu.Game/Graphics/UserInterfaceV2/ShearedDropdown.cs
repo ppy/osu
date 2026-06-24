@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
         }
 
-        public override bool HandlePositionalInput => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         protected partial class ShearedDropdownMenu : OsuDropdown<T>.OsuDropdownMenu
         {

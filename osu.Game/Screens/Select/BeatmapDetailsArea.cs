@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
@@ -21,18 +20,6 @@ namespace osu.Game.Screens.Select
         public BeatmapDetailsArea()
         {
             RelativeSizeAxes = Axes.X;
-        }
-
-        // Block background reveal for scores, header buttons / dropdowns
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (header.ControlHovered)
-                return true;
-
-            if (currentContent is BeatmapLeaderboardWedge leaderboardWedge && leaderboardWedge.ScoreHovered)
-                return true;
-
-            return base.OnMouseDown(e);
         }
 
         [BackgroundDependencyLoader]
