@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// </summary>
     public class Stamina : StrainSkill
     {
-        private double skillMultiplier => 1.1;
-        private double strainDecayBase => 0.4;
+        private const double skill_multiplier = 1.1;
+        private const double strain_decay_base = 0.4;
 
         public readonly bool SingleColourStamina;
         private readonly bool isConvert;
@@ -37,12 +37,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             this.isConvert = isConvert;
         }
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        private double strainDecay(double ms) => Math.Pow(strain_decay_base, ms / 1000);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            double staminaDifficulty = StaminaEvaluator.EvaluateDifficultyOf(current) * skillMultiplier;
+            double staminaDifficulty = StaminaEvaluator.EvaluateDifficultyOf(current) * skill_multiplier;
 
             // Safely prevents previous strains from shifting as new notes are added.
             var currentObject = current as TaikoDifficultyHitObject;
