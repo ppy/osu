@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -70,6 +70,9 @@ namespace osu.Game.Configuration
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
+
+            // OFFLINE testing mode: when true, the game will use DummyAPIAccess and avoid network
+            SetDefault(OsuSetting.OfflineMode, false);
 
             SetDefault(OsuSetting.AutomaticallyDownloadMissingBeatmaps, true);
 
@@ -266,12 +269,6 @@ namespace osu.Game.Configuration
                     value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
                     shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
                 ),
-                new TrackedSetting<bool>(OsuSetting.GameplayLeaderboard, state => new SettingDescription(
-                    rawValue: state,
-                    name: GlobalActionKeyBindingStrings.ToggleInGameLeaderboard,
-                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
-                    shortcut: LookupKeyBindings(GlobalAction.ToggleInGameLeaderboard))
-                ),
                 new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
                     name: GameplaySettingsStrings.HUDVisibilityMode,
@@ -370,6 +367,8 @@ namespace osu.Game.Configuration
         BeatmapLeaderboardSortMode,
         BeatmapDetailModsFilter,
         Username,
+        // OFFLINE testing mode: when true, the game will use DummyAPIAccess and avoid network
+        OfflineMode,
         ReleaseStream,
         SavePassword,
         SaveUsername,
