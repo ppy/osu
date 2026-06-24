@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
             double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindow(HitResult.Great) * 0.3;
 
-            var island = new Island(deltaDifferenceEpsilon);
-            var previousIsland = new Island(deltaDifferenceEpsilon);
+            var island = new Island(int.MaxValue);
+            var previousIsland = new Island(int.MaxValue);
 
             // we can't use dictionary here because we need to compare island with a tolerance
             // which is impossible to pass into the hash comparer
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                 // Make sure to always have the current island initialised - if we don't do it here it will only initialise on the next rhythm change
                 if (island.Delta == int.MaxValue)
-                    island = new Island((int)currDelta, deltaDifferenceEpsilon);
+                    island = new Island((int)currDelta);
 
                 // calculate how much current delta difference deserves a rhythm bonus
                 // this function is meant to reduce rhythm bonus for deltas that are multiples of each other (i.e 100 and 200)
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                             effectiveRatio *= 0.5;
 
                         // repeated island polarity (2 -> 4, 3 -> 5)
-                        if (island.IsSimilarPolarity(previousIsland))
+                        if (island.IsSimilarPolarity(previousIsland, deltaDifferenceEpsilon))
                             effectiveRatio *= 0.5;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
@@ -132,21 +132,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         if (isSpeedingUp)
                             effectiveRatio *= 0.65;
 
-                        var islandCount = islandCounts.FirstOrDefault(x => x.Island.Equals(island));
+                        (Island Island, int Count) tuple = islandCounts.FirstOrDefault(x => x.Island.AlmostEquals(island, deltaDifferenceEpsilon));
 
-                        if (islandCount != default)
+                        if (tuple != default)
                         {
-                            int countIndex = islandCounts.IndexOf(islandCount);
+                            int countIndex = islandCounts.IndexOf(tuple);
 
                             // only add island to island counts if they're going one after another
-                            if (previousIsland.Equals(island))
-                                islandCount.Count++;
+                            if (previousIsland.AlmostEquals(island, deltaDifferenceEpsilon))
+                                tuple.Count++;
 
                             // repeated island (ex: triplet -> triplet)
                             double power = DifficultyCalculationUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
-                            effectiveRatio *= Math.Min(3.0 / islandCount.Count, Math.Pow(1.0 / islandCount.Count, power));
+                            effectiveRatio *= Math.Min(3.0 / tuple.Count, Math.Pow(1.0 / tuple.Count, power));
 
-                            islandCounts[countIndex] = (islandCount.Island, islandCount.Count);
+                            islandCounts[countIndex] = (tuple.Island, tuple.Count);
                         }
                         else
                         {
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         if (prevDelta + deltaDifferenceEpsilon < currDelta) // we're slowing down, stop counting
                             firstDeltaSwitch = false; // if we're speeding up, this stays true and we keep counting island size.
 
-                        island = new Island((int)currDelta, deltaDifferenceEpsilon);
+                        island = new Island((int)currDelta);
                     }
                 }
                 else if (prevDelta > currDelta + deltaDifferenceEpsilon) // we're speeding up
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                     startRatio = effectiveRatio;
 
-                    island = new Island((int)currDelta, deltaDifferenceEpsilon);
+                    island = new Island((int)currDelta);
                 }
 
                 lastObj = prevObj;
@@ -217,24 +217,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             return 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, DifficultyCalculationUtils.SmoothstepBellCurve(deltaDifferenceFraction));
         }
 
-        private class Island : IEquatable<Island>
+        /// <summary>
+        /// An island is a thing. I'm not sure what thing it is, but it's definitely a thing.
+        /// TODO: document this stuff please.
+        /// </summary>
+        private class Island
         {
-            private readonly double deltaDifferenceEpsilon;
+            public int Delta { get; private set; }
+            public int DeltaCount { get; private set; } = 1;
 
-            public Island(double epsilon)
+            public Island(int delta)
             {
-                deltaDifferenceEpsilon = epsilon;
-            }
-
-            public Island(int delta, double epsilon)
-            {
-                deltaDifferenceEpsilon = epsilon;
                 Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
-                DeltaCount++;
             }
-
-            public int Delta { get; private set; } = int.MaxValue;
-            public int DeltaCount { get; private set; }
 
             public void AddDelta(int delta)
             {
@@ -244,22 +239,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 DeltaCount++;
             }
 
-            public bool IsSimilarPolarity(Island other)
+            public bool IsSimilarPolarity(Island other, double epsilon)
             {
                 // single delta islands shouldn't be compared
                 if (DeltaCount <= 1 || other.DeltaCount <= 1)
                     return false;
 
-                return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
+                return Math.Abs(Delta - other.Delta) < epsilon &&
                        DeltaCount % 2 == other.DeltaCount % 2;
             }
 
-            public bool Equals(Island? other)
+            public bool AlmostEquals(Island? other, double epsilon)
             {
                 if (other == null)
                     return false;
 
-                return Math.Abs(Delta - other.Delta) < deltaDifferenceEpsilon &&
+                return Math.Abs(Delta - other.Delta) < epsilon &&
                        DeltaCount == other.DeltaCount;
             }
 
