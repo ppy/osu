@@ -1321,7 +1321,7 @@ namespace osu.Game
             {
                 AddRange([
                     new UserActivityWebSocketDataSource(webSocketProvider),
-                    new PlayerStateWebSocketDataSource(webSocketProvider)
+                    new BeatmapStateWebSocketDataSource(webSocketProvider)
                 ]);
             }
         }

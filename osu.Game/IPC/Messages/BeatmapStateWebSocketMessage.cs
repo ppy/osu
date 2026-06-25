@@ -6,7 +6,7 @@ using osu.Game.IPC.Models;
 
 namespace osu.Game.IPC.Messages
 {
-    public class PlayerStateWebSocketMessage : OsuWebSocketMessage
+    public class BeatmapStateWebSocketMessage : OsuWebSocketMessage
     {
         [JsonPropertyName("beatmap")]
         public required WebSocketBeatmap Beatmap { get; init; }

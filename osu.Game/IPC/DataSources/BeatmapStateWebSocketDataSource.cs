@@ -20,7 +20,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.IPC.DataSources
 {
-    public partial class PlayerStateWebSocketDataSource : WebSocketDataSource
+    public partial class BeatmapStateWebSocketDataSource : WebSocketDataSource
     {
         [Resolved]
         private Bindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
@@ -37,7 +37,7 @@ namespace osu.Game.IPC.DataSources
         private ModSettingChangeTracker? modSettingChangeTracker;
         private ScheduledDelegate? debouncedModSettingsChange;
 
-        public PlayerStateWebSocketDataSource(IWebSocketProvider provider)
+        public BeatmapStateWebSocketDataSource(IWebSocketProvider provider)
             : base(provider) { }
 
         protected override void LoadComplete()
@@ -90,7 +90,7 @@ namespace osu.Game.IPC.DataSources
 
             var starDifficulty = await difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, rulesetInfo.Value, mods.Value).ConfigureAwait(false);
 
-            var msg = new PlayerStateWebSocketMessage
+            var msg = new BeatmapStateWebSocketMessage
             {
                 Beatmap = new WebSocketBeatmap
                 {
