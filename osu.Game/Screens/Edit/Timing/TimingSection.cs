@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
@@ -15,11 +14,8 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class TimingSection : Section<TimingControlPoint>
     {
-        private readonly BindableNumberWithCurrent<double> currentBeatLength = new BindableNumberWithCurrent<double>();
-
         private LabelledTimeSignature timeSignature = null!;
         private LabelledSwitchButton omitBarLine = null!;
-        private FormDiscreteAdjustmentControl<double> bpmAdjustmentBox = null!;
 
         [Resolved]
         private OsuConfigManager configManager { get; set; } = null!;
@@ -34,11 +30,6 @@ namespace osu.Game.Screens.Edit.Timing
                     Label = EditorStrings.AdjustExistingObjectsOnTimingChanges,
                     FixedLabelWidth = 220,
                     Current = configManager.GetBindable<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges),
-                },
-                bpmAdjustmentBox = new FormDiscreteAdjustmentControl<double>(1)
-                {
-                    Caption = "BPM",
-                    LabelFormat = v => v.ToLocalisableString(@"N2"),
                 },
                 new TapTimingControl(),
                 timeSignature = new LabelledTimeSignature
@@ -55,35 +46,6 @@ namespace osu.Game.Screens.Edit.Timing
 
             omitBarLine.Current.BindValueChanged(_ => saveChanges());
             timeSignature.Current.BindValueChanged(_ => saveChanges());
-
-            bpmAdjustmentBox.Current.BindValueChanged(val =>
-            {
-                if (val.NewValue < 0)
-                {
-                    bpmAdjustmentBox.Current.Value = val.OldValue;
-                    return;
-                }
-
-                currentBeatLength.Value = BeatLengthToBpm(val.NewValue);
-            });
-            currentBeatLength.BindValueChanged(val =>
-            {
-                if (ControlPoint.Value == null)
-                    return;
-
-                bpmAdjustmentBox.Current.Value = BeatLengthToBpm(val.NewValue);
-
-                if (isRebinding)
-                    return;
-
-                if (val.OldValue != val.NewValue && configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
-                {
-                    Beatmap.BeginChange();
-                    TimingSectionAdjustments.SetHitObjectBPM(Beatmap, ControlPoint.Value, val.OldValue);
-                    Beatmap.UpdateAllHitObjects();
-                    Beatmap.EndChange();
-                }
-            }, true);
 
             void saveChanges()
             {
@@ -107,7 +69,6 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 isRebinding = true;
 
-                currentBeatLength.Current = point.NewValue.BeatLengthBindable;
                 timeSignature.Current = point.NewValue.TimeSignatureBindable;
                 omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
 

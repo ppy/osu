@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -281,7 +282,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private void updateValueDisplay()
         {
-            textBox.Text = Current.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
+            textBox.Text = NumberFormattingExtensions.Normalise(decimal.CreateTruncating(Current.Value), OsuSliderBar<T>.MAX_DECIMAL_DIGITS).ToString(CultureInfo.CurrentCulture);
             valueLabel.Text = LabelFormat(Current.Value);
         }
 
