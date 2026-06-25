@@ -891,13 +891,9 @@ namespace osu.Game.Screens.Select
 
             CarouselItemsPresented = true;
 
-            int count = carousel.MatchedBeatmapsCount;
-
             updateNoResultsPlaceholder();
 
-            // Intentionally not localised until we have proper support for this (see https://github.com/ppy/osu-framework/pull/4918
-            // but also in this case we want support for formatting a number within a string).
-            FilterControl.StatusText = count != 1 ? $"{count:#,0} matches" : $"{count:#,0} match";
+            FilterControl.StatusText = SongSelectStrings.MatchesCount(carousel.MatchedBeatmapsCount);
 
             // If there's already a selection update in progress, let's not interrupt it.
             // Interrupting could cause the debounce interval to be reduced.
