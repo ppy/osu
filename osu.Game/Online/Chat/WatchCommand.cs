@@ -14,9 +14,6 @@ namespace osu.Game.Online.Chat
     public partial class WatchCommand : Component
     {
         [Resolved]
-        private IChannelPostTarget channelManager { get; set; } = null!;
-
-        [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
