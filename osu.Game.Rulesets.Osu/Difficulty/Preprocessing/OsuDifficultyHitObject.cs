@@ -196,25 +196,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
-        public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
+        public double GetDoubletapness(OsuDifficultyHitObject? nextObj)
         {
-            if (osuNextObj != null)
-            {
-                double currDeltaTime = Math.Max(1, DeltaTime);
-                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
+            if (nextObj == null) return 0;
 
-                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+            double currDeltaTime = Math.Max(1, DeltaTime);
+            double nextDeltaTime = Math.Max(1, nextObj.DeltaTime);
 
-                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
+            double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
 
-                // Can't doubletap if circles don't intersect
-                double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+            double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+            double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
 
-                return 1.0 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
-            }
+            // Can't doubletap if circles don't intersect
+            double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
-            return 0;
+            return 1.0 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
