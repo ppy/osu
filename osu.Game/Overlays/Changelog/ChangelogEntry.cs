@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                DocumentMargin = new MarginPadding(0),
+                DocumentMargin = new MarginPadding { Bottom = 10 },
                 DocumentPadding = new MarginPadding(0),
                 Text = entry.Message,
             };
