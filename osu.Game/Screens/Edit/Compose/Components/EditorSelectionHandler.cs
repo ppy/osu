@@ -13,6 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -536,15 +537,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (SelectedBlueprints.All(b => b.Item is IHasComboInformation))
             {
-                yield return new TernaryStateToggleMenuItem("New combo")
+                yield return new TernaryStateToggleMenuItem(EditorStrings.NewCombo)
                 {
                     State = { BindTarget = SelectionNewComboState },
                     Hotkey = new Hotkey(new KeyCombination(InputKey.Q))
                 };
             }
 
-            yield return new OsuMenuItem("Sample") { Items = getSampleSubmenuItems().ToArray(), };
-            yield return new OsuMenuItem("Bank") { Items = getBankSubmenuItems().ToArray(), };
+            yield return new OsuMenuItem(EditorStrings.Sample) { Items = getSampleSubmenuItems().ToArray(), };
+            yield return new OsuMenuItem(EditorStrings.Bank) { Items = getBankSubmenuItems().ToArray(), };
         }
 
         private IEnumerable<MenuItem> getSampleSubmenuItems()
@@ -601,7 +602,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.R))
             };
 
-            yield return new OsuMenuItem("Addition bank")
+            yield return new OsuMenuItem(EditorStrings.AdditionBank)
             {
                 Items = SelectionAdditionBankStates.Select(kvp =>
                     new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
