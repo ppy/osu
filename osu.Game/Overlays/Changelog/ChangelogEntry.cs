@@ -26,9 +26,6 @@ namespace osu.Game.Overlays.Changelog
         private OsuColour colours { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
-        [Resolved]
         private ILinkHandler? linkHandler { get; set; }
 
         private FontUsage fontLarge;
