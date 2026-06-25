@@ -616,6 +616,8 @@ namespace osu.Game.Overlays
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
+            // Only place where it may be changed without any external updating is in settings overlay button
+            // 'Clear all collection' that sends update with empty list. So just null it because there are no collections anymore.
             if (!collections.Any())
                 PlaylistCollection = null;
         }
