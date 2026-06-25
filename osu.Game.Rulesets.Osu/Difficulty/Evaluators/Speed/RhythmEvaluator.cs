@@ -50,12 +50,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 rhythmStart++;
 
             OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart);
-            OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)current.Previous(rhythmStart + 1);
+            OsuDifficultyHitObject prevPrevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart + 1);
 
             // we go from the furthest object back to the current one
             for (int i = rhythmStart; i > 0; i--)
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
+
                 if (currObj.BaseObject is Spinner)
                     continue;
 
@@ -66,9 +67,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 double currHistoricalDecay = Math.Min(noteDecay, timeDecay); // either we're limited by time or limited by object count.
 
                 // Use custom cap value to ensure that at this point delta time is actually zero
-                double currDelta = Math.Max(currObj.DeltaTime, 1e-7);
-                double prevDelta = Math.Max(prevObj.DeltaTime, 1e-7);
-                double lastDelta = Math.Max(lastObj.DeltaTime, 1e-7);
+                const double delta_min_value = 1e-7;
+
+                double currDelta = Math.Max(currObj.DeltaTime, delta_min_value);
+                double prevDelta = Math.Max(prevObj.DeltaTime, delta_min_value);
+
+                double currPrevDeltaDelta = Math.Abs(prevDelta - currDelta);
 
                 // Make sure to always have the current island initialised - if we don't do it here it will only initialise on the next rhythm change
                 if (island.Delta == int.MaxValue)
@@ -81,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 // reduce ratio bonus if delta difference is too big
                 double differenceMultiplier = Math.Clamp(2.0 - deltaDifference / 8.0, 0.0, 1.0);
 
-                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - deltaDifferenceEpsilon) / deltaDifferenceEpsilon);
+                double windowPenalty = Math.Clamp((currPrevDeltaDelta - deltaDifferenceEpsilon) / deltaDifferenceEpsilon, 0, 1);
 
                 double effectiveRatio = getEffectiveRatio(deltaDifference) * windowPenalty * differenceMultiplier;
 
@@ -100,9 +104,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     effectiveRatio = Math.Min(sliderEffectiveRatio, effectiveRatio);
                 }
 
-                bool isSpeedingUp = prevDelta > currDelta + deltaDifferenceEpsilon;
-
-                if (Math.Abs(prevDelta - currDelta) < deltaDifferenceEpsilon)
+                if (currPrevDeltaDelta < deltaDifferenceEpsilon)
                 {
                     // island is still progressing
                     island.AddDelta((int)currDelta);
@@ -110,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                 if (firstDeltaSwitch)
                 {
-                    if (Math.Abs(prevDelta - currDelta) > deltaDifferenceEpsilon)
+                    if (currPrevDeltaDelta > deltaDifferenceEpsilon)
                     {
                         // bpm change is into slider, this is easy acc window
                         if (currObj.BaseObject is Slider)
@@ -121,13 +123,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                             effectiveRatio *= 0.5;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
-                        if (lastDelta > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
+                        if (Math.Max(prevPrevObj.DeltaTime, delta_min_value) > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
                             effectiveRatio *= 0.125;
 
                         // repeated island size (ex: triplet -> triplet)
                         // TODO: remove this nerf since its staying here only for balancing purposes because of the flawed ratio calculation
                         if (previousIsland.DeltaCount == island.DeltaCount)
                             effectiveRatio *= 0.5;
+
+                        bool isSpeedingUp = prevDelta > currDelta + deltaDifferenceEpsilon;
 
                         if (isSpeedingUp)
                             effectiveRatio *= 0.65;
@@ -148,12 +152,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                             islandCounts[countIndex] = (tuple.Island, tuple.Count);
                         }
-                        else
+                        else if (island.DeltaCount > 0)
                         {
-                            if (island.DeltaCount > 0)
-                            {
-                                islandCounts.Add((island, 1));
-                            }
+                            islandCounts.Add((island, 1));
                         }
 
                         // scale down the difficulty if the object is doubletappable
@@ -172,11 +173,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                         startRatio = effectiveRatio;
 
-                        previousIsland = island;
-
                         if (prevDelta + deltaDifferenceEpsilon < currDelta) // we're slowing down, stop counting
                             firstDeltaSwitch = false; // if we're speeding up, this stays true and we keep counting island size.
 
+                        previousIsland = island;
                         island = new Island((int)currDelta);
                     }
                 }
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     island = new Island((int)currDelta);
                 }
 
-                lastObj = prevObj;
+                prevPrevObj = prevObj;
                 prevObj = currObj;
             }
 
