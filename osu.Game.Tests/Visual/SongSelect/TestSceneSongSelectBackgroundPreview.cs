@@ -4,12 +4,14 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Select;
 using osuTK.Input;
@@ -18,8 +20,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public partial class TestSceneSongSelectBackgroundPreview : SongSelectTestScene
     {
-        private const int backround_preview_delay_seconds = 1;
-
         [Test]
         public void TestLeaderboardScoresBlockBackgroundPreview()
         {
@@ -59,15 +59,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("wait for scores", () => SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Any());
+
+            double? clickTime = null;
             AddStep("click score", () =>
             {
                 InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Single());
                 InputManager.PressButton(MouseButton.Left);
+                clickTime = InputManager.Time.Current;
             });
-            AddWaitStep("wait for background preview", backround_preview_delay_seconds);
-
-            AddAssert("background preview not triggered", () => InputManager.HoveredDrawables.Any(hovered => hovered is BeatmapLeaderboardScore));
-            InputManager.ReleaseButton(MouseButton.Left);
+            AddUntilStep("wait for background preview", () => InputManager.Time.Current, () => Is.GreaterThan((clickTime + 3 * Screens.Select.SongSelect.REVEAL_BACKGROUND_DELAY) ?? double.PositiveInfinity));
+            AddAssert("background preview not triggered", () => this.ChildrenOfType<ScreenFooter>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]
@@ -100,20 +102,19 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("wait for leaderboard controls", () => SongSelect.ChildrenOfType<BeatmapDetailsArea.Header>().Any());
+
+            double? clickTime = null;
             AddStep("click scope", () =>
             {
                 var header = SongSelect.ChildrenOfType<BeatmapDetailsArea.Header>().Single();
                 var scopeDropdown = header.ChildrenOfType<ShearedDropdown<BeatmapLeaderboardScope>>().Single();
                 InputManager.MoveMouseTo(scopeDropdown);
                 InputManager.PressButton(MouseButton.Left);
+                clickTime = InputManager.Time.Current;
             });
-
-            AddWaitStep("wait for background preview", backround_preview_delay_seconds);
-            AddAssert("background preview not triggered", () =>
-            {
-                return InputManager.HoveredDrawables.Any(hovered => hovered is ShearedDropdown<BeatmapLeaderboardScope>);
-            });
-            InputManager.ReleaseButton(MouseButton.Left);
+            AddUntilStep("wait for background preview", () => InputManager.Time.Current, () => Is.GreaterThan((clickTime + 3 * Screens.Select.SongSelect.REVEAL_BACKGROUND_DELAY) ?? double.PositiveInfinity));
+            AddAssert("background preview not triggered", () => this.ChildrenOfType<ScreenFooter>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]
@@ -146,20 +147,19 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("wait for leaderboard controls", () => SongSelect.ChildrenOfType<BeatmapDetailsArea.Header>().Any());
+
+            double? clickTime = null;
             AddStep("click selected mods", () =>
             {
                 var header = SongSelect.ChildrenOfType<BeatmapDetailsArea.Header>().Single();
                 var toggleButton = header.ChildrenOfType<ShearedToggleButton>().Single();
                 InputManager.MoveMouseTo(toggleButton);
                 InputManager.PressButton(MouseButton.Left);
+                clickTime = InputManager.Time.Current;
             });
-
-            AddWaitStep("wait for background preview", backround_preview_delay_seconds);
-            AddAssert("background preview not triggered", () =>
-            {
-                return InputManager.HoveredDrawables.Any(hovered => hovered is ShearedToggleButton);
-            });
-            InputManager.ReleaseButton(MouseButton.Left);
+            AddUntilStep("wait for background preview", () => InputManager.Time.Current, () => Is.GreaterThan((clickTime + 3 * Screens.Select.SongSelect.REVEAL_BACKGROUND_DELAY) ?? double.PositiveInfinity));
+            AddAssert("background preview not triggered", () => this.ChildrenOfType<ScreenFooter>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]
@@ -186,10 +186,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.PressButton(MouseButton.Left);
             });
 
-            AddAssert("hovering leaderboard wedge", () => InputManager.HoveredDrawables.Any(hovered => hovered is BeatmapLeaderboardWedge));
-            AddWaitStep("wait for background preview", backround_preview_delay_seconds);
-            AddAssert("background preview triggered", () => !InputManager.HoveredDrawables.Any(hovered => hovered is BeatmapLeaderboardWedge));
-            InputManager.ReleaseButton(MouseButton.Left);
+            AddUntilStep("background preview triggered", () => this.ChildrenOfType<ScreenFooter>().Single().State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
     }
 }
