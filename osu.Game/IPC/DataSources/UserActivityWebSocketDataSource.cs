@@ -48,13 +48,6 @@ namespace osu.Game.IPC.DataSources
         {
             switch (userActivity)
             {
-                case UserActivity.InGame inGame:
-                    return new WebSocketInGameUserActivityData
-                    {
-                        BeatmapId = inGame.BeatmapID,
-                        RulesetId = inGame.RulesetID,
-                    };
-
                 case UserActivity.InLobby inLobby:
                     return new WebSocketInLobbyUserActivityData
                     {
@@ -68,12 +61,6 @@ namespace osu.Game.IPC.DataSources
                         ScoreId = watchingReplay.ScoreID,
                         PlayerName = watchingReplay.PlayerName,
                         BeatmapId = watchingReplay.BeatmapID,
-                    };
-
-                case UserActivity.EditingBeatmap editingBeatmap:
-                    return new WebSocketEditingBeatmapUserActivityData
-                    {
-                        BeatmapId = editingBeatmap.BeatmapID,
                     };
 
                 default:
