@@ -47,6 +47,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("User performance", createPerformanceTable);
             AddStep("User scores", createScoreTable);
             AddStep("Country scores", createCountryTable);
+            AddStep("Ranked play ladder", createRankedTable);
         }
 
         private void createCountryTable()
@@ -151,6 +152,26 @@ namespace osu.Game.Tests.Visual.Online
         {
             onLoadStarted();
             loadTable(new ScoresTable(1, createUserStatistics()));
+        }
+
+        private void createRankedTable()
+        {
+            onLoadStarted();
+            loadTable(new MatchmakingTable(1, new List<APIUserMatchmakingStatistics>
+            {
+                new APIUserMatchmakingStatistics
+                {
+                    User = new APIUser
+                    {
+                        Username = "first active user",
+                        CountryCode = CountryCode.JP,
+                        Active = true,
+                    },
+                    FirstPlacements = 10,
+                    Plays = 20,
+                    Rating = 1500,
+                },
+            }));
         }
 
         private void onLoadStarted()

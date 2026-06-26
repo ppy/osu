@@ -108,6 +108,15 @@ namespace osu.Game.Overlays
                 return;
             }
 
+            if (Header.Current.Value == RankingsScope.Matchmaking)
+            {
+                LoadDisplay(new MatchmakingLayout
+                {
+                    Ruleset = { BindTarget = ruleset },
+                });
+                return;
+            }
+
             var request = createScopedRequest();
             lastRequest = request;
 
