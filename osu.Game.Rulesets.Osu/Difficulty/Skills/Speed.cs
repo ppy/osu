@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        public double RelevantNoteCount()
+        public double RelevantObjectCount()
         {
             if (ObjectDifficulties.Count == 0)
                 return 0;
@@ -85,16 +85,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (sliderStrains.Count == 0)
                 return 0;
 
-            if (NoteWeightSum == 0)
+            if (ObjectWeightSum == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / NoteWeightSum; // What would the top note be if all note values were identical
+            double consistentTopObject = difficultyValue / ObjectWeightSum; // What would the top note be if all note values were identical
 
-            if (consistentTopNote == 0)
+            if (consistentTopObject == 0)
                 return 0;
 
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
-            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopNote, 0.88, 10, 1.1));
+            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopObject, 0.88, 10, 1.1));
         }
     }
 }
