@@ -65,6 +65,16 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             postLocalUserMessage("this is a message from the local user");
             postOpponentMessage("this is a message from the opponent");
+            AddStep("add long message", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Timestamp = DateTimeOffset.Now,
+                Sender = new APIUser
+                {
+                    Id = 2,
+                    Username = "peppy"
+                },
+                Content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget neque non leo placerat sollicitudin eget sit amet sem. Aenean ut ipsum et nulla lobortis viverra ut eget odio.",
+            }));
         }
 
         [Test]
