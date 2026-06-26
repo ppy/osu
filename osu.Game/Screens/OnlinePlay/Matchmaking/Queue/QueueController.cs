@@ -37,6 +37,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public readonly Bindable<ScreenQueue.MatchmakingScreenState> CurrentState = new Bindable<ScreenQueue.MatchmakingScreenState>();
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
+        /// <summary>
+        /// Timer since the queue was joined.
+        /// </summary>
+        public readonly Stopwatch QueueTimer = new Stopwatch();
+
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
@@ -45,8 +50,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         [Resolved]
         private INotificationOverlay? notifications { get; set; }
-
-        public Stopwatch Timer = new Stopwatch();
 
         private BackgroundQueueNotification? backgroundNotification;
 
@@ -75,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
-            Timer.Restart();
+            QueueTimer.Restart();
 
             client.MatchmakingJoinQueue(pool.Id).FireAndForget();
         }
@@ -95,7 +98,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = userId;
             lastDuelPool = pool;
-            Timer.Restart();
+            QueueTimer.Restart();
 
             client.MatchmakingIssueDuel(new MatchmakingIssueDuelRequest
             {

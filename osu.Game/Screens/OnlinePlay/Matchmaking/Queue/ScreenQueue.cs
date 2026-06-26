@@ -99,7 +99,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private GridContainer mainGrid = null!;
 
         private IBindable<bool> isConnected = null!;
-        private OsuSpriteText? queueingText;
 
         public ScreenQueue(MatchmakingPoolType poolType)
         {
@@ -417,16 +416,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             });
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (currentState.Value == MatchmakingScreenState.Queueing && queueingText != null)
-            {
-                queueingText.Text = "Waiting for a game... " + queue.Timer.Elapsed.ToString(@"mm\:ss");
-            }
-        }
-
         private void refreshLobbyData()
         {
             clearLobbyData();
@@ -578,12 +567,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Spacing = new Vector2(15),
                         Children = new Drawable[]
                         {
-                            queueingText = new OsuSpriteText
+                            new FillFlowContainer
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text =  "Waiting for a game... ",
-                                Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Text = "Waiting for a game...",
+                                        Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                    },
+                                    new QueueTimerText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                    }
+                                }
                             },
                             new LoadingSpinner
                             {
@@ -784,6 +789,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
+            }
+        }
+
+        private partial class QueueTimerText : OsuSpriteText
+        {
+            [Resolved]
+            private QueueController queue { get; set; } = null!;
+
+            public QueueTimerText()
+            {
+                AlwaysPresent = true;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                Text = queue.QueueTimer.Elapsed.ToString(@"mm\:ss");
             }
         }
     }
