@@ -196,6 +196,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Comma, GlobalAction.StepReplayBackward),
             new KeyBinding(InputKey.Period, GlobalAction.StepReplayForward),
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.ToggleReplaySettings),
+            new KeyBinding(InputKey.Shift, GlobalAction.HoldForPlaybackRateChange),
         };
 
         private static IEnumerable<KeyBinding> songSelectKeyBindings => new[]
@@ -535,7 +536,10 @@ namespace osu.Game.Input.Bindings
         EditorSubmitBeatmap,
 
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.EditExternally))]
-        EditorEditExternally
+        EditorEditExternally,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.HoldForReplayRateChange))]
+        HoldForPlaybackRateChange
     }
 
     public enum GlobalActionCategory

@@ -47,8 +47,6 @@ namespace osu.Game.Screens.Play
 
         private double originalPlaybackRate;
 
-        private bool isHolding;
-
         private ReplayFailIndicator? failIndicator;
         private PlaybackSettings? playbackSettings;
 
@@ -190,24 +188,17 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
-                    if (e.Repeat)
-                    {
-                        if (isHolding) return true;
-
-                        originalPlaybackRate = playbackSettings!.UserPlaybackRate.Value;
-                        playbackSettings!.UserPlaybackRate.Value *= 2;
-                        isHolding = true;
-                        if (GameplayClockContainer.IsPaused.Value)
-                            GameplayClockContainer.Start();
-                    }
+                    if (GameplayClockContainer.IsPaused.Value)
+                        GameplayClockContainer.Start();
                     else
-                    {
-                        if (GameplayClockContainer.IsPaused.Value)
-                            GameplayClockContainer.Start();
-                        else
-                            GameplayClockContainer.Stop();
-                    }
+                        GameplayClockContainer.Stop();
+                    return true;
 
+                case GlobalAction.HoldForPlaybackRateChange:
+                    if (e.Repeat) return false;
+
+                    originalPlaybackRate = playbackSettings!.UserPlaybackRate.Value;
+                    playbackSettings!.UserPlaybackRate.Value *= 2;
                     return true;
             }
 
@@ -243,8 +234,7 @@ namespace osu.Game.Screens.Play
 
             switch (e.Action)
             {
-                case GlobalAction.TogglePauseReplay:
-                    isHolding = false;
+                case GlobalAction.HoldForPlaybackRateChange:
                     playbackSettings!.UserPlaybackRate.Value = originalPlaybackRate;
                     return;
             }

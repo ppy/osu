@@ -215,27 +215,27 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestChangePlaybackRateViaHoldingSpace()
+        public void TestChangePlaybackRateViaHoldingShift()
         {
             loadPlayerWithBeatmap();
 
             double? lastRate = null;
 
             AddUntilStep("wait for first hit", () => Player.ScoreProcessor.TotalScore.Value > 0);
-            AddStep("Change playback rate with space", () =>
+            AddStep("Change playback rate with shift", () =>
             {
                 lastRate = Player.GameplayClockContainer.Rate;
-                InputManager.PressKey(Key.Space);
+                InputManager.PressKey(Key.ShiftLeft);
             });
 
             AddWaitStep("wait some", 5);
 
             AddAssert("rate changed", () => lastRate != Player.GameplayClockContainer.Rate);
 
-            AddStep("Change playback rate by releasing space", () =>
+            AddStep("Change playback rate by releasing shift", () =>
             {
                 lastRate = Player.GameplayClockContainer.Rate;
-                InputManager.ReleaseKey(Key.Space);
+                InputManager.ReleaseKey(Key.ShiftLeft);
             });
             AddWaitStep("wait some", 5);
             AddAssert("rate changed", () => lastRate != Player.GameplayClockContainer.Rate);
