@@ -6,6 +6,7 @@
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
@@ -161,15 +162,15 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("click first row with two bindings", () =>
             {
                 multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
-                InputManager.MoveMouseTo(multiBindingRow.ChildrenOfType<OsuSpriteText>().First());
+                InputManager.MoveMouseTo(multiBindingRow.ChildrenOfType<FormFieldCaption>().First());
                 InputManager.Click(MouseButton.Left);
             });
 
             clickClearButton();
 
             AddAssert("first binding cleared",
-                () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text,
-                () => Is.EqualTo(InputSettingsStrings.ActionHasNoKeyBinding));
+                () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text.ToString(),
+                () => Is.EqualTo(InputSettingsStrings.ActionHasNoKeyBinding.ToUpper().ToString()));
 
             AddStep("click second binding", () =>
             {
@@ -182,8 +183,8 @@ namespace osu.Game.Tests.Visual.Settings
             clickClearButton();
 
             AddAssert("second binding cleared",
-                () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text,
-                () => Is.EqualTo(InputSettingsStrings.ActionHasNoKeyBinding));
+                () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text.ToString(),
+                () => Is.EqualTo(InputSettingsStrings.ActionHasNoKeyBinding.ToUpper().ToString()));
 
             void clickClearButton()
             {
@@ -395,7 +396,7 @@ namespace osu.Game.Tests.Visual.Settings
             scrollToAndStartBinding("Left (centre)");
             AddStep("clear binding", () =>
             {
-                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
+                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<FormFieldCaption>().Any(s => s.Caption.ToString() == "Left (centre)"));
                 row.ChildrenOfType<DangerousRoundedButton>().Single().TriggerClick();
             });
             scrollToAndStartBinding("Left (rim)");
@@ -403,7 +404,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("reset Left (centre) to default", () =>
             {
-                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
+                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<FormFieldCaption>().Any(s => s.Caption.ToString() == "Left (centre)"));
                 row.ChildrenOfType<SettingsRevertToDefaultButton>().Single().TriggerClick();
             });
 
@@ -459,7 +460,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("revert row to default", () =>
             {
-                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
+                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<FormFieldCaption>().Any(s => s.Caption.ToString() == "Left (centre)"));
                 InputManager.MoveMouseTo(row.ChildrenOfType<SettingsRevertToDefaultButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
@@ -471,7 +472,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             AddStep("clear binding", () =>
             {
-                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == "Left (centre)"));
+                var row = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<FormFieldCaption>().Any(s => s.Caption.ToString() == "Left (centre)"));
                 row.ChildrenOfType<DangerousRoundedButton>().Single().TriggerClick();
             });
         }
@@ -480,11 +481,11 @@ namespace osu.Game.Tests.Visual.Settings
         {
             AddAssert($"Check {name} is bound to {keyName}", () =>
             {
-                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<FormFieldCaption>().Any(s => s.Caption.ToString() == name));
                 var firstButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().First();
 
                 return firstButton.Text.Text.ToString();
-            }, () => Is.EqualTo(keyName));
+            }, () => Is.EqualTo(keyName.ToUpperInvariant()));
         }
 
         private void scrollToAndStartBinding(string name, int bindingIndex = 0)
@@ -493,7 +494,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep($"Scroll to {name}", () =>
             {
-                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<OsuSpriteText>().Any(s => s.Text.ToString() == name));
+                var firstRow = panel.ChildrenOfType<KeyBindingRow>().First(r => r.ChildrenOfType<FormFieldCaption>().Any(s => s.Caption.ToString() == name));
                 targetButton = firstRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(bindingIndex);
 
                 panel.ChildrenOfType<SettingsPanel.SettingsSectionsContainer>().First().ScrollTo(targetButton);
