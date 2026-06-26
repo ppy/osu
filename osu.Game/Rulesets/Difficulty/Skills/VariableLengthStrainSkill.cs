@@ -14,6 +14,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// Similar to <see cref="StrainSkill"/>, but instead of strains having a fixed length, strains can be any length.
     /// A new <see cref="StrainPeak"/> is created for each <see cref="DifficultyHitObject"/>.
     /// </summary>
+    /// <remarks>
+    /// This class intends to replace <see cref="StrainSkill"/> eventually as it fixes bugs with that implementation.
+    /// Has not yet been applied globally as it changes resultant PP values in ways which may require discretion.
+    /// </remarks>
     public abstract class VariableLengthStrainSkill : Skill
     {
         /// <summary>
