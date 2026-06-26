@@ -23,6 +23,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Online.Rooms;
+using osu.Game.Online.Solo;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -383,6 +385,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                     case GetScoresRequest getScores:
                         leaderboardRequestsHandled++;
                         getScores.TriggerSuccess(new APIScoresCollection { Scores = [] });
+                        return true;
+
+                    case CreateSoloScoreRequest createSoloScoreRequest:
+                        createSoloScoreRequest.TriggerSuccess(new APIScoreToken { ID = 123456 });
                         return true;
 
                     default:
