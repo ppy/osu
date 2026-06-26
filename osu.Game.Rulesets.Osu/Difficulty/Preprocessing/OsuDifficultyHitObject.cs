@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
-        public double GetDoubletapness(OsuDifficultyHitObject? nextObj)
+        public double CalculateDoubleTapFeasibility(OsuDifficultyHitObject? nextObj)
         {
             if (nextObj == null) return 0;
 
