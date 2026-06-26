@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Settings
                                                                                 .All(f => f.FilterTerms.Any(t => t.ToString().Contains("scaling")))
                                                                      ));
 
-            AddAssert("ensure section is current", () => settings.CurrentSection.Value is GraphicsSection);
+            AddAssert("ensure section is current", () => settings.CurrentSection.Value is GameplaySection);
             AddAssert("ensure section is placed first", () => settings.CurrentSection.Value.Y == 0);
         }
 
