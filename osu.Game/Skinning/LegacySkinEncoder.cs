@@ -13,9 +13,9 @@ namespace osu.Game.Skinning
 {
     public class LegacySkinEncoder
     {
-        private readonly LegacySkin skin;
+        private readonly Skin skin;
 
-        public LegacySkinEncoder(LegacySkin skin)
+        public LegacySkinEncoder(Skin skin)
         {
             this.skin = skin;
         }
@@ -25,8 +25,8 @@ namespace osu.Game.Skinning
             // https://github.com/peppy/osu-stable-reference/blob/0b8b19af621dbb282773c22b36cc0453942b98d8/osu!/Graphics/Skinning/SkinOsu.cs#L147-L192
 
             writeSectionHeader(textWriter, LegacyDecoder<SkinConfiguration>.Section.General);
-            writeValue(textWriter, @"Name", skin.SkinInfo.PerformRead(s => s.Name));
-            writeValue(textWriter, @"Author", skin.SkinInfo.PerformRead(s => s.Creator));
+            writeValue(textWriter, @"Name", skin.Configuration.SkinInfo.Name);
+            writeValue(textWriter, @"Author", skin.Configuration.SkinInfo.Creator);
 
             // the reason why the keys are manually enumerated here rather than just iterating over `skin.Configuration.ConfigDictionary`
             // is that the skin decoder generally just dumps anything and everything that looks like a variable, from *any* section, into `ConfigDictionary`.
@@ -84,7 +84,7 @@ namespace osu.Game.Skinning
             writeGenericColour(textWriter, skin.Configuration.CustomColours, @"HyperDashFruit");
 
             // https://github.com/peppy/osu-stable-reference/blob/0b8b19af621dbb282773c22b36cc0453942b98d8/osu!/Graphics/Skinning/SkinMania.cs#L201-L230
-            foreach (var (keys, maniaConfig) in skin.ManiaConfigurations)
+            foreach (var (keys, maniaConfig) in (skin as LegacySkin)?.ManiaConfigurations ?? [])
             {
                 textWriter.WriteLine();
                 writeSectionHeader(textWriter, LegacyDecoder<SkinConfiguration>.Section.Mania);
