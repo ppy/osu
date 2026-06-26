@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public partial class TestSceneOsuModDifficultyAdjust : OsuModTestScene
     {
+        protected override bool AllowFail => true;
+
         [Test]
         public void TestNoAdjustment() => CreateModTest(new ModTestData
         {
@@ -70,6 +72,88 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } },
             Autoplay = true,
             PassCondition = () => checkSomeHit() && checkObjectsPreempt(450)
+        });
+
+        [Test]
+        public void TestScoreMultiplierCorrectWithNoAdjustment() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust(),
+            CreateBeatmap = () => new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 8
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            Autoplay = true,
+            PassCondition = () => Player.ScoreProcessor.TotalScore.Value == 1_000_000,
+        });
+
+        [Test]
+        public void TestScoreMultiplierCorrectWithSingleAdjustment() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust
+            {
+                ApproachRate = { Value = 7.3f }
+            },
+            CreateBeatmap = () => new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 8,
+                        ApproachRate = 7,
+                        OverallDifficulty = 6,
+                        DrainRate = 5,
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            Autoplay = true,
+            PassCondition = () => Player.ScoreProcessor.TotalScore.Value == 850_000,
+        });
+
+        [Test]
+        public void TestScoreMultiplierCorrectWithMultipleAdjustments() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModDifficultyAdjust
+            {
+                ApproachRate = { Value = 6.8f },
+                OverallDifficulty = { Value = 6.6f }
+            },
+            CreateBeatmap = () => new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 8,
+                        ApproachRate = 7,
+                        OverallDifficulty = 6,
+                        DrainRate = 5,
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
+            Autoplay = true,
+            PassCondition = () => Player.ScoreProcessor.TotalScore.Value == 630_000,
         });
 
         private bool checkObjectsPreempt(double target)

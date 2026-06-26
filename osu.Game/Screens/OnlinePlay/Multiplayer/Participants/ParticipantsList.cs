@@ -63,7 +63,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                 for (byte i = 0; i < slotUserIds.Length; ++i)
                 {
-                    var participant = slotUserIds[i] == null ? Slot.Empty(i) : Slot.FromUser(client.Room.Users.Single(u => u.UserID == slotUserIds[i]));
+                    var user = slotUserIds[i] != null ? client.Room.Users.SingleOrDefault(u => u.UserID == slotUserIds[i]) : null;
+                    var participant = user == null ? Slot.Empty(i) : Slot.FromUser(client.Room.Users.Single(u => u.UserID == slotUserIds[i]));
 
                     if (i >= slots.Count)
                         slots.Add(participant);

@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             current.BindValueChanged(_ =>
             {
                 updateState();
-                background.Flash();
+                background.FlashOnCommit();
 
                 ValueChanged?.Invoke();
             });

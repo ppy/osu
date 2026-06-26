@@ -234,6 +234,76 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString RulesetNotSupportSaving => new TranslatableString(getKey(@"ruleset_not_support_saving"), @"Saving is not supported for this ruleset yet, sorry!");
 
+        /// <summary>
+        /// "Export failed!"
+        /// </summary>
+        public static LocalisableString ExportFailed => new TranslatableString(getKey(@"export_failed"), @"Export failed!");
+
+        /// <summary>
+        /// "Import failed!"
+        /// </summary>
+        public static LocalisableString ImportFailed => new TranslatableString(getKey(@"import_failed"), @"Import failed!");
+
+        /// <summary>
+        /// "Open folder"
+        /// </summary>
+        public static LocalisableString OpenFolder => new TranslatableString(getKey(@"open_folder"), @"Open folder");
+
+        /// <summary>
+        /// "Cleaning up..."
+        /// </summary>
+        public static LocalisableString ExternalEditCleaningUp => new TranslatableString(getKey(@"external_edit_cleaning_up"), @"Cleaning up...");
+
+        /// <summary>
+        /// "Exporting for edit..."
+        /// </summary>
+        public static LocalisableString ExternalEditExporting => new TranslatableString(getKey(@"external_edit_exporting"), @"Exporting for edit...");
+
+        /// <summary>
+        /// "Beatmap is mounted externally"
+        /// </summary>
+        public static LocalisableString BeatmapMountedExternally => new TranslatableString(getKey(@"beatmap_mounted_externally"), @"Beatmap is mounted externally");
+
+        /// <summary>
+        /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
+        /// </summary>
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+
+        /// <summary>
+        /// "New combo"
+        /// </summary>
+        public static LocalisableString NewCombo => new TranslatableString(getKey(@"new_combo"), @"New combo");
+
+        /// <summary>
+        /// "Bank"
+        /// </summary>
+        public static LocalisableString Bank => new TranslatableString(getKey(@"bank"), @"Bank");
+
+        /// <summary>
+        /// "Normal bank"
+        /// </summary>
+        public static LocalisableString NormalBank => new TranslatableString(getKey(@"normal_bank"), @"Normal bank");
+
+        /// <summary>
+        /// "Addition bank"
+        /// </summary>
+        public static LocalisableString AdditionBank => new TranslatableString(getKey(@"addition_bank"), @"Addition bank");
+
+        /// <summary>
+        /// "Volume"
+        /// </summary>
+        public static LocalisableString SampleVolume => new TranslatableString(getKey(@"sample_volume"), @"Volume");
+
+        /// <summary>
+        /// "Sample"
+        /// </summary>
+        public static LocalisableString Sample => new TranslatableString(getKey(@"sample"), @"Sample");
+
+        /// <summary>
+        /// "Sample set"
+        /// </summary>
+        public static LocalisableString SampleSet => new TranslatableString(getKey(@"sample_set"), @"Sample set");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -295,6 +295,44 @@ namespace osu.Game.Tests.Skins.IO
             });
         });
 
+        [Test]
+        public Task TestExportRenameThenImportClassicSkin() => runSkinTest(async osu =>
+        {
+            var skinManager = osu.Dependencies.Get<SkinManager>();
+
+            skinManager.CurrentSkinInfo.Value = skinManager.DefaultClassicSkin.SkinInfo;
+
+            skinManager.EnsureMutableSkin();
+            skinManager.Rename(skinManager.CurrentSkinInfo.Value, "breadsticks");
+
+            MemoryStream exportStream = new MemoryStream();
+
+            Guid originalSkinId = skinManager.CurrentSkinInfo.Value.ID;
+
+            await skinManager.CurrentSkinInfo.Value.PerformRead(async s =>
+            {
+                Assert.That(s.Protected, Is.False);
+                Assert.That(s.CreateInstance(skinManager), Is.TypeOf<DefaultLegacySkin>());
+
+                await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
+
+                Assert.That(exportStream.Length, Is.GreaterThan(0));
+            });
+
+            // ReSharper disable once MethodHasAsyncOverload
+            osu.Dependencies.Get<RealmAccess>().Write(r => r.Remove(r.Find<SkinInfo>(originalSkinId)!));
+
+            var imported = await skinManager.Import(new ImportTask(exportStream, "breadsticks.osk"));
+
+            imported.PerformRead(s =>
+            {
+                Assert.That(s.Protected, Is.False);
+                Assert.That(s.ID, Is.Not.EqualTo(originalSkinId));
+                Assert.That(s.CreateInstance(skinManager), Is.TypeOf<DefaultLegacySkin>());
+                Assert.That(s.Name, Is.EqualTo("breadsticks"));
+            });
+        });
+
         #endregion
 
         [Test]

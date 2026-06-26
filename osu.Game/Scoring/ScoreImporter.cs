@@ -99,11 +99,6 @@ namespace osu.Game.Scoring
 
             if (string.IsNullOrEmpty(model.MaximumStatisticsJson))
                 model.MaximumStatisticsJson = JsonConvert.SerializeObject(model.MaximumStatistics);
-
-            // for pre-ScoreV2 lazer scores, apply a best-effort conversion of total score to ScoreV2.
-            // this requires: max combo, statistics, max statistics (where available), and mods to already be populated on the score.
-            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(model))
-                model.TotalScore = StandardisedScoreMigrationTools.GetNewStandardised(model);
         }
 
         // Very naive local caching to improve performance of large score imports (where the username is usually the same for most or all scores).

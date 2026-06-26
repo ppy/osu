@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Creates a <see cref="ScoreMultiplierCalculator"/> relevant to this ruleset.
         /// </summary>
-        public virtual ScoreMultiplierCalculator CreateScoreMultiplierCalculator() => new ScoreMultiplierCalculator();
+        public virtual ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new ScoreMultiplierCalculator(context);
 
         /// <summary>
         /// Create a transformer which adds lookups specific to a ruleset to skin sources.

@@ -161,6 +161,8 @@ namespace osu.Game
 
         private OnScreenDisplay onScreenDisplay;
 
+        private DialogOverlay dialogOverlay;
+
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
@@ -1047,6 +1049,7 @@ namespace osu.Game
                 { FrameworkSetting.VolumeUniversal, 0.6 },
                 { FrameworkSetting.VolumeMusic, 0.6 },
                 { FrameworkSetting.VolumeEffect, 0.6 },
+                { FrameworkSetting.AudioUseExperimentalWasapi, true },
             };
         }
 
@@ -1236,7 +1239,7 @@ namespace osu.Game
             }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
@@ -1298,10 +1301,17 @@ namespace osu.Game
 
             applyConfigMigrations();
 
+            string lastVersion = LocalConfig.Get<string>(OsuSetting.Version);
+            string version = Version;
+
+            // only show a notification if we've previously saved a version to the config file (ie. not the first run).
+            if (IsDeployedBuild && !string.IsNullOrEmpty(lastVersion) && version != lastVersion)
+                Notifications.Post(new UpdateCompleteNotification(version));
+
             // finally, update the version stored to the configuration.
             // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
             // debug / local compilations will reset to a non-release string.
-            LocalConfig.SetValue(OsuSetting.Version, Version);
+            LocalConfig.SetValue(OsuSetting.Version, version);
         }
 
         /// <summary>
@@ -1343,6 +1353,21 @@ namespace osu.Game
 
                 if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
                     penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
+            }
+
+            if (combined < 20260521 && RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            {
+                bool wasAlreadyUsing = Audio.UseExperimentalWasapi.Value;
+
+                // see application of FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET in FramedBeatmapClock.
+                // this basically undoes this new offset assuming that users which have been using this setting for a while
+                // already have had things tuned.
+                if (wasAlreadyUsing)
+                    LocalConfig.SetValue(OsuSetting.AudioOffset, LocalConfig.Get<double>(OsuSetting.AudioOffset) - FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET);
+
+                Audio.UseExperimentalWasapi.Value = true;
+
+                dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
             }
         }
 
