@@ -213,24 +213,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
 
-            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
+            List<StrainPeak> strains = GetCurrentStrainPeaks()
+                                       .Where(p => p.Value > 0)
+                                       .ToList();
 
             const int chunk_size = 20;
             double time = 0;
-            int strainsToRemove = 0; // All strains are removed at the end for optimization purposes
+            int skipCount = 0;
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             // Strains are split into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
-            while (strains.Count > strainsToRemove && time < reducedSectionTime)
+            while (strains.Count > skipCount && time < reducedSectionTime)
             {
-                StrainPeak strain = strains[strainsToRemove];
+                StrainPeak strain = strains[skipCount];
 
                 for (double addedTime = 0; addedTime < strain.SectionLength; addedTime += chunk_size)
                 {
                     double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / reducedSectionTime, 0, 1)));
 
+                    // intentionally add at end and sort afterwards, should be cheaper.
                     strains.Add(new StrainPeak(
                         strain.Value * Interpolation.Lerp(reduced_strain_baseline, 1.0, scale),
                         Math.Min(chunk_size, strain.SectionLength - addedTime)
@@ -238,10 +240,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
 
                 time += strain.SectionLength;
-                strainsToRemove++;
+                skipCount++;
             }
 
-            return strains.Skip(strainsToRemove).OrderByDescending(p => p.Value);
+            return strains.Skip(skipCount).OrderByDescending(p => p.Value);
         }
     }
 }
