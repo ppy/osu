@@ -153,9 +153,9 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         Anchor = direction | Anchor.y1,
                         Origin = direction | Anchor.y1,
-                        Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
+                        Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
                         Text = $"{(Multiplier > 0 ? "+" : "")}{(amount * T.CreateTruncating(Multiplier)).ToStandardFormattedString(maxDecimalDigits: 2)}",
-                        Padding = new MarginPadding(2),
+                        Padding = new MarginPadding(4),
                         Alpha = 0,
                     }
                 };
@@ -205,14 +205,14 @@ namespace osu.Game.Screens.Edit.Timing
             public void Flash()
             {
                 box
-                    .FadeTo(0.4f, 20, Easing.OutQuint)
+                    .FadeTo(0.4f, 40, Easing.OutQuint)
                     .Then()
-                    .FadeTo(0.2f, 400, Easing.OutQuint);
+                    .FadeTo(0.2f, 700, Easing.OutPow10);
 
                 text
-                    .MoveToY(-5, 20, Easing.OutQuint)
+                    .MoveToX(Multiplier > 0 ? 10 : -10, 40, Easing.OutQuint)
                     .Then()
-                    .MoveToY(0, 400, Easing.OutQuint);
+                    .MoveToX(0, 700, Easing.OutBounce);
             }
         }
     }
