@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data;
@@ -13,7 +12,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
-    public class RhythmEvaluator
+    public static class RhythmEvaluator
     {
         /// <summary>
         /// Evaluate the difficulty of a hitobject considering its interval change.
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double intervalPenalty = 0;
             double gapPenalty = 0;
 
-            double hitWindow = hitObject.HitWindow(HitResult.Great);
+            double hitWindow = hitObject.HitWindowGreat;
 
             if (rhythmData.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
             {
