@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -45,9 +46,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Transforms the object difficulties specifically for final difficulty summation.
         /// This can be used to decrease weight of certain objects based on a skill-specific criteria.
         /// </summary>
-        protected virtual void ApplyDifficultyTransformation(double[] difficulties)
-        {
-        }
+        protected virtual List<double> GetTransformedDifficulties(List<double> difficulties) => difficulties;
 
         public override double DifficultyValue()
         {
@@ -56,17 +55,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Objects with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These objects will not contribute to the difficulty.
-            double[] difficulties = ObjectDifficulties.Where(p => p > 0).ToArray();
+            var difficulties = ObjectDifficulties;
 
-            if (difficulties.Length == 0)
+            if (difficulties.Count == 0)
                 return 0;
 
-            ApplyDifficultyTransformation(difficulties);
+            difficulties = GetTransformedDifficulties(difficulties);
 
             double difficulty = 0;
             int index = 0;
 
-            foreach (double obj in difficulties.OrderDescending())
+            foreach (double obj in difficulties.OrderDescending().Where(v => v > 0))
             {
                 // Use a harmonic sum that considers each object of the map according to a predefined weight.
                 double weight = (1 + (HarmonicScale / (1 + index))) / (DiffUtils.Pow(index, DecayExponent) + 1 + (HarmonicScale / (1 + index)));
