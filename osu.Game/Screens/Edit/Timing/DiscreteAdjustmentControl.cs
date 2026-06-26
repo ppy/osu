@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -30,19 +29,11 @@ namespace osu.Game.Screens.Edit.Timing
         private const int max_multiplier = 10;
         private const int adjust_levels = 4;
 
-        public Container Content { get; set; }
-
         private readonly Box background;
 
-        private readonly OsuSpriteText text;
-
-        public LocalisableString Text
-        {
-            get => text.Text;
-            set => text.Text = value;
-        }
-
         private readonly RepeatingButtonBehaviour repeatBehaviour;
+
+        private OsuSpriteText incrementText;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -58,32 +49,27 @@ namespace osu.Game.Screens.Edit.Timing
             Masking = true;
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(Content = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                background = new Box
                 {
-                    background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Depth = float.MaxValue
-                    },
-                    text = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.Default.With(weight: FontWeight.SemiBold),
-                        Padding = new MarginPadding(5),
-                        Depth = float.MinValue
-                    }
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue
+                },
+                incrementText = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold),
+                    Padding = new MarginPadding(5),
+                    Depth = float.MinValue
+                },
+                repeatBehaviour = new RepeatingButtonBehaviour(this)
+                {
+                    RepeatBegan = () => editorBeatmap.BeginChange(),
+                    RepeatEnded = () => editorBeatmap.EndChange()
                 }
-            });
-
-            AddInternal(repeatBehaviour = new RepeatingButtonBehaviour(this)
-            {
-                RepeatBegan = () => editorBeatmap.BeginChange(),
-                RepeatEnded = () => editorBeatmap.EndChange()
-            });
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -93,8 +79,46 @@ namespace osu.Game.Screens.Edit.Timing
 
             for (int i = 1; i <= adjust_levels; i++)
             {
-                Content.Add(new IncrementBox(i, baseIncrement));
-                Content.Add(new IncrementBox(-i, baseIncrement));
+                AddInternal(new IncrementBox(i, baseIncrement));
+                AddInternal(new IncrementBox(-i, baseIncrement));
+            }
+
+            AddInternal(incrementText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
+                Padding = new MarginPadding(4),
+                Alpha = 0,
+            });
+        }
+
+        private IncrementBox? hoveredBox => InternalChildren.OfType<IncrementBox>().FirstOrDefault(d => d.IsHovered);
+
+        private IncrementBox? lastHovered;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (hoveredBox == lastHovered)
+                return;
+
+            lastHovered = hoveredBox;
+
+            if (lastHovered != null)
+            {
+                incrementText
+                    .MoveToX(Math.Sign(lastHovered.Multiplier) * Math.Abs(lastHovered.Index), 400, Easing.OutQuint)
+                    .FadeTo(0.8f, 200, Easing.OutQuint);
+
+                incrementText.Text = $"{(lastHovered.Multiplier > 0 ? "+" : "")}{(lastHovered.Amount * T.CreateTruncating(lastHovered.Multiplier)).ToStandardFormattedString(maxDecimalDigits: 2)}";
+            }
+            else
+            {
+                incrementText
+                    .MoveToX(0, 200, Easing.OutQuint)
+                    .FadeOut(200, Easing.OutQuint);
             }
         }
 
@@ -102,30 +126,40 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override bool OnClick(ClickEvent e)
         {
-            var hoveredBox = Content.OfType<IncrementBox>().FirstOrDefault(d => d.IsHovered);
-            if (hoveredBox == null)
-                return false;
+            if (hoveredBox is IncrementBox b)
+            {
+                Action?.Invoke(baseIncrement * T.CreateTruncating(b.Multiplier));
 
-            Action?.Invoke(baseIncrement * T.CreateTruncating(hoveredBox.Multiplier));
+                b.Flash();
 
-            hoveredBox.Flash();
+                incrementText
+                    .MoveToX(Math.Sign(b.Multiplier) * (Math.Abs(b.Index) * 5))
+                    .MoveToX(Math.Sign(b.Multiplier) * Math.Abs(b.Index), 700, Easing.OutQuint);
 
-            repeatBehaviour.SampleFrequencyModifier = ((double)hoveredBox.Multiplier / max_multiplier) * 0.2;
-            return true;
+                incrementText.FadeTo(1).FadeTo(0.8f, 1400, Easing.OutQuint);
+
+                repeatBehaviour.SampleFrequencyModifier = ((double)b.Multiplier / max_multiplier) * 0.2;
+                return true;
+            }
+
+            return false;
         }
 
         private partial class IncrementBox : CompositeDrawable
         {
+            public readonly T Amount;
             public readonly int Multiplier;
+            public readonly float Index;
 
             private readonly Box box;
-            private readonly OsuSpriteText text;
 
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
             public IncrementBox(int index, T amount)
             {
+                Index = index;
+                Amount = amount;
                 Multiplier = Math.Sign(index) * convertMultiplier(index);
 
                 float ratio = (float)index / adjust_levels;
@@ -149,15 +183,6 @@ namespace osu.Game.Screens.Edit.Timing
                         RelativeSizeAxes = Axes.Both,
                         Blending = BlendingParameters.Additive
                     },
-                    text = new OsuSpriteText
-                    {
-                        Anchor = direction | Anchor.y1,
-                        Origin = direction | Anchor.y1,
-                        Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
-                        Text = $"{(Multiplier > 0 ? "+" : "")}{(amount * T.CreateTruncating(Multiplier)).ToStandardFormattedString(maxDecimalDigits: 2)}",
-                        Padding = new MarginPadding(4),
-                        Alpha = 0,
-                    }
                 };
             }
 
@@ -187,18 +212,14 @@ namespace osu.Game.Screens.Edit.Timing
             protected override bool OnHover(HoverEvent e)
             {
                 box.Colour = colourProvider.Colour0;
-
                 box.FadeTo(0.2f, 100, Easing.OutQuint);
-                text.FadeIn(100, Easing.OutQuint);
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 box.Colour = colourProvider.Background1;
-
                 box.FadeTo(0.1f, 500, Easing.OutQuint);
-                text.FadeOut(100, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
 
@@ -208,11 +229,6 @@ namespace osu.Game.Screens.Edit.Timing
                     .FadeTo(0.4f, 40, Easing.OutQuint)
                     .Then()
                     .FadeTo(0.2f, 700, Easing.OutPow10);
-
-                text
-                    .MoveToX(Multiplier > 0 ? 10 : -10, 40, Easing.OutQuint)
-                    .Then()
-                    .MoveToX(0, 700, Easing.OutBounce);
             }
         }
     }
