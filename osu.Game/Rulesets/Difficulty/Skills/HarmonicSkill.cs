@@ -12,10 +12,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class HarmonicSkill : Skill
     {
         /// <summary>
-        /// The sum of note weights, calculated during summation.
+        /// The sum of object weights, calculated during summation.
         /// Required for any calculations which need to normalise difficulty value.
         /// </summary>
-        protected double NoteWeightSum;
+        protected double ObjectWeightSum;
 
         /// <summary>
         /// Scaling factor applied as HarmonicScale / (1 + index) during weight calculations.
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         /// <summary>
         /// Transforms the object difficulties specifically for final difficulty summation.
-        /// This can be used to decrease weight of certain notes based on a skill-specific criteria.
+        /// This can be used to decrease weight of certain objects based on a skill-specific criteria.
         /// </summary>
         protected virtual void ApplyDifficultyTransformation(double[] difficulties)
         {
@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0;
 
-            // Notes with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These notes will not contribute to the difficulty.
+            // Objects with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These objects will not contribute to the difficulty.
             double[] difficulties = ObjectDifficulties.Where(p => p > 0).ToArray();
 
             if (difficulties.Length == 0)
@@ -67,14 +67,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double difficulty = 0;
             int index = 0;
 
-            foreach (double note in difficulties.OrderDescending())
+            foreach (double obj in difficulties.OrderDescending())
             {
-                // Use a harmonic sum that considers each note of the map according to a predefined weight.
+                // Use a harmonic sum that considers each object of the map according to a predefined weight.
                 double weight = (1 + (HarmonicScale / (1 + index))) / (Math.Pow(index, DecayExponent) + 1 + (HarmonicScale / (1 + index)));
 
-                NoteWeightSum += weight;
+                ObjectWeightSum += weight;
 
-                difficulty += note * weight;
+                difficulty += obj * weight;
                 index += 1;
             }
 
@@ -89,15 +89,15 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            if (NoteWeightSum == 0)
+            if (ObjectWeightSum == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / NoteWeightSum; // What would the top difficulty be if all object difficulties were identical
+            double consistentTopObject = difficultyValue / ObjectWeightSum; // What would the top difficulty be if all object difficulties were identical
 
-            if (consistentTopNote == 0)
+            if (consistentTopObject == 0)
                 return 0;
 
-            return ObjectDifficulties.Sum(d => DifficultyCalculationUtils.Logistic(d / consistentTopNote, 0.88, 10, 1.1));
+            return ObjectDifficulties.Sum(d => DifficultyCalculationUtils.Logistic(d / consistentTopObject, 0.88, 10, 1.1));
         }
 
         public static double DifficultyToPerformance(double difficulty) => 4.0 * Math.Pow(difficulty, 3.0);
