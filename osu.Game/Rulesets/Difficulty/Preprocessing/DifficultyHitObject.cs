@@ -71,15 +71,15 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             ClockRate = clockRate;
         }
 
-        public DifficultyHitObject Previous(int backwardsIndex)
+        public DifficultyHitObject Previous(int skipCount = 0)
         {
-            int index = Index - (backwardsIndex + 1);
+            int index = Index - (skipCount + 1);
             return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
 
-        public DifficultyHitObject Next(int forwardsIndex)
+        public DifficultyHitObject Next(int skipCount = 0)
         {
-            int index = Index + (forwardsIndex + 1);
+            int index = Index + (skipCount + 1);
             return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
 
