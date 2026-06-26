@@ -23,12 +23,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The weight by which each strain value decays.
         /// </summary>
-        protected virtual double DecayWeight => 0.9;
+        protected readonly double DecayWeight;
 
         /// <summary>
         /// The maximum length of each strain section.
         /// </summary>
-        protected virtual int MaxSectionLength => 400;
+        protected readonly int MaxSectionLength;
 
         private double currentSectionPeak; // We also keep track of the peak strain in the current section.
         private double currentSectionBegin;
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// or if <see cref="Skill.DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
         /// in the future when a better memory-saving technique is implemented.
         /// </summary>
-        private double maxStoredSections => 11 / (1 - DecayWeight);
+        private readonly double maxStoredLength;
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
 
@@ -52,9 +52,19 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private readonly List<(double StrainValue, double StartTime)> queuedStrains = new List<(double, double)>();
 
-        protected VariableLengthStrainSkill(Mod[] mods)
+        /// <summary>
+        /// Create a new <see cref="VariableLengthStrainSkill"/>.
+        /// </summary>
+        /// <param name="mods">The mods.</param>
+        /// <param name="decayWeight">The weight by which each strain value decays.</param>
+        /// <param name="maxSectionLength">The maximum length of each strain section.</param>
+        protected VariableLengthStrainSkill(Mod[] mods, double decayWeight = 0.9, int maxSectionLength = 400)
             : base(mods)
         {
+            DecayWeight = decayWeight;
+            MaxSectionLength = maxSectionLength;
+
+            maxStoredLength = 11 / (1 - DecayWeight);
         }
 
         /// <summary>
@@ -162,11 +172,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             totalLength += sectionLength;
 
             // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
-            // `maxStoredSections` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
-            while (totalLength > maxStoredSections * MaxSectionLength)
+            // `maxStoredLength` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
+            while (totalLength > maxStoredLength * MaxSectionLength)
             {
-                totalLength -= strainPeaks[0].SectionLength;
-                strainPeaks.RemoveAt(0);
+                totalLength -= strainPeaks[^1].SectionLength;
+                strainPeaks.RemoveAt(strainPeaks.Count - 1);
             }
         }
 
@@ -190,11 +200,22 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <returns>The peak strain.</returns>
         protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
+        private bool peaksFinalised;
+
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
         /// including the peak of the current section.
         /// </summary>
-        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
+        public IEnumerable<StrainPeak> GetCurrentStrainPeaks()
+        {
+            if (!peaksFinalised)
+            {
+                saveCurrentPeak(currentSectionEnd - currentSectionBegin);
+                peaksFinalised = true;
+            }
+
+            return strainPeaks;
+        }
 
         /// <summary>
         /// Calculates the number of strains weighted against the top strain.
@@ -228,7 +249,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             public double Value { get; }
             public double SectionLength { get; }
 
-            public int CompareTo(StrainPeak other) => Value.CompareTo(other.Value);
+            // Reverse sort, highest is first.
+            public int CompareTo(StrainPeak other) => other.Value.CompareTo(Value);
         }
     }
 }
