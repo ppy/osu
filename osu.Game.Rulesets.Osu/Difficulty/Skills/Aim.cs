@@ -241,9 +241,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainsToRemove++;
             }
 
-            strains.RemoveRange(0, strainsToRemove);
-
-            return strains.OrderByDescending(p => p.Value);
+            return strains.Skip(strainsToRemove).OrderByDescending(p => p.Value);
         }
     }
 }
