@@ -322,7 +322,10 @@ namespace osu.Game.Online.API
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
-            if (!probeLiveness(out string reason))
+            // only check the liveness probe when actually connecting, and not when waiting for the second factor.
+            // `attemptConnect()` runs on a tight 50ms loop while waiting for the second factor,
+            // so probing during that time would result in a lot of traffic hitting the probe.
+            if (state.Value != APIState.RequiresSecondFactorAuth && !probeLiveness(out string reason))
             {
                 triggerOutage(reason);
                 return;
