@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -56,21 +57,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             public KeyButton()
             {
-                Margin = new MarginPadding(padding);
-
+                AutoSizeAxes = Axes.Both;
                 Masking = true;
-                CornerRadius = padding;
-
-                Height = height;
-                AutoSizeAxes = Axes.X;
+                CornerRadius = 5;
 
                 Children = new Drawable[]
                 {
                     new Container
                     {
                         AlwaysPresent = true,
-                        Width = 80,
-                        Height = height,
+                        Width = 60,
+                        AutoSizeAxes = Axes.Y,
                     },
                     box = new Box
                     {
@@ -78,8 +75,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                     Text = new OsuSpriteText
                     {
-                        Font = OsuFont.Numeric.With(size: 10),
-                        Margin = new MarginPadding(5),
+                        Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
+                        Margin = new MarginPadding(4),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
@@ -131,7 +128,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 else
                 {
                     box.FadeColour(IsHovered ? colourProvider.Light4 : colourProvider.Background6, transition_time, Easing.OutQuint);
-                    Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
+                    Text.FadeColour(IsHovered ? Color4.Black : colourProvider.Content1, transition_time, Easing.OutQuint);
                 }
             }
 
@@ -180,7 +177,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         alpha = 0.4f;
                     }
 
-                    Text.Text = keyCombinationString;
+                    Text.Text = keyCombinationString.ToUpper();
                     Text.Alpha = alpha;
                 }
             }
