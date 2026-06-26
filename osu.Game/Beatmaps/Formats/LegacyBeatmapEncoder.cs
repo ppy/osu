@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,8 +25,8 @@ namespace osu.Game.Beatmaps.Formats
         public const int FIRST_LAZER_VERSION = 128;
 
         private readonly IBeatmap beatmap;
-
         private readonly ISkin? skin;
+        private readonly LegacyStoryboardEncoder? storyboardEncoder;
 
         private readonly int onlineRulesetID;
 
@@ -34,10 +35,17 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
+        /// <param name="storyboard">
+        /// The combined storyboard, loaded from both the <c>.osu</c> and the <c>.osz</c>.
+        /// Only elements from the <c>.osu</c> (marked via <see cref="StoryboardElementSource.Beatmap"/>) will be encoded to the beatmap.
+        /// </param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin, Storyboard? storyboard)
         {
             this.beatmap = beatmap;
             this.skin = skin;
+
+            if (storyboard != null)
+                storyboardEncoder = new LegacyStoryboardEncoder(storyboard);
 
             onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
@@ -101,7 +109,12 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.CountdownOffset}"));
             if (onlineRulesetID == 3)
                 writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.SpecialStyle ? '1' : '0')}"));
-            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+
+            if (storyboardEncoder != null)
+                storyboardEncoder.EncodeGeneralToBeatmap(writer);
+            else
+                writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+
             if (beatmap.SamplesMatchPlaybackRate)
                 writer.WriteLine(@"SamplesMatchPlaybackRate: 1");
         }
@@ -151,14 +164,19 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Events]");
 
-            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            if (storyboardEncoder != null)
+            {
+                storyboardEncoder.EncodeEventsToBeatmap(writer);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                    writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            }
 
+            writer.WriteLine("// Break Periods");
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
-
-            foreach (string l in beatmap.UnhandledEventLines)
-                writer.WriteLine(l);
         }
 
         private void handleControlPoints(TextWriter writer)
@@ -208,9 +226,34 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.Time},"));
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.BeatLength},"));
-                    outputControlPointAt(controlPointProperties, true);
-                    lastControlPointProperties = controlPointProperties;
-                    lastControlPointProperties.SliderVelocity = 1;
+
+                    // `LegacyControlPointProperties` is a struct, thus it has by-value semantics,
+                    // thus assigning `controlPointProperties` to a local creates a copy.
+                    var timingPointProperties = controlPointProperties;
+
+                    // Slider velocity cannot be encoded in a timing point,
+                    // as the legacy format writes it out as "negative beat length".
+                    // Setting it to the default value of 1 ensures that any non-default slider velocity
+                    // will not be subject to the `IsRedundant()` guard lower down and thus still be output correctly.
+                    timingPointProperties.SliderVelocity = 1;
+
+                    // Kiai flag cannot be specified on the first timing point in the beatmap:
+                    // https://github.com/peppy/osu-stable-reference/blob/0b8b19af621dbb282773c22b36cc0453942b98d8/osu!/GameModes/Edit/Forms/TimingEntry.cs#L492-L495
+                    // That fact is also codified in the ranking criteria (https://osu.ppy.sh/wiki/en/Ranking_criteria#rules.2).
+                    // This is doing a thing slightly different from that in two major aspects:
+                    // - It applies to only groups with timing points, not to any control point groups.
+                    // - It applies to all groups with timing points that specify kiai time, not only the first one.
+                    // However, the two above conditions are acceptable, because:
+                    // - The ranking criteria also specifies that an inherited timing point cannot precede an uninherited timing point.
+                    //   Thus, the case of "first timing point group of beatmap does not have timing point" is fundamentally unsound,
+                    //   and guarded against via other measures such as preventing placement of objects before the first timing point.
+                    //   Therefore, checking only groups with timing points is sufficient.
+                    // - It's fine to enforce this for all uninherited timing points because an inherited point will be emitted below if necessary for kiai anyway.
+                    //   At worst doing so will result in some extra inherited points being output.
+                    timingPointProperties.EffectFlags &= ~LegacyEffectFlags.Kiai;
+
+                    outputControlPointAt(timingPointProperties, true);
+                    lastControlPointProperties = timingPointProperties;
                 }
 
                 if (controlPointProperties.IsRedundant(lastControlPointProperties))
@@ -623,7 +666,7 @@ namespace osu.Game.Beatmaps.Formats
             internal int SampleBank { get; init; }
             internal int CustomSampleBank { get; init; }
             internal int SampleVolume { get; init; }
-            internal LegacyEffectFlags EffectFlags { get; init; }
+            internal LegacyEffectFlags EffectFlags { get; set; }
 
             internal bool IsRedundant(LegacyControlPointProperties other) =>
                 SliderVelocity == other.SliderVelocity &&

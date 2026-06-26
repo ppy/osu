@@ -80,5 +80,15 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("set to importing", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.Importing()));
             AddStep("set to available", () => MultiplayerClient.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable()));
         }
+
+        [Test]
+        public void TestLastStand()
+        {
+            AddStep("active last stand", () =>
+            {
+                health.Value = 1_000_000;
+                health.Value = 1;
+            });
+        }
     }
 }

@@ -1,0 +1,53 @@
+osu file format v128
+
+[General]
+AudioFilename: audio.mp3
+AudioLeadIn: 0
+PreviewTime: -1
+Countdown: 0
+SampleSet: Normal
+StackLeniency: 0.7
+Mode: 0
+LetterboxInBreaks: 0
+UseSkinSprites: 0
+WidescreenStoryboard: 0
+
+[Editor]
+DistanceSpacing: 1
+BeatDivisor: 4
+GridSize: 32
+TimelineZoom: 1
+
+[Difficulty]
+HPDrainRate: 5
+CircleSize: 5
+OverallDifficulty: 5
+ApproachRate: 5
+SliderMultiplier: 1.4
+SliderTickRate: 1
+
+[Events]
+// Background and Video events
+0,0,"",0,0
+// Storyboard Layer 0 (Background)
+// Storyboard Layer 1 (Fail)
+// Storyboard Layer 2 (Pass)
+// Storyboard Layer 3 (Foreground)
+// Storyboard Layer 4 (Overlay)
+// Storyboard Sound Samples
+// Break Periods
+
+[TimingPoints]
+678,310.880829015544,4,1,0,100,1,1
+
+[Colours]
+Combo1: 255,192,0,255
+Combo2: 0,202,0,255
+Combo3: 18,124,255,255
+Combo4: 242,24,57,255
+
+[HitObjects]
+141,145,1610,5,0,1:0:0:0:
+237,245,1921,1,0,1:0:0:0:
+320,145,2232,1,0,1:0:0:0:
+413,254,2543,1,0,1:0:0:0:

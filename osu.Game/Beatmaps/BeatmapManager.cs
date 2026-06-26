@@ -27,6 +27,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Utils;
 using Realms;
 
@@ -216,7 +217,7 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, transferCollections: false);
+            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, new Storyboard(), transferCollections: false);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
@@ -359,8 +360,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null) =>
-            save(beatmapInfo, beatmapContent, beatmapSkin, transferCollections: true);
+        /// <param name="storyboard">The storyboard content to write, null if to be omitted.</param>
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null, Storyboard? storyboard = null) =>
+            save(beatmapInfo, beatmapContent, beatmapSkin, storyboard, transferCollections: true);
 
         public void DeleteAllVideos()
         {
@@ -502,7 +504,7 @@ namespace osu.Game.Beatmaps
             setInfo.Status = BeatmapOnlineStatus.LocallyModified;
         }
 
-        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, bool transferCollections)
+        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, Storyboard? storyboard, bool transferCollections)
         {
             var setInfo = beatmapInfo.BeatmapSet;
             Debug.Assert(setInfo != null);
@@ -526,7 +528,7 @@ namespace osu.Game.Beatmaps
             {
                 using var stream = new MemoryStream();
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
+                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin, storyboard).Encode(sw);
 
                 stream.Seek(0, SeekOrigin.Begin);
 
@@ -658,7 +660,10 @@ namespace osu.Game.Beatmaps
             remove => workingBeatmapCache.OnInvalidated -= value;
         }
 
-        public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID && !s.DeletePending));
+        public override bool IsAvailableLocally(BeatmapSetInfo model)
+        {
+            throw new InvalidOperationException($"Use overload with {nameof(IBeatmapInfo)} parameter instead.");
+        }
 
         public bool IsAvailableLocally(IBeatmapInfo model)
         {

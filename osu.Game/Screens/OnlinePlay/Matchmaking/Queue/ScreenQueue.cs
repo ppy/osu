@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -29,6 +31,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Matchmaking.Requests;
 using osu.Game.Online.Multiplayer;
@@ -40,6 +43,7 @@ using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
@@ -111,6 +115,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             enqueueSample = audio.Samples.Get(@"Multiplayer/Matchmaking/enqueue");
             matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
 
+            LinkFlowContainer experimentalText;
+
             InternalChild = new InverseScalingDrawSizePreservingFillContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -158,7 +164,39 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                 ],
                                                 Content = new[]
                                                 {
-                                                    new Drawable[] { new QueueSectionHeader("Queued players") },
+                                                    new Drawable[]
+                                                    {
+                                                        new FillFlowContainer
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new Container
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    AutoSizeAxes = Axes.Y,
+                                                                    Masking = true,
+                                                                    CornerRadius = 5,
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        new Box
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                            Colour = colours.Yellow
+                                                                        },
+                                                                        experimentalText = new ExperimentalLinkFlowContainer
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                            AutoSizeAxes = Axes.Y,
+                                                                            Padding = new MarginPadding(10),
+                                                                        }
+                                                                    }
+                                                                },
+                                                                new QueueSectionHeader("Queued players")
+                                                            }
+                                                        }
+                                                    },
                                                     new Drawable[]
                                                     {
                                                         new Container
@@ -314,6 +352,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     }
                 }
             };
+
+            experimentalText.AddIcon(FontAwesome.Solid.Lightbulb);
+            experimentalText.AddText(@" ");
+            experimentalText.AddText("This system is under continuous and rapid development.\n", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
+            experimentalText.AddText("Follow the ");
+            experimentalText.AddLink("changelog", @"https://osu.ppy.sh/community/forums/topics/2202736", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
+            experimentalText.AddText(" and provide any ");
+            experimentalText.AddLink("feedback", @"https://osu.ppy.sh/community/forums/topics/2198397", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
+            experimentalText.AddText(" on the osu! forums!");
         }
 
         protected override void LoadComplete()
@@ -393,15 +440,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
         });
 
+        private int historyInsertOrder;
+
         private async Task loadRecentMatches(RankedPlayRoomState[] matches)
         {
+            // matches initial API response.
+            const int max_panels = 50;
+
             await userLookupCache.GetUsersAsync(matches.SelectMany(m => m.Users.Keys).ToArray()).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
                 foreach (var match in matches)
                 {
-                    resultPanelContainer.Insert(-resultPanelContainer.Count, new RankedPlayMatchPanel(match)
+                    resultPanelContainer.Insert(historyInsertOrder--, new RankedPlayMatchPanel(match)
                     {
                         RelativeSizeAxes = Axes.X,
                         Width = 0.48f
@@ -413,6 +465,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     resultPanelContainer.LayoutDuration = 400;
                     resultPanelContainer.LayoutEasing = Easing.OutQuint;
                 }
+
+                while (resultPanelContainer.Count > max_panels)
+                    resultPanelContainer.Children.First().RemoveAndDisposeImmediately();
             });
         }
 
@@ -789,6 +844,37 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
+            }
+        }
+
+        private partial class ExperimentalLinkFlowContainer : LinkFlowContainer
+        {
+            public ExperimentalLinkFlowContainer()
+                : base(sp => sp.Colour = Color4.Black)
+            {
+            }
+
+            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart)
+                => new LinkCompiler(textPart);
+
+            private partial class LinkCompiler : DrawableLinkCompiler
+            {
+                public LinkCompiler(ITextPart part)
+                    : base(part)
+                {
+                }
+
+                public LinkCompiler(IEnumerable<Drawable> parts)
+                    : base(parts)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    IdleColour = colours.YellowDarker;
+                    HoverColour = Color4.Black;
+                }
             }
         }
 

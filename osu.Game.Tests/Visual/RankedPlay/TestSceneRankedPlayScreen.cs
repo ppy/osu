@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
 
-            AddWaitStep("wait", 3);
+            AddUntilStep("wait until cards are present", () => this.ChildrenOfType<PlayerHandOfCards.PlayerHandCard>().Count() == 5);
 
             for (int i = 0; i < 3; i++)
             {
