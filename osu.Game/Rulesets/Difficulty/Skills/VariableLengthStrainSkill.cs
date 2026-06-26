@@ -193,53 +193,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
 
         /// <summary>
-        /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
-        /// </summary>
-        public override double DifficultyValue()
-        {
-            double difficulty = 0;
-
-            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
-
-            List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
-
-            // Time is measured in units of strains
-            double time = 0;
-
-            // Difficulty is a continuous weighted sum of the sorted strains
-            for (int i = 0; i < strains.Count; i++)
-            {
-                /* Weighting function can be thought of as:
-                        b
-                        ∫ DecayWeight^x dx
-                        a
-                    where a = startTime and b = endTime
-
-                    Technically, the function below has been slightly modified from the equation above.
-                    The real function would be
-                        double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime))
-                        ...
-                        return difficulty / Math.Log(1 / DecayWeight)
-                    E.g. for a DecayWeight of 0.9, we're multiplying by 10 instead of 9.49122...
-
-                    This change makes it so that a map composed solely of MaxSectionLength chunks will have the exact same value when summed in this class and StrainSkill.
-                    Doing this ensures the relationship between strain values and difficulty values remains the same between the two classes.
-                */
-                double startTime = time;
-                double endTime = time + strains[i].SectionLength;
-
-                double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime);
-
-                difficulty += strains[i].Value * weight;
-                time = endTime;
-            }
-
-            return difficulty / (1 - DecayWeight);
-        }
-
-        /// <summary>
         /// Calculates the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
