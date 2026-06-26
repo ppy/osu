@@ -235,7 +235,7 @@ namespace osu.Game.Online.API
         /// Query the liveness probe to check whether to transition to / remain in <see cref="APIState.Failing"/> state.
         /// </summary>
         /// <returns>
-        /// <see langword="true"/> if the liveness probe is disabled, returns that online functions are available, or cannot be reached.
+        /// <see langword="true"/> if the liveness probe is disabled, returns that online functions are available, returns an unknown response, or cannot be reached.
         /// <see langword="false"/> if the liveness probe explicitly returns that online functions are not available. A user-facing message may be returned via <paramref name="reason"/>.
         /// </returns>
         private bool probeLiveness([CanBeNull] out string reason)
@@ -266,7 +266,7 @@ namespace osu.Game.Online.API
             }
 
             reason = req.ResponseObject.Reason;
-            return req.ResponseObject.Status == LivenessProbeResponse.LivenessStatus.Up;
+            return req.ResponseObject.Status != LivenessProbeResponse.LivenessStatus.Down;
         }
 
         private void triggerOutage(string reason)
