@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         break;
                 }
 
-                spectatorClient.Raise(s => s.OnNewFrames -= null, userId, new FrameDataBundle(header, new[] { new LegacyReplayFrame(Time.Current, 0, 0, ReplayButtonState.None) }));
+                spectatorClient.Raise(s => s.OnNewFrames -= null, userId, new FrameDataBundle(header, new[] { new LegacyReplayFrame(Time.Current, 0, 0, ReplayButtonState.None) }, null));
             }
         }
     }

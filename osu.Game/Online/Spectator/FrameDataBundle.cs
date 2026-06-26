@@ -21,6 +21,13 @@ namespace osu.Game.Online.Spectator
         [Key(1)]
         public IList<LegacyReplayFrame> Frames { get; set; }
 
+        /// <summary>
+        /// The sequence number of this frame bundle.
+        /// Used to determine ordering of frame bundles, and for server-side checks that server received all frame bundles it was supposed to.
+        /// </summary>
+        [Key(2)]
+        public long? SequenceNumber { get; set; }
+
         public FrameDataBundle(ScoreInfo score, ScoreProcessor scoreProcessor, IList<LegacyReplayFrame> frames)
         {
             Frames = frames;
@@ -28,10 +35,11 @@ namespace osu.Game.Online.Spectator
         }
 
         [JsonConstructor]
-        public FrameDataBundle(FrameHeader header, IList<LegacyReplayFrame> frames)
+        public FrameDataBundle(FrameHeader header, IList<LegacyReplayFrame> frames, long? sequenceNumber)
         {
             Header = header;
             Frames = frames;
+            SequenceNumber = sequenceNumber;
         }
     }
 }
