@@ -74,11 +74,12 @@ namespace osu.Game.Overlays.Mods
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            createButton = new ShearedButton(content_width)
+                            createButton = new ShearedButton
                             {
                                 // todo: for some very odd reason, this needs to be anchored to topright for the fill flow to be correctly sized to the AABB of the sheared button
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
+                                Width = content_width,
                                 Text = ModSelectOverlayStrings.AddPreset,
                                 Action = createPreset
                             }

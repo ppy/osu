@@ -24,21 +24,6 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public BindableBool Active { get; } = new BindableBool();
 
-        /// <summary>
-        /// Creates a new <see cref="ShearedToggleButton"/>
-        /// </summary>
-        /// <param name="width">
-        /// The width of the button.
-        /// <list type="bullet">
-        /// <item>If a non-<see langword="null"/> value is provided, this button will have a fixed width equal to the provided value.</item>
-        /// <item>If a <see langword="null"/> value is provided (or the argument is omitted entirely), the button will autosize in width to fit the text.</item>
-        /// </list>
-        /// </param>
-        public ShearedToggleButton(float? width = null)
-            : base(width)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {

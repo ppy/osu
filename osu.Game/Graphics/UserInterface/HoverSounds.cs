@@ -6,9 +6,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
+using osu.Game.Audio;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -18,6 +19,8 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public partial class HoverSounds : HoverSampleDebounceComponent
     {
+        public readonly Bindable<bool> Enabled = new Bindable<bool>(true);
+
         private Sample sampleHover;
 
         protected readonly HoverSampleSet SampleSet;
@@ -37,8 +40,10 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void PlayHoverSample()
         {
-            sampleHover.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
-            sampleHover.Play();
+            if (!Enabled.Value)
+                return;
+
+            SamplePlaybackHelper.PlayWithRandomPitch(sampleHover, pitchVariation: 0.02);
         }
     }
 }

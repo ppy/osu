@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
-            AddAssert("time advanced", () => currentFrameStableTime, () => Is.GreaterThan(pausedTime));
+            AddAssert("time advanced", () => currentFrameStableTime, () => Is.GreaterThan(pausedTime!));
         }
 
         [Test]

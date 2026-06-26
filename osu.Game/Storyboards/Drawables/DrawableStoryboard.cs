@@ -127,7 +127,7 @@ namespace osu.Game.Storyboards.Drawables
                 layer.Enabled = passing.Value ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
 
-        private class StoryboardResourceLookupStore : IResourceStore<byte[]>
+        public class StoryboardResourceLookupStore : IResourceStore<byte[]>
         {
             private readonly IResourceStore<byte[]> realmFileStore;
             private readonly Storyboard storyboard;

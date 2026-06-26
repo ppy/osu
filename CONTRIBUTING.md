@@ -2,6 +2,10 @@
 
 Thank you for showing interest in the development of osu!. We aim to provide a good collaborating environment for everyone involved, and as such have decided to list some of the most important things to keep in mind in the process. The guidelines below have been chosen based on past experience.
 
+## Foreword on AI usage
+
+Our team believes in **human contributions**. Any contribution – be it an issue report or a pull request – which is created by, documented by, or aided by AI/LLM usage will typically be **closed and locked without further discussion**.
+
 ## Table of contents
 
 1. [Reporting bugs](#reporting-bugs)
@@ -55,9 +59,7 @@ When in doubt, it's probably best to start with a discussion first. We will esca
 
 While pull requests from unaffiliated contributors are welcome, please note that due to significant community interest and limited review throughput, the core team's primary focus is on the issues which are currently [on the roadmap](https://github.com/orgs/ppy/projects/7/views/6). Reviewing PRs that fall outside of the scope of the roadmap is done on a best-effort basis, so please be aware that it may take a while before a core maintainer gets around to review your change.
 
-The [issue tracker](https://github.com/ppy/osu/issues) should provide plenty of issues to start with. We also have a [`good first issue`](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) label, although from experience it is not used very often, as it is relatively rare that we can spot an issue that will definitively be a good first issue for a new contributor regardless of their programming experience.
-
-In the case of simple issues, a direct PR is okay. However, if you decide to work on an existing issue which doesn't seem trivial, **please ask us first**. This way we can try to estimate if it is a good fit for you and provide the correct direction on how to address it. In addition, note that while we do not rule out external contributors from working on roadmapped issues, we will generally prefer to handle them ourselves unless they're not very time sensitive.
+The [issue tracker](https://github.com/ppy/osu/issues) should provide plenty of issues to start with. In the case of simple issues, a direct PR is okay. However, if you decide to work on an existing issue which doesn't seem trivial, **please ask us first**. This way we can try to estimate if it is a good fit for you and provide the correct direction on how to address it. In addition, note that while we do not rule out external contributors from working on roadmapped issues, we will generally prefer to handle them ourselves unless they're not very time sensitive.
 
 If you'd like to propose a subjective change to one of the visual aspects of the game, or there is a bigger task you'd like to work on, but there is no corresponding issue or discussion thread yet for it, **please open a discussion or issue first** to avoid wasted effort. This in particular applies if you want to work on [one of the available designs from the osu! Figma master library](https://www.figma.com/file/VIkXMYNPMtQem2RJg9k2iQ/Master-Library).
 

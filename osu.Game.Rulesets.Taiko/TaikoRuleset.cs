@@ -188,6 +188,8 @@ namespace osu.Game.Rulesets.Taiko
             }
         }
 
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new TaikoScoreMultiplierCalculator(context);
+
         public override string Description => "osu!taiko";
 
         public override string ShortName => SHORT_NAME;
@@ -222,15 +224,18 @@ namespace osu.Game.Rulesets.Taiko
 
         public override RulesetSettingsSubsection CreateSettings() => new TaikoSettingsSubsection(this);
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
                 HitResult.Great,
                 HitResult.Ok,
+                HitResult.Miss,
 
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 

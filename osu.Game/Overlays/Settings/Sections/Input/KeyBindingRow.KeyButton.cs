@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -139,9 +140,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             /// </summary>
             /// <param name="fullState">A <see cref="KeyCombination"/> generated from the full input state.</param>
             /// <param name="triggerKey">The key which triggered this update, and should be used as the binding.</param>
-            public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey) =>
-                // TODO: Distinct() can be removed after https://github.com/ppy/osu-framework/pull/6130 is merged.
-                UpdateKeyCombination(new KeyCombination(fullState.Keys.Where(KeyCombination.IsModifierKey).Append(triggerKey).Distinct().ToArray()));
+            public void UpdateKeyCombination(KeyCombination fullState, InputKey triggerKey)
+            {
+                var keys = fullState.Keys
+                                    .Where(KeyCombination.IsModifierKey)
+                                    .Append(triggerKey)
+                                    .ToArray();
+
+                // For gameplay bindings, users care about being able to use both left / right shift as different bindings.
+                // For global bindings, it's better to combine both of these into a virtual key which covers both side modifiers.
+                var combination = KeyBinding.Value.RulesetName == null
+                    ? keys.Select(k => k.GetVirtualKey() ?? k).ToArray()
+                    : keys;
+
+                UpdateKeyCombination(new KeyCombination(combination));
+            }
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {

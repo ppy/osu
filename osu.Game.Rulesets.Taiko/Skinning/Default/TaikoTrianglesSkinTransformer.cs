@@ -51,6 +51,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                                     spectatorList.Origin = Anchor.TopLeft;
                                     spectatorList.Position = new Vector2(320, -280);
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 RelativeSizeAxes = Axes.Both,

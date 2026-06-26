@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var hitWindows = new TaikoHitWindows();
 
-            HitResult[] usableHitResults = Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)).ToArray();
+            HitResult[] usableHitResults = Enum.GetValues<HitResult>().Where(hitWindows.IsHitResultAllowed).ToArray();
 
             AddInternal(judgementPooler = new JudgementPooler<DrawableTaikoJudgement>(usableHitResults));
 

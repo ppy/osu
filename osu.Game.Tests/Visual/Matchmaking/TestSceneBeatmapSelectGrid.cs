@@ -8,7 +8,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -17,12 +16,11 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
-using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneBeatmapSelectGrid : OnlinePlayTestScene
+    public partial class TestSceneBeatmapSelectGrid : MatchmakingTestScene
     {
         private MatchmakingPlaylistItem[] items = null!;
 
@@ -131,7 +129,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             {
                 var (candidateItems, finalItem) = pickRandomItems(5);
 
-                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem);
+                grid.RollAndDisplayFinalBeatmap(candidateItems, finalItem, finalItem);
             });
         }
 
@@ -160,7 +158,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem), 500);
+                Scheduler.AddDelayed(() => grid.PresentRolledBeatmap(finalItem, finalItem), 500);
             });
         }
 
@@ -175,7 +173,25 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
                 grid.PlayRollAnimation(finalItem, duration: 0);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem), 500);
+                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(finalItem, finalItem), 500);
+            });
+        }
+
+        [Test]
+        public void TestPresentRandomItem()
+        {
+            AddStep("present random item panel", () =>
+            {
+                var (candidateItems, finalItem) = pickRandomItems(4);
+
+                grid.TransferCandidatePanelsToRollContainer(candidateItems.Append(-1).ToArray(), duration: 0);
+                grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
+                grid.PlayRollAnimation(-1, duration: 0);
+
+                Scheduler.AddDelayed(() =>
+                {
+                    grid.PresentRolledBeatmap(-1, finalItem);
+                }, 500);
             });
         }
 
@@ -220,20 +236,19 @@ namespace osu.Game.Tests.Visual.Matchmaking
         }
 
         [Test]
-        public void TestPresentRandomItem()
+        public void TestRollAnimationFinalRandom()
         {
-            AddStep("present random item panel", () =>
+            AddStep("play animation", () =>
             {
-                grid.TransferCandidatePanelsToRollContainer(pickRandomItems(4).candidateItems.Append(-1).ToArray(), duration: 0);
-                grid.ArrangeItemsForRollAnimation(duration: 0, stagger: 0);
-                grid.PlayRollAnimation(-1, duration: 0);
+                (long[] candidateItems, _) = pickRandomItems(5);
 
-                Scheduler.AddDelayed(() => grid.PresentUnanimouslyChosenBeatmap(-1), 500);
+                candidateItems = candidateItems.Append(-1).ToArray();
+                long finalItem = items.First(i => !candidateItems.Contains(i.ID)).ID;
+
+                grid.RollAndDisplayFinalBeatmap(candidateItems, -1, finalItem);
             });
 
-            AddWaitStep("wait for animation", 5);
-
-            AddStep("reveal beatmap", () => grid.RevealRandomItem(items[RNG.Next(items.Length)].PlaylistItem));
+            AddWaitStep("wait for animation", 10);
         }
 
         private (long[] candidateItems, long finalItem) pickRandomItems(int count)

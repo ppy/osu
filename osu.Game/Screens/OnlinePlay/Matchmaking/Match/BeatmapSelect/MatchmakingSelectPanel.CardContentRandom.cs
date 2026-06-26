@@ -6,6 +6,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
@@ -22,59 +25,80 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
             private AvatarOverlay selectionOverlay = null!;
+            public SpriteIcon Dice { get; private set; } = null!;
+            public OsuSpriteText Label { get; private set; } = null!;
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChildren = new Drawable[]
+                InternalChild = new Container
                 {
-                    new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = BeatmapCard.CORNER_RADIUS,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background2,
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding
+                        new Box
                         {
-                            Horizontal = 10,
-                            Vertical = 4
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Dark5,
                         },
-                        Children = new Drawable[]
+                        new TrianglesV2
                         {
-                            new FillFlowContainer
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Children =
-                                [
-                                    new SpriteIcon
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Size = new Vector2(32),
-                                        Icon = FontAwesome.Solid.Random,
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Text = "Random",
-                                    }
-                                ]
-                            },
-                            selectionOverlay = new AvatarOverlay
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                            }
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.1f,
+                        },
+                        Label = new OsuSpriteText
+                        {
+                            Y = 20,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "Random"
+                        },
+                        Dice = new SpriteIcon
+                        {
+                            Y = -10,
+                            Size = new Vector2(28),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Icon = randomDiceIcon(),
+                        },
+                        selectionOverlay = new AvatarOverlay
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Margin = new MarginPadding { Right = 5 }
                         }
                     }
                 };
+
+                Dice.Spin(10_000, RotationDirection.Clockwise);
             }
+
+            public void RollDice()
+            {
+                var icon = randomDiceIcon();
+
+                while (icon.Equals(Dice.Icon))
+                    icon = randomDiceIcon();
+
+                Dice.ScaleTo(0.65f, 60, Easing.Out)
+                    .Then()
+                    .Schedule(() => Dice.Icon = icon)
+                    .ScaleTo(1f, 400, Easing.OutElasticHalf);
+            }
+
+            private static IconUsage[] diceIcons => new[]
+            {
+                FontAwesome.Solid.DiceOne,
+                FontAwesome.Solid.DiceTwo,
+                FontAwesome.Solid.DiceThree,
+                FontAwesome.Solid.DiceFour,
+                FontAwesome.Solid.DiceFive,
+                FontAwesome.Solid.DiceSix,
+            };
+
+            private static IconUsage randomDiceIcon() => diceIcons[RNG.Next(diceIcons.Length)];
         }
     }
 }

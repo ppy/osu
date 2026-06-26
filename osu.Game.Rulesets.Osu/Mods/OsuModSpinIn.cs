@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModSpinIn;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "Circles spin in. No approach circles.";
-        public override double ScoreMultiplier => 1;
 
         // todo: this mod needs to be incompatible with "hidden" due to forcing the circle to remain opaque,
         // further implementation will be required for supporting that.

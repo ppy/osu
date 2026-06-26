@@ -21,7 +21,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -221,7 +221,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         [HitResult.Miss] = 0,
                         [HitResult.Meh] = 0,
                         [HitResult.Great] = 0
-                    }, new ScoreProcessorStatistics(), DateTimeOffset.Now);
+                    }, new ScoreProcessorStatistics(), DateTimeOffset.Now, [], 0, []);
                 }
 
                 switch (RNG.Next(0, 3))

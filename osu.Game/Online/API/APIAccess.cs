@@ -400,7 +400,7 @@ namespace osu.Game.Online.API
 
                     userReq.Failure += ex =>
                     {
-                        if (ex is APIException)
+                        if (ex is APIException apiException && apiException.StatusCode < HttpStatusCode.InternalServerError)
                         {
                             LastLoginError = ex;
                             log.Add($@"Login failed for username {ProvidedUsername} on user retrieval ({LastLoginError.Message})!");
@@ -512,10 +512,10 @@ namespace osu.Game.Online.API
                         // attempt to parse a non-form error message
                         var response = JObject.Parse(req.GetResponseString().AsNonNull());
 
-                        string redirect = (string)response.SelectToken(@"url", true);
+                        string redirect = (string)response.SelectToken(@"url", false);
                         string message = (string)response.SelectToken(@"error", false);
 
-                        if (!string.IsNullOrEmpty(redirect))
+                        if (!string.IsNullOrEmpty(redirect) || !string.IsNullOrEmpty(message))
                         {
                             return new RegistrationRequest.RegistrationRequestErrors
                             {
@@ -687,7 +687,7 @@ namespace osu.Game.Online.API
             cancellationToken.Cancel();
         }
 
-        private class WebRequestFlushedException : Exception
+        internal class WebRequestFlushedException : Exception
         {
             public WebRequestFlushedException(APIState state)
                 : base($@"Request failed from flush operation (state {state})")

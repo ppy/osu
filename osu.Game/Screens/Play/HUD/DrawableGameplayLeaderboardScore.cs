@@ -16,7 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osu.Game.Utils;
@@ -357,7 +357,7 @@ namespace osu.Game.Screens.Play.HUD
             else if (Tracked)
             {
                 widthExtension = true;
-                setPanelColourAsTracked();
+                setPanelColour(BackgroundColour ?? colours.Orange2);
             }
             else if (isFriend)
             {
@@ -378,13 +378,6 @@ namespace osu.Game.Screens.Play.HUD
             leftLayerGradient.Colour = ColourInfo.GradientVertical(baseColour.Opacity(0.2f), baseColour.Opacity(0.5f));
             rightLayerGradient.Colour = ColourInfo.GradientVertical(baseColour.Opacity(0.1f), baseColour.Opacity(0.3f));
             scorePanel.BorderColour = ColourInfo.GradientVertical(baseColour.Opacity(0.2f), baseColour);
-        }
-
-        private void setPanelColourAsTracked()
-        {
-            leftLayerGradient.Colour = ColourInfo.GradientVertical(colours.Blue2.Opacity(0.3f), colours.Blue2);
-            rightLayerGradient.Colour = ColourInfo.GradientVertical(colours.Blue4.Opacity(0.25f), colours.Blue3.Opacity(0.6f));
-            scorePanel.BorderColour = ColourInfo.GradientVertical(colours.Blue1.Opacity(0.2f), colours.Blue1);
         }
 
         protected override void Update()

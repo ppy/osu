@@ -150,28 +150,7 @@ namespace osu.Game.Screens.Play
                     if (string.IsNullOrEmpty(exception.Message))
                         notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, "Failed to retrieve a score submission token."));
                     else
-                    {
-                        switch (exception.Message)
-                        {
-                            case @"missing token header":
-                            case @"invalid client hash":
-                            case @"invalid verification hash":
-                                notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, "Please ensure that you are using the latest version of the official game releases."));
-                                break;
-
-                            case @"invalid or missing beatmap_hash":
-                                notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, "This beatmap does not match the online version. Please update or redownload it."));
-                                break;
-
-                            case @"expired token":
-                                notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, "Your system clock is set incorrectly. Please check your system time, date and timezone."));
-                                break;
-
-                            default:
-                                notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, exception.Message));
-                                break;
-                        }
-                    }
+                        notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, getUserFacingAPIError(exception)));
                 }
 
                 if (shouldExit)
@@ -352,12 +331,34 @@ namespace osu.Game.Screens.Play
 
             request.Failure += e =>
             {
-                Logger.Error(e, $"Failed to submit score (token:{token.Value}): {e.Message}");
+                Logger.Error(e, $"{getUserFacingAPIError(e)}\n\nScore was not submitted (id: {token.Value})");
                 scoreSubmissionSource.SetResult(false);
             };
 
             api.Queue(request);
             return scoreSubmissionSource.Task;
+        }
+
+        private static string getUserFacingAPIError(Exception exception)
+        {
+            switch (exception.Message)
+            {
+                case @"missing token header":
+                case @"invalid client hash":
+                case @"invalid verification hash":
+                case @"invalid token":
+                case @"outdated client":
+                    return "Please ensure that you are using the latest version of the official game releases.";
+
+                case @"invalid or missing beatmap_hash":
+                    return "This beatmap does not match the online version. Please update or redownload it.";
+
+                case @"expired token":
+                    return "Your system clock is set incorrectly. Please check your system time, date and timezone.";
+
+                default:
+                    return exception.Message;
+            }
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)

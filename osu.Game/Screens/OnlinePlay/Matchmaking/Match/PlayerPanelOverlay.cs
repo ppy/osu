@@ -78,6 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             client.MatchRoomStateChanged += onRoomStateChanged;
             client.UserJoined += onUserJoined;
             client.UserLeft += onUserLeft;
+            client.UserKicked += onUserLeft;
 
             if (client.Room != null)
             {
@@ -207,6 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 client.MatchRoomStateChanged -= onRoomStateChanged;
                 client.UserJoined -= onUserJoined;
                 client.UserLeft -= onUserLeft;
+                client.UserKicked -= onUserLeft;
             }
         }
 

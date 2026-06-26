@@ -5,15 +5,15 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Matchmaking;
 using osu.Game.Overlays;
-using osu.Game.Screens.OnlinePlay.Match;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
@@ -41,28 +41,36 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
+        private readonly MatchmakingPoolType poolType;
+
         private Sample? dateWindupSample;
         private Sample? dateImpactSample;
         private Sample? beatmapWindupSample;
-        private Sample? beatmapImpactSample;
 
         private SampleChannel? dateWindupChannel;
         private SampleChannel? dateImpactChannel;
         private SampleChannel? beatmapWindupChannel;
-        private SampleChannel? beatmapImpactChannel;
 
         private IDisposable? duckOperation;
 
-        protected override BackgroundScreen CreateBackground() => new MatchmakingIntroBackgroundScreen(colourProvider);
+        protected override BackgroundScreen CreateBackground() => new MatchmakingBackgroundScreen(colourProvider);
 
-        public ScreenIntro()
+        public ScreenIntro(MatchmakingPoolType poolType)
         {
+            this.poolType = poolType;
             ValidForResume = false;
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            string poolTypeName = poolType switch
+            {
+                MatchmakingPoolType.QuickPlay => "Quick Play",
+                MatchmakingPoolType.RankedPlay => "Ranked Play",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
             InternalChildren = new Drawable[]
             {
                 introContent = new Container
@@ -100,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "Quick Play",
+                                            Text = poolTypeName,
                                             Margin = new MarginPadding { Horizontal = 10f, Vertical = 5f },
                                             Shear = -OsuGame.SHEAR,
                                             Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
@@ -116,7 +124,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
             dateWindupSample = audio.Samples.Get(@"DailyChallenge/date-windup");
             dateImpactSample = audio.Samples.Get(@"DailyChallenge/date-impact");
             beatmapWindupSample = audio.Samples.Get(@"DailyChallenge/beatmap-windup");
-            beatmapImpactSample = audio.Samples.Get(@"DailyChallenge/beatmap-impact");
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -195,7 +202,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
                         Schedule(() =>
                         {
                             if (this.IsCurrentScreen())
-                                this.Push(new ScreenQueue());
+                                this.Push(new ScreenQueue(poolType));
                         });
                     }
                 }
@@ -220,12 +227,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
             beatmapWindupChannel?.Play();
         }
 
-        private void playBeatmapImpactSample()
-        {
-            beatmapImpactChannel = beatmapImpactSample?.GetChannel();
-            beatmapImpactChannel?.Play();
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             resetAudio();
@@ -237,30 +238,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Intro
             dateWindupChannel?.Stop();
             dateImpactChannel?.Stop();
             beatmapWindupChannel?.Stop();
-            beatmapImpactChannel?.Stop();
             duckOperation?.Dispose();
-        }
-
-        private partial class MatchmakingIntroBackgroundScreen : RoomBackgroundScreen
-        {
-            private readonly OverlayColourProvider colourProvider;
-
-            public MatchmakingIntroBackgroundScreen(OverlayColourProvider colourProvider)
-                : base(null)
-            {
-                this.colourProvider = colourProvider;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                AddInternal(new Box
-                {
-                    Depth = float.MinValue,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5.Opacity(0.6f),
-                });
-            }
         }
     }
 }

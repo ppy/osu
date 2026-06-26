@@ -25,6 +25,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
@@ -429,8 +430,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 if (url != null)
                 {
                     items.AddRange([
-                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(url)),
-                        new OsuMenuItem("Copy link", MenuItemType.Standard, () => game?.CopyToClipboard(url))
+                        new OsuMenuItem(CommonStrings.ViewInBrowser, MenuItemType.Standard, () => game?.OpenUrlExternally(url)),
+                        new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url))
                     ]);
                 }
 

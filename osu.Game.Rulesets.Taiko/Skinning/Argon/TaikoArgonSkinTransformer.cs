@@ -51,6 +51,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
                                     spectatorList.Anchor = Anchor.BottomLeft;
                                     spectatorList.Origin = Anchor.TopLeft;
                                 }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 RelativeSizeAxes = Axes.Both,

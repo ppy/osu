@@ -10,7 +10,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Tests.Gameplay;
 
 namespace osu.Game.Tests.Visual.Gameplay
