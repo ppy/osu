@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (hitObject)
                 {
                     case Slider:
-                        return (fadeOutStartTime, longFadeDuration);
+                        return (fadeOutStartTime - fadeOutDuration, longFadeDuration - fadeOutDuration);
 
                     case SliderTick:
                         double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
