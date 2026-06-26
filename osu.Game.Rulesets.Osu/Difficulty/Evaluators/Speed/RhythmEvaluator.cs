@@ -158,8 +158,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         }
 
                         // scale down the difficulty if the object is doubletappable
-                        double doubletapness = prevObj.GetDoubletapness(currObj);
-                        effectiveRatio *= 1 - doubletapness * 0.75;
+                        effectiveRatio *= 1 - prevObj.CalculateDoubleTapFeasibility(currObj) * 0.75;
 
                         if (island.DeltaCount > 1)
                         {
