@@ -24,7 +24,6 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> path = new Bindable<string>(INDEX_PATH);
         private readonly Bindable<APIWikiPage?> wikiData = new Bindable<APIWikiPage?>();
-        private readonly IBindable<Language> language = new Bindable<Language>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -50,8 +49,8 @@ namespace osu.Game.Overlays
             path.BindValueChanged(onPathChanged);
             wikiData.BindTo(Header.WikiPageData);
 
-            language.BindTo(game.CurrentLanguage);
-            language.BindValueChanged(onLangChanged);
+            Header.CurrentLanguage.Value = game.CurrentLanguage.Value;
+            Header.CurrentLanguage.BindValueChanged(onLangChanged);
         }
 
         public void ShowPage(string pagePath = INDEX_PATH)
@@ -139,7 +138,7 @@ namespace osu.Game.Overlays
             if (e.NewValue == "error")
                 return;
 
-            loadPage(e.NewValue, language.Value);
+            loadPage(e.NewValue, Header.CurrentLanguage.Value);
         }
 
         private void onLangChanged(ValueChangedEvent<Language> e)
