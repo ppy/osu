@@ -628,20 +628,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Origin = Anchor.Centre,
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 4),
                                 Children = new Drawable[]
                                 {
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = "Waiting for a game...",
-                                        Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                        Text = "Searching for a match...",
+                                        Font = OsuFont.Style.Title,
                                     },
                                     new QueueTimerText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                        Font = OsuFont.Style.Body,
                                     }
                                 }
                             },
