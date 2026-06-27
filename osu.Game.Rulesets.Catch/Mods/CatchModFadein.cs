@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModFadein : ModHidden
+    public class CatchModFadeIn : ModHidden
     {
         public override string Name => "Fade In";
         public override string Acronym => "FI";
