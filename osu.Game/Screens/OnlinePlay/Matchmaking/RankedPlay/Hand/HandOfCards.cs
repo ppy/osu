@@ -177,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
             return true;
         }
 
-        protected virtual HandCard CreateHandCard(RankedPlayCard card) => new HandCard(card);
+        protected virtual HandCard CreateHandCard(RankedPlayCard card) => new HandCard(card, Flipped);
 
         protected virtual void OnCardStateChanged(HandCard card, ValueChangedEvent<RankedPlayCardState> evt)
         {
