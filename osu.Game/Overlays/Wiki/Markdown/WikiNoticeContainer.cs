@@ -21,13 +21,13 @@ namespace osu.Game.Overlays.Wiki.Markdown
         private readonly bool isOutdated;
         private readonly bool needsCleanup;
         private readonly bool isStub;
+        private readonly bool isFallback;
+        private readonly bool isTranslationOutdated;
+        private readonly LocalisableString originalLanguage;
 
         public WikiNoticeContainer(YamlFrontMatterBlock yamlFrontMatterBlock)
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(10);
+            setupLayout();
 
             foreach (StringLine line in yamlFrontMatterBlock.Lines)
             {
@@ -51,15 +51,51 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     case @"stub: true":
                         isStub = true;
                         break;
+
+                    case @"outdated_translation: true":
+                        isTranslationOutdated = true;
+                        break;
                 }
             }
+        }
+
+        public WikiNoticeContainer(LocalisableString originalLanguage)
+        {
+            setupLayout();
+
+            isFallback = true;
+            this.originalLanguage = originalLanguage;
+        }
+
+        private void setupLayout()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
+            Spacing = new Vector2(10);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             // Reference : https://github.com/ppy/osu-web/blob/master/resources/views/wiki/_notice.blade.php and https://github.com/ppy/osu-web/blob/master/resources/lang/en/wiki.php
-            // TODO : add notice box for fallback translation, legal translation and outdated translation after implement wiki locale in the future.
+            // TODO : add notice box for legal translation.
+            if (isFallback)
+            {
+                Add(new NoticeBox
+                {
+                    Text = WikiStrings.ShowFallbackTranslation(originalLanguage),
+                });
+            }
+
+            if (isTranslationOutdated)
+            {
+                Add(new NoticeBox()
+                {
+                    Text = WikiStrings.ShowTranslationOutdated(WikiStrings.ShowTranslationDefault),
+                });
+            }
+
             if (isOutdated)
             {
                 Add(new NoticeBox

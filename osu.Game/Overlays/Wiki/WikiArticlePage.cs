@@ -8,6 +8,7 @@ using Markdig.Syntax;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Overlays.Wiki
@@ -16,7 +17,7 @@ namespace osu.Game.Overlays.Wiki
     {
         public Container SidebarContainer { get; }
 
-        public WikiArticlePage(string currentPath, string markdown)
+        public WikiArticlePage(string currentPath, string markdown, bool isFallback = false, LocalisableString originalLanguage = default)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -58,6 +59,8 @@ namespace osu.Game.Overlays.Wiki
                                 Left = 30,
                                 Right = WaveOverlayContainer.HORIZONTAL_PADDING,
                             },
+                            IsFallback = isFallback,
+                            OriginalLanguage = originalLanguage,
                             OnAddHeading = sidebar.AddEntry,
                         }
                     },
@@ -68,6 +71,22 @@ namespace osu.Game.Overlays.Wiki
         private partial class ArticleMarkdownContainer : WikiMarkdownContainer
         {
             public Action<HeadingBlock, MarkdownHeading> OnAddHeading;
+
+            public bool IsFallback { get; set; }
+            public LocalisableString OriginalLanguage { get; set; }
+
+            private bool fallbackNoticeAdded;
+
+            protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
+            {
+                if (IsFallback && !fallbackNoticeAdded)
+                {
+                    container.Add(new WikiNoticeContainer(OriginalLanguage));
+                    fallbackNoticeAdded = true;
+                }
+
+                base.AddMarkdownComponent(markdownObject, container, level);
+            }
 
             protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock)
             {

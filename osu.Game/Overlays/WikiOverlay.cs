@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
@@ -166,7 +167,10 @@ namespace osu.Game.Overlays
             }
             else
             {
-                LoadDisplay(articlePage = new WikiArticlePage($@"{api.Endpoints.WebsiteUrl}/wiki/{path.Value}/", response.Markdown));
+                LoadDisplay(articlePage = new WikiArticlePage($@"{api.Endpoints.WebsiteUrl}/wiki/{path.Value}/",
+                    response.Markdown,
+                    Header.IsFallback.Value,
+                    Header.CurrentLanguage.Value.GetDescription()));
             }
         }
 
