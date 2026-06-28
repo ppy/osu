@@ -374,7 +374,7 @@ namespace osu.Game.Database
                             throw new InvalidOperationException($@"Filename ""{filenames.original}"" is not allowed.");
 
                         using (Stream s = archive.GetStream(filenames.original))
-                            files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false, parameters.PreferHardLinks), filenames.shortened));
+                            files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false, parameters.PreferHardLinks, parameters.PreferCopyOnWrite), filenames.shortened));
                     }
                 }
 
