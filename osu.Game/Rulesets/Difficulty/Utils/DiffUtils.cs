@@ -75,17 +75,29 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         public static double BellCurve(double x, double mean, double width, double multiplier = 1.0) => multiplier * Math.Exp(Math.E * -(Pow(x - mean, 2) / Pow(width, 2)));
 
         /// <summary>
-        /// Calculates a Smoothstep Bellcurve that returns returns 1 for x = mean, and smoothly reducing it's value to 0 over width
+        /// Calculates a Smoothstep bell curve that returns 1 for x = mean, and smoothly reducing it's value to 0 over width
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
         /// <param name="mean">Value of x, for which return value will be the highest (=1)</param>
         /// <param name="width">Range [mean - width, mean + width] where function will change values</param>
         /// <returns>The output of the smoothstep bell curve function of <paramref name="x"/></returns>
-        public static double SmoothstepBellCurve(double x, double mean = 0.5, double width = 0.5)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double SmoothstepBellCurve(double x, double mean, double width)
         {
             x -= mean;
             x = x > 0 ? (width - x) : (width + x);
             return Smoothstep(x, 0, width);
+        }
+
+        /// <summary>
+        /// Calculates a Smoothstep bell curve that returns 1 for x = mean, and smoothly reducing it's value to 0 over width
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double SmoothstepBellCurve(double x)
+        {
+            x = 0.5 - Math.Abs(x - 0.5);
+            x = Math.Clamp(x * 2.0, 0.0, 1.0);
+            return x * x * (3.0 - 2.0 * x);
         }
 
         /// <summary>

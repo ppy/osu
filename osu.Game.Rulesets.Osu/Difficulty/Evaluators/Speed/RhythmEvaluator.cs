@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
@@ -207,6 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static double getEffectiveRatio(double deltaDifference)
         {
             // Take only the fractional part of the value since we're only interested in punishing multiples
