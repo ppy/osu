@@ -147,8 +147,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                                 tuple.Count++;
 
                             // repeated island (ex: triplet -> triplet)
-                            double power = DifficultyCalculationUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
-                            effectiveRatio *= Math.Min(3.0 / tuple.Count, Math.Pow(1.0 / tuple.Count, power));
+                            double power = DiffUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
+                            effectiveRatio *= Math.Min(3.0 / tuple.Count, DiffUtils.Pow(1.0 / tuple.Count, power));
 
                             islandCounts[countIndex] = (tuple.Island, tuple.Count);
                         }
@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             }
 
             // If the current island is long we don't want the sum to have as big of an effect
-            rhythmComplexitySum *= DifficultyCalculationUtils.ReverseLerp(island.DeltaCount, 22, 3);
+            rhythmComplexitySum *= DiffUtils.ReverseLerp(island.DeltaCount, 22, 3);
 
             return Math.Sqrt(4 + rhythmComplexitySum * rhythm_overall_multiplier) / 2.0; // produces multiplier that can be applied to strain. range [1, infinity) (not really though);
         }
@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             // Take only the fractional part of the value since we're only interested in punishing multiples
             double deltaDifferenceFraction = deltaDifference - Math.Truncate(deltaDifference);
 
-            return 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, DifficultyCalculationUtils.SmoothstepBellCurve(deltaDifferenceFraction));
+            return 1.0 + rhythm_ratio_multiplier * Math.Min(0.5, DiffUtils.SmoothstepBellCurve(deltaDifferenceFraction));
         }
 
         /// <summary>

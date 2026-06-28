@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double strainDecay(double ms) => Math.Pow(strain_decay_base, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(strain_decay_base, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
 
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double difficulty = FlashlightEvaluator.EvaluateDifficultyOf(current, Mods);
 
             if (Mods.Any(m => m is OsuModTouchDevice))
-                difficulty = Math.Pow(difficulty, 0.9);
+                difficulty = DiffUtils.Pow(difficulty, 0.9);
 
             if (Mods.Any(m => m is OsuModMagnetised))
             {
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModDeflate))
             {
                 float deflateInitialScale = Mods.OfType<OsuModDeflate>().First().StartScale.Value;
-                difficulty *= Math.Clamp(DifficultyCalculationUtils.ReverseLerp(deflateInitialScale, 11, 1), 0.1, 1);
+                difficulty *= Math.Clamp(DiffUtils.ReverseLerp(deflateInitialScale, 11, 1), 0.1, 1);
             }
 
             if (Mods.Any(m => m is OsuModRelax))
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.4;
 
-            difficulty *= 0.985 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
+            difficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
 
             return difficulty;
         }
@@ -87,6 +87,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return sum;
         }
 
-        public static double DifficultyToPerformance(double difficulty) => 25 * Math.Pow(difficulty, 2);
+        public static double DifficultyToPerformance(double difficulty) => 25 * DiffUtils.Pow(difficulty, 2);
     }
 }

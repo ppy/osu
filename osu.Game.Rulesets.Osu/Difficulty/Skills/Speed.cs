@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double strainDecay(double ms) => Math.Pow(strain_decay_base, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(strain_decay_base, ms / 1000);
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             // Use a weighted sum of all notes. Constants are arbitrary and give nice values
-            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopObject, 0.88, 10, 1.1));
+            return sliderStrains.Sum(s => DiffUtils.Logistic(s / consistentTopObject, 0.88, 10, 1.1));
         }
     }
 }

@@ -196,12 +196,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
 
             double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-            double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
+            double windowRatio = DiffUtils.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
 
             // Can't doubletap if circles don't intersect
-            double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+            double distanceFactor = DiffUtils.Pow(DiffUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
-            return 1.0 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
+            return 1.0 - DiffUtils.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider currentSlider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = LazyTravelDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
+                TravelDistance = LazyTravelDistance * Math.Max(1, DiffUtils.Pow(currentSlider.RepeatCount, 0.3));
                 TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 

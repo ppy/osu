@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double preemptDifficulty = calculatePreemptDifficulty(velocity, constantAngleNerfFactor, currObj.Preempt);
 
-            double readingDifficulty = DifficultyCalculationUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
+            double readingDifficulty = DiffUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
 
             // Having less time to process information is harder
             readingDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
@@ -71,17 +71,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (nextObj != null)
             {
                 // Reduce difficulty if movement to next object is small
-                futureObjectDifficultyInfluence *= DifficultyCalculationUtils.Smootherstep(nextObj.LazyJumpDistance, 15, distance_influence_threshold);
+                futureObjectDifficultyInfluence *= DiffUtils.Smootherstep(nextObj.LazyJumpDistance, 15, distance_influence_threshold);
             }
 
             // Value higher note densities exponentially
-            double noteDensityDifficulty = Math.Pow(pastObjectDifficultyInfluence + futureObjectDifficultyInfluence, 1.7) * 0.4 * constantAngleNerfFactor * velocity;
+            double noteDensityDifficulty = DiffUtils.Pow(pastObjectDifficultyInfluence + futureObjectDifficultyInfluence, 1.7) * 0.4 * constantAngleNerfFactor * velocity;
 
             // Award only denser than average maps.
             noteDensityDifficulty = Math.Max(0, noteDensityDifficulty - density_difficulty_base);
 
             // Apply a soft cap to general density reading to account for partial memorization
-            noteDensityDifficulty = Math.Pow(noteDensityDifficulty, 0.45) * density_multiplier;
+            noteDensityDifficulty = DiffUtils.Pow(noteDensityDifficulty, 0.45) * density_multiplier;
 
             return noteDensityDifficulty;
         }
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
             // https://www.desmos.com/calculator/c175335a71
-            double preemptDifficulty = Math.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) / preempt_balancing_factor;
+            double preemptDifficulty = DiffUtils.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) / preempt_balancing_factor;
 
             preemptDifficulty *= constantAngleNerfFactor * velocity;
 
@@ -120,21 +120,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                                                         double constantAngleNerfFactor)
         {
             // Higher preempt means that time spent invisible is higher too, we want to reward that
-            double preemptFactor = Math.Pow(currObj.Preempt, 2.2) * 0.01;
+            double preemptFactor = DiffUtils.Pow(currObj.Preempt, 2.2) * 0.01;
 
             // Account for both past and current densities
-            double densityFactor = Math.Pow(currentVisibleObjectDensity + pastObjectDifficultyInfluence, 3.3) * 3;
+            double densityFactor = DiffUtils.Pow(currentVisibleObjectDensity + pastObjectDifficultyInfluence, 3.3) * 3;
 
             double hiddenDifficulty = (preemptFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
 
             // Apply a soft cap to general HD reading to account for partial memorization
-            hiddenDifficulty = Math.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
+            hiddenDifficulty = DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
 
             var previousObj = (OsuDifficultyHitObject)currObj.Previous(0);
 
             // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
             if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
-                hiddenDifficulty += hidden_multiplier * 2500 / Math.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
+                hiddenDifficulty += hidden_multiplier * 2500 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
 
             return hiddenDifficulty;
         }
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // When aiming an object small distances mean previous objects may be cheesed, so it doesn't matter whether they were arranged confusingly.
-                loopDifficulty *= DifficultyCalculationUtils.Smootherstep(loopObj.LazyJumpDistance, 15, distance_influence_threshold);
+                loopDifficulty *= DiffUtils.Smootherstep(loopObj.LazyJumpDistance, 15, distance_influence_threshold);
 
                 // Account less for objects close to the max reading window
                 double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
@@ -222,7 +222,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     break;
 
                 // Account less for objects that are close to the time limit.
-                double longIntervalFactor = 1 - DifficultyCalculationUtils.ReverseLerp(loopObj.AdjustedDeltaTime, maximum_angle_relevancy_time, minimum_angle_relevancy_time);
+                double longIntervalFactor = 1 - DiffUtils.ReverseLerp(loopObj.AdjustedDeltaTime, maximum_angle_relevancy_time, minimum_angle_relevancy_time);
 
                 if (loopObj.Angle != null && current.Angle != null)
                 {
@@ -237,14 +237,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                         double weight = 1.0;
 
                         // Be sure that one of the angles is very sharp, when other is wide
-                        weight *= DifficultyCalculationUtils.ReverseLerp(Math.Min(loopObj.Angle.Value, loopObjPrev0.Angle.Value) * 180 / Math.PI, 20, 5);
-                        weight *= DifficultyCalculationUtils.ReverseLerp(Math.Max(loopObj.Angle.Value, loopObjPrev0.Angle.Value) * 180 / Math.PI, 60, 120);
+                        weight *= DiffUtils.ReverseLerp(Math.Min(loopObj.Angle.Value, loopObjPrev0.Angle.Value) * 180 / Math.PI, 20, 5);
+                        weight *= DiffUtils.ReverseLerp(Math.Max(loopObj.Angle.Value, loopObjPrev0.Angle.Value) * 180 / Math.PI, 60, 120);
 
                         // Lerp between max angle difference and rescaled alternating difference, with more harsh scaling compared to normal difference
                         angleDifferenceAlternating = double.Lerp(Math.PI, 0.1 * angleDifferenceAlternating, weight);
                     }
 
-                    double stackFactor = DifficultyCalculationUtils.Smootherstep(loopObj.LazyJumpDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+                    double stackFactor = DiffUtils.Smootherstep(loopObj.LazyJumpDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
 
                     constantAngleCount += Math.Cos(3 * Math.Min(double.DegreesToRadians(30), Math.Min(angleDifference, angleDifferenceAlternating) * stackFactor)) * longIntervalFactor;
                 }
@@ -266,6 +266,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return Math.Clamp(2 - deltaTime / (reading_window_size / 2), 0, 1);
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.8, ms / 1000));
+        private static double highBpmBonus(double ms) => 1 / (1 - DiffUtils.Pow(0.8, ms / 1000));
     }
 }
