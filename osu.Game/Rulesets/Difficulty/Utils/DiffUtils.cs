@@ -59,9 +59,9 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             double sum = 0;
 
             foreach (double x in values)
-                sum += Math.Pow(x, p);
+                sum += Pow(x, p);
 
-            return Math.Pow(sum, 1.0 / p);
+            return Pow(sum, 1.0 / p);
         }
 
         /// <summary>
