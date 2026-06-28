@@ -26,17 +26,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.totalObjects = totalObjects;
         }
 
-        private const double skill_multiplier = 0.058;
-        private const double strain_decay_base = 0.15;
-
         private double currentStrain;
 
-        private double strainDecay(double ms) => DiffUtils.Pow(strain_decay_base, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(0.15, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous(0).StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
+            const double skill_multiplier = 0.058;
+
             if (!Mods.Any(m => m is OsuModFlashlight))
                 return 0;
 

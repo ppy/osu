@@ -11,9 +11,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 {
     public static class SpeedEvaluator
     {
-        private const double min_speed_bonus = 200; // 200 BPM 1/4th
-        private const double speed_balancing_factor = 40;
-
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
         /// <list type="bullet">
@@ -25,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         {
             if (current.BaseObject is Spinner)
                 return 0;
+
+            const double min_speed_bonus = 200; // 200 BPM 1/4th
+            const double speed_balancing_factor = 40;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
 

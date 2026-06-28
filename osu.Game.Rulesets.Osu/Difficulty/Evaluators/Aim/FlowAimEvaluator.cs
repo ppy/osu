@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class FlowAimEvaluator
     {
-        private const double velocity_change_multiplier = 0.52;
-
         /// <summary>
         /// Evaluates difficulty of "flow aim" - aiming pattern where player doesn't stop their cursor on every object and instead "flows" through them.
         /// </summary>
@@ -21,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         {
             if (current.BaseObject is Spinner || current.Index <= 1 || current.Previous(0).BaseObject is Spinner)
                 return 0;
+
+            const double velocity_change_multiplier = 0.52;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous(0);

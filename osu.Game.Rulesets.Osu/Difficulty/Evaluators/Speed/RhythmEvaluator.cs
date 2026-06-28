@@ -13,11 +13,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 {
     public static class RhythmEvaluator
     {
-        private const int history_time_max = 5 * 1000; // 5 seconds
-        private const int history_objects_max = 32;
-        private const double rhythm_overall_multiplier = 0.95;
-        private const double rhythm_ratio_multiplier = 26.0;
-
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
@@ -25,6 +20,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         {
             if (current.BaseObject is Spinner)
                 return 0;
+
+            const int history_time_max = 5 * 1000; // 5 seconds
+            const int history_objects_max = 32;
+            const double rhythm_overall_multiplier = 0.95;
 
             double rhythmComplexitySum = 0;
 
@@ -214,6 +213,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static double getEffectiveRatio(double deltaDifference)
         {
+            const double rhythm_ratio_multiplier = 26.0;
+
             // Take only the fractional part of the value since we're only interested in punishing multiples
             double deltaDifferenceFraction = deltaDifference - Math.Truncate(deltaDifference);
 

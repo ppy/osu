@@ -24,9 +24,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private const double skill_multiplier = 1.16;
-        private const double strain_decay_base = 0.3;
-
         protected override double HarmonicScale => 20;
         protected override double DecayExponent => 0.9;
 
@@ -35,10 +32,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
-        private double strainDecay(double ms) => DiffUtils.Pow(strain_decay_base, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(0.3, ms / 1000);
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
+            const double skill_multiplier = 1.16;
+
             if (Mods.Any(m => m is OsuModRelax))
                 return 0;
 
