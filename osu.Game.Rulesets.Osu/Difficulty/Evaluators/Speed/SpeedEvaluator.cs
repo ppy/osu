@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             double speedBonus = 0.0;
 
             // Add additional scaling bonus for streams/bursts higher than 200bpm
-            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
-                speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
+            if (DiffUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
+                speedBonus = 0.75 * DiffUtils.Pow((DiffUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
 
             // Base difficulty with all bonuses
             double speedDifficulty = (1 + speedBonus) * 1000 / strainTime;
@@ -52,6 +52,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             return speedDifficulty * doubleTapFeasibility;
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, ms / 1000));
+        private static double highBpmBonus(double ms) => 1 / (1 - DiffUtils.Pow(0.3, ms / 1000));
     }
 }
