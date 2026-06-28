@@ -217,13 +217,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         }
 
         /// <summary>
-        /// An island is a thing. I'm not sure what thing it is, but it's definitely a thing.
-        /// TODO: document this stuff please.
+        /// An island is a group of consecutive objects with the same delta time.
         /// </summary>
         private class Island
         {
+            /// <summary>
+            /// Delta time of every object in this island
+            /// </summary>
             public int Delta { get; private set; }
+
+            /// <summary>
+            /// How long the island is
+            /// </summary>
             public int DeltaCount { get; private set; } = 1;
+
+            /// <summary>
+            /// How many times island already occured
+            /// </summary>
             public int Occurrences { get; set; } = 1;
 
             public Island(int delta)
