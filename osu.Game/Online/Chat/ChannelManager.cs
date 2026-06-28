@@ -412,14 +412,16 @@ namespace osu.Game.Online.Chat
 
                 case @"help":
                     target.AddNewMessages(new InfoMessage(
-                        "Supported commands:\n" +
-                        " /help\n" +
-                        " /me [action]\n" +
-                        " /join [channel]\n" +
-                        " /chat [user]\n" +
-                        " /np\n" +
-                        " /savelog\n" +
-                        " /roll [2-100] (multiplayer only)"
+                        """
+                        Supported commands:
+                        • /help
+                        • /me [action]
+                        • /join [channel]
+                        • /chat [user]
+                        • /np
+                        • /savelog
+                        • /roll [2-100] (multiplayer only)
+                        """
                     ));
                     break;
 
