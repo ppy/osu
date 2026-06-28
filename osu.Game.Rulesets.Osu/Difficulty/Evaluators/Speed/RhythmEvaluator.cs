@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -136,28 +135,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         if (isSpeedingUp)
                             effectiveRatio *= 0.65;
 
-                        (Island Island, int Count) tuple = islandCounts.FirstOrDefault(x => x.Island.AlmostEquals(island, deltaDifferenceEpsilon));
+                        bool found = false;
 
-                        if (tuple != default)
+                        foreach ((Island Island, int Count) tuple in islandCounts)
                         {
-                            int countIndex = islandCounts.IndexOf(tuple);
+                            if (tuple.Island.AlmostEquals(island, deltaDifferenceEpsilon))
+                            {
+                                int countIndex = islandCounts.IndexOf(tuple);
+                                int count = tuple.Count;
 
-                            // only add island to island counts if they're going one after another
-                            if (previousIsland.AlmostEquals(island, deltaDifferenceEpsilon))
-                                tuple.Count++;
+                                // only add island to island counts if they're going one after another
+                                if (previousIsland.AlmostEquals(island, deltaDifferenceEpsilon))
+                                    islandCounts[countIndex] = (tuple.Island, ++count);
 
-                            // repeated island (ex: triplet -> triplet)
-                            double power = DiffUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
-                            effectiveRatio *= Math.Min(3.0 / tuple.Count, DiffUtils.Pow(1.0 / tuple.Count, power));
+                                // repeated island (ex: triplet -> triplet)
+                                double power = DiffUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
+                                effectiveRatio *= Math.Min(3.0 / count, DiffUtils.Pow(1.0 / count, power));
 
-                            islandCounts[countIndex] = (tuple.Island, tuple.Count);
+                                found = true;
+                                break;
+                            }
                         }
-                        else if (island.DeltaCount > 0)
-                        {
+
+                        if (!found && island.DeltaCount > 0)
                             islandCounts.Add((island, 1));
-                        }
 
-                        // scale down the difficulty if the object is doubletappable
+                        // scale down the difficulty if the object is double-tappable
                         effectiveRatio *= 1 - prevObj.CalculateDoubleTapFeasibility(currObj) * 0.75;
 
                         if (island.DeltaCount > 1)
