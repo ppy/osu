@@ -249,11 +249,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                        DeltaCount % 2 == other.DeltaCount % 2;
             }
 
-            public bool AlmostEquals(Island? other, double epsilon)
+            public bool AlmostEquals(Island other, double epsilon)
             {
-                if (other == null)
-                    return false;
-
                 return Math.Abs(Delta - other.Delta) < epsilon &&
                        DeltaCount == other.DeltaCount;
             }
