@@ -59,7 +59,7 @@ namespace osu.Game.IPC.DataSources
                     return new WebSocketWatchingReplayUserActivityData
                     {
                         ScoreId = watchingReplay.ScoreID,
-                        PlayerName = watchingReplay.PlayerName,
+                        UserId = watchingReplay.UserID,
                         BeatmapId = watchingReplay.BeatmapID,
                     };
 

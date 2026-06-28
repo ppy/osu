@@ -10,8 +10,8 @@ namespace osu.Game.IPC.Models
         [JsonPropertyName("score_id")]
         public required long ScoreId { get; init; }
 
-        [JsonPropertyName("player_name")]
-        public required string PlayerName { get; init; }
+        [JsonPropertyName("user_id")]
+        public required int UserId { get; init; }
 
         [JsonPropertyName("beatmap_id")]
         public required int BeatmapId { get; init; }
