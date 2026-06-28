@@ -32,9 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             var island = new Island(int.MaxValue);
             var previousIsland = new Island(int.MaxValue);
 
-            // we can't use dictionary here because we need to compare island with a tolerance
-            // which is impossible to pass into the hash comparer
-            var islandCounts = new List<(Island Island, int Count)>();
+            var islands = new List<Island>();
 
             double startDifficulty = 0; // store the difficulty of the current start of an island to buff for tighter rhythms
 
@@ -136,20 +134,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                         bool found = false;
 
-                        foreach ((Island Island, int Count) tuple in islandCounts)
+                        foreach (var existingIsland in islands)
                         {
-                            if (tuple.Island.AlmostEquals(island, deltaDifferenceEpsilon))
+                            if (existingIsland.AlmostEquals(island, deltaDifferenceEpsilon))
                             {
-                                int countIndex = islandCounts.IndexOf(tuple);
-                                int count = tuple.Count;
-
-                                // only add island to island counts if they're going one after another
+                                // only increase island occurrences if they're going one after another
                                 if (previousIsland.AlmostEquals(island, deltaDifferenceEpsilon))
-                                    islandCounts[countIndex] = (tuple.Island, ++count);
+                                    existingIsland.Occurrences++;
 
                                 // repeated island (ex: triplet -> triplet)
                                 double power = DiffUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
-                                effectiveDifficulty *= Math.Min(3.0 / count, DiffUtils.Pow(1.0 / count, power));
+                                effectiveDifficulty *= Math.Min(3.0 / existingIsland.Occurrences, DiffUtils.Pow(1.0 / existingIsland.Occurrences, power));
 
                                 found = true;
                                 break;
@@ -157,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                         }
 
                         if (!found && island.DeltaCount > 0)
-                            islandCounts.Add((island, 1));
+                            islands.Add(island);
 
                         // scale down the difficulty if the object is double-tappable
                         effectiveDifficulty *= 1 - prevObj.CalculateDoubleTapFeasibility(currObj) * 0.75;
@@ -229,6 +224,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         {
             public int Delta { get; private set; }
             public int DeltaCount { get; private set; } = 1;
+            public int Occurrences { get; set; } = 1;
 
             public Island(int delta)
             {
