@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
             if (isTranslationOutdated)
             {
-                Add(new NoticeBox()
+                Add(new NoticeBox
                 {
                     Text = WikiStrings.ShowTranslationOutdated(WikiStrings.ShowTranslationDefault),
                 });

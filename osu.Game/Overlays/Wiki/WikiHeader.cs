@@ -305,12 +305,15 @@ namespace osu.Game.Overlays.Wiki
                         : base(item)
                     {
                         Foreground.Padding = new MarginPadding { Vertical = 4, Horizontal = 2 };
-
-                        if (item is DropdownMenuItem<Language> dropdownItem)
-                            content.CountryCode = GetCountryCode(dropdownItem.Value);
                     }
 
-                    protected override Drawable CreateContent() => content = new WikiLocaleDropdownMenuItemContent();
+                    protected override Drawable CreateContent()
+                    {
+                        var itemContent = new WikiLocaleDropdownMenuItemContent();
+                        if (Item is DropdownMenuItem<Language> dropdownItem)
+                            itemContent.CountryCode = GetCountryCode(dropdownItem.Value);
+                        return content = itemContent;
+                    }
 
                     protected override void UpdateForegroundColour()
                     {
