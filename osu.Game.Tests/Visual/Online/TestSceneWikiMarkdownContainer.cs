@@ -82,6 +82,17 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestOutdatedTranslationNoticeBox()
+        {
+            AddStep("Add outdated translation yaml header", () =>
+            {
+                markdownContainer.Text = @"---
+outdated_translation: true
+---";
+            });
+        }
+
+        [Test]
         public void TestOutdatedNoticeBox()
         {
             AddStep("Add outdated yaml header", () =>

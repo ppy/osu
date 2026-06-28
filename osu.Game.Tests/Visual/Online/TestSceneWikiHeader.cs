@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki;
@@ -71,6 +72,25 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Change current to 'The Team'", () => header.Current.Value = "The Team");
             AddAssert("Current is 'The Team'", () => checkCurrent("The Team"));
             AddAssert("Check breadcrumb", checkBreadcrumb);
+
+            AddStep("Change language to Simplified Chinese", () => header.CurrentLanguage.Value = Language.zh);
+            AddAssert("Current language is Simplified Chinese", () => header.CurrentLanguage.Value == Language.zh);
+        }
+
+        [Test]
+        public void TestWikiFallbackKeepLanguage()
+        {
+            AddAssert("Current is index", () => checkCurrent(WikiHeader.IndexPageString));
+            AddStep("Change language to Traditional Chinese", () => header.CurrentLanguage.Value = Language.zh_hant);
+            AddStep("Change wiki page to one without Traditional Chinese translation", () => wikiPageData.Value = new APIWikiPage
+            {
+                Path = "People/The_Team",
+                Title = "The Team",
+                Subtitle = "People",
+                Locale = "en",
+                AvailableLocales = new List<string> { "en", "zh" }
+            });
+            AddAssert("Current language is Traditional Chinese", () => header.CurrentLanguage.Value == Language.zh_hant);
         }
 
         private bool checkCurrent(LocalisableString expectedCurrent) => header.Current.Value == expectedCurrent;
@@ -93,7 +113,9 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Path = "People/The_Team",
                 Title = "The Team",
-                Subtitle = "People"
+                Subtitle = "People",
+                Locale = "en",
+                AvailableLocales = new List<string> { "en", "zh" }
             };
         }
 
