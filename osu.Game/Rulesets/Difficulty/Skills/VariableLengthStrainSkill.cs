@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         /// <summary>
         /// The number of `MaxSectionLength` sections calculated such that enough of the difficulty value is preserved.
-        /// WARNING: This should be overridden if strains are ever used outside of <see cref="DifficultyValue"/>,
-        /// or if <see cref="DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
+        /// WARNING: This should be overridden if strains are ever used outside of <see cref="Skill.DifficultyValue"/>,
+        /// or if <see cref="Skill.DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
         /// in the future when a better memory-saving technique is implemented.
         /// </summary>
         private double maxStoredSections => 11 / (1 - DecayWeight);
