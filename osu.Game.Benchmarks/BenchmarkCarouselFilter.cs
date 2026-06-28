@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Carousel;
+using osu.Game.Tests.NonVisual.Filtering;
 
 namespace osu.Game.Benchmarks
 {
@@ -42,7 +42,7 @@ namespace osu.Game.Benchmarks
             Status = BeatmapOnlineStatus.Loved
         };
 
-        private CarouselBeatmap carouselBeatmap = null!;
+        private FilterMatchingTest.CarouselBeatmap carouselBeatmap = null!;
         private FilterCriteria criteria1 = null!;
         private FilterCriteria criteria2 = null!;
         private FilterCriteria criteria3 = null!;
@@ -55,7 +55,7 @@ namespace osu.Game.Benchmarks
             var beatmap = getExampleBeatmap();
             beatmap.OnlineID = 20201010;
             beatmap.BeatmapSet = new BeatmapSetInfo { OnlineID = 1535 };
-            carouselBeatmap = new CarouselBeatmap(beatmap);
+            carouselBeatmap = new FilterMatchingTest.CarouselBeatmap(beatmap);
             criteria1 = new FilterCriteria();
             criteria2 = new FilterCriteria
             {

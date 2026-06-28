@@ -21,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics.User;
 using osuTK;
@@ -67,10 +68,10 @@ namespace osu.Game.Screens.Ranking.Statistics
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding
                 {
-                    Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 3,
+                    Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 2,
                     Right = SIDE_PADDING,
-                    Top = SIDE_PADDING,
-                    Bottom = 50 // Approximate padding to the bottom of the score panel.
+                    Top = ScorePanel.EXPANDED_TOP_LAYER_HEIGHT,
+                    Bottom = 15 // Approximate padding to the bottom of the score panel.
                 },
                 Children = new Drawable[]
                 {
@@ -155,7 +156,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(30, 15),
+                                Spacing = new Vector2(30, 10),
                                 Direction = FillDirection.Full,
                             }
                         }
@@ -258,6 +259,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                     preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
                 else if (localUserScore.Rank < ScoreRank.C)
                     preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+                else if (localUserScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
+                    preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
 
                 if (preventTaggingReason == null)
                 {

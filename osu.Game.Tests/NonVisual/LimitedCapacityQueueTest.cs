@@ -5,6 +5,7 @@
 
 using System;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
@@ -25,7 +26,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestEmptyQueue()
         {
-            Assert.AreEqual(0, queue.Count);
+            ClassicAssert.AreEqual(0, queue.Count);
 
             Assert.Throws<ArgumentOutOfRangeException>(() => _ = queue[0]);
 
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.NonVisual
             foreach (int _ in queue)
                 count++;
 
-            Assert.AreEqual(0, count);
+            ClassicAssert.AreEqual(0, count);
         }
 
         [TestCase(1)]
@@ -46,14 +47,14 @@ namespace osu.Game.Tests.NonVisual
             for (int i = 0; i < count; ++i)
                 queue.Enqueue(i);
 
-            Assert.AreEqual(count, queue.Count);
+            ClassicAssert.AreEqual(count, queue.Count);
 
             for (int i = 0; i < count; ++i)
-                Assert.AreEqual(i, queue[i]);
+                ClassicAssert.AreEqual(i, queue[i]);
 
             int j = 0;
             foreach (int item in queue)
-                Assert.AreEqual(j++, item);
+                ClassicAssert.AreEqual(j++, item);
 
             for (int i = queue.Count; i < queue.Count + capacity; i++)
                 Assert.Throws<ArgumentOutOfRangeException>(() => _ = queue[i]);
@@ -67,14 +68,14 @@ namespace osu.Game.Tests.NonVisual
             for (int i = 0; i < count; ++i)
                 queue.Enqueue(i);
 
-            Assert.AreEqual(capacity, queue.Count);
+            ClassicAssert.AreEqual(capacity, queue.Count);
 
             for (int i = 0; i < queue.Count; ++i)
-                Assert.AreEqual(count - capacity + i, queue[i]);
+                ClassicAssert.AreEqual(count - capacity + i, queue[i]);
 
             int j = count - capacity;
             foreach (int item in queue)
-                Assert.AreEqual(j++, item);
+                ClassicAssert.AreEqual(j++, item);
 
             for (int i = queue.Count; i < queue.Count + capacity; i++)
                 Assert.Throws<ArgumentOutOfRangeException>(() => _ = queue[i]);
@@ -90,8 +91,8 @@ namespace osu.Game.Tests.NonVisual
 
             for (int i = 0; i < capacity; ++i)
             {
-                Assert.AreEqual(count - capacity + i, queue.Dequeue());
-                Assert.AreEqual(2 - i, queue.Count);
+                ClassicAssert.AreEqual(count - capacity + i, queue.Dequeue());
+                ClassicAssert.AreEqual(2 - i, queue.Count);
             }
 
             Assert.Throws<InvalidOperationException>(() => queue.Dequeue());
@@ -102,20 +103,20 @@ namespace osu.Game.Tests.NonVisual
         {
             queue.Enqueue(3);
             queue.Enqueue(5);
-            Assert.AreEqual(2, queue.Count);
+            ClassicAssert.AreEqual(2, queue.Count);
 
             queue.Clear();
-            Assert.AreEqual(0, queue.Count);
+            ClassicAssert.AreEqual(0, queue.Count);
             Assert.Throws<ArgumentOutOfRangeException>(() => _ = queue[0]);
 
             queue.Enqueue(7);
-            Assert.AreEqual(1, queue.Count);
-            Assert.AreEqual(7, queue[0]);
+            ClassicAssert.AreEqual(1, queue.Count);
+            ClassicAssert.AreEqual(7, queue[0]);
             Assert.Throws<ArgumentOutOfRangeException>(() => _ = queue[1]);
 
             queue.Enqueue(9);
-            Assert.AreEqual(2, queue.Count);
-            Assert.AreEqual(9, queue[1]);
+            ClassicAssert.AreEqual(2, queue.Count);
+            ClassicAssert.AreEqual(9, queue[1]);
         }
     }
 }

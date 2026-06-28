@@ -17,8 +17,8 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osuTK;
 
@@ -51,14 +51,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// <param name="room">The room.</param>
         /// <param name="playlistItem">The playlist item to be played.</param>
         /// <param name="users">The users which are participating in this game.</param>
-        public MultiplayerPlayer(Room room, PlaylistItem playlistItem, MultiplayerRoomUser[] users)
+        /// <param name="showFailingOverlay">Whether to show the red failing overlay.</param>
+        public MultiplayerPlayer(Room room, PlaylistItem playlistItem, MultiplayerRoomUser[] users, bool showFailingOverlay = true)
             : base(room, playlistItem, new PlayerConfiguration
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkipping = room.AutoSkip,
                 AutomaticallySkipIntro = room.AutoSkip,
                 ShowLeaderboard = true,
+                ShowFailingOverlay = showFailingOverlay
             })
         {
             leaderboardProvider = new MultiplayerLeaderboardProvider(users);
@@ -121,6 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.GameplayStarted += onGameplayStarted;
             client.ResultsReady += onResultsReady;
+            client.VoteToSkipIntroPassed += onVoteToSkipIntroPassed;
 
             ScoreProcessor.HasCompleted.BindValueChanged(_ =>
             {
@@ -148,6 +150,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(client.Room != null);
         }
 
+        protected override SkipOverlay CreateSkipOverlay(double startTime) => new MultiplayerSkipOverlay(startTime);
+
         protected override void StartGameplay()
         {
             // We can enter this screen one of two ways:
@@ -161,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.LocalUser?.State == MultiplayerUserState.Loaded)
             {
                 loadingDisplay.Show();
-                client.ChangeState(MultiplayerUserState.ReadyForGameplay);
+                client.ChangeState(MultiplayerUserState.ReadyForGameplay).FireAndForget();
             }
 
             // This will pause the clock, pending the gameplay started callback from the server.
@@ -219,6 +223,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60))).ConfigureAwait(false);
         }
 
+        protected override void RequestIntroSkip()
+        {
+            // If the room is set up such that the intro is automatically skipped, there's no need to vote on it.
+            if (Configuration.AutomaticallySkipIntro)
+            {
+                base.RequestIntroSkip();
+                return;
+            }
+
+            // No base call because we aren't skipping yet.
+            client.VoteToSkipIntro().FireAndForget();
+        }
+
+        private void onVoteToSkipIntroPassed()
+        {
+            Schedule(() => PerformIntroSkip(true));
+        }
+
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(Room.RoomID != null);
@@ -242,6 +264,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 client.GameplayStarted -= onGameplayStarted;
                 client.ResultsReady -= onResultsReady;
+                client.VoteToSkipIntroPassed -= onVoteToSkipIntroPassed;
             }
         }
     }

@@ -32,9 +32,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         protected override Container<Drawable> Content => content;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
-
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
         private DelegatedDependencyContainer dependencies = null!;
@@ -49,7 +46,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             });
         }
 
-        protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
 
         public override void SetUpSteps()
@@ -100,7 +97,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             Room[] rooms = new Room[count];
 
             // Can't reference Osu ruleset project here.
-            ruleset ??= rulesets.GetRuleset(0)!;
+            if (ruleset == null)
+            {
+                using var assemblyRulesetStore = new AssemblyRulesetStore();
+                ruleset = assemblyRulesetStore.GetRuleset(0)!;
+            }
 
             for (int i = 0; i < count; i++)
             {

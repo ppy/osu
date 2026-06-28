@@ -5,19 +5,31 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.Listing;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Online.Chat
 {
@@ -69,7 +81,21 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private UserLookupCache users { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
+        private MultiplayerClient multiplayerClient { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
+        private Storage storage { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
+        private INotificationOverlay notifications { get; set; }
+
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+        private readonly IBindableList<APIRelation> localUserBlocks = new BindableList<APIRelation>();
         private ScheduledDelegate scheduledAck;
 
         private IChatClient chatClient = null!;
@@ -93,8 +119,30 @@ namespace osu.Game.Online.Chat
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
             chatClient.RequestPresence();
 
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(userChanged);
+
             apiState.BindTo(api.State);
             apiState.BindValueChanged(_ => SendAck(), true);
+
+            localUserBlocks.BindTo(api.LocalUserState.Blocks);
+            localUserBlocks.BindCollectionChanged((_, args) => Schedule(() => onBlocksChanged(args)));
+        }
+
+        private void userChanged(ValueChangedEvent<APIUser> userChange)
+        {
+            if (userChange.OldValue?.Equals(userChange.NewValue) == true)
+                return;
+
+            CurrentChannel.Value = null;
+
+            foreach (var joinedChannel in joinedChannels)
+                joinedChannel.Joined.Value = false;
+
+            joinedChannels.Clear();
+            // additionally clear the history of last joined channels so that the new user can't reopen the old user's channels
+            // (would likely fail web-side on perms anyway, but why even get that far)
+            closedChannels.Clear();
         }
 
         /// <summary>
@@ -239,11 +287,11 @@ namespace osu.Game.Online.Chat
 
             switch (command.ToLowerInvariant())
             {
-                case "np":
+                case @"np":
                     AddInternal(new NowPlayingCommand(target));
                     break;
 
-                case "me":
+                case @"me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
                         target.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
@@ -253,7 +301,7 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true, target);
                     break;
 
-                case "join":
+                case @"join":
                     if (string.IsNullOrWhiteSpace(content))
                     {
                         target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
@@ -271,9 +319,9 @@ namespace osu.Game.Online.Chat
                     JoinChannel(channel);
                     break;
 
-                case "chat":
-                case "msg":
-                case "query":
+                case @"chat":
+                case @"msg":
+                case @"query":
                     if (string.IsNullOrWhiteSpace(content))
                     {
                         target.AddNewMessages(new ErrorMessage($"Usage: /{command} [user]"));
@@ -298,8 +346,72 @@ namespace osu.Game.Online.Chat
                     api.Queue(request);
                     break;
 
-                case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np"));
+                case @"roll":
+                    if (target.Type != ChannelType.Multiplayer || multiplayerClient?.Room?.ChannelID != target.Id)
+                    {
+                        target.AddNewMessages(new ErrorMessage("Cannot roll when not in a multiplayer room."));
+                        break;
+                    }
+
+                    uint max = 100;
+
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        if (!uint.TryParse(content, out max) || max < 2 || max > 100)
+                        {
+                            target.AddNewMessages(new ErrorMessage("Usage: /roll [2-100]"));
+                            break;
+                        }
+                    }
+
+                    var rollRequest = new RollRequest { Max = max };
+                    multiplayerClient.SendMatchRequest(rollRequest).FireAndForget(onError: ex =>
+                    {
+                        string message = ex is HubException
+                            ? $"Failed to roll: {ex.Message}"
+                            : "Failed to roll.";
+                        target.AddNewMessages(new ErrorMessage(message));
+                    });
+                    break;
+
+                case @"savelog":
+                    ProgressNotification notification = new ProgressNotification
+                    {
+                        State = ProgressNotificationState.Active,
+                        Text = NotificationsStrings.LogsExportOngoing,
+                    };
+                    notifications?.Post(notification);
+
+                    exportChannelLog(target).ContinueWith(t =>
+                    {
+                        if (t.Exception != null)
+                        {
+                            Logger.Log($@"Failed to export channel log: {t.Exception}");
+                            notification.State = ProgressNotificationState.Cancelled;
+                            return;
+                        }
+
+                        string result = t.GetResultSafely();
+
+                        if (result == null)
+                        {
+                            Logger.Log("Failed to export channel log due to missing storage.");
+                            notification.State = ProgressNotificationState.Cancelled;
+                            return;
+                        }
+
+                        notification.CompletionText = NotificationsStrings.FileExportFinished(result);
+                        notification.CompletionClickAction = () =>
+                        {
+                            (storage as OsuStorage)?.GetExportStorage().PresentFileExternally(result);
+                            return true;
+                        };
+                        notification.State = ProgressNotificationState.Completed;
+                    });
+                    break;
+
+                case @"help":
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np, /savelog, /roll [2-100] (multiplayer only)"));
                     break;
 
                 default:
@@ -311,8 +423,9 @@ namespace osu.Game.Online.Chat
         private void addMessages(List<Message> messages)
         {
             var channels = JoinedChannels.ToList();
+            var blockedUserIds = localUserBlocks.Select(b => b.TargetID).ToList();
 
-            foreach (var group in messages.GroupBy(m => m.ChannelId))
+            foreach (var group in messages.Where(m => !blockedUserIds.Contains(m.SenderId)).GroupBy(m => m.ChannelId))
                 channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
             lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
@@ -639,6 +752,38 @@ namespace osu.Game.Online.Chat
             req.Failure += e => Logger.Log($"Failed to mark channel {channel} up to '{message}' as read ({e.Message})", LoggingTarget.Network);
 
             api.Queue(req);
+        }
+
+        private void onBlocksChanged(NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action != NotifyCollectionChangedAction.Add)
+                return;
+
+            foreach (APIRelation newBlock in args.NewItems!)
+            {
+                foreach (var channel in joinedChannels)
+                    channel.RemoveMessagesFromUser(newBlock.TargetID);
+            }
+        }
+
+        [ItemCanBeNull]
+        private async Task<string> exportChannelLog(Channel channel)
+        {
+            if (storage is not OsuStorage osuStorage)
+                return null;
+
+            string filename = string.Format($@"chat-{channel.Name}-{DateTimeOffset.Now:yyyyMMdd-hhmmss}.txt").GetValidFilename();
+            var exportStorage = osuStorage.GetExportStorage();
+
+            using (var file = exportStorage.CreateFileSafely(filename))
+            {
+                using var textWriter = new StreamWriter(file);
+
+                foreach (var message in channel.Messages)
+                    await textWriter.WriteLineAsync($@"{message.Timestamp:yyyy-MM-dd HH:mm} {message.Sender.Username}: {message.Content}").ConfigureAwait(false);
+            }
+
+            return filename;
         }
 
         protected override void Dispose(bool isDisposing)

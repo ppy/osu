@@ -24,7 +24,7 @@ namespace osu.Game.Online.Chat
         private GameHost host { get; set; } = null!;
 
         [Resolved]
-        private Clipboard clipboard { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
@@ -88,7 +88,7 @@ namespace osu.Game.Online.Chat
             }
 
             if (dialogOverlay != null && shouldWarn)
-                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url), () => clipboard.SetText(url)));
+                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url), () => game?.CopyToClipboard(url)));
             else
                 host.OpenUrlExternally(url);
         }
@@ -98,7 +98,7 @@ namespace osu.Game.Online.Chat
             public ExternalLinkDialog(string url, Action openExternalLinkAction, Action copyExternalLinkAction)
             {
                 HeaderText = DialogStrings.CautionHeaderText;
-                BodyText = $"Are you sure you want to open the following link in a web browser?\n\n{url}";
+                BodyText = DialogStrings.ExternalLinkBodyText(url);
 
                 Icon = FontAwesome.Solid.ExclamationTriangle;
 
@@ -106,7 +106,7 @@ namespace osu.Game.Online.Chat
                 {
                     new PopupDialogOkButton
                     {
-                        Text = @"Open in browser",
+                        Text = DialogStrings.ExternalLinkOkButton,
                         Action = openExternalLinkAction
                     },
                     new PopupDialogCancelButton

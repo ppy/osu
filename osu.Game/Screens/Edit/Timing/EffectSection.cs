@@ -11,21 +11,24 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class EffectSection : Section<EffectControlPoint>
     {
-        private LabelledSwitchButton kiai = null!;
+        private FormCheckBox kiai = null!;
 
-        private SliderWithTextBoxInput<double> scrollSpeedSlider = null!;
+        private FormSliderBar<double> scrollSpeedSlider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Flow.AddRange(new Drawable[]
             {
-                kiai = new LabelledSwitchButton { Label = "Kiai Time" },
-                scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
+                kiai = new FormCheckBox { Caption = "Kiai Time" },
+                scrollSpeedSlider = new FormSliderBar<double>
                 {
+                    Caption = "Scroll Speed",
                     Current = new EffectControlPoint().ScrollSpeedBindable,
-                    KeyboardStep = 0.1f
-                }
+                    KeyboardStep = 0.1f,
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this
+                },
             });
         }
 
@@ -81,9 +84,9 @@ namespace osu.Game.Screens.Edit.Timing
             effectPoint.ScrollSpeedBindable.Value = scrollSpeed.NewValue;
         }
 
-        protected override EffectControlPoint CreatePoint()
+        protected override EffectControlPoint CreatePoint(ControlPointGroup selectedGroup)
         {
-            var reference = Beatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.EffectPointAt(selectedGroup.Time);
 
             return new EffectControlPoint
             {

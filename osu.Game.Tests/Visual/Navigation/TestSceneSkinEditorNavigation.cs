@@ -27,7 +27,7 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Navigation
     public partial class TestSceneSkinEditorNavigation : OsuGameTestScene
     {
         private SoloSongSelect songSelect;
-        private ModSelectOverlay modSelect => songSelect.ChildrenOfType<ModSelectOverlay>().First();
+        private ModSelectOverlay modSelect => Game.ChildrenOfType<ModSelectOverlay>().First();
 
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
@@ -278,6 +278,8 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             advanceToSongSelect();
             openSkinEditor();
+            AddUntilStep("skin editor visible", () => skinEditor.State.Value == Visibility.Visible);
+
             AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
@@ -290,14 +292,15 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
 
             toggleSkinEditor();
+            AddUntilStep("skin editor hidden", () => skinEditor.State.Value == Visibility.Hidden);
 
-            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(1)));
+            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(2)));
             AddUntilStep("settings visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.GreaterThan(0));
 
             AddStep("move cursor to right of screen too far", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(10240, 0)));
             AddUntilStep("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
 
-            PlayerSettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PlayerSettingsOverlay>().SingleOrDefault();
+            ReplaySettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<ReplaySettingsOverlay>().SingleOrDefault();
         }
 
         [Test]

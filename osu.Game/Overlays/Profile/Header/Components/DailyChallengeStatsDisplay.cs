@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             dailyPlayCount.Text = DailyChallengeStatsDisplayStrings.UnitDay(stats.PlayCount.ToLocalisableString("N0"));
-            dailyPlayCount.Colour = colours.ForRankingTier(DailyChallengeStatsTooltip.TierForPlayCount(stats.PlayCount));
+            dailyPlayCount.Colour = OsuColour.ForRankingTier(DailyChallengeStatsTooltip.TierForPlayCount(stats.PlayCount));
 
             bool playedToday = stats.LastUpdate?.Date == DateTimeOffset.UtcNow.Date;
             bool userIsOnOwnProfile = stats.UserID == api.LocalUser.Value.Id;

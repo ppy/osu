@@ -32,7 +32,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Storyboards.Drawables;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -266,7 +266,11 @@ namespace osu.Game.Tests.Visual.Background
 
             FadeAccessibleResults results = null;
 
-            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo())));
+            AddStep("Transition to Results", () =>
+            {
+                player.ValidForResume = false;
+                player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo()));
+            });
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
 

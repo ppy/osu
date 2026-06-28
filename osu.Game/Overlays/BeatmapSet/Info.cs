@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -24,18 +23,19 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly Box successRateBackground;
         private readonly Box background;
-        private readonly MetadataSection<string[]?> userTags;
 
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
         public readonly Bindable<APIBeatmap> Beatmap = new Bindable<APIBeatmap>();
 
         public Info()
         {
-            SuccessRate successRate;
             MetadataSectionNominators nominators;
-            MetadataSection source, mapperTags;
+            MetadataSectionSource source;
             MetadataSectionGenre genre;
             MetadataSectionLanguage language;
+            MetadataSectionUserTags userTags;
+            MetadataSectionMapperTags mapperTags;
+            SuccessRate successRate;
 
             RelativeSizeAxes = Axes.X;
             Height = base_height;
@@ -116,35 +116,15 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 nominators.Metadata = (b.NewValue?.CurrentNominations ?? Array.Empty<BeatmapSetOnlineNomination>(), b.NewValue?.RelatedUsers ?? Array.Empty<APIUser>());
                 source.Metadata = b.NewValue?.Source ?? string.Empty;
-                mapperTags.Metadata = b.NewValue?.Tags ?? string.Empty;
-                updateUserTags();
                 genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = (int)SearchGenre.Unspecified };
                 language.Metadata = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = (int)SearchLanguage.Unspecified };
+                mapperTags.Metadata = b.NewValue?.Tags ?? string.Empty;
             });
             Beatmap.BindValueChanged(b =>
             {
+                userTags.Metadata = b.NewValue?.GetTopUserTags().Select(t => t.Tag.Name).ToArray() ?? Array.Empty<string>();
                 successRate.Beatmap = b.NewValue;
-                updateUserTags();
             });
-        }
-
-        private void updateUserTags()
-        {
-            if (Beatmap.Value?.TopTags == null || Beatmap.Value.TopTags.Length == 0 || BeatmapSet.Value?.RelatedTags == null)
-            {
-                userTags.Metadata = null;
-                return;
-            }
-
-            var tagsById = BeatmapSet.Value.RelatedTags.ToDictionary(t => t.Id);
-            userTags.Metadata = Beatmap.Value.TopTags
-                                       .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
-                                       .Where(t => t.relatedTag != null)
-                                       // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
-                                       .OrderByDescending(t => t.topTag.VoteCount)
-                                       .ThenBy(t => t.relatedTag!.Name)
-                                       .Select(t => t.relatedTag!.Name)
-                                       .ToArray();
         }
 
         [BackgroundDependencyLoader]
