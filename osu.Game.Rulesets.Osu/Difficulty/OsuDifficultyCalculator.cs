@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             var scoreAttributes = simulator.Simulate(WorkingBeatmap, beatmap);
 
             double baseAimPerformance = OsuPerformanceCalculator.DifficultyToPerformance(aimRating);
-            double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
-            double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
+            double baseSpeedPerformance = OsuPerformanceCalculator.DifficultyToPerformance(speedRating);
+            double baseReadingPerformance = OsuPerformanceCalculator.DifficultyToPerformance(readingRating);
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             double baseCognitionPerformance = SumCognitionDifficulty(baseReadingPerformance, baseFlashlightPerformance);
 
