@@ -291,6 +291,16 @@ namespace osu.Game.Online.Chat
                     AddInternal(new NowPlayingCommand(target));
                     break;
 
+                case @"watch":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /watch [user]"));
+                        break;
+                    }
+
+                    AddInternal(new WatchCommand(target, content));
+                    break;
+
                 case @"me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
@@ -411,7 +421,7 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case @"help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np, /savelog, /roll [2-100] (multiplayer only)"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np, /watch [user], /savelog, /roll [2-100] (multiplayer only)"));
                     break;
 
                 default:
