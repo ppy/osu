@@ -414,13 +414,13 @@ namespace osu.Game.Online.Chat
                     target.AddNewMessages(new InfoMessage(
                         """
                         Supported commands:
-                            /help            - Displays all available commands.                        
-                            /me [action]     - Perform a third-person action.
-                            /join [channel]  - Joins the specified channel.
-                            /chat [user]     - Opens a new chat tab with the specified user.
-                            /np              - Print to chat the current song you are listening to or playing.
-                            /savelog         - Saves the current chat tab to a text file.
-                            /roll [2-100]    - Rolls a random number (multiplayer only).
+                        /help            - Displays all available commands.                        
+                        /me [action]     - Perform a third-person action.
+                        /join [channel]  - Joins the specified channel.
+                        /chat [user]     - Opens a new chat tab with the specified user.
+                        /np              - Print to chat the current song you are listening to or playing.
+                        /savelog         - Saves the current chat tab to a text file.
+                        /roll [2-100]    - Rolls a random number (multiplayer only).
                         """
                     ));
                     break;
