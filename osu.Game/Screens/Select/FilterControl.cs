@@ -348,6 +348,14 @@ namespace osu.Game.Screens.Select
             searchTextBox.Current.Value = query;
         }
 
+        /// <summary>
+        /// Clears the active collection filter, returning to "All Beatmaps".
+        /// </summary>
+        public void ClearCollectionFilter()
+        {
+            collectionDropdown.Current.Value = new AllBeatmapsCollectionFilterMenuItem();
+        }
+
         protected override void PopIn()
         {
             this.MoveToX(0, SongSelect.ENTER_DURATION, Easing.OutQuint)

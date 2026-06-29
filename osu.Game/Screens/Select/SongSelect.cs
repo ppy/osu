@@ -1182,6 +1182,17 @@ namespace osu.Game.Screens.Select
 
             var beatmapInfo = workingBeatmap.BeatmapInfo;
 
+            // If a collection filter is active and the presented beatmap is not in it,
+            // clear the filter so the beatmap is visible in the carousel.
+            var criteria = FilterControl.CreateCriteria();
+
+            if (criteria.Collection != null)
+            {
+                var hashes = criteria.CollectionBeatmapMD5Hashes;
+                if (hashes == null || !hashes.Contains(beatmapInfo.MD5Hash))
+                    FilterControl.ClearCollectionFilter();
+            }
+
             // Don't change the local ruleset if the user is on another ruleset and is showing converted beatmaps.
             // Eventually we probably want to check whether conversion is actually possible for the current ruleset.
             bool requiresRulesetSwitch = !beatmapInfo.Ruleset.Equals(Ruleset.Value)
