@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
@@ -59,14 +60,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
-                CornerRadius = 5;
+                CornerRadius = 3f;
+                CornerExponent = 2.5f;
 
                 Children = new Drawable[]
                 {
                     new Container
                     {
                         AlwaysPresent = true,
-                        Width = 60,
+                        Width = 65,
                         AutoSizeAxes = Axes.Y,
                     },
                     box = new Box
@@ -75,8 +77,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                     Text = new OsuSpriteText
                     {
-                        Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
-                        Margin = new MarginPadding(4),
+                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                        Spacing = new Vector2(1, 0),
+                        Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
@@ -120,15 +123,22 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private void updateHoverState()
             {
+                const float transition_time = 120;
+
                 if (isBinding)
                 {
-                    box.FadeColour(colourProvider.Light2, transition_time, Easing.OutQuint);
+                    box.FadeColour(colourProvider.Light3, transition_time, Easing.OutQuint);
+                    Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
+                }
+                else if (IsHovered)
+                {
+                    box.FadeColour(colourProvider.Light4, transition_time, Easing.OutQuint);
                     Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
                 }
                 else
                 {
-                    box.FadeColour(IsHovered ? colourProvider.Light4 : colourProvider.Background6, transition_time, Easing.OutQuint);
-                    Text.FadeColour(IsHovered ? Color4.Black : colourProvider.Content1, transition_time, Easing.OutQuint);
+                    box.FadeColour(colourProvider.Background5, transition_time * 2, Easing.OutQuint);
+                    Text.FadeColour(colourProvider.Content1, transition_time * 2, Easing.OutQuint);
                 }
             }
 

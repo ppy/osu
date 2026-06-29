@@ -46,6 +46,12 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestBasic()
+        {
+            AddStep("do nothing", () => { });
+        }
+
+        [Test]
         public void TestBindingTwoNonModifiers()
         {
             AddStep("press j", () => InputManager.PressKey(Key.J));

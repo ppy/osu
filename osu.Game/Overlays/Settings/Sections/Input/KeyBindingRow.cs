@@ -18,13 +18,16 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Input;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -99,7 +102,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Sample?[]? keypressSamples;
 
-        private const float transition_time = 150;
         private const float spacing = 5;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -118,6 +120,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
         }
+
+        private OsuSpriteText pendingBindingText = null!;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audioManager)
@@ -190,23 +194,38 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 },
                                 cancelAndClearButtons = new FillFlowContainer
                                 {
-                                    AutoSizeAxes = Axes.Both,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Full,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Alpha = 0,
                                     Spacing = new Vector2(5),
+                                    Padding = new MarginPadding(5) { Top = 0 },
                                     Children = new Drawable[]
                                     {
+                                        pendingBindingText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Alpha = 0.4f,
+                                            Text = InputSettingsStrings.PendingBinding,
+                                            Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                                        },
                                         new RoundedButton
                                         {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
                                             Text = CommonStrings.ButtonsCancel,
-                                            Size = new Vector2(80, 20),
+                                            Size = new Vector2(120, 30),
                                             Action = () => finalise(false)
                                         },
                                         new DangerousRoundedButton
                                         {
-                                            Text = CommonStrings.ButtonsClear,
-                                            Size = new Vector2(80, 20),
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Text = "Clear binding",
+                                            Size = new Vector2(120, 30),
                                             Action = clear
                                         },
                                     },
@@ -512,6 +531,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             cancelAndClearButtons.FadeIn(300, Easing.OutQuint);
             cancelAndClearButtons.BypassAutoSizeAxes &= ~Axes.Y;
+
+            pendingBindingText.FadeTo(1, 500).Then().FadeTo(0.4f, 500).Loop();
 
             updateBindTarget();
             base.OnFocus(e);
