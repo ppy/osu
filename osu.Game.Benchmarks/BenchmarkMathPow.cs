@@ -13,15 +13,24 @@ namespace osu.Game.Benchmarks
         public double Exponent { get; set; }
 
         [Benchmark]
-        public void MathPow()
+        public double MathPow()
         {
-            double _ = Math.Pow(1.299995, Exponent);
+            return Math.Pow(1.299995, Exponent);
         }
 
         [Benchmark]
-        public void DiffUtilsPow()
+        public double DiffUtilsPowDouble()
         {
-            double _ = DiffUtils.Pow(1.299995, Exponent);
+            return DiffUtils.Pow(1.299995, Exponent);
+        }
+
+        [Benchmark]
+        public double DiffUtilsPowInt()
+        {
+            if ((int)Exponent != Exponent)
+                throw new NotSupportedException();
+
+            return DiffUtils.Pow(1.299995, (int)Exponent);
         }
     }
 }
