@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Notifications
             IconContent.Colour = ColourInfo.GradientVertical(Colour4.Orange, Colour4.OrangeRed);
 
             TextFlow.Clear();
-            TextFlow.AddText("Online server outage in progress".ToUpperInvariant(), s =>
+            TextFlow.AddText("Server outage in progress".ToUpperInvariant(), s =>
             {
                 s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
                 s.Colour = Colour4.Orange;
