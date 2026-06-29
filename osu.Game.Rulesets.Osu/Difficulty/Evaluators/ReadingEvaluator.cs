@@ -14,13 +14,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
     {
         private const double reading_window_size = 3000; // 3 seconds
         private const double distance_influence_threshold = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.5; // 1.5 circles distance between centers
-        private const double hidden_multiplier = 0.28;
-        private const double density_multiplier = 2.4;
-        private const double density_difficulty_base = 2.5;
-        private const double preempt_balancing_factor = 140000;
-        private const double preempt_starting_point = 500; // AR 9.66 in milliseconds
-        private const double minimum_angle_relevancy_time = 2000; // 2 seconds
-        private const double maximum_angle_relevancy_time = 200;
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
@@ -65,6 +58,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double calculateDensityDifficulty(OsuDifficultyHitObject? nextObj, double velocity, double constantAngleNerfFactor,
                                                          double pastObjectDifficultyInfluence, double currentVisibleObjectDensity)
         {
+            const double density_multiplier = 2.4;
+            const double density_difficulty_base = 2.5;
+
             // Consider future densities too because it can make the path the cursor takes less clear
             double futureObjectDifficultyInfluence = Math.Sqrt(currentVisibleObjectDensity);
 
@@ -96,6 +92,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         private static double calculatePreemptDifficulty(double velocity, double constantAngleNerfFactor, double preempt)
         {
+            const double preempt_balancing_factor = 140000;
+            const double preempt_starting_point = 500; // AR 9.66 in milliseconds
+
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
             // https://www.desmos.com/calculator/c175335a71
             double preemptDifficulty = DiffUtils.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) / preempt_balancing_factor;
@@ -119,6 +118,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double calculateHiddenDifficulty(OsuDifficultyHitObject currObj, double pastObjectDifficultyInfluence, double currentVisibleObjectDensity, double velocity,
                                                         double constantAngleNerfFactor)
         {
+            const double hidden_multiplier = 0.28;
+
             // Higher preempt means that time spent invisible is higher too, we want to reward that
             double preemptFactor = DiffUtils.Pow(currObj.Preempt, 2.2) * 0.01;
 
@@ -206,6 +207,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         // https://www.desmos.com/calculator/eb057a4822
         private static double getConstantAngleNerfFactor(OsuDifficultyHitObject current)
         {
+            const double minimum_angle_relevancy_time = 2000; // 2 seconds
+            const double maximum_angle_relevancy_time = 200;
+
             double constantAngleCount = 0;
             int index = 0;
             double currentTimeGap = 0;

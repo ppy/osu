@@ -31,12 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private const double skill_multiplier_snap = 70.9;
-        private const double skill_multiplier_agility = 2.35;
-        private const double skill_multiplier_flow = 242.0;
-        private const double skill_multiplier_total = 1.12;
-        private const double combined_snap_norm_exponent = 1.2;
-
         /// <summary>
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
@@ -73,6 +67,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
+            const double skill_multiplier_snap = 70.9;
+            const double skill_multiplier_agility = 2.35;
+            const double skill_multiplier_flow = 242.0;
+
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;
             double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_flow;
@@ -92,6 +90,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
         {
+            const double skill_multiplier_total = 1.12;
+            const double combined_snap_norm_exponent = 1.2;
+
             // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
             // Agility on the other hand is supposed to measure the rate of cursor velocity changes while snapping
             // So snapping every circle on a stream requires an enormous amount of agility at which point it's easier to flow

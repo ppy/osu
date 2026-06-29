@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 {
     public static class AgilityEvaluator
     {
-        private const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.2; // 1.2 circles distance between centers
-
         /// <summary>
         /// Evaluates the difficulty of fast aiming
         /// </summary>
@@ -20,6 +18,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         {
             if (current.BaseObject is Spinner)
                 return 0;
+
+            const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.2; // 1.2 circles distance between centers
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;

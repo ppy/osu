@@ -29,13 +29,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private const double skill_multiplier = 2.5;
-        private const double strain_decay_base = 0.8;
-
-        private double strainDecay(double ms) => DiffUtils.Pow(strain_decay_base, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
+            const double skill_multiplier = 2.5;
+
             objectList.Add(current);
 
             double decay = strainDecay(current.DeltaTime);

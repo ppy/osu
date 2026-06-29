@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoAccScalingExponent = 2 + attributes.MonoStaminaFactor;
             double monoAccScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
 
-            return difficultyValue * DiffUtils.Pow(DiffUtils.Erf(monoAccScalingShift / (Math.Sqrt(2) * estimatedUnstableRate.Value)), monoAccScalingExponent);
+            return difficultyValue * DiffUtils.Pow(DiffUtils.Erf(monoAccScalingShift / (DiffUtils.SQRT2 * estimatedUnstableRate.Value)), monoAccScalingExponent);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double pLowerBound = (n * p + z * z / 2) / (n + z * z) - z / (n + z * z) * Math.Sqrt(n * p * (1 - p) + z * z / 4);
 
             // We can be 99% confident that the deviation is not higher than:
-            return greatHitWindow / (Math.Sqrt(2) * DiffUtils.ErfInv(pLowerBound));
+            return greatHitWindow / (DiffUtils.SQRT2 * DiffUtils.ErfInv(pLowerBound));
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;

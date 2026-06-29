@@ -9,6 +9,11 @@ namespace osu.Game.Rulesets.Difficulty.Utils
     public static partial class DiffUtils
     {
         /// <summary>
+        /// Square root of 2
+        /// </summary>
+        public const double SQRT2 = 1.4142135623730950;
+
+        /// <summary>
         /// Converts BPM value into milliseconds
         /// </summary>
         /// <param name="bpm">Beats per minute</param>
