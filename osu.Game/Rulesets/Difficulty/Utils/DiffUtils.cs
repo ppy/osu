@@ -210,6 +210,8 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             return erfInv;
         }
 
+        // In actual debug testing it's very rare for a (double, double) call to end up with a rounded int value in the first place.
+        // Making an explicit overload is slightly faster than running the `switch` in such cases.
         public static double Pow(double x, double exponent) => Math.Pow(x, exponent);
 
         public static double Pow(double x, int exponent) => exponent switch
@@ -219,7 +221,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             2 => x * x,
             3 => x * x * x,
             4 => x * x * x * x,
-            5 => x * x * x * x * x,
+            5 => x * x * x * x * x, // This is the largest value used in diffcalc right now.
             _ => Math.Pow(x, exponent)
         };
 
