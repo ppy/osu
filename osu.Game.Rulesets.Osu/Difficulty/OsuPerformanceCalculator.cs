@@ -459,12 +459,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (pLowerBound > 0.01)
             {
                 // Compute deviation assuming greats and oks are normally distributed.
-                deviation = greatHitWindow / (Math.Sqrt(2) * DiffUtils.ErfInv(pLowerBound));
+                deviation = greatHitWindow / (DiffUtils.SQRT2 * DiffUtils.ErfInv(pLowerBound));
 
                 // Subtract the deviation provided by tails that land outside the ok hit window from the deviation computed above.
                 // This is equivalent to calculating the deviation of a normal distribution truncated at +-okHitWindow.
                 double okHitWindowTailAmount = Math.Sqrt(2 / Math.PI) * okHitWindow * Math.Exp(-0.5 * DiffUtils.Pow(okHitWindow / deviation, 2))
-                                               / (deviation * DiffUtils.Erf(okHitWindow / (Math.Sqrt(2) * deviation)));
+                                               / (deviation * DiffUtils.Erf(okHitWindow / (DiffUtils.SQRT2 * deviation)));
 
                 deviation *= Math.Sqrt(1 - okHitWindowTailAmount);
             }

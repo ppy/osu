@@ -15,14 +15,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
     public static class FlashlightEvaluator
     {
-        private const double max_opacity_bonus = 0.4;
-        private const double hidden_bonus = 0.2;
-
-        private const double min_velocity = 0.5;
-        private const double slider_multiplier = 1.3;
-
-        private const double min_angle_multiplier = 0.2;
-
         /// <summary>
         /// Evaluates the difficulty of memorising and hitting an object, based on:
         /// <list type="bullet">
@@ -37,6 +29,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             if (current.BaseObject is Spinner)
                 return 0;
+
+            const double max_opacity_bonus = 0.4;
+            const double hidden_bonus = 0.2;
+
+            const double min_velocity = 0.5;
+            const double slider_multiplier = 1.3;
+
+            const double min_angle_multiplier = 0.2;
 
             var osuCurrent = (OsuDifficultyHitObject)current;
             var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
