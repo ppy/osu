@@ -79,6 +79,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public int? LengthLimit { get; init; }
 
+        public bool SelectAllOnFocus { get; init; }
+
         private FormControlBackground background = null!;
         private InnerTextBox textBox = null!;
         private FormFieldCaption caption = null!;
@@ -129,6 +131,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
                             t.LengthLimit = LengthLimit;
+                            t.SelectAllOnFocus = SelectAllOnFocus;
                             t.Current = Current;
                             t.CommitOnFocusLost = true;
                             t.OnCommit += (textBox, newText) =>
