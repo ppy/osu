@@ -48,6 +48,20 @@ namespace osu.Game.Online.Chat
             @"#lobby"
         };
 
+        /// <summary>
+        /// The commands that are supported
+        /// </summary>
+        private readonly string[] commands =
+        {
+            "help",
+            "me [action]",
+            "join [channel]",
+            "chat [user]",
+            "np",
+            "savelog",
+            "roll [2-100]"
+        };
+
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
@@ -261,6 +275,24 @@ namespace osu.Game.Online.Chat
                 dequeueAndRun();
         }
 
+        /// <summary>
+        /// Returns recommended command
+        /// </summary>
+        /// <param name="inputCommand"></param>
+        /// <returns></returns>
+        private string getRecommendedCommand(string inputCommand)
+        {
+            string recommended = commands
+                .Select(c => c.Split(' ')[0])
+                .Where(c => c != inputCommand)
+                .OrderByDescending(c => c.Contains(inputCommand) || inputCommand.Contains(c))
+                .ThenBy(c => Math.Abs(c.Length - inputCommand.Length))
+                .FirstOrDefault();
+
+            // If no recommended command is found, return "help" command
+            return string.IsNullOrEmpty(recommended) ? "help" : $"{recommended}";
+        }
+
         private static void handlePostException(Exception exception)
         {
             if (exception is APIException apiException)
@@ -426,7 +458,13 @@ namespace osu.Game.Online.Chat
                     break;
 
                 default:
-                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
+                    string recommendedCommand = getRecommendedCommand(command);
+                    target.AddNewMessages(new ErrorMessage(
+                        $"""
+                        Unknown command '/{command}'. Type /help for a list of available commands.
+                        Recommended command: /{string.Join(", ", recommendedCommand)}
+                        """
+                    ));
                     break;
             }
         }
