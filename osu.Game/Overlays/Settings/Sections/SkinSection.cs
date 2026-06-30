@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections
         private IDisposable realmSubscription;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] SkinEditorOverlay skinEditor)
+        private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
         {
             Children = new Drawable[]
             {
@@ -80,10 +81,20 @@ namespace osu.Game.Overlays.Settings.Sections
                         new DeleteSkinButton { Padding = new MarginPadding { Left = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
                     }
                 },
+                new SkinFavouriteButton(),
                 new SettingsButtonV2
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = SkinSettingsStrings.CycleSkinsThroughFavoritesOnly,
+                    HintText = SkinSettingsStrings.CycleSkinsThroughFavoritesOnlyDescription,
+                    Current = config.GetBindable<bool>(OsuSetting.CycleSkinsThroughFavoritesOnly),
+                })
+                {
+                    Keywords = new[] { "skin", "cycle", "favourite", "favorite", "pin", "hotkey", "keybind" },
                 },
             };
         }
@@ -131,7 +142,55 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private partial class SkinDropdown : FormDropdown<Live<SkinInfo>>
         {
-            protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
+            protected override LocalisableString GenerateItemText(Live<SkinInfo> item)
+                => item.PerformRead(s => s.Pinned ? $"♥ {s}" : s.ToString());
+        }
+
+        public partial class SkinFavouriteButton : SettingsButtonV2
+        {
+            [Resolved]
+            private SkinManager skins { get; set; }
+
+            private Bindable<Skin> currentSkin;
+            private HeartIcon heart;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Action = togglePin;
+
+                Content.Add(heart = new HeartIcon
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    X = 16,
+                    Size = new Vector2(16),
+                });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                currentSkin = skins.CurrentSkin.GetBoundCopy();
+                currentSkin.BindValueChanged(_ => updateState());
+                currentSkin.BindDisabledChanged(_ => updateState(), true);
+            }
+
+            private void updateState(bool withAnimation = false)
+            {
+                bool currentlyPinned = currentSkin.Value.SkinInfo.PerformRead(s => s.Pinned);
+                heart.SetActive(currentlyPinned, withAnimation);
+                Text = currentlyPinned ? SkinSettingsStrings.UnpinSkin : SkinSettingsStrings.PinSkin;
+                Enabled.Value = !currentSkin.Disabled;
+            }
+
+            private void togglePin()
+            {
+                skins.TogglePinned(skins.CurrentSkinInfo.Value);
+                // CurrentSkin.ValueChanged isn't fired by a pinned-flag mutation; refresh manually.
+                updateState(withAnimation: currentSkin.Value.SkinInfo.PerformRead(s => s.Pinned));
+            }
         }
 
         public partial class RenameSkinButton : SettingsButtonV2, IHasPopover
