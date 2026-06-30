@@ -6,10 +6,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Ranking.Expanded
 {
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var timeText = time.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt");
 
             if (withPrefix)
-                Text = LocalisableString.Format("Played on {0}", timeText);
+                Text = LeaderboardStrings.PlayedOn(timeText);
             else
                 Text = timeText;
         }
