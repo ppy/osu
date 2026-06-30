@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected override double RollingDuration => 250;
 
-        [SettingSource("Wireframe opacity", "Controls the opacity of the wireframes behind the digits.")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.WireframeOpacity), nameof(SkinnableComponentStrings.WireframeOpacityDescription))]
         public BindableFloat WireframeOpacity { get; } = new BindableFloat(0.25f)
         {
             Precision = 0.01f,
