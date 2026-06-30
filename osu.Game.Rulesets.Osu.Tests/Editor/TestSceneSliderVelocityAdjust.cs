@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private DifficultyPointPiece difficultyPointPiece => blueprint.ChildrenOfType<DifficultyPointPiece>().First();
 
-        private IndeterminateSliderWithTextBoxInput<double> velocityTextBox => Game.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().First().ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().First();
+        private SliderVelocityAdjustmentControl velocityControl => Game.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().First().ChildrenOfType<SliderVelocityAdjustmentControl>().First();
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             if (adjustVelocity)
             {
                 AddStep("open velocity adjust panel", () => difficultyPointPiece.TriggerClick());
-                AddStep("change velocity", () => velocityTextBox.Current.Value = 2);
+                AddStep("change velocity", () => velocityControl.Current.Value = 2);
 
                 AddAssert("velocity adjusted", () => slider!.Velocity,
                     () => Is.EqualTo(velocity!.Value * 2).Within(Precision.DOUBLE_EPSILON));
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
 
             AddStep("open velocity adjust panel", () => difficultyPointPiece.TriggerClick());
-            AddStep("change velocity", () => velocityTextBox.Current.Value = 2);
+            AddStep("change velocity", () => velocityControl.Current.Value = 2);
 
             AddAssert("velocity adjusted", () => slider!.Velocity, () => Is.EqualTo(velocityBefore!.Value * 2).Within(Precision.DOUBLE_EPSILON));
 
