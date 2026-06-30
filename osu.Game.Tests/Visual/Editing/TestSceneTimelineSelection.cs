@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
@@ -433,5 +434,50 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void assertSelectionIs(IEnumerable<HitObject> hitObjects)
             => AddAssert("correct hitobjects selected", () => EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).SequenceEqual(hitObjects));
+
+        [Test]
+        public void TestNoteLock()
+        {
+            HitCircle addedCircle = null!;
+
+            AddStep("add hitobjects", () =>
+            {
+                EditorBeatmap.Add(addedCircle = new HitCircle { StartTime = 100, Position = new Vector2(150, 150) });
+            });
+
+            AddStep("enable notelock", () =>
+            {
+                Editor.ChildrenOfType<ComposeBlueprintContainer>().First().NoteLock.Value = TernaryState.True;
+            });
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.Add(addedCircle));
+
+            moveMouseToObject(() => addedCircle);
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
+
+            AddAssert("circle didn't move", () => addedCircle.StartTime == 100);
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddStep("disable notelock", () =>
+            {
+                Editor.ChildrenOfType<ComposeBlueprintContainer>().First().NoteLock.Value = TernaryState.False;
+            });
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.Add(addedCircle));
+
+            moveMouseToObject(() => addedCircle);
+
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+
+            AddStep("move mouse", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(50, 0)));
+
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("circle moved", () => addedCircle.StartTime != 100);
+        }
     }
 }
