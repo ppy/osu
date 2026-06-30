@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public partial class TestSceneSnapAllNotesToGrid : EditorTestScene
+    public partial class TestSceneSnapAllNotesToDivisor : EditorTestScene
     {
         private const double beat_length = 60_000 / 180.0;
         private const double timing_point_time = 1500;
@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestSnapAllToCurrentGrid()
+        public void TestSnapAllToCurrentDivisor()
         {
             AddStep("set raw times", () =>
             {
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.Editing
                 beatDivisor.SetArbitraryDivisor(divisor);
             });
 
-            AddStep("snap all to grid", () => EditorBeatmap.SnapAllHitObjectsToCurrentGrid());
+            AddStep("snap all to grid", () => EditorBeatmap.SnapAllHitObjectsToCurrentDivisor());
 
             AddAssert("circle snapped", () =>
             {

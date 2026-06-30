@@ -451,7 +451,7 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
-                                            new EditorMenuItem(EditorStrings.SnapAllNotesToCurrentGrid, MenuItemType.Destructive, confirmSnapAllHitObjectsToCurrentGrid),
+                                            new EditorMenuItem(EditorStrings.SnapAllNotesToCurrentSnapDivisor, MenuItemType.Destructive, confirmSnapAllHitObjectsToCurrentDivisor),
                                             bookmarkController.Menu,
                                         }
                                     }
@@ -1027,12 +1027,12 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.PreviewTime.Value = (int)clock.CurrentTime;
         }
 
-        private void confirmSnapAllHitObjectsToCurrentGrid()
+        private void confirmSnapAllHitObjectsToCurrentDivisor()
         {
-            dialogOverlay.Push(new SnapAllNotesConfirmationDialog(SnapAllHitObjectsToCurrentGrid));
+            dialogOverlay.Push(new SnapAllNotesConfirmationDialog(SnapAllHitObjectsToCurrentDivisor));
         }
 
-        protected void SnapAllHitObjectsToCurrentGrid() => editorBeatmap.SnapAllHitObjectsToCurrentGrid();
+        protected void SnapAllHitObjectsToCurrentDivisor() => editorBeatmap.SnapAllHitObjectsToCurrentDivisor();
 
         private void setUpTrack(bool seekToStart = false)
         {

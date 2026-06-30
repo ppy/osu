@@ -529,9 +529,9 @@ namespace osu.Game.Screens.Edit
         public double SnapTime(double time, double? referenceTime) => ControlPointInfo.GetClosestSnappedTime(time, BeatDivisor, referenceTime);
 
         /// <summary>
-        /// Snaps every hit object's start time (and end time when applicable) to the current beat divisor grid.
+        /// Snaps every hit object's start time (and end time when applicable) to the current snap divisor.
         /// </summary>
-        public void SnapAllHitObjectsToCurrentGrid()
+        public void SnapAllHitObjectsToCurrentDivisor()
         {
             if (HitObjects.Count == 0)
                 return;
