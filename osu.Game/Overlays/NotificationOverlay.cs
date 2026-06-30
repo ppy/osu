@@ -19,11 +19,11 @@ using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
-using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays
 {
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays
                                     Children = new[]
                                     {
                                         // The main section adds as a catch-all for notifications which don't group into other sections.
-                                        new NotificationSection(AccountsStrings.NotificationsTitle),
+                                        new NotificationSection(WebLocalisation.AccountsStrings.NotificationsTitle),
                                         new NotificationSection(NotificationsStrings.RunningTasks, new[] { typeof(ProgressNotification) }),
                                     }
                                 }

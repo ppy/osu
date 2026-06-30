@@ -27,7 +27,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Skinning;
 using osuTK;
 using Realms;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.Settings.Sections
             [BackgroundDependencyLoader]
             private void load()
             {
-                Text = WebCommonStrings.ButtonsDelete;
+                Text = WebLocalisation.CommonStrings.ButtonsDelete;
                 Action = delete;
             }
 
@@ -292,7 +292,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             MatchingFilter = true,
-                            Text = WebCommonStrings.ButtonsSave,
+                            Text = WebLocalisation.CommonStrings.ButtonsSave,
                         }
                     }
                 };

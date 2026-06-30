@@ -7,7 +7,7 @@ using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dialog
 {
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Dialog
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = WebCommonStrings.ButtonsCancel,
+                    Text = WebLocalisation.CommonStrings.ButtonsCancel,
                     Action = onCancel
                 },
             };

@@ -30,7 +30,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select
 {
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Select
                 }
                 else
                 {
-                    items.Add(new OsuMenuItem(WebCommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick()));
+                    items.Add(new OsuMenuItem(WebLocalisation.CommonStrings.ButtonsExpand.ToSentence(), MenuItemType.Highlighted, () => TriggerClick()));
                     items.Add(new OsuMenuItemSpacer());
                 }
 

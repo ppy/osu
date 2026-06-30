@@ -27,7 +27,7 @@ using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Input;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            Text = CommonStrings.ButtonsCancel,
+                                            Text = WebLocalisation.CommonStrings.ButtonsCancel,
                                             Size = new Vector2(120, 30),
                                             Action = () => finalise(false)
                                         },

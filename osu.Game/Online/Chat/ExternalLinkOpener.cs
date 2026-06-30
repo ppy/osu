@@ -14,7 +14,7 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Online.Chat
 {
@@ -116,7 +116,7 @@ namespace osu.Game.Online.Chat
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = WebCommonStrings.ButtonsCancel,
+                        Text = WebLocalisation.CommonStrings.ButtonsCancel,
                     },
                 };
             }

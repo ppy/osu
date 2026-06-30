@@ -31,12 +31,10 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
-using CommonStrings = osu.Game.Localisation.CommonStrings;
 using SongSelect = osu.Game.Screens.Select.SongSelect;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -326,8 +324,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, BeatmapsetsStrings.ShowScoreboardHeadersCombo, model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, model.DisplayAccuracy)
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, WebLocalisation.BeatmapsetsStrings.ShowScoreboardHeadersCombo, model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, WebLocalisation.BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, model.DisplayAccuracy)
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -465,7 +463,7 @@ namespace osu.Game.Online.Leaderboards
                 if (Score.Files.Count > 0)
                 {
                     items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
-                    items.Add(new OsuMenuItem(WebCommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                    items.Add(new OsuMenuItem(WebLocalisation.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
                 }
 
                 return items.ToArray();

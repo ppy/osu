@@ -15,14 +15,14 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
-using CommonStrings = osu.Game.Localisation.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly bool noVideo;
 
-        public LocalisableString TooltipText => BeatmapsetsStrings.ShowDetailsDownloadDefault;
+        public LocalisableString TooltipText => WebLocalisation.BeatmapsetsStrings.ShowDetailsDownloadDefault;
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = BeatmapsetsStrings.ShowDetailsDownloadDefault,
+                                Text = WebLocalisation.BeatmapsetsStrings.ShowDetailsDownloadDefault,
                                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             if (!beatmapSet.HasVideo)
                 return string.Empty;
 
-            return noVideo ? BeatmapsetsStrings.ShowDetailsDownloadNoVideo : BeatmapsetsStrings.ShowDetailsDownloadVideo;
+            return noVideo ? WebLocalisation.BeatmapsetsStrings.ShowDetailsDownloadNoVideo : WebLocalisation.BeatmapsetsStrings.ShowDetailsDownloadVideo;
         }
     }
 }
