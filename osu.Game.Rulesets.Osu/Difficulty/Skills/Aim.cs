@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (maxSliderStrain == 0)
                 return 0;
 
-            return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
+            return sliderStrains.Sum(strain => DiffUtils.Logistic(strain / maxSliderStrain, 0.5, 12.0));
         }
 
         public double CountTopWeightedSliders(double difficultyValue)
