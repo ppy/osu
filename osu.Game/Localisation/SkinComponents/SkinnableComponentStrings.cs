@@ -80,6 +80,11 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString WireframeOpacityDescription => new TranslatableString(getKey(@"wireframe_opacity_description"), @"Controls the opacity of the wireframes behind the digits.");
 
+        /// <summary>
+        /// "Inverted shear"
+        /// </summary>
+        public static LocalisableString InvertedShear => new TranslatableString(getKey(@"inverted_shear"), @"Inverted shear");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
