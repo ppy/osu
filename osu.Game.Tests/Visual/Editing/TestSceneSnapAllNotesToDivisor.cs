@@ -118,10 +118,7 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 var s = EditorBeatmap.HitObjects.OfType<Spinner>().Single();
                 double expStart = EditorBeatmap.SnapTime(spinnerRawStart, null);
-                double expEnd = EditorBeatmap.SnapTime(spinnerRawEnd, null);
-                double minEnd = expStart + EditorBeatmap.GetBeatLengthAtTime(expStart);
-                if (expEnd < minEnd)
-                    expEnd = minEnd;
+                double expEnd = Math.Max(expStart + EditorBeatmap.GetBeatLengthAtTime(expStart), EditorBeatmap.SnapTime(spinnerRawEnd, expStart));
 
                 return Precision.AlmostEquals(s.StartTime, expStart) && Precision.AlmostEquals(s.EndTime, expEnd);
             });
@@ -141,7 +138,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("plain slider tail near grid", () =>
             {
                 var s = EditorBeatmap.HitObjects.OfType<Slider>().First(sl => sl.RepeatCount == 0);
-                double snappedEnd = EditorBeatmap.SnapTime(s.EndTime, null);
+                double snappedEnd = EditorBeatmap.SnapTime(s.EndTime, s.StartTime);
                 return Math.Abs(s.EndTime - snappedEnd) < 2.0 && !double.IsNaN(s.SliderVelocityMultiplier);
             });
 
@@ -160,7 +157,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("reverse slider tail near grid", () =>
             {
                 var s = EditorBeatmap.HitObjects.OfType<Slider>().First(sl => sl.RepeatCount > 0);
-                double snappedEnd = EditorBeatmap.SnapTime(s.EndTime, null);
+                double snappedEnd = EditorBeatmap.SnapTime(s.EndTime, s.StartTime);
                 return Math.Abs(s.EndTime - snappedEnd) < 2.0 && !double.IsNaN(s.SliderVelocityMultiplier);
             });
         }

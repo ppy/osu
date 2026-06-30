@@ -544,11 +544,7 @@ namespace osu.Game.Screens.Edit
                 double oldEnd = hitObject.GetEndTime();
 
                 double newStart = SnapTime(oldStart, null);
-                double newEnd = SnapTime(oldEnd, null);
-                double minBeatStep = GetBeatLengthAtTime(newStart);
-
-                if (newEnd < newStart + minBeatStep)
-                    newEnd = newStart + minBeatStep;
+                double newEnd = Math.Max(newStart + GetBeatLengthAtTime(newStart), SnapTime(oldEnd, newStart));
 
                 bool changed = false;
 
@@ -569,7 +565,6 @@ namespace osu.Game.Screens.Edit
                         if (oldDuration > 0 && !Precision.AlmostEquals(oldDuration, newDurationTarget))
                         {
                             double scaledMultiplier = sv.SliderVelocityMultiplier * (oldDuration / newDurationTarget);
-                            scaledMultiplier = Math.Clamp(scaledMultiplier, sv.SliderVelocityMultiplierBindable.MinValue, sv.SliderVelocityMultiplierBindable.MaxValue);
 
                             if (!Precision.AlmostEquals(sv.SliderVelocityMultiplier, scaledMultiplier))
                             {
