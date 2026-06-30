@@ -41,6 +41,18 @@ namespace osu.Game.Online.Matchmaking
         Task MatchmakingAcceptInvitation();
 
         /// <summary>
+        /// Issues a matchmaking duel.
+        /// </summary>
+        /// <param name="request">Describes the duel.</param>
+        Task<MatchmakingIssueDuelResponse> MatchmakingIssueDuel(MatchmakingIssueDuelRequest request);
+
+        /// <summary>
+        /// Accepts a matchmaking duel invitation.
+        /// </summary>
+        /// <param name="request">Describes the duel.</param>
+        Task<MatchmakingAcceptDuelResponse> MatchmakingAcceptDuel(MatchmakingAcceptDuelRequest request);
+
+        /// <summary>
         /// Declines a matchmaking room invitation.
         /// </summary>
         Task MatchmakingDeclineInvitation();

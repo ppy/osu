@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -16,8 +17,11 @@ using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -33,17 +37,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             public required RankedPlayDamageInfo PlayerDamageInfo { get; init; }
             public required RankedPlayDamageInfo OpponentDamageInfo { get; init; }
 
+            public required APIBeatmap Beatmap { get; init; }
+            public required Mod[] Mods { get; init; }
+
             [Resolved]
             private RankedPlayMatchInfo matchInfo { get; set; } = null!;
 
             [Resolved]
-            private OsuColour colour { get; set; } = null!;
+            private OsuColour colours { get; set; } = null!;
 
             private static Vector2 cardSize => new Vector2(950, 550);
 
             private readonly Bindable<Visibility> cornerPieceVisibility = new Bindable<Visibility>();
             private readonly Bindable<float> scoreBarProgress = new Bindable<float>();
 
+            private Drawable beatmapPanel = null!;
             private PanelScaffold panelScaffold = null!;
             private Box flash = null!;
             private ScoreDetails playerScoreDetails = null!;
@@ -52,6 +60,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             private RankedPlayScoreCounter opponentScoreCounter = null!;
             private RankedPlayScoreCounter damageCounter = null!;
             private OsuSpriteText flyingDamageText = null!;
+
+            private FillFlowContainer damageBreakdownContainer = null!;
+            private OsuSpriteText damageBreakdownValueText = null!;
+            private OsuSpriteText damageBreakdownSourceText = null!;
+
             private ScoreBar playerScoreBar = null!;
             private ScoreBar opponentScoreBar = null!;
             private OsuSpriteText roundNumber = null!;
@@ -64,6 +77,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             private DrawableSample resultsAppearSample = null!;
             private DrawableSample dmgFlySample = null!;
             private DrawableSample dmgHitSample = null!;
+            private DrawableSample damageMultiplierSample = null!;
+            private DrawableSample damageMultiplierUpSample = null!;
+            private DrawableSample damageMultiplierDownSample = null!;
             private DrawableSample hpDownSample = null!;
             private DrawableSample playerAppearSample = null!;
             private DrawableSample pseudoScoreCounterSample = null!;
@@ -85,6 +101,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                             .Select(it => it.Value.DamageInfo)
                                             .OfType<RankedPlayDamageInfo>()
                                             .MaxBy(it => it.Damage)!;
+
+                AddInternal(new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = cardSize,
+                    Child = beatmapPanel = new Container
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.BottomRight,
+                        Margin = new MarginPadding { Bottom = 10 },
+                        Scale = new Vector2(1.1f),
+                        Size = new Vector2(MatchmakingSelectPanel.WIDTH, MatchmakingSelectPanel.HEIGHT),
+                        Child = new MatchmakingSelectPanel.CardContentBeatmap(Beatmap, Mods)
+                    }
+                });
 
                 AddInternal(panelScaffold = new PanelScaffold
                 {
@@ -167,7 +199,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                                 },
                                             ],
                                             [
-                                                playerScoreCounter = new RankedPlayScoreCounter(numDigits(PlayerScore.TotalScore))
+                                                playerScoreCounter = new RankedPlayScoreCounter
                                                 {
                                                     Font = OsuFont.GetFont(size: 60, fixedWidth: true),
                                                     Anchor = Anchor.Centre,
@@ -216,7 +248,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                                 },
                                             ],
                                             [
-                                                opponentScoreCounter = new RankedPlayScoreCounter(numDigits(OpponentScore.TotalScore))
+                                                opponentScoreCounter = new RankedPlayScoreCounter
                                                 {
                                                     Font = OsuFont.GetFont(size: 60, fixedWidth: true),
                                                     Anchor = Anchor.Centre,
@@ -249,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 Origin = Anchor.Centre,
                                 Children =
                                 [
-                                    damageCounter = new RankedPlayScoreCounter(numDigits(losingDamageInfo.Damage))
+                                    damageCounter = new RankedPlayScoreCounter
                                     {
                                         Font = OsuFont.GetFont(size: 36, weight: FontWeight.SemiBold, fixedWidth: true),
                                         Spacing = new Vector2(-2),
@@ -264,24 +296,35 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                         BypassAutoSizeAxes = Axes.Both,
                                         Alpha = 0,
                                     },
-                                    new OsuSpriteText
+                                ]
+                            },
+                            damageBreakdownContainer = new FillFlowContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(-5),
+                                Alpha = 0,
+                                Children =
+                                [
+                                    damageBreakdownValueText = new OsuSpriteText
                                     {
-                                        BypassAutoSizeAxes = Axes.Both,
-                                        Text = $"{matchInfo.RoomState.DamageMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x",
-                                        Anchor = Anchor.CentreRight,
+                                        Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 42),
-                                        Rotation = 30,
-                                        Alpha = 0,
-                                        Colour = colour.RedLight
+                                        Font = OsuFont.GetFont(size: 22, weight: FontWeight.SemiBold),
+                                        Colour = colours.Yellow
                                     },
+                                    damageBreakdownSourceText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Font = OsuFont.GetFont(size: 16),
+                                    }
                                 ]
                             },
                             new OsuSpriteText
                             {
-                                Text = Precision.AlmostEquals(matchInfo.RoomState.DamageMultiplier, 1)
-                                    ? "Damage"
-                                    : $"Damage {matchInfo.RoomState.DamageMultiplier.ToStandardFormattedString(maxDecimalDigits: 1)}x",
+                                Text = "Damage",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
                                 Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 22),
@@ -297,6 +340,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         resultsAppearSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/results-appear")),
                         dmgFlySample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-fly")),
                         dmgHitSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit")),
+                        damageMultiplierSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-multiplier")),
+                        damageMultiplierUpSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-multiplier-up")),
+                        damageMultiplierDownSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-multiplier-down")),
                         hpDownSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/hp-down")),
                         playerAppearSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/players-appear")),
                         pseudoScoreCounterSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/pseudo-score-counter")),
@@ -323,6 +369,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 double delay = 0;
 
                 resultsAppearSample.Play();
+
+                beatmapPanel.FadeOut()
+                            .Delay(800)
+                            .FadeIn(300);
 
                 panelScaffold.FadeIn(100)
                              .ResizeTo(0)
@@ -362,7 +412,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     playerScoreCounter.TransformValueTo(PlayerScore.TotalScore, score_text_duration - 500);
                     opponentScoreCounter.TransformValueTo(OpponentScore.TotalScore, score_text_duration - 500);
 
-                    damageCounter.TransformValueTo(losingDamageInfo.Damage, score_text_duration - 500);
+                    damageCounter.TransformValueTo(losingDamageInfo.DirectDamage, score_text_duration - 500);
 
                     long maxAchievableScore = Math.Max(
                         Math.Max(PlayerScore.TotalScore, OpponentScore.TotalScore),
@@ -450,6 +500,78 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 }
 
                 delay += 800;
+
+                List<(int rawDamage, string displayValue, string source)> damageBreakdowns = [];
+
+                if (!Precision.AlmostEquals(1, losingDamageInfo.Multiplier))
+                {
+                    damageBreakdowns.Add((
+                        (int)Math.Ceiling(losingDamageInfo.DirectDamage * losingDamageInfo.Multiplier) - losingDamageInfo.DirectDamage,
+                        $"x{losingDamageInfo.Multiplier.ToStandardFormattedString(maxDecimalDigits: 1)}",
+                        "multiplier"
+                    ));
+                }
+
+                if (losingDamageInfo.BonusDamage != 0)
+                {
+                    damageBreakdowns.Add((
+                        losingDamageInfo.BonusDamage,
+                        $"{losingDamageInfo.BonusDamage:+#,##0;-#,##0}",
+                        "bonus"
+                    ));
+                }
+
+                int pitchChangeAmount = 0;
+
+                foreach (var breakdown in damageBreakdowns)
+                {
+                    using (BeginDelayedSequence(delay))
+                    {
+                        int pitch = pitchChangeAmount;
+
+                        Schedule(() =>
+                        {
+                            damageBreakdownValueText.Text = breakdown.displayValue;
+                            damageBreakdownSourceText.Text = breakdown.source;
+
+                            SampleChannel damageBreakdownChannel = damageMultiplierSample.GetChannel();
+                            damageBreakdownChannel.Frequency.Value = 1f + (pitch * .1f);
+                            damageBreakdownChannel.Play();
+                        });
+
+                        damageBreakdownContainer.MoveToX(120)
+                                                .FadeInFromZero(400);
+
+                        using (BeginDelayedSequence(1000))
+                        {
+                            damageBreakdownContainer.MoveTo(Vector2.Zero, 400, Easing.OutQuint)
+                                                    .FadeOut(200, Easing.OutQuint);
+
+                            Schedule(() =>
+                            {
+                                damageCounter.SetValueInstantly(damageCounter.Value + breakdown.rawDamage);
+                                damageCounter
+                                    .ScaleTo(new Vector2(1.25f), 200, Easing.OutQuint)
+                                    .Then()
+                                    .ScaleTo(Vector2.One, 200);
+
+                                SampleChannel scoreChangeChannel = breakdown.rawDamage > 0 ? damageMultiplierUpSample.GetChannel() : damageMultiplierDownSample.GetChannel();
+                                scoreChangeChannel.Frequency.Value = 1f + (pitch * .1f);
+                                scoreChangeChannel.Play();
+                            });
+
+                            if (breakdown.rawDamage > 0)
+                                pitchChangeAmount++;
+                            else if (breakdown.rawDamage < 0)
+                                pitchChangeAmount--;
+                        }
+                    }
+
+                    delay += 1400;
+                }
+
+                if (damageBreakdowns.Count > 0)
+                    delay += 600;
 
                 bool playerTookDamage = OpponentScore.TotalScore > PlayerScore.TotalScore;
                 double loserPanDirection = playerTookDamage ? -OsuGameBase.SFX_STEREO_STRENGTH : OsuGameBase.SFX_STEREO_STRENGTH;

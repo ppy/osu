@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mods;
@@ -111,10 +113,24 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private ImmutableHashSet<string>? collectionBeatmapMD5Hashes;
+        private Live<BeatmapCollection>? collection;
+
         /// <summary>
         /// Hashes from the <see cref="BeatmapCollection"/> to filter to.
         /// </summary>
-        public IEnumerable<string>? CollectionBeatmapMD5Hashes { get; set; }
+        public IEnumerable<string>? CollectionBeatmapMD5Hashes =>
+            collectionBeatmapMD5Hashes ??= Collection?.PerformRead(c => c.BeatmapMD5Hashes.ToImmutableHashSet());
+
+        public Live<BeatmapCollection>? Collection
+        {
+            get => collection;
+            set
+            {
+                collection = value;
+                collectionBeatmapMD5Hashes = null;
+            }
+        }
 
         public IRulesetFilterCriteria? RulesetCriteria { get; set; }
 

@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Screens.Edit
 {
@@ -84,6 +85,8 @@ namespace osu.Game.Screens.Edit
         [CanBeNull]
         public readonly EditorBeatmapSkin BeatmapSkin;
 
+        public readonly Storyboard Storyboard;
+
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
@@ -96,7 +99,7 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, Storyboard storyboard = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
             PlayableBeatmap.ControlPointInfo = ConvertControlPoints(PlayableBeatmap.ControlPointInfo);
@@ -105,6 +108,10 @@ namespace osu.Game.Screens.Edit
 
             if (beatmapSkin is LegacyBeatmapSkin skin)
                 BeatmapSkin = new EditorBeatmapSkin(this, skin);
+
+            Storyboard = storyboard ?? new Storyboard();
+            Storyboard.Beatmap = this;
+            Storyboard.BeatmapInfo = this.beatmapInfo;
 
             beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
@@ -197,8 +204,6 @@ namespace osu.Game.Screens.Edit
             get => PlayableBeatmap.Breaks;
             set => PlayableBeatmap.Breaks = value;
         }
-
-        public List<string> UnhandledEventLines => PlayableBeatmap.UnhandledEventLines;
 
         public double TotalBreakTime => PlayableBeatmap.TotalBreakTime;
 

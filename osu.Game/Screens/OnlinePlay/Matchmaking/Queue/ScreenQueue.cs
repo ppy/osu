@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -29,6 +31,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Matchmaking.Requests;
 using osu.Game.Online.Multiplayer;
@@ -40,6 +43,7 @@ using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
@@ -75,11 +79,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         [Resolved]
         private MusicController music { get; set; } = null!;
 
+        [Resolved]
+        private DashboardOverlay? dashboardOverlay { get; set; }
+
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
-        private readonly Bindable<MatchmakingPool[]> availablePools = new Bindable<MatchmakingPool[]>([]);
+        private readonly Bindable<MatchmakingPool[]?> availablePools = new Bindable<MatchmakingPool[]?>();
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
-
         private readonly MatchmakingPoolType poolType;
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
@@ -96,6 +102,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private GridContainer mainGrid = null!;
 
+        private IBindable<bool> isConnected = null!;
+
         public ScreenQueue(MatchmakingPoolType poolType)
         {
             this.poolType = poolType;
@@ -106,6 +114,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             enqueueSample = audio.Samples.Get(@"Multiplayer/Matchmaking/enqueue");
             matchFoundSample = audio.Samples.Get(@"Multiplayer/Matchmaking/match-found");
+
+            LinkFlowContainer experimentalText;
 
             InternalChild = new InverseScalingDrawSizePreservingFillContainer
             {
@@ -154,7 +164,39 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                 ],
                                                 Content = new[]
                                                 {
-                                                    new Drawable[] { new QueueSectionHeader("Queued players") },
+                                                    new Drawable[]
+                                                    {
+                                                        new FillFlowContainer
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new Container
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    AutoSizeAxes = Axes.Y,
+                                                                    Masking = true,
+                                                                    CornerRadius = 5,
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        new Box
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                            Colour = colours.Yellow
+                                                                        },
+                                                                        experimentalText = new ExperimentalLinkFlowContainer
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                            AutoSizeAxes = Axes.Y,
+                                                                            Padding = new MarginPadding(10),
+                                                                        }
+                                                                    }
+                                                                },
+                                                                new QueueSectionHeader("Queued players")
+                                                            }
+                                                        }
+                                                    },
                                                     new Drawable[]
                                                     {
                                                         new Container
@@ -310,6 +352,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     }
                 }
             };
+
+            experimentalText.AddIcon(FontAwesome.Solid.Lightbulb);
+            experimentalText.AddText(@" ");
+            experimentalText.AddText("This system is under continuous and rapid development.\n", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
+            experimentalText.AddText("Follow the ");
+            experimentalText.AddLink("changelog", @"https://osu.ppy.sh/community/forums/topics/2202736", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
+            experimentalText.AddText(" and provide any ");
+            experimentalText.AddLink("feedback", @"https://osu.ppy.sh/community/forums/topics/2198397", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
+            experimentalText.AddText(" on the osu! forums!");
         }
 
         protected override void LoadComplete()
@@ -330,11 +381,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 }
             }
 
+            client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
+
             currentState.BindTo(queue.CurrentState);
             currentState.BindValueChanged(s => SetState(s.NewValue));
-            client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
-            selectedPool.BindValueChanged(onSelectedPoolChanged, true);
-            populateAvailablePools().FireAndForget();
+
+            selectedPool.BindTo(queue.SelectedPool);
+            selectedPool.BindValueChanged(e => refreshLobbyData());
+
+            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindValueChanged(connected => Schedule(() =>
+            {
+                if (connected.NewValue)
+                {
+                    populateAvailablePools().FireAndForget();
+                    refreshLobbyData();
+                }
+                else
+                {
+                    availablePools.Value = null;
+                    clearLobbyData();
+                }
+            }), true);
         }
 
         private async Task populateAvailablePools()
@@ -345,8 +413,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 availablePools.Value = pools;
 
-                // Default to the user's ruleset for the initial pool selection.
-                selectedPool.Value = pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
+                // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
+                selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
             });
         }
 
@@ -360,7 +428,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                            {
                                APIUser?[] users = result.GetResultSafely();
                                if (!cancellation.IsCancellationRequested)
-                                   Users = users.OfType<APIUser>().ToArray();
+                                   cloud.Users = users.OfType<APIUser>().ToArray();
                            }), cancellation.Token);
 
             // Global (incremental) updates will not contain the user rating, so keep the one we already received from initial status data.
@@ -369,27 +437,45 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             ratingGraph.SetData(status.RatingDistribution, userRating);
 
-            foreach (var state in status.RecentMatches.OfType<RankedPlayRoomState>())
-            {
-                resultPanelContainer.Insert(-resultPanelContainer.Count, new DelayedLoadWrapper(new RankedPlayMatchPanel(state)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Width = 1
-                }, 0)
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Width = 0.48f
-                });
-            }
+            loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
         });
 
-        private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
-        {
-            userRating = null;
-            ratingGraph.SetData([], null);
-            resultPanelContainer.Clear();
+        private int historyInsertOrder;
 
-            if (e.NewValue == null)
+        private async Task loadRecentMatches(RankedPlayRoomState[] matches)
+        {
+            // matches initial API response.
+            const int max_panels = 50;
+
+            await userLookupCache.GetUsersAsync(matches.SelectMany(m => m.Users.Keys).ToArray()).ConfigureAwait(false);
+
+            Scheduler.Add(() =>
+            {
+                foreach (var match in matches)
+                {
+                    resultPanelContainer.Insert(historyInsertOrder--, new RankedPlayMatchPanel(match)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Width = 0.48f
+                    });
+                }
+
+                if (resultPanelContainer.Any(c => c.Position != Vector2.Zero))
+                {
+                    resultPanelContainer.LayoutDuration = 400;
+                    resultPanelContainer.LayoutEasing = Easing.OutQuint;
+                }
+
+                while (resultPanelContainer.Count > max_panels)
+                    resultPanelContainer.Children.First().RemoveAndDisposeImmediately();
+            });
+        }
+
+        private void refreshLobbyData()
+        {
+            clearLobbyData();
+
+            if (selectedPool.Value == null)
             {
                 client.MatchmakingLeaveLobby().FireAndForget();
                 return;
@@ -397,8 +483,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             client.MatchmakingJoinLobbyWithParams(new MatchmakingJoinLobbyRequest
             {
-                PoolId = e.NewValue.Id
+                PoolId = selectedPool.Value.Id
             }).FireAndForget();
+        }
+
+        private void clearLobbyData()
+        {
+            resultPanelContainer.Clear();
+            resultPanelContainer.LayoutDuration = 0;
+            userRating = null;
+            ratingGraph.SetData([], null);
+
+            cloud.Users = Array.Empty<APIUser>();
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
@@ -423,6 +519,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.OnSuspending(e);
 
+            stopWaitingLoopPlayback();
             client.MatchmakingLeaveLobby().FireAndForget();
         }
 
@@ -431,14 +528,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (base.OnExiting(e))
                 return true;
 
-            client.MatchmakingLeaveLobby().FireAndForget();
+            stopWaitingLoopPlayback();
 
             switch (currentState.Value)
             {
                 default:
-                    return false;
-
-                case MatchmakingScreenState.Queueing:
+                    client.MatchmakingLeaveLobby().FireAndForget();
                     queue.SearchInBackground();
                     return false;
 
@@ -451,11 +546,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     // Block exit until it's initiated from inside the matchmaking screen.
                     return true;
             }
-        }
-
-        public APIUser[] Users
-        {
-            set => cloud.Users = value;
         }
 
         public void SetState(MatchmakingScreenState newState)
@@ -472,11 +562,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             switch (newState)
             {
                 case MatchmakingScreenState.Idle:
+                    LinkFlowContainer duelHint;
+
                     mainContent.Child = new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        AutoSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(10),
                         Children = new Drawable[]
@@ -495,6 +588,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Width = 200,
+                                Enabled = { BindTarget = isConnected },
                                 SelectedPool = { BindTarget = selectedPool },
                                 Action = () =>
                                 {
@@ -502,9 +596,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     queue.JoinQueue(selectedPool.Value);
                                 },
                                 Text = "Begin queueing",
+                            },
+                            duelHint = new LinkFlowContainer
+                            {
+                                TextAnchor = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                             }
                         }
                     };
+
+                    duelHint.AddText("Open the ");
+                    duelHint.AddLink("dashboard", () => dashboardOverlay?.Show());
+                    duelHint.AddText(" to duel another player!");
+
                     break;
 
                 case MatchmakingScreenState.Queueing:
@@ -517,12 +622,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Spacing = new Vector2(15),
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
+                            new FillFlowContainer
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = "Waiting for a game...",
-                                Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 4),
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Text = "Searching for a match...",
+                                        Font = OsuFont.Style.Title,
+                                    },
+                                    new QueueTimerText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.Style.Body,
+                                    }
+                                }
                             },
                             new LoadingSpinner
                             {
@@ -723,6 +845,55 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
+            }
+        }
+
+        private partial class ExperimentalLinkFlowContainer : LinkFlowContainer
+        {
+            public ExperimentalLinkFlowContainer()
+                : base(sp => sp.Colour = Color4.Black)
+            {
+            }
+
+            protected override DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart)
+                => new LinkCompiler(textPart);
+
+            private partial class LinkCompiler : DrawableLinkCompiler
+            {
+                public LinkCompiler(ITextPart part)
+                    : base(part)
+                {
+                }
+
+                public LinkCompiler(IEnumerable<Drawable> parts)
+                    : base(parts)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    IdleColour = colours.YellowDarker;
+                    HoverColour = Color4.Black;
+                }
+            }
+        }
+
+        private partial class QueueTimerText : OsuSpriteText
+        {
+            [Resolved]
+            private QueueController queue { get; set; } = null!;
+
+            public QueueTimerText()
+            {
+                AlwaysPresent = true;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                Text = queue.QueueTimer.Elapsed.ToString(@"mm\:ss");
             }
         }
     }

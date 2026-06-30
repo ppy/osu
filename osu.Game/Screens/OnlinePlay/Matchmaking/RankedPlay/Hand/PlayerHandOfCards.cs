@@ -102,7 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
                 cardDeselectSamples[i] = audio.Samples.Get(@$"Multiplayer/Matchmaking/Ranked/card-deselect-{i + 1}");
         }
 
-        protected override HandCard CreateHandCard(RankedPlayCard card) => new PlayerHandCard(card)
+        protected override HandCard CreateHandCard(RankedPlayCard card) => new PlayerHandCard(card, Flipped)
         {
             Clicked = cardClicked,
             Dragged = cardDragged,
@@ -199,6 +199,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         private void moveCardFocus(int direction)
         {
             var cards = GetCardsInDisplayOrder();
+
+            if (cards.Count == 0)
+                return;
 
             int currentIndex = cards.FindIndex(c => c.HasFocus);
 
