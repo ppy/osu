@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
@@ -64,14 +63,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Spacing = new Vector2(0, vertical_spacing),
                             Children = new Drawable[]
                             {
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsRankedScore),
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsHitAccuracy),
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsPlayCount),
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsTotalScore),
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsTotalHits),
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsHitsPerPlay),
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsMaximumCombo),
-                                new ExtendedDetailsEntryLabel(UsersStrings.ShowStatsReplaysWatchedByOthers),
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsRankedScore },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsHitAccuracy },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsPlayCount },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsTotalScore },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsTotalHits },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsHitsPerPlay },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsMaximumCombo },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsReplaysWatchedByOthers },
                             }
                         },
                         new FillFlowContainer
@@ -82,14 +81,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Spacing = new Vector2(0, vertical_spacing),
                             Children = new Drawable[]
                             {
-                                rankedScore = new ExtendedDetailsEntryValue(),
-                                hitAccuracy = new ExtendedDetailsEntryValue(),
-                                playCount = new ExtendedDetailsEntryValue(),
-                                totalScore = new ExtendedDetailsEntryValue(),
-                                totalHits = new ExtendedDetailsEntryValue(),
-                                hitsPerPlay = new ExtendedDetailsEntryValue(),
-                                maximumCombo = new ExtendedDetailsEntryValue(),
-                                replaysWatched = new ExtendedDetailsEntryValue(),
+                                rankedScore = new ExtendedDetailsEntryValue(colourProvider),
+                                hitAccuracy = new ExtendedDetailsEntryValue(colourProvider),
+                                playCount = new ExtendedDetailsEntryValue(colourProvider),
+                                totalScore = new ExtendedDetailsEntryValue(colourProvider),
+                                totalHits = new ExtendedDetailsEntryValue(colourProvider),
+                                hitsPerPlay = new ExtendedDetailsEntryValue(colourProvider),
+                                maximumCombo = new ExtendedDetailsEntryValue(colourProvider),
+                                replaysWatched = new ExtendedDetailsEntryValue(colourProvider),
                             }
                         },
                     }
@@ -131,29 +130,18 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public partial class ExtendedDetailsEntryLabel : OsuSpriteText
         {
-            public ExtendedDetailsEntryLabel(LocalisableString text)
+            public ExtendedDetailsEntryLabel(OverlayColourProvider colourProvider)
             {
                 Font = OsuFont.Default.With(size: 12);
-                Text = text;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
                 Colour = colourProvider.Content1;
             }
         }
 
         public partial class ExtendedDetailsEntryValue : OsuSpriteText
         {
-            public ExtendedDetailsEntryValue()
+            public ExtendedDetailsEntryValue(OverlayColourProvider colourProvider)
             {
                 Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
                 Colour = colourProvider.Content2;
             }
         }
