@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             foreach (var cp in currentGroupItems)
             {
-                if (cp is TimingControlPoint tp)
+                if (cp is TimingControlPoint tp && configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
                 {
                     TimingSectionAdjustments.AdjustHitObjectOffset(beatmap, tp, offsetChange.NewValue - offsetChange.OldValue);
                     beatmap.UpdateAllHitObjects();
