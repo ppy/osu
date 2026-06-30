@@ -11,7 +11,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -551,7 +550,7 @@ namespace osu.Game.Screens.Edit
                 double newStart = SnapTime(oldStart, null);
                 double newEnd = Math.Max(newStart + GetBeatLengthAtTime(newStart), SnapTime(oldEnd, newStart));
 
-                bool changed = false;
+                hitObject.StartTime = newStart;
 
                 switch (hitObject)
                 {
@@ -561,62 +560,20 @@ namespace osu.Game.Screens.Edit
                         double oldDuration = oldEnd - oldStart;
                         double newDurationTarget = newEnd - newStart;
 
-                        if (!Precision.AlmostEquals(oldStart, newStart))
-                        {
-                            hitObject.StartTime = newStart;
-                            changed = true;
-                        }
-
-                        if (oldDuration > 0 && !Precision.AlmostEquals(oldDuration, newDurationTarget))
-                        {
-                            double scaledMultiplier = sv.SliderVelocityMultiplier * (oldDuration / newDurationTarget);
-
-                            if (!Precision.AlmostEquals(sv.SliderVelocityMultiplier, scaledMultiplier))
-                            {
-                                sv.SliderVelocityMultiplier = scaledMultiplier;
-                                changed = true;
-                            }
-                        }
+                        if (oldDuration > 0)
+                            sv.SliderVelocityMultiplier *= oldDuration / newDurationTarget;
 
                         break;
                     }
 
                     // Long notes with a real duration (spinners, hold notes, swells, etc.).
                     case IHasDuration hasDuration:
-                    {
-                        if (!Precision.AlmostEquals(oldStart, newStart))
-                        {
-                            hitObject.StartTime = newStart;
-                            changed = true;
-                        }
-
-                        double newDuration = newEnd - newStart;
-
-                        if (!Precision.AlmostEquals(hasDuration.Duration, newDuration))
-                        {
-                            hasDuration.Duration = newDuration;
-                            changed = true;
-                        }
-
+                        hasDuration.Duration = newEnd - newStart;
                         break;
-                    }
-
-                    // Hit circles and other objects: only the start time is snapped.
-                    default:
-                    {
-                        if (!Precision.AlmostEquals(oldStart, newStart))
-                        {
-                            hitObject.StartTime = newStart;
-                            changed = true;
-                        }
-
-                        break;
-                    }
                 }
-
-                if (changed)
-                    Update(hitObject);
             }
+
+            UpdateAllHitObjects();
 
             EndChange();
         }
