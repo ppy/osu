@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -10,7 +11,9 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -161,17 +164,17 @@ namespace osu.Game.Screens.Ranking
             switch (replayAvailability)
             {
                 case ReplayAvailability.Local:
-                    button.TooltipText = @"watch replay";
+                    button.TooltipText = SongSelectStrings.WatchReplay.ToLower();
                     button.Enabled.Value = true;
                     break;
 
                 case ReplayAvailability.Online:
-                    button.TooltipText = @"download replay";
+                    button.TooltipText = UsersStrings.ShowExtraTopRanksDownloadReplay.ToLower();
                     button.Enabled.Value = true;
                     break;
 
                 default:
-                    button.TooltipText = @"replay unavailable";
+                    button.TooltipText = ResultsScreenStrings.ReplayUnavailable;
                     button.Enabled.Value = false;
                     break;
             }

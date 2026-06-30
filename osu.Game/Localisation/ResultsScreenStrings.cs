@@ -24,6 +24,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoPPForFailedScores => new TranslatableString(getKey(@"no_pp_for_failed_scores"), @"Performance points are not granted for failed scores.");
 
+        /// <summary>
+        /// "importing score..."
+        /// </summary>
+        public static LocalisableString ImportingScore => new TranslatableString(getKey(@"importing_score"), @"importing score...");
+
+        /// <summary>
+        /// "save score"
+        /// </summary>
+        public static LocalisableString SaveScore => new TranslatableString(getKey(@"save_score"), @"save score");
+
+        /// <summary>
+        /// "replay unavailable"
+        /// </summary>
+        public static LocalisableString ReplayUnavailable => new TranslatableString(getKey(@"replay_unavailable"), @"replay unavailable");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
