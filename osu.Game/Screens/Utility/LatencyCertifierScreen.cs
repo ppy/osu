@@ -336,9 +336,9 @@ namespace osu.Game.Screens.Utility
             LocalisableString? cannotIncreaseReason = null;
 
             if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > target_host_update_frames)
-                cannotIncreaseReason = LatencyCertifierStrings.CannotIncreaseLevelDueToMaximumLevel;
+                cannotIncreaseReason = LatencyCertifierStrings.MaximumLevelReached;
             else if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > Clock.FramesPerSecond)
-                cannotIncreaseReason = LatencyCertifierStrings.CannotIncreaseLevelDueToLowPerformance;
+                cannotIncreaseReason = LatencyCertifierStrings.LowPerformanceRestriction;
 
             FillFlowContainer buttonFlow;
 
@@ -434,7 +434,7 @@ namespace osu.Game.Screens.Utility
                 }),
                 new OsuSpriteText
                 {
-                    Text = LatencyCertifierStrings.ResultsWithRecommendedRefreshRate(mapDifficultyToTargetFrameRate(DifficultyLevel + 1)),
+                    Text = LatencyCertifierStrings.CertificationResults(mapDifficultyToTargetFrameRate(DifficultyLevel + 1)),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),

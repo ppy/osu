@@ -73,12 +73,12 @@ Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclus
         /// <summary>
         /// "You&#39;ve reached the maximum level."
         /// </summary>
-        public static LocalisableString CannotIncreaseLevelDueToMaximumLevel => new TranslatableString(getKey(@"cannot_increase_level_due_to_maximum_level"), @"You've reached the maximum level.");
+        public static LocalisableString MaximumLevelReached => new TranslatableString(getKey(@"maximum_level_reached"), @"You've reached the maximum level.");
 
         /// <summary>
         /// "Game is not running fast enough to test this level!"
         /// </summary>
-        public static LocalisableString CannotIncreaseLevelDueToLowPerformance => new TranslatableString(getKey(@"cannot_increase_level_due_to_low_performance"), @"Game is not running fast enough to test this level!");
+        public static LocalisableString LowPerformanceRestriction => new TranslatableString(getKey(@"low_performance_restriction"), @"Game is not running fast enough to test this level!");
 
         /// <summary>
         /// "Continue to the next level"
@@ -118,7 +118,7 @@ Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclus
         /// <summary>
         /// "You should use a frame limiter with update rate of {0} Hz (or FPS) for best results!"
         /// </summary>
-        public static LocalisableString ResultsWithRecommendedRefreshRate(int recommendedRefreshRate) => new TranslatableString(getKey(@"results_with_recommended_refresh_rate"), @"You should use a frame limiter with update rate of {0} Hz (or FPS) for best results!", recommendedRefreshRate);
+        public static LocalisableString CertificationResults(int recommendedRefreshRate) => new TranslatableString(getKey(@"certification_results"), @"You should use a frame limiter with update rate of {0} Hz (or FPS) for best results!", recommendedRefreshRate);
 
         /// <summary>
         /// "Feels better"
