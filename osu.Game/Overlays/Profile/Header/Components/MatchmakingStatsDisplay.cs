@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -107,30 +108,57 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return;
             }
 
-            APIUserMatchmakingStatistics[] stats = User.Value.User.MatchmakingStatistics;
+            APIUserMatchmakingStatistics[] allStats = User.Value.User.MatchmakingStatistics;
 
-            if (stats.Length == 0)
+            if (allStats.Length == 0)
             {
                 Hide();
                 return;
             }
 
-            int? highestRank = null;
+            APIUserMatchmakingStatistics? highestRankStats = null;
 
-            foreach (var stat in stats)
+            foreach (var stats in allStats)
             {
-                if (stat.Pool.Active && stat.Rank != null)
-                {
-                    if (highestRank == null || stat.Rank < highestRank)
-                        highestRank = stat.Rank;
-                }
+                if (stats.Pool.Active && (highestRankStats == null || stats.Rank < highestRankStats.Rank))
+                    highestRankStats = stats;
             }
 
-            rankText.Text = highestRank == null ? "-" : $"#{highestRank:N0}";
+            rankText.Text = highestRankStats == null ? "-" : $"#{highestRankStats.Rank:N0}";
 
-            TooltipContent = new MatchmakingStatsTooltipData(colourProvider, stats.OrderByDescending(s => s.PoolId).ToArray());
+            if (highestRankStats != null)
+                rankText.Colour = OsuColour.ForRankingTier(GetRankingTier(highestRankStats));
+
+            TooltipContent = new MatchmakingStatsTooltipData(colourProvider, allStats.OrderByDescending(s => s.PoolId).ToArray());
 
             Show();
+        }
+
+        /// <seealso href="https://github.com/ppy/osu-web/blob/9f136df53a1c436229b0e4eb192011c15514dcf9/resources/js/profile-page/matchmaking.tsx#L15-L34"/>
+        public static RankingTier GetRankingTier(APIUserMatchmakingStatistics stats)
+        {
+            int rank = stats.Rank;
+            float percent = stats.RankPercent;
+
+            if (rank <= 100)
+                return RankingTier.Lustrous;
+
+            if (percent < 0.05)
+                return RankingTier.Radiant;
+
+            if (percent < 0.2)
+                return RankingTier.Rhodium;
+
+            if (percent < 0.5)
+                return RankingTier.Platinum;
+
+            if (percent < 0.75)
+                return RankingTier.Gold;
+
+            if (percent < 0.95)
+                return RankingTier.Silver;
+
+            return RankingTier.Bronze;
         }
 
         public ITooltip<MatchmakingStatsTooltipData> GetCustomTooltip() => new MatchmakingStatsTooltip();

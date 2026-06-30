@@ -78,19 +78,23 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
-        private Drawable[] createRow(OverlayColourProvider colourProvider, APIUserMatchmakingStatistics stat)
+        private Drawable[] createRow(OverlayColourProvider colourProvider, APIUserMatchmakingStatistics stats)
         {
             return
             [
                 new StatisticText(colourProvider)
                 {
-                    Text = stat.Pool.Name,
+                    Text = stats.Pool.Name,
                     Colour = Color4.White
                 },
-                new StatisticText(colourProvider) { Text = $"#{stat.Rank:N0}" },
-                new StatisticText(colourProvider) { Text = stat.FirstPlacements.ToString("N0") },
-                new StatisticText(colourProvider) { Text = stat.Plays.ToString("N0") },
-                new StatisticText(colourProvider) { Text = stat.Rating.ToString("N0") + (stat.IsRatingProvisional ? "*" : string.Empty) }
+                new StatisticText(colourProvider)
+                {
+                    Text = $"#{stats.Rank:N0}",
+                    Colour = OsuColour.ForRankingTier(MatchmakingStatsDisplay.GetRankingTier(stats))
+                },
+                new StatisticText(colourProvider) { Text = stats.FirstPlacements.ToString("N0") },
+                new StatisticText(colourProvider) { Text = stats.Plays.ToString("N0") },
+                new StatisticText(colourProvider) { Text = stats.Rating.ToString("N0") + (stats.IsRatingProvisional ? "*" : string.Empty) }
             ];
         }
 
