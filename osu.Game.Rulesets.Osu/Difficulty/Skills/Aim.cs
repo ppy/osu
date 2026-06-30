@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// The number of sections with the highest strains, which the peak strain reductions will apply to.
         /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
         /// </summary>
-        private int reducedSectionTime => 4000;
+        private const int reduced_section_time = 4000;
 
         /// <summary>
         /// The baseline multiplier applied to the section with the biggest strain.
@@ -225,13 +225,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             // Strains are split into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
-            while (strains.Count > skipCount && time < reducedSectionTime)
+            while (strains.Count > skipCount && time < reduced_section_time)
             {
                 StrainPeak strain = strains[skipCount];
 
                 for (double addedTime = 0; addedTime < strain.SectionLength; addedTime += chunk_size)
                 {
-                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / reducedSectionTime, 0, 1)));
+                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / reduced_section_time, 0, 1)));
 
                     // intentionally add at end and sort afterwards, should be cheaper.
                     strains.Add(new StrainPeak(
