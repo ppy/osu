@@ -39,6 +39,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ReplayUnavailable => new TranslatableString(getKey(@"replay_unavailable"), @"replay unavailable");
 
+        /// <summary>
+        /// "Achieved PP"
+        /// </summary>
+        public static LocalisableString AchievedPP => new TranslatableString(getKey(@"achieved_pp"), @"Achieved PP");
+
+        /// <summary>
+        /// "Maximum PP"
+        /// </summary>
+        public static LocalisableString MaximumPP => new TranslatableString(getKey(@"maximum_pp"), @"Maximum PP");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

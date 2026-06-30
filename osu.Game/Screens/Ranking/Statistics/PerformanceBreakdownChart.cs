@@ -17,6 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
 using osuTK.Graphics;
@@ -110,7 +111,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                             Origin = Anchor.CentreLeft,
                                             Anchor = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                            Text = "Achieved PP",
+                                            Text = ResultsScreenStrings.AchievedPP,
                                             Colour = Color4Extensions.FromHex("#66FFCC")
                                         },
                                         achievedPerformance = new OsuSpriteText
@@ -128,7 +129,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                             Origin = Anchor.CentreLeft,
                                             Anchor = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                            Text = "Maximum",
+                                            Text = ResultsScreenStrings.MaximumPP,
                                             Colour = OsuColour.Gray(0.7f)
                                         },
                                         maximumPerformance = new OsuSpriteText
