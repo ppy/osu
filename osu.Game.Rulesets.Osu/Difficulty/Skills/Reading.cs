@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Reading : HarmonicSkill
     {
-        private readonly List<DifficultyHitObject> objectList = new List<DifficultyHitObject>();
-
         private readonly bool hasHiddenMod;
 
         public Reading(Mod[] mods)
@@ -29,18 +27,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
+        private double reducedNoteCount;
+        private double? reducedDuration;
+
         private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             const double skill_multiplier = 2.5;
-
-            objectList.Add(current);
+            const double reduced_difficulty_duration = 60 * 1000;
 
             double decay = strainDecay(current.DeltaTime);
 
             currentStrain *= decay;
             currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
+
+            reducedDuration ??= current.StartTime + reduced_difficulty_duration;
+
+            if (current.StartTime <= reducedDuration)
+                reducedNoteCount++;
 
             return currentStrain;
         }
@@ -75,8 +80,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
 
-            int reducedNoteCount = calculateReducedNoteCount();
-
             for (int i = 0; i < Math.Min(difficulties.Count, reducedNoteCount); i++)
             {
                 double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((double)i / reducedNoteCount, 0, 1)));
@@ -84,28 +87,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return difficulties;
-        }
-
-        private int calculateReducedNoteCount()
-        {
-            const double reduced_difficulty_duration = 60 * 1000;
-
-            if (objectList.Count == 0)
-                return 0;
-
-            double reducedDuration = objectList.First().StartTime + reduced_difficulty_duration;
-
-            int reducedNoteCount = 0;
-
-            foreach (var hitObject in objectList)
-            {
-                if (hitObject.StartTime > reducedDuration)
-                    break;
-
-                reducedNoteCount++;
-            }
-
-            return reducedNoteCount;
         }
 
         public override double CountTopWeightedObjectDifficulties(double difficultyValue)
