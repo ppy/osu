@@ -35,10 +35,36 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (!effectPoint.KiaiMode)
                 return;
 
+            double beatLength = timingPoint.BeatLength; // bpm = 60000 / beatLength
+            double flashingPeriod;
+
+            if (beatLength <= 120) // >=500 bpm, flash every 4 beats
+            {
+                if (beatIndex % 4 != 0)
+                {
+                    return;
+                }
+
+                flashingPeriod = beatLength * 4;
+            }
+            else if (beatLength <= 240) // >=250 bpm, flash every 2 beats
+            {
+                if (beatIndex % 2 != 0)
+                {
+                    return;
+                }
+
+                flashingPeriod = beatLength * 2;
+            }
+            else // <250 bpm, flash every beat
+            {
+                flashingPeriod = beatLength;
+            }
+
             Child
                 .FadeTo(flash_opacity, EarlyActivationMilliseconds, Easing.OutQuint)
                 .Then()
-                .FadeOut(Math.Max(fade_length, timingPoint.BeatLength - fade_length), Easing.OutSine);
+                .FadeOut(Math.Max(fade_length, flashingPeriod - fade_length), Easing.OutSine);
         }
     }
 }
