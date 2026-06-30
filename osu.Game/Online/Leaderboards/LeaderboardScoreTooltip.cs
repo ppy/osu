@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -135,11 +136,12 @@ namespace osu.Game.Online.Leaderboards
 
         private void updateTimestampLabel()
         {
-            if (displayedScore != null)
-            {
-                timestampLabel.Text = LocalisableString.Format("Played on {0}",
-                    displayedScore.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt"));
-            }
+            if (displayedScore == null)
+                return;
+
+            var timeText = displayedScore.Date.ToLocalTime().ToLocalisableString(prefer24HourTime.Value ? @"d MMMM yyyy HH:mm" : @"d MMMM yyyy h:mm tt");
+
+            timestampLabel.Text = LeaderboardStrings.PlayedOn(timeText);
         }
 
         protected override void PopIn() => this.FadeIn(20, Easing.OutQuint);

@@ -49,6 +49,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoTeam => new TranslatableString(getKey(@"no_team"), @"You are not on a team. Maybe you should join one!");
 
+        /// <summary>
+        /// "Played on {0}"
+        /// </summary>
+        public static LocalisableString PlayedOn(LocalisableString timeText) => new TranslatableString(getKey(@"played_on"), @"Played on {0}", timeText);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
