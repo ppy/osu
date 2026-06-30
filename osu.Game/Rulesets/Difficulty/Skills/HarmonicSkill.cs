@@ -53,18 +53,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0;
 
-            // Objects with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These objects will not contribute to the difficulty.
-            var difficulties = ObjectDifficulties;
-
-            if (difficulties.Count == 0)
-                return 0;
-
-            difficulties = GetTransformedDifficulties(difficulties);
+            List<double> difficulties = GetTransformedDifficulties(ObjectDifficulties);
 
             double difficulty = 0;
             int index = 0;
 
+            // Objects with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These objects will not contribute to the difficulty.
             foreach (double obj in difficulties.OrderDescending().Where(v => v > 0))
             {
                 // Use a harmonic sum that considers each object of the map according to a predefined weight.
