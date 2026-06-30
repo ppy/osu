@@ -85,6 +85,11 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString InvertedShear => new TranslatableString(getKey(@"inverted_shear"), @"Inverted shear");
 
+        /// <summary>
+        /// "Bar height"
+        /// </summary>
+        public static LocalisableString BarHeight => new TranslatableString(getKey(@"bar_height"), @"Bar height");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
