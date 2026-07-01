@@ -43,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {
             typeof(IRequiresApproachCircles),
+            typeof(OsuModObjectScaleTween),
             typeof(OsuModRandom),
             typeof(OsuModSpunOut),
             typeof(OsuModStrictTracking),
