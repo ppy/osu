@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Extensions;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Skinning
@@ -27,13 +26,6 @@ namespace osu.Game.Skinning
         {
             Lookup = lookup;
             Ruleset = ruleset;
-        }
-
-        public override string ToString()
-        {
-            if (Ruleset == null) return Lookup.GetDescription();
-
-            return $"{Lookup.GetDescription()} (\"{Ruleset.Name}\" only)";
         }
 
         public bool Equals(GlobalSkinnableContainerLookup? other)
