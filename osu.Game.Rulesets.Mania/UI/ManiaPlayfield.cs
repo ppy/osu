@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Primitives;
@@ -97,30 +98,15 @@ namespace osu.Game.Rulesets.Mania.UI
         public void Add(BarLine barLine) => stages.ForEach(s => s.Add(barLine));
 
         /// <summary>
-        /// Retrieves a column from a screen-space position.
+        /// Find the closest column to the proposed screen space position.
         /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        /// <returns>The column which the <paramref name="screenSpacePosition"/> lies in.</returns>
-        public Column GetColumnByPosition(Vector2 screenSpacePosition)
+        /// <param name="screenSpaceX">The screen-space X coordinate.</param>
+        /// <returns>The column which the <paramref name="screenSpaceX"/> is closest to.</returns>
+        public Column GetClosestColumnByPosition(float screenSpaceX)
         {
-            Column found = null;
-
-            foreach (var stage in stages)
-            {
-                foreach (var column in stage.Columns)
-                {
-                    if (column.ReceivePositionalInputAt(new Vector2(screenSpacePosition.X, column.ScreenSpaceDrawQuad.Centre.Y)))
-                    {
-                        found = column;
-                        break;
-                    }
-                }
-
-                if (found != null)
-                    break;
-            }
-
-            return found;
+            return stages
+                   .SelectMany(s => s.Columns.Select((Column column, float distance) (c) => (c, Math.Abs(screenSpaceX - c.ScreenSpaceDrawQuad.Centre.X))))
+                   .MinBy(c => c.distance).column;
         }
 
         /// <summary>

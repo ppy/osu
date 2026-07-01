@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
 
         protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
-            Playfield.GetColumnByPosition(screenSpacePosition);
+            Playfield.GetClosestColumnByPosition(screenSpacePosition.X);
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods) =>
             drawableRuleset = new DrawableManiaEditorRuleset(ruleset, beatmap, mods);
