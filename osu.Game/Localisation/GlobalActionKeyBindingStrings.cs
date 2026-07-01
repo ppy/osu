@@ -365,9 +365,9 @@ namespace osu.Game.Localisation
         public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
 
         /// <summary>
-        /// "Hold to double playback speed"
+        /// "Fast forward replay"
         /// </summary>
-        public static LocalisableString HoldForReplayRateChange => new TranslatableString(getKey(@"hold_for_replay_rate_change"), @"Hold to double playback speed");
+        public static LocalisableString FastForwardReplay => new TranslatableString(getKey(@"fast_forward_replay"), @"Fast forward replay");
 
         /// <summary>
         /// "Toggle chat focus"

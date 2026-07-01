@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
 
         private double? lastFrameTime;
 
-        private double originalPlaybackRate;
+        private double userPlaybackRateBeforeFastForward;
 
         private ReplayFailIndicator? failIndicator;
         private PlaybackSettings? playbackSettings;
@@ -194,10 +194,10 @@ namespace osu.Game.Screens.Play
                         GameplayClockContainer.Stop();
                     return true;
 
-                case GlobalAction.HoldForPlaybackRateChange:
+                case GlobalAction.FastForwardReplay:
                     if (e.Repeat) return false;
 
-                    originalPlaybackRate = playbackSettings!.UserPlaybackRate.Value;
+                    userPlaybackRateBeforeFastForward = playbackSettings!.UserPlaybackRate.Value;
                     playbackSettings!.UserPlaybackRate.Value *= 2;
                     return true;
             }
@@ -229,13 +229,10 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            if (!LoadedBeatmapSuccessfully)
-                return;
-
             switch (e.Action)
             {
-                case GlobalAction.HoldForPlaybackRateChange:
-                    playbackSettings!.UserPlaybackRate.Value = originalPlaybackRate;
+                case GlobalAction.FastForwardReplay:
+                    playbackSettings!.UserPlaybackRate.Value = userPlaybackRateBeforeFastForward;
                     return;
             }
         }
