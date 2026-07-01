@@ -1,14 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
+using osu.Framework.Extensions.TypeExtensions;
 
 namespace osu.Game.Online
 {
@@ -22,6 +22,7 @@ namespace osu.Game.Online
             MessagePackSerializerOptions.Standard.WithResolver(new SignalRUnionWorkaroundResolver());
 
         private static readonly IReadOnlyDictionary<Type, IMessagePackFormatter> formatter_map = createFormatterMap();
+        private static readonly ConcurrentDictionary<Type, IMessagePackFormatter> enum_formatter_map = [];
 
         private static IReadOnlyDictionary<Type, IMessagePackFormatter> createFormatterMap()
         {
@@ -33,7 +34,7 @@ namespace osu.Game.Online
 
             return new Dictionary<Type, IMessagePackFormatter>(baseMap.Select(t =>
             {
-                var formatter = (IMessagePackFormatter)Activator.CreateInstance(typeof(TypeRedirectingFormatter<,>).MakeGenericType(t.derivedType, t.baseType));
+                var formatter = (IMessagePackFormatter)Activator.CreateInstance(typeof(TypeRedirectingFormatter<,>).MakeGenericType(t.derivedType, t.baseType))!;
                 return new KeyValuePair<Type, IMessagePackFormatter>(t.derivedType, formatter);
             }));
         }
@@ -43,7 +44,15 @@ namespace osu.Game.Online
             if (formatter_map.TryGetValue(typeof(T), out var formatter))
                 return (IMessagePackFormatter<T>)formatter;
 
-            return StandardResolver.Instance.GetFormatter<T>();
+            if (typeof(T).IsEnum)
+            {
+                if (enum_formatter_map.TryGetValue(typeof(T), out formatter))
+                    return (IMessagePackFormatter<T>)formatter;
+
+                return (IMessagePackFormatter<T>)(enum_formatter_map[typeof(T)] = (IMessagePackFormatter)Activator.CreateInstance(typeof(EnumFormatter<>).MakeGenericType(typeof(T)))!);
+            }
+
+            return StandardResolver.Instance.GetFormatterWithVerify<T>();
         }
 
         public class TypeRedirectingFormatter<TActual, TBase> : IMessagePackFormatter<TActual>
@@ -52,14 +61,55 @@ namespace osu.Game.Online
 
             public TypeRedirectingFormatter()
             {
-                baseFormatter = StandardResolver.Instance.GetFormatter<TBase>();
+                baseFormatter = StandardResolver.Instance.GetFormatterWithVerify<TBase>();
             }
 
-            public void Serialize(ref MessagePackWriter writer, TActual value, MessagePackSerializerOptions options) =>
-                baseFormatter.Serialize(ref writer, (TBase)(object)value, StandardResolver.Options);
+            public void Serialize(ref MessagePackWriter writer, TActual value, MessagePackSerializerOptions options)
+                => baseFormatter.Serialize(ref writer, (TBase)(object)value!, StandardResolver.Options);
 
-            public TActual Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) =>
-                (TActual)(object)baseFormatter.Deserialize(ref reader, StandardResolver.Options);
+            public TActual Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+                => (TActual)(object)baseFormatter.Deserialize(ref reader, StandardResolver.Options)!;
+        }
+
+        public class EnumFormatter<T> : IMessagePackFormatter<T>
+            where T : Enum
+        {
+            private readonly IMessagePackFormatter<T> formatter;
+
+            public EnumFormatter()
+            {
+                formatter = StandardResolver.Instance.GetFormatterWithVerify<T>();
+            }
+
+            public void Serialize(ref MessagePackWriter writer, T value, MessagePackSerializerOptions options)
+            {
+                EnumValueOutOfRangeException<T>.ThrowIfNotDefined(value);
+                formatter.Serialize(ref writer, value, StandardResolver.Options);
+            }
+
+            public T Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+            {
+                T result = formatter.Deserialize(ref reader, StandardResolver.Options);
+                EnumValueOutOfRangeException<T>.ThrowIfNotDefined(result);
+                return result;
+            }
+        }
+
+        public class EnumValueOutOfRangeException<T> : Exception
+            where T : Enum
+        {
+            public EnumValueOutOfRangeException(T value)
+                : base($"Enum value '{value}' out of range for type '{typeof(T).ReadableName()}'")
+            {
+            }
+
+            public static void ThrowIfNotDefined(T value)
+            {
+                if (Enum.IsDefined(typeof(T), value))
+                    return;
+
+                throw new EnumValueOutOfRangeException<T>(value);
+            }
         }
     }
 }
