@@ -59,7 +59,7 @@ using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Users;
 using osuTK.Input;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Edit
 {
@@ -1285,7 +1285,7 @@ namespace osu.Game.Screens.Edit
             yield return new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Destructive, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } };
             yield return new OsuMenuItemSpacer();
 
-            var save = new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => attemptMutationOperation(Save)) { Hotkey = new Hotkey(PlatformAction.Save) };
+            var save = new EditorMenuItem(WebLocalisation.CommonStrings.ButtonsSave, MenuItemType.Standard, () => attemptMutationOperation(Save)) { Hotkey = new Hotkey(PlatformAction.Save) };
             saveRelatedMenuItems.Add(save);
             yield return save;
 

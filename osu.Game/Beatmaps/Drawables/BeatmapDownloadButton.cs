@@ -12,10 +12,10 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Resources.Localisation.Web;
-using CommonStrings = osu.Game.Localisation.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Drawables
                         if ((beatmapSet as IBeatmapSetOnlineInfo)?.Availability.DownloadDisabled == true)
                         {
                             button.Enabled.Value = false;
-                            button.TooltipText = BeatmapsetsStrings.AvailabilityDisabled;
+                            button.TooltipText = WebLocalisation.BeatmapsetsStrings.AvailabilityDisabled;
                         }
 
                         break;

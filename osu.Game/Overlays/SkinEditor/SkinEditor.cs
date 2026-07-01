@@ -18,7 +18,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using Web = osu.Game.Resources.Localisation.Web;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -36,6 +35,7 @@ using osu.Game.Skinning;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Utils;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.SkinEditor
                                                 {
                                                     Items = new OsuMenuItem[]
                                                     {
-                                                        new EditorMenuItem(Web.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()) { Hotkey = new Hotkey(PlatformAction.Save) },
+                                                        new EditorMenuItem(WebLocalisation.CommonStrings.ButtonsSave, MenuItemType.Standard, () => Save()) { Hotkey = new Hotkey(PlatformAction.Save) },
                                                         new EditorMenuItem(CommonStrings.Export, MenuItemType.Standard, () => skins.ExportCurrentSkin()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
                                                         new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, () => _ = editExternally()) { Action = { Disabled = !RuntimeInfo.IsDesktop } },
                                                         new OsuMenuItemSpacer(),

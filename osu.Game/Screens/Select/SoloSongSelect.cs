@@ -21,7 +21,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osu.Game.Utils;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select
 {
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Select
             };
 
             if (beatmaps.CanHide(beatmap))
-                yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
+                yield return new OsuMenuItem(WebLocalisation.CommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
         }
 
         protected override void OnStart()

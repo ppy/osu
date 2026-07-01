@@ -16,11 +16,10 @@ using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Utils;
 using osuTK.Graphics;
-using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapListing
         public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         public BeatmapSearchGeneralFilterRow()
-            : base(BeatmapsStrings.ListingSearchFiltersGeneral)
+            : base(WebLocalisation.BeatmapsStrings.ListingSearchFiltersGeneral)
         {
         }
 
@@ -200,7 +199,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = WebCommonStrings.ButtonsCancel,
+                    Text = WebLocalisation.CommonStrings.ButtonsCancel,
                 },
             };
         }

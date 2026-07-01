@@ -27,7 +27,6 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -37,7 +36,7 @@ using osu.Game.Users.Drawables;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
-using CommonStrings = osu.Game.Localisation.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Select
 {
@@ -324,9 +323,9 @@ namespace osu.Game.Screens.Select
                                                     Direction = FillDirection.Horizontal,
                                                     Children = new Drawable[]
                                                     {
-                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
+                                                        new ScoreComponentLabel(WebLocalisation.BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
                                                             Score.MaxCombo == Score.GetMaximumAchievableCombo(), 60),
-                                                        new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
+                                                        new ScoreComponentLabel(WebLocalisation.BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
                                                             55),
                                                     },
                                                     Alpha = 0,
@@ -518,8 +517,8 @@ namespace osu.Game.Screens.Select
 
         private (CaseTransformableString, LocalisableString DisplayAccuracy)[] getStatistics(ScoreInfo model) => new[]
         {
-            (BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), model.MaxCombo.ToString().Insert(model.MaxCombo.ToString().Length, "x")),
-            (BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), model.DisplayAccuracy),
+            (WebLocalisation.BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), model.MaxCombo.ToString().Insert(model.MaxCombo.ToString().Length, "x")),
+            (WebLocalisation.BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), model.DisplayAccuracy),
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -634,7 +633,7 @@ namespace osu.Game.Screens.Select
                 if (ShowReplay != null)
                     items.Add(new OsuMenuItem(SongSelectStrings.WatchReplay, MenuItemType.Standard, () => ShowReplay.Invoke(Score)));
                 items.Add(new OsuMenuItem(CommonStrings.Export, MenuItemType.Standard, () => scoreManager.Export(Score)));
-                items.Add(new OsuMenuItem(Resources.Localisation.Web.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                items.Add(new OsuMenuItem(WebLocalisation.CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
                 return items.ToArray();
             }

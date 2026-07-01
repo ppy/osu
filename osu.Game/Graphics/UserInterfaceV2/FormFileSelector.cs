@@ -25,7 +25,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -296,7 +296,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 Padding = new MarginPadding(5),
                                 Child = new DangerousRoundedButton
                                 {
-                                    Text = CommonStrings.ButtonsClear,
+                                    Text = WebLocalisation.CommonStrings.ButtonsClear,
                                     Action = () => OnFileSelected(null),
                                     Enabled = { Value = current.Value != null },
                                     Padding = new MarginPadding(5),

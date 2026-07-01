@@ -25,13 +25,12 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
-using ChatStrings = osu.Game.Localisation.ChatStrings;
+using WebLocalisation = osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -191,7 +190,7 @@ namespace osu.Game.Overlays.Chat
 
                 items.Add(new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, openUserProfile));
 
-                items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
+                items.Add(new OsuMenuItem(WebLocalisation.UsersStrings.CardSendMessage, MenuItemType.Standard, openUserChannel));
 
                 // We should probably be checking against an online state here.
                 // But we can't use MetadataClient.GetPresence because we may not be requesting/receiving presences.
@@ -211,10 +210,10 @@ namespace osu.Game.Overlays.Chat
                 }
 
                 items.Add(new OsuMenuItemSpacer());
-                items.Add(new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
+                items.Add(new OsuMenuItem(WebLocalisation.UsersStrings.ReportButtonText, MenuItemType.Destructive, ReportRequested));
                 items.Add(api.LocalUserState.Blocks.Any(b => b.TargetID == user.OnlineID)
-                    ? new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Unblock(user)))
-                    : new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Block(user))));
+                    ? new OsuMenuItem(WebLocalisation.UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Unblock(user)))
+                    : new OsuMenuItem(WebLocalisation.UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Block(user))));
 
                 return items.ToArray();
             }
