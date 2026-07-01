@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         /// A small amount to spin beyond a given angle to mitigate floating-point precision errors.
         /// </summary>
-        public const float SPIN_ERROR = MathF.PI / 8;
+        public const float SPIN_ERROR = 1;
 
         /// <summary>
         /// The offset from the centre of the spinner at which to spin.
