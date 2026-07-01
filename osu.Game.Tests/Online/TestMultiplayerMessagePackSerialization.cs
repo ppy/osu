@@ -69,5 +69,28 @@ namespace osu.Game.Tests.Online
             var deserialized = MessagePackSerializer.Deserialize<MatchUserState>(serialized, SignalRUnionWorkaroundResolver.OPTIONS);
             ClassicAssert.True(deserialized is TeamVersusUserState);
         }
+
+        [Test]
+        public void TestEnumValidation()
+        {
+            Assert.DoesNotThrow(() =>
+                MessagePackSerializer.Deserialize<SimpleEnum>(MessagePackSerializer.Serialize(SimpleEnum.Value, SignalRUnionWorkaroundResolver.OPTIONS), SignalRUnionWorkaroundResolver.OPTIONS));
+            Assert.Throws<MessagePackSerializationException>(() =>
+                MessagePackSerializer.Deserialize<SimpleEnum>(MessagePackSerializer.Serialize((SimpleEnum?)null, SignalRUnionWorkaroundResolver.OPTIONS), SignalRUnionWorkaroundResolver.OPTIONS));
+            Assert.Throws<MessagePackSerializationException>(() =>
+                MessagePackSerializer.Deserialize<SimpleEnum>(MessagePackSerializer.Serialize((SimpleEnum)100, SignalRUnionWorkaroundResolver.OPTIONS), SignalRUnionWorkaroundResolver.OPTIONS));
+
+            Assert.DoesNotThrow(() =>
+                MessagePackSerializer.Deserialize<SimpleEnum?>(MessagePackSerializer.Serialize(SimpleEnum.Value, SignalRUnionWorkaroundResolver.OPTIONS), SignalRUnionWorkaroundResolver.OPTIONS));
+            Assert.DoesNotThrow(() =>
+                MessagePackSerializer.Deserialize<SimpleEnum?>(MessagePackSerializer.Serialize((SimpleEnum?)null, SignalRUnionWorkaroundResolver.OPTIONS), SignalRUnionWorkaroundResolver.OPTIONS));
+            Assert.Throws<MessagePackSerializationException>(() =>
+                MessagePackSerializer.Deserialize<SimpleEnum?>(MessagePackSerializer.Serialize((SimpleEnum)100, SignalRUnionWorkaroundResolver.OPTIONS), SignalRUnionWorkaroundResolver.OPTIONS));
+        }
+
+        public enum SimpleEnum
+        {
+            Value
+        }
     }
 }
