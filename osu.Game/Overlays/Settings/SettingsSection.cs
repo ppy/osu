@@ -51,8 +51,40 @@ namespace osu.Game.Overlays.Settings
 
                 matchingFilter = value;
 
+                if (matchingFilter && FilteringActive)
+                    showHorizontalSiblings();
+
                 if (IsPresent != wasPresent)
                     Invalidate(Invalidation.Presence);
+            }
+        }
+
+        private void showHorizontalSiblings()
+        {
+            foreach (var child in FlowContent)
+            {
+                if (child is FillFlowContainer { Direction: FillDirection.Horizontal } row)
+                {
+                    bool hasVisibleButtons = false;
+
+                    foreach (var item in row.Children)
+                    {
+                        if (item is IFilterable && item.IsPresent)
+                        {
+                            hasVisibleButtons = true;
+                            break;
+                        }
+                    }
+
+                    if (hasVisibleButtons)
+                    {
+                        foreach (var item in row.Children)
+                        {
+                            if (item is IFilterable filterable)
+                                filterable.MatchingFilter = true;
+                        }
+                    }
+                }
             }
         }
 
