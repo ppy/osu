@@ -13,12 +13,14 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osu.Game.Rulesets.Mods;
@@ -129,7 +131,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new MessagePlaceholder("Extended statistics are only available after watching a replay!"),
+                            new MessagePlaceholder(ResultsScreenStrings.ExtendedStatisticsAvailableAfterWatchingReplay),
                             new ReplayDownloadButton(newScore)
                             {
                                 Scale = new Vector2(1.5f),
@@ -190,7 +192,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Origin = Anchor.TopCentre,
                             Children = new Drawable[]
                             {
-                                new MessagePlaceholder("More statistics available after watching a replay!"),
+                                new MessagePlaceholder(ResultsScreenStrings.MoreStatisticsAvailableAfterWatchingReplay),
                                 new ReplayDownloadButton(newScore)
                                 {
                                     Scale = new Vector2(1.5f),
@@ -230,7 +232,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 && newScore.OnlineID > 0
                 && newScore.OnlineID == AchievedScore.OnlineID)
             {
-                yield return new StatisticItem("Overall Ranking", () => new OverallRanking(newScore)
+                yield return new StatisticItem(ResultsScreenStrings.OverallRankingHeader, () => new OverallRanking(newScore)
                 {
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.Centre,
@@ -241,7 +243,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             if (newScore.BeatmapInfo!.OnlineID > 0
                 && api.IsLoggedIn)
             {
-                string? preventTaggingReason = null;
+                LocalisableString? preventTaggingReason = null;
 
                 // We may want to iterate on the following conditions further in the future
 
@@ -254,17 +256,17 @@ namespace osu.Game.Screens.Ranking.Statistics
                      .FirstOrDefault());
 
                 if (localUserScore == null)
-                    preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
+                    preventTaggingReason = ResultsScreenStrings.PreventTaggingForUnplayedBeatmaps;
                 else if (localUserScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
-                    preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
+                    preventTaggingReason = ResultsScreenStrings.PreventTaggingForConvertedBeatmaps;
                 else if (localUserScore.Rank < ScoreRank.C)
-                    preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+                    preventTaggingReason = ResultsScreenStrings.PreventTaggingForInappropriateScores;
                 else if (localUserScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
-                    preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
+                    preventTaggingReason = ResultsScreenStrings.PreventTaggingForConversionMods;
 
-                if (preventTaggingReason == null)
+                if (!preventTaggingReason.HasValue)
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
+                    yield return new StatisticItem(ResultsScreenStrings.TagTheBeatmapHeader, () => new UserTagControl(newScore.BeatmapInfo)
                     {
                         Writable = true,
                         RelativeSizeAxes = Axes.X,
@@ -274,7 +276,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new FillFlowContainer<CompositeDrawable>
+                    yield return new StatisticItem(ResultsScreenStrings.TagTheBeatmapHeader, () => new FillFlowContainer<CompositeDrawable>
                     {
                         Children = new CompositeDrawable[]
                         {
@@ -283,7 +285,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 TextAnchor = Anchor.Centre,
-                                Text = preventTaggingReason,
+                                Text = preventTaggingReason.Value,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
