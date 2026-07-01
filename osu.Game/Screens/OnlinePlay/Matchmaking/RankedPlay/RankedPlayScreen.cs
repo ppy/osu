@@ -25,7 +25,6 @@ using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
@@ -131,7 +130,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 matchInfo = new RankedPlayMatchInfo(),
                 backgroundMusic = new BackgroundMusicManager(),
                 new RankedPlayBeatmapAvailabilityTracker(),
-                new GlobalScrollAdjustsVolume(),
                 content = new InverseScalingDrawSizePreservingFillContainer
                 {
                     Anchor = Anchor.Centre,

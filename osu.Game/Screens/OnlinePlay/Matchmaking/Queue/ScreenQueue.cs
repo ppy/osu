@@ -37,7 +37,6 @@ using osu.Game.Online.Matchmaking.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
@@ -123,7 +122,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Children = new Drawable[]
                 {
                     waitingLoop = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop")),
-                    new GlobalScrollAdjustsVolume(),
                     mainGrid = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,

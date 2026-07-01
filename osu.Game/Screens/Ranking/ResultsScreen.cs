@@ -26,7 +26,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Volume;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
@@ -122,7 +121,6 @@ namespace osu.Game.Screens.Ranking
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new GlobalScrollAdjustsVolume(),
                                         StatisticsPanel = new StatisticsPanel
                                         {
                                             RelativeSizeAxes = Axes.Both,
