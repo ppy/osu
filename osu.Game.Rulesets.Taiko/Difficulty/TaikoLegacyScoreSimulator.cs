@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -161,7 +162,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
                     // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjects/Taiko/SliderTaiko.cs#L288
                     for (double i = drumRoll.StartTime; i < hittableEndTime; i += minHitDelay)
-                        simulateHit(new DrumRollTick(drumRoll), null, ref attributes);
+                        simulateHit(new DrumRollTick(drumRoll) { IsStrong = drumRoll.IsStrong }, null, ref attributes);
                     return;
 
                 case StrongNestedHitObject:
