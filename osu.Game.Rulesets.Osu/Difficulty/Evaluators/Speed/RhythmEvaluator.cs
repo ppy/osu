@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -16,9 +15,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(OsuDifficultyHitObject currObj)
         {
-            if (current.BaseObject is Spinner)
+            if (currObj.BaseObject is Spinner)
                 return 0;
 
             const int history_time_max = 5 * 1000; // 5 seconds
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
             double rhythmComplexitySum = 0;
 
-            double deltaDifferenceEpsilon = ((OsuDifficultyHitObject)current).HitWindowGreat * 0.3;
+            double deltaDifferenceEpsilon = currObj.HitWindowGreat * 0.3;
 
             var island = new Island(int.MaxValue);
             var previousIsland = new Island(int.MaxValue);
@@ -38,26 +37,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
             bool firstDeltaSwitch = false;
 
-            int historicalNoteCount = Math.Min(current.Index, history_objects_max);
+            int historicalNoteCount = Math.Min(currObj.Index, history_objects_max);
 
             int rhythmStart = 0;
 
-            while (rhythmStart < historicalNoteCount - 2 && current.StartTime - current.Previous(rhythmStart).StartTime < history_time_max)
+            while (rhythmStart < historicalNoteCount - 2 && currObj.StartTime - currObj.Previous(rhythmStart).StartTime < history_time_max)
                 rhythmStart++;
 
-            OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart);
-            OsuDifficultyHitObject prevPrevObj = (OsuDifficultyHitObject)current.Previous(rhythmStart + 1);
+            OsuDifficultyHitObject loopPrevObj = (OsuDifficultyHitObject)currObj.Previous(rhythmStart);
+            OsuDifficultyHitObject loopPrev1Obj = (OsuDifficultyHitObject)currObj.Previous(rhythmStart + 1);
 
             // we go from the furthest object back to the current one
             for (int i = rhythmStart; i > 0; i--)
             {
-                OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
+                OsuDifficultyHitObject loopObj = (OsuDifficultyHitObject)currObj.Previous(i - 1);
 
-                if (currObj.BaseObject is Spinner)
+                if (loopObj.BaseObject is Spinner)
                     continue;
 
                 // scales note 0 to 1 from history to now
-                double timeDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max;
+                double timeDecay = (history_time_max - (currObj.StartTime - loopObj.StartTime)) / history_time_max;
                 double noteDecay = (double)(historicalNoteCount - i) / historicalNoteCount;
 
                 double currHistoricalDecay = Math.Min(noteDecay, timeDecay); // either we're limited by time or limited by object count.
@@ -65,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 // Use custom cap value to ensure that at this point delta time is actually zero
                 const double delta_min_value = 1e-7;
 
-                double currDelta = Math.Max(currObj.DeltaTime, delta_min_value);
-                double prevDelta = Math.Max(prevObj.DeltaTime, delta_min_value);
+                double currDelta = Math.Max(loopObj.DeltaTime, delta_min_value);
+                double prevDelta = Math.Max(loopPrevObj.DeltaTime, delta_min_value);
 
                 double deltaDifference = Math.Abs(prevDelta - currDelta);
 
@@ -88,12 +87,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 // if previous object is a slider it might be easier to tap since you don't have to do a whole tapping motion
                 // while a full deltatime might end up some weird ratio the "unpress->tap" motion might be simple
                 // for example a slider-circle-circle pattern should be evaluated as a regular triple and not as a single->double
-                if (prevObj.BaseObject is Slider)
+                if (loopPrevObj.BaseObject is Slider)
                 {
-                    double sliderLazyEndDelta = currObj.MinimumJumpTime;
+                    double sliderLazyEndDelta = loopObj.MinimumJumpTime;
                     double sliderLazyDeltaDifferenceRatio = Math.Max(sliderLazyEndDelta, currDelta) / Math.Min(sliderLazyEndDelta, currDelta);
 
-                    double sliderRealEndDelta = currObj.LastObjectEndDeltaTime;
+                    double sliderRealEndDelta = loopObj.LastObjectEndDeltaTime;
                     double sliderRealDeltaDifferenceRatio = Math.Max(sliderRealEndDelta, currDelta) / Math.Min(sliderRealEndDelta, currDelta);
 
                     double sliderEffectiveDifficulty = Math.Min(getEffectiveDifficulty(sliderLazyDeltaDifferenceRatio), getEffectiveDifficulty(sliderRealDeltaDifferenceRatio));
@@ -111,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     if (deltaDifference > deltaDifferenceEpsilon)
                     {
                         // bpm change is into slider, this is easy acc window
-                        if (currObj.BaseObject is Slider)
+                        if (loopObj.BaseObject is Slider)
                             effectiveDifficulty *= 0.5;
 
                         // repeated island polarity (2 -> 4, 3 -> 5)
@@ -119,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                             effectiveDifficulty *= 0.5;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
-                        if (Math.Max(prevPrevObj.DeltaTime, delta_min_value) > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
+                        if (Math.Max(loopPrev1Obj.DeltaTime, delta_min_value) > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
                             effectiveDifficulty *= 0.125;
 
                         // repeated island size (ex: triplet -> triplet)
@@ -155,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                             islands.Add(island);
 
                         // scale down the difficulty if the object is double-tappable
-                        effectiveDifficulty *= 1 - prevObj.CalculateDoubleTapFeasibility(currObj) * 0.75;
+                        effectiveDifficulty *= 1 - loopPrevObj.CalculateDoubleTapFeasibility(currObj) * 0.75;
 
                         if (island.DeltaCount > 1)
                         {
@@ -182,12 +181,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     firstDeltaSwitch = true;
 
                     // bpm change is into slider, this is easy acc window
-                    if (currObj.BaseObject is Slider)
+                    if (loopObj.BaseObject is Slider)
                         effectiveDifficulty *= 0.6;
 
                     // bpm change was from a slider, this is easier typically than circle -> circle
                     // unintentional side effect is that bursts with kicksliders at the ends might have lower difficulty than bursts without sliders
-                    if (prevObj.BaseObject is Slider)
+                    if (loopObj.BaseObject is Slider)
                         effectiveDifficulty *= 0.6;
 
                     startDifficulty = effectiveDifficulty;
@@ -195,8 +194,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     island = new Island((int)currDelta);
                 }
 
-                prevPrevObj = prevObj;
-                prevObj = currObj;
+                loopPrev1Obj = loopPrevObj;
+                loopPrevObj = loopObj;
             }
 
             // If the current island is long we don't want the sum to have as big of an effect

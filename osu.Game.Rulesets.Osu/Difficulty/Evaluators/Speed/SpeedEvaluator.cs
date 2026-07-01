@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -18,22 +17,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         /// <item><description>and how easily they can be cheesed.</description></item>
         /// </list>
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        public static double EvaluateDifficultyOf(OsuDifficultyHitObject currObj)
         {
-            if (current.BaseObject is Spinner)
+            if (currObj.BaseObject is Spinner)
                 return 0;
 
             const double min_speed_bonus = 200; // 200 BPM 1/4th
             const double speed_balancing_factor = 40;
 
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-
-            double strainTime = osuCurrObj.AdjustedDeltaTime;
-            double doubleTapFeasibility = 1.0 - osuCurrObj.CalculateDoubleTapFeasibility((OsuDifficultyHitObject?)osuCurrObj.Next(0));
+            double strainTime = currObj.AdjustedDeltaTime;
+            double doubleTapFeasibility = 1.0 - currObj.CalculateDoubleTapFeasibility((OsuDifficultyHitObject?)currObj.Next());
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / osuCurrObj.HitWindowGreat) / 0.93, 0.92, 1);
+            strainTime /= Math.Clamp((strainTime / currObj.HitWindowGreat) / 0.93, 0.92, 1);
 
             // speedBonus will be 0.0 for BPM < 200
             double speedBonus = 0.0;
@@ -45,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             // Base difficulty with all bonuses
             double speedDifficulty = (1 + speedBonus) * 1000 / strainTime;
 
-            speedDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            speedDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             // Apply penalty if there's doubletappable doubles
             return speedDifficulty * doubleTapFeasibility;

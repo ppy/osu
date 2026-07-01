@@ -39,15 +39,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (!Mods.Any(m => m is OsuModFlashlight))
                 return 0;
 
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += calculateAdjustedDifficulty(current) * skill_multiplier;
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            currentStrain *= strainDecay(osuCurrObj.DeltaTime);
+            currentStrain += calculateAdjustedDifficulty(osuCurrObj) * skill_multiplier;
 
             return currentStrain;
         }
 
-        private double calculateAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(OsuDifficultyHitObject osuCurrObj)
         {
-            double difficulty = FlashlightEvaluator.EvaluateDifficultyOf(current, Mods);
+            double difficulty = FlashlightEvaluator.EvaluateDifficultyOf(osuCurrObj, Mods);
 
             if (Mods.Any(m => m is OsuModTouchDevice))
                 difficulty = DiffUtils.Pow(difficulty, 0.9);
@@ -70,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.4;
 
-            difficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
+            difficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, osuCurrObj.OverallDifficulty), 2) / 4000;
 
             return difficulty;
         }

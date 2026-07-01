@@ -41,12 +41,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModRelax))
                 return 0;
 
-            double decay = strainDecay(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            double decay = strainDecay(osuCurrObj.AdjustedDeltaTime);
 
             currentStrain *= decay;
-            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
+            currentStrain += calculateAdjustedDifficulty(osuCurrObj) * (1 - decay) * skill_multiplier;
 
-            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(osuCurrObj);
 
             double totalStrain = currentStrain * currentRhythm;
 
@@ -56,9 +57,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return totalStrain;
         }
 
-        private double calculateAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(OsuDifficultyHitObject osuCurrObj)
         {
-            double difficulty = SpeedEvaluator.EvaluateDifficultyOf(current);
+            double difficulty = SpeedEvaluator.EvaluateDifficultyOf(osuCurrObj);
 
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.5;

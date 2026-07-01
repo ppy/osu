@@ -37,17 +37,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             objectList.Add(current);
 
-            double decay = strainDecay(current.DeltaTime);
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            double decay = strainDecay(osuCurrObj.AdjustedDeltaTime);
 
             currentStrain *= decay;
-            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
+            currentStrain += calculateAdjustedDifficulty(osuCurrObj) * (1 - decay) * skill_multiplier;
 
             return currentStrain;
         }
 
-        private double calculateAdjustedDifficulty(DifficultyHitObject current)
+        private double calculateAdjustedDifficulty(OsuDifficultyHitObject osuCurrObj)
         {
-            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(current, hasHiddenMod);
+            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(osuCurrObj, hasHiddenMod);
 
             if (Mods.Any(m => m is OsuModTouchDevice))
                 difficulty = DiffUtils.Pow(difficulty, 0.89);
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.1;
 
-            difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2.2) / 1125.0;
+            difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, osuCurrObj.OverallDifficulty), 2.2) / 1125.0;
 
             return difficulty;
         }
