@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.1;
 
-            difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, osuCurrObj.OverallDifficulty, 2.2) / 1125.0;
+            difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, osuCurrObj.OverallDifficulty), 2.2) / 1125.0;
 
             return difficulty;
         }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
             const double wiggle_multiplier = 1.02;
 
-            var prevObj = (OsuDifficultyHitObject)currObj.Previous(0);
+            var prevObj = (OsuDifficultyHitObject)currObj.Previous();
             var prev2Obj = (OsuDifficultyHitObject)currObj.Previous(2);
 
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
@@ -87,13 +86,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 // Rescaling velocity for the wide angle bonus
                 const double wide_angle_time_scale = 1.45;
-                double wideAngleCurrVelocity = currDistance / DiffUtils.Pow(osuCurrObj.AdjustedDeltaTime, wide_angle_time_scale);
-                double wideAnglePrevVelocity = prevDistance / DiffUtils.Pow(osuLastObj.AdjustedDeltaTime, wide_angle_time_scale);
+                double wideAngleCurrVelocity = currDistance / DiffUtils.Pow(currObj.AdjustedDeltaTime, wide_angle_time_scale);
+                double wideAnglePrevVelocity = prevDistance / DiffUtils.Pow(prevObj.AdjustedDeltaTime, wide_angle_time_scale);
 
-                if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+                if (prevObj.BaseObject is Slider && withSliderTravelDistance)
                 {
-                    double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
-                    wideAngleCurrVelocity = Math.Max(wideAngleCurrVelocity, sliderDistance / DiffUtils.Pow(osuCurrObj.AdjustedDeltaTime, wide_angle_time_scale));
+                    double sliderDistance = prevObj.LazyTravelDistance + currObj.LazyJumpDistance;
+                    wideAngleCurrVelocity = Math.Max(wideAngleCurrVelocity, sliderDistance / DiffUtils.Pow(currObj.AdjustedDeltaTime, wide_angle_time_scale));
                 }
 
                 wideAngleBonus *= Math.Min(wideAngleCurrVelocity, wideAnglePrevVelocity);
