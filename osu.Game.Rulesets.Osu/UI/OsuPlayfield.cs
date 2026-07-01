@@ -217,6 +217,8 @@ namespace osu.Game.Rulesets.Osu.UI
             AddInternal(resumeInputBlocker);
         }
 
+        public void AttachInputInterceptor(Drawable interceptor) => AddInternal(interceptor);
+
         private partial class ProxyContainer : LifetimeManagementContainer
         {
             public void Add(Drawable proxy) => AddInternal(proxy);
