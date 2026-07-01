@@ -27,38 +27,64 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             hasHiddenMod = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
         }
 
-        private double currentDifficulty;
+        private double currentStrain;
 
-        private double skillMultiplier => 2.5;
-        private double strainDecayBase => 0.8;
-
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
+            const double skill_multiplier = 2.5;
+
             objectList.Add(current);
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             double decay = strainDecay(osuCurrObj.AdjustedDeltaTime);
 
-            currentDifficulty *= decay;
+            currentStrain *= decay;
+            currentStrain += calculateAdjustedDifficulty(osuCurrObj) * (1 - decay) * skill_multiplier;
 
-            currentDifficulty += ReadingEvaluator.EvaluateDifficultyOf(osuCurrObj, hasHiddenMod) * (1 - decay) * skillMultiplier;
-
-            return currentDifficulty;
+            return currentStrain;
         }
 
-        protected override void ApplyDifficultyTransformation(double[] difficulties)
+        private double calculateAdjustedDifficulty(OsuDifficultyHitObject osuCurrObj)
         {
+            double difficulty = ReadingEvaluator.EvaluateDifficultyOf(osuCurrObj, hasHiddenMod);
+
+            if (Mods.Any(m => m is OsuModTouchDevice))
+                difficulty = DiffUtils.Pow(difficulty, 0.89);
+
+            if (Mods.Any(m => m is OsuModMagnetised))
+            {
+                float magnetisedStrength = Mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
+                difficulty *= 1.0 - magnetisedStrength;
+            }
+
+            if (Mods.Any(m => m is OsuModRelax))
+                difficulty *= 0.4;
+
+            if (Mods.Any(m => m is OsuModAutopilot))
+                difficulty *= 0.1;
+
+            difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, osuCurrObj.OverallDifficulty, 2.2) / 1125.0;
+
+            return difficulty;
+        }
+
+        protected override List<double> GetTransformedDifficulties(List<double> difficulties)
+        {
+            difficulties = difficulties.Where(v => v > 0).ToList();
+
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
 
             int reducedNoteCount = calculateReducedNoteCount();
 
-            for (int i = 0; i < Math.Min(difficulties.Length, reducedNoteCount); i++)
+            for (int i = 0; i < Math.Min(difficulties.Count, reducedNoteCount); i++)
             {
                 double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((double)i / reducedNoteCount, 0, 1)));
                 difficulties[i] *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
             }
+
+            return difficulties;
         }
 
         private int calculateReducedNoteCount()
@@ -88,15 +114,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            if (NoteWeightSum == 0)
+            if (ObjectWeightSum == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / NoteWeightSum; // What would the top difficulty be if all object difficulties were identical
+            double consistentTopNote = difficultyValue / ObjectWeightSum; // What would the top difficulty be if all object difficulties were identical
 
             if (consistentTopNote == 0)
                 return 0;
 
-            return ObjectDifficulties.Sum(d => DifficultyCalculationUtils.Logistic(d / consistentTopNote, 1.15, 5, 1.1));
+            return ObjectDifficulties.Sum(d => DiffUtils.Logistic(d / consistentTopNote, 1.15, 5, 1.1));
         }
     }
 }

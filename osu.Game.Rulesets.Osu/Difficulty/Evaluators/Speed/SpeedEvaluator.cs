@@ -5,15 +5,11 @@ using System;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 {
     public static class SpeedEvaluator
     {
-        private const double min_speed_bonus = 200; // 200 BPM 1/4th
-        private const double speed_balancing_factor = 40;
-
         /// <summary>
         /// Evaluates the difficulty of tapping the current object, based on:
         /// <list type="bullet">
@@ -26,29 +22,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             if (currObj.BaseObject is Spinner)
                 return 0;
 
+            const double min_speed_bonus = 200; // 200 BPM 1/4th
+            const double speed_balancing_factor = 40;
+
             double strainTime = currObj.AdjustedDeltaTime;
-            double doubletapness = 1.0 - currObj.GetDoubletapness((OsuDifficultyHitObject?)currObj.Next(0));
+            double doubleTapFeasibility = 1.0 - currObj.CalculateDoubleTapFeasibility(currObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
-            strainTime /= Math.Clamp((strainTime / currObj.HitWindow(HitResult.Great)) / 0.93, 0.92, 1);
+            strainTime /= Math.Clamp((strainTime / currObj.HitWindowGreat) / 0.93, 0.92, 1);
 
             // speedBonus will be 0.0 for BPM < 200
             double speedBonus = 0.0;
 
             // Add additional scaling bonus for streams/bursts higher than 200bpm
-            if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
-                speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
+            if (DiffUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
+                speedBonus = 0.75 * DiffUtils.Pow((DiffUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
 
             // Base difficulty with all bonuses
-            double difficulty = (1 + speedBonus) * 1000 / strainTime;
+            double speedDifficulty = (1 + speedBonus) * 1000 / strainTime;
 
-            difficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
+            speedDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             // Apply penalty if there's doubletappable doubles
-            return difficulty * doubletapness;
+            return speedDifficulty * doubleTapFeasibility;
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - Math.Pow(0.3, ms / 1000));
+        private static double highBpmBonus(double ms) => 1 / (1 - DiffUtils.Pow(0.3, ms / 1000));
     }
 }

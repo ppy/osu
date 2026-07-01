@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Timing
     internal abstract partial class Section<T> : CompositeDrawable
         where T : ControlPoint
     {
-        private OsuCheckbox checkbox = null!;
+        protected OsuCheckbox Checkbox { get; private set; } = null!;
         private Container content = null!;
 
         protected FillFlowContainer Flow { get; private set; } = null!;
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Timing
         protected EditorBeatmap Beatmap { get; private set; } = null!;
 
         [Resolved]
-        protected Bindable<ControlPointGroup> SelectedGroup { get; private set; } = null!;
+        protected Bindable<ControlPointGroup?> SelectedGroup { get; private set; } = null!;
 
         [Resolved]
         protected IEditorChangeHandler? ChangeHandler { get; private set; }
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Padding = new MarginPadding { Horizontal = 10 },
                     Children = new Drawable[]
                     {
-                        checkbox = new OsuCheckbox
+                        Checkbox = new OsuCheckbox
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -92,24 +92,24 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            checkbox.Current.BindValueChanged(selected =>
+            Checkbox.Current.BindValueChanged(selected =>
             {
                 if (selected.NewValue)
                 {
                     if (SelectedGroup.Value == null)
                     {
-                        checkbox.Current.Value = false;
+                        Checkbox.Current.Value = false;
                         return;
                     }
 
                     if (ControlPoint.Value == null)
-                        SelectedGroup.Value.Add(ControlPoint.Value = CreatePoint());
+                        SelectedGroup.Value.Add(ControlPoint.Value = CreatePoint(SelectedGroup.Value));
                 }
                 else
                 {
                     if (ControlPoint.Value != null)
                     {
-                        SelectedGroup.Value.Remove(ControlPoint.Value);
+                        SelectedGroup.Value!.Remove(ControlPoint.Value);
                         ControlPoint.Value = null;
                     }
                 }
@@ -117,17 +117,18 @@ namespace osu.Game.Screens.Edit.Timing
                 content.BypassAutoSizeAxes = selected.NewValue ? Axes.None : Axes.Y;
             }, true);
 
-            SelectedGroup.BindValueChanged(points =>
-            {
-                ControlPoint.Value = points.NewValue?.ControlPoints.OfType<T>().FirstOrDefault();
-                checkbox.Current.Value = ControlPoint.Value != null;
-            }, true);
-
+            SelectedGroup.BindValueChanged(OnSelectedGroupChanged, true);
             ControlPoint.BindValueChanged(OnControlPointChanged, true);
+        }
+
+        protected virtual void OnSelectedGroupChanged(ValueChangedEvent<ControlPointGroup?> group)
+        {
+            ControlPoint.Value = group.NewValue?.ControlPoints.OfType<T>().FirstOrDefault();
+            Checkbox.Current.Value = ControlPoint.Value != null;
         }
 
         protected abstract void OnControlPointChanged(ValueChangedEvent<T?> point);
 
-        protected abstract T CreatePoint();
+        protected abstract T CreatePoint(ControlPointGroup selectedGroup);
     }
 }

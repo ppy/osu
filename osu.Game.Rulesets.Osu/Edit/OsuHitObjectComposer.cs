@@ -76,6 +76,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         public readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
+        private readonly OsuSliderVelocityToolboxGroup sliderVelocityToolboxGroup = new OsuSliderVelocityToolboxGroup();
+
+        [Cached]
         protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
 
         [Cached]
@@ -111,6 +114,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             RightToolbox.AddRange(new Drawable[]
                 {
+                    sliderVelocityToolboxGroup,
                     OsuGridToolboxGroup,
                     new TransformToolboxGroup
                     {

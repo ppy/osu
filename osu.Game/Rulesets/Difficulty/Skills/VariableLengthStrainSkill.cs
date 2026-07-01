@@ -14,17 +14,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// Similar to <see cref="StrainSkill"/>, but instead of strains having a fixed length, strains can be any length.
     /// A new <see cref="StrainPeak"/> is created for each <see cref="DifficultyHitObject"/>.
     /// </summary>
+    /// <remarks>
+    /// This class intends to replace <see cref="StrainSkill"/> eventually as it fixes bugs with that implementation.
+    /// Has not yet been applied globally as it changes resultant PP values in ways which may require discretion.
+    /// </remarks>
     public abstract class VariableLengthStrainSkill : Skill
     {
         /// <summary>
         /// The weight by which each strain value decays.
         /// </summary>
-        protected virtual double DecayWeight => 0.9;
+        protected readonly double DecayWeight;
 
         /// <summary>
         /// The maximum length of each strain section.
         /// </summary>
-        protected virtual int MaxSectionLength => 400;
+        protected readonly int MaxSectionLength;
 
         private double currentSectionPeak; // We also keep track of the peak strain in the current section.
         private double currentSectionBegin;
@@ -32,11 +36,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         /// <summary>
         /// The number of `MaxSectionLength` sections calculated such that enough of the difficulty value is preserved.
-        /// WARNING: This should be overridden if strains are ever used outside of <see cref="DifficultyValue"/>,
-        /// or if <see cref="DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
+        /// WARNING: This should be overridden if strains are ever used outside of <see cref="Skill.DifficultyValue"/>,
+        /// or if <see cref="Skill.DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
         /// in the future when a better memory-saving technique is implemented.
         /// </summary>
-        private double maxStoredSections => 11 / (1 - DecayWeight);
+        private readonly double maxStoredLength;
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
 
@@ -48,9 +52,19 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private readonly List<(double StrainValue, double StartTime)> queuedStrains = new List<(double, double)>();
 
-        protected VariableLengthStrainSkill(Mod[] mods)
+        /// <summary>
+        /// Create a new <see cref="VariableLengthStrainSkill"/>.
+        /// </summary>
+        /// <param name="mods">The mods.</param>
+        /// <param name="decayWeight">The weight by which each strain value decays.</param>
+        /// <param name="maxSectionLength">The maximum length of each strain section.</param>
+        protected VariableLengthStrainSkill(Mod[] mods, double decayWeight = 0.9, int maxSectionLength = 400)
             : base(mods)
         {
+            DecayWeight = decayWeight;
+            MaxSectionLength = maxSectionLength;
+
+            maxStoredLength = 11 / (1 - DecayWeight);
         }
 
         /// <summary>
@@ -158,11 +172,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             totalLength += sectionLength;
 
             // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
-            // `maxStoredSections` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
-            while (totalLength > maxStoredSections * MaxSectionLength)
+            // `maxStoredLength` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
+            while (totalLength > maxStoredLength * MaxSectionLength)
             {
-                totalLength -= strainPeaks[0].SectionLength;
-                strainPeaks.RemoveAt(0);
+                totalLength -= strainPeaks[^1].SectionLength;
+                strainPeaks.RemoveAt(strainPeaks.Count - 1);
             }
         }
 
@@ -186,57 +200,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <returns>The peak strain.</returns>
         protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
+        private bool peaksFinalised;
+
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="MaxSectionLength"/> section of the beatmap,
         /// including the peak of the current section.
         /// </summary>
-        public IEnumerable<StrainPeak> GetCurrentStrainPeaks() => strainPeaks.Append(new StrainPeak(currentSectionPeak, currentSectionEnd - currentSectionBegin));
-
-        /// <summary>
-        /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
-        /// </summary>
-        public override double DifficultyValue()
+        public IEnumerable<StrainPeak> GetCurrentStrainPeaks()
         {
-            double difficulty = 0;
-
-            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
-            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
-
-            List<StrainPeak> strains = peaks.OrderByDescending(p => (p.Value, p.SectionLength)).ToList();
-
-            // Time is measured in units of strains
-            double time = 0;
-
-            // Difficulty is a continuous weighted sum of the sorted strains
-            for (int i = 0; i < strains.Count; i++)
+            if (!peaksFinalised)
             {
-                /* Weighting function can be thought of as:
-                        b
-                        ∫ DecayWeight^x dx
-                        a
-                    where a = startTime and b = endTime
-
-                    Technically, the function below has been slightly modified from the equation above.
-                    The real function would be
-                        double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime))
-                        ...
-                        return difficulty / Math.Log(1 / DecayWeight)
-                    E.g. for a DecayWeight of 0.9, we're multiplying by 10 instead of 9.49122...
-
-                    This change makes it so that a map composed solely of MaxSectionLength chunks will have the exact same value when summed in this class and StrainSkill.
-                    Doing this ensures the relationship between strain values and difficulty values remains the same between the two classes.
-                */
-                double startTime = time;
-                double endTime = time + strains[i].SectionLength;
-
-                double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime);
-
-                difficulty += strains[i].Value * weight;
-                time = endTime;
+                saveCurrentPeak(currentSectionEnd - currentSectionBegin);
+                peaksFinalised = true;
             }
 
-            return difficulty / (1 - DecayWeight);
+            return strainPeaks;
         }
 
         /// <summary>
@@ -271,7 +249,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             public double Value { get; }
             public double SectionLength { get; }
 
-            public int CompareTo(StrainPeak other) => Value.CompareTo(other.Value);
+            // Reverse sort, highest is first.
+            public int CompareTo(StrainPeak other) => other.Value.CompareTo(Value);
         }
     }
 }

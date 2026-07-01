@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Calculates the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public virtual double CountTopWeightedStrains(double difficultyValue)
+        public double CountTopWeightedStrains(double difficultyValue)
         {
             if (ObjectDifficulties.Count == 0)
                 return 0.0;

@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// <summary>
         /// Based on ultrawide monitor configurations, plus a bit of lenience for users which are intentionally aiming for higher horizontal velocity.
         /// </summary>
-        private const float largest_feasible_aspect_ratio = 23f / 9;
+        private const float largest_feasible_aspect_ratio = 32f / 9;
 
         private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
         {
@@ -345,14 +345,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private partial class NoTabletMessage : CompositeDrawable
         {
-            private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+            private IBindable<string> noTabletDetectedText = new Bindable<string>();
             private LinkFlowContainer linkContainer;
 
             [Resolved]
             private LocalisationManager localisation { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(OsuGameBase game, OsuColour colours, OverlayColourProvider colourProvider)
+            private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -406,26 +406,23 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                 };
 
-                if (game != null)
-                    currentLanguage.BindTo(game.CurrentLanguage);
+                const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
+                noTabletDetectedText = localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(url));
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                currentLanguage.BindValueChanged(_ =>
-                    // schedule required because `LocalisationManager` won't have new language set correctly yet.
-                    Schedule(() =>
-                    {
-                        linkContainer.Clear();
-                        linkContainer.NewLine();
+                noTabletDetectedText.BindValueChanged(_ =>
+                {
+                    linkContainer.Clear();
+                    linkContainer.NewLine();
 
-                        const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
-                        var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
+                    var formattedSource = MessageFormatter.FormatText(noTabletDetectedText.Value);
 
-                        linkContainer.AddLinks(formattedSource.Text, formattedSource.Links);
-                    }), true);
+                    linkContainer.AddLinks(formattedSource.Text, formattedSource.Links);
+                }, true);
             }
         }
     }

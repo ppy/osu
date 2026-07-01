@@ -51,13 +51,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// <param name="room">The room.</param>
         /// <param name="playlistItem">The playlist item to be played.</param>
         /// <param name="users">The users which are participating in this game.</param>
-        public MultiplayerPlayer(Room room, PlaylistItem playlistItem, MultiplayerRoomUser[] users)
+        /// <param name="showFailingOverlay">Whether to show the red failing overlay.</param>
+        public MultiplayerPlayer(Room room, PlaylistItem playlistItem, MultiplayerRoomUser[] users, bool showFailingOverlay = true)
             : base(room, playlistItem, new PlayerConfiguration
             {
                 AllowPause = false,
                 AllowRestart = false,
                 AutomaticallySkipIntro = room.AutoSkip,
                 ShowLeaderboard = true,
+                ShowFailingOverlay = showFailingOverlay
             })
         {
             leaderboardProvider = new MultiplayerLeaderboardProvider(users);

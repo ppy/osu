@@ -26,7 +26,6 @@ namespace osu.Game.Tests.Beatmaps
 
             BeatmapInfo = baseBeatmap.BeatmapInfo;
             ControlPointInfo = baseBeatmap.ControlPointInfo;
-            UnhandledEventLines = baseBeatmap.UnhandledEventLines;
             AudioLeadIn = baseBeatmap.AudioLeadIn;
             StackLeniency = baseBeatmap.StackLeniency;
             SpecialStyle = baseBeatmap.SpecialStyle;

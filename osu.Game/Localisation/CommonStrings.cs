@@ -60,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Height => new TranslatableString(getKey(@"height"), @"Height");
 
         /// <summary>
+        /// "Download"
+        /// </summary>
+        public static LocalisableString Download => new TranslatableString(getKey(@"download"), @"Download");
+
+        /// <summary>
         /// "Downloading..."
         /// </summary>
         public static LocalisableString Downloading => new TranslatableString(getKey(@"downloading"), @"Downloading...");
@@ -165,9 +170,14 @@ namespace osu.Game.Localisation
         public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"Exit");
 
         /// <summary>
-        /// "Caps lock is active"
+        /// "Caps Lock"
         /// </summary>
-        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"Caps lock is active");
+        public static LocalisableString CapsLock => new TranslatableString(getKey(@"caps_lock"), @"Caps Lock");
+
+        /// <summary>
+        /// "Caps Lock is active"
+        /// </summary>
+        public static LocalisableString CapsLockIsActive => new TranslatableString(getKey(@"caps_lock_is_active"), @"Caps Lock is active");
 
         /// <summary>
         /// "Revert to default"
@@ -178,6 +188,11 @@ namespace osu.Game.Localisation
         /// "General"
         /// </summary>
         public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
+
+        /// <summary>
+        /// "Open"
+        /// </summary>
+        public static LocalisableString OpenLink => new TranslatableString(getKey(@"open_link"), @"Open");
 
         /// <summary>
         /// "Copy link"
@@ -203,6 +218,31 @@ namespace osu.Game.Localisation
         /// "Delete..."
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
+
+        /// <summary>
+        /// "Go to beatmap"
+        /// </summary>
+        public static LocalisableString GoToBeatmap => new TranslatableString(getKey(@"go_to_beatmap"), @"Go to beatmap");
+
+        /// <summary>
+        /// "View in browser"
+        /// </summary>
+        public static LocalisableString ViewInBrowser => new TranslatableString(getKey(@"view_in_browser"), @"View in browser");
+
+        /// <summary>
+        /// "Create copy"
+        /// </summary>
+        public static LocalisableString CreateCopy => new TranslatableString(getKey(@"create_copy"), @"Create copy");
+
+        /// <summary>
+        /// "{0} item|{0} items"
+        /// </summary>
+        public static LocalisableString ItemsCount(int quantity) => new PluralisableString(new TranslatableString(getKey(@"items_count"), @"{0} item|{0} items", quantity), quantity, '|');
+
+        /// <summary>
+        /// "{0} beatmap|{0} beatmaps"
+        /// </summary>
+        public static LocalisableString BeatmapsCount(int quantity) => new PluralisableString(new TranslatableString(getKey(@"beatmaps_count"), @"{0} beatmap|{0} beatmaps", quantity), quantity, '|');
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects
@@ -13,9 +14,11 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// On hit - the hold note was held correctly for the full duration.<br />
     /// On miss - the hold note was released at some point during its judgement period.
     /// </summary>
-    public class HoldNoteBody : ManiaHitObject
+    public class HoldNoteBody : ManiaHitObject, IHasDuration
     {
         public override Judgement CreateJudgement() => new HoldNoteBodyJudgement();
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+        public double Duration { get; set; }
+        public double EndTime => StartTime + Duration;
     }
 }

@@ -68,6 +68,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                                         },
                                         new FormTextBox
                                         {
+                                            Caption = "Length limited text",
+                                            PlaceholderText = "I can only hold 10 characters!",
+                                            LengthLimit = 10,
+                                            TabbableContentContainer = this,
+                                        },
+                                        new FormTextBox
+                                        {
                                             Caption = "Artist",
                                             HintText = "Poot artist here!",
                                             PlaceholderText = "Here is an artist",
@@ -188,6 +195,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                                             Caption = "File selector",
                                             PlaceholderText = "Select a file",
                                         },
+                                        new FormFileSelector
+                                        {
+                                            Caption = "File selector with deselection",
+                                            PlaceholderText = "Select a file",
+                                            AllowClear = true,
+                                        },
                                         new FormBeatmapFileSelector(true)
                                         {
                                             Caption = "File selector with intermediate choice dialog",
@@ -222,6 +235,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     Padding = new MarginPadding(10),
                                     Children = new Drawable[]
                                     {
+                                        new FormPasswordTextBox
+                                        {
+                                            Caption = "Password",
+                                            TabbableContentContainer = this,
+                                        },
                                         new FormNumberBox(allowDecimals: true)
                                         {
                                             Caption = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
