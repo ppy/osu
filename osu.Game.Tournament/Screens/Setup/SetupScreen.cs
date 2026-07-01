@@ -14,6 +14,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osuTK;
@@ -41,6 +42,9 @@ namespace osu.Game.Tournament.Screens.Setup
 
         [Resolved]
         private TournamentSceneManager? sceneManager { get; set; }
+
+        [Resolved]
+        private DialogOverlay? dialogOverlay { get; set; }
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private Bindable<Size> windowSize = null!;
@@ -134,8 +138,13 @@ namespace osu.Game.Tournament.Screens.Setup
                     ButtonText = "Set height",
                     Action = height =>
                     {
-                        windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
-                    }
+                        Size previousSize = windowSize.Value;
+                        Size newSize = new Size((int)(height * TournamentSceneManager.ASPECT_RATIO / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
+                        if (previousSize == newSize) return;
+
+                        windowSize.Value = newSize;
+                        dialogOverlay?.Push(new ResolutionConfirmationDialog(() => windowSize.Value = previousSize));
+                    },
                 },
                 new LabelledSwitchButton
                 {
@@ -151,8 +160,6 @@ namespace osu.Game.Tournament.Screens.Setup
                 },
             };
         }
-
-        private const float aspect_ratio = 16f / 9f;
 
         protected override void Update()
         {
