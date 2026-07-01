@@ -31,17 +31,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
 
             double noteDensityDifficulty = calculateDensityDifficulty(nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, currentVisibleObjectDensity);
+            noteDensityDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             double hiddenDifficulty = hidden
                 ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, currentVisibleObjectDensity, velocity, constantAngleNerfFactor)
                 : 0;
+            hiddenDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
-            double preemptDifficulty = calculatePreemptDifficulty(velocity, constantAngleNerfFactor, currObj.Preempt);
+            double preemptDifficulty = calculatePreemptDifficulty(currObj, constantAngleNerfFactor, currObj.Preempt);
 
             double readingDifficulty = DiffUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
-
-            // Having less time to process information is harder
-            readingDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             return readingDifficulty;
         }
@@ -90,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <item><description>how many milliseconds elapse between the approach circle appearing and touching the inner circle</description></item>
         /// </list>
         /// </summary>
-        private static double calculatePreemptDifficulty(double velocity, double constantAngleNerfFactor, double preempt)
+        private static double calculatePreemptDifficulty(OsuDifficultyHitObject currObj, double constantAngleNerfFactor, double preempt)
         {
             const double preempt_balancing_factor = 140000;
             const double preempt_starting_point = 500; // AR 9.66 in milliseconds
@@ -98,8 +97,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
             // https://www.desmos.com/calculator/c175335a71
             double preemptDifficulty = DiffUtils.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) / preempt_balancing_factor;
+            double velocity = currObj.LazyJumpDistance / currObj.AdjustedDeltaTime;
+            velocity *= highBpmBonus(currObj.AdjustedDeltaTime);
 
-            preemptDifficulty *= constantAngleNerfFactor * velocity;
+            preemptDifficulty *= constantAngleNerfFactor * (30 + velocity * 0.5);
 
             return preemptDifficulty;
         }

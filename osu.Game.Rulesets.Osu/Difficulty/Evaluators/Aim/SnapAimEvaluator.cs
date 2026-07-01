@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 return 0;
 
             const double wide_angle_multiplier = 9.67;
-            const double acute_angle_multiplier = 2.41;
+            const double acute_angle_multiplier = 2.5;
             const double slider_multiplier = 1.5;
             const double velocity_change_multiplier = 0.9;
 
