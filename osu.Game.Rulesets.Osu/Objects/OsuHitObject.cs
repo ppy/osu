@@ -81,7 +81,25 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private HitObjectProperty<int> stackHeight;
 
-        public Bindable<int> StackHeightBindable => stackHeight.Bindable;
+        public Bindable<int> StackHeightBindable
+        {
+            get
+            {
+                if (stackHeight.BindableCreated)
+                    return stackHeight.Bindable;
+
+                stackHeight.Bindable.BindValueChanged(height =>
+                {
+                    foreach (var nested in NestedHitObjects)
+                    {
+                        if (nested is OsuHitObject osuHitObject)
+                            osuHitObject.StackHeight = height.NewValue;
+                    }
+                });
+
+                return stackHeight.Bindable;
+            }
+        }
 
         public int StackHeight
         {
@@ -153,18 +171,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             get => lastInCombo.Value;
             set => lastInCombo.Value = value;
-        }
-
-        protected OsuHitObject()
-        {
-            StackHeightBindable.BindValueChanged(height =>
-            {
-                foreach (var nested in NestedHitObjects)
-                {
-                    if (nested is OsuHitObject osuHitObject)
-                        osuHitObject.StackHeight = height.NewValue;
-                }
-            });
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
