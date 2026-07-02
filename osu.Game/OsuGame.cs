@@ -46,6 +46,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
@@ -1077,6 +1078,9 @@ namespace osu.Game
 
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
             MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
+
+            if (API is APIAccess api)
+                api.PostNotification = n => Notifications.Post(n);
 
             ScreenFooter.BackReceptor backReceptor;
 
