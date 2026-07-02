@@ -167,7 +167,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (hitObject)
                 {
                     case Slider:
-                        return (fadeOutStartTime, longFadeDuration);
+                        // Offset (by fadeOutDuration) to make slider body begin fading out after head fades out like Stable
+                        return (fadeOutStartTime + fadeOutDuration, longFadeDuration - fadeOutDuration);
 
                     case SliderTick:
                         double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
