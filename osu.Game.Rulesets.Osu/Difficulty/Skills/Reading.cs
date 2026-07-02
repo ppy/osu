@@ -42,8 +42,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= decay;
             currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
 
+            // This currently operates under the assumption that `ObjectDifficultyOf` is called once per object, and in order.
+            // Under that assumption, we can trust that `current.StartTime` refers to the start time of the first object in the case that `reducedDuration` is yet to be set.
             reducedDuration ??= current.StartTime + reduced_difficulty_duration;
 
+            // This relies on the same assumption, as calling in order means that we can safely increase the note count until we reach the first object after the reduced duration.
             if (current.StartTime <= reducedDuration)
                 reducedNoteCount++;
 
