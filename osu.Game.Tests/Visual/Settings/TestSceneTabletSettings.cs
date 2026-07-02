@@ -16,6 +16,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -117,12 +119,31 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestOffsetValidity()
+        public void TestOffsetClamping()
         {
             ensureValid();
-            AddStep("move right", () => tabletHandler.AreaOffset.Value = Vector2.Zero);
+            AddStep("move outside bounds", () => tabletHandler.AreaOffset.Value = Vector2.Zero);
+            AddAssert("offset is clamped", () => tabletHandler.AreaOffset.Value == tabletHandler.AreaSize.Value / 2);
+            ensureValid();
+
+            AddStep("disable lock to usable area", () => settings.ChildrenOfType<FormCheckBox>().First(c => c.Caption == TabletSettingsStrings.LockToUsableArea).Current.Value = false);
+            AddStep("move outside bounds", () => tabletHandler.AreaOffset.Value = Vector2.Zero);
             ensureInvalid();
-            AddStep("move back", () => tabletHandler.AreaOffset.Value = tabletHandler.AreaSize.Value / 2);
+
+            AddStep("enable lock to usable area", () => settings.ChildrenOfType<FormCheckBox>().First(c => c.Caption == TabletSettingsStrings.LockToUsableArea).Current.Value = true);
+            AddAssert("offset is clamped again", () => tabletHandler.AreaOffset.Value == tabletHandler.AreaSize.Value / 2);
+            ensureValid();
+
+            AddStep("rotate 45", () => tabletHandler.Rotation.Value = 45);
+            AddAssert("lock is disabled automatically", () => !settings.ChildrenOfType<FormCheckBox>().First(c => c.Caption == TabletSettingsStrings.LockToUsableArea).Current.Value);
+            ensureInvalid();
+
+            AddStep("attempt to enable lock", () => settings.ChildrenOfType<FormCheckBox>().First(c => c.Caption == TabletSettingsStrings.LockToUsableArea).Current.Value = true);
+            AddAssert("lock remains disabled", () => !settings.ChildrenOfType<FormCheckBox>().First(c => c.Caption == TabletSettingsStrings.LockToUsableArea).Current.Value);
+
+            AddStep("rotate to 0", () => tabletHandler.Rotation.Value = 0);
+            AddStep("enable lock again", () => settings.ChildrenOfType<FormCheckBox>().First(c => c.Caption == TabletSettingsStrings.LockToUsableArea).Current.Value = true);
+            AddAssert("lock enabled successfully", () => settings.ChildrenOfType<FormCheckBox>().First(c => c.Caption == TabletSettingsStrings.LockToUsableArea).Current.Value);
             ensureValid();
         }
 
