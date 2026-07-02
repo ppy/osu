@@ -33,6 +33,13 @@ namespace osu.Game.Online.Spectator
         [Key(4)]
         public Dictionary<HitResult, int> MaximumStatistics { get; set; } = new Dictionary<HitResult, int>();
 
+        /// <summary>
+        /// The sequence number of the last frame bundle in the replay.
+        /// Only available in <see cref="ISpectatorServer.EndPlaySession"/> invocations.
+        /// </summary>
+        [Key(5)]
+        public long? LastFrameBundleSequenceNumber { get; set; }
+
         public bool Equals(SpectatorState other)
         {
             if (ReferenceEquals(null, other)) return false;

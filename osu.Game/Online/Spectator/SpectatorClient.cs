@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -89,8 +90,10 @@ namespace osu.Game.Online.Spectator
         private Score? currentScore;
         private long? currentScoreToken;
         private ScoreProcessor? currentScoreProcessor;
+        private long currentFrameBundleSequenceNumber;
 
         private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
+        private readonly Dictionary<long, List<FrameDataBundle>> allFrameBundles = new Dictionary<long, List<FrameDataBundle>>();
 
         private readonly List<LegacyReplayFrame> pendingFrames = new List<LegacyReplayFrame>();
 
@@ -284,6 +287,8 @@ namespace osu.Game.Online.Spectator
                 if (pendingFrames.Count > 0)
                     purgePendingFrames();
 
+                currentState.LastFrameBundleSequenceNumber = currentFrameBundleSequenceNumber;
+
                 clearScoreState();
 
                 if (state.HasPassed)
@@ -305,6 +310,9 @@ namespace osu.Game.Online.Spectator
             currentScore = score;
             currentScoreToken = scoreToken;
             currentScoreProcessor = state.ScoreProcessor;
+            currentFrameBundleSequenceNumber = 0;
+            if (scoreToken != null)
+                allFrameBundles[scoreToken.Value] = new List<FrameDataBundle>();
         }
 
         private void clearScoreState()
@@ -315,6 +323,22 @@ namespace osu.Game.Online.Spectator
             currentScore = null;
             currentScoreProcessor = null;
             currentScoreToken = null;
+            currentFrameBundleSequenceNumber = 0;
+        }
+
+        public Task<CompleteReplayResponse> CompleteReplay(CompleteReplayRequest completeReplayRequest)
+        {
+            if (!allFrameBundles.Remove(completeReplayRequest.ScoreTokenId, out var frameBundlesForScoreToken))
+                return Task.FromResult(new CompleteReplayResponse([]));
+
+            var sequenceNumberSet = completeReplayRequest.FrameBundleSequenceNumbers.ToHashSet();
+            if (sequenceNumberSet.Count == 0)
+                return Task.FromResult(new CompleteReplayResponse([]));
+
+            var bundles = frameBundlesForScoreToken.Where(b => b.SequenceNumber != null && sequenceNumberSet.Contains(b.SequenceNumber.Value))
+                                                   .OrderBy(b => b.SequenceNumber)
+                                                   .ToArray();
+            return Task.FromResult(new CompleteReplayResponse(bundles));
         }
 
         public virtual void WatchUser(int userId)
@@ -389,7 +413,16 @@ namespace osu.Game.Online.Spectator
             Debug.Assert(currentScoreProcessor != null);
 
             var frames = pendingFrames.ToArray();
-            var bundle = new FrameDataBundle(currentScore.ScoreInfo, currentScoreProcessor, frames);
+            var bundle = new FrameDataBundle(currentScore.ScoreInfo, currentScoreProcessor, frames)
+            {
+                SequenceNumber = Interlocked.Increment(ref currentFrameBundleSequenceNumber)
+            };
+
+            if (currentScoreToken != null)
+            {
+                Debug.Assert(allFrameBundles.ContainsKey(currentScoreToken.Value));
+                allFrameBundles[currentScoreToken.Value].Add(bundle);
+            }
 
             pendingFrames.Clear();
             lastPurgeTime = Time.Current;

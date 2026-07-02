@@ -49,5 +49,12 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         /// <param name="userId">The ID of the user who ended watching.</param>
         Task UserEndedWatching(int userId);
+
+        /// <summary>
+        /// Called by the server in response to <see cref="ISpectatorServer.EndPlaySession"/>.
+        /// Using data provided in <see cref="SpectatorState"/>, this gives the server a last chance to retrieve any <see cref="FrameDataBundle"/>s
+        /// that it may not have received due to connection drop-outs or similar.
+        /// </summary>
+        Task<CompleteReplayResponse> CompleteReplay(CompleteReplayRequest request);
     }
 }
