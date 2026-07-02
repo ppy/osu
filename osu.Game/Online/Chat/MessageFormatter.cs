@@ -15,7 +15,11 @@ namespace osu.Game.Online.Chat
 {
     public static class MessageFormatter
     {
-        private static readonly TimeSpan regex_timeout;
+        // IMPORTANT: this has to be defined and initialised to a non-zero value BEFORE all usages below.
+        // failing to do so will cause the `Regex` constructor invocations in initialisers below to throw.
+        private static readonly TimeSpan regex_timeout = DebugUtils.IsNUnitRunning
+            ? TimeSpan.FromSeconds(1)
+            : TimeSpan.FromMilliseconds(5);
 
         // [[Performance Points]] -> wiki:Performance Points (https://osu.ppy.sh/wiki/Performance_Points)
         private static readonly Regex wiki_regex = new Regex(@"\[\[(?<text>[^\]]+)\]\]", RegexOptions.None, regex_timeout);
@@ -69,13 +73,6 @@ namespace osu.Game.Online.Chat
             set => websiteRootUrl = value
                                     .Trim('/') // trim potential trailing slash/
                                     .Split('/').Last(); // only keep domain name, ignoring protocol.
-        }
-
-        static MessageFormatter()
-        {
-            regex_timeout = DebugUtils.IsNUnitRunning
-                ? TimeSpan.FromSeconds(1)
-                : TimeSpan.FromMilliseconds(5);
         }
 
         private static string websiteRootUrl = "osu.ppy.sh";
