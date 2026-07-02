@@ -44,9 +44,9 @@ namespace osu.Game.Tests.Visual.Online
         public void TestClickableAvatarHover()
         {
             AddStep("hover avatar with user panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<ClickableAvatar>().ElementAt(1)));
-            AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<ClickableAvatar.UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
+            AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
             AddStep("hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
-            AddUntilStep("wait for tooltip to hide", () => this.ChildrenOfType<ClickableAvatar.UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Hidden);
+            AddUntilStep("wait for tooltip to hide", () => this.ChildrenOfType<UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Hidden);
 
             AddStep("hover avatar without user panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<ClickableAvatar>().ElementAt(0)));
             AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<OsuTooltipContainer.OsuTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
