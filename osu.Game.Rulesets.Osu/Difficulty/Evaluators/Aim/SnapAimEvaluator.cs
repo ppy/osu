@@ -47,7 +47,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             snapDifficulty += calculateWiggleBonus(osuCurrObj, osuLastObj, currVelocity, prevVelocity, currDistance, prevDistance);
             snapDifficulty += calculateVelocityChangeBonus(withSliderTravelDistance, prevVelocity, currVelocity, currDistance, osuCurrObj, osuLastObj);
-            snapDifficulty += calculateSliderBonus(withSliderTravelDistance, osuCurrObj);
+
+            if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
+            {
+                snapDifficulty += calculateSliderBonus(osuCurrObj);
+            }
 
             // Apply high circle size bonus
             snapDifficulty *= osuCurrObj.SmallCircleBonus;
@@ -183,12 +187,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             return wiggleBonus * wiggle_multiplier;
         }
 
-        private static double calculateSliderBonus(bool withSliderTravelDistance, OsuDifficultyHitObject osuCurrObj)
+        private static double calculateSliderBonus(OsuDifficultyHitObject osuCurrObj)
         {
             const double slider_multiplier = 1.5;
-
-            if (osuCurrObj.BaseObject is not Slider || !withSliderTravelDistance)
-                return 0;
 
             // Reward sliders based on velocity.
             double sliderBonus = osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
