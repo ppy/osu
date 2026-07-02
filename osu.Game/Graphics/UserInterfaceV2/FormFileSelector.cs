@@ -194,7 +194,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             initialChooserPath = Current.Value?.DirectoryName;
             placeholderText.Alpha = Current.Value == null ? 1 : 0;
             filenameText.Text = Current.Value?.Name ?? string.Empty;
-            background.Flash();
+            background.FlashOnCommit();
         }
 
         protected override bool OnClick(ClickEvent e)

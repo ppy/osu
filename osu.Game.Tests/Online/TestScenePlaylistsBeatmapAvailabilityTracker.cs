@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestBeatmapDownloadingFlow()
         {
-            AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
+            AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapInfo));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
             AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
@@ -128,8 +128,8 @@ namespace osu.Game.Tests.Online
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
             AddStep("allow importing", () => beatmaps.AllowImport.Set());
-            AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
-            AddUntilStep("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
+            AddUntilStep("wait for import", () => beatmaps.ConsumeLastImport() != null);
+            AddUntilStep("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapInfo));
             addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
         }
 
@@ -167,6 +167,29 @@ namespace osu.Game.Tests.Online
             addAvailabilityCheckStep("locally available after re-import", BeatmapAvailability.LocallyAvailable);
         }
 
+        [Test]
+        public void TestManualExternalImportDuringDownload()
+        {
+            AddStep("allow importing", () => beatmaps.AllowImport.Set());
+
+            AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapInfo));
+            addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
+
+            AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
+            addAvailabilityCheckStep("state downloading", () => BeatmapAvailability.Downloading(0.0f));
+
+            AddStep("import beatmap externally", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+            AddUntilStep("wait for import", () => beatmaps.ConsumeLastImport() != null);
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).SetProgress(0.4f));
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+
+            AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).TriggerSuccess(testBeatmapFile));
+            AddUntilStep("wait for import", () => beatmaps.ConsumeLastImport() != null);
+            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+        }
+
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
             AddUntilStep(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
@@ -199,12 +222,19 @@ namespace osu.Game.Tests.Online
         {
             public readonly ManualResetEventSlim AllowImport = new ManualResetEventSlim();
 
-            public Live<BeatmapSetInfo>? CurrentImport { get; private set; }
+            private Live<BeatmapSetInfo>? currentImport;
 
             public TestBeatmapManager(Storage storage, RealmAccess realm, IAPIProvider api, AudioManager audioManager, IResourceStore<byte[]> resources,
                                       GameHost? host = null, WorkingBeatmap? defaultBeatmap = null)
                 : base(storage, realm, api, audioManager, resources, host, defaultBeatmap)
             {
+            }
+
+            public Live<BeatmapSetInfo>? ConsumeLastImport()
+            {
+                Live<BeatmapSetInfo>? result = currentImport;
+                currentImport = null;
+                return result;
             }
 
             protected override BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm)
@@ -228,7 +258,7 @@ namespace osu.Game.Tests.Online
                     if (!testBeatmapManager.AllowImport.Wait(TimeSpan.FromSeconds(10), cancellationToken))
                         throw new TimeoutException("Timeout waiting for import to be allowed.");
 
-                    return testBeatmapManager.CurrentImport = base.ImportModel(item, archive, parameters, cancellationToken);
+                    return testBeatmapManager.currentImport = base.ImportModel(item, archive, parameters, cancellationToken);
                 }
 
                 protected override void PostImport(BeatmapSetInfo model, Realm realm, ImportParameters parameters)

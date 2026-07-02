@@ -12,6 +12,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -93,7 +94,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("no-collection group present", () =>
             {
-                var group = grouping.GroupItems.Single(g => g.Key.Title == "Not in collection");
+                var group = grouping.GroupItems.Single(g => g.Key.Title == BeatmapCarouselFilterGroupingStrings.NotInCollection);
                 return group.Value.Select(i => i.Model).OfType<GroupedBeatmapSet>().Single().BeatmapSet.Equals(beatmapSet);
             });
 

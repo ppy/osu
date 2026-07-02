@@ -2,18 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
-    public static partial class DifficultyCalculationUtils
+    public static partial class DiffUtils
     {
+        /// <summary>
+        /// Square root of 2
+        /// </summary>
+        public const double SQRT2 = 1.4142135623730950;
+
         /// <summary>
         /// Converts BPM value into milliseconds
         /// </summary>
         /// <param name="bpm">Beats per minute</param>
         /// <param name="delimiter">Which rhythm delimiter to use, default is 1/4</param>
-        /// <returns>BPM conveted to milliseconds</returns>
+        /// <returns>BPM converted to milliseconds</returns>
         public static double BPMToMilliseconds(double bpm, int delimiter = 4)
         {
             return 60000.0 / delimiter / bpm;
@@ -24,7 +29,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// </summary>
         /// <param name="ms">Milliseconds</param>
         /// <param name="delimiter">Which rhythm delimiter to use, default is 1/4</param>
-        /// <returns>Milliseconds conveted to beats per minute</returns>
+        /// <returns>Milliseconds converted to beats per minute</returns>
         public static double MillisecondsToBPM(double ms, int delimiter = 4)
         {
             return 60000.0 / (ms * delimiter);
@@ -54,7 +59,15 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="p">The value of <i>p</i> to calculate the norm for.</param>
         /// <param name="values">The coefficients of the vector.</param>
         /// <returns>The <i>p</i>-norm of the vector.</returns>
-        public static double Norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
+        public static double Norm(double p, params double[] values)
+        {
+            double sum = 0;
+
+            foreach (double x in values)
+                sum += Pow(x, p);
+
+            return Pow(sum, 1.0 / p);
+        }
 
         /// <summary>
         /// Calculates a Gaussian-based bell curve function (https://en.wikipedia.org/wiki/Gaussian_function)
@@ -64,20 +77,32 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <param name="width">The width (spread) of the curve</param>
         /// <param name="multiplier">Multiplier to adjust the curve's height</param>
         /// <returns>The output of the bell curve function of <paramref name="x"/></returns>
-        public static double BellCurve(double x, double mean, double width, double multiplier = 1.0) => multiplier * Math.Exp(Math.E * -(Math.Pow(x - mean, 2) / Math.Pow(width, 2)));
+        public static double BellCurve(double x, double mean, double width, double multiplier = 1.0) => multiplier * Math.Exp(Math.E * -(Pow(x - mean, 2) / Pow(width, 2)));
 
         /// <summary>
-        /// Calculates a Smoothstep Bellcurve that returns returns 1 for x = mean, and smoothly reducing it's value to 0 over width
+        /// Calculates a Smoothstep bell curve that returns 1 for x = mean, and smoothly reducing it's value to 0 over width
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
         /// <param name="mean">Value of x, for which return value will be the highest (=1)</param>
         /// <param name="width">Range [mean - width, mean + width] where function will change values</param>
         /// <returns>The output of the smoothstep bell curve function of <paramref name="x"/></returns>
-        public static double SmoothstepBellCurve(double x, double mean = 0.5, double width = 0.5)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double SmoothstepBellCurve(double x, double mean, double width)
         {
             x -= mean;
             x = x > 0 ? (width - x) : (width + x);
             return Smoothstep(x, 0, width);
+        }
+
+        /// <summary>
+        /// Calculates a Smoothstep bell curve that returns 1 for x = mean, and smoothly reducing it's value to 0 over width
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double SmoothstepBellCurve(double x)
+        {
+            x = 0.5 - Math.Abs(x - 0.5);
+            x = Math.Clamp(x * 2.0, 0.0, 1.0);
+            return x * x * (3.0 - 2.0 * x);
         }
 
         /// <summary>
@@ -179,11 +204,26 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             double baseApprox = Math.Sqrt(t1 * t1 - t2) - t1;
 
             // Correction reduces max error from -0.005 to -0.00045.
-            double c = x >= 0.85 ? Math.Pow((x - 0.85) / 0.293, 8) : 0;
+            double c = x >= 0.85 ? Pow((x - 0.85) / 0.293, 8) : 0;
             double erfInv = sgn * (Math.Sqrt(baseApprox) + c);
 
             return erfInv;
         }
+
+        // In actual debug testing it's very rare for a (double, double) call to end up with a rounded int value in the first place.
+        // Making an explicit overload is slightly faster than running the `switch` in such cases.
+        public static double Pow(double x, double exponent) => Math.Pow(x, exponent);
+
+        public static double Pow(double x, int exponent) => exponent switch
+        {
+            0 => 1,
+            1 => x,
+            2 => x * x,
+            3 => x * x * x,
+            4 => x * x * x * x,
+            5 => x * x * x * x * x, // This is the largest value used in diffcalc right now.
+            _ => Math.Pow(x, exponent)
+        };
 
         /// <summary>
         /// Inverse complementary error function (https://en.wikipedia.org/wiki/Error_function)

@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void velocityPopoverHasFocus() => AddUntilStep("velocity popover textbox focused", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var slider = popover?.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
             var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
 
             return textbox?.HasFocus == true;
@@ -164,17 +164,17 @@ namespace osu.Game.Tests.Visual.Editing
         private void velocityPopoverHasSingleValue(double velocity) => AddUntilStep($"velocity popover has {velocity}", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var control = popover?.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
 
-            return slider?.Current.Value == velocity;
+            return control?.Current.Value == velocity && !control.IsMultipleValues;
         });
 
         private void velocityPopoverHasIndeterminateValue() => AddUntilStep("velocity popover has indeterminate value", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var control = popover?.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
 
-            return slider != null && slider.Current.Value == null;
+            return control != null && control.IsMultipleValues;
         });
 
         private void dismissPopover()
@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void setVelocityViaPopover(double velocity) => AddStep($"set {velocity} via popover", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Single();
-            var slider = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var slider = popover.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
             slider.Current.Value = velocity;
         });
 
