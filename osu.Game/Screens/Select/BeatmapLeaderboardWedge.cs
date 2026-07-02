@@ -88,12 +88,13 @@ namespace osu.Game.Screens.Select
 
         private const float personal_best_height = 112;
 
-        // Blocking mouse down is required to avoid song select's background reveal logic happening while hovering scores.
-        // Our horizontal alignment doesn't really align with the rest of the sheared components (protrudes a touch to the right) which makes
-        // it complicated to handle this at a higher level.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => scoresScroll.ReceivePositionalInputAt(screenSpacePos);
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (scoresContainer.Any(score => score.IsHovered))
+                return true;
 
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
+            return base.OnMouseDown(e);
+        }
 
         private Sample? swishSample;
 

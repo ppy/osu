@@ -868,6 +868,7 @@ namespace osu.Game.Screens.Select
         public bool IsFiltering => carousel.IsFiltering || filterDebounce?.State == ScheduledDelegate.RunState.Waiting;
 
         private const double filter_delay = 250;
+        public const double REVEAL_BACKGROUND_DELAY = 200;
 
         private ScheduledDelegate? filterDebounce;
 
@@ -984,7 +985,7 @@ namespace osu.Game.Screens.Select
                     updateBackgroundDim();
 
                     Footer?.Hide();
-                }, 200);
+                }, REVEAL_BACKGROUND_DELAY);
             }
 
             return base.OnMouseDown(e);
