@@ -288,6 +288,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                                                 Colour4.Yellow,
                                             }
                                         },
+                                        new FormColourPicker
+                                        {
+                                            Caption = "Colour picker",
+                                            HintText = "Allows to pick colours",
+                                        },
                                     },
                                 }
                             },
