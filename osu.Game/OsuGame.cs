@@ -1369,6 +1369,40 @@ namespace osu.Game
 
                 dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
             }
+
+            if (combined < 20260614)
+            {
+                var beatmapDetailTab = LocalConfig.Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
+
+                if (beatmapDetailTab != BeatmapDetailTab.Details)
+                {
+                    var leaderboardScope = BeatmapLeaderboardScope.Local;
+
+                    switch (beatmapDetailTab)
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        case BeatmapDetailTab.Country:
+                            leaderboardScope = BeatmapLeaderboardScope.Country;
+                            break;
+
+                        case BeatmapDetailTab.Friends:
+                            leaderboardScope = BeatmapLeaderboardScope.Friend;
+                            break;
+
+                        case BeatmapDetailTab.Team:
+                            leaderboardScope = BeatmapLeaderboardScope.Team;
+                            break;
+
+                        case BeatmapDetailTab.Global:
+#pragma warning restore CS0618 // Type or member is obsolete
+                            leaderboardScope = BeatmapLeaderboardScope.Global;
+                            break;
+                    }
+
+                    LocalConfig.SetValue(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Ranking);
+                    LocalConfig.SetValue(OsuSetting.BeatmapLeaderboardScope, leaderboardScope);
+                }
+            }
         }
 
         private void handleBackButton()
