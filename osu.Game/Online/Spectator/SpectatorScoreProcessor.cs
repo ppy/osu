@@ -14,7 +14,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Online.Spectator
 {
@@ -25,9 +24,22 @@ namespace osu.Game.Online.Spectator
     public partial class SpectatorScoreProcessor : Component
     {
         /// <summary>
+        /// Whether to use the the total score without mods for display purposes.
+        /// </summary>
+        public bool UseTotalScoreWithoutMods { get; set; }
+
+        /// <summary>
         /// The current total score.
         /// </summary>
         public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
+
+        /// <summary>
+        /// The total number of points awarded for the score without including mod multipliers.
+        /// </summary>
+        /// <remarks>
+        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
+        /// </remarks>
+        public readonly BindableLong TotalScoreWithoutMods = new BindableLong { MinValue = 0 };
 
         /// <summary>
         /// The current accuracy.
@@ -52,9 +64,12 @@ namespace osu.Game.Online.Spectator
         /// <summary>
         /// The applied <see cref="Mod"/>s.
         /// </summary>
-        public IReadOnlyList<Mod> Mods => scoreInfo?.Mods ?? Array.Empty<Mod>();
+        public IReadOnlyList<Mod> Mods => Score?.Mods ?? Array.Empty<Mod>();
 
-        public Func<ScoringMode, long> GetDisplayScore => mode => scoreInfo?.GetDisplayScore(mode) ?? 0;
+        /// <summary>
+        /// The score.
+        /// </summary>
+        public ScoreInfo? Score { get; private set; }
 
         private IClock? referenceClock;
 
@@ -78,7 +93,6 @@ namespace osu.Game.Online.Spectator
         private readonly int userId;
 
         private SpectatorState? spectatorState;
-        private ScoreInfo? scoreInfo;
 
         public SpectatorScoreProcessor(int userId)
         {
@@ -101,13 +115,13 @@ namespace osu.Game.Online.Spectator
         {
             if (!spectatorStates.TryGetValue(userId, out var userState) || userState.BeatmapID == null || userState.RulesetID == null)
             {
-                scoreInfo = null;
+                Score = null;
                 spectatorState = null;
                 replayFrames.Clear();
                 return;
             }
 
-            if (scoreInfo != null)
+            if (Score != null)
                 return;
 
             RulesetInfo? rulesetInfo = rulesetStore.GetRuleset(userState.RulesetID.Value);
@@ -117,7 +131,7 @@ namespace osu.Game.Online.Spectator
             Ruleset ruleset = rulesetInfo.CreateInstance();
 
             spectatorState = userState;
-            scoreInfo = new ScoreInfo
+            Score = new ScoreInfo
             {
                 Ruleset = rulesetInfo,
                 Mods = userState.Mods.Select(m => m.ToMod(ruleset)).ToArray()
@@ -131,7 +145,7 @@ namespace osu.Game.Online.Spectator
 
             Schedule(() =>
             {
-                if (scoreInfo == null)
+                if (Score == null)
                     return;
 
                 replayFrames.Add(new TimedFrame(bundle.Frames.First().Time, bundle.Header));
@@ -141,7 +155,7 @@ namespace osu.Game.Online.Spectator
 
         public void UpdateScore()
         {
-            if (scoreInfo == null || replayFrames.Count == 0)
+            if (Score == null || replayFrames.Count == 0)
                 return;
 
             Debug.Assert(spectatorState != null);
@@ -154,16 +168,18 @@ namespace osu.Game.Online.Spectator
             TimedFrame frame = replayFrames[frameIndex];
             Debug.Assert(frame.Header != null);
 
-            scoreInfo.Accuracy = frame.Header.Accuracy;
-            scoreInfo.MaxCombo = frame.Header.MaxCombo;
-            scoreInfo.Statistics = frame.Header.Statistics;
-            scoreInfo.MaximumStatistics = spectatorState.MaximumStatistics;
-            scoreInfo.TotalScore = frame.Header.TotalScore;
+            Score.Accuracy = frame.Header.Accuracy;
+            Score.MaxCombo = frame.Header.MaxCombo;
+            Score.Statistics = frame.Header.Statistics;
+            Score.MaximumStatistics = spectatorState.MaximumStatistics;
+            Score.TotalScore = frame.Header.TotalScore;
+            Score.TotalScoreWithoutMods = frame.Header.TotalScoreWithoutMods ?? 0;
 
             Accuracy.Value = frame.Header.Accuracy;
             Combo.Value = frame.Header.Combo;
             HighestCombo.Value = frame.Header.MaxCombo;
             TotalScore.Value = frame.Header.TotalScore;
+            TotalScoreWithoutMods.Value = frame.Header.TotalScoreWithoutMods ?? 0;
         }
 
         protected override void Dispose(bool isDisposing)

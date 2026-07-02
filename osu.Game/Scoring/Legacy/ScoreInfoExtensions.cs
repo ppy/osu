@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
@@ -13,18 +14,34 @@ namespace osu.Game.Scoring.Legacy
     public static class ScoreInfoExtensions
     {
         public static long GetDisplayScore(this ScoreProcessor scoreProcessor, ScoringMode mode)
-            => getDisplayScore(scoreProcessor.Ruleset.RulesetInfo.OnlineID, scoreProcessor.TotalScore.Value, mode, scoreProcessor.MaximumStatistics);
+        {
+            if (scoreProcessor.UseTotalScoreWithoutMods)
+                return GetDisplayScore(scoreProcessor.Ruleset.RulesetInfo.OnlineID, scoreProcessor.TotalScoreWithoutMods.Value, mode, scoreProcessor.MaximumStatistics);
+
+            return GetDisplayScore(scoreProcessor.Ruleset.RulesetInfo.OnlineID, scoreProcessor.TotalScore.Value, mode, scoreProcessor.MaximumStatistics);
+        }
+
+        public static long GetDisplayScore(this SpectatorScoreProcessor scoreProcessor, ScoringMode mode)
+        {
+            if (scoreProcessor.Score is not ScoreInfo score)
+                return 0;
+
+            if (scoreProcessor.UseTotalScoreWithoutMods)
+                return GetDisplayScore(score.RulesetID, score.TotalScoreWithoutMods, mode, score.MaximumStatistics);
+
+            return GetDisplayScore(score.RulesetID, score.TotalScore, mode, score.MaximumStatistics);
+        }
 
         public static long GetDisplayScore(this ScoreInfo scoreInfo, ScoringMode mode)
-            => getDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
+            => GetDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
 
         public static long GetDisplayScore(this SoloScoreInfo soloScoreInfo, ScoringMode mode)
-            => getDisplayScore(soloScoreInfo.RulesetID, soloScoreInfo.TotalScore, mode, soloScoreInfo.MaximumStatistics);
+            => GetDisplayScore(soloScoreInfo.RulesetID, soloScoreInfo.TotalScore, mode, soloScoreInfo.MaximumStatistics);
 
         public static long GetDisplayScore(this MultiplayerScore multiplayerScore, ScoringMode mode)
-            => getDisplayScore(multiplayerScore.RulesetId, multiplayerScore.TotalScore, mode, multiplayerScore.MaximumStatistics);
+            => GetDisplayScore(multiplayerScore.RulesetId, multiplayerScore.TotalScore, mode, multiplayerScore.MaximumStatistics);
 
-        private static long getDisplayScore(int rulesetId, long score, ScoringMode mode, IReadOnlyDictionary<HitResult, int> maximumStatistics)
+        public static long GetDisplayScore(int rulesetId, long score, ScoringMode mode, IReadOnlyDictionary<HitResult, int> maximumStatistics)
         {
             if (mode == ScoringMode.Standardised)
                 return score;

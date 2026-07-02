@@ -44,7 +44,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <remarks>
         /// Should only be disabled for special cases.
         /// When disabled, <see cref="JudgementProcessor.RevertResult"/> cannot be used.</remarks>
-        internal bool TrackHitEvents = true;
+        internal bool TrackHitEvents { get; set; } = true;
+
+        /// <summary>
+        /// Whether to use the the total score without mods for display purposes.
+        /// </summary>
+        internal bool UseTotalScoreWithoutMods { get; set; }
 
         /// <summary>
         /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
