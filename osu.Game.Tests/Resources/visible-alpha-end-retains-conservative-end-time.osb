@@ -1,0 +1,6 @@
+[Events]
+//Storyboard Layer 0 (Background)
+Sprite,Background,Centre,"Textures/test-image.png",320,240
+ F,0,1000,2000,0,1
+ F,0,3000,4000,1,0.5
+ S,0,4000,10000,1,2
