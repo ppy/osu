@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -127,12 +126,10 @@ namespace osu.Game.Screens.Menu
             switch (tipIndex)
             {
                 case 0:
-                    return MenuTipStrings.ToggleToolbarShortcut(
-                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleToolbar).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.ToggleToolbarShortcut(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleToolbar));
 
                 case 1:
-                    return MenuTipStrings.GameSettingsShortcut(
-                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSettings).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.GameSettingsShortcut(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleSettings));
 
                 case 2:
                     return MenuTipStrings.DynamicSettings;
@@ -147,8 +144,7 @@ namespace osu.Game.Screens.Menu
                     return MenuTipStrings.ScreenScalingSettings;
 
                 case 6:
-                    return MenuTipStrings.FreeOsuDirect(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleBeatmapListing).FirstOrDefault()
-                                                        ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.FreeOsuDirect(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleBeatmapListing));
 
                 case 7:
                     return MenuTipStrings.ReplaySeeking;
@@ -178,16 +174,16 @@ namespace osu.Game.Screens.Menu
                     return MenuTipStrings.GlobalStatisticsShortcut;
 
                 case 16:
-                    return MenuTipStrings.ReplayPausing(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.TogglePauseReplay).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.ReplayPausing(keyBindingStore.GetBindingsStringFor(GlobalAction.TogglePauseReplay));
 
                 case 17:
                     return MenuTipStrings.ConfigurableHotkeys;
 
                 case 18:
-                    return MenuTipStrings.PeekHUDWhenHidden(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.HoldForHUD).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.PeekHUDWhenHidden(keyBindingStore.GetBindingsStringFor(GlobalAction.HoldForHUD));
 
                 case 19:
-                    return MenuTipStrings.SkinEditor(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleSkinEditor).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.SkinEditor(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleSkinEditor));
 
                 case 20:
                     return MenuTipStrings.DragAndDropImageInSkinEditor;
@@ -200,14 +196,13 @@ namespace osu.Game.Screens.Menu
 
                 case 23:
                     return MenuTipStrings.SkinChangeShortcuts([
-                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
-                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.PreviousSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
-                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.NextSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
+                        keyBindingStore.GetBindingsStringFor(GlobalAction.RandomSkin),
+                        keyBindingStore.GetBindingsStringFor(GlobalAction.PreviousSkin),
+                        keyBindingStore.GetBindingsStringFor(GlobalAction.NextSkin),
                     ]);
 
                 case 24:
-                    return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault()
-                                                                       ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetBindingsStringFor(GlobalAction.ToggleReplaySettings));
 
                 case 25:
                     return MenuTipStrings.CopyModsFromScore;
