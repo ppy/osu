@@ -11,7 +11,7 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
-    public class RankedPlayPlayer : MultiplayerPlayer
+    public partial class RankedPlayPlayer : MultiplayerPlayer
     {
         public RankedPlayPlayer(MultiplayerRoom room)
             : base(new Room(room), new PlaylistItem(room.CurrentPlaylistItem), room.Users.ToArray(), showFailingOverlay: false, useTotalScoreWithoutMods: true)
