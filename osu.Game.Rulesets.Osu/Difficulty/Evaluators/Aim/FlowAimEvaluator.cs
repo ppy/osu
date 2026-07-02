@@ -45,7 +45,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             flowDifficulty += calculateAcuteAngleBonus(osuCurrObj, currVelocity, overlappedNotesWeight);
             flowDifficulty += calculateVelocityChangeBonus(osuCurrObj, osuLastObj, currVelocity, prevVelocity, currDistance, overlappedNotesWeight, withSliderTravelDistance);
-            flowDifficulty += calculateSliderBonus(osuCurrObj, withSliderTravelDistance);
+
+            if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
+            {
+                flowDifficulty += calculateSliderBonus(osuCurrObj);
+            }
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
             flowDifficulty = DiffUtils.Pow(flowDifficulty, 1.45);
@@ -103,13 +107,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             return overlapVelocityBuff * distRatio * overlappedNotesWeight * velocity_change_multiplier;
         }
 
-        private static double calculateSliderBonus(OsuDifficultyHitObject osuCurrObj, bool withSliderTravelDistance)
-        {
-            if (osuCurrObj.BaseObject is not Slider || !withSliderTravelDistance)
-                return 0;
-
-            return osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
-        }
+        private static double calculateSliderBonus(OsuDifficultyHitObject osuCurrObj)
+            => osuCurrObj.TravelDistance / osuCurrObj.TravelTime;
 
         private static double calculateCurrentVelocity(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj, double currDistance, bool withSliderTravelDistance)
         {
