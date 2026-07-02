@@ -120,7 +120,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             modSelectOverlay = new RankedPlayModSelectOverlay
             {
                 SelectedMods = { BindTarget = selectedMods },
-                IsValidMod = m => m is ModHidden,
             };
         }
 
