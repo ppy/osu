@@ -52,6 +52,9 @@ namespace osu.Game.Scoring.Legacy
         [JsonProperty("pauses")]
         public int[] Pauses { get; set; } = [];
 
+        [JsonProperty("replay_bookmarks")]
+        public int[] ReplayBookmarks { get; set; } = [];
+
         public static LegacyReplaySoloScoreInfo FromScore(ScoreInfo score) => new LegacyReplaySoloScoreInfo
         {
             OnlineID = score.OnlineID,
@@ -63,6 +66,7 @@ namespace osu.Game.Scoring.Legacy
             UserID = score.User.OnlineID,
             TotalScoreWithoutMods = score.TotalScoreWithoutMods > 0 ? score.TotalScoreWithoutMods : null,
             Pauses = score.Pauses.ToArray(),
+            ReplayBookmarks = score.ReplayBookmarks.ToArray(),
         };
     }
 }

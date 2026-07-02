@@ -158,6 +158,8 @@ namespace osu.Game.Scoring
 
         public IList<int> Pauses { get; } = null!;
 
+        public IList<int> ReplayBookmarks { get; } = null!;
+
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
             Ruleset = ruleset ?? new RulesetInfo();

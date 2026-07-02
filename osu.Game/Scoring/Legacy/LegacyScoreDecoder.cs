@@ -143,6 +143,7 @@ namespace osu.Game.Scoring.Legacy
                             PopulateTotalScoreWithoutMods(score.ScoreInfo);
 
                         score.ScoreInfo.Pauses.AddRange(readScore.Pauses);
+                        score.ScoreInfo.ReplayBookmarks.AddRange(readScore.ReplayBookmarks);
                     });
                 }
             }

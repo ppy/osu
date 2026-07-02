@@ -195,6 +195,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
             new KeyBinding(InputKey.Comma, GlobalAction.StepReplayBackward),
             new KeyBinding(InputKey.Period, GlobalAction.StepReplayForward),
+            new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.ReplayAddBookmark),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.ReplayRemoveClosestBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.ReplaySeekToPreviousBookmark),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.ReplaySeekToNextBookmark),
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.ToggleReplaySettings),
         };
 
@@ -535,7 +539,19 @@ namespace osu.Game.Input.Bindings
         EditorSubmitBeatmap,
 
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.EditExternally))]
-        EditorEditExternally
+        EditorEditExternally,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ReplayAddBookmark))]
+        ReplayAddBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ReplayRemoveClosestBookmark))]
+        ReplayRemoveClosestBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ReplaySeekToPreviousBookmark))]
+        ReplaySeekToPreviousBookmark,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ReplaySeekToNextBookmark))]
+        ReplaySeekToNextBookmark
     }
 
     public enum GlobalActionCategory
