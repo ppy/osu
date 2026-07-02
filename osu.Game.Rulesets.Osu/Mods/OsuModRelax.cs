@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -20,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer, IHasNoTimedInputs
     {
+        [SettingSource("Perfect Timing", "Hits circles exactly on time regardless of cursor position.")]
+        public Bindable<bool> PerfectTiming { get; } = new BindableBool();
+
         public override LocalisableString Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
 
         public override Type[] IncompatibleMods =>
@@ -32,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private bool isDownState;
         private bool wasLeft;
+        private double previousTime;
 
         private OsuInputManager osuInputManager = null!;
 
@@ -82,8 +88,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
+                // Perfect timing is handled by the hitcircle itself. If we're using Perfect Timing, we don't need to look ahead.
+                float relaxLeniency = PerfectTiming.Value ? 0 : RELAX_LENIENCY;
+
                 // we are not yet close enough to the object.
-                if (time < h.HitObject.StartTime - RELAX_LENIENCY)
+                if (time < h.HitObject.StartTime - relaxLeniency)
                     break;
 
                 // already hit or beyond the hittable end time.
@@ -121,13 +130,29 @@ namespace osu.Game.Rulesets.Osu.Mods
             else if (isDownState && time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
                 changeState(false);
 
+            previousTime = time;
+
             void handleHitCircle(DrawableHitCircle circle)
             {
-                if (!circle.HitArea.IsHovered)
-                    return;
-
                 Debug.Assert(circle.HitObject.HitWindows != null);
-                requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
+
+                // If we use perfect timing, we click the circle exactly on time.
+                if (PerfectTiming.Value)
+                {
+                    // Use previousTime and current time to detect crossing the hit window
+                    if (previousTime < circle.HitObject.StartTime && time >= circle.HitObject.StartTime)
+                    {
+                        requiresHit = true;
+                    }
+                }
+                else
+                {
+                    // Wait until the cursor is hovering over the circle before we click.
+                    if (!circle.HitArea.IsHovered)
+                        return;
+
+                    requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
+                }
             }
 
             void changeState(bool down)
