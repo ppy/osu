@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Utils;
@@ -31,11 +32,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             var catchAttributes = (CatchDifficultyAttributes)attributes;
 
-            num300 = score.GetCount300() ?? 0; // HitResult.Great
+            num300 = score.Statistics[HitResult.Great];
             num100 = score.GetCount100() ?? 0; // HitResult.LargeTickHit
             num50 = score.GetCount50() ?? 0; // HitResult.SmallTickHit
             numKatu = score.GetCountKatu() ?? 0; // HitResult.SmallTickMiss
             numMiss = score.GetCountMiss() ?? 0; // HitResult.Miss PLUS HitResult.LargeTickMiss
+
+            double scoreMaxCombo = Math.Clamp(score.MaxCombo, 0, catchAttributes.MaxCombo);
 
             // We are heavily relying on aim in catch the beat
             double value = DiffUtils.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
@@ -52,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
-                value *= Math.Min(DiffUtils.Pow(score.MaxCombo, 0.35) / DiffUtils.Pow(catchAttributes.MaxCombo, 0.35), 1.0);
+                value *= Math.Min(DiffUtils.Pow(scoreMaxCombo, 0.35) / DiffUtils.Pow(catchAttributes.MaxCombo, 0.35), 1.0);
 
             var difficulty = score.BeatmapInfo!.Difficulty.Clone();
 

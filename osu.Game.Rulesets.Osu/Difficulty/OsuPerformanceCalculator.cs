@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
             usingScoreV2 = score.Mods.Any(m => m is ModScoreV2);
 
-            accuracy = score.Accuracy;
-            scoreMaxCombo = score.MaxCombo;
+            accuracy = Math.Clamp(score.Accuracy, 0, 1);
+            scoreMaxCombo = Math.Clamp(score.MaxCombo, 0, osuAttributes.MaxCombo);
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
