@@ -308,26 +308,26 @@ namespace osu.Game.Rulesets.Taiko
             double rate = ModUtils.CalculateRateWithMods(mods);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = "Affects timing requirements for hits and mash rate requirements for swells.",
+                Description = SongSelectStrings.TaikoAccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               ))
-                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric("Hits per second required to clear swells", LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
+                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.HitsPerSecondRequiredToClearSwells, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
                                               .ToArray()
             };
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
             {
-                Description = "Affects the harshness of health drain and the health penalties for missing."
+                Description = SongSelectStrings.HPDrainDescription
             };
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
             {
-                Description = "Multiplier applied to the baseline scroll speed of the playfield when no mods are active."
+                Description = SongSelectStrings.ScrollSpeedDescription
             };
         }
     }
