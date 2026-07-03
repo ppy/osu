@@ -123,6 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             effectiveMissCount = Math.Max(countMiss, effectiveMissCount);
             effectiveMissCount = Math.Min(totalHits, effectiveMissCount);
+            effectiveMissCount = Math.Max(0, effectiveMissCount);
 
             if (effectiveMissCount > 0)
             {

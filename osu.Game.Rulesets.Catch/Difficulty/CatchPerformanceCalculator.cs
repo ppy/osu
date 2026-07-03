@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             num100 = score.GetCount100() ?? 0; // HitResult.LargeTickHit
             num50 = score.GetCount50() ?? 0; // HitResult.SmallTickHit
             numKatu = score.GetCountKatu() ?? 0; // HitResult.SmallTickMiss
-            numMiss = score.GetCountMiss() ?? 0; // HitResult.Miss PLUS HitResult.LargeTickMiss
+            numMiss = Math.Max(0, score.GetCountMiss() ?? 0); // HitResult.Miss PLUS HitResult.LargeTickMiss
 
             double scoreMaxCombo = Math.Clamp(score.MaxCombo, 0, catchAttributes.MaxCombo);
 
