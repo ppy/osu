@@ -495,7 +495,7 @@ namespace osu.Game.Rulesets.Mania
             attributes.RemoveAll(a => a.Acronym == "KC");
 
             float holdNoteRatio = beatmapInfo.TotalObjectCount == 0 ? 0 : (float)beatmapInfo.EndTimeObjectCount / beatmapInfo.TotalObjectCount;
-            attributes.Insert(0, new RulesetBeatmapAttribute("Hold notes", @"HN", holdNoteRatio, holdNoteRatio, 1)
+            attributes.Insert(0, new RulesetBeatmapAttribute(BeatmapStatisticStrings.HoldNotes, @"HN", holdNoteRatio, holdNoteRatio, 1)
             {
                 ValueFormat = "P0"
             });
