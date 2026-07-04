@@ -329,7 +329,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
-        public override LocalisableString VariantDescription => "Keys";
+        public override LocalisableString VariantDescription => SongSelectStrings.ManiaVariant;
 
         public override IEnumerable<int> AvailableVariants
         {
