@@ -155,9 +155,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll Speed");
 
         /// <summary>
-        /// "Multiplier applied to the baseline scroll speed of the playfield when no mods are active."
+        /// "Multiplier applied to the baseline scroll speed of the playfield."
         /// </summary>
-        public static LocalisableString ScrollSpeedDescription => new TranslatableString(getKey(@"scroll_speed_description"), @"Multiplier applied to the baseline scroll speed of the playfield when no mods are active.");
+        public static LocalisableString ScrollSpeedDescription => new TranslatableString(getKey(@"scroll_speed_description"), @"Multiplier applied to the baseline scroll speed of the playfield.");
 
         /// <summary>
         /// "Key Count"
