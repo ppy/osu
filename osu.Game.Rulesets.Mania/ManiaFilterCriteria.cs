@@ -19,7 +19,9 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaFilterCriteria : IRulesetFilterCriteria
     {
-        private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT).ToHashSet();
+        // using `2 * MAX_STAGE_KEYS` here instead of `LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT`,
+        // as the former is higher and achievable by engaging key mods (Dual Stages + 10K)
+        private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, 2 * ManiaRuleset.MAX_STAGE_KEYS).ToHashSet();
         private FilterCriteria.OptionalRange<float> longNotePercentage;
 
         public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
