@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
 
@@ -122,12 +123,31 @@ namespace osu.Game.Overlays.Login
                     };
 
                     if (!string.IsNullOrEmpty(api.UserFacingOutageMessage.Value))
-                        linkFlow.AddText(api.UserFacingOutageMessage.Value);
-                    else
-                        linkFlow.AddText(state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting);
+                    {
+                        linkFlow.AddText("Server outage in progress".ToUpperInvariant(), s =>
+                        {
+                            s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
+                            s.Colour = Colour4.Orange;
+                        });
 
-                    linkFlow.NewLine();
-                    linkFlow.AddLink(LoginPanelStrings.SignOut, api.Logout, string.Empty);
+                        linkFlow.AddParagraph(api.UserFacingOutageMessage.Value, s => s.Font = OsuFont.Style.Caption1);
+                    }
+                    else if (state.NewValue == APIState.Failing)
+                    {
+                        linkFlow.AddParagraph(state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting, s =>
+                        {
+                            s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
+                            s.Colour = Colour4.Orange;
+                        });
+                    }
+                    else
+                    {
+                        linkFlow.AddParagraph(ToolbarStrings.Connecting, s =>
+                            s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
+                    }
+
+                    linkFlow.NewParagraph();
+                    linkFlow.AddLink(LoginPanelStrings.SignOut, api.Logout, string.Empty, s => s.Font = OsuFont.Style.Caption2);
                     break;
 
                 case APIState.Online:
