@@ -68,6 +68,8 @@ namespace osu.Game.Online.API
         /// </summary>
         public IBindable<APIState> State => state;
 
+        public IBindable<string?> UserFacingOutageMessage { get; } = new Bindable<string?>();
+
         public virtual void Queue(APIRequest request)
         {
             request.AttachAPI(this);

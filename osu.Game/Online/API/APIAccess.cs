@@ -121,6 +121,13 @@ namespace osu.Game.Online.API
                 IsBackground = true
             };
 
+            state.BindValueChanged(val =>
+            {
+                // assume that any change from a failing state means that the previously set outage message is no longer valid.
+                if (val.NewValue != APIState.Failing)
+                    userFacingOutageMessage.Value = null;
+            });
+
             thread.Start();
         }
 
@@ -273,6 +280,8 @@ namespace osu.Game.Online.API
         {
             state.Value = APIState.Failing;
             string userFacingMessage = reason ?? "Online functionality is not available due to an outage. Sorry for the inconvenience.";
+
+            userFacingOutageMessage.Value = userFacingMessage;
 
             Schedule(() =>
             {
@@ -597,6 +606,10 @@ namespace osu.Game.Online.API
         /// The current connectivity state of the API.
         /// </summary>
         public IBindable<APIState> State => state;
+
+        public IBindable<string> UserFacingOutageMessage => userFacingOutageMessage;
+
+        private readonly Bindable<string> userFacingOutageMessage = new Bindable<string>(string.Empty);
 
         private void handleWebException(WebException we)
         {
