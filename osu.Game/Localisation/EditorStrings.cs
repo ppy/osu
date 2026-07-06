@@ -45,6 +45,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
+        /// "Snap all notes to current snap divisor"
+        /// </summary>
+        public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor");
+
+        /// <summary>
         /// "Move already placed objects when changing timing"
         /// </summary>
         public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");

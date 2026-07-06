@@ -68,6 +68,9 @@ namespace osu.Desktop
             if (OperatingSystem.IsWindows())
                 NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
 
+            // This is a safe default. Localised usages should specify lower values as required.
+            AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(1000));
+
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
 

@@ -155,22 +155,6 @@ namespace osu.Game.Screens.Select
             backgroundBorder.Colour = ratingColour;
             contentBackground.Colour = ratingColour.Darken(1f);
             glow.Colour = ColourInfo.GradientHorizontal(ratingColour, ratingColour.Opacity(0f));
-
-            switch (starNumber)
-            {
-                case 0:
-                    starRatingText.Text = @"Below 1 Star";
-                    break;
-
-                case 1:
-                    starRatingText.Text = @"1 Star";
-                    break;
-
-                default:
-                    starRatingText.Text = $"{starNumber} Stars";
-                    break;
-            }
-
             iconContainer.Colour = starNumber >= 7 ? colourProvider.Content1 : colourProvider.Background5;
             starRatingText.Colour = colourProvider.Content1;
             starRatingText.Text = group.Title;
