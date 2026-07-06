@@ -35,7 +35,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             {
                 // If the last object is a slider, then we extend the travel velocity through the slider into the current object.
                 double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
-                currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
+
+                currVelocity = Math.Max(currVelocity, sliderDistance / Math.Max(osuLastObj.EndTime - osuLastObj.StartTime, osuCurrObj.AdjustedDeltaTime));
             }
 
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;

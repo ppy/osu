@@ -48,7 +48,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
-                currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
+
+                currVelocity = Math.Max(currVelocity, sliderDistance / Math.Max(osuLastObj.EndTime - osuLastObj.StartTime, osuCurrObj.AdjustedDeltaTime));
             }
 
             double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
