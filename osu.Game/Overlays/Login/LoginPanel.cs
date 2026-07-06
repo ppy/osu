@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -118,12 +117,17 @@ namespace osu.Game.Overlays.Login
                                 Origin = Anchor.TopCentre,
                                 TextAnchor = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
-                                Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
                             },
                         },
                     };
 
-                    linkFlow.AddLink(Resources.Localisation.Web.CommonStrings.ButtonsCancel.ToLower(), api.Logout, string.Empty);
+                    if (!string.IsNullOrEmpty(api.UserFacingOutageMessage.Value))
+                        linkFlow.AddText(api.UserFacingOutageMessage.Value);
+                    else
+                        linkFlow.AddText(state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting);
+
+                    linkFlow.NewLine();
+                    linkFlow.AddLink(LoginPanelStrings.SignOut, api.Logout, string.Empty);
                     break;
 
                 case APIState.Online:
