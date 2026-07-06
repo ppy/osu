@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
             var osuNextObj = (OsuDifficultyHitObject)current.Next();
 
-            // Calculate if current/previous sliders are overlapping with this object (2B sliders)
+            // Calculate if current/previous sliders are overlapping with the next object (2B sliders)
             bool isCurrentSlider2B = osuCurrObj.EndTime - osuCurrObj.StartTime > osuNextObj?.AdjustedDeltaTime;
             bool isLastSlider2B = osuLastObj.EndTime - osuLastObj.StartTime > osuCurrObj.AdjustedDeltaTime;
 

@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
-            // Calculate if current/previous sliders are overlapping with this object (2B sliders)
+            // Calculate if current/previous sliders are overlapping with the next object (2B sliders)
             bool isCurrentSlider2B = osuCurrObj.EndTime - osuCurrObj.StartTime > osuNextObj?.AdjustedDeltaTime;
             bool isLastSlider2B = osuLastObj.EndTime - osuLastObj.StartTime > osuCurrObj.AdjustedDeltaTime;
 
