@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch
@@ -19,13 +20,13 @@ namespace osu.Game.Rulesets.Catch
 
     public enum CatchAction
     {
-        [Description("Move left")]
+        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.CatchMoveLeft))]
         MoveLeft,
 
-        [Description("Move right")]
+        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.CatchMoveRight))]
         MoveRight,
 
-        [Description("Engage dash")]
+        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.CatchDash))]
         Dash,
     }
 }
