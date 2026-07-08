@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString FrameLimiter => new TranslatableString(getKey(@"frame_limiter"), @"Frame limiter");
 
         /// <summary>
+        /// "If you experience latency or performance issues, try running a latency certifier to determine the optimal frame limiter value!"
+        /// </summary>
+        public static LocalisableString TryRunningLatencyCertifier => new TranslatableString(getKey(@"try_running_latency_certifier"), @"If you experience latency or performance issues, try running a latency certifier to determine the optimal frame limiter value!");
+
+        /// <summary>
         /// "Threading mode"
         /// </summary>
         public static LocalisableString ThreadingMode => new TranslatableString(getKey(@"threading_mode"), @"Threading mode");

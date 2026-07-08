@@ -56,6 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 })
                 {
                     Keywords = new[] { @"fps", @"framerate" },
+                    Note = { Value = new SettingsNote.Data(GraphicsSettingsStrings.TryRunningLatencyCertifier, SettingsNote.Type.Informational) },
                 },
                 new SettingsItemV2(new FormEnumDropdown<ExecutionMode>
                 {
