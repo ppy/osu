@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public class AccuracyHeatmapStrings
+    public static class AccuracyHeatmapStrings
     {
         private const string prefix = @"osu.Game.Resources.Localisation.AccuracyHeatmap";
 
