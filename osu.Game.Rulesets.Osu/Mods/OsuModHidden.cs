@@ -41,7 +41,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             static void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+                if (osuObject is Slider)
+                    // Something Like this
+                    osuObject.TimeFadeIn = osuObject.TimePreempt * (FADE_IN_DURATION_MULTIPLIER + FADE_OUT_DURATION_MULTIPLIER);
+                else
+                    osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                     applyFadeInAdjustment(nested);
             }
@@ -167,8 +172,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (hitObject)
                 {
                     case Slider:
-                        // Offset (by fadeOutDuration) to make slider body begin fading out after head fades out like Stable
-                        return (fadeOutStartTime + fadeOutDuration, longFadeDuration - fadeOutDuration);
+                        return (fadeOutStartTime, longFadeDuration);
 
                     case SliderTick:
                         double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
