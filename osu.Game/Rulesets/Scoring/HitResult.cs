@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates small tick miss.
         /// </summary>
         [EnumMember(Value = "small_tick_miss")]
-        [Order(12)]
+        [Order(11)]
         SmallTickMiss,
 
         /// <summary>
@@ -79,14 +79,14 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description(@"S Tick")]
         [EnumMember(Value = "small_tick_hit")]
-        [Order(7)]
+        [Order(6)]
         SmallTickHit,
 
         /// <summary>
         /// Indicates a large tick miss.
         /// </summary>
         [EnumMember(Value = "large_tick_miss")]
-        [Order(11)]
+        [Order(12)]
         LargeTickMiss,
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description(@"L Tick")]
         [EnumMember(Value = "large_tick_hit")]
-        [Order(6)]
+        [Order(7)]
         LargeTickHit,
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description("S Bonus")]
         [EnumMember(Value = "small_bonus")]
-        [Order(10)]
+        [Order(9)]
         SmallBonus,
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         [Description("L Bonus")]
         [EnumMember(Value = "large_bonus")]
-        [Order(9)]
+        [Order(10)]
         LargeBonus,
 
         /// <summary>
