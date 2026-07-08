@@ -343,7 +343,7 @@ namespace osu.Game.Rulesets.Osu
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
+                new StatisticItem(AccuracyHeatmapStrings.AccuracyHeatmapHeader, () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250
