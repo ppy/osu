@@ -416,7 +416,7 @@ namespace osu.Game.Rulesets.Mania
                 RelativeSizeAxes = Axes.X,
                 Height = 250
             }, true),
-            new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
+            new StatisticItem(RankingStatisticsStrings.StatisticsHeader, () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
             {
                 new AverageHitError(score.HitEvents),
                 new UnstableRate(score.HitEvents)
