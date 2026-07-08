@@ -160,6 +160,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ShiftClickInBeatmapOverlay => new TranslatableString(getKey(@"shift_click_in_beatmap_overlay"), @"Shift-click on a beatmap panel in the beatmap listing overlay to quickly download or view the beatmap in song select!");
 
         /// <summary>
+        /// "Try running a latency certifier to determine the optimal frame limiter value!"
+        /// </summary>
+        public static LocalisableString TryRunningLatencyCertifier => new TranslatableString(getKey(@"try_running_latency_certifier"), @"Try running a latency certifier to determine the optimal frame limiter value!");
+
+        /// <summary>
         /// "a tip for you:"
         /// </summary>
         public static LocalisableString MenuTipTitle => new TranslatableString(getKey(@"menu_tip_title"), @"a tip for you:");
