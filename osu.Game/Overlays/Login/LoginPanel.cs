@@ -16,7 +16,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
 
