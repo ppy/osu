@@ -264,7 +264,7 @@ namespace osu.Game.Rulesets.Taiko
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                new StatisticItem(ResultsScreenStrings.TimingDistributionHeader, () => new HitEventTimingDistributionGraph(timedHitEvents)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250

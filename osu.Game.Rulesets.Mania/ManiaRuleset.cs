@@ -411,7 +411,7 @@ namespace osu.Game.Rulesets.Mania
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             }),
-            new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
+            new StatisticItem(ResultsScreenStrings.TimingDistributionHeader, () => new HitEventTimingDistributionGraph(score.HitEvents)
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 250

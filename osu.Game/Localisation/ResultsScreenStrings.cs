@@ -50,6 +50,11 @@ namespace osu.Game.Localisation
         public static LocalisableString MoreStatisticsAvailableAfterWatchingReplay => new TranslatableString(getKey(@"more_statistics_available_after_watching_replay"), @"More statistics available after watching a replay!");
 
         /// <summary>
+        /// "Timing Distribution"
+        /// </summary>
+        public static LocalisableString TimingDistributionHeader => new TranslatableString(getKey(@"timing_distribution_header"), @"Timing Distribution");
+
+        /// <summary>
         /// "Overall Ranking"
         /// </summary>
         public static LocalisableString OverallRankingHeader => new TranslatableString(getKey(@"overall_ranking_header"), @"Overall Ranking");
