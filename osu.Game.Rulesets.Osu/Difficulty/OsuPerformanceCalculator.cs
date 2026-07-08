@@ -535,7 +535,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         // Miss penalty assumes that a player will miss on the hardest parts of a map,
         // so we use the amount of relatively difficult sections to adjust miss penalty
         // to make it more punishing on maps with lower amount of hard sections.
-        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.93 / (missCount / (4 * Math.Log(difficultStrainCount)) + 1);
+        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.93 / (missCount / (4 * Math.Log(Math.Max(1, difficultStrainCount))) + 1);
         private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(DiffUtils.Pow(scoreMaxCombo, 0.8) / DiffUtils.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private double calculateRateAdjustedApproachRate(double approachRate, double clockRate)
