@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
         [SettingSource(typeof(DefaultRankDisplayStrings), nameof(DefaultRankDisplayStrings.PlaySamplesOnRankChange))]
         public BindableBool PlaySamples { get; set; } = new BindableBool(true);
 
-        [SettingSource(typeof(DefaultRankDisplayStrings), nameof(DefaultRankDisplayStrings.HideDuringGameplay))]
+        [SettingSource(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.HideDuringGameplay))]
         public BindableBool HideDuringGameplay { get; set; } = new BindableBool();
 
         private readonly Sprite rankDisplay;
