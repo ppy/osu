@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Scoring
         internal bool TrackHitEvents { get; set; } = true;
 
         /// <summary>
-        /// Whether to use the the total score without mods for display purposes.
+        /// Whether to use the total score without mods for display purposes.
         /// </summary>
         internal bool UseTotalScoreWithoutMods { get; set; }
 

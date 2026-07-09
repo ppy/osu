@@ -188,7 +188,8 @@ namespace osu.Game.Screens.Play.Leaderboards
                 return;
 
             var orderedByScore = scores
-                                 .OrderByDescending(i => i.TotalScore.Value)
+                                 // Some implementations override GetDisplayScore (see: SpectatorScoreProcessor.UseTotalScoreWithoutMods).
+                                 .OrderByDescending(i => i.GetDisplayScore(ScoringMode.Standardised))
                                  .ThenBy(i => i.TotalScoreTiebreaker)
                                  .ToList();
 

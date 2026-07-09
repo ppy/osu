@@ -24,7 +24,7 @@ namespace osu.Game.Online.Spectator
     public partial class SpectatorScoreProcessor : Component
     {
         /// <summary>
-        /// Whether to use the the total score without mods for display purposes.
+        /// Whether to use the total score without mods for display purposes.
         /// </summary>
         public bool UseTotalScoreWithoutMods { get; set; }
 
