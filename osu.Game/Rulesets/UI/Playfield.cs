@@ -62,6 +62,9 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
+        /// <summary>
+        /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
+        /// </summary>
         public IEnumerable<DrawableHitObject> AllHitObjects
         {
             get

@@ -91,10 +91,9 @@ namespace osu.Game.Rulesets.Scoring
 
             if (FailConditions != null)
             {
-                foreach (var condition in FailConditions.GetInvocationList())
+                foreach (var d in FailConditions.GetInvocationList())
                 {
-                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
-                    if (conditionResult)
+                    if (d is Func<HealthProcessor, JudgementResult, bool> condition && condition(this, result))
                         return true;
                 }
             }

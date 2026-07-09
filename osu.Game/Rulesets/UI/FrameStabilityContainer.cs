@@ -166,18 +166,24 @@ namespace osu.Game.Rulesets.UI
             // A difference of more than 500 ms seems like a sane number we should never exceed.
             //
             // Double-checking against the parent clock ensures we don't accidentally freeze time when the game stutters due to a long running frame.
-            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500 && game?.Clock.ElapsedFrameTime <= 500)
+            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500)
             {
-                if (invalidBassTimeLogCount < 10)
-                {
-                    invalidBassTimeLogCount++;
-                    Logger.Log("Ignoring likely invalid time value provided by BASS during gameplay");
-                    Logger.Log($"- provided: {referenceClock.CurrentTime:N2}");
-                    Logger.Log($"- expected: {proposedTime:N2}");
-                }
+                // If game is not available, fall back to validating against the proposed time difference only.
+                double frameTime = game?.Clock.ElapsedFrameTime ?? 0;
 
-                state = PlaybackState.NotValid;
-                return;
+                if (frameTime <= 500)
+                {
+                    if (invalidBassTimeLogCount < 10)
+                    {
+                        invalidBassTimeLogCount++;
+                        Logger.Log("Ignoring likely invalid time value provided by BASS during gameplay");
+                        Logger.Log($"- provided: {referenceClock.CurrentTime:N2}");
+                        Logger.Log($"- expected: {proposedTime:N2}");
+                    }
+
+                    state = PlaybackState.NotValid;
+                    return;
+                }
             }
 
             invalidBassTimeLogCount = 0;

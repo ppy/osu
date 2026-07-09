@@ -559,7 +559,7 @@ namespace osu.Game.Beatmaps.Formats
             }, timingChange);
         }
 
-        private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
+        private readonly LinkedList<ControlPoint> pendingControlPoints = new LinkedList<ControlPoint>();
         private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
         private double pendingControlPointsTime;
         private bool hasApproachRate;
@@ -569,24 +569,31 @@ namespace osu.Game.Beatmaps.Formats
             if (time != pendingControlPointsTime)
                 flushPendingPoints();
 
+            // Changes from non-timing-points should override any changes from timing-points of the same type.
+            // Insert timing changes at the front (processed last in reverse iteration = override loser),
+            // non-timing at the end (processed first in reverse iteration = override winner).
             if (timingChange)
-                pendingControlPoints.Insert(0, point);
+                pendingControlPoints.AddFirst(point);
             else
-                pendingControlPoints.Add(point);
+                pendingControlPoints.AddLast(point);
 
             pendingControlPointsTime = time;
         }
 
         private void flushPendingPoints()
         {
-            // Changes from non-timing-points are added to the end of the list (see addControlPoint()) and should override any changes from timing-points (added to the start of the list).
-            for (int i = pendingControlPoints.Count - 1; i >= 0; i--)
-            {
-                var type = pendingControlPoints[i].GetType();
-                if (!pendingControlPointTypes.Add(type))
-                    continue;
+            // Changes from non-timing-points are at the end of the list (added via AddLast) and should override
+            // any changes from timing-points (added via AddFirst) of the same type.
+            // Iterate in reverse so non-timing entries (at end) are processed first.
+            var node = pendingControlPoints.Last;
 
-                beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingControlPoints[i]);
+            while (node != null)
+            {
+                var type = node.Value.GetType();
+                if (pendingControlPointTypes.Add(type))
+                    beatmap.ControlPointInfo.Add(pendingControlPointsTime, node.Value);
+
+                node = node.Previous;
             }
 
             pendingControlPoints.Clear();

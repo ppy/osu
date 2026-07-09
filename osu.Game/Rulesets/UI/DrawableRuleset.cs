@@ -216,9 +216,12 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
+            // Materialize the hit objects list once to avoid re-evaluating LINQ queries per mod.
+            var allHitObjects = Playfield.AllHitObjects.ToList();
+
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObject>())
             {
-                foreach (var drawableHitObject in Playfield.AllHitObjects)
+                foreach (var drawableHitObject in allHitObjects)
                     mod.ApplyToDrawableHitObject(drawableHitObject);
             }
         }

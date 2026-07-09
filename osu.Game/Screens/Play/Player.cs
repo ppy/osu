@@ -800,6 +800,11 @@ namespace osu.Game.Screens.Play
         private Task<ScoreInfo> prepareScoreForDisplayTask;
 
         /// <summary>
+        /// Lock for thread-safe access to <see cref="prepareScoreForDisplayTask"/>.
+        /// </summary>
+        private readonly object prepareScoreLock = new object();
+
+        /// <summary>
         /// Handles changes in player state which may progress the completion of gameplay / this screen's lifetime.
         /// </summary>
         private void checkScoreCompleted()
@@ -908,44 +913,50 @@ namespace osu.Game.Screens.Play
         [ItemCanBeNull]
         private Task<ScoreInfo> prepareAndImportScoreAsync(bool forceImport = false)
         {
-            // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
-            DrawableRuleset.SetRecordTarget(null);
-
-            if (prepareScoreForDisplayTask != null)
-                return prepareScoreForDisplayTask;
-
-            // We do not want to import the score in cases where we don't show results
-            bool canShowResults = Configuration.ShowResults && ScoreProcessor.HasCompleted.Value && GameplayState.HasPassed;
-            if (!canShowResults && !forceImport)
-                return Task.FromResult<ScoreInfo>(null);
-
-            // Clone score before beginning any async processing.
-            // - Must be run synchronously as the score may potentially be mutated in the background.
-            // - Must be cloned for the same reason.
-            Score scoreCopy = Score.DeepClone();
-
-            return prepareScoreForDisplayTask = Task.Run(async () =>
+            lock (prepareScoreLock)
             {
-                try
+                if (prepareScoreForDisplayTask != null)
+                    return prepareScoreForDisplayTask;
+
+                // We do not want to import the score in cases where we don't show results
+                bool canShowResults = Configuration.ShowResults && ScoreProcessor.HasCompleted.Value && GameplayState.HasPassed;
+                if (!canShowResults && !forceImport)
                 {
-                    await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, @"Score preparation failed!");
+                    prepareScoreForDisplayTask = Task.FromResult<ScoreInfo>(null);
+                    return prepareScoreForDisplayTask;
                 }
 
-                try
-                {
-                    await ImportScore(scoreCopy).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, @"Score import failed!");
-                }
+                // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
+                DrawableRuleset.SetRecordTarget(null);
 
-                return scoreCopy.ScoreInfo;
-            });
+                // Clone score before beginning any async processing.
+                // - Must be run synchronously as the score may potentially be mutated in the background.
+                // - Must be cloned for the same reason.
+                Score scoreCopy = Score.DeepClone();
+
+                return prepareScoreForDisplayTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, @"Score preparation failed!");
+                    }
+
+                    try
+                    {
+                        await ImportScore(scoreCopy).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, @"Score import failed!");
+                    }
+
+                    return scoreCopy.ScoreInfo;
+                });
+            }
         }
 
         #region Fail Logic
