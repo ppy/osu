@@ -56,6 +56,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void setup(Func<IReadOnlyList<Mod>>? mods = null)
         {
+            setupBeforeGameplayStart(mods);
+            startGameplay();
+        }
+
+        private void setupBeforeGameplayStart(Func<IReadOnlyList<Mod>>? mods = null)
+        {
             AddStep("set beatmap", () =>
             {
                 Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
@@ -69,7 +75,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("initialise gameplay", () =>
             {
-                Stack.Push(player = new MultiplayerPlayer(MultiplayerClient.ServerAPIRoom!, new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                Stack.Push(player = new MultiplayerPlayer(MultiplayerClient.ClientAPIRoom!, new PlaylistItem(Beatmap.Value.BeatmapInfo)
                 {
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
                 }, MultiplayerClient.ServerRoom!.Users.ToArray()));
@@ -79,7 +85,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("gameplay clock is paused", () => player.ChildrenOfType<GameplayClockContainer>().Single().IsPaused.Value);
             AddAssert("gameplay clock is not running", () => !player.ChildrenOfType<GameplayClockContainer>().Single().IsRunning);
+        }
 
+        private void startGameplay()
+        {
             AddStep("start gameplay", () => ((IMultiplayerClient)MultiplayerClient).GameplayStarted());
 
             AddUntilStep("gameplay clock is not paused", () => !player.ChildrenOfType<GameplayClockContainer>().Single().IsPaused.Value);
