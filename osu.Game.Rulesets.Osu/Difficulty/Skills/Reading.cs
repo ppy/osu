@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override List<double> GetTransformedDifficulties(List<double> difficulties)
         {
-            const double reduced_difficulty_duration = 60 * 1000;
+            const double reduced_difficulty_duration = 40 * 1000;
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
 
             double firstStartTime = objectList.First().StartTime;
