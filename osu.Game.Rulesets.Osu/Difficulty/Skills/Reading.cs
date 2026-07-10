@@ -76,7 +76,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
 
             double firstStartTime = objectList.First().StartTime;
-            double reducedDuration = firstStartTime + reduced_difficulty_duration;
+            double lastStartTime = objectList.Last().StartTime;
+            double reducedDuration = Math.Min(firstStartTime + reduced_difficulty_duration, lastStartTime);
 
             if (objectList.Count == 0 || difficulties.Count == 0)
                 return difficulties;
