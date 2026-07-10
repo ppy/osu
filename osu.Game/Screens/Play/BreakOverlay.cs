@@ -142,10 +142,12 @@ namespace osu.Game.Screens.Play
 
         private void updateInfoVisibility()
         {
-            // Logger.Log($"configVisibilityMode = {configVisibilityMode.Value:G}");
+            // If HUD Overlay Visibility is set to Never, the user probably
+            // doesn't want to see their current stats.
+            // Therefore, hide the info/stats portion of the break overlay.
             if (configVisibilityMode.Value == HUDVisibilityMode.Never)
             {
-                Logger.Log("configVisibilityMode = Never, hiding break info");
+                Logger.Log("configVisibilityMode == Never, hiding break info");
                 info.Hide();
             }
             else
