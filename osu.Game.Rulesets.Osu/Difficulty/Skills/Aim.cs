@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -29,18 +28,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             IncludeSliders = includeSliders;
         }
 
+        protected override double DecayWeight => 0.92;
+        protected override double MaxStoredLength => 10000;
+
         private double currentStrain;
-
-        /// <summary>
-        /// The number of sections with the highest strains, which the peak strain reductions will apply to.
-        /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
-        /// </summary>
-        private int reducedSectionTime => 4000;
-
-        /// <summary>
-        /// The baseline multiplier applied to the section with the biggest strain.
-        /// </summary>
-        private const double reduced_strain_baseline = 0.727;
+        private double strainWeightSum;
 
         private readonly List<double> sliderStrains = new List<double>();
 
@@ -69,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             const double skill_multiplier_snap = 70.9;
             const double skill_multiplier_agility = 2.35;
-            const double skill_multiplier_flow = 242.0;
+            const double skill_multiplier_flow = 253.0;
 
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;
@@ -90,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
         {
-            const double skill_multiplier_total = 1.12;
+            const double skill_multiplier_total = 1.22;
             const double combined_snap_norm_exponent = 1.2;
 
             // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
@@ -159,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (sliderStrains.Count == 0)
                 return 0;
 
-            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+            double consistentTopStrain = difficultyValue / strainWeightSum; // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
                 return 0;
@@ -170,17 +162,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
+            const double length_bonus = 1.6;
             double difficulty = 0;
             double time = 0;
 
-            var strains = getReducedStrainPeaks();
+            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+            // These sections will not contribute to the difficulty.
+            var peaks = GetCurrentStrainPeaks().Where(p => p.Value > 0);
+
+            List<StrainPeak> strains = peaks.OrderByDescending(p => p.Value).ToList();
 
             // Difficulty is a continuous weighted sum of the sorted strains
             foreach (StrainPeak strain in strains)
             {
                 /* Weighting function can be thought of as:
                         b
-                        ∫ DecayWeight^x dx
+                        ∫ DecayWeight^x + lengthBonus / (x + lengthOffset) dx
                         a
                     where a = startTime and b = endTime
 
@@ -197,54 +194,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double startTime = time;
                 double endTime = time + strain.SectionLength / MaxSectionLength;
 
-                double weight = DiffUtils.Pow(DecayWeight, startTime) - DiffUtils.Pow(DecayWeight, endTime);
+                double weight = (DiffUtils.Pow(DecayWeight, startTime) - DiffUtils.Pow(DecayWeight, endTime)) / (1 - DecayWeight)
+                                + length_bonus * Math.Log((endTime + 50) / (startTime + 50));
+
+                strainWeightSum += weight;
 
                 difficulty += strain.Value * weight;
                 time = endTime;
             }
 
-            return difficulty / (1 - DecayWeight);
+            return difficulty;
         }
 
-        /// <summary>
-        /// Returns a sorted enumerable of strain peaks with the highest values reduced.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<StrainPeak> getReducedStrainPeaks()
+        public double CountTopWeightedStrains(double difficultyValue)
         {
-            // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
-            // These sections will not contribute to the difficulty.
+            if (ObjectDifficulties.Count == 0)
+                return 0.0;
 
-            List<StrainPeak> strains = GetCurrentStrainPeaks()
-                                       .Where(p => p.Value > 0)
-                                       .ToList();
+            double consistentTopStrain = difficultyValue / strainWeightSum; // What would the top strain be if all strain values were identical
 
-            const int chunk_size = 20;
-            double time = 0;
-            int skipCount = 0;
+            if (consistentTopStrain == 0)
+                return ObjectDifficulties.Count;
 
-            // We are reducing the highest strains first to account for extreme difficulty spikes
-            // Strains are split into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
-            while (strains.Count > skipCount && time < reducedSectionTime)
-            {
-                StrainPeak strain = strains[skipCount];
-
-                for (double addedTime = 0; addedTime < strain.SectionLength; addedTime += chunk_size)
-                {
-                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / reducedSectionTime, 0, 1)));
-
-                    // intentionally add at end and sort afterwards, should be cheaper.
-                    strains.Add(new StrainPeak(
-                        strain.Value * Interpolation.Lerp(reduced_strain_baseline, 1.0, scale),
-                        Math.Min(chunk_size, strain.SectionLength - addedTime)
-                    ));
-                }
-
-                time += strain.SectionLength;
-                skipCount++;
-            }
-
-            return strains.Skip(skipCount).OrderByDescending(p => p.Value);
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectDifficulties.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
     }
 }
