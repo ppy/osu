@@ -81,6 +81,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private ScoreModelDownloader scoreDownloader { get; set; }
+
         private const float expanded_right_content_width = 200;
         private const float grade_width = 35;
         private const float username_min_width = 120;
@@ -625,6 +628,9 @@ namespace osu.Game.Screens.Select
 
                 if (Score.OnlineID > 0)
                     items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
+
+                if (Score.HasOnlineReplay && Score.Files.Count == 0)
+                    items.Add(new OsuMenuItem(@"Download replay", MenuItemType.Standard, () => scoreDownloader.Download(Score)));
 
                 if (Score.Files.Count <= 0) return items.ToArray();
 
