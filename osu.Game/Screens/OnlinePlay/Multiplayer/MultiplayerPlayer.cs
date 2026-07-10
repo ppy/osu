@@ -198,6 +198,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             loadingDisplay.Hide();
             base.StartGameplay();
 
+            // It is possible that the skip overlay has been clicked before `onGameplayStarted()'.
+            // If so, the intro-skipped clock will reset as gameplay starts, leaving the player unable to skip.
+            // This ensures the intro is properly skipped regardless of the overlay.
             if (Configuration.AutomaticallySkipIntro)
             {
                 RequestIntroSkip();
