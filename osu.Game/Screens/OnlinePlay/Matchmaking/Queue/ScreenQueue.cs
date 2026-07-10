@@ -893,12 +893,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 base.Update();
 
-                var elapsed = queue.QueueTimer.Elapsed;
-
-                if (elapsed.TotalHours >= 1)
-                    Text = $"{(int)elapsed.TotalHours:00}:{elapsed.Minutes:00}:{elapsed.Seconds:00}";
-                else
-                    Text = elapsed.ToString(@"mm\:ss");
+                Text = queue.QueueTimer.Elapsed.ToFormattedDuration();
             }
         }
     }
