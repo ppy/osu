@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.Timing
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Full,
                         Spacing = new Vector2(5),
-                        Child = addPresetButton = new RoundedButton
+                        Child = addPresetButton = new AddPresetButton
                         {
                             Width = 50,
                             Height = 25,
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Timing
             };
 
             presets.BindTo(beatmap.SliderVelocityPresets);
-            presetsFlow.SetLayoutPosition(addPresetButton, float.MinValue);
+            presetsFlow.SetLayoutPosition(addPresetButton, float.MaxValue);
         }
 
         protected override void LoadComplete()
@@ -246,6 +246,16 @@ namespace osu.Game.Screens.Edit.Timing
                 }
 
                 return base.OnMouseDown(e);
+            }
+        }
+
+        private partial class AddPresetButton : RoundedButton
+        {
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Content.CornerRadius = 5;
             }
         }
     }
