@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
@@ -23,12 +22,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The weight by which each strain value decays.
         /// </summary>
-        protected readonly double DecayWeight;
+        protected virtual double DecayWeight => 0.9;
 
         /// <summary>
         /// The maximum length of each strain section.
         /// </summary>
-        protected readonly int MaxSectionLength;
+        protected virtual int MaxSectionLength => 400;
 
         private double currentSectionPeak; // We also keep track of the peak strain in the current section.
         private double currentSectionBegin;
@@ -40,7 +39,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// or if <see cref="Skill.DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
         /// in the future when a better memory-saving technique is implemented.
         /// </summary>
-        private readonly double maxStoredLength;
+        protected virtual double MaxStoredLength => 11 / (1 - DecayWeight);
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
 
@@ -52,19 +51,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private readonly List<(double StrainValue, double StartTime)> queuedStrains = new List<(double, double)>();
 
-        /// <summary>
-        /// Create a new <see cref="VariableLengthStrainSkill"/>.
-        /// </summary>
-        /// <param name="mods">The mods.</param>
-        /// <param name="decayWeight">The weight by which each strain value decays.</param>
-        /// <param name="maxSectionLength">The maximum length of each strain section.</param>
-        protected VariableLengthStrainSkill(Mod[] mods, double decayWeight = 0.9, int maxSectionLength = 400)
+        protected VariableLengthStrainSkill(Mod[] mods)
             : base(mods)
         {
-            DecayWeight = decayWeight;
-            MaxSectionLength = maxSectionLength;
-
-            maxStoredLength = 11 / (1 - DecayWeight);
         }
 
         /// <summary>
@@ -173,7 +162,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Remove from the back of our strain peaks if there's any which are too deep to contribute to difficulty.
             // `maxStoredLength` dictates for us how many sections will preserve at least 99.999% of the difficulty value.
-            while (totalLength > maxStoredLength * MaxSectionLength)
+            while (totalLength > MaxStoredLength * MaxSectionLength)
             {
                 totalLength -= strainPeaks[^1].SectionLength;
                 strainPeaks.RemoveAt(strainPeaks.Count - 1);
@@ -215,24 +204,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             }
 
             return strainPeaks;
-        }
-
-        /// <summary>
-        /// Calculates the number of strains weighted against the top strain.
-        /// The result is scaled by clock rate as it affects the total number of strains.
-        /// </summary>
-        public virtual double CountTopWeightedStrains(double difficultyValue)
-        {
-            if (ObjectDifficulties.Count == 0)
-                return 0.0;
-
-            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
-
-            if (consistentTopStrain == 0)
-                return ObjectDifficulties.Count;
-
-            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>

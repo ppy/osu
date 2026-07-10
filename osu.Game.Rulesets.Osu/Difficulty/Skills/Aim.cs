@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         protected override double DecayWeight => 0.92;
-        protected override double MaxStoredSections => 10000;
+        protected override double MaxStoredLength => 10000;
 
         private double currentStrain;
         private double strainWeightSum;
@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        public override double CountTopWeightedStrains(double difficultyValue)
+        public double CountTopWeightedStrains(double difficultyValue)
         {
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
