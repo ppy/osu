@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
-            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>(beatmap.HitObjects.Count);
             List<DifficultyHitObject>[] perColumnObjects = new List<DifficultyHitObject>[totalColumns];
 
             for (int column = 0; column < totalColumns; column++)

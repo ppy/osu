@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Rhythm.Data;
@@ -13,7 +12,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 {
-    public class RhythmEvaluator
+    public static class RhythmEvaluator
     {
         /// <summary>
         /// Evaluate the difficulty of a hitobject considering its interval change.
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double intervalPenalty = 0;
             double gapPenalty = 0;
 
-            double hitWindow = hitObject.HitWindow(HitResult.Great);
+            double hitWindow = hitObject.HitWindowGreat;
 
             if (rhythmData.SameRhythmGroupedHitObjects?.FirstHitObject == hitObject) // Difficulty for SameRhythmGroupedHitObjects
             {
@@ -63,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
                 if (durationDifference > 0)
                 {
-                    intervalDifficulty *= DifficultyCalculationUtils.Logistic(
+                    intervalDifficulty *= DiffUtils.Logistic(
                         durationDifference / hitWindow,
                         midpointOffset: 0.35,
                         multiplier: 2,
@@ -72,13 +71,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             }
 
             // Penalise patterns that can be hit within a single hit window.
-            intervalDifficulty *= DifficultyCalculationUtils.Logistic(
+            intervalDifficulty *= DiffUtils.Logistic(
                 sameRhythmGroupedHitObjects.Duration / hitWindow,
                 midpointOffset: 0.3,
                 multiplier: 2,
                 maxValue: 1);
 
-            return Math.Pow(intervalDifficulty, 0.75);
+            return DiffUtils.Pow(intervalDifficulty, 0.75);
         }
 
         /// <summary>
@@ -145,10 +144,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double gapRatio = gapInterval / Math.Max(rhythmInterval, 1);
 
             // The gap ratio normalised to represent if the gap is long.
-            double gapFactor = DifficultyCalculationUtils.Logistic(gapRatio, 1.75, 20);
+            double gapFactor = DiffUtils.Logistic(gapRatio, 1.75, 20);
 
             // The length in objects of this rhythm normalised to represent if the rhythm change is frequent enough to be penalised.
-            double lengthFactor = DifficultyCalculationUtils.ReverseLerp(rhythmLength, 8, 2);
+            double lengthFactor = DiffUtils.ReverseLerp(rhythmLength, 8, 2);
 
             return 1.0 - 0.75 * gapFactor * lengthFactor;
         }
@@ -171,10 +170,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             difficulty += terms / (1 + ratio);
 
             // Give bonus to near-1 ratios
-            difficulty += DifficultyCalculationUtils.BellCurve(ratio, 1, 0.5);
+            difficulty += DiffUtils.BellCurve(ratio, 1, 0.5);
 
             // Penalize ratios that are VERY near 1
-            difficulty -= DifficultyCalculationUtils.BellCurve(ratio, 1, 0.3);
+            difficulty -= DiffUtils.BellCurve(ratio, 1, 0.3);
 
             difficulty = Math.Max(difficulty, 0);
             difficulty /= Math.Sqrt(8);
@@ -186,6 +185,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         /// Multiplier for a given denominator term.
         /// </summary>
         private static double termPenalty(double ratio, int denominator, double power, double multiplier) =>
-            -multiplier * Math.Pow(Math.Cos(denominator * Math.PI * ratio), power);
+            -multiplier * DiffUtils.Pow(Math.Cos(denominator * Math.PI * ratio), power);
     }
 }

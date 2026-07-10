@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         private Drawable? bodySprite;
         private Drawable? lightContainer;
         private Drawable? light;
-        private LegacyNoteBodyStyle? bodyStyle;
+        private LegacyManiaSkinConfiguration.LegacyNoteBodyStyle? bodyStyle;
 
         public LegacyBodyPiece()
         {
@@ -74,9 +74,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 };
             }
 
-            bodyStyle = skin.GetConfig<ManiaSkinConfigurationLookup, LegacyNoteBodyStyle>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.NoteBodyStyle))?.Value;
+            bodyStyle = skin.GetConfig<ManiaSkinConfigurationLookup, LegacyManiaSkinConfiguration.LegacyNoteBodyStyle>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.NoteBodyStyle))?.Value;
 
-            var wrapMode = bodyStyle == LegacyNoteBodyStyle.Stretch ? WrapMode.ClampToEdge : WrapMode.Repeat;
+            var wrapMode = bodyStyle == LegacyManiaSkinConfiguration.LegacyNoteBodyStyle.Stretch ? WrapMode.ClampToEdge : WrapMode.Repeat;
 
             direction.BindTo(scrollingInfo.Direction);
             isHitting.BindTo(holdNote.IsHolding);
@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             // here we go...
             switch (bodyStyle)
             {
-                case LegacyNoteBodyStyle.Stretch:
+                case LegacyManiaSkinConfiguration.LegacyNoteBodyStyle.Stretch:
                     // this is how lazer works by default. nothing required.
                     if (bodySprite != null)
                         bodySprite.Scale = new Vector2(1, scaleDirection);

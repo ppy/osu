@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedDifficultStrainCount = speed.CountTopWeightedObjectDifficulties(speedDifficultyValue);
             double readingDifficultNoteCount = reading.CountTopWeightedObjectDifficulties(readingDifficultyValue);
 
-            double speedNotes = speed.RelevantNoteCount();
+            double speedNotes = speed.RelevantObjectCount();
 
             double aimNoSlidersTopWeightedSliderCount = aimWithoutSliders.CountTopWeightedSliders(aimNoSlidersDifficultyValue);
             double aimNoSlidersDifficultStrainCount = aimWithoutSliders.CountTopWeightedStrains(aimNoSlidersDifficultyValue);
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
             double baseCognitionPerformance = SumCognitionDifficulty(baseReadingPerformance, baseFlashlightPerformance);
 
-            double basePerformance = DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseCognitionPerformance);
+            double basePerformance = DiffUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseCognitionPerformance);
 
             double starRating = calculateStarRating(basePerformance);
 
@@ -132,10 +132,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return reading;
 
             // Nerf flashlight value in cognition sum when reading is greater than flashlight
-            return DifficultyCalculationUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
+            return DiffUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
         }
 
-        private double calculateAimDifficultyRating(double difficultyValue) => Math.Pow(difficultyValue, 0.65) * 0.01422;
+        private double calculateAimDifficultyRating(double difficultyValue) => DiffUtils.Pow(difficultyValue, 0.65) * 0.01422;
 
         private double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * 0.0675;
 
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
         {
-            List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+            List<DifficultyHitObject> objects = new List<DifficultyHitObject>(beatmap.HitObjects.Count);
 
             double clockRate = ModUtils.CalculateRateWithMods(mods);
 

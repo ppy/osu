@@ -10,12 +10,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -39,8 +41,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
+        private ILocalisedBindableString titleText = null!;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LocalisationManager localisationManager)
         {
             AutoSizeAxes = Axes.Both;
 
@@ -129,9 +133,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 },
             };
 
-            // can't use this because osu-web does weird stuff with \\n.
-            // Text = UsersStrings.ShowDailyChallengeTitle.,
-            label.AddParagraph("Daily\nChallenge");
+            titleText = localisationManager.GetLocalisedBindableString(UsersStrings.ShowDailyChallengeTitle);
+            titleText.BindValueChanged(val =>
+            {
+                label.Clear();
+                label.AddParagraph(val.NewValue.Replace(@"\n", "\n"));
+            }, true);
         }
 
         protected override void LoadComplete()

@@ -95,6 +95,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ActionHasNoKeyBinding => new TranslatableString(getKey(@"action_has_no_key_binding"), @"(none)");
 
+        /// <summary>
+        /// "Press a key combination to set a new binding..."
+        /// </summary>
+        public static LocalisableString PendingBinding => new TranslatableString(getKey(@"press_akey_combination_to"), @"Press a key combination to set a new binding...");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

@@ -34,6 +34,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("title")]
         public string Title { get; set; }
 
+        [JsonProperty("message")]
+        public string Message { get; set; }
+
         [JsonProperty("message_html")]
         public string MessageHtml { get; set; }
 

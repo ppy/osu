@@ -17,7 +17,7 @@
       "rollForward": false
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2025.1208.0",
+      "version": "2026.611.0",
       "commands": [
         "localisation"
       ],

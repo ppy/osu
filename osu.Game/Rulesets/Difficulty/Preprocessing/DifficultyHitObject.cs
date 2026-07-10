@@ -51,6 +51,8 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// </summary>
         public readonly double ClockRate;
 
+        public readonly double HitWindowGreat;
+
         /// <summary>
         /// Creates a new <see cref="DifficultyHitObject"/>.
         /// </summary>
@@ -69,47 +71,43 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             StartTime = hitObject.StartTime / clockRate;
             EndTime = hitObject.GetEndTime() / clockRate;
             ClockRate = clockRate;
+            HitWindowGreat = HitWindow(HitResult.Great);
         }
 
-        public DifficultyHitObject Previous(int backwardsIndex)
+        public DifficultyHitObject Previous(int skipCount = 0)
         {
-            int index = Index - (backwardsIndex + 1);
+            int index = Index - (skipCount + 1);
             return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
 
-        public DifficultyHitObject Next(int forwardsIndex)
+        public DifficultyHitObject Next(int skipCount = 0)
         {
-            int index = Index + (forwardsIndex + 1);
+            int index = Index + (skipCount + 1);
             return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
 
         /// <summary>
         /// Retrieves the full rate-adjusted hit window for a <see cref="HitResult"/>.
         /// </summary>
-        public double HitWindow(HitResult hitResult)
-        {
-            return 2 * RawHitWindow(hitResult) / ClockRate;
-        }
+        protected double HitWindow(HitResult hitResult) => 2 * getRawHitWindow(hitResult) / ClockRate;
 
         /// <summary>
         /// Retrieves the hit window for a <see cref="HitResult"/>.
         /// </summary>
-        protected virtual double RawHitWindow(HitResult hitResult)
+        private double getRawHitWindow(HitResult hitResult)
         {
             // Try to get HitWindows from nested hit objects
             // This is important for objects such as Slider in osu! where the object itself has HitWindows set to Empty, but the nested SliderHead has proper hit windows
-            if (BaseObject.HitWindows == HitWindows.Empty)
-            {
-                foreach (var nestedHitObject in BaseObject.NestedHitObjects)
-                {
-                    if (nestedHitObject.HitWindows == HitWindows.Empty)
-                        continue;
+            if (BaseObject.HitWindows != HitWindows.Empty)
+                return BaseObject.HitWindows.WindowFor(hitResult);
 
+            foreach (var nestedHitObject in BaseObject.NestedHitObjects)
+            {
+                if (nestedHitObject.HitWindows != HitWindows.Empty)
                     return nestedHitObject.HitWindows.WindowFor(hitResult);
-                }
             }
 
-            return BaseObject.HitWindows.WindowFor(hitResult);
+            return 0;
         }
     }
 }

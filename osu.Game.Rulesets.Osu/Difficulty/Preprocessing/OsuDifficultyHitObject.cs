@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Time (in ms) between the object first appearing and the time it needs to be clicked.
         /// <see cref="OsuHitObject.TimePreempt"/> adjusted by clock rate.
         /// </summary>
-        public readonly double Preempt;
+        public double Preempt => BaseObject.TimePreempt / ClockRate;
 
         /// <summary>
         /// Normalised distance from the start position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
@@ -126,37 +125,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
-        public double SmallCircleBonus { get; private set; }
+        public double SmallCircleBonus => Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 70);
 
         /// <summary>
         /// Object's immediate OverallDifficulty value calculated from the raw hitwindow.
         /// </summary>
-        public double OverallDifficulty
-        {
-            get
-            {
-                double hitWindowGreat = RawHitWindow(HitResult.Great) / ClockRate;
-
-                return (79.5 - hitWindowGreat) / 6;
-            }
-        }
-
-        private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
-        private readonly OsuDifficultyHitObject? lastDifficultyObject;
+        public double OverallDifficulty => (79.5 - HitWindowGreat / 2) / 6;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            lastLastDifficultyObject = index > 1 ? (OsuDifficultyHitObject)objects[index - 2] : null;
-            lastDifficultyObject = index > 0 ? (OsuDifficultyHitObject)objects[index - 1] : null;
-
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
-            LastObjectEndDeltaTime = lastDifficultyObject != null ? Math.Max(StartTime - lastDifficultyObject.EndTime, MIN_DELTA_TIME) : AdjustedDeltaTime;
-
-            SmallCircleBonus = Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 70);
-
-            Preempt = BaseObject.TimePreempt / clockRate;
+            LastObjectEndDeltaTime = Previous() is DifficultyHitObject last ? Math.Max(StartTime - last.EndTime, MIN_DELTA_TIME) : AdjustedDeltaTime;
 
             computeSliderCursorPosition();
             setDistances(clockRate);
@@ -196,25 +177,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
-        public double GetDoubletapness(OsuDifficultyHitObject? osuNextObj)
+        public double CalculateDoubleTapFeasibility(OsuDifficultyHitObject? nextObj)
         {
-            if (osuNextObj != null)
-            {
-                double currDeltaTime = Math.Max(1, DeltaTime);
-                double nextDeltaTime = Math.Max(1, osuNextObj.DeltaTime);
+            if (nextObj == null) return 0;
 
-                double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
+            double currDeltaTime = Math.Max(1, DeltaTime);
+            double nextDeltaTime = Math.Max(1, nextObj.DeltaTime);
 
-                double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-                double windowRatio = Math.Pow(Math.Min(1, currDeltaTime / HitWindow(HitResult.Great)), 5);
+            double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
 
-                // Can't doubletap if circles don't intersect
-                double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+            double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
+            double windowRatio = DiffUtils.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 5);
 
-                return 1.0 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
-            }
+            // Can't doubletap if circles don't intersect
+            double distanceFactor = DiffUtils.Pow(DiffUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
-            return 0;
+            return 1.0 - DiffUtils.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
@@ -222,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (BaseObject is Slider currentSlider)
             {
                 // Bonus for repeat sliders until a better per nested object strain system can be achieved.
-                TravelDistance = LazyTravelDistance * Math.Max(1, Math.Pow(currentSlider.RepeatCount, 0.3));
+                TravelDistance = LazyTravelDistance * Math.Max(1, DiffUtils.Pow(currentSlider.RepeatCount, 0.3));
                 TravelTime = Math.Max(LazyTravelTime / clockRate, MIN_DELTA_TIME);
             }
 
@@ -234,6 +212,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = NORMALISED_RADIUS / (float)BaseObject.Radius;
+
+            var lastDifficultyObject = Previous() as OsuDifficultyHitObject;
+            var lastLastDifficultyObject = Previous(1) as OsuDifficultyHitObject;
 
             Vector2 lastCursorPosition = lastDifficultyObject != null ? getEndCursorPosition(lastDifficultyObject) : LastObject.StackedPosition;
 
@@ -280,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastDifficultyObject);
 
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
-                double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
+                double sliderAngle = calculateSliderAngle(lastDifficultyObject, lastLastCursorPosition);
 
                 Vector2 v = BaseObject.StackedPosition - lastCursorPosition;
                 NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));

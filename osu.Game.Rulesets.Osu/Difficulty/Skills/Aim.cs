@@ -32,18 +32,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double MaxStoredSections => 10000;
 
         private double currentStrain;
-
-        private double skillMultiplierSnap => 70.9;
-        private double skillMultiplierAgility => 2.35;
-        private double skillMultiplierFlow => 277.0;
-        private double skillMultiplierTotal => 1.12;
-        private double combinedSnapNormExponent => 1.0;
-        private double lengthBonus => 1.6;
         private double strainWeightSum;
 
         private readonly List<double> sliderStrains = new List<double>();
 
-        private double strainDecay(double ms) => Math.Pow(0.2, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(0.2, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
             currentStrain * strainDecay(time - current.Previous(0).StartTime);
@@ -66,9 +59,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierSnap;
-            double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skillMultiplierAgility;
-            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skillMultiplierFlow;
+            const double skill_multiplier_snap = 70.9;
+            const double skill_multiplier_agility = 2.35;
+            const double skill_multiplier_flow = 277.0;
+
+            double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
+            double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;
+            double flowDifficulty = FlowAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_flow;
 
             double totalDifficulty = calculateTotalValue(snapDifficulty, agilityDifficulty, flowDifficulty);
 
@@ -78,17 +75,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 totalDifficulty *= 1.0 - magnetisedStrength;
             }
 
-            totalDifficulty *= 0.985 + Math.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
+            totalDifficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
 
             return totalDifficulty;
         }
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
         {
+            const double skill_multiplier_total = 1.12;
+            const double combined_snap_norm_exponent = 1.2;
+
             // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
             // Agility on the other hand is supposed to measure the rate of cursor velocity changes while snapping
             // So snapping every circle on a stream requires an enormous amount of agility at which point it's easier to flow
-            double combinedSnapDifficulty = DifficultyCalculationUtils.Norm(combinedSnapNormExponent, snapDifficulty, agilityDifficulty);
+            double combinedSnapDifficulty = DiffUtils.Norm(combined_snap_norm_exponent, snapDifficulty, agilityDifficulty);
 
             double pSnap = calculateSnapFlowProbability(flowDifficulty / combinedSnapDifficulty);
             double pFlow = 1 - pSnap;
@@ -96,8 +96,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
                 // we don't adjust agility here since agility represents TD difficulty in a decent enough way
-                snapDifficulty = Math.Pow(snapDifficulty, 0.89);
-                combinedSnapDifficulty = DifficultyCalculationUtils.Norm(combinedSnapNormExponent, snapDifficulty, agilityDifficulty);
+                snapDifficulty = DiffUtils.Pow(snapDifficulty, 0.89);
+                combinedSnapDifficulty = DiffUtils.Norm(combined_snap_norm_exponent, snapDifficulty, agilityDifficulty);
             }
 
             if (Mods.Any(m => m is OsuModRelax))
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double totalDifficulty = combinedSnapDifficulty * pSnap + flowDifficulty * pFlow;
 
-            double totalStrain = totalDifficulty * skillMultiplierTotal;
+            double totalStrain = totalDifficulty * skill_multiplier_total;
 
             return totalStrain;
         }
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (double.IsNaN(ratio))
                 return 1;
 
-            return DifficultyCalculationUtils.Logistic(-k * Math.Log(ratio));
+            return DiffUtils.Logistic(-k * Math.Log(ratio));
         }
 
         public double GetDifficultSliders()
@@ -157,11 +157,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return sliderStrains.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
+            return sliderStrains.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
 
         public override double DifficultyValue()
         {
+            const double length_bonus = 1.6;
             double difficulty = 0;
             double time = 0;
 
@@ -182,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     Technically, the function below has been slightly modified from the equation above.
                     The real function would be
-                        double weight = Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime);
+                        double weight = DiffUtils.Pow(DecayWeight, startTime) - DiffUtils.Pow(DecayWeight, endTime);
                         ...
                         return difficulty / Math.Log(1 / DecayWeight);
                     E.g. for a DecayWeight of 0.9, we're multiplying by 10 instead of 9.49122...
@@ -193,8 +194,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double startTime = time;
                 double endTime = time + strain.SectionLength / MaxSectionLength;
 
-                double weight = (Math.Pow(DecayWeight, startTime) - Math.Pow(DecayWeight, endTime)) / (1 - DecayWeight)
-                                + lengthBonus * Math.Log((endTime + 50) / (startTime + 50));
+                double weight = (DiffUtils.Pow(DecayWeight, startTime) - DiffUtils.Pow(DecayWeight, endTime)) / (1 - DecayWeight)
+                                + length_bonus * Math.Log((endTime + 50) / (startTime + 50));
 
                 strainWeightSum += weight;
 
@@ -216,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return ObjectDifficulties.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectDifficulties.Sum(s => DifficultyCalculationUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
+            return ObjectDifficulties.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
     }
 }

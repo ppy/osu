@@ -199,7 +199,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                                 },
                                             ],
                                             [
-                                                playerScoreCounter = new RankedPlayScoreCounter(numDigits(PlayerScore.TotalScore))
+                                                playerScoreCounter = new RankedPlayScoreCounter
                                                 {
                                                     Font = OsuFont.GetFont(size: 60, fixedWidth: true),
                                                     Anchor = Anchor.Centre,
@@ -248,7 +248,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                                 },
                                             ],
                                             [
-                                                opponentScoreCounter = new RankedPlayScoreCounter(numDigits(OpponentScore.TotalScore))
+                                                opponentScoreCounter = new RankedPlayScoreCounter
                                                 {
                                                     Font = OsuFont.GetFont(size: 60, fixedWidth: true),
                                                     Anchor = Anchor.Centre,
@@ -281,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 Origin = Anchor.Centre,
                                 Children =
                                 [
-                                    damageCounter = new RankedPlayScoreCounter(numDigits(losingDamageInfo.Damage))
+                                    damageCounter = new RankedPlayScoreCounter
                                     {
                                         Font = OsuFont.GetFont(size: 36, weight: FontWeight.SemiBold, fixedWidth: true),
                                         Spacing = new Vector2(-2),
