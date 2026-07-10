@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
-using osuTK.Graphics.OpenGL;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -76,8 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
 
             double firstStartTime = objectList.First().StartTime;
-            double lastStartTime = objectList.Last().StartTime;
-            double reducedDuration = Math.Min(firstStartTime + reduced_difficulty_duration, lastStartTime);
+            double reducedDuration = firstStartTime + reduced_difficulty_duration;
 
             if (objectList.Count == 0 || difficulties.Count == 0)
                 return difficulties;
