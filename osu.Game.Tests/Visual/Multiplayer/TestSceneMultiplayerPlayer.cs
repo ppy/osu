@@ -54,6 +54,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("score changed", () => player.GameplayState.ScoreProcessor.TotalScore.Value > 0);
         }
 
+        [Test]
+        public void TestSkipBeforeGameplayStartsWhenAutoSkipEnabled()
+        {
+            AddStep("enable auto skip", () => MultiplayerClient.ChangeSettings(autoSkip: true));
+
+            setupBeforeGameplayStart();
+
+            AddStep("click skip overlay", () => this.ChildrenOfType<MultiplayerSkipOverlay.Button>().Single().TriggerClick());
+
+            startGameplay();
+
+            AddAssert("gameplay clock skipped to intro", () =>
+            {
+                GameplayClockContainer clock = player.ChildrenOfType<GameplayClockContainer>().Single();
+                return clock.CurrentTime >= clock.GameplayStartTime - MasterGameplayClockContainer.MINIMUM_SKIP_TIME;
+            });
+        }
+
         private void setup(Func<IReadOnlyList<Mod>>? mods = null)
         {
             setupBeforeGameplayStart(mods);
