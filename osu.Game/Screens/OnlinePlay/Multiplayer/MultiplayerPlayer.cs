@@ -200,7 +200,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (Configuration.AutomaticallySkipIntro)
             {
-                base.RequestIntroSkip();
+                RequestIntroSkip();
             }
         });
 
@@ -230,11 +230,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void RequestIntroSkip()
         {
-            if (!Configuration.AutomaticallySkipIntro)
+            // If the room is set up such that the intro is automatically skipped, there's no need to vote on it.
+            if (Configuration.AutomaticallySkipIntro)
             {
-                // No base call because we aren't skipping yet.
-                client.VoteToSkipIntro().FireAndForget();
+                base.RequestIntroSkip();
+                return;
             }
+
+            // No base call because we aren't skipping yet.
+            client.VoteToSkipIntro().FireAndForget();
         }
 
         private void onVoteToSkipIntroPassed()
