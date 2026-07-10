@@ -44,11 +44,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         protected abstract double ProcessInternal(DifficultyHitObject current);
 
-        /// <summary>
-        /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
-        /// </summary>
-        public abstract double DifficultyValue();
-
         public IReadOnlyList<double> GetObjectDifficulties() => ObjectDifficulties;
     }
 }

@@ -108,15 +108,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return reducedNoteCount;
         }
 
-        public override double CountTopWeightedObjectDifficulties(double difficultyValue)
+        public override double CountTopWeightedObjectDifficulties(double difficultyValue, double objectWeightSum)
         {
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            if (ObjectWeightSum == 0)
+            if (objectWeightSum == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / ObjectWeightSum; // What would the top difficulty be if all object difficulties were identical
+            double consistentTopNote = difficultyValue / objectWeightSum; // What would the top difficulty be if all object difficulties were identical
 
             if (consistentTopNote == 0)
                 return 0;

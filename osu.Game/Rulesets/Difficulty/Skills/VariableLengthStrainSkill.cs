@@ -36,10 +36,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         /// <summary>
         /// The number of `MaxSectionLength` sections calculated such that enough of the difficulty value is preserved.
-        /// WARNING: This should be overridden if strains are ever used outside of <see cref="Skill.DifficultyValue"/>,
-        /// or if <see cref="Skill.DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
-        /// in the future when a better memory-saving technique is implemented.
         /// </summary>
+        /// <remarks>
+        /// This variable operates under the assumption that final difficulty calculation uses a standard geometric sum,
+        /// and that <see cref="strainPeaks"/> is not required for any other purpose
+        /// </remarks>
         private readonly double maxStoredLength;
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
