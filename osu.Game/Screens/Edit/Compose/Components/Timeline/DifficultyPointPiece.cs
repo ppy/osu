@@ -15,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -74,22 +75,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    new OsuContextMenuContainer // required for `SliderVelocityAdjustmentControl`'s context menus to work when right-clicking velocity presets
                     {
                         Width = 250,
-                        Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 15),
-                        Children = new Drawable[]
+                        Child = new FillFlowContainer
                         {
-                            adjustmentControl = new SliderVelocityAdjustmentControl(),
-                            new OsuTextFlowContainer
+                            Direction = FillDirection.Vertical,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(0, 15),
+                            Children = new Drawable[]
                             {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Text = "Hold shift while dragging the end of an object to adjust velocity while snapping."
-                            },
-                            new SliderVelocityInspector(adjustmentControl.Current),
+                                adjustmentControl = new SliderVelocityAdjustmentControl(),
+                                new OsuTextFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Text = "Hold shift while dragging the end of an object to adjust velocity while snapping."
+                                },
+                                new SliderVelocityInspector(adjustmentControl.Current),
+                            }
                         }
                     }
                 };

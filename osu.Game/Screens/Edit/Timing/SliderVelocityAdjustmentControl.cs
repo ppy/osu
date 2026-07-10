@@ -9,6 +9,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -20,6 +22,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 using osuTK.Input;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -206,7 +209,7 @@ namespace osu.Game.Screens.Edit.Timing
             base.Dispose(isDisposing);
         }
 
-        internal partial class SliderVelocityPresetTernaryButton : DrawableTernaryButton
+        internal partial class SliderVelocityPresetTernaryButton : DrawableTernaryButton, IHasContextMenu
         {
             public double Velocity { get; }
             public Action<double>? OnDelete { get; init; }
@@ -247,6 +250,11 @@ namespace osu.Game.Screens.Edit.Timing
 
                 return base.OnMouseDown(e);
             }
+
+            public MenuItem[] ContextMenuItems =>
+            [
+                new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => OnDelete?.Invoke(Velocity))
+            ];
         }
 
         private partial class AddPresetButton : RoundedButton
