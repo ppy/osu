@@ -387,6 +387,7 @@ namespace osu.Game.Skinning
                                     var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
                                     var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
                                     var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
                                     Vector2 pos = new Vector2();
 
@@ -413,6 +414,13 @@ namespace osu.Game.Skinning
                                         leaderboard.X = 10;
                                     }
 
+                                    if (hitError != null)
+                                    {
+                                        hitError.Anchor = Anchor.BottomCentre;
+                                        hitError.Origin = Anchor.CentreLeft;
+                                        hitError.Rotation = -90;
+                                    }
+
                                     foreach (var d in container.OfType<ISerialisableDrawable>())
                                         d.UsesFixedAnchor = true;
                                 })
@@ -420,6 +428,7 @@ namespace osu.Game.Skinning
                                     new LegacyDefaultComboCounter(),
                                     new SpectatorList(),
                                     new DrawableGameplayLeaderboard(),
+                                    new BarHitErrorMeter(),
                                 };
                             }
 
@@ -443,15 +452,6 @@ namespace osu.Game.Skinning
                                     songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
                                 }
 
-                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-
-                                if (hitError != null)
-                                {
-                                    hitError.Anchor = Anchor.BottomCentre;
-                                    hitError.Origin = Anchor.CentreLeft;
-                                    hitError.Rotation = -90;
-                                }
-
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
                                     d.UsesFixedAnchor = true;
                             })
@@ -461,7 +461,6 @@ namespace osu.Game.Skinning
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
                                     new LegacySongProgress(),
-                                    new BarHitErrorMeter(),
 
                                     // to match stable, health bars are in front of everything else
                                     // for the sake of hacky full screen area health bars

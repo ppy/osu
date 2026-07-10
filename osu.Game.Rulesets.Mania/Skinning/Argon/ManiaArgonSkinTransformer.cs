@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
                                 var combo = container.ChildrenOfType<ArgonManiaComboCounter>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
 
                                 if (leaderboard != null)
                                     leaderboard.Position = new Vector2(36, 115);
@@ -58,6 +61,20 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 if (spectatorList != null)
                                     spectatorList.Position = new Vector2(36, -66);
 
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.CentreLeft;
+                                    hitError.Origin = Anchor.CentreLeft;
+                                }
+
+                                if (hitError2 != null)
+                                {
+                                    hitError2.Anchor = Anchor.CentreRight;
+                                    hitError2.Scale = new Vector2(-1, 1);
+                                    // origin flipped to match scale above.
+                                    hitError2.Origin = Anchor.CentreLeft;
+                                }
+
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
                                     d.UsesFixedAnchor = true;
                             })
@@ -68,7 +85,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                }
+                                },
+                                new BarHitErrorMeter(),
+                                new BarHitErrorMeter(),
                             };
                     }
 
