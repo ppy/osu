@@ -74,6 +74,11 @@ namespace osu.Game.Online.API
         IBindable<APIState> State { get; }
 
         /// <summary>
+        /// When servers are on fire, this will contain a message which can be displayed to an end user.
+        /// </summary>
+        IBindable<string?> UserFacingOutageMessage { get; }
+
+        /// <summary>
         /// Queue a new request.
         /// </summary>
         /// <param name="request">The request to perform.</param>

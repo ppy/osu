@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -23,13 +24,24 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
+        /// <summary>
+        /// Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
+        /// </summary>
+        protected const double CHECK_PRECISION = 0.00001;
+
         protected void Test(double? expectedStarRating, int expectedMaxCombo, string name, params Mod[] mods)
         {
-            var attributes = CreateDifficultyCalculator(GetBeatmap(name)).Calculate(mods);
+            var calc = CreateDifficultyCalculator(GetBeatmap(name));
+            var attributes = calc.Calculate(mods);
 
-            // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
-            Assert.That(attributes.StarRating, Is.EqualTo(expectedStarRating).Within(0.00001));
+            var timedAttributes = calc.CalculateTimed(mods);
+
+            Assert.That(attributes.StarRating, Is.EqualTo(expectedStarRating).Within(CHECK_PRECISION));
             Assert.That(attributes.MaxCombo, Is.EqualTo(expectedMaxCombo));
+
+            // Test timed attributes ends on same value as non-timed.
+            Assert.That(timedAttributes.Last().Attributes.StarRating, Is.EqualTo(attributes.StarRating).Within(CHECK_PRECISION));
+            Assert.That(timedAttributes.Last().Attributes.MaxCombo, Is.EqualTo(attributes.MaxCombo));
         }
 
         protected IWorkingBeatmap GetBeatmap(string name)

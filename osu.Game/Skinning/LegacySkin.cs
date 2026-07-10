@@ -461,8 +461,11 @@ namespace osu.Game.Skinning
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
                                     new LegacySongProgress(),
-                                    new LegacyHealthDisplay(),
                                     new BarHitErrorMeter(),
+
+                                    // to match stable, health bars are in front of everything else
+                                    // for the sake of hacky full screen area health bars
+                                    new LegacyHealthDisplay(),
                                 }
                             };
                     }
