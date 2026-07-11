@@ -26,7 +26,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
@@ -53,22 +52,22 @@ namespace osu.Game.Tests.Visual.Navigation
 
             switchToGameplayScene();
 
-            BarHitErrorMeter hitErrorMeter = null;
+            ArgonAccuracyCounter accuracyCounter = null;
 
-            AddUntilStep("select bar hit error blueprint", () =>
+            AddUntilStep("select argon accuracy counter blueprint", () =>
             {
-                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().FirstOrDefault(b => b.Item is BarHitErrorMeter);
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().FirstOrDefault(b => b.Item is ArgonAccuracyCounter);
 
                 if (blueprint == null)
                     return false;
 
-                hitErrorMeter = (BarHitErrorMeter)blueprint.Item;
+                accuracyCounter = (ArgonAccuracyCounter)blueprint.Item;
                 skinEditor.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
                 return true;
             });
 
-            AddAssert("value is default", () => hitErrorMeter.JudgementLineThickness.IsDefault);
+            AddAssert("value is default", () => accuracyCounter.WireframeOpacity.IsDefault);
 
             AddStep("hover first slider", () =>
             {
@@ -81,7 +80,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("adjust slider via keyboard", () => InputManager.Key(Key.Left));
 
-            AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
+            AddAssert("value is less than default", () => accuracyCounter.WireframeOpacity.Value < accuracyCounter.WireframeOpacity.Default);
         }
 
         [Test]
