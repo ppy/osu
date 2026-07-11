@@ -21,6 +21,9 @@ namespace osu.Game.Online.API
         public const int DUMMY_USER_ID = 1001;
 
         public DummyLocalUserState LocalUserState { get; } = new DummyLocalUserState();
+
+        public string ScoreProcessingNoticeUrl { get; set; } = string.Empty;
+
         public Bindable<APIUser> LocalUser => LocalUserState.User;
 
         ILocalUserState IAPIProvider.LocalUserState => LocalUserState;

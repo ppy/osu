@@ -53,6 +53,8 @@ namespace osu.Game.Online.API
 
         public string ProvidedUsername { get; private set; }
 
+        public string ScoreProcessingNoticeUrl { get; private set; }
+
         public SessionVerificationMethod? SessionVerificationMethod { get; private set; }
 
         public string SecondFactorCode { get; private set; }
@@ -434,6 +436,7 @@ namespace osu.Game.Online.API
                         Debug.Assert(ThreadSafety.IsUpdateThread);
 
                         localUserState.SetLocalUser(me);
+                        ScoreProcessingNoticeUrl = me.ScoreProcessingNoticeUrl;
                         SessionVerificationMethod = me.SessionVerificationMethod;
                         state.Value = SessionVerificationMethod == null ? APIState.Online : APIState.RequiresSecondFactorAuth;
                         livenessStopwatch.Restart();

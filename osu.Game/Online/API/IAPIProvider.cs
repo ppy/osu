@@ -26,6 +26,12 @@ namespace osu.Game.Online.API
         ILocalUserState LocalUserState { get; }
 
         /// <summary>
+        /// When there's ongoing SR/PP reprocessing, this will be non-empty and contain a URL leading to the news post
+        /// giving user facing details about the ongoing deployment process.
+        /// </summary>
+        string ScoreProcessingNoticeUrl { get; }
+
+        /// <summary>
         /// The language supplied by this provider to API requests.
         /// </summary>
         Language Language { get; }
