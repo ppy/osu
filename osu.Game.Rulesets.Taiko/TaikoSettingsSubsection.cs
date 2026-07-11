@@ -35,6 +35,12 @@ namespace osu.Game.Rulesets.Taiko
                 }),
                 new SettingsItemV2(new FormCheckBox
                 {
+                    Caption = RulesetSettingsStrings.HitAnimations,
+                    HintText = RulesetSettingsStrings.HitAnimationsTooltip,
+                    Current = config.GetBindable<bool>(TaikoRulesetSetting.HitAnimations)
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
                     Caption = RulesetSettingsStrings.RateAdjustedHitAnimation,
                     HintText = RulesetSettingsStrings.RateAdjustedHitAnimationTooltip,
                     Current = config.GetBindable<bool>(TaikoRulesetSetting.RateAdjustedHitAnimation)
