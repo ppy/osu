@@ -297,8 +297,29 @@ namespace osu.Game.Beatmaps
             // Convert
             IBeatmap converted = converter.Convert(token);
 
+            List<IApplicableAfterBeatmapConversion> applicableAfterBeatmapConversions = mods.OfType<IApplicableAfterBeatmapConversion>().ToList();
+            List<IApplicableAfterBeatmapConversion> applicableAfterBeatmapConversionsSorted = new List<IApplicableAfterBeatmapConversion>();
+            IApplicableAfterBeatmapConversion noRelease = null;
+
+            foreach (var mod in applicableAfterBeatmapConversions)
+            {
+                if (mod.GetType().Name == "ManiaModNoRelease")
+                {
+                    noRelease = mod;
+                }
+                else
+                {
+                    applicableAfterBeatmapConversionsSorted.Add(mod);
+                }
+            }
+
+            if (noRelease != null)
+            {
+                applicableAfterBeatmapConversionsSorted.Add(noRelease);
+            }
+
             // Apply conversion mods to the result
-            foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
+            foreach (var mod in applicableAfterBeatmapConversionsSorted)
             {
                 token.ThrowIfCancellationRequested();
                 mod.ApplyToBeatmap(converted);
