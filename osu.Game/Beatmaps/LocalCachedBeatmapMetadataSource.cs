@@ -81,6 +81,11 @@ namespace osu.Game.Beatmaps
 
         public bool TryLookup(BeatmapInfo beatmapInfo, [NotNullWhen(true)] out OnlineBeatmapMetadata? onlineMetadata)
         {
+            return TryLookup(null, null, beatmapInfo, out onlineMetadata);
+        }
+
+        public bool TryLookup(SqliteConnection? db, int? version, BeatmapInfo beatmapInfo, [NotNullWhen(true)] out OnlineBeatmapMetadata? onlineMetadata)
+        {
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
             if (!Available)
@@ -98,19 +103,22 @@ namespace osu.Game.Beatmaps
 
             try
             {
-                using (var db = getConnection())
+                if (db == null)
                 {
+                    db = getConnection();
                     db.Open();
 
-                    switch (getCacheVersion(db))
-                    {
-                        case 2:
-                            // can be removed 20260123
-                            return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
+                    version = GetCacheVersion(db);
+                }
 
-                        case 3:
-                            return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
-                    }
+                switch (version)
+                {
+                    case 2:
+                        // can be removed 20260123
+                        return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
+
+                    case 3:
+                        return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
                 }
 
                 onlineMetadata = null;
@@ -245,7 +253,7 @@ namespace osu.Game.Beatmaps
                 using (var connection = getConnection())
                 {
                     connection.Open();
-                    return getCacheVersion(connection) >= version;
+                    return GetCacheVersion(connection) >= version;
                 }
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 26 || ex.SqliteErrorCode == 11) // SQLITE_NOTADB, SQLITE_CORRUPT
@@ -255,7 +263,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private int getCacheVersion(SqliteConnection connection)
+        public int GetCacheVersion(SqliteConnection connection)
         {
             using (var cmd = connection.CreateCommand())
             {
