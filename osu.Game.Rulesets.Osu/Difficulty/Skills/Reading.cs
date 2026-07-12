@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 if (hitObject.StartTime > reducedDuration)
                     break;
 
-                double ratio = (double)(hitObject.StartTime - firstStartTime) / (reducedDuration - firstStartTime);
+                double ratio = (hitObject.StartTime - firstStartTime) / (reducedDuration - firstStartTime);
                 double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp(ratio, 0, 1)));
                 difficulties[i] *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
             }
