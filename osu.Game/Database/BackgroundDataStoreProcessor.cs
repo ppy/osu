@@ -335,40 +335,61 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(beatmapIds.Count, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
 
+            const int chunk_size = 500;
             int processedCount = 0;
             int failedCount = 0;
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            foreach (var id in beatmapIds)
+            var actions = new List<Action<Realm>>();
+
+            realmAccess.Run(r =>
             {
-                if (notification?.State == ProgressNotificationState.Cancelled)
-                    break;
-
-                updateNotificationProgress(notification, processedCount, beatmapIds.Count);
-
-                sleepIfRequired();
-
-                realmAccess.Run(r =>
+                foreach (Guid id in beatmapIds)
                 {
-                    var beatmap = r.Find<BeatmapInfo>(id);
+                    if (notification?.State == ProgressNotificationState.Cancelled)
+                        break;
 
-                    if (beatmap != null)
+                    if (actions.Count >= chunk_size) performWrite(actions);
+
+                    updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+
+                    sleepIfRequired();
+
+                    var beatmap = r.Find<BeatmapInfo>(id)?.Detach();
+
+                    if (beatmap == null)
                     {
-                        try
-                        {
-                            beatmapUpdater.ProcessObjectCounts(beatmap);
-                            ++processedCount;
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Log($"Background processing failed on {beatmap}: {e}");
-                            ++failedCount;
-                        }
+                        ++processedCount;
+                        continue;
                     }
-                });
-            }
+
+                    try
+                    {
+                        beatmapUpdater.ProcessObjectCounts(beatmap);
+
+                        actions.Add(realm =>
+                        {
+                            var item = realm.Find<BeatmapInfo>(id)!;
+
+                            item.TotalObjectCount = beatmap.TotalObjectCount;
+                            item.EndTimeObjectCount = beatmap.EndTimeObjectCount;
+
+                            ((IWorkingBeatmapCache)beatmapManager).Invalidate(item);
+                        });
+
+                        ++processedCount;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Background processing failed on {beatmap}: {e}");
+                        ++failedCount;
+                    }
+                }
+            });
+
+            if (actions.Count > 0) performWrite(actions);
 
             completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
 

@@ -71,20 +71,17 @@ namespace osu.Game.Beatmaps
 
         public void ProcessObjectCounts(BeatmapInfo beatmapInfo, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
-            beatmapInfo.Realm!.Write(_ =>
-            {
-                // Before we use below, we want to invalidate.
-                workingBeatmapCache.Invalidate(beatmapInfo);
+            // Before we use below, we want to invalidate.
+            workingBeatmapCache.Invalidate(beatmapInfo);
 
-                var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
-                var beatmap = working.Beatmap;
+            var working = workingBeatmapCache.GetWorkingBeatmap(beatmapInfo);
+            var beatmap = working.Beatmap;
 
-                beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
-                beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
+            beatmapInfo.EndTimeObjectCount = beatmap.HitObjects.Count(h => h is IHasDuration);
+            beatmapInfo.TotalObjectCount = beatmap.HitObjects.Count;
 
-                // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
-                workingBeatmapCache.Invalidate(beatmapInfo);
-            });
+            // And invalidate again afterwards as re-fetching the most up-to-date database metadata will be required.
+            workingBeatmapCache.Invalidate(beatmapInfo);
         }
 
         #region Implementation of IDisposable
