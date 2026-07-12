@@ -88,7 +88,7 @@ namespace osu.Game.Database
 
             ProcessingTask = Task.Factory.StartNew(() =>
             {
-                Logger.Log("Beginning background data store processing..");
+                Logger.Log("Beginning background data store processing...");
 
                 clearOutdatedStarRatings();
                 populateMissingStarRatings();
@@ -107,7 +107,7 @@ namespace osu.Game.Database
             {
                 if (t.Exception?.InnerException is ObjectDisposedException)
                 {
-                    Logger.Log("Finished background aborted during shutdown");
+                    Logger.Log("Background data store processing aborted during shutdown.");
                     return;
                 }
 
@@ -381,7 +381,7 @@ namespace osu.Game.Database
 
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
-                Logger.Log($"Processing {processedCount} of {totalCount} beatmaps object counts completed in {stopwatch.ElapsedMilliseconds}ms");
+                Logger.Log($"Processing {processedCount} of {totalCount} missing beatmaps hitobject counts completed in {stopwatch.ElapsedMilliseconds}ms");
             });
         }
 
@@ -642,7 +642,7 @@ namespace osu.Game.Database
 
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
-                Logger.Log($"Converting totalScore {processedCount} of {totalCount} scores completed in {stopwatch.ElapsedMilliseconds}ms");
+                Logger.Log($"Converting total score {processedCount} of {totalCount} scores completed in {stopwatch.ElapsedMilliseconds}ms");
             });
         }
 
@@ -751,7 +751,7 @@ namespace osu.Game.Database
                 return;
             }
 
-            Logger.Log("Querying for beatmap sets that contain missing submission/rank date...");
+            Logger.Log("Querying for beatmap sets that contain missing submission/rank dates...");
 
             // find all ranked beatmap sets with missing date ranked or date submitted that have at least one difficulty ranked as well.
             // the reason for checking ranked status of the difficulties is that they can be locally modified or unknown too, and for those the lookup is likely to fail.
@@ -769,7 +769,7 @@ namespace osu.Game.Database
                 int processedCount = 0;
                 int failedCount = 0;
 
-                Logger.Log($"Found {totalCount} beatmap sets with missing submission/rank date.");
+                Logger.Log($"Found {totalCount} beatmap sets with missing submission/rank dates.");
 
                 if (totalCount == 0) return;
 
@@ -885,7 +885,7 @@ namespace osu.Game.Database
                 return;
             }
 
-            Logger.Log(@"Updating user tags");
+            Logger.Log("Querying for beatmap that has outdated user tags...");
 
             // while this is constrained to run every month or so (every time a new online.db cache is retrieved), there's some chance that this will still run much too often and be annoying to users.
             // if that turns out to be the case we may need a better way to debounce this (or just delete the backpopulation logic after some time has passed?)
@@ -900,7 +900,7 @@ namespace osu.Game.Database
                 int updatedCount = 0;
                 int failedCount = 0;
 
-                Logger.Log($@"Checking for tag updates for {totalCount} beatmaps.");
+                Logger.Log($"Found {totalCount} beatmaps with outdated user tags.");
 
                 if (totalCount == 0) return;
 
