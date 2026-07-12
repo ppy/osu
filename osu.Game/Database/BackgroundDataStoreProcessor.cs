@@ -156,7 +156,7 @@ namespace osu.Game.Database
         /// from the <see cref="beatmapUpdater"/> firing online requests as part of the update.
         /// Star rating recalculations can be ran strictly locally.
         /// </remarks>
-        private void populateMissingStarRatings()
+        private void populateMissingStarRatings(int chunk_size = 500)
         {
             HashSet<Guid> beatmapIds = new HashSet<Guid>();
 
@@ -175,7 +175,6 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(beatmapIds.Count, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
 
-            const int chunk_size = 500;
             int processedCount = 0;
             int failedCount = 0;
 
@@ -316,7 +315,7 @@ namespace osu.Game.Database
             Logger.Log($"Processing {processedCount} of {beatmapSetIds.Count} online beatmapsets completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void processBeatmapsWithMissingObjectCounts()
+        private void processBeatmapsWithMissingObjectCounts(int chunk_size = 500)
         {
             Logger.Log("Querying for beatmaps with missing hitobject counts to reprocess...");
 
@@ -335,7 +334,6 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(beatmapIds.Count, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
 
-            const int chunk_size = 500;
             int processedCount = 0;
             int failedCount = 0;
 
@@ -394,7 +392,7 @@ namespace osu.Game.Database
             Logger.Log($"Processing {processedCount} of {beatmapIds.Count} beatmaps object counts completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void processScoresWithMissingStatistics()
+        private void processScoresWithMissingStatistics(int chunk_size = 1000)
         {
             HashSet<Guid> scoreIds = new HashSet<Guid>();
 
@@ -420,7 +418,6 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(scoreIds.Count, "Populating missing statistics for scores", "scores have been populated with missing statistics");
 
-            const int chunk_size = 1000;
             int processedCount = 0;
             int failedCount = 0;
 
@@ -487,7 +484,7 @@ namespace osu.Game.Database
             Logger.Log($"Processing {processedCount} of {scoreIds.Count} missing scores statistics completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void upgradeModMultipliers()
+        private void upgradeModMultipliers(int chunk_size = 500)
         {
             Logger.Log("Querying for scores that need mod multiplier upgrade...");
 
@@ -510,7 +507,6 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new mod multipliers", "scores have been upgraded to the new mod multipliers");
 
-            const int chunk_size = 500;
             int processedCount = 0;
             int failedCount = 0;
 
@@ -576,7 +572,7 @@ namespace osu.Game.Database
             Logger.Log($"Upgrading {processedCount} of {scoreIds.Count} scores to new mod multipliers completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void convertLegacyTotalScoreToStandardised()
+        private void convertLegacyTotalScoreToStandardised(int chunk_size = 500)
         {
             Logger.Log("Querying for scores that need total score conversion...");
 
@@ -599,7 +595,6 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
 
-            const int chunk_size = 500;
             int processedCount = 0;
             int failedCount = 0;
 
@@ -670,7 +665,7 @@ namespace osu.Game.Database
             Logger.Log($"Converting totalScore {processedCount} of {scoreIds.Count} scores completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void upgradeScoreRanks()
+        private void upgradeScoreRanks(int chunk_size = 3000)
         {
             Logger.Log("Querying for scores that need rank upgrades...");
 
@@ -690,7 +685,6 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks.");
 
-            const int chunk_size = 3000;
             int processedCount = 0;
             int failedCount = 0;
 
@@ -758,7 +752,7 @@ namespace osu.Game.Database
             Logger.Log($"Upgrading {processedCount} of {scoreIds.Count} score ranks completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void backpopulateMissingSubmissionAndRankDates()
+        private void backpopulateMissingSubmissionAndRankDates(int chunk_size = 1000)
         {
             if (!localMetadataSource.Available)
             {
@@ -801,7 +795,6 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(beatmapSetIds.Count, "Populating missing submission and rank dates", "beatmap sets now have correct submission and rank dates.");
 
-            const int chunk_size = 1000;
             int processedCount = 0;
             int failedCount = 0;
 
@@ -891,7 +884,7 @@ namespace osu.Game.Database
             Logger.Log($"Populating {processedCount} of {beatmapSetIds.Count} missing submission and rank dates completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void backpopulateUserTags()
+        private void backpopulateUserTags(int chunk_size = 2000)
         {
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
@@ -937,7 +930,6 @@ namespace osu.Game.Database
             var notification = showProgressNotification(beatmapIds.Count, @"Updating user tags",
                 @"beatmaps have had their tags updated. This runs once a month to allow searching user tags.");
 
-            const int chunk_size = 2000;
             int processedCount = 0;
             int updatedCount = 0;
             int failedCount = 0;
