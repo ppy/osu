@@ -76,6 +76,8 @@ namespace osu.Game.Database
 
         private LocalCachedBeatmapMetadataSource localMetadataSource = null!;
 
+        private List<Action<Realm>> actions = [];
+
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
         protected override void LoadComplete()
@@ -189,8 +191,6 @@ namespace osu.Game.Database
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var actions = new List<Action<Realm>>();
 
             realmAccess.Run(r =>
             {
@@ -342,8 +342,6 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var actions = new List<Action<Realm>>();
-
             realmAccess.Run(r =>
             {
                 foreach (Guid id in beatmapIds)
@@ -428,8 +426,6 @@ namespace osu.Game.Database
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var actions = new List<Action<Realm>>();
 
             realmAccess.Run(r =>
             {
@@ -521,8 +517,6 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var actions = new List<Action<Realm>>();
-
             realmAccess.Run(r =>
             {
                 foreach (Guid id in scoreIds)
@@ -611,8 +605,6 @@ namespace osu.Game.Database
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var actions = new List<Action<Realm>>();
 
             realmAccess.Run(r =>
             {
@@ -704,8 +696,6 @@ namespace osu.Game.Database
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var actions = new List<Action<Realm>>();
 
             realmAccess.Run(r =>
             {
@@ -834,8 +824,6 @@ namespace osu.Game.Database
                 return;
             }
 
-            var actions = new List<Action<Realm>>();
-
             realmAccess.Run(r =>
             {
                 foreach (Guid id in beatmapSetIds)
@@ -956,8 +944,6 @@ namespace osu.Game.Database
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            var actions = new List<Action<Realm>>();
 
             SqliteConnection sqliteConnection;
             int sqliteVersion;
