@@ -158,53 +158,47 @@ namespace osu.Game.Database
         /// </remarks>
         private void populateMissingStarRatings(int chunk_size = 500)
         {
-            HashSet<Guid> beatmapIds = new HashSet<Guid>();
-
             Logger.Log("Querying for beatmaps with missing star ratings...");
 
             realmAccess.Run(r =>
             {
-                foreach (var b in r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null))
-                    beatmapIds.Add(b.ID);
-            });
+                var beatmaps = r
+                 .All<BeatmapInfo>()
+                 .Where(b => b.StarRating < 0 && b.BeatmapSet != null);
 
-            if (beatmapIds.Count == 0)
-                return;
+                int totalCount = beatmaps.Count();
+                int processedCount = 0;
+                int failedCount = 0;
 
-            Logger.Log($"Found {beatmapIds.Count} beatmaps which require star rating reprocessing.");
+                Logger.Log($"Found {totalCount} beatmaps which require star rating reprocessing.");
 
-            var notification = showProgressNotification(beatmapIds.Count, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
+                if (totalCount == 0) return;
 
-            int processedCount = 0;
-            int failedCount = 0;
+                var notification = showProgressNotification(totalCount, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
 
-            Dictionary<string, Ruleset> rulesetCache = new Dictionary<string, Ruleset>();
+                Dictionary<string, Ruleset> rulesetCache = new Dictionary<string, Ruleset>();
 
-            Ruleset getRuleset(RulesetInfo rulesetInfo)
-            {
-                if (!rulesetCache.TryGetValue(rulesetInfo.ShortName, out var ruleset))
-                    ruleset = rulesetCache[rulesetInfo.ShortName] = rulesetInfo.CreateInstance();
+                Ruleset getRuleset(RulesetInfo rulesetInfo)
+                {
+                    if (!rulesetCache.TryGetValue(rulesetInfo.ShortName, out var ruleset))
+                        ruleset = rulesetCache[rulesetInfo.ShortName] = rulesetInfo.CreateInstance();
 
-                return ruleset;
-            }
+                    return ruleset;
+                }
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            realmAccess.Run(r =>
-            {
-                foreach (Guid id in beatmapIds)
+                foreach (var beatmap in beatmaps)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
-
-                    var beatmap = r.Find<BeatmapInfo>(id);
 
                     if (beatmap == null)
                     {
@@ -224,7 +218,7 @@ namespace osu.Game.Database
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<BeatmapInfo>(id)!;
+                            var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
                             item.StarRating = starRating;
 
                             ((IWorkingBeatmapCache)beatmapManager).Invalidate(item);
@@ -234,44 +228,47 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"Background processing failed on {beatmap}: {e}");
+                        Logger.Log($"Background processing failed on beatmap {beatmap.ID}: {e}");
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+
+                completeNotification(notification, processedCount, totalCount, failedCount);
+
+                Logger.Log($"Populating {processedCount} of {totalCount} missing star ratings completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-
-            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
-
-            Logger.Log($"Populating {processedCount} of {beatmapIds.Count} missing star ratings completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void processOnlineBeatmapSetsWithNoUpdate()
         {
+            // BeatmapProcessor is responsible for both online and local processing.
+            // In the case a user isn't logged in, it won't update LastOnlineUpdate and therefore re-queue,
+            // causing overhead from the non-online processing to redundantly run every startup.
+            //
+            // We may eventually consider making the Process call more specific (or avoid this in any number
+            // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
+            if (!api.IsLoggedIn)
+            {
+                Logger.Log("Not logged in for beatmap sets to reprocess...");
+                return;
+            }
+
             HashSet<Guid> beatmapSetIds = new HashSet<Guid>();
 
             Logger.Log("Querying for beatmap sets to reprocess...");
 
             realmAccess.Run(r =>
             {
-                // BeatmapProcessor is responsible for both online and local processing.
-                // In the case a user isn't logged in, it won't update LastOnlineUpdate and therefore re-queue,
-                // causing overhead from the non-online processing to redundantly run every startup.
-                //
-                // We may eventually consider making the Process call more specific (or avoid this in any number
-                // of other possible ways), but for now avoid queueing if the user isn't logged in at startup.
-                if (api.IsLoggedIn)
-                {
-                    foreach (var b in r.All<BeatmapInfo>().Where(b => b.OnlineID > 0 && b.LastOnlineUpdate == null && b.BeatmapSet != null))
-                        beatmapSetIds.Add(b.BeatmapSet!.ID);
-                }
+                foreach (var b in r.All<BeatmapInfo>().Where(b => b.OnlineID > 0 && b.LastOnlineUpdate == null && b.BeatmapSet != null))
+                    beatmapSetIds.Add(b.BeatmapSet!.ID);
             });
+
+            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require online updates.");
 
             if (beatmapSetIds.Count == 0)
                 return;
-
-            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require online updates.");
 
             var notification = showProgressNotification(beatmapSetIds.Count, "Updating online data for beatmaps", "beatmaps' online data have been updated");
 
@@ -281,7 +278,7 @@ namespace osu.Game.Database
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            foreach (var id in beatmapSetIds)
+            foreach (Guid id in beatmapSetIds)
             {
                 if (notification?.State == ProgressNotificationState.Cancelled)
                     break;
@@ -303,7 +300,7 @@ namespace osu.Game.Database
                         }
                         catch (Exception e)
                         {
-                            Logger.Log($"Background processing failed on {set}: {e}");
+                            Logger.Log($"Background processing failed on beatmap set {id}: {e}");
                             ++failedCount;
                         }
                     }
@@ -312,48 +309,44 @@ namespace osu.Game.Database
 
             completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
 
-            Logger.Log($"Processing {processedCount} of {beatmapSetIds.Count} online beatmapsets completed in {stopwatch.ElapsedMilliseconds}ms");
+            Logger.Log($"Processing {processedCount} of {beatmapSetIds.Count} online beatmap sets completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void processBeatmapsWithMissingObjectCounts(int chunk_size = 500)
         {
             Logger.Log("Querying for beatmaps with missing hitobject counts to reprocess...");
 
-            HashSet<Guid> beatmapIds = new HashSet<Guid>();
-
             realmAccess.Run(r =>
             {
-                foreach (var b in r.All<BeatmapInfo>().Where(b => b.TotalObjectCount < 0 || b.EndTimeObjectCount < 0))
-                    beatmapIds.Add(b.ID);
-            });
+                var beatmaps = r
+                 .All<BeatmapInfo>()
+                 .Where(b => b.TotalObjectCount < 0 || b.EndTimeObjectCount < 0);
 
-            if (beatmapIds.Count == 0)
-                return;
+                int totalCount = beatmaps.Count();
+                int processedCount = 0;
+                int failedCount = 0;
 
-            Logger.Log($"Found {beatmapIds.Count} beatmaps which require statistics population.");
+                Logger.Log($"Found {totalCount} beatmaps which require statistics population.");
 
-            var notification = showProgressNotification(beatmapIds.Count, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
+                if (totalCount == 0) return;
 
-            int processedCount = 0;
-            int failedCount = 0;
+                var notification = showProgressNotification(totalCount, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            realmAccess.Run(r =>
-            {
-                foreach (Guid id in beatmapIds)
+                foreach (var b in beatmaps)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
 
-                    var beatmap = r.Find<BeatmapInfo>(id)?.Detach();
+                    var beatmap = b?.Detach();
 
                     if (beatmap == null)
                     {
@@ -367,7 +360,7 @@ namespace osu.Game.Database
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<BeatmapInfo>(id)!;
+                            var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
 
                             item.TotalObjectCount = beatmap.TotalObjectCount;
                             item.EndTimeObjectCount = beatmap.EndTimeObjectCount;
@@ -379,65 +372,57 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"Background processing failed on {beatmap}: {e}");
+                        Logger.Log($"Background processing failed on beatmap {beatmap.ID}: {e}");
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+
+                completeNotification(notification, processedCount, totalCount, failedCount);
+
+                Logger.Log($"Processing {processedCount} of {totalCount} beatmaps object counts completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-
-            completeNotification(notification, processedCount, beatmapIds.Count, failedCount);
-
-            Logger.Log($"Processing {processedCount} of {beatmapIds.Count} beatmaps object counts completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void processScoresWithMissingStatistics(int chunk_size = 1000)
         {
-            HashSet<Guid> scoreIds = new HashSet<Guid>();
-
             Logger.Log("Querying for scores to reprocess...");
 
             realmAccess.Run(r =>
             {
-                foreach (var score in r.All<ScoreInfo>().Where(s => !s.BackgroundReprocessingFailed))
-                {
-                    if (score.BeatmapInfo != null
-                        && score.Statistics.Sum(kvp => kvp.Value) > 0
-                        && score.MaximumStatistics.Sum(kvp => kvp.Value) == 0)
-                    {
-                        scoreIds.Add(score.ID);
-                    }
-                }
-            });
+                var scores = r
+                 .All<ScoreInfo>()
+                 .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null)
+                 .AsEnumerable()
+                 // must be done after materialisation, as realm doesn't want to support
+                 // nested property predicates
+                 .Where(s => s.Statistics.Sum(kvp => kvp.Value) > 0
+                             && s.MaximumStatistics.Sum(kvp => kvp.Value) == 0);
 
-            if (scoreIds.Count == 0)
-                return;
+                int totalCount = scores.Count();
+                int processedCount = 0;
+                int failedCount = 0;
 
-            Logger.Log($"Found {scoreIds.Count} scores which require statistics population.");
+                Logger.Log($"Found {totalCount} scores which require statistics population.");
 
-            var notification = showProgressNotification(scoreIds.Count, "Populating missing statistics for scores", "scores have been populated with missing statistics");
+                if (totalCount == 0) return;
 
-            int processedCount = 0;
-            int failedCount = 0;
+                var notification = showProgressNotification(totalCount, "Populating missing statistics for scores", "scores have been populated with missing statistics");
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            realmAccess.Run(r =>
-            {
-                foreach (Guid id in scoreIds)
+                foreach (var score in scores)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
-
-                    var score = r.Find<ScoreInfo>(id)?.Detach();
 
                     if (score == null)
                     {
@@ -452,7 +437,7 @@ namespace osu.Game.Database
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
                             item.MaximumStatisticsJson = maximumStatisticsJson;
                         });
 
@@ -464,32 +449,33 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log(@$"Failed to populate maximum statistics for {id}: {e}");
+                        Logger.Log(@$"Failed to populate maximum statistics for {score.ID}: {e}");
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
                             item.BackgroundReprocessingFailed = true;
                         });
 
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+
+                completeNotification(notification, processedCount, totalCount, failedCount);
+
+                Logger.Log($"Processing {processedCount} of {totalCount} missing scores statistics completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-
-            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
-
-            Logger.Log($"Processing {processedCount} of {scoreIds.Count} missing scores statistics completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void upgradeModMultipliers(int chunk_size = 500)
         {
             Logger.Log("Querying for scores that need mod multiplier upgrade...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
-                r.All<ScoreInfo>()
+            realmAccess.Run(r =>
+            {
+                var scores = r.All<ScoreInfo>()
                  .Where(s => !s.BackgroundReprocessingFailed
                              && s.BeatmapInfo != null
                              && s.TotalScoreVersion < 30000017 // version number represents version with latest mod multiplier change
@@ -497,36 +483,33 @@ namespace osu.Game.Database
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't want to support
                  // nested property predicates
-                 .Where(s => s.Ruleset.IsLegacyRuleset())
-                 .Select(s => s.ID)));
+                 .Where(s => s.Ruleset.IsLegacyRuleset());
 
-            Logger.Log($"Found {scoreIds.Count} scores which require mod multiplier upgrade.");
+                int totalCount = scores.Count();
+                int processedCount = 0;
+                int failedCount = 0;
 
-            if (scoreIds.Count == 0)
-                return;
+                Logger.Log($"Found {totalCount} scores which require mod multiplier upgrade.");
 
-            var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new mod multipliers", "scores have been upgraded to the new mod multipliers");
+                if (totalCount == 0) return;
 
-            int processedCount = 0;
-            int failedCount = 0;
+                var notification = showProgressNotification(totalCount, "Upgrading scores to new mod multipliers", "scores have been upgraded to the new mod multipliers");
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            realmAccess.Run(r =>
-            {
-                foreach (Guid id in scoreIds)
+                foreach (var s in scores)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
 
-                    var score = r.Find<ScoreInfo>(id)?.Detach();
+                    var score = s?.Detach();
 
                     if (score == null || score.BeatmapInfo == null)
                     {
@@ -539,7 +522,7 @@ namespace osu.Game.Database
                         StandardisedScoreMigrationTools.UpdateToLatestScoreMultipliers(score, score.BeatmapInfo.Difficulty);
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
                             item.TotalScore = score.TotalScore;
                             item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
                         });
@@ -552,32 +535,33 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"Failed to upgrade mod multipliers for {id}: {e}");
+                        Logger.Log($"Failed to upgrade mod multipliers for {score.ID}: {e}");
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
                             item.BackgroundReprocessingFailed = true;
                         });
 
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+
+                completeNotification(notification, processedCount, totalCount, failedCount);
+
+                Logger.Log($"Upgrading {processedCount} of {totalCount} scores to new mod multipliers completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-
-            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
-
-            Logger.Log($"Upgrading {processedCount} of {scoreIds.Count} scores to new mod multipliers completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void convertLegacyTotalScoreToStandardised(int chunk_size = 500)
         {
             Logger.Log("Querying for scores that need total score conversion...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
-                r.All<ScoreInfo>()
+            realmAccess.Run(r =>
+            {
+                var scores = r.All<ScoreInfo>()
                  .Where(s => !s.BackgroundReprocessingFailed
                              && s.BeatmapInfo != null
                              && s.IsLegacyScore
@@ -585,36 +569,33 @@ namespace osu.Game.Database
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't want to support
                  // nested property predicates
-                 .Where(s => s.Ruleset.IsLegacyRuleset())
-                 .Select(s => s.ID)));
+                 .Where(s => s.Ruleset.IsLegacyRuleset());
 
-            Logger.Log($"Found {scoreIds.Count} scores which require total score conversion.");
+                int totalCount = scores.Count();
+                int processedCount = 0;
+                int failedCount = 0;
 
-            if (scoreIds.Count == 0)
-                return;
+                Logger.Log($"Found {totalCount} scores which require total score conversion.");
 
-            var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
+                if (totalCount == 0) return;
 
-            int processedCount = 0;
-            int failedCount = 0;
+                var notification = showProgressNotification(totalCount, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            realmAccess.Run(r =>
-            {
-                foreach (Guid id in scoreIds)
+                foreach (var s in scores)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
 
-                    var score = r.Find<ScoreInfo>(id)?.Detach();
+                    var score = s?.Detach();
 
                     if (score == null)
                     {
@@ -628,7 +609,7 @@ namespace osu.Game.Database
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
 
                             item.Accuracy = score.Accuracy;
                             item.Rank = score.Rank;
@@ -645,66 +626,62 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"Failed to convert total score for {id}: {e}");
+                        Logger.Log($"Failed to convert total score for {score.ID}: {e}");
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
                             item.BackgroundReprocessingFailed = true;
                         });
 
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+
+                completeNotification(notification, processedCount, totalCount, failedCount);
+
+                Logger.Log($"Converting totalScore {processedCount} of {totalCount} scores completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-
-            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
-
-            Logger.Log($"Converting totalScore {processedCount} of {scoreIds.Count} scores completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void upgradeScoreRanks(int chunk_size = 3000)
         {
             Logger.Log("Querying for scores that need rank upgrades...");
 
-            HashSet<Guid> scoreIds = realmAccess.Run(r => new HashSet<Guid>(
-                r.All<ScoreInfo>()
+            realmAccess.Run(r =>
+            {
+                var scores = r.All<ScoreInfo>()
                  .Where(s => s.TotalScoreVersion < 30000013 && !s.BackgroundReprocessingFailed) // last total score version with a significant change to ranks
                  .AsEnumerable()
                  // must be done after materialisation, as realm doesn't support
                  // filtering on nested property predicates or projection via `.Select()`
-                 .Where(s => s.Ruleset.IsLegacyRuleset())
-                 .Select(s => s.ID)));
+                 .Where(s => s.Ruleset.IsLegacyRuleset());
 
-            Logger.Log($"Found {scoreIds.Count} scores which require rank upgrades.");
+                int totalCount = scores.Count();
+                int processedCount = 0;
+                int failedCount = 0;
 
-            if (scoreIds.Count == 0)
-                return;
+                Logger.Log($"Found {totalCount} scores which require rank upgrades.");
 
-            var notification = showProgressNotification(scoreIds.Count, "Adjusting ranks of scores", "scores now have more correct ranks.");
+                if (totalCount == 0) return;
 
-            int processedCount = 0;
-            int failedCount = 0;
+                var notification = showProgressNotification(totalCount, "Adjusting ranks of scores", "scores now have more correct ranks.");
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            realmAccess.Run(r =>
-            {
-                foreach (Guid id in scoreIds)
+                foreach (var score in scores)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
-
-                    var score = r.Find<ScoreInfo>(id);
 
                     if (score == null)
                     {
@@ -718,7 +695,7 @@ namespace osu.Game.Database
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
 
                             item.Rank = rank;
                             item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
@@ -732,24 +709,24 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"Failed to update rank score {id}: {e}");
+                        Logger.Log($"Failed to update score rank {score.ID}: {e}");
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<ScoreInfo>(id)!;
+                            var item = realm.Find<ScoreInfo>(score.ID)!;
                             item.BackgroundReprocessingFailed = true;
                         });
 
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+
+                completeNotification(notification, processedCount, totalCount, failedCount);
+
+                Logger.Log($"Upgrading {processedCount} of {totalCount} score ranks completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-
-            completeNotification(notification, processedCount, scoreIds.Count, failedCount);
-
-            Logger.Log($"Upgrading {processedCount} of {scoreIds.Count} score ranks completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void backpopulateMissingSubmissionAndRankDates(int chunk_size = 1000)
@@ -781,56 +758,52 @@ namespace osu.Game.Database
             // this is because metadata lookups are primarily based on file hash, so they will fail to match if the beatmap does not match the online version
             // (which is likely to be the case if the beatmap is locally modified or unknown).
             // that said, one difficulty in ranked state is enough for the backpopulation to work.
-            HashSet<Guid> beatmapSetIds = realmAccess.Run(r => new HashSet<Guid>(
-                r.All<BeatmapSetInfo>()
-                 .Filter($@"{nameof(BeatmapSetInfo.StatusInt)} > 0 && ({nameof(BeatmapSetInfo.DateRanked)} == null || {nameof(BeatmapSetInfo.DateSubmitted)} == null) "
-                         + $@"&& ANY {nameof(BeatmapSetInfo.Beatmaps)}.{nameof(BeatmapInfo.StatusInt)} > 0")
-                 .AsEnumerable()
-                 .Select(b => b.ID)));
-
-            if (beatmapSetIds.Count == 0)
-                return;
-
-            Logger.Log($"Found {beatmapSetIds.Count} beatmap sets with missing submission/rank date.");
-
-            var notification = showProgressNotification(beatmapSetIds.Count, "Populating missing submission and rank dates", "beatmap sets now have correct submission and rank dates.");
-
-            int processedCount = 0;
-            int failedCount = 0;
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            SqliteConnection sqliteConnection;
-            int sqliteVersion;
-
-            try
-            {
-                sqliteConnection = localMetadataSource.GetConnection();
-                sqliteConnection.Open();
-
-                sqliteVersion = localMetadataSource.GetCacheVersion(sqliteConnection);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"Could not open sqlite database: {ex}");
-                return;
-            }
-
             realmAccess.Run(r =>
             {
-                foreach (Guid id in beatmapSetIds)
+                var beatmapsSet = r.All<BeatmapSetInfo>()
+                 .Filter($@"{nameof(BeatmapSetInfo.StatusInt)} > 0 && ({nameof(BeatmapSetInfo.DateRanked)} == null || {nameof(BeatmapSetInfo.DateSubmitted)} == null) "
+                         + $@"&& ANY {nameof(BeatmapSetInfo.Beatmaps)}.{nameof(BeatmapInfo.StatusInt)} > 0")
+                 .AsEnumerable();
+
+                int totalCount = beatmapsSet.Count();
+                int processedCount = 0;
+                int failedCount = 0;
+
+                Logger.Log($"Found {totalCount} beatmap sets with missing submission/rank date.");
+
+                if (totalCount == 0) return;
+
+                var notification = showProgressNotification(totalCount, "Populating missing submission and rank dates", "beatmap sets now have correct submission and rank dates.");
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                SqliteConnection sqliteConnection;
+                int sqliteVersion;
+
+                try
+                {
+                    sqliteConnection = localMetadataSource.GetConnection();
+                    sqliteConnection.Open();
+
+                    sqliteVersion = localMetadataSource.GetCacheVersion(sqliteConnection);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"Could not open sqlite database: {ex}");
+                    return;
+                }
+
+                foreach (var beatmapSet in beatmapsSet)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, beatmapSetIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
-
-                    var beatmapSet = r.Find<BeatmapSetInfo>(id);
 
                     if (beatmapSet == null)
                     {
@@ -856,7 +829,7 @@ namespace osu.Game.Database
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<BeatmapSetInfo>(id)!;
+                            var item = realm.Find<BeatmapSetInfo>(beatmapSet.ID)!;
 
                             item.DateRanked = result.DateRanked;
                             item.DateSubmitted = result.DateSubmitted;
@@ -870,18 +843,18 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"Failed to update ranked/submitted dates for beatmap set {id}: {e}");
+                        Logger.Log($"Failed to update ranked/submitted dates for beatmap set {beatmapSet.ID}: {e}");
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+                sqliteConnection.Close();
+
+                completeNotification(notification, processedCount, totalCount, failedCount);
+
+                Logger.Log($"Populating {processedCount} of {totalCount} missing submission and rank dates completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-            sqliteConnection.Close();
-
-            completeNotification(notification, processedCount, beatmapSetIds.Count, failedCount);
-
-            Logger.Log($"Populating {processedCount} of {beatmapSetIds.Count} missing submission and rank dates completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void backpopulateUserTags(int chunk_size = 2000)
@@ -916,57 +889,53 @@ namespace osu.Game.Database
 
             // while this is constrained to run every month or so (every time a new online.db cache is retrieved), there's some chance that this will still run much too often and be annoying to users.
             // if that turns out to be the case we may need a better way to debounce this (or just delete the backpopulation logic after some time has passed?)
-            HashSet<Guid> beatmapIds = realmAccess.Run(r => new HashSet<Guid>(
-                r.All<BeatmapInfo>()
-                 .Filter($"{nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
-                 .AsEnumerable()
-                 .Select(b => b.ID)));
-
-            if (beatmapIds.Count == 0)
-                return;
-
-            Logger.Log($@"Checking for tag updates for {beatmapIds.Count} beatmaps.");
-
-            var notification = showProgressNotification(beatmapIds.Count, @"Updating user tags",
-                @"beatmaps have had their tags updated. This runs once a month to allow searching user tags.");
-
-            int processedCount = 0;
-            int updatedCount = 0;
-            int failedCount = 0;
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            SqliteConnection sqliteConnection;
-            int sqliteVersion;
-
-            try
-            {
-                sqliteConnection = localMetadataSource.GetConnection();
-                sqliteConnection.Open();
-
-                sqliteVersion = localMetadataSource.GetCacheVersion(sqliteConnection);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log($"Could not open sqlite database: {ex}");
-                return;
-            }
-
             realmAccess.Run(r =>
             {
-                foreach (Guid id in beatmapIds)
+                var beatmaps = r.All<BeatmapInfo>()
+                 .Filter($"{nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
+                 .AsEnumerable();
+
+                int totalCount = beatmaps.Count();
+                int processedCount = 0;
+                int updatedCount = 0;
+                int failedCount = 0;
+
+                Logger.Log($@"Checking for tag updates for {totalCount} beatmaps.");
+
+                if (totalCount == 0) return;
+
+                var notification = showProgressNotification(totalCount, @"Updating user tags",
+                    @"beatmaps have had their tags updated. This runs once a month to allow searching user tags.");
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                SqliteConnection sqliteConnection;
+                int sqliteVersion;
+
+                try
+                {
+                    sqliteConnection = localMetadataSource.GetConnection();
+                    sqliteConnection.Open();
+
+                    sqliteVersion = localMetadataSource.GetCacheVersion(sqliteConnection);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"Could not open sqlite database: {ex}");
+                    return;
+                }
+
+                foreach (var beatmap in beatmaps)
                 {
                     if (notification?.State == ProgressNotificationState.Cancelled)
                         break;
 
                     if (actions.Count >= chunk_size) performWrite(actions);
 
-                    updateNotificationProgress(notification, processedCount, beatmapIds.Count);
+                    updateNotificationProgress(notification, processedCount, totalCount);
 
                     sleepIfRequired();
-
-                    var beatmap = r.Find<BeatmapInfo>(id);
 
                     if (beatmap == null)
                     {
@@ -998,7 +967,7 @@ namespace osu.Game.Database
 
                         actions.Add(realm =>
                         {
-                            var item = realm.Find<BeatmapInfo>(id)!;
+                            var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
 
                             item.Metadata.UserTags.Clear();
                             item.Metadata.UserTags.AddRange(userTags);
@@ -1013,21 +982,21 @@ namespace osu.Game.Database
                     }
                     catch (Exception e)
                     {
-                        Logger.Log(@$"Failed to update user tags for beatmap {id}: {e}");
+                        Logger.Log(@$"Failed to update user tags for beatmap {beatmap.ID}: {e}");
                         ++failedCount;
                     }
                 }
+
+                if (actions.Count > 0) performWrite(actions);
+                sqliteConnection.Close();
+
+                // Report the updated item count rather than the total processed. Users don't really care about noops here.
+                completeNotification(notification, updatedCount, updatedCount, failedCount);
+
+                config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
+
+                Logger.Log($"Populating {processedCount} of {totalCount} beatmap user tags completed in {stopwatch.ElapsedMilliseconds}ms");
             });
-
-            if (actions.Count > 0) performWrite(actions);
-            sqliteConnection.Close();
-
-            // Report the updated item count rather than the total processed. Users don't really care about noops here.
-            completeNotification(notification, updatedCount, updatedCount, failedCount);
-
-            config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
-
-            Logger.Log($"Populating {processedCount} of {beatmapIds.Count} beatmap user tags completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void performWrite(List<Action<Realm>> actions)
