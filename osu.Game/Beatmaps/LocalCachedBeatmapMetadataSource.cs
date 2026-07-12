@@ -105,7 +105,7 @@ namespace osu.Game.Beatmaps
             {
                 if (db == null)
                 {
-                    db = getConnection();
+                    db = GetConnection();
                     db.Open();
 
                     version = GetCacheVersion(db);
@@ -170,7 +170,7 @@ namespace osu.Game.Beatmaps
             log(@"Local metadata cache purged due to corruption.");
         }
 
-        private SqliteConnection getConnection() =>
+        public SqliteConnection GetConnection() =>
             new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
 
         public Task FetchCache()
@@ -250,7 +250,7 @@ namespace osu.Game.Beatmaps
         {
             try
             {
-                using (var connection = getConnection())
+                using (var connection = GetConnection())
                 {
                     connection.Open();
                     return GetCacheVersion(connection) >= version;
