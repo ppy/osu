@@ -514,47 +514,72 @@ namespace osu.Game.Database
 
             var notification = showProgressNotification(scoreIds.Count, "Upgrading scores to new mod multipliers", "scores have been upgraded to the new mod multipliers");
 
+            const int chunk_size = 500;
             int processedCount = 0;
             int failedCount = 0;
 
-            foreach (var id in scoreIds)
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var actions = new List<Action<Realm>>();
+
+            realmAccess.Run(r =>
             {
-                if (notification?.State == ProgressNotificationState.Cancelled)
-                    break;
-
-                updateNotificationProgress(notification, processedCount, scoreIds.Count);
-
-                sleepIfRequired();
-
-                try
+                foreach (Guid id in scoreIds)
                 {
-                    // Can't use async overload because we're not on the update thread.
-                    // ReSharper disable once MethodHasAsyncOverload
-                    realmAccess.Write(r =>
+                    if (notification?.State == ProgressNotificationState.Cancelled)
+                        break;
+
+                    if (actions.Count >= chunk_size) performWrite(actions);
+
+                    updateNotificationProgress(notification, processedCount, scoreIds.Count);
+
+                    sleepIfRequired();
+
+                    var score = r.Find<ScoreInfo>(id)?.Detach();
+
+                    if (score == null || score.BeatmapInfo == null)
                     {
-                        ScoreInfo s = r.Find<ScoreInfo>(id)!;
-                        if (s.BeatmapInfo == null)
-                            return;
+                        ++processedCount;
+                        continue;
+                    }
 
-                        StandardisedScoreMigrationTools.UpdateToLatestScoreMultipliers(s, s.BeatmapInfo.Difficulty);
-                        s.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                    });
+                    try
+                    {
+                        StandardisedScoreMigrationTools.UpdateToLatestScoreMultipliers(score, score.BeatmapInfo.Difficulty);
+                        actions.Add(realm =>
+                        {
+                            var item = realm.Find<ScoreInfo>(id)!;
+                            item.TotalScore = score.TotalScore;
+                            item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                        });
 
-                    ++processedCount;
+                        ++processedCount;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Failed to upgrade mod multipliers for {id}: {e}");
+
+                        actions.Add(realm =>
+                        {
+                            var item = realm.Find<ScoreInfo>(id)!;
+                            item.BackgroundReprocessingFailed = true;
+                        });
+
+                        ++failedCount;
+                    }
                 }
-                catch (ObjectDisposedException)
-                {
-                    throw;
-                }
-                catch (Exception e)
-                {
-                    Logger.Log($"Failed to upgrade mod multipliers for {id}: {e}");
-                    realmAccess.Write(r => r.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
-                    ++failedCount;
-                }
-            }
+            });
+
+            if (actions.Count > 0) performWrite(actions);
 
             completeNotification(notification, processedCount, scoreIds.Count, failedCount);
+
+            Logger.Log($"Upgrading {processedCount} of {scoreIds.Count} scores to new mod multipliers completed in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void convertLegacyTotalScoreToStandardised()
