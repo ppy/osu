@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 : 0;
             hiddenDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
-            double preemptDifficulty = calculatePreemptDifficulty(currObj, constantAngleNerfFactor, currObj.Preempt);
+            double preemptDifficulty = calculatePreemptDifficulty(currObj, constantAngleNerfFactor, currObj.Preempt / 1000);
 
             double readingDifficulty = DiffUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
 
@@ -97,12 +97,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
             // https://www.desmos.com/calculator/c175335a71
             double preemptDifficulty = DiffUtils.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) / preempt_balancing_factor;
-            double velocity = currObj.LazyJumpDistance / currObj.AdjustedDeltaTime;
-            velocity *= highBpmBonus(currObj.AdjustedDeltaTime);
 
-            preemptDifficulty *= constantAngleNerfFactor * (30 + velocity * 0.5);
+            // Base difficulty for reading high AR, starting from raw preempt difficulty
+            double baseDifficulty = preemptDifficulty;
 
-            return preemptDifficulty;
+            // Velocity bonus, as harder patterns are harder to read
+            double velocityFactor = (currObj.LazyJumpDistance / currObj.AdjustedDeltaTime) * highBpmBonus(currObj.AdjustedDeltaTime);
+
+            // Safeguard against easy maps with extremely high AR
+            double reduceBaseline = velocityFactor * 10;
+
+            if (baseDifficulty > reduceBaseline)
+            {
+                // Scale logarithmically past the baseline
+                double delta = baseDifficulty - reduceBaseline;
+                baseDifficulty = reduceBaseline + Math.Log(delta + 1);
+            }
+
+            // Apply multipliers to base difficulty and velocity factor
+            double difficulty = 30 * baseDifficulty + 0.5 * velocityFactor * preemptDifficulty;
+
+            return difficulty * constantAngleNerfFactor;
         }
 
         /// <summary>
