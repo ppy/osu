@@ -8,7 +8,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -161,17 +160,6 @@ namespace osu.Game.Database
 
             realmAccess.Run(r =>
             {
-                var beatmaps = r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null);
-
-                int totalCount = beatmaps.Count();
-                int processedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} beatmaps which require star rating reprocessing.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
-
                 Dictionary<string, Ruleset> rulesetCache = new Dictionary<string, Ruleset>();
 
                 Ruleset getRuleset(RulesetInfo rulesetInfo)
@@ -182,21 +170,13 @@ namespace osu.Game.Database
                     return ruleset;
                 }
 
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (BeatmapInfo beatmap in beatmaps)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    try
+                var beatmaps = r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null);
+                batchedProcessing(
+                    items: beatmaps,
+                    processItem: b =>
                     {
+                        var beatmap = b.Detach();
+
                         var working = beatmapManager.GetWorkingBeatmap(beatmap);
                         var ruleset = getRuleset(working.BeatmapInfo.Ruleset);
 
@@ -205,27 +185,25 @@ namespace osu.Game.Database
                         var calculator = ruleset.CreateDifficultyCalculator(working);
                         double starRating = calculator.Calculate().StarRating;
 
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
-                            item.StarRating = starRating;
-
-                            ((IWorkingBeatmapCache)beatmapManager).Invalidate(item);
-                        });
-
-                        ++processedCount;
-                    }
-                    catch (Exception e)
+                        return starRating;
+                    },
+                    saveItem: (realm, beatmap, starRating) =>
                     {
-                        Logger.Log($"Background processing failed on beatmap {beatmap.ID}: {e}");
-                        ++failedCount;
+                        var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
+                        item.StarRating = starRating;
+
+                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(item);
+                    },
+                    new BatchOptions
+                    {
+                        ChunkSize = chunkSize,
+                        FoundTemplate = "Found {total} beatmaps which require star rating reprocessing.",
+                        RunningNotificationTemplate = "Reprocessing star rating for beatmaps",
+                        CompletedNotificationTemplate = "beatmaps' star ratings have been updated",
+                        ExceptionTemplate = "Calculating star rating failed",
+                        FinishedTemplate = "Populating {processed} of {total} missing star ratings completed in {elapsed}ms"
                     }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-                completeNotification(notification, processedCount, totalCount, failedCount);
-
-                Logger.Log($"Populating {processedCount} of {totalCount} missing star ratings completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
         }
 
@@ -305,58 +283,34 @@ namespace osu.Game.Database
             realmAccess.Run(r =>
             {
                 var beatmaps = r.All<BeatmapInfo>().Where(b => b.TotalObjectCount < 0 || b.EndTimeObjectCount < 0);
-
-                int totalCount = beatmaps.Count();
-                int processedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} beatmaps which require statistics population.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (var b in beatmaps)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    var beatmap = b.Detach();
-
-                    try
+                batchedProcessing<BeatmapInfo, BeatmapInfo>(
+                    items: beatmaps,
+                    processItem: b =>
                     {
+                        var beatmap = b.Detach();
                         beatmapUpdater.ProcessObjectCounts(beatmap);
 
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
-
-                            item.TotalObjectCount = beatmap.TotalObjectCount;
-                            item.EndTimeObjectCount = beatmap.EndTimeObjectCount;
-
-                            ((IWorkingBeatmapCache)beatmapManager).Invalidate(item);
-                        });
-
-                        ++processedCount;
-                    }
-                    catch (Exception e)
+                        return beatmap;
+                    },
+                    saveItem: (realm, beatmap, result) =>
                     {
-                        Logger.Log($"Background processing failed on beatmap {beatmap.ID}: {e}");
-                        ++failedCount;
+                        var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
+
+                        item.TotalObjectCount = result.TotalObjectCount;
+                        item.EndTimeObjectCount = result.EndTimeObjectCount;
+
+                        ((IWorkingBeatmapCache)beatmapManager).Invalidate(item);
+                    },
+                    new BatchOptions
+                    {
+                        ChunkSize = chunkSize,
+                        FoundTemplate = "Found {total} beatmaps which require statistics population.",
+                        RunningNotificationTemplate = "Populating missing statistics for beatmaps",
+                        CompletedNotificationTemplate = "beatmaps have been populated with missing statistics",
+                        ExceptionTemplate = "Calculating hitobject counts failed",
+                        FinishedTemplate = "Processing {processed} of {total} missing beatmaps hitobject counts completed in {elapsed}ms"
                     }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-                completeNotification(notification, processedCount, totalCount, failedCount);
-
-                Logger.Log($"Processing {processedCount} of {totalCount} missing beatmaps hitobject counts completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
         }
 
@@ -366,61 +320,33 @@ namespace osu.Game.Database
 
             realmAccess.Run(r =>
             {
-                var scores = r
-                             .All<ScoreInfo>()
-                             .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null)
-                             .AsEnumerable()
-                             // must be done after materialisation, as realm doesn't want to support
-                             // nested property predicates
-                             .Where(s => s.Statistics.Sum(kvp => kvp.Value) > 0
-                                         && s.MaximumStatistics.Sum(kvp => kvp.Value) == 0);
+                var scores = r.All<ScoreInfo>()
+                              .Where(s => !s.BackgroundReprocessingFailed && s.BeatmapInfo != null)
+                              .AsEnumerable()
+                              // must be done after materialisation, as realm doesn't want to support
+                              // nested property predicates
+                              .Where(s => s.Statistics.Sum(kvp => kvp.Value) > 0
+                                          && s.MaximumStatistics.Sum(kvp => kvp.Value) == 0);
 
-                int totalCount = scores.Count();
-                int processedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} scores which require statistics population.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, "Populating missing statistics for scores", "scores have been populated with missing statistics");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (var score in scores)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    try
+                batchedProcessing<ScoreInfo, string>(
+                    items: scores,
+                    processItem: score =>
                     {
                         scoreManager.PopulateMaximumStatistics(score);
-                        string maximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
-
-                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.MaximumStatisticsJson = maximumStatisticsJson);
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
+                        return JsonConvert.SerializeObject(score.MaximumStatistics);
+                    },
+                    saveItem: (realm, score, result) => realm.Find<ScoreInfo>(score.ID)!.MaximumStatisticsJson = result,
+                    new BatchOptions
                     {
-                        throw;
+                        ChunkSize = chunkSize,
+                        MarkAsFailedOnException = true,
+                        FoundTemplate = "Found {total} scores which require statistics population.",
+                        RunningNotificationTemplate = "Populating missing statistics for scores",
+                        CompletedNotificationTemplate = "scores have been populated with missing statistics",
+                        ExceptionTemplate = "Failed to populate maximum statistics",
+                        FinishedTemplate = "Processing {processed} of {total} missing scores statistics completed in {elapsed}ms"
                     }
-                    catch (Exception e)
-                    {
-                        Logger.Log(@$"Failed to populate maximum statistics for {score.ID}: {e}");
-                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
-                        ++failedCount;
-                    }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-                completeNotification(notification, processedCount, totalCount, failedCount);
-
-                Logger.Log($"Processing {processedCount} of {totalCount} missing scores statistics completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
         }
 
@@ -440,64 +366,34 @@ namespace osu.Game.Database
                               // nested property predicates
                               .Where(s => s.Ruleset.IsLegacyRuleset());
 
-                int totalCount = scores.Count();
-                int processedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} scores which require mod multiplier upgrade.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, "Upgrading scores to new mod multipliers", "scores have been upgraded to the new mod multipliers");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (var s in scores)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    var score = s.Detach();
-
-                    if (score.BeatmapInfo == null)
+                batchedProcessing<ScoreInfo, ScoreInfo>(
+                    items: scores,
+                    processItem: s =>
                     {
-                        ++processedCount;
-                        continue;
-                    }
+                        var score = s.Detach();
+                        if (score.BeatmapInfo == null)
+                            return null;
 
-                    try
-                    {
                         StandardisedScoreMigrationTools.UpdateToLatestScoreMultipliers(score, score.BeatmapInfo.Difficulty);
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-                            item.TotalScore = score.TotalScore;
-                            item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                        });
-
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
+                        return score;
+                    },
+                    saveItem: (realm, score, result) =>
                     {
-                        throw;
-                    }
-                    catch (Exception e)
+                        var item = realm.Find<ScoreInfo>(score.ID)!;
+                        item.TotalScore = result.TotalScore;
+                        item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    },
+                    new BatchOptions
                     {
-                        Logger.Log($"Failed to upgrade mod multipliers for {score.ID}: {e}");
-                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
-                        ++failedCount;
+                        ChunkSize = chunkSize,
+                        MarkAsFailedOnException = true,
+                        FoundTemplate = "Found {total} scores which require mod multiplier upgrade.",
+                        RunningNotificationTemplate = "Upgrading scores to new mod multipliers",
+                        CompletedNotificationTemplate = "scores have been upgraded to the new mod multipliers",
+                        ExceptionTemplate = "Failed to upgrade mod multipliers",
+                        FinishedTemplate = "Upgrading {processed} of {total} scores to new mod multipliers completed in {elapsed}ms"
                     }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-                completeNotification(notification, processedCount, totalCount, failedCount);
-
-                Logger.Log($"Upgrading {processedCount} of {totalCount} scores to new mod multipliers completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
         }
 
@@ -517,63 +413,36 @@ namespace osu.Game.Database
                               // nested property predicates
                               .Where(s => s.Ruleset.IsLegacyRuleset());
 
-                int totalCount = scores.Count();
-                int processedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} scores which require total score conversion.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (var s in scores)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    var score = s.Detach();
-
-                    try
+                batchedProcessing<ScoreInfo, ScoreInfo>(
+                    items: scores,
+                    processItem: s =>
                     {
+                        var score = s.Detach();
                         StandardisedScoreMigrationTools.UpdateFromLegacy(score, beatmapManager.GetWorkingBeatmap(score.BeatmapInfo));
 
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-
-                            item.Accuracy = score.Accuracy;
-                            item.Rank = score.Rank;
-                            item.TotalScore = score.TotalScore;
-                            item.TotalScoreWithoutMods = score.TotalScoreWithoutMods;
-                            item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                        });
-
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
+                        return score;
+                    },
+                    saveItem: (realm, score, result) =>
                     {
-                        throw;
-                    }
-                    catch (Exception e)
+                        var item = realm.Find<ScoreInfo>(score.ID)!;
+
+                        item.Accuracy = result.Accuracy;
+                        item.Rank = result.Rank;
+                        item.TotalScore = result.TotalScore;
+                        item.TotalScoreWithoutMods = result.TotalScoreWithoutMods;
+                        item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    },
+                    new BatchOptions
                     {
-                        Logger.Log($"Failed to convert total score for {score.ID}: {e}");
-                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
-                        ++failedCount;
+                        ChunkSize = chunkSize,
+                        MarkAsFailedOnException = true,
+                        FoundTemplate = "Found {total} scores which require total score conversion.",
+                        RunningNotificationTemplate = "Upgrading scores to new scoring algorithm",
+                        CompletedNotificationTemplate = "scores have been upgraded to the new scoring algorithm",
+                        ExceptionTemplate = "Failed to convert total score",
+                        FinishedTemplate = "Converting total score {processed} of {total} scores completed in {elapsed}ms"
                     }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-                completeNotification(notification, processedCount, totalCount, failedCount);
-
-                Logger.Log($"Converting total score {processedCount} of {totalCount} scores completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
         }
 
@@ -590,58 +459,27 @@ namespace osu.Game.Database
                               // filtering on nested property predicates or projection via `.Select()`
                               .Where(s => s.Ruleset.IsLegacyRuleset());
 
-                int totalCount = scores.Count();
-                int processedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} scores which require rank upgrades.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, "Adjusting ranks of scores", "scores now have more correct ranks.");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (var score in scores)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    try
+                batchedProcessing(
+                    items: scores,
+                    processItem: StandardisedScoreMigrationTools.ComputeRank,
+                    saveItem: (realm, score, rank) =>
                     {
-                        var rank = StandardisedScoreMigrationTools.ComputeRank(score);
+                        var item = realm.Find<ScoreInfo>(score.ID)!;
 
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-
-                            item.Rank = rank;
-                            item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
-                        });
-
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
+                        item.Rank = rank;
+                        item.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                    },
+                    new BatchOptions
                     {
-                        throw;
+                        ChunkSize = chunkSize,
+                        MarkAsFailedOnException = true,
+                        FoundTemplate = "Found {total} scores which require rank upgrades.",
+                        RunningNotificationTemplate = "Adjusting ranks of scores",
+                        CompletedNotificationTemplate = "scores now have more correct ranks.",
+                        ExceptionTemplate = "Failed to update score rank",
+                        FinishedTemplate = "Upgrading {processed} of {total} score ranks completed in {elapsed}ms"
                     }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Failed to update score rank {score.ID}: {e}");
-                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
-                        ++failedCount;
-                    }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-                completeNotification(notification, processedCount, totalCount, failedCount);
-
-                Logger.Log($"Upgrading {processedCount} of {totalCount} score ranks completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
         }
 
@@ -678,34 +516,14 @@ namespace osu.Game.Database
             // that said, one difficulty in ranked state is enough for the backpopulation to work.
             realmAccess.Run(r =>
             {
-                var beatmapsSet = r.All<BeatmapSetInfo>()
-                                   .Filter($@"{nameof(BeatmapSetInfo.StatusInt)} > 0 && ({nameof(BeatmapSetInfo.DateRanked)} == null || {nameof(BeatmapSetInfo.DateSubmitted)} == null) "
-                                           + $@"&& ANY {nameof(BeatmapSetInfo.Beatmaps)}.{nameof(BeatmapInfo.StatusInt)} > 0")
-                                   .AsEnumerable();
+                var beatmapsSets = r.All<BeatmapSetInfo>()
+                                    .Filter($@"{nameof(BeatmapSetInfo.StatusInt)} > 0 && ({nameof(BeatmapSetInfo.DateRanked)} == null || {nameof(BeatmapSetInfo.DateSubmitted)} == null) "
+                                            + $@"&& ANY {nameof(BeatmapSetInfo.Beatmaps)}.{nameof(BeatmapInfo.StatusInt)} > 0")
+                                    .AsEnumerable();
 
-                int totalCount = beatmapsSet.Count();
-                int processedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} beatmap sets with missing submission/rank dates.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, "Populating missing submission and rank dates", "beatmap sets now have correct submission and rank dates.");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (var beatmapSet in beatmapsSet)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    try
+                batchedProcessing<BeatmapSetInfo, OnlineBeatmapMetadata>(
+                    items: beatmapsSets,
+                    processItem: beatmapSet =>
                     {
                         var beatmap = beatmapSet.Beatmaps.First(b => b.Status >= BeatmapOnlineStatus.Ranked);
                         bool lookupSucceeded = localMetadataSource.TryLookup(localMetadataSource.CachedConnection, localMetadataSource.CachedVersion, beatmap, out var result);
@@ -713,38 +531,30 @@ namespace osu.Game.Database
                         if (!lookupSucceeded)
                         {
                             Logger.Log($"Could not find {beatmapSet.GetDisplayString()} in local cache while backpopulating missing submission/rank date");
-                            ++failedCount;
-
-                            continue;
+                            return null;
                         }
 
                         Debug.Assert(result != null);
 
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<BeatmapSetInfo>(beatmapSet.ID)!;
-
-                            item.DateRanked = result.DateRanked;
-                            item.DateSubmitted = result.DateSubmitted;
-                        });
-
-                        ++processedCount;
-                    }
-                    catch (ObjectDisposedException)
+                        return result;
+                    },
+                    saveItem: (realm, beatmapSet, result) =>
                     {
-                        throw;
-                    }
-                    catch (Exception e)
+                        var item = realm.Find<BeatmapSetInfo>(beatmapSet.ID)!;
+
+                        item.DateRanked = result.DateRanked;
+                        item.DateSubmitted = result.DateSubmitted;
+                    },
+                    new BatchOptions
                     {
-                        Logger.Log($"Failed to update ranked/submitted dates for beatmap set {beatmapSet.ID}: {e}");
-                        ++failedCount;
+                        ChunkSize = chunkSize,
+                        FoundTemplate = "Found {total} beatmap sets with missing submission/rank dates.",
+                        RunningNotificationTemplate = "Populating missing submission and rank dates",
+                        CompletedNotificationTemplate = "beatmap sets now have correct submission and rank dates.",
+                        ExceptionTemplate = "Failed to update ranked/submitted dates for beatmap set {id}",
+                        FinishedTemplate = "Populating {processed} of {total} missing submission and rank dates completed in {elapsed}ms"
                     }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-                completeNotification(notification, processedCount, totalCount, failedCount);
-
-                Logger.Log($"Populating {processedCount} of {totalCount} missing submission and rank dates completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
 
             localMetadataSource.CachedConnection?.Close();
@@ -788,40 +598,16 @@ namespace osu.Game.Database
             {
                 var beatmaps = r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}");
 
-                int totalCount = beatmaps.Count();
-                int processedCount = 0;
-                int updatedCount = 0;
-                int failedCount = 0;
-
-                Logger.Log($"Found {totalCount} beatmaps with outdated user tags.");
-                if (totalCount == 0) return;
-
-                var notification = showProgressNotification(totalCount, @"Updating user tags",
-                    @"beatmaps have had their tags updated. This runs once a month to allow searching user tags.");
-
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                foreach (var beatmap in beatmaps)
-                {
-                    if (notification?.State == ProgressNotificationState.Cancelled)
-                        break;
-
-                    if (actions.Count >= chunkSize) performWrite(actions);
-
-                    updateNotificationProgress(notification, processedCount, totalCount);
-                    sleepIfRequired();
-
-                    try
+                batchedProcessing<BeatmapInfo, HashSet<string>>(
+                    items: beatmaps,
+                    processItem: beatmap =>
                     {
                         bool lookupSucceeded = localMetadataSource.TryLookup(localMetadataSource.CachedConnection, localMetadataSource.CachedVersion, beatmap, out var result);
 
                         if (!lookupSucceeded)
                         {
                             Logger.Log(@$"Could not find {beatmap.GetDisplayString()} in local cache while backpopulating missing user tags");
-                            ++processedCount;
-
-                            continue;
+                            return null;
                         }
 
                         Debug.Assert(result != null);
@@ -830,43 +616,102 @@ namespace osu.Game.Database
 
                         if (userTags.SetEquals(beatmap.Metadata.UserTags))
                         {
-                            ++processedCount;
-                            continue;
+                            return null;
                         }
 
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
-
-                            item.Metadata.UserTags.Clear();
-                            item.Metadata.UserTags.AddRange(userTags);
-                        });
-
-                        ++processedCount;
-                        ++updatedCount;
-                    }
-                    catch (ObjectDisposedException)
+                        return userTags;
+                    },
+                    saveItem: (realm, beatmap, userTags) =>
                     {
-                        throw;
-                    }
-                    catch (Exception e)
+                        var item = realm.Find<BeatmapInfo>(beatmap.ID)!;
+
+                        item.Metadata.UserTags.Clear();
+                        item.Metadata.UserTags.AddRange(userTags);
+                    },
+                    new BatchOptions
                     {
-                        Logger.Log(@$"Failed to update user tags for beatmap {beatmap.ID}: {e}");
-                        ++failedCount;
+                        ChunkSize = chunkSize,
+                        FoundTemplate = "Found beatmaps with outdated user tags.",
+                        RunningNotificationTemplate = "Updating user tags",
+                        CompletedNotificationTemplate = "beatmaps have had their tags updated. This runs once a month to allow searching user tags.",
+                        ExceptionTemplate = "Failed to update user tags",
+                        FinishedTemplate = "Populating {processed} of {total} beatmap user tags completed in {elapsed}ms"
                     }
-                }
-
-                if (actions.Count > 0) performWrite(actions);
-
-                // Report the updated item count rather than the total processed. Users don't really care about noops here.
-                completeNotification(notification, updatedCount, updatedCount, failedCount);
-
-                config.SetValue(OsuSetting.LastOnlineTagsPopulation, metadataSourceFetchDate);
-
-                Logger.Log($"Populating {processedCount} of {totalCount} beatmap user tags completed in {stopwatch.ElapsedMilliseconds}ms");
+                );
             });
 
             localMetadataSource.CachedConnection?.Close();
+        }
+
+        /// <summary>
+        /// Helper method to process realm items in a batch of variable size to reduce writes to disk,
+        /// and it speed up processes by huge amount,
+        /// especially one's that run fast such as "upgradeScoreRanks" or "backpopulateMissingSubmissionAndRankDates".
+        /// </summary>
+        /// <typeparam name="T">a type of single item.</typeparam>
+        /// <typeparam name="R">a return type for <paramref name="processItem"/></typeparam>
+        /// <param name="items">collection of items to process.</param>
+        /// <param name="processItem">a function that transforms each item <typeparamref name="T"/> into type <typeparamref name="R"/> or null.</param>
+        /// <param name="saveItem">a function to save item in realm.Write transaction.</param>
+        /// <param name="options">See <see cref="BatchOptions"/></param>
+        private void batchedProcessing<T, R>(
+            IEnumerable<T> items,
+            Func<T, R?> processItem,
+            Action<Realm, T, R> saveItem,
+            BatchOptions options
+        ) where T : RealmObjectBase
+        {
+            int totalCount = items.Count();
+            int processedCount = 0;
+            int failedCount = 0;
+
+            Logger.Log(options.FoundTemplate.Replace("{total}", totalCount.ToString()));
+            if (totalCount == 0) return;
+
+            var notification = showProgressNotification(totalCount, options.RunningNotificationTemplate, options.CompletedNotificationTemplate);
+            var stopwatch = Stopwatch.StartNew();
+
+            foreach (var item in items)
+            {
+                if (notification?.State == ProgressNotificationState.Cancelled)
+                    break;
+
+                if (actions.Count >= options.ChunkSize) performWrite(actions);
+
+                updateNotificationProgress(notification, processedCount + failedCount, totalCount);
+                sleepIfRequired();
+
+                // i don't know how to get ID in other way, please help
+                var id = (item as ScoreInfo)?.ID;
+
+                try
+                {
+                    var result = processItem(item);
+
+                    if (result == null)
+                    {
+                        ++failedCount;
+                        continue;
+                    }
+
+                    actions.Add(realm => saveItem(realm, item, result));
+                    processedCount++;
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"{options.ExceptionTemplate.Replace("{id}", id.ToString())}: {e}");
+                    if (options.MarkAsFailedOnException)
+                        actions.Add(realm => realm.Find<ScoreInfo>(id)!.BackgroundReprocessingFailed = true);
+                    ++failedCount;
+                }
+            }
+
+            if (actions.Count > 0) performWrite(actions);
+            completeNotification(notification, processedCount + failedCount, totalCount, failedCount);
+
+            Logger.Log(options.FinishedTemplate.Replace("{processed}", processedCount.ToString())
+                              .Replace("{total}", totalCount.ToString())
+                              .Replace("{elapsed}", $"{stopwatch.ElapsedMilliseconds}ms"));
         }
 
         private void performWrite(List<Action<Realm>> actions)
@@ -943,6 +788,47 @@ namespace osu.Game.Database
                 Logger.Log("Background processing sleeping due to active gameplay...");
                 Thread.Sleep(TimeToSleepDuringGameplay);
             }
+        }
+
+        private record BatchOptions
+        {
+            public int ChunkSize = 100;
+
+            /// <summary>
+            /// Sets <see cref="ScoreInfo.BackgroundReprocessingFailed"/> to true
+            /// </summary>
+            /// <remarks>Should be only used for <see cref="ScoreInfo"/>.</remarks>
+            public bool MarkAsFailedOnException;
+
+            /// <summary>
+            /// Template for a log message of total found items.
+            /// </summary>
+            /// <remarks>Supports placeholders: {total}.</remarks>
+            public string FoundTemplate = "";
+
+            /// <summary>
+            /// Template for notification message of running process.
+            /// </summary>
+            /// <remarks>No placeholders.</remarks>
+            public string RunningNotificationTemplate = "";
+
+            /// <summary>
+            /// Template for notification message of completed process.
+            /// </summary>
+            /// <remarks>No placeholders.</remarks>
+            public string CompletedNotificationTemplate = "";
+
+            /// <summary>
+            /// Template for a log message of an exception.
+            /// </summary>
+            /// <remarks>Supports placeholders: {id}.</remarks>
+            public string ExceptionTemplate = "";
+
+            /// <summary>
+            /// Template for a log message of finished process.
+            /// </summary>
+            /// <remarks>Supports placeholders: {processed}, {total}, {elapsed}.</remarks>
+            public string FinishedTemplate = "";
         }
     }
 }
