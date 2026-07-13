@@ -88,9 +88,24 @@ namespace osu.Game.Screens.Select
 
         private const float personal_best_height = 112;
 
+        private const float scores_scroll_left_padding = 80f;
+
+        private const float scores_scroll_top_padding = 5f;
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (scoresContainer.Any(score => score.IsHovered))
+            // No scores, allow background preview
+            if (!scoresContainer.Any())
+                return base.OnMouseDown(e);
+
+            // Block mousedown from the top left of the leaderboard list to the bottom right of the last score
+            var mousePosition = scoresScroll.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+            float scrollOffset = (float)scoresScroll.Current;
+            var lastScore = scoresContainer.Last();
+            var bottomRight = new Vector2(lastScore.X + lastScore.DrawWidth + scores_scroll_left_padding,
+                lastScore.Y + lastScore.DrawHeight + scores_scroll_top_padding - scrollOffset);
+
+            if (mousePosition.X <= bottomRight.X && mousePosition.Y <= bottomRight.Y)
                 return true;
 
             return base.OnMouseDown(e);
@@ -121,9 +136,9 @@ namespace osu.Game.Screens.Select
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding
                             {
-                                Top = 5,
+                                Top = scores_scroll_top_padding,
                                 // Left padding offsets the shear to create a visually appealing list display.
-                                Left = 80f,
+                                Left = scores_scroll_left_padding,
                                 // Bottom padding ensures the last entry's full width is displayed
                                 // (ie it is fully on screen after shear is considered).
                                 Bottom = BeatmapLeaderboardScore.HEIGHT * 3
