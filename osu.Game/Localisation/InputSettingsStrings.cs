@@ -100,6 +100,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString PendingBinding => new TranslatableString(getKey(@"press_akey_combination_to"), @"Press a key combination to set a new binding...");
 
+        /// <summary>
+        /// "Clear binding"
+        /// </summary>
+        public static LocalisableString ClearBindingButton => new TranslatableString(getKey(@"clear_binding_button"), @"Clear binding");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }
