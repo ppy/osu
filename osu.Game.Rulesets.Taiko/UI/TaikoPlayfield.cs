@@ -337,7 +337,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void addDrumRollHit(DrawableDrumRollTick drawableTick)
         {
-            // with hit animations disabled, hits are hidden as soon as they're judged, so there's nothing to fly off the drum.
             if (!hitAnimations.Value)
                 return;
 
