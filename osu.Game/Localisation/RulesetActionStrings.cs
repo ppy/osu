@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public class RulesetActionStrings
+    public static class RulesetActionStrings
     {
         private const string prefix = @"osu.Game.Resources.Localisation.RulesetAction";
 
