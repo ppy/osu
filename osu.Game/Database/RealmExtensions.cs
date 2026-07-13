@@ -51,21 +51,7 @@ namespace osu.Game.Database
         /// <param name="function">The write operation to run.</param>
         public static void Write(this Realm realm, Action<Realm> function)
         {
-            Transaction? transaction = null;
-
-            try
-            {
-                if (!realm.IsInTransaction)
-                    transaction = realm.BeginWrite();
-
-                function(realm);
-
-                transaction?.Commit();
-            }
-            finally
-            {
-                transaction?.Dispose();
-            }
+            BulkWrite(realm, [function]);
         }
 
         /// <summary>

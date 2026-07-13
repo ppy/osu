@@ -519,18 +519,7 @@ namespace osu.Game.Database
         /// <param name="action">The work to run.</param>
         public void Write(Action<Realm> action)
         {
-            if (ThreadSafety.IsUpdateThread)
-            {
-                total_writes_update.Value++;
-                Realm.Write(action);
-            }
-            else
-            {
-                total_writes_async.Value++;
-
-                using (var realm = getRealmInstance())
-                    realm.Write(action);
-            }
+            BulkWrite([action]);
         }
 
         /// <summary>
