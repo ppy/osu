@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     break;
 
                 case ArmedState.Miss:
-                    this.FadeOut(hitAnimations.Value ? 100 : 0);
+                    this.FadeOut(hitAnimations.Value ? 100 : 60);
                     break;
 
                 case ArmedState.Hit:
