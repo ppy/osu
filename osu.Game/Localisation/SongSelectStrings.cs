@@ -118,6 +118,10 @@ namespace osu.Game.Localisation
         /// "Download replay"
         /// </summary>
         public static LocalisableString DownloadReplay => new TranslatableString(getKey(@"download_replay"), @"Download replay");
+        /// <summary>
+        /// "Replay downloading"
+        /// </summary>
+        public static LocalisableString ReplayDownloading => new TranslatableString(getKey(@"replay_downloading"), @"Replay downloading");
 
         /// <summary>
         /// "For all difficulties"

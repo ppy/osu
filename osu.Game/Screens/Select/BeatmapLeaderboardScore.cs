@@ -623,16 +623,25 @@ namespace osu.Game.Screens.Select
                 // system mods should never be copied across regardless of anything.
                 var copyableMods = Score.Mods.Where(m => IsValidMod.Invoke(m) && m.Type != ModType.System).ToArray();
 
+                bool replayAvailableLocally = scoreManager.IsAvailableLocally(Score);
+                bool replayDownloading = scoreDownloader.GetExistingDownload(Score) != null;
+
                 if (copyableMods.Length > 0)
                     items.Add(new OsuMenuItem(SongSelectStrings.UseTheseMods, MenuItemType.Highlighted, () => SelectedMods.Value = copyableMods));
 
                 if (Score.OnlineID > 0)
                     items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
 
-                if (Score.HasOnlineReplay && Score.Files.Count == 0)
-                    items.Add(new OsuMenuItem(SongSelectStrings.DownloadReplay, MenuItemType.Standard, () => scoreDownloader.Download(Score)));
+                if (!replayAvailableLocally)
+                {
+                    if (replayDownloading)
+                        items.Add(new OsuMenuItem(SongSelectStrings.ReplayDownloading));
+                    else if (Score.HasOnlineReplay)
+                        items.Add(new OsuMenuItem(SongSelectStrings.DownloadReplay, MenuItemType.Standard, () => scoreDownloader.Download(Score)));
+                }
 
-                if (Score.Files.Count <= 0) return items.ToArray();
+                if (Score.Files.Count <= 0)
+                    return items.ToArray();
 
                 if (items.Count > 0)
                     items.Add(new OsuMenuItemSpacer());
