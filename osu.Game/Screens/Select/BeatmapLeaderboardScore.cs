@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Select
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private ScoreModelDownloader scoreDownloader { get; set; }
+        private ScoreModelDownloader scoreDownloader { get; set; } = null!;
 
         private const float expanded_right_content_width = 200;
         private const float grade_width = 35;
