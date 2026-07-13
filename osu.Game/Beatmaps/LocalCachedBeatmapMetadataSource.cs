@@ -30,6 +30,9 @@ namespace osu.Game.Beatmaps
 
         private const string cache_database_name = @"online.db";
 
+        public SqliteConnection? CachedConnection;
+        public int? CachedVersion;
+
         public LocalCachedBeatmapMetadataSource(Storage storage)
         {
             try
@@ -105,10 +108,10 @@ namespace osu.Game.Beatmaps
             {
                 if (db == null)
                 {
-                    db = GetConnection();
+                    db = getConnection();
                     db.Open();
 
-                    version = GetCacheVersion(db);
+                    version = getCacheVersion(db);
                 }
 
                 switch (version)
@@ -170,8 +173,23 @@ namespace osu.Game.Beatmaps
             log(@"Local metadata cache purged due to corruption.");
         }
 
-        public SqliteConnection GetConnection() =>
+        private SqliteConnection getConnection() =>
             new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
+
+        public void CreateCachedConnection()
+        {
+            try
+            {
+                CachedConnection = getConnection();
+                CachedConnection.Open();
+
+                CachedVersion = getCacheVersion(CachedConnection);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Could not create cached sqlite connection: {e}");
+            }
+        }
 
         public Task FetchCache()
         {
@@ -250,10 +268,10 @@ namespace osu.Game.Beatmaps
         {
             try
             {
-                using (var connection = GetConnection())
+                using (var connection = getConnection())
                 {
                     connection.Open();
-                    return GetCacheVersion(connection) >= version;
+                    return getCacheVersion(connection) >= version;
                 }
             }
             catch (SqliteException ex) when (ex.SqliteErrorCode == 26 || ex.SqliteErrorCode == 11) // SQLITE_NOTADB, SQLITE_CORRUPT
@@ -263,7 +281,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        public int GetCacheVersion(SqliteConnection connection)
+        private int getCacheVersion(SqliteConnection connection)
         {
             using (var cmd = connection.CreateCommand())
             {
@@ -414,6 +432,7 @@ namespace osu.Game.Beatmaps
         public void Dispose()
         {
             cacheDownloadRequest?.Dispose();
+            CachedConnection?.Close();
         }
     }
 }

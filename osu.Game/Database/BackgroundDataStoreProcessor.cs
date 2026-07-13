@@ -75,7 +75,6 @@ namespace osu.Game.Database
         private OsuConfigManager config { get; set; } = null!;
 
         private LocalCachedBeatmapMetadataSource localMetadataSource = null!;
-
         private readonly List<Action<Realm>> actions = [];
 
         protected virtual int TimeToSleepDuringGameplay => 30000;
@@ -162,16 +161,13 @@ namespace osu.Game.Database
 
             realmAccess.Run(r =>
             {
-                var beatmaps = r
-                               .All<BeatmapInfo>()
-                               .Where(b => b.StarRating < 0 && b.BeatmapSet != null);
+                var beatmaps = r.All<BeatmapInfo>().Where(b => b.StarRating < 0 && b.BeatmapSet != null);
 
                 int totalCount = beatmaps.Count();
                 int processedCount = 0;
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} beatmaps which require star rating reprocessing.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, "Reprocessing star rating for beatmaps", "beatmaps' star ratings have been updated");
@@ -197,7 +193,6 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     try
@@ -228,7 +223,6 @@ namespace osu.Game.Database
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
                 Logger.Log($"Populating {processedCount} of {totalCount} missing star ratings completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -261,8 +255,7 @@ namespace osu.Game.Database
 
             Logger.Log($"Found {beatmapSetIds.Count} beatmap sets which require online updates.");
 
-            if (beatmapSetIds.Count == 0)
-                return;
+            if (beatmapSetIds.Count == 0) return;
 
             var notification = showProgressNotification(beatmapSetIds.Count, "Updating online data for beatmaps", "beatmaps' online data have been updated");
 
@@ -278,7 +271,6 @@ namespace osu.Game.Database
                     break;
 
                 updateNotificationProgress(notification, processedCount, beatmapSetIds.Count);
-
                 sleepIfRequired();
 
                 realmAccess.Run(r =>
@@ -312,16 +304,13 @@ namespace osu.Game.Database
 
             realmAccess.Run(r =>
             {
-                var beatmaps = r
-                               .All<BeatmapInfo>()
-                               .Where(b => b.TotalObjectCount < 0 || b.EndTimeObjectCount < 0);
+                var beatmaps = r.All<BeatmapInfo>().Where(b => b.TotalObjectCount < 0 || b.EndTimeObjectCount < 0);
 
                 int totalCount = beatmaps.Count();
                 int processedCount = 0;
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} beatmaps which require statistics population.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, "Populating missing statistics for beatmaps", "beatmaps have been populated with missing statistics");
@@ -337,7 +326,6 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     var beatmap = b.Detach();
@@ -366,7 +354,6 @@ namespace osu.Game.Database
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
                 Logger.Log($"Processing {processedCount} of {totalCount} missing beatmaps hitobject counts completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -393,7 +380,6 @@ namespace osu.Game.Database
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} scores which require statistics population.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, "Populating missing statistics for scores", "scores have been populated with missing statistics");
@@ -409,7 +395,6 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     try
@@ -417,12 +402,7 @@ namespace osu.Game.Database
                         scoreManager.PopulateMaximumStatistics(score);
                         string maximumStatisticsJson = JsonConvert.SerializeObject(score.MaximumStatistics);
 
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-                            item.MaximumStatisticsJson = maximumStatisticsJson;
-                        });
-
+                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.MaximumStatisticsJson = maximumStatisticsJson);
                         ++processedCount;
                     }
                     catch (ObjectDisposedException)
@@ -432,19 +412,12 @@ namespace osu.Game.Database
                     catch (Exception e)
                     {
                         Logger.Log(@$"Failed to populate maximum statistics for {score.ID}: {e}");
-
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-                            item.BackgroundReprocessingFailed = true;
-                        });
-
+                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
                         ++failedCount;
                     }
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
                 Logger.Log($"Processing {processedCount} of {totalCount} missing scores statistics completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -472,7 +445,6 @@ namespace osu.Game.Database
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} scores which require mod multiplier upgrade.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, "Upgrading scores to new mod multipliers", "scores have been upgraded to the new mod multipliers");
@@ -488,7 +460,6 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     var score = s.Detach();
@@ -518,19 +489,12 @@ namespace osu.Game.Database
                     catch (Exception e)
                     {
                         Logger.Log($"Failed to upgrade mod multipliers for {score.ID}: {e}");
-
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-                            item.BackgroundReprocessingFailed = true;
-                        });
-
+                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
                         ++failedCount;
                     }
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
                 Logger.Log($"Upgrading {processedCount} of {totalCount} scores to new mod multipliers completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -558,7 +522,6 @@ namespace osu.Game.Database
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} scores which require total score conversion.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, "Upgrading scores to new scoring algorithm", "scores have been upgraded to the new scoring algorithm");
@@ -574,7 +537,6 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     var score = s.Detach();
@@ -603,19 +565,12 @@ namespace osu.Game.Database
                     catch (Exception e)
                     {
                         Logger.Log($"Failed to convert total score for {score.ID}: {e}");
-
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-                            item.BackgroundReprocessingFailed = true;
-                        });
-
+                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
                         ++failedCount;
                     }
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
                 Logger.Log($"Converting total score {processedCount} of {totalCount} scores completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -640,7 +595,6 @@ namespace osu.Game.Database
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} scores which require rank upgrades.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, "Adjusting ranks of scores", "scores now have more correct ranks.");
@@ -656,7 +610,6 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     try
@@ -680,19 +633,12 @@ namespace osu.Game.Database
                     catch (Exception e)
                     {
                         Logger.Log($"Failed to update score rank {score.ID}: {e}");
-
-                        actions.Add(realm =>
-                        {
-                            var item = realm.Find<ScoreInfo>(score.ID)!;
-                            item.BackgroundReprocessingFailed = true;
-                        });
-
+                        actions.Add(realm => realm.Find<ScoreInfo>(score.ID)!.BackgroundReprocessingFailed = true);
                         ++failedCount;
                     }
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
                 Logger.Log($"Upgrading {processedCount} of {totalCount} score ranks completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -723,6 +669,8 @@ namespace osu.Game.Database
 
             Logger.Log("Querying for beatmap sets that contain missing submission/rank dates...");
 
+            localMetadataSource.CreateCachedConnection();
+
             // find all ranked beatmap sets with missing date ranked or date submitted that have at least one difficulty ranked as well.
             // the reason for checking ranked status of the difficulties is that they can be locally modified or unknown too, and for those the lookup is likely to fail.
             // this is because metadata lookups are primarily based on file hash, so they will fail to match if the beatmap does not match the online version
@@ -740,29 +688,12 @@ namespace osu.Game.Database
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} beatmap sets with missing submission/rank dates.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, "Populating missing submission and rank dates", "beatmap sets now have correct submission and rank dates.");
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-
-                SqliteConnection sqliteConnection;
-                int sqliteVersion;
-
-                try
-                {
-                    sqliteConnection = localMetadataSource.GetConnection();
-                    sqliteConnection.Open();
-
-                    sqliteVersion = localMetadataSource.GetCacheVersion(sqliteConnection);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log($"Could not open sqlite database: {ex}");
-                    return;
-                }
 
                 foreach (var beatmapSet in beatmapsSet)
                 {
@@ -772,14 +703,12 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     try
                     {
                         var beatmap = beatmapSet.Beatmaps.First(b => b.Status >= BeatmapOnlineStatus.Ranked);
-
-                        bool lookupSucceeded = localMetadataSource.TryLookup(sqliteConnection, sqliteVersion, beatmap, out var result);
+                        bool lookupSucceeded = localMetadataSource.TryLookup(localMetadataSource.CachedConnection, localMetadataSource.CachedVersion, beatmap, out var result);
 
                         if (!lookupSucceeded)
                         {
@@ -813,12 +742,12 @@ namespace osu.Game.Database
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-                sqliteConnection.Close();
-
                 completeNotification(notification, processedCount, totalCount, failedCount);
 
                 Logger.Log($"Populating {processedCount} of {totalCount} missing submission and rank dates completed in {stopwatch.ElapsedMilliseconds}ms");
             });
+
+            localMetadataSource.CachedConnection?.Close();
         }
 
         private void backpopulateUserTags(int chunkSize = 2000)
@@ -851,13 +780,13 @@ namespace osu.Game.Database
 
             Logger.Log("Querying for beatmap that has outdated user tags...");
 
+            localMetadataSource.CreateCachedConnection();
+
             // while this is constrained to run every month or so (every time a new online.db cache is retrieved), there's some chance that this will still run much too often and be annoying to users.
             // if that turns out to be the case we may need a better way to debounce this (or just delete the backpopulation logic after some time has passed?)
             realmAccess.Run(r =>
             {
-                var beatmaps = r.All<BeatmapInfo>()
-                                .Filter($"{nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}")
-                                .AsEnumerable();
+                var beatmaps = r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.StatusInt)} IN {{ 1,2,4 }}");
 
                 int totalCount = beatmaps.Count();
                 int processedCount = 0;
@@ -865,7 +794,6 @@ namespace osu.Game.Database
                 int failedCount = 0;
 
                 Logger.Log($"Found {totalCount} beatmaps with outdated user tags.");
-
                 if (totalCount == 0) return;
 
                 var notification = showProgressNotification(totalCount, @"Updating user tags",
@@ -873,22 +801,6 @@ namespace osu.Game.Database
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-
-                SqliteConnection sqliteConnection;
-                int sqliteVersion;
-
-                try
-                {
-                    sqliteConnection = localMetadataSource.GetConnection();
-                    sqliteConnection.Open();
-
-                    sqliteVersion = localMetadataSource.GetCacheVersion(sqliteConnection);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log($"Could not open sqlite database: {ex}");
-                    return;
-                }
 
                 foreach (var beatmap in beatmaps)
                 {
@@ -898,12 +810,11 @@ namespace osu.Game.Database
                     if (actions.Count >= chunkSize) performWrite(actions);
 
                     updateNotificationProgress(notification, processedCount, totalCount);
-
                     sleepIfRequired();
 
                     try
                     {
-                        bool lookupSucceeded = localMetadataSource.TryLookup(sqliteConnection, sqliteVersion, beatmap, out var result);
+                        bool lookupSucceeded = localMetadataSource.TryLookup(localMetadataSource.CachedConnection, localMetadataSource.CachedVersion, beatmap, out var result);
 
                         if (!lookupSucceeded)
                         {
@@ -946,7 +857,6 @@ namespace osu.Game.Database
                 }
 
                 if (actions.Count > 0) performWrite(actions);
-                sqliteConnection.Close();
 
                 // Report the updated item count rather than the total processed. Users don't really care about noops here.
                 completeNotification(notification, updatedCount, updatedCount, failedCount);
@@ -955,6 +865,8 @@ namespace osu.Game.Database
 
                 Logger.Log($"Populating {processedCount} of {totalCount} beatmap user tags completed in {stopwatch.ElapsedMilliseconds}ms");
             });
+
+            localMetadataSource.CachedConnection?.Close();
         }
 
         private void performWrite(List<Action<Realm>> actions)
