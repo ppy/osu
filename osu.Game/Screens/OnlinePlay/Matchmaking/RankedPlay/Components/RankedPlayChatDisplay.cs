@@ -295,16 +295,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
                 messageContainer.Add(newMessage);
 
-                float offset = 0;
-
                 ScheduleAfterChildren(() =>
                 {
-                    // Layout bubbles, pushing all others upwards to make room for the new one.
-                    foreach (var child in messageContainer.Reverse())
+                    ScheduleAfterChildren(() => // just one frame defer so that textflowcontainer settles wrapped height
                     {
-                        child.MoveToY(-offset, 400, Easing.OutPow10);
-                        offset += child.DrawHeight + message_spacing;
-                    }
+                        // Layout bubbles, pushing all others upwards to make room for the new one.
+                        float offset = 0;
+                        foreach (var child in messageContainer.Reverse())
+                        {
+                            child.MoveToY(-offset, 400, Easing.OutPow10);
+                            offset += child.Height + message_spacing;
+                        }
+                    });
                 });
 
                 // Hide any overflowing message.
