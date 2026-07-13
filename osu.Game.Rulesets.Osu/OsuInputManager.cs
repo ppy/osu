@@ -106,13 +106,13 @@ namespace osu.Game.Rulesets.Osu
 
     public enum OsuAction
     {
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.OsuLeftButton))]
+        [LocalisableDescription(typeof(OsuActionStrings), nameof(OsuActionStrings.LeftButton))]
         LeftButton,
 
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.OsuRightButton))]
+        [LocalisableDescription(typeof(OsuActionStrings), nameof(OsuActionStrings.RightButton))]
         RightButton,
 
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.OsuSmoke))]
+        [LocalisableDescription(typeof(OsuActionStrings), nameof(OsuActionStrings.Smoke))]
         Smoke,
     }
 }

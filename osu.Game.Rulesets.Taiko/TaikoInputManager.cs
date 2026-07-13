@@ -20,16 +20,16 @@ namespace osu.Game.Rulesets.Taiko
 
     public enum TaikoAction
     {
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.TaikoLeftRim))]
+        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.LeftRim))]
         LeftRim,
 
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.TaikoLeftCentre))]
+        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.LeftCentre))]
         LeftCentre,
 
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.TaikoRightCentre))]
+        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.RightCentre))]
         RightCentre,
 
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.TaikoRightRim))]
+        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.RightRim))]
         RightRim
     }
 }

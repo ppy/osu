@@ -20,13 +20,13 @@ namespace osu.Game.Rulesets.Catch
 
     public enum CatchAction
     {
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.CatchMoveLeft))]
+        [LocalisableDescription(typeof(CatchActionStrings), nameof(CatchActionStrings.MoveLeft))]
         MoveLeft,
 
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.CatchMoveRight))]
+        [LocalisableDescription(typeof(CatchActionStrings), nameof(CatchActionStrings.MoveRight))]
         MoveRight,
 
-        [LocalisableDescription(typeof(RulesetActionStrings), nameof(RulesetActionStrings.CatchDash))]
+        [LocalisableDescription(typeof(CatchActionStrings), nameof(CatchActionStrings.Dash))]
         Dash,
     }
 }

@@ -20,88 +20,88 @@ namespace osu.Game.Rulesets.Mania
 
     public enum ManiaAction
     {
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key1))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key1))]
         Key1,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key2))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key2))]
         Key2,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key3))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key3))]
         Key3,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key4))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key4))]
         Key4,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key5))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key5))]
         Key5,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key6))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key6))]
         Key6,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key7))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key7))]
         Key7,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key8))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key8))]
         Key8,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key9))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key9))]
         Key9,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key10))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key10))]
         Key10,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key11))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key11))]
         Key11,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key12))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key12))]
         Key12,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key13))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key13))]
         Key13,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key14))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key14))]
         Key14,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key15))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key15))]
         Key15,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key16))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key16))]
         Key16,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key17))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key17))]
         Key17,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key18))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key18))]
         Key18,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key19))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key19))]
         Key19,
 
-        [LocalisableDescription(typeof(ManiaActionStrings), nameof(ManiaActionStrings.Key20))]
+        [LocalisableDescription(typeof(ManiaActionStringsHelper), nameof(ManiaActionStringsHelper.Key20))]
         Key20,
     }
 
-    file class ManiaActionStrings
+    static file class ManiaActionStringsHelper
     {
-        public static LocalisableString Key1 => RulesetActionStrings.ManiaKey(1);
-        public static LocalisableString Key2 => RulesetActionStrings.ManiaKey(2);
-        public static LocalisableString Key3 => RulesetActionStrings.ManiaKey(3);
-        public static LocalisableString Key4 => RulesetActionStrings.ManiaKey(4);
-        public static LocalisableString Key5 => RulesetActionStrings.ManiaKey(5);
-        public static LocalisableString Key6 => RulesetActionStrings.ManiaKey(6);
-        public static LocalisableString Key7 => RulesetActionStrings.ManiaKey(7);
-        public static LocalisableString Key8 => RulesetActionStrings.ManiaKey(8);
-        public static LocalisableString Key9 => RulesetActionStrings.ManiaKey(9);
-        public static LocalisableString Key10 => RulesetActionStrings.ManiaKey(10);
-        public static LocalisableString Key11 => RulesetActionStrings.ManiaKey(11);
-        public static LocalisableString Key12 => RulesetActionStrings.ManiaKey(12);
-        public static LocalisableString Key13 => RulesetActionStrings.ManiaKey(13);
-        public static LocalisableString Key14 => RulesetActionStrings.ManiaKey(14);
-        public static LocalisableString Key15 => RulesetActionStrings.ManiaKey(15);
-        public static LocalisableString Key16 => RulesetActionStrings.ManiaKey(16);
-        public static LocalisableString Key17 => RulesetActionStrings.ManiaKey(17);
-        public static LocalisableString Key18 => RulesetActionStrings.ManiaKey(18);
-        public static LocalisableString Key19 => RulesetActionStrings.ManiaKey(19);
-        public static LocalisableString Key20 => RulesetActionStrings.ManiaKey(20);
+        public static LocalisableString Key1 => ManiaActionStrings.Key(1);
+        public static LocalisableString Key2 => ManiaActionStrings.Key(2);
+        public static LocalisableString Key3 => ManiaActionStrings.Key(3);
+        public static LocalisableString Key4 => ManiaActionStrings.Key(4);
+        public static LocalisableString Key5 => ManiaActionStrings.Key(5);
+        public static LocalisableString Key6 => ManiaActionStrings.Key(6);
+        public static LocalisableString Key7 => ManiaActionStrings.Key(7);
+        public static LocalisableString Key8 => ManiaActionStrings.Key(8);
+        public static LocalisableString Key9 => ManiaActionStrings.Key(9);
+        public static LocalisableString Key10 => ManiaActionStrings.Key(10);
+        public static LocalisableString Key11 => ManiaActionStrings.Key(11);
+        public static LocalisableString Key12 => ManiaActionStrings.Key(12);
+        public static LocalisableString Key13 => ManiaActionStrings.Key(13);
+        public static LocalisableString Key14 => ManiaActionStrings.Key(14);
+        public static LocalisableString Key15 => ManiaActionStrings.Key(15);
+        public static LocalisableString Key16 => ManiaActionStrings.Key(16);
+        public static LocalisableString Key17 => ManiaActionStrings.Key(17);
+        public static LocalisableString Key18 => ManiaActionStrings.Key(18);
+        public static LocalisableString Key19 => ManiaActionStrings.Key(19);
+        public static LocalisableString Key20 => ManiaActionStrings.Key(20);
     }
 }
