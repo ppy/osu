@@ -207,6 +207,8 @@ namespace osu.Game.Tests.NonVisual
                 {
                     return 0;
                 }
+
+                public override double DifficultyValue() => 1;
             }
         }
 
