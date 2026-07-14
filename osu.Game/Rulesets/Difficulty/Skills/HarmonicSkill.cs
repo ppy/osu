@@ -12,6 +12,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class HarmonicSkill : Skill
     {
         /// <summary>
+        /// The sum of object weights, calculated during summation.
+        /// Required for any calculations which need to normalise difficulty value.
+        /// </summary>
+        protected double ObjectWeightSum;
+
+        /// <summary>
         /// Scaling factor applied as HarmonicScale / (1 + index) during weight calculations.
         /// A higher value will increase the influence of the hardest object difficulties during summation.
         /// </summary>
@@ -42,22 +48,23 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected virtual List<double> GetTransformedDifficulties(List<double> difficulties) => difficulties;
 
-        public (double Difficulty, double ObjectWeightSum) DifficultyValue()
+        public override double DifficultyValue()
         {
+            ObjectWeightSum = 0;
+
             if (ObjectDifficulties.Count == 0)
-                return (0, 0);
+                return 0;
 
             // Objects with 0 difficulty are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These objects will not contribute to the difficulty.
             var difficulties = ObjectDifficulties;
 
             if (difficulties.Count == 0)
-                return (0, 0);
+                return 0;
 
             difficulties = GetTransformedDifficulties(difficulties);
 
             double difficulty = 0;
-            double objectWeightSum = 0;
             int index = 0;
 
             foreach (double obj in difficulties.OrderDescending().Where(v => v > 0))
@@ -65,27 +72,27 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 // Use a harmonic sum that considers each object of the map according to a predefined weight.
                 double weight = (1 + (HarmonicScale / (1 + index))) / (DiffUtils.Pow(index, DecayExponent) + 1 + (HarmonicScale / (1 + index)));
 
-                objectWeightSum += weight;
+                ObjectWeightSum += weight;
 
                 difficulty += obj * weight;
                 index += 1;
             }
 
-            return (difficulty, objectWeightSum);
+            return difficulty;
         }
 
         /// <summary>
         /// Calculates the number of object difficulties weighted against the top object difficulty.
         /// </summary>
-        public virtual double CountTopWeightedObjectDifficulties(double difficultyValue, double objectWeightSum)
+        public virtual double CountTopWeightedObjectDifficulties(double difficultyValue)
         {
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            if (objectWeightSum == 0)
+            if (ObjectWeightSum == 0)
                 return 0.0;
 
-            double consistentTopObject = difficultyValue / objectWeightSum; // What would the top difficulty be if all object difficulties were identical
+            double consistentTopObject = difficultyValue / ObjectWeightSum; // What would the top difficulty be if all object difficulties were identical
 
             if (consistentTopObject == 0)
                 return 0;

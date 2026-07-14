@@ -41,12 +41,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimDifficultyValue = aim.DifficultyValue();
             double aimNoSlidersDifficultyValue = aimWithoutSliders.DifficultyValue();
-            (double speedDifficultyValue, double speedObjectWeightSum) = speed.DifficultyValue();
-            (double readingDifficultyValue, double readingObjectWeightSum) = reading.DifficultyValue();
+            double speedDifficultyValue = speed.DifficultyValue();
+            double readingDifficultyValue = reading.DifficultyValue();
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains(aimDifficultyValue);
-            double speedDifficultStrainCount = speed.CountTopWeightedObjectDifficulties(speedDifficultyValue, speedObjectWeightSum);
-            double readingDifficultNoteCount = reading.CountTopWeightedObjectDifficulties(readingDifficultyValue, readingObjectWeightSum);
+            double speedDifficultStrainCount = speed.CountTopWeightedObjectDifficulties(speedDifficultyValue);
+            double readingDifficultNoteCount = reading.CountTopWeightedObjectDifficulties(readingDifficultyValue);
 
             double speedNotes = speed.RelevantObjectCount();
 
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimTopWeightedSliderFactor = aimNoSlidersTopWeightedSliderCount / Math.Max(1, aimNoSlidersDifficultStrainCount - aimNoSlidersTopWeightedSliderCount);
 
-            double speedTopWeightedSliderCount = speed.CountTopWeightedSliders(speedDifficultyValue, speedObjectWeightSum);
+            double speedTopWeightedSliderCount = speed.CountTopWeightedSliders(speedDifficultyValue);
             double speedTopWeightedSliderFactor = speedTopWeightedSliderCount / Math.Max(1, speedDifficultStrainCount - speedTopWeightedSliderCount);
 
             double difficultSliders = aim.GetDifficultSliders();

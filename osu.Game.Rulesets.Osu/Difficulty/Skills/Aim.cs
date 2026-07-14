@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return sliderStrains.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
 
-        public double DifficultyValue()
+        public override double DifficultyValue()
         {
             double difficulty = 0;
             double time = 0;

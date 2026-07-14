@@ -79,15 +79,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return ObjectDifficulties.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxStrain * 12.0 - 6.0))));
         }
 
-        public double CountTopWeightedSliders(double difficultyValue, double objectWeightSum)
+        public double CountTopWeightedSliders(double difficultyValue)
         {
             if (sliderStrains.Count == 0)
                 return 0;
 
-            if (objectWeightSum == 0)
+            if (ObjectWeightSum == 0)
                 return 0.0;
 
-            double consistentTopObject = difficultyValue / objectWeightSum; // What would the top note be if all note values were identical
+            double consistentTopObject = difficultyValue / ObjectWeightSum; // What would the top note be if all note values were identical
 
             if (consistentTopObject == 0)
                 return 0;
