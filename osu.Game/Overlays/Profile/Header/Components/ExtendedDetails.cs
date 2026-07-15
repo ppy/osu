@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            var font = OsuFont.Default.With(size: 12);
             const float vertical_spacing = 4;
             const float horizontal_spacing = 20;
 
@@ -64,14 +63,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Spacing = new Vector2(0, vertical_spacing),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsRankedScore },
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsHitAccuracy },
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsPlayCount },
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsTotalScore },
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsTotalHits },
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsHitsPerPlay },
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsMaximumCombo },
-                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsReplaysWatchedByOthers },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsRankedScore },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsHitAccuracy },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsPlayCount },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsTotalScore },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsTotalHits },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsHitsPerPlay },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsMaximumCombo },
+                                new ExtendedDetailsEntryLabel(colourProvider) { Text = UsersStrings.ShowStatsReplaysWatchedByOthers },
                             }
                         },
                         new FillFlowContainer
@@ -82,14 +81,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Spacing = new Vector2(0, vertical_spacing),
                             Children = new Drawable[]
                             {
-                                rankedScore = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
-                                hitAccuracy = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
-                                playCount = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
-                                totalScore = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
-                                totalHits = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
-                                hitsPerPlay = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
-                                maximumCombo = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
-                                replaysWatched = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                rankedScore = new ExtendedDetailsEntryValue(colourProvider),
+                                hitAccuracy = new ExtendedDetailsEntryValue(colourProvider),
+                                playCount = new ExtendedDetailsEntryValue(colourProvider),
+                                totalScore = new ExtendedDetailsEntryValue(colourProvider),
+                                totalHits = new ExtendedDetailsEntryValue(colourProvider),
+                                hitsPerPlay = new ExtendedDetailsEntryValue(colourProvider),
+                                maximumCombo = new ExtendedDetailsEntryValue(colourProvider),
+                                replaysWatched = new ExtendedDetailsEntryValue(colourProvider),
                             }
                         },
                     }
@@ -127,6 +126,24 @@ namespace osu.Game.Overlays.Profile.Header.Components
             hitsPerPlay.Text = getHitsPerPlay(statistics).ToLocalisableString(@"N0");
             maximumCombo.Text = statistics.MaxCombo.ToLocalisableString(@"N0");
             replaysWatched.Text = statistics.ReplaysWatched.ToLocalisableString(@"N0");
+        }
+
+        public partial class ExtendedDetailsEntryLabel : OsuSpriteText
+        {
+            public ExtendedDetailsEntryLabel(OverlayColourProvider colourProvider)
+            {
+                Font = OsuFont.Default.With(size: 12);
+                Colour = colourProvider.Content1;
+            }
+        }
+
+        public partial class ExtendedDetailsEntryValue : OsuSpriteText
+        {
+            public ExtendedDetailsEntryValue(OverlayColourProvider colourProvider)
+            {
+                Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
+                Colour = colourProvider.Content2;
+            }
         }
     }
 }
