@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.Catch
 {
-    public static class CatchActionStrings
+    public static class ActionStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.CatchAction";
+        private const string prefix = @"osu.Game.Resources.Localisation.Catch.Action";
 
         /// <summary>
         /// "Move left"

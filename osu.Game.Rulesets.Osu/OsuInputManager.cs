@@ -9,7 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Lists;
 using osu.Framework.Localisation;
 using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
@@ -106,13 +106,13 @@ namespace osu.Game.Rulesets.Osu
 
     public enum OsuAction
     {
-        [LocalisableDescription(typeof(OsuActionStrings), nameof(OsuActionStrings.LeftButton))]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.LeftButton))]
         LeftButton,
 
-        [LocalisableDescription(typeof(OsuActionStrings), nameof(OsuActionStrings.RightButton))]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.RightButton))]
         RightButton,
 
-        [LocalisableDescription(typeof(OsuActionStrings), nameof(OsuActionStrings.Smoke))]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.Smoke))]
         Smoke,
     }
 }

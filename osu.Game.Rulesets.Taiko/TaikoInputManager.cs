@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
-using osu.Game.Localisation;
+using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko
@@ -20,16 +20,16 @@ namespace osu.Game.Rulesets.Taiko
 
     public enum TaikoAction
     {
-        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.LeftRim))]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.LeftRim))]
         LeftRim,
 
-        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.LeftCentre))]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.LeftCentre))]
         LeftCentre,
 
-        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.RightCentre))]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.RightCentre))]
         RightCentre,
 
-        [LocalisableDescription(typeof(TaikoActionStrings), nameof(TaikoActionStrings.RightRim))]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.RightRim))]
         RightRim
     }
 }

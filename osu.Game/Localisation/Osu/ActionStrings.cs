@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.Osu
 {
-    public static class OsuActionStrings
+    public static class ActionStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.OsuAction";
+        private const string prefix = @"osu.Game.Resources.Localisation.Osu.Action";
 
         /// <summary>
         /// "Left button"

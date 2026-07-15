@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.Mania
 {
-    public static class ManiaActionStrings
+    public static class ActionStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.ManiaAction";
+        private const string prefix = @"osu.Game.Resources.Localisation.Mania.Action";
 
         /// <summary>
         /// "Key {0}"

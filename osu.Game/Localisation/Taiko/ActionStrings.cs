@@ -3,11 +3,11 @@
 
 using osu.Framework.Localisation;
 
-namespace osu.Game.Localisation
+namespace osu.Game.Localisation.Taiko
 {
-    public static class TaikoActionStrings
+    public static class ActionStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.TaikoAction";
+        private const string prefix = @"osu.Game.Resources.Localisation.Taiko.Action";
 
         /// <summary>
         /// "Left (rim)"
