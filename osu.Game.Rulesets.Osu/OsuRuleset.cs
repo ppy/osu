@@ -234,6 +234,14 @@ namespace osu.Game.Rulesets.Osu
             }
         }
 
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context)
+        {
+            if (context.Score != null && context.Score.TotalScoreVersion < 30000017)
+                return new OsuScoreMultiplierCalculatorV1(context);
+
+            return new OsuScoreMultiplierCalculatorV2(context);
+        }
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(RulesetInfo, beatmap);

@@ -660,7 +660,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria) => match;
             public bool TryParseCustomKeywordCriteria(string key, Operator op, string value) => false;
 
-            public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods) => false;
+            public bool FilterMayChangeFromMods(FilterCriteria criteria, ValueChangedEvent<IReadOnlyList<Mod>> mods) => false;
         }
     }
 }

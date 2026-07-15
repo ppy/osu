@@ -16,21 +16,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class RankedPlayBackgroundScreen : BackgroundScreen
     {
-        public RankedPlayBackground Background { get; }
+        private RankedPlayBackground background { get; }
 
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         public Bindable<bool> ShowBeatmapBackground { get; } = new BindableBool();
 
+        public RankedPlayColourScheme? ColourScheme
+        {
+            set
+            {
+                if (value != null)
+                    background.FadeColours(value.PrimaryDarker.Darken(0.5f), value.PrimaryDarkest.Darken(0.5f));
+                else
+                    background.FadeColours(Color4Extensions.FromHex("#15061e"), Color4Extensions.FromHex("#240d36"));
+            }
+        }
+
         public RankedPlayBackgroundScreen()
         {
-            InternalChild = Background = new RankedPlayBackground
+            InternalChild = background = new RankedPlayBackground
             {
                 RelativeSizeAxes = Axes.Both,
-                GradientOutside = Color4Extensions.FromHex("716BE0"),
-                GradientInside = Color4Extensions.FromHex("#71308F"),
-                DotsColour = Color4Extensions.FromHex("#CC46F6").Opacity(0.5f),
             };
         }
 

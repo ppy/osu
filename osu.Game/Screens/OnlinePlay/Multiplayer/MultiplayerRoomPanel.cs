@@ -58,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null || client.LocalUser == null)
                 return;
 
-            ChangeSettingsButton.Alpha = client.IsHost ? 1 : 0;
+            ChangeSettingsButton.Alpha = client.IsHost || client.IsReferee ? 1 : 0;
             SelectedItem.Value = new PlaylistItem(client.Room.CurrentPlaylistItem);
         });
 

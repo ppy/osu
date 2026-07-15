@@ -33,7 +33,6 @@ namespace osu.Game.Configuration
         public OsuConfigManager(Storage storage)
             : base(storage)
         {
-            Migrate();
         }
 
         protected override void InitialiseDefaults()
@@ -249,31 +248,6 @@ namespace osu.Game.Configuration
             }
 
             return false;
-        }
-
-        public void Migrate()
-        {
-            // arrives as 2020.123.0-lazer
-            string rawVersion = Get<string>(OsuSetting.Version);
-
-            if (rawVersion.Length < 6)
-                return;
-
-            string[] pieces = rawVersion.Split('.');
-
-            // on a fresh install or when coming from a non-release build, execution will end here.
-            // we don't want to run migrations in such cases.
-            if (!int.TryParse(pieces[0], out int year)) return;
-            if (!int.TryParse(pieces[1], out int monthDay)) return;
-
-            int combined = year * 10000 + monthDay;
-
-            if (combined < 20250214)
-            {
-                // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
-                if (RuntimeInfo.IsMobile)
-                    GetBindable<float>(OsuSetting.UIScale).SetDefault();
-            }
         }
 
         public override TrackedSettings CreateTrackedSettings()

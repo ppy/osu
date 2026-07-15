@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Edit.Blueprints;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                           """;
         }
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.DraftingCompass };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorGrid };
 
         public override PlacementBlueprint CreatePlacementBlueprint() => new GridPlacementBlueprint();
     }

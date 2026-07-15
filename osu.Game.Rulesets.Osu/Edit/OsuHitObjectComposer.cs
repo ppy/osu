@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -76,6 +77,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         public readonly OsuDistanceSnapProvider DistanceSnapProvider = new OsuDistanceSnapProvider();
 
         [Cached]
+        private readonly OsuSliderVelocityToolboxGroup sliderVelocityToolboxGroup = new OsuSliderVelocityToolboxGroup();
+
+        [Cached]
         protected readonly OsuGridToolboxGroup OsuGridToolboxGroup = new OsuGridToolboxGroup();
 
         [Cached]
@@ -111,6 +115,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             RightToolbox.AddRange(new Drawable[]
                 {
+                    new OsuContextMenuContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Child = sliderVelocityToolboxGroup,
+                    },
                     OsuGridToolboxGroup,
                     new TransformToolboxGroup
                     {

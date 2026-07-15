@@ -49,13 +49,13 @@ namespace osu.Game.Beatmaps.Formats
             return sb;
         }
 
-        protected override void ParseStreamInto(LineBufferedReader stream, Storyboard storyboard)
+        protected override void ParseStreamInto(LineBufferedReader stream, bool isPrimaryStream, Storyboard storyboard)
         {
             this.storyboard = storyboard;
-            base.ParseStreamInto(stream, storyboard);
+            base.ParseStreamInto(stream, isPrimaryStream, storyboard);
         }
 
-        protected override void ParseLine(Storyboard storyboard, Section section, string line)
+        protected override void ParseLine(Storyboard storyboard, Section section, string line, bool isPrimaryStream)
         {
             switch (section)
             {
@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Formats
                     return;
 
                 case Section.Events:
-                    handleEvents(line);
+                    handleEvents(line, isPrimaryStream);
                     return;
 
                 case Section.Variables:
@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps.Formats
                     return;
             }
 
-            base.ParseLine(storyboard, section, line);
+            base.ParseLine(storyboard, section, line, isPrimaryStream);
         }
 
         private void handleGeneral(Storyboard storyboard, string line)
@@ -91,7 +91,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEvents(string line)
+        private void handleEvents(string line, bool isPrimaryStream)
         {
             decodeVariables(ref line);
 
@@ -116,8 +116,24 @@ namespace osu.Game.Beatmaps.Formats
                 if (!Enum.TryParse(split[0], out LegacyEventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
+                var source = isPrimaryStream ? StoryboardElementSource.Beatmap : StoryboardElementSource.Shared;
+
                 switch (type)
                 {
+                    case LegacyEventType.Background:
+                    {
+                        // the actual filename is handled in `LegacyBeatmapDecoder`.
+                        // this only handles the background offset, because it does not logically belong in `Beatmap` or related classes.
+                        if (split.Length > 4)
+                        {
+                            float x = Parsing.ParseFloat(split[3]);
+                            float y = Parsing.ParseFloat(split[4]);
+                            storyboard.BackgroundOffset = new Vector2(x, y);
+                        }
+
+                        break;
+                    }
+
                     case LegacyEventType.Video:
                     {
                         int offset = Parsing.ParseInt(split[1]);
@@ -131,7 +147,7 @@ namespace osu.Game.Beatmaps.Formats
                         if (!SupportedExtensions.VIDEO_EXTENSIONS.Contains(Path.GetExtension(path).ToLowerInvariant()))
                             break;
 
-                        storyboard.GetLayer("Video").Add(storyboardSprite = new StoryboardVideo(path, offset));
+                        storyboard.GetLayer("Video").Add(storyboardSprite = new StoryboardVideo(source, path, offset));
                         break;
                     }
 
@@ -142,7 +158,7 @@ namespace osu.Game.Beatmaps.Formats
                         string path = CleanFilename(split[3]);
                         float x = Parsing.ParseFloat(split[4], Parsing.MAX_COORDINATE_VALUE);
                         float y = Parsing.ParseFloat(split[5], Parsing.MAX_COORDINATE_VALUE);
-                        storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
+                        storyboardSprite = new StoryboardSprite(source, path, origin, new Vector2(x, y));
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
                     }
@@ -162,7 +178,7 @@ namespace osu.Game.Beatmaps.Formats
                             frameDelay = Math.Round(0.015 * frameDelay) * 1.186 * (1000 / 60f);
 
                         var loopType = split.Length > 8 ? parseAnimationLoopType(split[8]) : AnimationLoopType.LoopForever;
-                        storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
+                        storyboardSprite = new StoryboardAnimation(source, path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
                     }
@@ -173,7 +189,7 @@ namespace osu.Game.Beatmaps.Formats
                         string layer = parseLayer(split[2]);
                         string path = CleanFilename(split[3]);
                         float volume = split.Length > 4 ? Parsing.ParseFloat(split[4]) : 100;
-                        storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
+                        storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(source, path, time, (int)volume));
                         break;
                     }
                 }
@@ -192,7 +208,8 @@ namespace osu.Game.Beatmaps.Formats
                         string triggerName = split[1];
                         double startTime = split.Length > 2 ? Parsing.ParseDouble(split[2]) : double.MinValue;
                         double endTime = split.Length > 3 ? Parsing.ParseDouble(split[3]) : double.MaxValue;
-                        int groupNumber = split.Length > 4 ? Parsing.ParseInt(split[4]) : 0;
+                        // negation as per https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L736
+                        int groupNumber = split.Length > 4 ? -Parsing.ParseInt(split[4]) : 0;
                         currentCommandsGroup = storyboardSprite?.AddTriggerGroup(triggerName, startTime, endTime, groupNumber);
                         break;
                     }

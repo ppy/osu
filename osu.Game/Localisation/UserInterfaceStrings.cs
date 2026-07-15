@@ -194,6 +194,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ShowHidden => new TranslatableString(getKey(@"show_hidden"), @"Show hidden");
 
+        /// <summary>
+        /// "Currently online"
+        /// </summary>
+        public static LocalisableString CurrentlyOnline => new TranslatableString(getKey(@"currently_online"), @"Currently online");
+
+        /// <summary>
+        /// "User search"
+        /// </summary>
+        public static LocalisableString UserSearch => new TranslatableString(getKey(@"user_search"), @"User search");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

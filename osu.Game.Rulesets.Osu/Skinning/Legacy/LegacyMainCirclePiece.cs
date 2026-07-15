@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private readonly bool hasNumber;
 
         protected LegacyKiaiFlashingDrawable CircleSprite = null!;
-        protected LegacyKiaiFlashingDrawable OverlaySprite = null!;
+        protected Sprite OverlaySprite = null!;
 
         protected Container OverlayLayer { get; private set; } = null!;
 
@@ -93,12 +93,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(@$"{circleName}overlay")?.WithMaximumSize(maxSize) })
+                    Child = OverlaySprite = new Sprite
                     {
+                        Texture = skin.GetTexture(@$"{circleName}overlay")?.WithMaximumSize(maxSize),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                }
+                },
+                CircleSprite.FlashingDrawable.CreateProxy(),
             };
 
             if (hasNumber)
@@ -142,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     255);
 
                 CircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue);
-                OverlaySprite.KiaiGlowColour = CircleSprite.KiaiGlowColour = LegacyColourCompatibility.DisallowZeroAlpha(kiaiTintColour);
+                CircleSprite.KiaiGlowColour = LegacyColourCompatibility.DisallowZeroAlpha(kiaiTintColour);
             }, true);
 
             if (hasNumber)

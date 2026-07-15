@@ -151,9 +151,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                Masking = true;
-                CornerRadius = 5;
-
                 // We use our own background for more control.
                 Background.Alpha = 0;
 

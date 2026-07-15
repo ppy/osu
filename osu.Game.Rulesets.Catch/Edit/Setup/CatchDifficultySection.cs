@@ -117,6 +117,15 @@ namespace osu.Game.Rulesets.Catch.Edit.Setup
             Beatmap.Difficulty.CircleSize = circleSizeSlider.Current.Value;
             Beatmap.Difficulty.DrainRate = healthDrainSlider.Current.Value;
             Beatmap.Difficulty.ApproachRate = approachRateSlider.Current.Value;
+            // in lazer catch, Overall Difficulty does *nothing* - as it should be in a sane world.
+            // in stable, it does *one extremely specific thing* which is influence the infamous `difficultyPeppyStars`
+            // which in turn affects score V1 (see `LegacyRulesetExtensions.CalculateDifficultyPeppyStars()`).
+            // there is a Ranking Criteria rule saying that Overall Difficulty and Approach Rate should match:
+            // https://osu.ppy.sh/wiki/en/Ranking_criteria/osu!catch
+            // the one case wherein that breaks stable is on some marathon maps;
+            // on those setting Overall Difficulty too high can lead to score V1 exceeding 32 bits ("score overflow").
+            // that case can be manually handled by mappers.
+            Beatmap.Difficulty.OverallDifficulty = approachRateSlider.Current.Value;
             Beatmap.Difficulty.SliderMultiplier = baseVelocitySlider.Current.Value;
             Beatmap.Difficulty.SliderTickRate = tickRateSlider.Current.Value;
 

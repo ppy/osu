@@ -211,6 +211,11 @@ namespace osu.Game.Rulesets
         public ModTouchDevice? GetTouchDeviceMod() => CreateMod<ModTouchDevice>();
 
         /// <summary>
+        /// Creates a <see cref="ScoreMultiplierCalculator"/> relevant to this ruleset.
+        /// </summary>
+        public virtual ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new ScoreMultiplierCalculator(context);
+
+        /// <summary>
         /// Create a transformer which adds lookups specific to a ruleset to skin sources.
         /// </summary>
         /// <param name="skin">The source skin.</param>
@@ -313,11 +318,22 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => Array.Empty<KeyBinding>();
 
         /// <summary>
+        /// Text that describes what variants in a ruleset are.
+        /// Override this to provide better copy than the generic "Variant" text which may not tell users much.
+        /// </summary>
+        public virtual LocalisableString VariantDescription => "Variant";
+
+        /// <summary>
         /// Gets the name for a key binding variant. This is used for display in the settings overlay.
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
         public virtual LocalisableString GetVariantName(int variant) => string.Empty;
+
+        /// <summary>
+        /// Returns the ID of the variant that is applicable for the given <paramref name="beatmapInfo"/>, given the current active <paramref name="mods"/>.
+        /// </summary>
+        public virtual int GetVariantForBeatmap(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null) => 0;
 
         /// <summary>
         /// For rulesets which support legacy (osu-stable) replay conversion, this method will create an empty replay frame
@@ -418,6 +434,12 @@ namespace osu.Game.Rulesets
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10);
         }
+
+        /// <summary>
+        /// Overload of <see cref="GetAdjustedDisplayDifficulty"/> for display on Ranked Cards
+        /// </summary>
+        public virtual IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods) =>
+            GetBeatmapAttributesForDisplay(beatmapInfo, mods);
 
         /// <summary>
         /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.

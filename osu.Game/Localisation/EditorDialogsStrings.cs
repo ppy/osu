@@ -75,9 +75,24 @@ namespace osu.Game.Localisation
         public static LocalisableString DeleteDifficultyDetails(string difficultyName, int objectCount) => new TranslatableString(getKey(@"delete_difficulty_details"), @"Difficulty ""{0}"" with {1} objects", difficultyName, objectCount);
 
         /// <summary>
+        /// "This overwrites artist, title, source, and tags on all other difficulties. This cannot be undone."
+        /// </summary>
+        public static LocalisableString SyncMetadataConfirmationBody => new TranslatableString(getKey(@"sync_metadata_confirmation_body"), @"This overwrites artist, title, source, and tags on all other difficulties. This cannot be undone.");
+
+        /// <summary>
         /// "All Bookmarks"
         /// </summary>
         public static LocalisableString AllBookmarks => new TranslatableString(getKey(@"all_bookmarks"), @"All Bookmarks");
+
+        /// <summary>
+        /// "Snap all notes to the current snap divisor?"
+        /// </summary>
+        public static LocalisableString SnapAllNotesConfirmationHeader => new TranslatableString(getKey(@"snap_all_notes_confirmation_header"), @"Snap all notes to the current snap divisor?");
+
+        /// <summary>
+        /// "Every hit object in this difficulty will move to the nearest tick for your current snap divisor. Slider and hold durations may change. You can undo this from the editor history."
+        /// </summary>
+        public static LocalisableString SnapAllNotesConfirmationBody => new TranslatableString(getKey(@"snap_all_notes_confirmation_body"), @"Every hit object in this difficulty will move to the nearest tick for your current snap divisor. Slider and hold durations may change. You can undo this from the editor history.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

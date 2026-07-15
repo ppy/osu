@@ -17,6 +17,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 {
     public partial class FriendDisplay : CompositeDrawable
     {
+        public IBindable<bool> Loading => loading;
+        private readonly BindableBool loading = new BindableBool();
+
         private readonly IBindableList<APIRelation> apiFriends = new BindableList<APIRelation>();
 
         [Resolved]
@@ -27,7 +30,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private Box controlBackground = null!;
         private UserListToolbar userListToolbar = null!;
         private Container<FriendsList> listContainer = null!;
-        private LoadingLayer loading = null!;
         private BasicSearchTextBox searchTextBox = null!;
 
         private CancellationTokenSource? listLoadCancellation;
@@ -124,7 +126,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                                     PlaceholderText = HomeStrings.SearchPlaceholder,
                                                 },
                                                 Empty(),
-                                                userListToolbar = new UserListToolbar(true)
+                                                userListToolbar = new UserListToolbar
                                                 {
                                                     Anchor = Anchor.CentreRight,
                                                     Origin = Anchor.CentreRight,
@@ -144,7 +146,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                                 AutoSizeAxes = Axes.Y,
                                                 Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING }
                                             },
-                                            loading = new LoadingLayer(true)
                                         }
                                     }
                                 }
@@ -183,12 +184,12 @@ namespace osu.Game.Overlays.Dashboard.Friends
                 SearchText = { BindTarget = searchTextBox.Current }
             };
 
-            loading.Show();
+            loading.Value = true;
             LoadComponentAsync(newList, finishLoad, cancellationSource.Token);
 
             void finishLoad(FriendsList list)
             {
-                loading.Hide();
+                loading.Value = false;
 
                 if (currentList != null)
                 {

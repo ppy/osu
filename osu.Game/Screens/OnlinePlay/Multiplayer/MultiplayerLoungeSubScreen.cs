@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             StatusDropdown.Current.BindValueChanged(_ => showInProgress.Alpha = StatusDropdown.Current.Value == RoomModeFilter.Open ? 1 : 0, true);
         }
 
-        protected override FilterCriteria CreateFilterCriteria()
+        protected override LoungeFilterCriteria CreateFilterCriteria()
         {
             var criteria = base.CreateFilterCriteria();
             criteria.Category = @"realtime";
