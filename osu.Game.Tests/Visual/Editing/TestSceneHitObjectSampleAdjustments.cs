@@ -83,10 +83,10 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestPopoverHasNoFocus()
+        public void TestPopoverHasFocus()
         {
             clickSamplePiece(0);
-            samplePopoverHasNoFocus();
+            samplePopoverHasFocus();
         }
 
         [Test]
@@ -1248,13 +1248,13 @@ namespace osu.Game.Tests.Visual.Editing
             return popover != null;
         });
 
-        private void samplePopoverHasNoFocus() => AddUntilStep("sample popover textbox not focused", () =>
+        private void samplePopoverHasFocus() => AddUntilStep("sample popover textbox not focused", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
             var slider = popover?.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
             var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
 
-            return textbox?.HasFocus == false;
+            return textbox?.HasFocus == true;
         });
 
         private void samplePopoverHasSingleVolume(int volume) => AddUntilStep($"sample popover has volume {volume}", () =>
