@@ -40,8 +40,7 @@ namespace osu.Game.Tests.Beatmaps
             Assert.That(attributes.MaxCombo, Is.EqualTo(expectedMaxCombo));
 
             // Test timed attributes ends on same value as non-timed.
-            Assert.That(timedAttributes.Last().Attributes.StarRating, Is.EqualTo(attributes.StarRating).Within(CHECK_PRECISION));
-            Assert.That(timedAttributes.Last().Attributes.MaxCombo, Is.EqualTo(attributes.MaxCombo));
+            Assert.That(timedAttributes.Last().Attributes, Is.EqualTo(attributes).UsingPropertiesComparer());
         }
 
         protected IWorkingBeatmap GetBeatmap(string name)

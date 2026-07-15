@@ -53,7 +53,7 @@ namespace osu.Game.Online.API
 
         public string ProvidedUsername { get; private set; }
 
-        public string ScoreProcessingNoticeUrl { get; private set; }
+        public string ScoreProcessingNoticeUrl { get; private set; } = string.Empty;
 
         public SessionVerificationMethod? SessionVerificationMethod { get; private set; }
 
