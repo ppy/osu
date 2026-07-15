@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select
                 new BeatmapCarouselFilterMatching
                 {
                     GetCriteria = () => Criteria!,
-                    GetLocalUserTopRanks =  GetBeatmapInfoGuidToTopRankMapping,
+                    GetLocalUserTopRanks = GetBeatmapInfoGuidToTopRankMapping,
                 },
                 new BeatmapCarouselFilterSorting(() => Criteria!),
                 grouping = new BeatmapCarouselFilterGrouping

@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Select
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
         {
             var criteria = GetCriteria();
-            var localUserTopRanks = criteria.Rank.Values.Count != ScoreRank.GetNames<ScoreRank>().Length ? GetLocalUserTopRanks(criteria) : null;
+            var localUserTopRanks = criteria.Rank.Values.Count != Enum.GetNames<ScoreRank>().Length ? GetLocalUserTopRanks(criteria) : null;
             return matchItems(items, criteria, localUserTopRanks).ToList();
         }, cancellationToken).ConfigureAwait(false);
 
