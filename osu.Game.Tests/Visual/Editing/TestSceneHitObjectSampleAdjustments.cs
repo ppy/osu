@@ -5,8 +5,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Humanizer;
 using NUnit.Framework;
-using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -1232,9 +1230,6 @@ namespace osu.Game.Tests.Visual.Editing
 
         private void seekSamplePiece(int direction) => AddStep($"seek sample piece {direction}", () =>
         {
-            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault(o => o.IsPresent);
-            popover?.FindClosestParent<IFocusManager>()?.ChangeFocus(null);
-
             InputManager.PressKey(Key.ControlLeft);
             InputManager.PressKey(Key.ShiftLeft);
             InputManager.Key(direction < 1 ? Key.Left : Key.Right);
