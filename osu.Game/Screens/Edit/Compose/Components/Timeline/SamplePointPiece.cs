@@ -743,6 +743,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // because the tooltip machinery framework-side is too smart for it (the tooltip text is only regenerated on direct changes to `Current`).
                 // Just disable it to hide the skeleton. It's of little use anyhow.
                 TooltipFormat = _ => default;
+                TransferValueOnCommit = true;
             }
         }
     }
