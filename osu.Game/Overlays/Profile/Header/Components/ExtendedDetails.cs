@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -29,57 +30,69 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private SpriteText replaysWatched = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             var font = OsuFont.Default.With(size: 12);
             const float vertical_spacing = 4;
+            const float horizontal_spacing = 20;
 
             AutoSizeAxes = Axes.Both;
+            CornerRadius = 6;
+            Masking = true;
 
-            // this should really be a grid, but trying to avoid one to avoid the performance hit.
-            InternalChild = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(20, 0),
-                Children = new[]
+                new Box
                 {
-                    new FillFlowContainer
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background4,
+                },
+                // this should really be a grid, but trying to avoid one to avoid the performance hit.
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(horizontal_spacing, 0),
+                    Padding = new MarginPadding { Vertical = 18, Horizontal = 12 },
+                    Children = new[]
                     {
-                        Name = @"Labels",
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, vertical_spacing),
-                        Children = new Drawable[]
+                        new FillFlowContainer
                         {
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsRankedScore },
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsHitAccuracy },
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsPlayCount },
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsTotalScore },
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsTotalHits },
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsHitsPerPlay },
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsMaximumCombo },
-                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsReplaysWatchedByOthers },
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Name = @"Values",
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, vertical_spacing),
-                        Children = new Drawable[]
+                            Name = @"Labels",
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, vertical_spacing),
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsRankedScore },
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsHitAccuracy },
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsPlayCount },
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsTotalScore },
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsTotalHits },
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsHitsPerPlay },
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsMaximumCombo },
+                                new OsuSpriteText { Font = font, Colour = colourProvider.Content1, Text = UsersStrings.ShowStatsReplaysWatchedByOthers },
+                            }
+                        },
+                        new FillFlowContainer
                         {
-                            rankedScore = new OsuSpriteText { Font = font },
-                            hitAccuracy = new OsuSpriteText { Font = font },
-                            playCount = new OsuSpriteText { Font = font },
-                            totalScore = new OsuSpriteText { Font = font },
-                            totalHits = new OsuSpriteText { Font = font },
-                            hitsPerPlay = new OsuSpriteText { Font = font },
-                            maximumCombo = new OsuSpriteText { Font = font },
-                            replaysWatched = new OsuSpriteText { Font = font },
-                        }
-                    },
+                            Name = @"Values",
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, vertical_spacing),
+                            Children = new Drawable[]
+                            {
+                                rankedScore = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                hitAccuracy = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                playCount = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                totalScore = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                totalHits = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                hitsPerPlay = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                maximumCombo = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                                replaysWatched = new OsuSpriteText { Font = font.With(weight: FontWeight.Bold), Colour = colourProvider.Content2 },
+                            }
+                        },
+                    }
                 }
             };
         }
