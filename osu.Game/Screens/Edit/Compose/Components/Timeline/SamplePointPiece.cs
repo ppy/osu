@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
@@ -744,6 +745,24 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // Just disable it to hide the skeleton. It's of little use anyhow.
                 TooltipFormat = _ => default;
                 TransferValueOnCommit = true;
+            }
+
+            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new TextBox();
+
+            private partial class TextBox : FormNumberBox.InnerNumberBox
+            {
+                public TextBox()
+                    : base(true)
+                {
+                }
+
+                public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+                {
+                    if (e.Action == PlatformAction.SelectBackwardWord || e.Action == PlatformAction.SelectForwardWord)
+                        return false;
+
+                    return base.OnPressed(e);
+                }
             }
         }
     }
