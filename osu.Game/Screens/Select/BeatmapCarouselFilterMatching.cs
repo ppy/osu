@@ -15,24 +15,18 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapCarouselFilterMatching : ICarouselFilter
     {
-        private readonly Func<FilterCriteria> getCriteria;
-        private readonly Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks;
+        public required Func<FilterCriteria> GetCriteria { get; init; }
+        public required Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> GetLocalUserTopRanks { get; init; }
         public int BeatmapItemsCount { get; private set; }
-
-        public BeatmapCarouselFilterMatching(Func<FilterCriteria> getCriteria, Func<FilterCriteria, IReadOnlyDictionary<Guid, ScoreRank>> getLocalUserTopRanks)
-        {
-            this.getCriteria = getCriteria;
-            this.getLocalUserTopRanks = getLocalUserTopRanks;
-        }
 
         public async Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken) => await Task.Run(() =>
         {
-            var criteria = getCriteria();
-            var localUserTopRanks = getLocalUserTopRanks(criteria);
+            var criteria = GetCriteria();
+            var localUserTopRanks = criteria.Rank.Values.Count != ScoreRank.GetNames<ScoreRank>().Length ? GetLocalUserTopRanks(criteria) : null;
             return matchItems(items, criteria, localUserTopRanks).ToList();
         }, cancellationToken).ConfigureAwait(false);
 
-        private IEnumerable<CarouselItem> matchItems(IEnumerable<CarouselItem> items, FilterCriteria criteria, IReadOnlyDictionary<Guid, ScoreRank> localUserTopRanks)
+        private IEnumerable<CarouselItem> matchItems(IEnumerable<CarouselItem> items, FilterCriteria criteria, IReadOnlyDictionary<Guid, ScoreRank>? localUserTopRanks)
         {
             int countMatching = 0;
 
@@ -53,7 +47,7 @@ namespace osu.Game.Screens.Select
             BeatmapItemsCount = countMatching;
         }
 
-        public static bool CheckCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria, IReadOnlyDictionary<Guid, ScoreRank> localUserTopRanks)
+        public static bool CheckCriteriaMatch(BeatmapInfo beatmap, FilterCriteria criteria, IReadOnlyDictionary<Guid, ScoreRank>? localUserTopRanks)
         {
             bool match = criteria.Ruleset == null || beatmap.AllowGameplayWithRuleset(criteria.Ruleset!, criteria.AllowConvertedBeatmaps);
 
@@ -94,10 +88,13 @@ namespace osu.Game.Screens.Select
             match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(beatmap.BeatDivisor);
             match &= !criteria.OnlineStatus.HasFilter || criteria.OnlineStatus.IsInRange(beatmap.Status);
 
-            if (localUserTopRanks.TryGetValue(beatmap.ID, out ScoreRank scoreRank))
-                match &= !criteria.Rank.HasFilter || criteria.Rank.IsInRange(scoreRank);
-            else
-                match &= !criteria.Rank.HasFilter || criteria.Rank.IsInRange(ScoreRank.None);
+            if (localUserTopRanks is not null)
+            {
+                if (localUserTopRanks.TryGetValue(beatmap.ID, out ScoreRank scoreRank))
+                    match &= !criteria.Rank.HasFilter || criteria.Rank.IsInRange(scoreRank);
+                else
+                    match &= !criteria.Rank.HasFilter || criteria.Rank.IsInRange(ScoreRank.None);
+            }
 
             if (!match) return false;
 

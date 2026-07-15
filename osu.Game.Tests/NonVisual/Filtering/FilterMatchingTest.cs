@@ -455,7 +455,6 @@ namespace osu.Game.Tests.NonVisual.Filtering
             ClassicAssert.True(carouselItem.Filtered.Value);
         }
 
-        [Test]
         [TestCase("rank=None", 0)]
         [TestCase("rank=X", 1)]
         [TestCase("rank=A")]
