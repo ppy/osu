@@ -81,6 +81,8 @@ namespace osu.Game.Rulesets.Mania
         Key20,
     }
 
+    // Workaround for the inability to pass arguments to `LocalisableDescription`.
+    // Should be removed if such a feature is added at all.
     static file class ActionStringsHelper
     {
         public static LocalisableString Key1 => ActionStrings.Key(1);
