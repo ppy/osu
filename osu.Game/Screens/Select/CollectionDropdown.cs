@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using Microsoft.VisualBasic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -68,50 +69,52 @@ namespace osu.Game.Screens.Select
 
         private void SortFilters()
         {
-            var sorted = filters.ToList()
+            var allItem = filters.FirstOrDefault(filter => filter is AllBeatmapsCollectionFilterMenuItem);
+            var manageItem = filters.FirstOrDefault(filter => filter is ManageCollectionsFilterMenuItem);
+
+            var collectionItems = filters
+                .Where(filter => filter is not AllBeatmapsCollectionFilterMenuItem && filter is not ManageCollectionsFilterMenuItem)
+                .ToList()
                 .OrderBy(filter => filter.CollectionName.ToString(), StringComparer.OrdinalIgnoreCase)
                 .ToList();
+
             filters.Clear();
-            filters.AddRange(sorted);
+            if (allItem != null)
+                filters.Add(allItem);
+            filters.AddRange(collectionItems);
+            if (manageItem != null)
+                filters.Add(manageItem);
         }
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
-            if (changes == null)
+            Guid? selectedId = null;
+            var selectedItem = SelectedItem?.Value;
+            if (selectedItem?.Collection != null)
             {
-                filters.Clear();
-                filters.Add(allBeatmapsItem);
-                filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
-                if (ShowManageCollectionsItem)
-                    filters.Add(new ManageCollectionsFilterMenuItem());
-                SortFilters();
+                var collectionId = selectedItem.Collection.ID;
+                if (collections.Any(c => c.ID == collectionId))
+                    selectedId = collectionId;
+            }
+
+            // rebuild list
+            filters.Clear();
+            filters.Add(allBeatmapsItem);
+            filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
+
+            if (ShowManageCollectionsItem)
+                filters.Add(new ManageCollectionsFilterMenuItem());
+            SortFilters();
+
+            // if still exists, return selected filter
+            if (selectedId.HasValue)
+            {
+                var selectedFilter = filters.FirstOrDefault(f => f.Collection?.ID == selectedId);
+                Current.Value = selectedFilter ?? allBeatmapsItem;
             }
             else
             {
-                var selectedId = SelectedItem?.Value?.Collection?.ID;
-
-                // rebuild list
-                filters.Clear();
-                filters.Add(allBeatmapsItem);
-                filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
-
-                if (ShowManageCollectionsItem)
-                    filters.Add(new ManageCollectionsFilterMenuItem());
-                SortFilters();
-
-                // if still exists
-                if (selectedId.HasValue)
-                {
-                    var selectedFilter = filters.FirstOrDefault(filter => filter.Collection?.ID == selectedId);
-                    if (selectedFilter != null)
-                        Current.Value = selectedFilter;
-                    else
-                        Current.Value = allBeatmapsItem;
-                }
-                else
-                {
-                    Current.Value = allBeatmapsItem;
-                }
+                Current.Value = allBeatmapsItem;
             }
         }
 
