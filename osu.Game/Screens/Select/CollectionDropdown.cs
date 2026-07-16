@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -87,42 +88,30 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                foreach (int i in changes.DeletedIndices.OrderDescending())
-                    filters.RemoveAt(i + 1);
+                var selectedId = SelectedItem?.Value?.Collection?.ID;
 
-                foreach (int i in changes.InsertedIndices)
-                    filters.Insert(i + 1, new CollectionFilterMenuItem(collections[i].ToLive(realm)));
+                // rebuild list
+                filters.Clear();
+                filters.Add(allBeatmapsItem);
+                filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
 
-                var selectedItem = SelectedItem?.Value;
-
-                foreach (int i in changes.NewModifiedIndices)
-                {
-                    var updatedItem = collections[i];
-
-                    // This is responsible for updating the state of the +/- button and the collection's name.
-                    // TODO: we can probably make the menu items update with changes to avoid this.
-                    filters.RemoveAt(i + 1);
-                    filters.Insert(i + 1, new CollectionFilterMenuItem(updatedItem.ToLive(realm)));
-
-                    if (updatedItem.ID == selectedItem?.Collection?.ID)
-                    {
-                        // This current update and schedule is required to work around dropdown headers not updating text even when the selected item
-                        // changes. It's not great but honestly the whole dropdown menu structure isn't great. This needs to be fixed, but I'll issue
-                        // a warning that it's going to be a frustrating journey.
-                        Current.Value = allBeatmapsItem;
-                        Schedule(() =>
-                        {
-                            // current may have changed before the scheduled call is run.
-                            if (Current.Value != allBeatmapsItem)
-                                return;
-
-                            Current.Value = filters.SingleOrDefault(f => f.Collection?.ID == selectedItem.Collection?.ID) ?? filters[0];
-                        });
-
-                        break;
-                    }
-                }
+                if (ShowManageCollectionsItem)
+                    filters.Add(new ManageCollectionsFilterMenuItem());
                 SortFilters();
+
+                // if still exists
+                if (selectedId.HasValue)
+                {
+                    var selectedFilter = filters.FirstOrDefault(filter => filter.Collection?.ID == selectedId);
+                    if (selectedFilter != null)
+                        Current.Value = selectedFilter;
+                    else
+                        Current.Value = allBeatmapsItem;
+                }
+                else
+                {
+                    Current.Value = allBeatmapsItem;
+                }
             }
         }
 
