@@ -78,18 +78,20 @@ namespace osu.Game.Rulesets.Osu.Tests
             const double offset_iterations = 400;
             var beatmap = GetBeatmap(name);
 
-            var attributes = CreateDifficultyCalculator(beatmap).Calculate();
-            double expectedStarRating = attributes.StarRating;
+            var expectedAttributes = CreateDifficultyCalculator(beatmap).Calculate();
 
             for (int i = 0; i < offset_iterations; i++)
             {
                 foreach (var beatmapHitObject in beatmap.Beatmap.HitObjects)
                     beatmapHitObject.StartTime++;
 
-                attributes = CreateDifficultyCalculator(beatmap).Calculate();
+                var calc = CreateDifficultyCalculator(beatmap);
 
-                Assert.That(attributes.StarRating, Is.EqualTo(expectedStarRating).Within(CHECK_PRECISION));
-                Assert.That(attributes.MaxCombo, Is.EqualTo(expectedMaxCombo));
+                var attributes = calc.Calculate();
+                var timedAttributes = calc.CalculateTimed();
+
+                Assert.That(attributes, Is.EqualTo(expectedAttributes).UsingPropertiesComparer());
+                Assert.That(timedAttributes.Last().Attributes, Is.EqualTo(expectedAttributes).UsingPropertiesComparer());
             }
         }
 

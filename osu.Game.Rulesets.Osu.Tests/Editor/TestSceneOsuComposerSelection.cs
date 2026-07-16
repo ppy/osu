@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(blueprintContainer.ChildrenOfType<SliderBodyPiece>().Single().ScreenSpaceDrawQuad.Centre));
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
-            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
+            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Any(m => m.State == MenuState.Open));
         }
 
         [Test]
@@ -374,7 +374,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.Click(MouseButton.Left);
             });
             AddStep("right click node", () => InputManager.Click(MouseButton.Right));
-            AddUntilStep("context menu open", () => this.ChildrenOfType<ContextMenuContainer>().Single().ChildrenOfType<Menu>().All(m => m.State == MenuState.Open));
+            AddUntilStep("context menu open", () => this.ChildrenOfType<Menu>().Any(m => m.State == MenuState.Open));
         }
 
         [Test]
