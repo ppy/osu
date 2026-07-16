@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -54,7 +55,7 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
         }
 
         /// <summary>
@@ -79,11 +80,19 @@ namespace osu.Game.Collections
             }
         }
 
+        private void SortItems()
+        {
+            var sorted = Items.OrderBy(item => item.Value.Name, StringComparer.OrdinalIgnoreCase).ToList();
+            Items.Clear();
+            Items.AddRange(sorted);
+        }
+
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
         {
             if (changes == null)
             {
                 Items.AddRange(collections.AsEnumerable().Select(c => c.ToLive(realm)));
+                SortItems();
                 return;
             }
 
@@ -93,9 +102,6 @@ namespace osu.Game.Collections
             foreach (int i in changes.InsertedIndices)
                 Items.Insert(i, collections[i].ToLive(realm));
 
-            if (changes.InsertedIndices.Length == 1)
-                lastCreated = collections[changes.InsertedIndices[0]].ID;
-
             foreach (int i in changes.NewModifiedIndices)
             {
                 var updatedItem = collections[i];
@@ -103,6 +109,11 @@ namespace osu.Game.Collections
                 Items.RemoveAt(i);
                 Items.Insert(i, updatedItem.ToLive(realm));
             }
+
+            SortItems();
+
+            if (changes.InsertedIndices.Length == 1)
+                lastCreated = collections[changes.InsertedIndices[0]].ID;
         }
 
         protected override OsuRearrangeableListItem<Live<BeatmapCollection>> CreateOsuDrawable(Live<BeatmapCollection> item) =>

@@ -60,9 +60,18 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), collectionsChanged);
 
             Current.BindValueChanged(selectionChanged);
+        }
+
+        private void SortFilters()
+        {
+            var sorted = filters.ToList()
+                .OrderBy(filter => filter.CollectionName.ToString(), StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            filters.Clear();
+            filters.AddRange(sorted);
         }
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
@@ -74,6 +83,7 @@ namespace osu.Game.Screens.Select
                 filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
                 if (ShowManageCollectionsItem)
                     filters.Add(new ManageCollectionsFilterMenuItem());
+                SortFilters();
             }
             else
             {
@@ -112,6 +122,7 @@ namespace osu.Game.Screens.Select
                         break;
                     }
                 }
+                SortFilters();
             }
         }
 
