@@ -3,13 +3,14 @@
 
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class OsuHitObjectInspector : HitObjectInspector
+    public partial class OsuHitObjectInspector(OsuDistanceSnapProvider snapProvider) : HitObjectInspector
     {
         protected override void AddInspectorValues(HitObject[] objects)
         {
@@ -28,13 +29,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (precedingObject != null && precedingObject is not Spinner)
                 {
                     AddHeader("From previous");
-                    AddValue($"{(firstInSelection.StackedPosition - precedingObject.StackedEndPosition).Length:#,0.##}px");
+                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(precedingObject, firstInSelection).ToLocalisableString(@"0.##x")} ({(firstInSelection.StackedPosition - precedingObject.StackedEndPosition).Length:#,0.##}px)");
                 }
 
                 if (nextObject != null && nextObject is not Spinner)
                 {
                     AddHeader("To next");
-                    AddValue($"{(nextObject.StackedPosition - lastInSelection.StackedEndPosition).Length:#,0.##}px");
+                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(lastInSelection, nextObject).ToLocalisableString(@"0.##x")} ({(nextObject.StackedPosition - lastInSelection.StackedEndPosition).Length:#,0.##}px)");
                 }
             }
         }

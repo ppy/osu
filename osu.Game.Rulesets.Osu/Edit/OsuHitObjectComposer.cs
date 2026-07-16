@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<TernaryState> rectangularGridSnapToggle = new Bindable<TernaryState>();
 
-        protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector();
+        protected override Drawable CreateHitObjectInspector() => new OsuHitObjectInspector(DistanceSnapProvider);
 
         protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
