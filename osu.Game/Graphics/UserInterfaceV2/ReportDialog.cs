@@ -18,10 +18,10 @@ using osuTK;
 namespace osu.Game.Graphics.UserInterfaceV2
 {
     /// <summary>
-    /// A generic popover for sending an online report about something.
+    /// A generic dialog for sending an online report about something.
     /// </summary>
     /// <typeparam name="TReportReason">An enumeration type with all valid reasons for the report.</typeparam>
-    public abstract partial class ReportPopover<TReportReason> : OsuPopover
+    public abstract partial class ReportDialog<TReportReason> : OsuPopover
         where TReportReason : struct, Enum
     {
         [Resolved]
@@ -55,14 +55,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private readonly bool showConfirmation;
 
         /// <summary>
-        /// Creates a new <see cref="ReportPopover{TReportReason}"/>.
+        /// Creates a new <see cref="ReportDialog{TReportReason}"/>.
         /// </summary>
-        /// <param name="headerString">The text to display in the header of the popover.</param>
+        /// <param name="headerString">The text to display in the header of the dialog.</param>
         /// <param name="showConfirmation">
-        /// Whether the popover should show a generic "Thank you for your report" confirmation message.
-        /// Set this to `true` if you're displaying a custom message outside of this popover.
+        /// Whether the dialog should show a generic "Thank you for your report" confirmation message.
+        /// Set this to `true` if you're displaying a custom message outside of this dialog.
         /// </param>
-        protected ReportPopover(LocalisableString headerString, bool showConfirmation = true)
+        protected ReportDialog(LocalisableString headerString, bool showConfirmation = true)
             : base(false)
         {
             header = headerString;
@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                     loadingLayer.Show();
 
                                 // we don't want size easing to mess up any transforms that are happening
-                                // when the popover is appearing, hence easing is only enabled after
+                                // when the dialog is appearing, hence easing is only enabled after
                                 // the report is submitted
                                 Content.AutoSizeEasing = Easing.OutQuint;
                                 Content.AutoSizeDuration = 500F;

@@ -231,7 +231,7 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        public Popover GetPopover() => new ReportChatPopover(message);
+        public Popover GetPopover() => new ReportChatDialog(message);
 
         /// <summary>
         /// Performs a highlight animation on this <see cref="ChatLine"/>.

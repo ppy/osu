@@ -704,26 +704,26 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportChatDialog>().Single().ChildrenOfType<RoundedButton>().Single();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportChatPopover>().Any());
+            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportChatDialog>().Any());
             AddStep("Set report data", () =>
             {
-                var field = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<OsuTextBox>().First();
+                var field = this.ChildrenOfType<ReportChatDialog>().Single().ChildrenOfType<OsuTextBox>().First();
                 field.Current.Value = "test other";
             });
 
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportChatPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportChatDialog>().Single().ChildrenOfType<RoundedButton>().Single();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("Overlay closed", () => !this.ChildrenOfType<ReportChatPopover>().Any());
+            AddUntilStep("Overlay closed", () => !this.ChildrenOfType<ReportChatDialog>().Any());
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
             AddUntilStep("Info message displayed", () => channelManager.CurrentChannel.Value.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));

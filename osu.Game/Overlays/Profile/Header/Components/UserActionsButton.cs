@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             public APIUser? User;
 
-            public Popover? GetPopover() => User != null ? new ReportUserPopover(User) : null;
+            public Popover? GetPopover() => User != null ? new ReportUserDialog(User) : null;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Comments
 
         public Popover GetPopover()
         {
-            var popover = new ReportCommentPopover(comment);
+            var popover = new ReportCommentDialog(comment);
 
             popover.Submitted += () =>
             {
