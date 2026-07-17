@@ -13,13 +13,14 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -40,6 +41,7 @@ namespace osu.Game.Tests.Visual.Online
     public partial class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
         private TestChatOverlay chatOverlay;
+        private DialogOverlay dialogOverlay;
         private ChannelManager channelManager;
 
         private readonly APIUser testUser = new APIUser { Username = "test user", Id = 5071479 };
@@ -72,11 +74,13 @@ namespace osu.Game.Tests.Visual.Online
                 CachedDependencies = new (Type, object)[]
                 {
                     (typeof(ChannelManager), channelManager = new ChannelManager(API)),
+                    (typeof(IDialogOverlay), dialogOverlay = new DialogOverlay())
                 },
                 Children = new Drawable[]
                 {
                     channelManager,
                     chatOverlay = new TestChatOverlay(),
+                    dialogOverlay,
                 },
             };
         });
@@ -694,17 +698,27 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-            AddStep("Show report popover", () => this.ChildrenOfType<ChatLine>().First().ShowPopover());
+            AddStep("Open context menu", () =>
+            {
+                var username = this.ChildrenOfType<DrawableChatUsername>().First().ChildrenOfType<TruncatingSpriteText>().First();
+                InputManager.MoveMouseTo(username);
+                InputManager.Click(MouseButton.Right);
+            });
+            AddStep("Select report option", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<Menu.DrawableMenuItem>().First(m => m.Item.Text.ToString() == "Report"));
+                InputManager.Click(MouseButton.Left);
+            });
 
             AddStep("Set report reason to other", () =>
             {
-                var reason = this.ChildrenOfType<OsuEnumDropdown<ChatReportReason>>().Single();
+                var reason = this.ChildrenOfType<FormEnumDropdown<ChatReportReason>>().Single();
                 reason.Current.Value = ChatReportReason.Other;
             });
 
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportChatDialog>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportChatDialog.SubmitButton>().Single();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
@@ -718,7 +732,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportChatDialog>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportChatDialog.SubmitButton>().Single();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });

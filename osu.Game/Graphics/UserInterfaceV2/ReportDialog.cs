@@ -3,17 +3,19 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Settings;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -21,11 +23,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
     /// A generic dialog for sending an online report about something.
     /// </summary>
     /// <typeparam name="TReportReason">An enumeration type with all valid reasons for the report.</typeparam>
-    public abstract partial class ReportDialog<TReportReason> : OsuPopover
+    public abstract partial class ReportDialog<TReportReason> : PopupDialog
         where TReportReason : struct, Enum
     {
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        /// <summary>
+        /// Intentionally hardcoded to `OverlayColourScheme.Plum` since it fits well
+        /// with the colour scheme of the `PopupDialog`.
+        /// </summary>
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
         /// <summary>
         /// The action to run when the report is submitted.
@@ -42,15 +51,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public event Action? Failure;
 
-        private ReverseChildIDFillFlowContainer<Drawable> form = null!;
-        private ReportConfirmation confirmation = null!;
-        private OsuEnumDropdown<TReportReason> reasonDropdown = null!;
-        private OsuTextBox commentsTextBox = null!;
-        private ErrorTextFlowContainer errorMessage = null!;
-        private RoundedButton submitButton = null!;
-        private LoadingLayer loadingLayer = null!;
-
-        private readonly LocalisableString header;
+        private readonly ReverseChildIDFillFlowContainer<Drawable> form;
+        private readonly FormEnumDropdown<TReportReason> reasonDropdown;
+        private readonly FormTextBox commentsTextBox;
+        private readonly SettingsNote errorNote;
+        private readonly PopupDialogButton submitButton;
+        private readonly LoadingLayer loadingLayer;
 
         private readonly bool showConfirmation;
 
@@ -63,110 +69,71 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// Set this to `true` if you're displaying a custom message outside of this dialog.
         /// </param>
         protected ReportDialog(LocalisableString headerString, bool showConfirmation = true)
-            : base(false)
         {
-            header = headerString;
             this.showConfirmation = showConfirmation;
+
+            Icon = FontAwesome.Solid.ExclamationTriangle;
+            HeaderText = headerString;
+
+            MainContent.Add(form = new ReverseChildIDFillFlowContainer<Drawable>
+            {
+                Direction = FillDirection.Vertical,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(7),
+                Padding = new MarginPadding { Horizontal = 20 },
+                Children = new Drawable[]
+                {
+                    reasonDropdown = new FormEnumDropdown<TReportReason>
+                    {
+                        Caption = UsersStrings.ReportReason,
+                    },
+                    commentsTextBox = new FormTextBox
+                    {
+                        Caption = UsersStrings.ReportComments,
+                        PlaceholderText = UsersStrings.ReportPlaceholder,
+                    },
+                    errorNote = new SettingsNote
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    },
+                },
+            });
+
+            Add(loadingLayer = new LoadingLayer(true)
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            Buttons = new[]
+            {
+                submitButton = new SubmitButton
+                {
+                    Action = () =>
+                    {
+                        if (showConfirmation)
+                            loadingLayer.Show();
+
+                        // we don't want size easing to mess up any transforms that are happening
+                        // when the dialog is appearing, hence easing is only enabled after
+                        // the report is submitted
+                        Content.AutoSizeEasing = Easing.OutQuint;
+                        Content.AutoSizeDuration = 500F;
+
+                        Submitted?.Invoke();
+                        performRequest();
+
+                        if (!showConfirmation)
+                            Hide();
+                    }
+                },
+                new PopupDialogCancelButton { Text = WebCommonStrings.ButtonsCancel },
+            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            Content.AutoSizeAxes = Axes.Y;
-            Content.Width = 500;
-
-            Children = new Drawable[]
-            {
-                form = new ReverseChildIDFillFlowContainer<Drawable>
-                {
-                    Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(7),
-                    Padding = new MarginPadding(20),
-                    Children = new Drawable[]
-                    {
-                        new SpriteIcon
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Icon = FontAwesome.Solid.ExclamationTriangle,
-                            Size = new Vector2(36),
-                        },
-                        new OsuSpriteText
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Text = header,
-                            Font = OsuFont.Torus.With(size: 25),
-                            Margin = new MarginPadding { Bottom = 10 }
-                        },
-                        new OsuSpriteText
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Text = UsersStrings.ReportReason,
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 40,
-                            Child = reasonDropdown = new OsuEnumDropdown<TReportReason>
-                            {
-                                RelativeSizeAxes = Axes.X
-                            }
-                        },
-                        new OsuSpriteText
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Text = UsersStrings.ReportComments,
-                        },
-                        commentsTextBox = new OsuTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            PlaceholderText = UsersStrings.ReportPlaceholder,
-                        },
-                        errorMessage = new ErrorTextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
-                        submitButton = new RoundedButton
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Width = 200,
-                            BackgroundColour = colours.Red3,
-                            Text = UsersStrings.ReportActionsSend,
-                            Action = () =>
-                            {
-                                if (showConfirmation)
-                                    loadingLayer.Show();
-
-                                // we don't want size easing to mess up any transforms that are happening
-                                // when the dialog is appearing, hence easing is only enabled after
-                                // the report is submitted
-                                Content.AutoSizeEasing = Easing.OutQuint;
-                                Content.AutoSizeDuration = 500F;
-
-                                Submitted?.Invoke();
-                                performRequest();
-
-                                if (!showConfirmation)
-                                    this.HidePopover();
-                            },
-                            Margin = new MarginPadding { Bottom = 5, Top = 10 },
-                        },
-                    },
-                },
-                confirmation = new ReportConfirmation(),
-                loadingLayer = new LoadingLayer(true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            };
-
             commentsTextBox.Current.BindValueChanged(_ => updateStatus());
 
             reasonDropdown.Current.BindValueChanged(_ => updateStatus());
@@ -176,7 +143,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void performRequest()
         {
-            var request = GetRequest(reasonDropdown.Current.Value, commentsTextBox.Text);
+            var request = GetRequest(reasonDropdown.Current.Value, commentsTextBox.Current.Value);
 
             request.Success += handleSuccess;
             request.Failure += handleFailure;
@@ -191,10 +158,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Schedule(() =>
                 {
                     form.Hide();
-                    confirmation.Show();
+                    Buttons = [];
+                    HeaderText = UsersStrings.ReportThanks;
 
                     loadingLayer.Hide();
-                    Scheduler.AddDelayed(this.HidePopover, 2000);
+                    Scheduler.AddDelayed(Hide, 2000);
                 });
             }
 
@@ -205,7 +173,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (showConfirmation)
             {
-                Schedule(() => errorMessage.AddErrors([e.Message]));
+                Schedule(() => errorNote.Current.Value = new SettingsNote.Data(e.Message, SettingsNote.Type.Critical));
                 loadingLayer.Hide();
             }
 
@@ -230,35 +198,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         protected virtual bool IsCommentRequired(TReportReason reason) => true;
 
-        public partial class ReportConfirmation : FillFlowContainer
+        public partial class SubmitButton : PopupDialogButton
         {
-            public ReportConfirmation()
-            {
-                Direction = FillDirection.Vertical;
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Spacing = new Vector2(7);
-                Padding = new MarginPadding(20);
-                Alpha = 0;
+            public override bool HideDialogBeforeInvoke => false;
 
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Icon = FontAwesome.Solid.ExclamationTriangle,
-                        Size = new Vector2(36),
-                    },
-                    new OsuSpriteText
-                    {
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Text = UsersStrings.ReportThanks,
-                        Font = OsuFont.Torus.With(size: 25),
-                        Margin = new MarginPadding { Bottom = 10 }
-                    },
-                };
+            public SubmitButton()
+                : base(HoverSampleSet.DialogOk)
+            {
+                Text = UsersStrings.ReportActionsSend;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                ButtonColour = colours.Red;
             }
         }
     }

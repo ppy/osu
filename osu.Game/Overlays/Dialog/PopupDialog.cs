@@ -91,6 +91,13 @@ namespace osu.Game.Overlays.Dialog
             {
                 buttonsContainer.ChildrenEnumerable = value;
 
+                // Hide the container if it is empty, so that it doesn't unnecessarily
+                // insert its padding into the parent container.
+                if (buttonsContainer.Children.Any())
+                    buttonsContainer.Show();
+                else
+                    buttonsContainer.Hide();
+
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;

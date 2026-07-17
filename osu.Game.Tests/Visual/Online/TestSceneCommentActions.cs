@@ -255,12 +255,12 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Set reason to other", () =>
             {
-                var reason = this.ChildrenOfType<OsuEnumDropdown<CommentReportReason>>().Single();
+                var reason = this.ChildrenOfType<FormEnumDropdown<CommentReportReason>>().Single();
                 reason.Current.Value = CommentReportReason.Other;
             });
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportCommentDialog>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportCommentDialog.SubmitButton>().First();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
@@ -273,7 +273,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportCommentDialog>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportCommentDialog.SubmitButton>().First();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
