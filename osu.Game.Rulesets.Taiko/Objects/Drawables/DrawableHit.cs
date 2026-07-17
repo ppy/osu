@@ -175,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 case ArmedState.Hit:
                     if (!hitAnimations.Value)
                     {
-                        this.FadeOut(0);
+                        this.FadeOut();
 
                         // despite being invisible, this object must stay alive long enough for its nested strong hit (if any) to be judged,
                         // otherwise gameplay will never complete (see also: `TaikoModHidden.ApplyNormalVisibilityState()`).
