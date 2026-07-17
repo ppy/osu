@@ -14,6 +14,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Mania;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -462,7 +463,7 @@ namespace osu.Game.Rulesets.Mania
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
             {
-                Description = SongSelectStrings.KeyCountDescription
+                Description = RulesetStrings.KeyCountDescription
             };
 
             var hitWindows = new ManiaHitWindows();
@@ -471,7 +472,7 @@ namespace osu.Game.Rulesets.Mania
             hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
             {
-                Description = SongSelectStrings.ManiaAccuracyDescription,
+                Description = RulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(

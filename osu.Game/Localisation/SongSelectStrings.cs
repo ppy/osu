@@ -60,19 +60,14 @@ namespace osu.Game.Localisation
         public static LocalisableString CircleSize => new TranslatableString(getKey(@"circle_size"), @"Circle Size");
 
         /// <summary>
-        /// "Affects the size of hit circles and sliders."
-        /// </summary>
-        public static LocalisableString OsuCircleSizeDescription => new TranslatableString(getKey(@"osu_circle_size_description"), @"Affects the size of hit circles and sliders.");
-
-        /// <summary>
         /// "Hit circle radius"
         /// </summary>
         public static LocalisableString HitCircleRadius => new TranslatableString(getKey(@"hit_circle_radius"), @"Hit circle radius");
 
         /// <summary>
-        /// "Affects the size of fruits."
+        /// "Key Count"
         /// </summary>
-        public static LocalisableString CatchCircleSizeDescription => new TranslatableString(getKey(@"catch_circle_size_description"), @"Affects the size of fruits.");
+        public static LocalisableString KeyCount => new TranslatableString(getKey(@"key_count"), @"Key Count");
 
         /// <summary>
         /// "Approach Rate"
@@ -80,64 +75,14 @@ namespace osu.Game.Localisation
         public static LocalisableString ApproachRate => new TranslatableString(getKey(@"approach_rate"), @"Approach Rate");
 
         /// <summary>
-        /// "Affects how early objects appear on screen relative to their hit time."
-        /// </summary>
-        public static LocalisableString OsuApproachRateDescription => new TranslatableString(getKey(@"osu_approach_rate_description"), @"Affects how early objects appear on screen relative to their hit time.");
-
-        /// <summary>
-        /// "Approach time"
-        /// </summary>
-        public static LocalisableString ApproachTime => new TranslatableString(getKey(@"approach_time"), @"Approach time");
-
-        /// <summary>
-        /// "Affects how early fruits fade in on the screen."
-        /// </summary>
-        public static LocalisableString CatchApproachRateDescription => new TranslatableString(getKey(@"catch_approach_rate_description"), @"Affects how early fruits fade in on the screen.");
-
-        /// <summary>
-        /// "Fade-in time"
-        /// </summary>
-        public static LocalisableString FadeInTime => new TranslatableString(getKey(@"fade_in_time"), @"Fade-in time");
-
-        /// <summary>
         /// "Accuracy"
         /// </summary>
         public static LocalisableString Accuracy => new TranslatableString(getKey(@"accuracy"), @"Accuracy");
 
         /// <summary>
-        /// "Affects timing requirements for hit circles and spin speed requirements for spinners."
-        /// </summary>
-        public static LocalisableString OsuAccuracyDescription => new TranslatableString(getKey(@"osu_accuracy_description"), @"Affects timing requirements for hit circles and spin speed requirements for spinners.");
-
-        /// <summary>
         /// "{0} hit window"
         /// </summary>
         public static LocalisableString HitResultWindow(string hitResult) => new TranslatableString(getKey(@"hit_result_window"), @"{0} hit window", hitResult);
-
-        /// <summary>
-        /// "RPM required to clear spinners"
-        /// </summary>
-        public static LocalisableString RpmRequiredToClearSpinners => new TranslatableString(getKey(@"rpm_required_to_clear_spinners"), @"RPM required to clear spinners");
-
-        /// <summary>
-        /// "RPM required to get full spinner bonus"
-        /// </summary>
-        public static LocalisableString RpmRequiredToGetFullSpinnerBonus => new TranslatableString(getKey(@"rpm_required_to_get_full_spinner_bonus"), @"RPM required to get full spinner bonus");
-
-        /// <summary>
-        /// "Affects timing requirements for hits and mash rate requirements for swells."
-        /// </summary>
-        public static LocalisableString TaikoAccuracyDescription => new TranslatableString(getKey(@"taiko_accuracy_description"), @"Affects timing requirements for hits and mash rate requirements for swells.");
-
-        /// <summary>
-        /// "Hits per second required to clear swells"
-        /// </summary>
-        public static LocalisableString HitsPerSecondRequiredToClearSwells => new TranslatableString(getKey(@"hits_per_second_required_to_clear_swells"), @"Hits per second required to clear swells");
-
-        /// <summary>
-        /// "Affects timing requirements for notes."
-        /// </summary>
-        public static LocalisableString ManiaAccuracyDescription => new TranslatableString(getKey(@"mania_accuracy_description"), @"Affects timing requirements for notes.");
 
         /// <summary>
         /// "HP Drain"
@@ -153,21 +98,6 @@ namespace osu.Game.Localisation
         /// "Scroll Speed"
         /// </summary>
         public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll Speed");
-
-        /// <summary>
-        /// "Multiplier applied to the baseline scroll speed of the playfield."
-        /// </summary>
-        public static LocalisableString ScrollSpeedDescription => new TranslatableString(getKey(@"scroll_speed_description"), @"Multiplier applied to the baseline scroll speed of the playfield.");
-
-        /// <summary>
-        /// "Key Count"
-        /// </summary>
-        public static LocalisableString KeyCount => new TranslatableString(getKey(@"key_count"), @"Key Count");
-
-        /// <summary>
-        /// "Affects the number of key columns on the playfield."
-        /// </summary>
-        public static LocalisableString KeyCountDescription => new TranslatableString(getKey(@"key_count_description"), @"Affects the number of key columns on the playfield.");
 
         /// <summary>
         /// "Submitted"

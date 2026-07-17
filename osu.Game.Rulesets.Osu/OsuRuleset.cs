@@ -16,6 +16,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Osu;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -411,7 +412,7 @@ namespace osu.Game.Rulesets.Osu
             // for circle size, we can use `effectiveDifficulty` directly
             yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
             {
-                Description = SongSelectStrings.OsuCircleSizeDescription,
+                Description = RulesetStrings.CircleSizeDescription,
                 AdditionalMetrics =
                 [
                     new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.HitCircleRadius, (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.#"))
@@ -421,10 +422,10 @@ namespace osu.Game.Rulesets.Osu
             // for approach rate, we can use `effectiveDifficulty` directly, and it is even convenient to do so (it correctly handles rate-changing mods like DT/HT)
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
             {
-                Description = SongSelectStrings.OsuApproachRateDescription,
+                Description = RulesetStrings.ApproachRateDescription,
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.ApproachTime,
+                    new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.ApproachTime,
                         LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, OsuHitObject.PREEMPT_RANGE):#,0.##} ms"))
                 ]
             };
@@ -440,7 +441,7 @@ namespace osu.Game.Rulesets.Osu
             double rate = ModUtils.CalculateRateWithMods(mods);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = SongSelectStrings.OsuAccuracyDescription,
+                Description = RulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
@@ -448,8 +449,8 @@ namespace osu.Game.Rulesets.Osu
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).Concat([
-                                                  new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.RpmRequiredToClearSpinners, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
-                                                  new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.RpmRequiredToGetFullSpinnerBonus, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.RpmRequiredToClearSpinners, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.RpmRequiredToGetFullSpinnerBonus, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
                                               ]).ToArray()
             };
 

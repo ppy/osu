@@ -35,6 +35,7 @@ using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Edit.Setup;
@@ -310,7 +311,7 @@ namespace osu.Game.Rulesets.Taiko
             double rate = ModUtils.CalculateRateWithMods(mods);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = SongSelectStrings.TaikoAccuracyDescription,
+                Description = RulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
@@ -318,7 +319,7 @@ namespace osu.Game.Rulesets.Taiko
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               ))
-                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.HitsPerSecondRequiredToClearSwells, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
+                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.HitsPerSecondRequiredToClearSwells, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
                                               .ToArray()
             };
 
@@ -329,7 +330,7 @@ namespace osu.Game.Rulesets.Taiko
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
             {
-                Description = SongSelectStrings.ScrollSpeedDescription
+                Description = RulesetStrings.ScrollSpeedDescription
             };
         }
     }
