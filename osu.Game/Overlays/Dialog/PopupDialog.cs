@@ -98,14 +98,26 @@ namespace osu.Game.Overlays.Dialog
                     {
                         if (actionInvoked) return;
 
-                        actionInvoked = true;
-
                         // Hide the dialog before running the action.
                         // This is important as the code which is performed may check for a dialog being present (ie. `OsuGame.PerformFromScreen`)
                         // and we don't want it to see the already dismissed dialog.
-                        Hide();
+                        //
+                        // Can be overriden using `PopupDialogButton.HideDialogBeforeInvoke` if a dialog needs to remain
+                        // open after invoking an action (eg. report forms).
+                        if (b.HideDialogBeforeInvoke)
+                        {
+                            actionInvoked = true;
+                            Hide();
+                        }
 
                         action?.Invoke();
+
+                        // Delay setting `actionInvoke` for buttons requesting not to hide the dialog before invoke
+                        // until after the action has been invoked, so that the popup hide logic in `PopOut` can fire properly.
+                        //
+                        // This is done assuming the invoked action will handle hiding the dialog itself.
+                        if (!b.HideDialogBeforeInvoke)
+                            actionInvoked = true;
                     };
                 }
             }
