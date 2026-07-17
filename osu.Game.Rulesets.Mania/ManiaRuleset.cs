@@ -330,7 +330,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
-        public override LocalisableString VariantDescription => RulesetStrings.VariantDescription;
+        public override LocalisableString VariantDescription => ManiaRulesetStrings.VariantDescription;
 
         public override IEnumerable<int> AvailableVariants
         {
