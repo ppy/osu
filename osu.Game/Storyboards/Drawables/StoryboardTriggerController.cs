@@ -2,8 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Storyboards.Commands;
 
 namespace osu.Game.Storyboards.Drawables
@@ -18,6 +23,15 @@ namespace osu.Game.Storyboards.Drawables
 
         private readonly BindableWithCurrent<bool> passing = new BindableWithCurrent<bool>();
 
+        private readonly IBindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
+
+        [BackgroundDependencyLoader]
+        private void load(GameplayState? gameplayState)
+        {
+            if (gameplayState != null)
+                lastJudgementResult.BindTo(gameplayState.LastJudgementResult);
+        }
+
         public void Bind<TDrawable>(TDrawable drawable, StoryboardTriggerGroup triggerGroup)
             where TDrawable : Drawable, IFlippable, IVectorScalable
         {
@@ -29,6 +43,14 @@ namespace osu.Game.Storyboards.Drawables
 
                 case @"Failing":
                     bindPassing(drawable, triggerGroup, false);
+                    break;
+
+                case @"HitObjectHit":
+                    lastJudgementResult.BindValueChanged(val =>
+                    {
+                        if (val.NewValue.IsNotNull() && val.NewValue.IsHit && val.NewValue.Type.IsScorable())
+                            playTrigger(drawable, triggerGroup);
+                    });
                     break;
             }
         }
