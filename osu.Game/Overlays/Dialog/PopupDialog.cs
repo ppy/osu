@@ -40,6 +40,8 @@ namespace osu.Game.Overlays.Dialog
         private readonly TextFlowContainer header;
         private readonly TextFlowContainer body;
 
+        protected override Container<Drawable> Content => content;
+
         public Container MainContent { get; private set; }
 
         private bool actionInvoked;
@@ -117,7 +119,7 @@ namespace osu.Game.Overlays.Dialog
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 content = new Container
                 {
@@ -125,21 +127,21 @@ namespace osu.Game.Overlays.Dialog
                     AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Masking = true,
+                    CornerRadius = 20,
+                    CornerExponent = 2.5f,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.2f),
+                        Radius = 14,
+                    },
                     Alpha = 0f,
                     Children = new Drawable[]
                     {
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
-                                Radius = 14,
-                            },
                             Children = new Drawable[]
                             {
                                 new Box
