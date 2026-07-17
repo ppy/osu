@@ -15,6 +15,11 @@ namespace osu.Game.Localisation.Osu
         public static LocalisableString CircleSizeDescription => new TranslatableString(getKey(@"circle_size_description"), @"Affects the size of hit circles and sliders.");
 
         /// <summary>
+        /// "Hit circle radius"
+        /// </summary>
+        public static LocalisableString HitCircleRadius => new TranslatableString(getKey(@"hit_circle_radius"), @"Hit circle radius");
+
+        /// <summary>
         /// "Affects how early objects appear on screen relative to their hit time."
         /// </summary>
         public static LocalisableString ApproachRateDescription => new TranslatableString(getKey(@"approach_rate_description"), @"Affects how early objects appear on screen relative to their hit time.");
@@ -30,6 +35,11 @@ namespace osu.Game.Localisation.Osu
         public static LocalisableString AccuracyDescription => new TranslatableString(getKey(@"accuracy_description"), @"Affects timing requirements for hit circles and spin speed requirements for spinners.");
 
         /// <summary>
+        /// "{0} hit window"
+        /// </summary>
+        public static LocalisableString HitResultWindow(string hitResult) => new TranslatableString(getKey(@"hit_result_window"), @"{0} hit window", hitResult);
+
+        /// <summary>
         /// "RPM required to clear spinners"
         /// </summary>
         public static LocalisableString RpmRequiredToClearSpinners => new TranslatableString(getKey(@"rpm_required_to_clear_spinners"), @"RPM required to clear spinners");
@@ -38,6 +48,11 @@ namespace osu.Game.Localisation.Osu
         /// "RPM required to get full spinner bonus"
         /// </summary>
         public static LocalisableString RpmRequiredToGetFullSpinnerBonus => new TranslatableString(getKey(@"rpm_required_to_get_full_spinner_bonus"), @"RPM required to get full spinner bonus");
+
+        /// <summary>
+        /// "Affects the harshness of health drain and the health penalties for missing."
+        /// </summary>
+        public static LocalisableString HPDrainDescription => new TranslatableString(getKey(@"hp_drain_description"), @"Affects the harshness of health drain and the health penalties for missing.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

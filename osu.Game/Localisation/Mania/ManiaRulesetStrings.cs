@@ -10,14 +10,14 @@ namespace osu.Game.Localisation.Mania
         private const string prefix = @"osu.Game.Resources.Localisation.Mania.ManiaRuleset";
 
         /// <summary>
-        /// "Affects timing requirements for notes."
-        /// </summary>
-        public static LocalisableString AccuracyDescription => new TranslatableString(getKey(@"accuracy_description"), @"Affects timing requirements for notes.");
-
-        /// <summary>
         /// "Affects the number of key columns on the playfield."
         /// </summary>
         public static LocalisableString KeyCountDescription => new TranslatableString(getKey(@"key_count_description"), @"Affects the number of key columns on the playfield.");
+
+        /// <summary>
+        /// "Affects timing requirements for notes."
+        /// </summary>
+        public static LocalisableString AccuracyDescription => new TranslatableString(getKey(@"accuracy_description"), @"Affects timing requirements for notes.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

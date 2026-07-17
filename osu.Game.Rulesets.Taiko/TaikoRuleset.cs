@@ -35,6 +35,7 @@ using osu.Game.Skinning;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Osu;
 using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Configuration;
@@ -315,7 +316,7 @@ namespace osu.Game.Rulesets.Taiko
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
+                                                  OsuRulesetStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               ))
@@ -325,7 +326,7 @@ namespace osu.Game.Rulesets.Taiko
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
             {
-                Description = SongSelectStrings.HPDrainDescription
+                Description = OsuRulesetStrings.HPDrainDescription
             };
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
