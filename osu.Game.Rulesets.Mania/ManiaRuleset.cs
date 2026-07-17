@@ -14,6 +14,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Mania;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -329,7 +330,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
-        public override LocalisableString VariantDescription => SongSelectStrings.ManiaVariant;
+        public override LocalisableString VariantDescription => RulesetStrings.VariantDescription;
 
         public override IEnumerable<int> AvailableVariants
         {

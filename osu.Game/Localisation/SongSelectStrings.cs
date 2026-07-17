@@ -250,11 +250,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Source => new TranslatableString(getKey(@"source"), @"Source");
 
         /// <summary>
-        /// "Keys"
-        /// </summary>
-        public static LocalisableString ManiaVariant => new TranslatableString(getKey(@"mania_variant"), @"Keys");
-
-        /// <summary>
         /// "No matching beatmaps"
         /// </summary>
         public static LocalisableString NoMatchingBeatmaps => new TranslatableString(getKey(@"no_matching_beatmaps"), @"No matching beatmaps");
