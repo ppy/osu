@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (precedingObject != null && precedingObject is not Spinner)
                 {
-                    AddHeader("To previous");
+                    AddHeader("From previous");
                     AddValue($"{(firstInSelection.StackedPosition - precedingObject.StackedEndPosition).Length:#,0.##}px");
                 }
 

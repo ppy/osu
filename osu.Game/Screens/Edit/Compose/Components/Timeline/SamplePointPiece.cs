@@ -13,7 +13,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -24,7 +26,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
-using osu.Game.Screens.Edit.Timing;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -189,11 +190,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly HitObject hitObject;
 
-            private LabelledDropdown<string> bank = null!;
-            private LabelledDropdown<string> additionBank = null!;
+            private FormDropdown<string> bank = null!;
+            private FormDropdown<string> additionBank = null!;
             private FillFlowContainer<SampleSetTernaryButton>? sampleSetsFlow;
-            private LabelledDropdown<EditorBeatmapSkin.SampleSet>? sampleSetDropdown;
-            private IndeterminateSliderWithTextBoxInput<int> volume = null!;
+            private FormDropdown<EditorBeatmapSkin.SampleSet>? sampleSetDropdown;
+            private VolumeControl volume = null!;
             private SkinnableSound demoSample = null!;
 
             private FillFlowContainer togglesCollection = null!;
@@ -258,22 +259,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(5, 5),
                             },
-                            bank = new LabelledDropdown<string>(padded: false)
+                            bank = new FormDropdown<string>
                             {
-                                Label = EditorStrings.NormalBank,
+                                Caption = EditorStrings.NormalBank,
                                 Items = HitSampleInfo.ALL_BANKS,
                             },
-                            additionBank = new LabelledDropdown<string>(padded: false)
+                            additionBank = new FormDropdown<string>
                             {
-                                Label = EditorStrings.AdditionBank,
+                                Caption = EditorStrings.AdditionBank,
                                 Items = HitSampleInfo.ALL_BANKS,
                             },
                             createSampleSetContent(),
-                            volume = new IndeterminateSliderWithTextBoxInput<int>(EditorStrings.SampleVolume, new BindableInt(100)
+                            volume = new VolumeControl
                             {
-                                MinValue = DrawableHitObject.MINIMUM_SAMPLE_VOLUME,
-                                MaxValue = 100,
-                            })
+                                Caption = EditorStrings.SampleVolume,
+                                Current = new BindableInt(100)
+                                {
+                                    MinValue = DrawableHitObject.MINIMUM_SAMPLE_VOLUME,
+                                    MaxValue = 100,
+                                }
+                            }
                         }
                     },
                     new EditorSkinProvidingContainer(beatmap)
@@ -291,8 +296,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // even if there are multiple objects selected, we can still display sample volume or bank if they all have the same value.
                 int? commonVolume = getCommonVolume();
-                if (commonVolume != null)
-                    volume.Current.Value = commonVolume.Value;
+                volume.Current.Value = commonVolume ?? 100;
+                volume.IsMultipleValues = commonVolume == null;
 
                 updatePrimaryBankState();
                 bank.Current.BindValueChanged(val =>
@@ -320,8 +325,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 volume.Current.BindValueChanged(val =>
                 {
-                    if (val.NewValue != null)
-                        setVolume(val.NewValue.Value);
+                    setVolume(val.NewValue);
                 });
 
                 createStateBindables();
@@ -329,15 +333,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 togglesCollection.AddRange(createTernaryButtons());
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                ScheduleAfterChildren(() => volume.TakeFocus());
+            }
+
             private Drawable createSampleSetContent()
             {
                 if (beatmap.BeatmapSkin == null)
-                    return Empty();
+                    return Empty().With(d => d.Alpha = 0);
 
                 var sampleSets = beatmap.BeatmapSkin.GetAvailableSampleSets().ToList();
 
                 if (sampleSets.Count == 0)
-                    return Empty();
+                    return Empty().With(d => d.Alpha = 0);
 
                 sampleSets.Insert(0, new EditorBeatmapSkin.SampleSet(0, "User skin"));
 
@@ -366,9 +377,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     return sampleSetsFlow;
                 }
 
-                sampleSetDropdown = new LabelledDropdown<EditorBeatmapSkin.SampleSet>(padded: false)
+                sampleSetDropdown = new FormDropdown<EditorBeatmapSkin.SampleSet>
                 {
-                    Label = EditorStrings.SampleSet,
+                    Caption = EditorStrings.SampleSet,
                     Items = sampleSets,
                 };
                 sampleSetDropdown.Current.BindValueChanged(val =>
@@ -528,6 +539,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         relevantSamples[i] = relevantSamples[i].With(newVolume: newVolume);
                     }
                 });
+                volume.IsMultipleValues = false;
             }
 
             #region hitsound toggles
@@ -694,6 +706,64 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             #endregion
+        }
+
+        internal partial class VolumeControl : FormSliderBar<int>
+        {
+            private bool isMultipleValues;
+
+            /// <summary>
+            /// This is a hack to allow the text box to show an indication that multiple slider velocity values are active
+            /// when the selection contains multiple objects with different velocities.
+            /// </summary>
+            public bool IsMultipleValues
+            {
+                get => isMultipleValues;
+                set
+                {
+                    if (isMultipleValues == value)
+                        return;
+
+                    isMultipleValues = value;
+                    updateLabelFormat();
+                }
+            }
+
+            private void updateLabelFormat()
+            {
+                LabelFormat = isMultipleValues
+                    ? static _ => "(multiple)"
+                    : v => LocalisableString.Interpolate($"{v / 100.0:P0}");
+            }
+
+            public VolumeControl()
+            {
+                updateLabelFormat();
+
+                // The `IsMultipleValues` / `updateLabelFormat()` hack above to jam an indicator of multiple active values does not work for tooltip
+                // because the tooltip machinery framework-side is too smart for it (the tooltip text is only regenerated on direct changes to `Current`).
+                // Just disable it to hide the skeleton. It's of little use anyhow.
+                TooltipFormat = _ => default;
+                TransferValueOnCommit = true;
+            }
+
+            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new TextBox();
+
+            private partial class TextBox : FormNumberBox.InnerNumberBox
+            {
+                public TextBox()
+                    : base(true)
+                {
+                }
+
+                public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+                {
+                    if (e.Action == PlatformAction.SelectBackwardWord || e.Action == PlatformAction.SelectForwardWord)
+                        return false;
+
+                    return base.OnPressed(e);
+                }
+            }
         }
     }
 }

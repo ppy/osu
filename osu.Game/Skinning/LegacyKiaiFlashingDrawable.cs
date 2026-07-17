@@ -14,11 +14,11 @@ namespace osu.Game.Skinning
     {
         public Color4 KiaiGlowColour
         {
-            get => flashingDrawable.Colour;
-            set => flashingDrawable.Colour = value;
+            get => FlashingDrawable.Colour;
+            set => FlashingDrawable.Colour = value;
         }
 
-        private readonly Drawable flashingDrawable;
+        public readonly Drawable FlashingDrawable;
 
         private const float flash_opacity = 0.3f;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Skinning
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
                 }),
-                flashingDrawable = (creationFunc.Invoke() ?? Empty()).With(d =>
+                FlashingDrawable = (creationFunc.Invoke() ?? Empty()).With(d =>
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
@@ -48,7 +48,7 @@ namespace osu.Game.Skinning
             if (!effectPoint.KiaiMode)
                 return;
 
-            flashingDrawable
+            FlashingDrawable
                 .FadeTo(flash_opacity)
                 .Then()
                 .FadeOut(Math.Max(80, timingPoint.BeatLength - 80), Easing.OutSine);

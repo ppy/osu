@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);
             countMeh = score.Statistics.GetValueOrDefault(HitResult.Meh);
-            countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+            countMiss = Math.Max(0, score.Statistics.GetValueOrDefault(HitResult.Miss));
 
             clockRate = ModUtils.CalculateRateWithMods(score.Mods);
 
