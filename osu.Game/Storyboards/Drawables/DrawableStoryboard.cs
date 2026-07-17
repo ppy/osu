@@ -26,6 +26,9 @@ namespace osu.Game.Storyboards.Drawables
         [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }
 
+        [Cached(typeof(StoryboardTriggerController))]
+        public StoryboardTriggerController TriggerController { get; }
+
         /// <summary>
         /// Whether the storyboard is considered finished.
         /// </summary>
@@ -77,6 +80,10 @@ namespace osu.Game.Storyboards.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+            });
+            AddInternal(TriggerController = new StoryboardTriggerController
+            {
+                Passing = passing,
             });
         }
 
