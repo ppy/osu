@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public event TextBox.OnCommitHandler? OnCommit;
 
-        private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
+        private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>(string.Empty);
 
         /// <summary>
         /// Caption describing this slider bar, displayed on top of the controls.
