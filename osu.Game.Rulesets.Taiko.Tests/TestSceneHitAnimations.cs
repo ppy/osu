@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -25,15 +24,19 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             setHitAnimations(false);
 
-            Func<bool> judgedHitsAlwaysHidden = checkJudgedHitsAlwaysHidden();
+            bool allSuccessfulHitsImmediatelyHidden = true;
 
             CreateModTest(new ModTestData
             {
                 Autoplay = true,
                 CreateBeatmap = createBeatmapWithStrongHit,
-                PassCondition = () => judgedHitsAlwaysHidden()
-                                      && Player.ScoreProcessor.HasCompleted.Value
-                                      && Player.Results.All(result => result.Type == result.Judgement.MaxResult),
+                PassCondition = () =>
+                {
+                    allSuccessfulHitsImmediatelyHidden &= getSuccessfulHits().All(h => h.Alpha == 0);
+                    return allSuccessfulHitsImmediatelyHidden
+                           && Player.ScoreProcessor.HasCompleted.Value
+                           && Player.Results.All(result => result.Type == result.Judgement.MaxResult);
+                },
             });
         }
 
@@ -42,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             setHitAnimations(false);
 
-            Func<bool> judgedHitsAlwaysHidden = checkJudgedHitsAlwaysHidden();
+            bool allSuccessfulHitsImmediatelyHidden = true;
 
             CreateModTest(new ModTestData
             {
@@ -57,7 +60,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     new TaikoReplayFrame(300, TaikoAction.LeftRim),
                     new TaikoReplayFrame(320),
                 },
-                PassCondition = () => judgedHitsAlwaysHidden() && Player.ScoreProcessor.HasCompleted.Value,
+                PassCondition = () =>
+                {
+                    allSuccessfulHitsImmediatelyHidden &= getSuccessfulHits().All(h => h.Alpha == 0);
+                    return allSuccessfulHitsImmediatelyHidden && Player.ScoreProcessor.HasCompleted.Value;
+                },
             });
         }
 
@@ -66,13 +73,17 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             setHitAnimations(false);
 
-            Func<bool> judgedHitsAlwaysHidden = checkJudgedHitsAlwaysHidden();
+            bool allSuccessfulHitsImmediatelyHidden = true;
 
             CreateModTest(new ModTestData
             {
                 Autoplay = false,
                 CreateBeatmap = createBeatmapWithStrongHit,
-                PassCondition = () => judgedHitsAlwaysHidden() && Player.ScoreProcessor.HasCompleted.Value,
+                PassCondition = () =>
+                {
+                    allSuccessfulHitsImmediatelyHidden &= getSuccessfulHits().All(h => h.Alpha == 0);
+                    return allSuccessfulHitsImmediatelyHidden && Player.ScoreProcessor.HasCompleted.Value;
+                },
             });
         }
 
@@ -81,31 +92,24 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             setHitAnimations(true);
 
-            Func<bool> judgedHitsAlwaysHidden = checkJudgedHitsAlwaysHidden();
+            bool allSuccessfulHitsImmediatelyHidden = true;
 
             CreateModTest(new ModTestData
             {
                 Autoplay = true,
                 CreateBeatmap = createBeatmapWithStrongHit,
-                PassCondition = () => !judgedHitsAlwaysHidden()
-                                      && Player.ScoreProcessor.HasCompleted.Value
-                                      && Player.Results.All(result => result.Type == result.Judgement.MaxResult),
+                PassCondition = () =>
+                {
+                    allSuccessfulHitsImmediatelyHidden &= getSuccessfulHits().All(h => h.Alpha == 0);
+                    return !allSuccessfulHitsImmediatelyHidden
+                           && Player.ScoreProcessor.HasCompleted.Value
+                           && Player.Results.All(result => result.Type == result.Judgement.MaxResult);
+                },
             });
         }
 
-        private Func<bool> checkJudgedHitsAlwaysHidden()
-        {
-            bool judgedHitSeenVisible = false;
-
-            return () =>
-            {
-                judgedHitSeenVisible |= getJudgedHits().Any(hit => hit.Alpha > 0);
-                return !judgedHitSeenVisible;
-            };
-        }
-
-        private IEnumerable<DrawableHit> getJudgedHits()
-            => Player.ChildrenOfType<DrawableHit>().Where(hit => hit.Judged && hit.Time.Current > hit.HitStateUpdateTime);
+        private IEnumerable<DrawableHit> getSuccessfulHits()
+            => Player.ChildrenOfType<DrawableHit>().Where(hit => hit.Judged && hit.Result.IsHit && hit.Time.Current > hit.HitStateUpdateTime);
 
         private void setHitAnimations(bool enabled)
             => AddStep($"set hit animations to {enabled}", () =>
