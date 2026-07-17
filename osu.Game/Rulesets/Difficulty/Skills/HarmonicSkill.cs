@@ -50,6 +50,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         public override double DifficultyValue()
         {
+            ObjectWeightSum = 0;
+
             if (ObjectDifficulties.Count == 0)
                 return 0;
 

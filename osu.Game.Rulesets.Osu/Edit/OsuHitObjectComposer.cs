@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -114,7 +115,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             RightToolbox.AddRange(new Drawable[]
                 {
-                    sliderVelocityToolboxGroup,
+                    new OsuContextMenuContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Child = sliderVelocityToolboxGroup,
+                    },
                     OsuGridToolboxGroup,
                     new TransformToolboxGroup
                     {

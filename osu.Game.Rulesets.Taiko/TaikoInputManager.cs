@@ -1,9 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
+using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko
@@ -19,16 +20,16 @@ namespace osu.Game.Rulesets.Taiko
 
     public enum TaikoAction
     {
-        [Description("Left (rim)")]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.LeftRim))]
         LeftRim,
 
-        [Description("Left (centre)")]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.LeftCentre))]
         LeftCentre,
 
-        [Description("Right (centre)")]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.RightCentre))]
         RightCentre,
 
-        [Description("Right (rim)")]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.RightRim))]
         RightRim
     }
 }

@@ -79,7 +79,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public readonly object Action;
 
-        private Bindable<bool> isDefault { get; } = new BindableBool(true);
+        public IBindable<bool> IsDefault => isDefault;
+        private readonly Bindable<bool> isDefault = new BindableBool(true);
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -224,7 +225,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            Text = "Clear binding",
+                                            Text = InputSettingsStrings.ClearBindingButton,
                                             Size = new Vector2(120, 30),
                                             Action = clear
                                         },
