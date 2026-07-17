@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
             AddWaitStep("wait some", 3);
-            AddStep("complete request", () => pendingRequest?.TriggerSuccess());
+            AddStep("complete request", () => pendingRequest.TriggerSuccess());
             AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.False);
 
             AddAssert("ensure form is not present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.False);
