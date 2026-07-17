@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation.Catch
 {
-    public static class RulesetStrings
+    public static class CatchRulesetStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Catch.Ruleset";
+        private const string prefix = @"osu.Game.Resources.Localisation.Catch.CatchRuleset";
 
         /// <summary>
         /// "Affects the size of fruits."

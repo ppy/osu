@@ -412,7 +412,7 @@ namespace osu.Game.Rulesets.Osu
             // for circle size, we can use `effectiveDifficulty` directly
             yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
             {
-                Description = RulesetStrings.CircleSizeDescription,
+                Description = OsuRulesetStrings.CircleSizeDescription,
                 AdditionalMetrics =
                 [
                     new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.HitCircleRadius, (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.#"))
@@ -422,10 +422,10 @@ namespace osu.Game.Rulesets.Osu
             // for approach rate, we can use `effectiveDifficulty` directly, and it is even convenient to do so (it correctly handles rate-changing mods like DT/HT)
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
             {
-                Description = RulesetStrings.ApproachRateDescription,
+                Description = OsuRulesetStrings.ApproachRateDescription,
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.ApproachTime,
+                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.ApproachTime,
                         LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, OsuHitObject.PREEMPT_RANGE):#,0.##} ms"))
                 ]
             };
@@ -441,7 +441,7 @@ namespace osu.Game.Rulesets.Osu
             double rate = ModUtils.CalculateRateWithMods(mods);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = RulesetStrings.AccuracyDescription,
+                Description = OsuRulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
@@ -449,8 +449,8 @@ namespace osu.Game.Rulesets.Osu
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).Concat([
-                                                  new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.RpmRequiredToClearSpinners, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
-                                                  new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.RpmRequiredToGetFullSpinnerBonus, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToClearSpinners, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToGetFullSpinnerBonus, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
                                               ]).ToArray()
             };
 

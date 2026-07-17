@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation.Mania
 {
-    public static class RulesetStrings
+    public static class ManiaRulesetStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Mania.Ruleset";
+        private const string prefix = @"osu.Game.Resources.Localisation.Mania.ManiaRuleset";
 
         /// <summary>
         /// "Affects timing requirements for notes."

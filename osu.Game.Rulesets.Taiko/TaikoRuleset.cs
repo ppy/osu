@@ -311,7 +311,7 @@ namespace osu.Game.Rulesets.Taiko
             double rate = ModUtils.CalculateRateWithMods(mods);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = RulesetStrings.AccuracyDescription,
+                Description = TaikoRulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
@@ -319,7 +319,7 @@ namespace osu.Game.Rulesets.Taiko
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               ))
-                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.HitsPerSecondRequiredToClearSwells, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
+                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(TaikoRulesetStrings.HitsPerSecondRequiredToClearSwells, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
                                               .ToArray()
             };
 
@@ -330,7 +330,7 @@ namespace osu.Game.Rulesets.Taiko
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
             {
-                Description = RulesetStrings.ScrollSpeedDescription
+                Description = TaikoRulesetStrings.ScrollSpeedDescription
             };
         }
     }

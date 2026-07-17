@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation.Taiko
 {
-    public static class RulesetStrings
+    public static class TaikoRulesetStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Taiko.Ruleset";
+        private const string prefix = @"osu.Game.Resources.Localisation.Taiko.TaikoRuleset";
 
         /// <summary>
         /// "Affects timing requirements for hits and mash rate requirements for swells."

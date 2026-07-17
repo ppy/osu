@@ -5,9 +5,9 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation.Osu
 {
-    public static class RulesetStrings
+    public static class OsuRulesetStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Osu.Ruleset";
+        private const string prefix = @"osu.Game.Resources.Localisation.Osu.OsuRuleset";
 
         /// <summary>
         /// "Affects the size of hit circles and sliders."

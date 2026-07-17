@@ -298,7 +298,7 @@ namespace osu.Game.Rulesets.Catch
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
             {
-                Description = RulesetStrings.CircleSizeDescription,
+                Description = CatchRulesetStrings.CircleSizeDescription,
                 AdditionalMetrics =
                 [
                     new RulesetBeatmapAttribute.AdditionalMetric(SongSelectStrings.HitCircleRadius, (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("0.#"))
@@ -306,10 +306,10 @@ namespace osu.Game.Rulesets.Catch
             };
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
             {
-                Description = RulesetStrings.ApproachRateDescription,
+                Description = CatchRulesetStrings.ApproachRateDescription,
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric(RulesetStrings.FadeInTime, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##} ms"))
+                    new RulesetBeatmapAttribute.AdditionalMetric(CatchRulesetStrings.FadeInTime, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##} ms"))
                 ]
             };
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
