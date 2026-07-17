@@ -12,17 +12,22 @@ using osu.Game.Input.Bindings;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public partial class DialogOverlay : OsuFocusedOverlayContainer, IDialogOverlay
     {
+        private readonly Box dimLayer;
         private readonly Container dialogContainer;
 
         protected override string PopInSampleName => "UI/dialog-pop-in";
         protected override string PopOutSampleName => "UI/dialog-pop-out";
+
+        protected override bool DimMainContent => false;
 
         [Resolved]
         private MusicController musicController { get; set; }
@@ -43,18 +48,28 @@ namespace osu.Game.Overlays
 
         public DialogOverlay()
         {
-            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.Both;
 
-            Child = dialogContainer = new Container
+            Child = new Container
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    dimLayer = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                        Alpha = 0.5f,
+                    },
+                    dialogContainer = new Container
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        AutoSizeAxes = Axes.Y,
+                        Width = 500,
+                    },
+                },
             };
-
-            Width = 500;
-
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -113,6 +128,23 @@ namespace osu.Game.Overlays
 
         protected override bool BlockNonPositionalInput => true;
 
+        private bool closeOnMouseUp;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            closeOnMouseUp = !dialogContainer.ReceivePositionalInputAt(e.ScreenSpaceMousePosition);
+
+            return base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (closeOnMouseUp && !dialogContainer.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                Hide();
+
+            base.OnMouseUp(e);
+        }
+
         protected override void PopIn()
         {
             duckOperation = musicController?.Duck(new DuckParameters
@@ -121,6 +153,8 @@ namespace osu.Game.Overlays
                 DuckDuration = 100,
                 RestoreDuration = 100,
             });
+
+            dimLayer.FadeTo(0.5f, PopupDialog.ENTER_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
@@ -131,6 +165,8 @@ namespace osu.Game.Overlays
             // PopOut gets called initially, but we only want to hide dialog when we have been loaded and are present.
             if (IsLoaded && CurrentDialog?.State.Value == Visibility.Visible)
                 CurrentDialog.Hide();
+
+            dimLayer.FadeOut(PopupDialog.EXIT_DURATION, Easing.OutQuint);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
