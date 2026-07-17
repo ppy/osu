@@ -260,7 +260,7 @@ namespace osu.Game.Tests.Editing.Checks
             if (hasStoryboard)
             {
                 storyboard = new Storyboard();
-                storyboard.GetLayer("Background").Add(new StoryboardSprite("test.png", Anchor.Centre, Vector2.Zero));
+                storyboard.GetLayer("Background").Add(new StoryboardSprite(StoryboardElementSource.Beatmap, "test.png", Anchor.Centre, Vector2.Zero));
             }
 
             var verifiedCurrentBeatmap = new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(currentBeatmap, storyboard), currentBeatmap);

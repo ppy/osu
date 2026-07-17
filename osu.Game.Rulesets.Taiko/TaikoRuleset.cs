@@ -77,12 +77,14 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.D, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
+            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
             new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
             new KeyBinding(InputKey.J, TaikoAction.RightCentre),
+            new KeyBinding(InputKey.None, TaikoAction.RightCentre),
             new KeyBinding(InputKey.K, TaikoAction.RightRim),
+            new KeyBinding(InputKey.None, TaikoAction.RightRim),
         };
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
@@ -187,6 +189,8 @@ namespace osu.Game.Rulesets.Taiko
                     return Array.Empty<Mod>();
             }
         }
+
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new TaikoScoreMultiplierCalculator(context);
 
         public override string Description => "osu!taiko";
 

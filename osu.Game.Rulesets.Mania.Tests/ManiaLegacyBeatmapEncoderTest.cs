@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             var decoded = DecodeFromLegacy(beatmaps_resource_store.GetStream($"Resources/Testing/Beatmaps/{name}.osu"), beatmaps_resource_store, name);
             var decodedAfterEncode = DecodeFromLegacy(EncodeToLegacy(decoded), beatmaps_resource_store, name);
 
-            Sort(decoded.beatmap);
-            Sort(decodedAfterEncode.beatmap);
+            Sort(decoded.Beatmap);
+            Sort(decodedAfterEncode.Beatmap);
 
             CompareBeatmaps(decoded, decodedAfterEncode);
         }

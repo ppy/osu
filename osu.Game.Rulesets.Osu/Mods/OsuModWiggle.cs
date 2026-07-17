@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModWiggle;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "They just won't stay still...";
-        public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform), typeof(OsuModMagnetised), typeof(OsuModRepel), typeof(OsuModDepth) };
 
         private const int wiggle_duration = 100; // (ms) Higher = fewer wiggles

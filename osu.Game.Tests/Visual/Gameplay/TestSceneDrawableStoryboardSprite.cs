@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var layer = storyboard.GetLayer("Background");
 
-                var sprite = new StoryboardSprite(lookup_name, Anchor.TopLeft, new Vector2(256, 192));
+                var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, lookup_name, Anchor.TopLeft, new Vector2(256, 192));
                 sprite.Commands.AddAlpha(Easing.None, 0, 2000, 0, 2);
 
                 layer.Elements.Clear();
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var layer = storyboard.GetLayer("Video");
 
-                var sprite = new StoryboardVideo("Videos/test-video.mp4", Time.Current);
+                var sprite = new StoryboardVideo(StoryboardElementSource.Beatmap, "Videos/test-video.mp4", Time.Current);
 
                 if (scaleTransformProvided)
                 {
@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var layer = storyboard.GetLayer("Background");
 
-            var sprite = new StoryboardSprite(lookupName, origin, initialPosition);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, lookupName, origin, initialPosition);
             var loop = sprite.AddLoopingGroup(Time.Current, 100);
             loop.AddAlpha(Easing.None, 0, 10000, 1, 1);
 

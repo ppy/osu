@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -111,10 +110,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public bool PlaySamplesOnAdjust { get; init; } = true;
 
+        private Func<T, LocalisableString> labelFormat;
+
         /// <summary>
         /// The string formatting function to use for the value label.
         /// </summary>
-        public Func<T, LocalisableString> LabelFormat { get; init; }
+        public Func<T, LocalisableString> LabelFormat
+        {
+            get => labelFormat;
+            set
+            {
+                labelFormat = value;
+
+                if (IsLoaded)
+                    updateValueDisplay();
+            }
+        }
 
         /// <summary>
         /// The string formatting function to use for the slider's tooltip text.
@@ -123,7 +134,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public Func<T, LocalisableString> TooltipFormat { get; init; }
 
         private FormControlBackground background = null!;
-        private Box flashLayer = null!;
         private FormTextBox.InnerTextBox textBox = null!;
         private OsuSpriteText valueLabel = null!;
         private FormFieldCaption captionText = null!;
@@ -138,7 +148,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public FormSliderBar()
         {
-            LabelFormat ??= defaultLabelFormat;
+            labelFormat ??= DefaultLabelFormat;
             TooltipFormat ??= v => LabelFormat(v);
 
             // the reason why this slider is created in constructor rather than in BDL like the rest of drawable hierarchy is as follows:
@@ -176,6 +186,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             current.MinValueChanged += v => currentNumberInstantaneous.MinValue = v;
             current.MaxValueChanged += v => currentNumberInstantaneous.MaxValue = v;
             current.PrecisionChanged += v => currentNumberInstantaneous.Precision = v;
+            current.DefaultChanged += v => currentNumberInstantaneous.Default = v.NewValue;
             current.DisabledChanged += disabled =>
             {
                 if (disabled)
@@ -198,18 +209,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
-
             InternalChildren = new Drawable[]
             {
                 background = new FormControlBackground(),
-                flashLayer = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Transparent,
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -246,22 +248,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                     AutoSizeAxes = Axes.Y,
                                     Children = new Drawable[]
                                     {
-                                        textBox = new FormNumberBox.InnerNumberBox(allowDecimals: true)
+                                        textBox = CreateTextBox().With(box =>
                                         {
-                                            RelativeSizeAxes = Axes.X,
+                                            box.RelativeSizeAxes = Axes.X;
                                             // the textbox is hidden when the control is unfocused,
                                             // but clicking on the label should reach the textbox,
                                             // therefore make it always present.
-                                            AlwaysPresent = true,
-                                            CommitOnFocusLost = true,
-                                            SelectAllOnFocus = true,
-                                            OnInputError = () =>
-                                            {
-                                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
-                                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
-                                            },
-                                            TabbableContentContainer = tabbableContentContainer,
-                                        },
+                                            box.AlwaysPresent = true;
+                                            box.CommitOnFocusLost = true;
+                                            box.SelectAllOnFocus = true;
+                                            box.OnInputError = background.FlashOnInputError;
+                                            box.TabbableContentContainer = tabbableContentContainer;
+                                        }),
                                         valueLabel = new TruncatingSpriteText
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -285,6 +283,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             if (game != null)
                 currentLanguage.BindTo(game.CurrentLanguage);
         }
+
+        internal virtual FormNumberBox.InnerNumberBox CreateTextBox() => new FormNumberBox.InnerNumberBox(true);
 
         protected override void LoadComplete()
         {
@@ -327,7 +327,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             currentNumberInstantaneous.TriggerChange();
             current.Value = currentNumberInstantaneous.Value;
 
-            background.Flash();
+            background.FlashOnCommit();
         }
 
         private void tryUpdateSliderFromTextBox()
@@ -437,7 +437,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
-        private LocalisableString defaultLabelFormat(T value) => currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
+        public LocalisableString DefaultLabelFormat(T value) => value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
 
         public partial class InnerSlider : OsuSliderBar<T>
         {
@@ -455,7 +455,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             private Box leftBox = null!;
             private Box rightBox = null!;
+            private Container defaultLine = null!;
+
             private InnerSliderNub nub = null!;
+
             public const float NUB_WIDTH = 10;
 
             [Resolved]
@@ -495,10 +498,23 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Horizontal = RangePadding, },
-                        Child = nub = new InnerSliderNub
+                        Children = new Drawable[]
                         {
-                            ResetToDefault = ResetToDefault,
-                        }
+                            nub = new InnerSliderNub
+                            {
+                                ResetToDefault = ResetToDefault,
+                            },
+                            defaultLine = new Circle
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.Centre,
+                                Colour = colourProvider.Content2,
+                                Blending = BlendingParameters.Additive,
+                                Alpha = 0.3f,
+                                Size = new Vector2(4),
+                                RelativePositionAxes = Axes.X,
+                            }
+                        },
                     },
                 };
             }
@@ -508,7 +524,22 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 base.LoadComplete();
 
                 Current.BindDisabledChanged(_ => updateState(), true);
+
+                Current.DefaultChanged += _ => updateDefaultValue();
+                updateDefaultValue();
+
                 FinishTransforms(true);
+            }
+
+            private void updateDefaultValue()
+            {
+                // hack to get normalised default value.
+                var copy = (BindableNumber<T>)Current.GetUnboundCopy();
+
+                copy.Disabled = false;
+                copy.SetDefault();
+
+                defaultLine.X = copy.NormalizedValue;
             }
 
             protected override void UpdateAfterChildren()
@@ -564,12 +595,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 rightBox.Colour = colourProvider.Background5;
 
                 Color4 leftColour = colourProvider.Light4;
+                Color4 defaultLineColour;
                 Color4 nubColour;
 
                 if (IsHovered || HasFocus || IsDragged)
+                {
+                    defaultLineColour = colourProvider.Content1.Lighten(0.4f);
                     nubColour = colourProvider.Highlight1;
+                }
                 else
+                {
                     nubColour = colourProvider.Highlight1.Darken(0.1f);
+                    defaultLineColour = colourProvider.Content2;
+                }
 
                 if (Current.Disabled)
                 {
@@ -579,11 +617,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 leftBox.FadeColour(leftColour, 250, Easing.OutQuint);
                 nub.FadeColour(nubColour, 250, Easing.OutQuint);
+                defaultLine.FadeColour(defaultLineColour, 250, Easing.OutQuint);
             }
 
             protected override void UpdateValue(float value)
             {
                 nub.MoveToX(value, 250, Easing.OutElasticQuarter);
+                defaultLine.ResizeHeightTo(Current.IsDefault ? 28 : 6, 250, Easing.OutElasticQuarter);
             }
 
             protected override bool Commit()

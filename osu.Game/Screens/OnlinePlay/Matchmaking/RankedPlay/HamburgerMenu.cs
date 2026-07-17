@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Spacing = new Vector2(3),
                 };
 
-                addButton(rankedPlayScreen?.ActiveSubScreen is not EndedScreen ? "Give up" : "Exit", FontAwesome.Solid.SignOutAlt, () => rankedPlayScreen?.Exit());
+                addButton(rankedPlayScreen?.ActiveSubScreen is not EndedScreen ? "Give up" : CommonStrings.Exit, FontAwesome.Solid.SignOutAlt, () => rankedPlayScreen?.Exit());
             }
 
             protected override void LoadComplete()

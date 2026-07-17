@@ -430,7 +430,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 if (url != null)
                 {
                     items.AddRange([
-                        new OsuMenuItem("View in browser", MenuItemType.Standard, () => game?.OpenUrlExternally(url)),
+                        new OsuMenuItem(CommonStrings.ViewInBrowser, MenuItemType.Standard, () => game?.OpenUrlExternally(url)),
                         new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url))
                     ]);
                 }

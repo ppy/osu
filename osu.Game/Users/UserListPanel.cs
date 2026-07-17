@@ -2,15 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using osu.Framework.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Extensions.Color4Extensions;
-using osuTK.Graphics;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
-using osuTK;
 using osu.Game.Overlays.Profile.Header.Components;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Users
 {
@@ -51,7 +51,7 @@ namespace osu.Game.Users
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10, 0),
-                        Children = new Drawable[]
+                        Children = new[]
                         {
                             CreateAvatar().With(avatar =>
                             {
@@ -64,12 +64,23 @@ namespace osu.Game.Users
                                 flag.Anchor = Anchor.CentreLeft;
                                 flag.Origin = Anchor.CentreLeft;
                             }),
+                            CreateTeamLogo().With(flag =>
+                            {
+                                flag.Anchor = Anchor.CentreLeft;
+                                flag.Origin = Anchor.CentreLeft;
+                            }),
                             CreateUsername().With(username =>
                             {
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
                                 username.UseFullGlyphHeight = false;
-                            })
+                            }),
+                            CreateRank().With(rank =>
+                            {
+                                rank.Anchor = Anchor.CentreLeft;
+                                rank.Origin = Anchor.CentreLeft;
+                                rank.UseFullGlyphHeight = false;
+                            }),
                         }
                     },
                     new FillFlowContainer

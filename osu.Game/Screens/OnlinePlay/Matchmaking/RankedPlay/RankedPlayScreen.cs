@@ -40,7 +40,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     [Cached]
-    public partial class RankedPlayScreen : OsuScreen, IPreviewTrackOwner, IHandlePresentBeatmap
+    public sealed partial class RankedPlayScreen : OsuScreen, IPreviewTrackOwner, IHandlePresentBeatmap
     {
         protected override bool InitialBackButtonVisibility => false;
 
@@ -92,7 +92,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private readonly Container stageOverlayContainer;
         private readonly Container<RankedPlaySubScreen> screenContainer;
-        private readonly RankedPlayChatDisplay chat;
 
         private RankedPlayBottomOrnament ornament = null!;
         private IDisposable? ornamentOverlayRegistration;
@@ -103,6 +102,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         private readonly Bindable<Visibility> cornerPieceVisibility = new Bindable<Visibility>();
         private readonly Bindable<bool> showBeatmapBackground = new Bindable<bool>();
+
+        private readonly Container content;
+
+        [Cached]
+        private readonly RankedPlayChatDisplay chat;
 
         [Cached]
         private readonly RankedPlayMatchInfo matchInfo;
@@ -125,45 +129,53 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             InternalChildren = new Drawable[]
             {
                 matchInfo = new RankedPlayMatchInfo(),
+                backgroundMusic = new BackgroundMusicManager(),
                 new RankedPlayBeatmapAvailabilityTracker(),
                 new GlobalScrollAdjustsVolume(),
-                new PopoverContainer
+                content = new InverseScalingDrawSizePreservingFillContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new OsuContextMenuContainer
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        new PopoverContainer
                         {
-                            screenContainer = new Container<RankedPlaySubScreen>
+                            RelativeSizeAxes = Axes.Both,
+                            Child = new OsuContextMenuContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                            },
-                            chat = new RankedPlayChatDisplay(room)
-                            {
-                                Anchor = Anchor.BottomRight,
-                                Origin = Anchor.BottomRight,
-                                Margin = new MarginPadding
+                                Children = new Drawable[]
                                 {
-                                    Bottom = 10,
-                                    Right = 10
-                                },
-                                State = { Value = Visibility.Hidden }
-                            },
-                            new HamburgerMenu
-                            {
-                                Size = new Vector2(56),
+                                    screenContainer = new Container<RankedPlaySubScreen>
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                    new HamburgerMenu
+                                    {
+                                        Size = new Vector2(56),
+                                    }
+                                }
                             }
-                        }
-                    }
+                        },
+                        stageOverlayContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        overlayContainer = new CardDetailsOverlayContainer(),
+                        particleContainer = new SongPreviewParticleContainer(),
+                    },
                 },
-                stageOverlayContainer = new Container
+                chat = new RankedPlayChatDisplay(room)
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 10,
+                        Right = 10
+                    },
+                    State = { Value = Visibility.Hidden }
                 },
-                overlayContainer = new CardDetailsOverlayContainer(),
-                particleContainer = new SongPreviewParticleContainer(),
-                backgroundMusic = new BackgroundMusicManager()
             };
         }
 
@@ -196,7 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             localUser = users.GetUserAsync(localUserId).GetResultSafely() ?? api.LocalUser.Value;
             opponentUser = users.GetUserAsync(opponentUserId).GetResultSafely() ?? APIUser.UnknownUser(opponentUserId);
 
-            AddRangeInternal([
+            content.AddRange([
                 new RankedPlayCornerPiece(RankedPlayColourScheme.BLUE, Anchor.BottomLeft)
                 {
                     State = { BindTarget = cornerPieceVisibility },
@@ -247,7 +259,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 if (screen.ShowStageOverlay)
                 {
                     APIUser? pickingUser = null;
-                    double? multiplier = matchInfo.Stage.Value < RankedPlayStage.CardPlay ? null : matchInfo.RoomState.DamageMultiplier;
                     RankedPlayColourScheme colourScheme = RankedPlayColourScheme.BLUE;
 
                     if (matchInfo.Stage.Value == RankedPlayStage.CardPlay && matchInfo.RoomState.ActiveUser != null)
@@ -259,7 +270,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     stageOverlayContainer.Add(new RankedPlayStageOverlay(screen.StageHeading, colourScheme)
                     {
                         PickingUser = pickingUser,
-                        Multiplier = multiplier,
                     });
 
                     rankedPlayBackground.ColourScheme = colourScheme;

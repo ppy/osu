@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual
                 Ruleset.Value = CreateRuleset()!.RulesetInfo;
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
 
-                var beatmapEncoder = new LegacyBeatmapEncoder(beatmap, null);
+                var beatmapEncoder = new LegacyBeatmapEncoder(beatmap, null, null);
 
                 using (var writer = new StreamWriter(beatmapStream, Encoding.UTF8, leaveOpen: true))
                     beatmapEncoder.Encode(writer);

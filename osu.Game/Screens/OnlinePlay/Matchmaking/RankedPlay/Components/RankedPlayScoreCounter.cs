@@ -2,8 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
-using osu.Framework.Allocation;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -15,8 +14,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     public partial class RankedPlayScoreCounter : CompositeDrawable
     {
-        private readonly FillFlowContainer digitFlow;
-        private readonly CounterDigit[] digits;
+        private readonly FillFlowContainer counterFlow;
+        private readonly List<CounterDigit> digits = [];
 
         public required FontUsage Font { get; init; }
 
@@ -37,15 +36,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         public TransformSequence<RankedPlayScoreCounter> TransformValueTo(long value, double duration = 0, Easing easing = Easing.None) => this.TransformTo(nameof(Value), value, duration, easing);
 
-        public RankedPlayScoreCounter(int numDigits = 6)
+        public RankedPlayScoreCounter()
         {
-            digits = new CounterDigit[numDigits];
-
             AutoSizeAxes = Axes.Both;
 
             InternalChildren =
             [
-                digitFlow = new FillFlowContainer
+                counterFlow = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
@@ -55,34 +52,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         public Vector2 Spacing
         {
-            get => digitFlow.Spacing;
-            set => digitFlow.Spacing = value;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            string templateString = Math.Pow(10, digits.Length - 1).ToString("N0");
-
-            for (int i = 0, digitIndex = 0; i < templateString.Length; i++)
-            {
-                if (char.IsDigit(templateString[i]))
-                {
-                    digitFlow.Add(digits[digitIndex++] = new CounterDigit
-                    {
-                        Font = Font.With(fixedWidth: true),
-                    });
-                }
-                else
-                {
-                    digitFlow.Add(new OsuSpriteText
-                    {
-                        Text = templateString[i].ToString(),
-                        Font = Font,
-                        Shadow = false,
-                    });
-                }
-            }
+            get => counterFlow.Spacing;
+            set => counterFlow.Spacing = value;
         }
 
         protected override void LoadComplete()
@@ -101,9 +72,51 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private void updateDigits(bool animated = true)
         {
+            string displayString = value.ToString(@"N0");
+
+            if (counterFlow.Count != displayString.Length)
+            {
+                CounterDigit[] oldDigits = digits.ToArray();
+
+                counterFlow.Clear();
+                digits.Clear();
+
+                for (int i = 0; i < displayString.Length; i++)
+                {
+                    if (char.IsDigit(displayString[i]))
+                    {
+                        CounterDigit digit = new CounterDigit(Font.With(fixedWidth: true));
+                        digits.Add(digit);
+                        counterFlow.Add(digit);
+                    }
+                    else
+                    {
+                        counterFlow.Add(new OsuSpriteText
+                        {
+                            Text = displayString[i].ToString(),
+                            Font = Font,
+                            Shadow = false,
+                        });
+                    }
+                }
+
+                // Transfer values across as best as we can
+                for (int offset = 0; offset < oldDigits.Length; offset++)
+                {
+                    int oldIndex = oldDigits.Length - 1 - offset;
+                    int newIndex = digits.Count - 1 - offset;
+
+                    if (newIndex < 0)
+                        break;
+
+                    digits[newIndex].Offset = oldDigits[oldIndex].Offset;
+                    digits[newIndex].CompleteAnimations();
+                }
+            }
+
             long current = value;
 
-            for (int i = digits.Length - 1; i >= 0; i--)
+            for (int i = digits.Count - 1; i >= 0; i--)
             {
                 digits[i].Offset = current;
 
@@ -116,6 +129,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private partial class CounterDigit : CompositeDrawable
         {
+            public double Offset { get; set; }
+
             private readonly DoubleSpring spring = new DoubleSpring
             {
                 NaturalFrequency = 2.5f,
@@ -123,20 +138,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 Response = 1f
             };
 
-            public double Offset { get; set; }
+            private readonly BufferedContainer blurContainer;
+            private readonly OsuSpriteText upperDigit;
+            private readonly OsuSpriteText lowerDigit;
 
-            private OsuSpriteText upperDigit = null!;
-            private OsuSpriteText lowerDigit = null!;
-
-            private BufferedContainer blurContainer = null!;
-
-            public required FontUsage Font { get; init; }
-
-            [BackgroundDependencyLoader]
-            private void load()
+            public CounterDigit(FontUsage font)
             {
-                Debug.Assert(Font.FixedWidth);
-
                 InternalChild = blurContainer = new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -157,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 upperDigit = new OsuSpriteText
                                 {
                                     Text = "9",
-                                    Font = Font,
+                                    Font = font,
                                     RelativePositionAxes = Axes.Y,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -166,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 lowerDigit = new OsuSpriteText
                                 {
                                     Text = "0",
-                                    Font = Font,
+                                    Font = font,
                                     RelativePositionAxes = Axes.Y,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,

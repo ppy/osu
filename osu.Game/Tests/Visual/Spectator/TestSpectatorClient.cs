@@ -204,10 +204,16 @@ namespace osu.Game.Tests.Visual.Spectator
             });
         }
 
-        protected override async Task DisconnectInternal()
+        protected override Task DisconnectInternal()
         {
-            await base.DisconnectInternal().ConfigureAwait(false);
             isConnected.Value = false;
+            return Task.CompletedTask;
+        }
+
+        public override Task Reconnect()
+        {
+            isConnected.Value = true;
+            return Task.CompletedTask;
         }
     }
 }

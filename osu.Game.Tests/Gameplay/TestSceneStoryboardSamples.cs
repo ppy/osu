@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Gameplay
                 {
                     Child = new FrameStabilityContainer
                     {
-                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
+                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, string.Empty, 0, 1))
                     }
                 });
             });
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Gameplay
                 {
                     Child = new FrameStabilityContainer
                     {
-                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
+                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, string.Empty, 0, 1))
                     }
                 });
 
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Gameplay
                     Child = beatmapSkinSourceContainer
                 });
 
-                beatmapSkinSourceContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
+                beatmapSkinSourceContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, "test-sample", 1, 1))
                 {
                     Clock = gameplayContainer
                 });

@@ -20,6 +20,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Visual
 {
@@ -104,6 +105,8 @@ namespace osu.Game.Tests.Visual
 
             public new void SetPreviewPointToCurrentTime() => base.SetPreviewPointToCurrentTime();
 
+            public new void SnapAllHitObjectsToCurrentDivisor() => base.SnapAllHitObjectsToCurrentDivisor();
+
             public new bool Save() => base.Save();
 
             public new void Cut() => base.Cut();
@@ -178,7 +181,7 @@ namespace osu.Game.Tests.Visual
                     => testBeatmapManager.TestBeatmap;
             }
 
-            public override void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
+            public override void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null, Storyboard storyboard = null)
             {
                 // don't actually care about saving for this context.
             }

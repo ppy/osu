@@ -1206,6 +1206,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
         }
 
+        [Test]
+        public void TestMaxParticipantsAndSlots()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                Password = "password",
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ],
+                MaxParticipants = 10
+            });
+
+            AddStep("turn max participants off", () => multiplayerClient.ChangeSettings(maxParticipants: null));
+            AddStep("turn max participants back on", () => multiplayerClient.ChangeSettings(maxParticipants: 8));
+        }
+
         private void enterGameplay()
         {
             pressReadyButton();
