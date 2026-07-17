@@ -37,6 +37,8 @@ namespace osu.Game.Overlays.Dialog
 
         private bool actionInvoked;
 
+        public Container MainContent { get; set; }
+
         public IconUsage Icon
         {
             get => icon.Icon;
@@ -199,6 +201,13 @@ namespace osu.Game.Overlays.Dialog
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = 15 },
+                                },
+                                MainContent = new Container
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
                                 },
                                 buttonsContainer = new FillFlowContainer<PopupDialogButton>
                                 {

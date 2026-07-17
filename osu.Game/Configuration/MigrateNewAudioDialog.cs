@@ -12,7 +12,7 @@ using osu.Game.Overlays.Settings.Sections.Audio;
 
 namespace osu.Game.Configuration
 {
-    public partial class MigrateNewAudioDialog : PopupDialog
+    public partial class MigrateNewAudioDialog : ButtonPopupDialog
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
