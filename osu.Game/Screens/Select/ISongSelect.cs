@@ -27,6 +27,12 @@ namespace osu.Game.Screens.Select
         void RestoreAllHidden(BeatmapSetInfo beatmapSet);
 
         /// <summary>
+        /// Requests the user for confirmation to delete all beatmap sets contained within the given group.
+        /// </summary>
+        /// <param name="group">The group whose contents should be deleted.</param>
+        void DeleteGroup(GroupDefinition group);
+
+        /// <summary>
         /// Opens the manage collections dialog.
         /// </summary>
         void ManageCollections();
