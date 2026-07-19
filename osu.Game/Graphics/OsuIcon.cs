@@ -184,6 +184,7 @@ namespace osu.Game.Graphics
         public static IconUsage ModRelax => get(OsuIconMapping.ModRelax);
         public static IconUsage ModRepel => get(OsuIconMapping.ModRepel);
         public static IconUsage ModScoreV2 => get(OsuIconMapping.ModScoreV2);
+        public static IconUsage ModStartPos => get(OsuIconMapping.ModStartPos);
         public static IconUsage ModSevenKeys => get(OsuIconMapping.ModSevenKeys);
         public static IconUsage ModSimplifiedRhythm => get(OsuIconMapping.ModSimplifiedRhythm);
         public static IconUsage ModSingleTap => get(OsuIconMapping.ModSingleTap);
@@ -669,6 +670,9 @@ namespace osu.Game.Graphics
 
             [Description(@"Mods/mod-score-v2")]
             ModScoreV2,
+
+            [Description(@"Mods/mod-start-pos")]
+            ModStartPos,
 
             [Description(@"Mods/mod-seven-keys")]
             ModSevenKeys,

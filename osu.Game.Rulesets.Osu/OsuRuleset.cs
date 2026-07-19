@@ -184,6 +184,7 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Conversion:
                     return new Mod[]
                     {
+                        new OsuModStartPos(),
                         new OsuModTargetPractice(),
                         new OsuModDifficultyAdjust(),
                         new OsuModClassic(),
