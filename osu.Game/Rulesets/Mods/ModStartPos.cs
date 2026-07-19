@@ -23,13 +23,12 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModStartPos;
         public override ModType Type => ModType.Conversion;
         public override LocalisableString Description => "Start from any point in the beatmap.";
-        public override bool Ranked => UsesDefaultConfiguration;
 
         [SettingSource("Start time", "The time from which to start the beatmap.", SettingControlType = typeof(SettingsSlider<double, StartTimeSlider>))]
         public BindableDouble StartTime { get; } = new BindableDouble(0)
         {
             MinValue = 0,
-            MaxValue = 300,
+            MaxValue = 1337,
             Precision = 1,
         };
 
