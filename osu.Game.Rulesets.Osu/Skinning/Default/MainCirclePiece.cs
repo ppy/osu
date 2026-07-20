@@ -7,6 +7,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
@@ -46,6 +47,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
 
+        [Resolved(canBeNull: true)]
+        private OsuRulesetConfigManager? rulesetConfig { get; set; }
+
+        private readonly Bindable<bool> hitAnimations = new Bindable<bool>(true);
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -53,6 +59,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+
+            rulesetConfig?.BindWith(OsuRulesetSetting.HitAnimations, hitAnimations);
         }
 
         protected override void LoadComplete()
@@ -82,6 +90,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 switch (state)
                 {
                     case ArmedState.Hit:
+                        if (!hitAnimations.Value)
+                        {
+                            this.FadeOut(100);
+                            break;
+                        }
+
                         const double flash_in = 40;
                         const double flash_out = 100;
 

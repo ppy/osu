@@ -14,6 +14,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -52,6 +53,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private OsuRulesetConfigManager? rulesetConfig { get; set; }
+
+        private readonly Bindable<bool> hitAnimations = new Bindable<bool>(true);
 
         public ArgonMainCirclePiece(bool withOuterFill)
         {
@@ -121,6 +127,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
 
             configHitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
+
+            rulesetConfig?.BindWith(OsuRulesetSetting.HitAnimations, hitAnimations);
         }
 
         protected override void LoadComplete()
@@ -162,6 +170,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 switch (state)
                 {
                     case ArmedState.Hit:
+                        if (!hitAnimations.Value)
+                        {
+                            this.FadeOut(100);
+                            break;
+                        }
+
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
                         const double fade_out_time = 800;
                         const double flash_in_duration = 150;

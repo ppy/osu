@@ -44,6 +44,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
+                    Caption = RulesetSettingsStrings.HitAnimations,
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.HitAnimations)
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
                     Caption = RulesetSettingsStrings.CursorTrail,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 }),

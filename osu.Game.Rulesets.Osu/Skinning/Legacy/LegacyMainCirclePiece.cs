@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
@@ -45,6 +46,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private OsuRulesetConfigManager? rulesetConfig { get; set; }
+
+        private readonly Bindable<bool> hitAnimations = new Bindable<bool>(true);
 
         public LegacyMainCirclePiece(string? priorityLookupPrefix = null, bool hasNumber = true)
         {
@@ -126,6 +132,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 accentColour.BindTo(drawableOsuObject.AccentColour);
                 indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
             }
+
+            rulesetConfig?.BindWith(OsuRulesetSetting.HitAnimations, hitAnimations);
         }
 
         protected override void LoadComplete()
@@ -166,6 +174,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (state)
                 {
                     case ArmedState.Hit:
+                        if (!hitAnimations.Value)
+                        {
+                            this.FadeOut(100);
+                            break;
+                        }
+
                         CircleSprite.FadeOut(legacy_fade_duration);
                         CircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 

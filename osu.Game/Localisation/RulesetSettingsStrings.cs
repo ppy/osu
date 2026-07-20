@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SnakingOutSliders => new TranslatableString(getKey(@"snaking_out_sliders"), @"Snaking out sliders");
 
         /// <summary>
+        /// "Hit animations"
+        /// </summary>
+        public static LocalisableString HitAnimations => new TranslatableString(getKey(@"hit_animations"), @"Hit animations");
+
+        /// <summary>
         /// "Cursor trail"
         /// </summary>
         public static LocalisableString CursorTrail => new TranslatableString(getKey(@"cursor_trail"), @"Cursor trail");
