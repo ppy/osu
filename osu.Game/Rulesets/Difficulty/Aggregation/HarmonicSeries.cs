@@ -9,7 +9,23 @@ namespace osu.Game.Rulesets.Difficulty.Aggregation
 {
     public static class HarmonicSeries
     {
-        public static (double difficulty, double weigthSum) Aggregate(List<double> difficulties, double harmonicScale = 1.0, double decayExponent = 0.9)
+        /// <summary>
+        /// Harmonic series (https://en.wikipedia.org/wiki/Harmonic_series_(mathematics)) summation
+        /// </summary>
+        /// <param name="difficulties">List of difficulties to sum.</param>
+        /// <param name="harmonicScale">
+        /// Scaling factor applied as HarmonicScale / (1 + index) during weight calculations.
+        /// A higher value will increase the influence of the hardest object difficulties during summation.
+        /// </param>
+        /// <param name="decayExponent">
+        /// Exponent that controls the rate of which decay increases as the index increases.
+        /// Values closer to 1 decay faster whilst lower values give more weight to lower object difficulties.
+        /// </param>
+        /// <returns>
+        /// difficulty: Summation result.
+        /// weightSum: The sum of difficulty weights, calculated during summation.
+        /// </returns>
+        public static (double difficulty, double weightSum) Aggregate(List<double> difficulties, double harmonicScale = 1.0, double decayExponent = 0.9)
         {
             if (difficulties.Count == 0)
                 return (0, 0);
