@@ -69,9 +69,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
+        private double catchUpMultiplier => IsCatchingUp ? catchup_rate : 1;
+
         public double Rate
         {
-            get => IsCatchingUp ? catchup_rate : 1;
+            get => masterClock.Rate * catchUpMultiplier;
             set => throw new NotImplementedException();
         }
 
@@ -84,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 // To avoid this, use a constant 16ms elapsed time for now. Probably not too correct, but this whole logic isn't too correct anyway.
                 // Clamping is required to ensure that player clocks don't get too far ahead if ProcessFrame is run multiple times.
                 double elapsedSource = masterClock.ElapsedFrameTime != 0 ? masterClock.ElapsedFrameTime : Math.Clamp(masterClock.CurrentTime - CurrentTime, 0, 16);
-                double elapsed = elapsedSource * Rate;
+                double elapsed = elapsedSource * catchUpMultiplier;
 
                 CurrentTime += elapsed;
                 ElapsedFrameTime = elapsed;
