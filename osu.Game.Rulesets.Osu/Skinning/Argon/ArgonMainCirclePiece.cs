@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                     case ArmedState.Hit:
                         if (!hitAnimations.Value)
                         {
-                            this.FadeOut(100);
+                            Hide();
                             break;
                         }
 
