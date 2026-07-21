@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -36,13 +35,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (precedingObject != null && precedingObject is not Spinner)
                 {
                     AddHeader("From previous");
-                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(precedingObject, firstInSelection).ToLocalisableString("N2")}x ({(firstInSelection.StackedPosition - precedingObject.StackedEndPosition).Length:#,0.##}px)");
+                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(precedingObject, firstInSelection):N2}x ({(firstInSelection.StackedPosition - precedingObject.StackedEndPosition).Length:#,0.##}px)");
                 }
 
                 if (nextObject != null && nextObject is not Spinner)
                 {
                     AddHeader("To next");
-                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(lastInSelection, nextObject).ToLocalisableString("N2")}x ({(nextObject.StackedPosition - lastInSelection.StackedEndPosition).Length:#,0.##}px)");
+                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(lastInSelection, nextObject):N2}x ({(nextObject.StackedPosition - lastInSelection.StackedEndPosition).Length:#,0.##}px)");
                 }
             }
         }
