@@ -321,6 +321,14 @@ namespace osu.Game.Beatmaps.Formats
                     }).Where(p => p.result).Select(p => p.val).ToArray();
                     break;
 
+                case @"VelocityPresets":
+                    beatmap.SliderVelocityPresets = pair.Value.Split(',').Select(v =>
+                    {
+                        bool result = double.TryParse(v, out double val);
+                        return new { result, val };
+                    }).Where(p => p.result).Select(p => p.val).ToArray();
+                    break;
+
                 case @"DistanceSpacing":
                     beatmap.DistanceSpacing = Math.Max(0, Parsing.ParseDouble(pair.Value));
                     break;

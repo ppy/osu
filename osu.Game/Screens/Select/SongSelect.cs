@@ -1151,7 +1151,7 @@ namespace osu.Game.Screens.Select
 
         #region Implementation of ISongSelect
 
-        void ISongSelect.Search(string query) => FilterControl.Search(query);
+        void ISongSelect.AddToSearch(string query) => FilterControl.AddToSearch(query);
 
         bool ISongSelect.CanPresentScore => true;
 
