@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -20,15 +19,12 @@ namespace osu.Game.Screens.Play.HUD
             this.replayLoaded.BindTo(replayLoaded);
         }
 
-        protected override void UpdateDisplay(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        protected override ModIcon CreateModIcon(Mod mod, bool showExtendedInformation)
         {
-            base.UpdateDisplay(mods);
+            var modIcon = new ClickableModIcon(mod, showExtendedInformation);
 
-            foreach (ModIcon modIcon in IconsContainer)
+            if (modIcon.Mod is IAdjustableWhenReplay dmod)
             {
-                if (modIcon.Mod is not IAdjustableWhenReplay dmod)
-                    continue;
-
                 dmod.IsDisabled.BindValueChanged(_ => modIcon.Colour = dmod.IsDisabled.Value ? OsuColour.Gray(0.7f) : Color4.White, true);
 
                 modIcon.Action = () =>
@@ -39,6 +35,8 @@ namespace osu.Game.Screens.Play.HUD
                     dmod.IsDisabled.Toggle();
                 };
             }
+
+            return modIcon;
         }
     }
 }

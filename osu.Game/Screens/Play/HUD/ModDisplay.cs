@@ -62,18 +62,18 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 showExtendedInformation = value;
-                foreach (var icon in IconsContainer)
+                foreach (var icon in iconsContainer)
                     icon.ShowExtendedInformation = value;
             }
         }
 
         public FillDirection FillDirection
         {
-            get => IconsContainer.Direction;
-            set => IconsContainer.Direction = value;
+            get => iconsContainer.Direction;
+            set => iconsContainer.Direction = value;
         }
 
-        protected readonly FillFlowContainer<ModIcon> IconsContainer;
+        private readonly FillFlowContainer<ModIcon> iconsContainer;
 
         public ModDisplay(bool showExtendedInformation = true)
         {
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
 
             AutoSizeAxes = Axes.Both;
 
-            InternalChild = IconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+            InternalChild = iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
@@ -92,17 +92,19 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            Current.BindValueChanged(UpdateDisplay, true);
+            Current.BindValueChanged(updateDisplay, true);
             updateExpansionMode(0);
         }
 
-        protected virtual void UpdateDisplay(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        private void updateDisplay(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            IconsContainer.Clear();
+            iconsContainer.Clear();
 
             foreach (Mod mod in mods.NewValue.AsOrdered())
-                IconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(MOD_ICON_SCALE) });
+                iconsContainer.Add(CreateModIcon(mod, showExtendedInformation).With(m => m.Scale = new Vector2(MOD_ICON_SCALE)));
         }
+
+        protected virtual ModIcon CreateModIcon(Mod mod, bool showExtendedInformation) => new ModIcon(mod, showExtendedInformation);
 
         private void updateExpansionMode(double duration = 500)
         {
@@ -128,13 +130,13 @@ namespace osu.Game.Screens.Play.HUD
         private void expand(double duration = 500)
         {
             if (ExpansionMode != ExpansionMode.AlwaysContracted)
-                IconsContainer.TransformSpacingTo(new Vector2(5, -10), duration, Easing.OutQuint);
+                iconsContainer.TransformSpacingTo(new Vector2(5, -10), duration, Easing.OutQuint);
         }
 
         private void contract(double duration = 500)
         {
             if (ExpansionMode != ExpansionMode.AlwaysExpanded)
-                IconsContainer.TransformSpacingTo(new Vector2(-25), duration, Easing.OutQuint);
+                iconsContainer.TransformSpacingTo(new Vector2(-25), duration, Easing.OutQuint);
         }
 
         protected override bool OnHover(HoverEvent e)

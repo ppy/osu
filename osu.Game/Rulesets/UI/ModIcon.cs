@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Display the specified mod at a fixed size.
     /// </summary>
-    public partial class ModIcon : OsuClickableContainer, IHasCustomTooltip<Mod>
+    public partial class ModIcon : Container, IHasCustomTooltip<Mod>
     {
         public readonly BindableBool Selected = new BindableBool();
 
