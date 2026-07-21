@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -16,9 +15,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The catch up rate.
         /// </summary>
-        private const double catchup_rate = 2;
+        public const double CATCHUP_RATE = 2;
 
-        private readonly GameplayClockContainer masterClock;
+        private readonly IFrameBasedClock masterClock;
 
         public double CurrentTime { get; private set; }
 
@@ -41,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public bool IsRunning { get; set; }
 
-        public SpectatorPlayerClock(GameplayClockContainer masterClock)
+        public SpectatorPlayerClock(IFrameBasedClock masterClock)
         {
             this.masterClock = masterClock;
         }
@@ -69,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
-        private double catchUpMultiplier => IsCatchingUp ? catchup_rate : 1;
+        private double catchUpMultiplier => IsCatchingUp ? CATCHUP_RATE : 1;
 
         public double Rate
         {
