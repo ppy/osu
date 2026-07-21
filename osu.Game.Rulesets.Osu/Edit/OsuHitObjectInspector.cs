@@ -10,8 +10,15 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class OsuHitObjectInspector(OsuDistanceSnapProvider snapProvider) : HitObjectInspector
+    public partial class OsuHitObjectInspector : HitObjectInspector
     {
+        private readonly OsuDistanceSnapProvider snapProvider;
+
+        public OsuHitObjectInspector(OsuDistanceSnapProvider snapProvider)
+        {
+            this.snapProvider = snapProvider;
+        }
+
         protected override void AddInspectorValues(HitObject[] objects)
         {
             base.AddInspectorValues(objects);
