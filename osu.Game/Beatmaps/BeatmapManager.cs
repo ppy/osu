@@ -278,7 +278,7 @@ namespace osu.Game.Beatmaps
         /// Restore a beatmap set.
         /// </summary>
         /// <param name="beatmapSetInfo">The beatmap set to restore.</param>
-        public void RestoreBeatmapSet(BeatmapSetInfo beatmapSetInfo)
+        public void Restore(BeatmapSetInfo beatmapSetInfo)
         {
             Realm.Run(r =>
             {
