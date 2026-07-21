@@ -12,7 +12,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModDoubleTime : ModRateAdjust
+    public abstract class ModDoubleTime : ModRateAdjust, IAdjustableWhenReplay
     {
         public override string Name => "Double Time";
         public override string Acronym => "DT";
@@ -44,12 +44,15 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
+        public BindableBool IsDisabled { get; } = new BindableBool();
+
         private readonly RateAdjustModHelper rateAdjustHelper;
 
         protected ModDoubleTime()
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
             rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
+            rateAdjustHelper.DisableSpeedChange.BindTo(IsDisabled);
         }
 
         public override void ApplyToTrack(IAdjustableAudioComponent track)
