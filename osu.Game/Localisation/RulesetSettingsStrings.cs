@@ -95,9 +95,9 @@ namespace osu.Game.Localisation
         public static LocalisableString HitAnimations => new TranslatableString(getKey(@"hit_animations"), @"Hit animations");
 
         /// <summary>
-        /// "Hits will fly off the screen when hit. When disabled, hits will disappear immediately."
+        /// "When enabled, hits will fly off the screen. When disabled, hits will disappear immediately."
         /// </summary>
-        public static LocalisableString HitAnimationsTooltip => new TranslatableString(getKey(@"hit_animations_tooltip"), @"Hits will fly off the screen when hit. When disabled, hits will disappear immediately.");
+        public static LocalisableString HitAnimationsTaikoTooltip => new TranslatableString(getKey(@"hit_animations_taiko_tooltip"), @"When enabled, hits will fly off the screen. When disabled, hits will disappear immediately.");
 
         /// <summary>
         /// "{0}ms (speed {1:N1})"
