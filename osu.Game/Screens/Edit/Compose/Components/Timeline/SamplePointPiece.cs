@@ -763,6 +763,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     return base.OnPressed(e);
                 }
+
+                protected override bool OnKeyDown(KeyDownEvent e)
+                {
+                    // mappers wish to be able to use sample sound / bank toggles while this text box is focused
+                    // to facilitate this, only use standard text box handling for relevant inputs
+                    // and let all other inputs fall through unhandled so that overarching composer elements
+                    // can handle the hitsounding toggles
+                    switch (e.Key)
+                    {
+                        // inputting volume number
+                        case >= Key.Keypad0 and <= Key.Keypad9:
+                        case >= Key.Number0 and <= Key.Number9:
+                        // committing the number
+                        case Key.Enter:
+                        case Key.KeypadEnter:
+                        // releasing focus
+                        case Key.Escape:
+                            return base.OnKeyDown(e);
+
+                        default:
+                            return false;
+                    }
+                }
+
+                protected override void NotifyInputError()
+                {
+                    // base call intentionally suppressed.
+                    // as most keypresses are allowed to fall through this text box to allow other interactions via composer elements,
+                    // it feels wrong to have those fall-through inputs additionally flash this text box red as if something bad happened.
+                }
             }
         }
     }
