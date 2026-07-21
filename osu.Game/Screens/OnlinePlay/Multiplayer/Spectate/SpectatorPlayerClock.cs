@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -16,9 +15,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The catch up rate.
         /// </summary>
-        private const double catchup_rate = 2;
+        public const double CATCHUP_RATE = 2;
 
-        private readonly GameplayClockContainer masterClock;
+        private readonly IFrameBasedClock masterClock;
 
         public double CurrentTime { get; private set; }
 
@@ -41,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public bool IsRunning { get; set; }
 
-        public SpectatorPlayerClock(GameplayClockContainer masterClock)
+        public SpectatorPlayerClock(IFrameBasedClock masterClock)
         {
             this.masterClock = masterClock;
         }
@@ -69,9 +68,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
         }
 
+        private double catchUpMultiplier => IsCatchingUp ? CATCHUP_RATE : 1;
+
         public double Rate
         {
-            get => IsCatchingUp ? catchup_rate : 1;
+            get => masterClock.Rate * catchUpMultiplier;
             set => throw new NotImplementedException();
         }
 
@@ -81,10 +82,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 // When in catch-up mode, the source is usually not running.
                 // In such a case, its elapsed time may be zero, which would cause catch-up to get stuck.
-                // To avoid this, use a constant 16ms elapsed time for now. Probably not too correct, but this whole logic isn't too correct anyway.
-                // Clamping is required to ensure that player clocks don't get too far ahead if ProcessFrame is run multiple times.
+                // To avoid this, calculate the "elapsed" time manually based on the difference with the master clock.
                 double elapsedSource = masterClock.ElapsedFrameTime != 0 ? masterClock.ElapsedFrameTime : Math.Clamp(masterClock.CurrentTime - CurrentTime, 0, 16);
-                double elapsed = elapsedSource * Rate;
+                double elapsed = elapsedSource * catchUpMultiplier;
 
                 CurrentTime += elapsed;
                 ElapsedFrameTime = elapsed;
