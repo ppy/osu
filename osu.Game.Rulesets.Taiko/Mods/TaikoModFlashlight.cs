@@ -64,7 +64,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 if (!flashlightProperties.IsValid)
                 {
-                    FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
+                    // https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameModes/Play/Rulesets/Taiko/RulesetTaiko.cs#L480-L481
+                    // 1.6f is "magic factor" for matching stable positioning specs, see `OsuPlayfieldAdjustmentContainer` et al.
+                    FlashlightPosition = new Vector2(208 * 1.6f);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
                     FlashlightSize = new Vector2(0, GetSize());
