@@ -170,11 +170,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        if (!hitAnimations.Value)
-                        {
-                            Hide();
-                            break;
-                        }
 
                         // Fade out time is at a maximum of 800. Must match `DrawableHitCircle`'s arbitrary lifetime spec.
                         const double fade_out_time = 800;
@@ -182,6 +177,35 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         const double resize_duration = 400;
 
                         const float shrink_size = 0.8f;
+
+                        if (!hitAnimations.Value)
+                        {
+                            const double fade_out_no_anim = 50;
+
+                            flash.HitLighting = configHitLighting.Value;
+
+                            if (configHitLighting.Value)
+                            {
+                                flash.FadeTo(1, fade_out_no_anim, Easing.OutQuint);
+                            }
+                            else
+                            {
+                                flash.FadeTo(1, fade_out_no_anim, Easing.OutQuint)
+                                     .Then()
+                                     .FadeOut(fade_out_no_anim, Easing.OutQuint);
+                            }
+
+                            // To keep hit lighting on Argon we must fade the components before the main object.
+                            number.FadeOut(fade_out_no_anim);
+                            border.FadeOut(fade_out_no_anim);
+                            innerFill.FadeOut(fade_out_no_anim);
+                            outerFill.FadeOut(fade_out_no_anim);
+                            innerGradient.FadeOut(fade_out_no_anim);
+                            outerGradient.FadeOut(fade_out_no_anim);
+
+                            this.FadeOut(fade_out_time);
+                            break;
+                        }
 
                         // Animating with the number present is distracting.
                         // The number disappearing is hidden by the bright flash.

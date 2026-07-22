@@ -168,6 +168,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             const double legacy_fade_duration = 240;
+            const double fade_out_no_anim = 50;
 
             using (BeginAbsoluteSequence(drawableObject.AsNonNull().HitStateUpdateTime))
             {
@@ -176,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     case ArmedState.Hit:
                         if (!hitAnimations.Value)
                         {
-                            Hide();
+                            this.FadeOut(fade_out_no_anim);
                             break;
                         }
 

@@ -90,12 +90,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        if (!hitAnimations.Value)
-                        {
-                            Hide();
-                            break;
-                        }
-
+                        const double fade_out_time = 800;
                         const double flash_in = 40;
                         const double flash_out = 100;
 
@@ -104,6 +99,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                              .FadeOut(flash_out);
 
                         explode.FadeIn(flash_in);
+
+                        if (!hitAnimations.Value)
+                        {
+                            const double fade_out_no_anim = 50;
+
+                            // To keep hit lighting we must fade the components before the main object.
+                            ring.FadeOut(fade_out_no_anim);
+                            circle.FadeOut(fade_out_no_anim);
+                            number.FadeOut(fade_out_no_anim);
+
+                            this.FadeOut(fade_out_time);
+                            break;
+                        }
+
                         this.ScaleTo(1.5f, 400, Easing.OutQuad);
 
                         using (BeginDelayedSequence(flash_in))
@@ -113,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                             circle.FadeOut();
                             number.FadeOut();
 
-                            this.FadeOut(800);
+                            this.FadeOut(fade_out_time);
                         }
 
                         break;
