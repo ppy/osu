@@ -114,7 +114,14 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.LoadComplete();
 
-            health.BindValueChanged(val => passing.Value = val.NewValue >= 0.5, true);
+            health.BindValueChanged(val =>
+            {
+                // TODO: this is very arbitrary and doesn't work how it is historically supposed to.
+                // - For taiko ruleset, this will cause the first half of a perfect play to be "failing".
+                // - For all cases, it can flip-flop states too often (on stable it only updated at end of combo).
+                // - Also, in stable a different condition was used for non-break-time passing state (local combo performance).
+                passing.Value = val.NewValue >= 0.5;
+            }, true);
             passing.BindValueChanged(_ => updateLayerVisibility(), true);
         }
 
