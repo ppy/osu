@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         private readonly IBindable<APIUser> user = new Bindable<APIUser>();
         private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
-        private readonly BindableBool showLeaderboard = new BindableBool();
+        private readonly Bindable<GameplayLeaderboardVisibilityMode> leaderboardVisibility = new();
         private readonly IBindable<LocalUserPlayingState> localUserPlayingState = new Bindable<LocalUserPlayingState>();
 
         private readonly Bindable<int?> position = new Bindable<int?>();
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             scores.BindTo(leaderboardProvider.Scores);
             user.BindTo(api.LocalUser);
-            configManager.BindWith(OsuSetting.GameplayLeaderboard, showLeaderboard);
+            configManager.BindWith(OsuSetting.GameplayLeaderboardVisibilityMode, leaderboardVisibility);
             localUserPlayingState.BindTo(gameplayState.PlayingState);
 
             AutoSizeAxes = Axes.Y;
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             user.BindValueChanged(_ => updateScoreBindings());
             scores.BindCollectionChanged((_, __) => updateScoreBindings(), true);
 
-            showLeaderboard.BindValueChanged(_ => updateVisibility());
+            leaderboardVisibility.BindValueChanged(_ => updateVisibility());
             localUserPlayingState.BindValueChanged(_ => updateVisibility(), true);
 
             State.BindValueChanged(_ => updatePosition());
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void updateVisibility()
         {
-            bool shouldDisplay = userScore != null && (showLeaderboard.Value || localUserPlayingState.Value == LocalUserPlayingState.Break);
+            bool shouldDisplay = userScore != null && (leaderboardVisibility.Value.ShouldDisplay(true) || localUserPlayingState.Value == LocalUserPlayingState.Break);
 
             State.Value = shouldDisplay ? Visibility.Visible : Visibility.Hidden;
         }

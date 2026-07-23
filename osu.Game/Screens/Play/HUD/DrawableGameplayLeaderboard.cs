@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
         private IGameplayLeaderboardProvider leaderboardProvider { get; set; } = null!;
 
         private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
-        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+        private readonly Bindable<GameplayLeaderboardVisibilityMode> configVisibility = new Bindable<GameplayLeaderboardVisibilityMode>();
         private readonly IBindable<LocalUserPlayingState> userPlayingState = new Bindable<LocalUserPlayingState>();
         private readonly IBindable<bool> holdingForHUD = new Bindable<bool>();
 
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, GameplayState? gameplayState, HUDOverlay? hudOverlay)
         {
-            config.BindWith(OsuSetting.GameplayLeaderboard, configVisibility);
+            config.BindWith(OsuSetting.GameplayLeaderboardVisibilityMode, configVisibility);
 
             if (gameplayState != null)
                 userPlayingState.BindTo(gameplayState.PlayingState);
@@ -115,7 +115,8 @@ namespace osu.Game.Screens.Play.HUD
             if (Flow.Alpha < 1)
                 scroll.ScrollToStart(false);
 
-            Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && (configVisibility.Value || AlwaysShown) ? 1 : 0, 100, Easing.OutQuint);
+            Flow.FadeTo(configVisibility.Value.ShouldDisplay(leaderboardProvider is MultiplayerLeaderboardProvider) ? 1 : 0, 100, Easing.OutQuint);
+
             expanded.Value = !CollapseDuringGameplay.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
         }
 
