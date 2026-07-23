@@ -30,6 +30,9 @@ namespace osu.Game.Beatmaps
 
         private const string cache_database_name = @"online.db";
 
+        public SqliteConnection? CachedConnection;
+        public int? CachedVersion;
+
         public LocalCachedBeatmapMetadataSource(Storage storage)
         {
             try
@@ -81,6 +84,11 @@ namespace osu.Game.Beatmaps
 
         public bool TryLookup(BeatmapInfo beatmapInfo, [NotNullWhen(true)] out OnlineBeatmapMetadata? onlineMetadata)
         {
+            return TryLookup(null, null, beatmapInfo, out onlineMetadata);
+        }
+
+        public bool TryLookup(SqliteConnection? db, int? version, BeatmapInfo beatmapInfo, [NotNullWhen(true)] out OnlineBeatmapMetadata? onlineMetadata)
+        {
             Debug.Assert(beatmapInfo.BeatmapSet != null);
 
             if (!Available)
@@ -98,19 +106,22 @@ namespace osu.Game.Beatmaps
 
             try
             {
-                using (var db = getConnection())
+                if (db == null)
                 {
+                    db = getConnection();
                     db.Open();
 
-                    switch (getCacheVersion(db))
-                    {
-                        case 2:
-                            // can be removed 20260123
-                            return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
+                    version = getCacheVersion(db);
+                }
 
-                        case 3:
-                            return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
-                    }
+                switch (version)
+                {
+                    case 2:
+                        // can be removed 20260123
+                        return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
+
+                    case 3:
+                        return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
                 }
 
                 onlineMetadata = null;
@@ -164,6 +175,21 @@ namespace osu.Game.Beatmaps
 
         private SqliteConnection getConnection() =>
             new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
+
+        public void CreateCachedConnection()
+        {
+            try
+            {
+                CachedConnection = getConnection();
+                CachedConnection.Open();
+
+                CachedVersion = getCacheVersion(CachedConnection);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Could not create cached sqlite connection: {e}");
+            }
+        }
 
         public Task FetchCache()
         {
@@ -406,6 +432,7 @@ namespace osu.Game.Beatmaps
         public void Dispose()
         {
             cacheDownloadRequest?.Dispose();
+            CachedConnection?.Close();
         }
     }
 }
