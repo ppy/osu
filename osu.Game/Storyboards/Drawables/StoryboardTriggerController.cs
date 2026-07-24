@@ -91,10 +91,12 @@ namespace osu.Game.Storyboards.Drawables
             if (!HitSampleTriggerDefinition.TryParse(triggerGroup.TriggerName, out var definition))
                 return;
 
-            // TODO: consider optimising. this likely does a lot of redundant work
             lastPlayedSamples.BindValueChanged(val =>
             {
                 if (val.NewValue == null)
+                    return;
+
+                if (!triggerGroup.ActiveAt(drawable.Time.Current))
                     return;
 
                 if (definition.Value.Matches(val.NewValue.OfType<HitSampleInfo>()))
@@ -215,7 +217,7 @@ namespace osu.Game.Storyboards.Drawables
         private static void playTrigger<TDrawable>(TDrawable drawable, StoryboardTriggerGroup triggerGroup)
             where TDrawable : Drawable, IFlippable, IVectorScalable
         {
-            if (drawable.Time.Current < triggerGroup.TriggerStartTime || drawable.Time.Current > triggerGroup.TriggerEndTime)
+            if (!triggerGroup.ActiveAt(drawable.Time.Current))
                 return;
 
             foreach (var command in triggerGroup.AllCommands.OrderBy(c => c.StartTime))
