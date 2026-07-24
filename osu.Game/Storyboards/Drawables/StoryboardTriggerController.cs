@@ -215,9 +215,12 @@ namespace osu.Game.Storyboards.Drawables
         private static void playTrigger<TDrawable>(TDrawable drawable, StoryboardTriggerGroup triggerGroup)
             where TDrawable : Drawable, IFlippable, IVectorScalable
         {
-            using (drawable.BeginDelayedSequence(0))
+            if (drawable.Time.Current < triggerGroup.TriggerStartTime || drawable.Time.Current > triggerGroup.TriggerEndTime)
+                return;
+
+            foreach (var command in triggerGroup.AllCommands.OrderBy(c => c.StartTime))
             {
-                foreach (var command in triggerGroup.AllCommands.OrderBy(c => c.StartTime))
+                using (drawable.BeginDelayedSequence(command.StartTime))
                     command.ApplyTransforms(drawable);
             }
         }
