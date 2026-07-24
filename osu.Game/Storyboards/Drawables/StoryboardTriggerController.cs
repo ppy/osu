@@ -26,14 +26,17 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         private readonly BindableWithCurrent<bool> passing = new BindableWithCurrent<bool>();
-
         private readonly IBindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
+        private readonly IBindable<ISampleInfo[]?> lastPlayedSamples = new Bindable<ISampleInfo[]?>();
 
         [BackgroundDependencyLoader]
         private void load(GameplayState? gameplayState)
         {
             if (gameplayState != null)
+            {
                 lastJudgementResult.BindTo(gameplayState.LastJudgementResult);
+                lastPlayedSamples.BindTo(gameplayState.LastPlayedSamples);
+            }
         }
 
         public void Bind<TDrawable>(TDrawable drawable, StoryboardTriggerGroup triggerGroup)
@@ -51,6 +54,10 @@ namespace osu.Game.Storyboards.Drawables
 
                 case @"HitObjectHit":
                     bindHitObjectHit(drawable, triggerGroup);
+                    break;
+
+                case string s when s.StartsWith(HitSampleTriggerDefinition.PREFIX, StringComparison.OrdinalIgnoreCase):
+                    bindHitSample(drawable, triggerGroup);
                     break;
             }
         }
@@ -78,20 +85,41 @@ namespace osu.Game.Storyboards.Drawables
 
         #region Hit sample triggers
 
+        private void bindHitSample<TDrawable>(TDrawable drawable, StoryboardTriggerGroup triggerGroup) where TDrawable : Drawable, IFlippable, IVectorScalable
+        {
+            if (!HitSampleTriggerDefinition.TryParse(triggerGroup.TriggerName, out var definition))
+                return;
+
+            // TODO: consider optimising. this likely does a lot of redundant work
+            lastPlayedSamples.BindValueChanged(val =>
+            {
+                if (val.NewValue == null)
+                    return;
+
+                foreach (var sample in val.NewValue.OfType<HitSampleInfo>())
+                {
+                    if (definition.Value.Matches(sample))
+                        playTrigger(drawable, triggerGroup);
+                }
+            });
+        }
+
         private struct HitSampleTriggerDefinition
         {
+            public const string PREFIX = @"HitSound";
+
             public string? NormalBank { get; set; }
             public string? AdditionBank { get; set; }
             public string? Name { get; set; }
             public string? Suffix { get; set; }
 
-            public string CanonicalName => $@"HitSound{NormalBank}{AdditionBank}{Name}{Suffix}";
+            public string CanonicalName => $@"{PREFIX}{NormalBank}{AdditionBank}{Name}{Suffix}";
 
             private static readonly Regex parse_regex = new Regex(
-                @"(?i)^HitSound(?<bank1>(All|Normal|Soft|Drum))?(?<bank2>(All|Normal|Soft|Drum))?(?<name>(Whistle|Clap|Finish))?(?<suffix>\d+)?$",
+                @$"(?i)^{PREFIX}(?<bank1>(All|Normal|Soft|Drum))?(?<bank2>(All|Normal|Soft|Drum))?(?<name>(Whistle|Clap|Finish))?(?<suffix>\d+)?$",
                 RegexOptions.Compiled);
 
-            public bool TryParse(string triggerName, [NotNullWhen(true)] out HitSampleTriggerDefinition? result)
+            public static bool TryParse(string triggerName, [NotNullWhen(true)] out HitSampleTriggerDefinition? result)
             {
                 var match = parse_regex.Match(triggerName);
 
