@@ -46,11 +46,7 @@ namespace osu.Game.Storyboards.Drawables
                     break;
 
                 case @"HitObjectHit":
-                    lastJudgementResult.BindValueChanged(val =>
-                    {
-                        if (val.NewValue.IsNotNull() && val.NewValue.IsHit && val.NewValue.Type.IsScorable())
-                            playTrigger(drawable, triggerGroup);
-                    });
+                    bindHitObjectHit(drawable, triggerGroup);
                     break;
             }
         }
@@ -64,6 +60,15 @@ namespace osu.Game.Storyboards.Drawables
                     return;
 
                 playTrigger(drawable, triggerGroup);
+            });
+        }
+
+        private void bindHitObjectHit<TDrawable>(TDrawable drawable, StoryboardTriggerGroup triggerGroup) where TDrawable : Drawable, IFlippable, IVectorScalable
+        {
+            lastJudgementResult.BindValueChanged(val =>
+            {
+                if (val.NewValue.IsNotNull() && val.NewValue.IsHit && val.NewValue.Type.IsScorable())
+                    playTrigger(drawable, triggerGroup);
             });
         }
 
