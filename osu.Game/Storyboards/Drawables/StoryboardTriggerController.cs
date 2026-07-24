@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -96,24 +97,22 @@ namespace osu.Game.Storyboards.Drawables
                 if (val.NewValue == null)
                     return;
 
-                foreach (var sample in val.NewValue.OfType<HitSampleInfo>())
-                {
-                    if (definition.Value.Matches(sample))
-                        playTrigger(drawable, triggerGroup);
-                }
+                if (definition.Value.Matches(val.NewValue.OfType<HitSampleInfo>()))
+                    playTrigger(drawable, triggerGroup);
             });
         }
 
-        private struct HitSampleTriggerDefinition
+        private readonly struct HitSampleTriggerDefinition
         {
             public const string PREFIX = @"HitSound";
 
-            public string? NormalBank { get; set; }
-            public string? AdditionBank { get; set; }
-            public string? Name { get; set; }
-            public string? Suffix { get; set; }
+            public string RawName { get; init; }
+            public string? NormalBank { get; init; }
+            public string? AdditionBank { get; init; }
+            public string? AdditionName { get; init; }
+            public string? Suffix { get; init; }
 
-            public string CanonicalName => $@"{PREFIX}{NormalBank}{AdditionBank}{Name}{Suffix}";
+            public override string ToString() => RawName;
 
             private static readonly Regex parse_regex = new Regex(
                 @$"(?i)^{PREFIX}(?<bank1>(All|Normal|Soft|Drum))?(?<bank2>(All|Normal|Soft|Drum))?(?<name>(Whistle|Clap|Finish))?(?<suffix>\d+)?$",
@@ -134,41 +133,80 @@ namespace osu.Game.Storyboards.Drawables
                 string? bank2 = match.Groups[@"bank2"].Success ? match.Groups[@"bank2"].Value : null;
                 string? suffix = match.Groups[@"suffix"].Success ? match.Groups[@"suffix"].Value : null;
 
+                // https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameplayElements/Events/Trigger/EventTriggerHitSound.cs#L70-L80
                 bool bank1IsAddition = bank1 != null && bank2 == null && name != null;
+
+                // remap names from the regex onto `HitSampleInfo` constants.
+                // this simplifies logic later, and is faster than string checks at time of trigger.
+                name = name?.ToLowerInvariant() switch
+                {
+                    @"whistle" => HitSampleInfo.HIT_WHISTLE,
+                    @"clap" => HitSampleInfo.HIT_CLAP,
+                    @"finish" => HitSampleInfo.HIT_FINISH,
+                    _ => null,
+                };
+                bank1 = mapBankName(bank1);
+                bank2 = mapBankName(bank2);
 
                 var trigger = new HitSampleTriggerDefinition
                 {
-                    Name = name,
+                    RawName = triggerName,
+                    AdditionName = name,
                     NormalBank = bank1IsAddition ? bank2 : bank1,
                     AdditionBank = bank1IsAddition ? bank1 : bank2,
                     Suffix = suffix,
                 };
 
-                if (!string.Equals(triggerName, trigger.CanonicalName, StringComparison.OrdinalIgnoreCase))
-                {
-                    result = null;
-                    return false;
-                }
-
                 result = trigger;
                 return true;
+
+                string? mapBankName(string? triggerBank) =>
+                    triggerBank?.ToLowerInvariant() switch
+                    {
+                        @"normal" => HitSampleInfo.BANK_NORMAL,
+                        @"soft" => HitSampleInfo.BANK_SOFT,
+                        @"drum" => HitSampleInfo.BANK_DRUM,
+                        _ => null, // "all" falls into this case which is intended as it means no filter anyway.
+                    };
             }
 
-            public bool Matches(HitSampleInfo hitSampleInfo)
+            public bool Matches(IEnumerable<HitSampleInfo> hitSamples)
             {
-                if (Name != null && !string.Equals(Name, hitSampleInfo.Name, StringComparison.OrdinalIgnoreCase))
-                    return false;
+                // lazer treats "addition bank" and "addition samples" slightly differently than stable does.
+                // in stable, "normal bank" and "addition bank" were just properties of a hitsound.
+                // a hitsound did not *need* to have an addition sound to have a defined bank for it.
+                // contrary to this, lazer will just not emit an addition `HitSampleInfo` at all,
+                // and because `HitSampleInfo` is what stores the bank, there is nowhere for the addition bank definition to go.
+                // this is why the behaviour of the trigger as written below is not 100% accurate to stable.
+                // the difference is perceivable the most on triggers like `HitSoundAllSoft` which will sometimes not trigger
+                // on objects that do not have an addition sound, even if the "soft" bank should be inherited via a "green line" or baseline beatmap sample set.
 
-                if (NormalBank != null && (hitSampleInfo.Name != HitSampleInfo.HIT_NORMAL || !string.Equals(hitSampleInfo.Bank, NormalBank, StringComparison.OrdinalIgnoreCase)))
-                    return false;
+                // if the addition name is specified, it must be found among the samples.
+                bool foundAddition = AdditionName == null;
+                // if the addition bank is specified, at least one addition sound must use this bank.
+                bool additionBankCorrect = AdditionBank == null;
 
-                if (AdditionBank != null && (hitSampleInfo.Name == HitSampleInfo.HIT_NORMAL || !string.Equals(hitSampleInfo.Bank, AdditionBank, StringComparison.OrdinalIgnoreCase)))
-                    return false;
+                foreach (var hitSampleInfo in hitSamples)
+                {
+                    if (hitSampleInfo.Name == HitSampleInfo.HIT_NORMAL)
+                    {
+                        if (NormalBank != null && hitSampleInfo.Bank != NormalBank)
+                            return false;
+                    }
+                    else
+                    {
+                        if (AdditionName != null && hitSampleInfo.Name == AdditionName)
+                            foundAddition = true;
 
-                if (Suffix != null && !string.Equals(Name, hitSampleInfo.Name, StringComparison.OrdinalIgnoreCase))
-                    return false;
+                        if (AdditionBank != null && hitSampleInfo.Bank == AdditionBank)
+                            additionBankCorrect = true;
+                    }
 
-                return true;
+                    if (Suffix != null && !string.Equals(Suffix, hitSampleInfo.Suffix, StringComparison.OrdinalIgnoreCase))
+                        return false;
+                }
+
+                return foundAddition && additionBankCorrect;
             }
         }
 
