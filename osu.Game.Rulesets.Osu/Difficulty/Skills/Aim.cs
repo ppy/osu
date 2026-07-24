@@ -31,17 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        /// <summary>
-        /// The number of sections with the highest strains, which the peak strain reductions will apply to.
-        /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
-        /// </summary>
-        private const int reduced_section_time = 4000;
-
-        /// <summary>
-        /// The baseline multiplier applied to the section with the biggest strain.
-        /// </summary>
-        private const double reduced_strain_baseline = 0.727;
-
         private readonly List<double> sliderStrains = new List<double>();
 
         private double strainDecay(double ms) => DiffUtils.Pow(0.2, ms / 1000);
@@ -212,9 +201,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <returns></returns>
         private IEnumerable<StrainPeak> getReducedStrainPeaks()
         {
+            const int reduced_section_time = 4000;
+            const double reduced_strain_baseline = 0.727;
+
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-
             List<StrainPeak> strains = GetCurrentStrainPeaks()
                                        .Where(p => p.Value > 0)
                                        .ToList();
