@@ -26,16 +26,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             const double velocity_change_multiplier = 0.52;
 
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+            var osuNextObj = (OsuDifficultyHitObject)current.Next();
 
-            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
-            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
+            // Calculate if current/previous sliders are overlapping with the next object (2B sliders)
+            bool isCurrentSlider2B = osuCurrObj.EndTime - osuCurrObj.StartTime > osuNextObj?.AdjustedDeltaTime;
+            bool isLastSlider2B = osuLastObj.EndTime - osuLastObj.StartTime > osuCurrObj.AdjustedDeltaTime;
+
+            double currDistance = withSliderTravelDistance && !isCurrentSlider2B ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
+            double prevDistance = withSliderTravelDistance && !isLastSlider2B ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
 
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
 
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+            if (osuLastObj.BaseObject is Slider && !isLastSlider2B && withSliderTravelDistance)
             {
                 // If the last object is a slider, then we extend the travel velocity through the slider into the current object.
                 double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
+
                 currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
             }
 

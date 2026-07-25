@@ -37,22 +37,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             const double wiggle_multiplier = 1.02;
 
             var osuLast2Obj = (OsuDifficultyHitObject)current.Previous(2);
+            var osuNextObj = (OsuDifficultyHitObject)current.Next();
 
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
 
+            // Calculate if current/previous sliders are overlapping with the next object (2B sliders)
+            bool isCurrentSlider2B = osuCurrObj.EndTime - osuCurrObj.StartTime > osuNextObj?.AdjustedDeltaTime;
+            bool isLastSlider2B = osuLastObj.EndTime - osuLastObj.StartTime > osuCurrObj.AdjustedDeltaTime;
+
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
-            double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
+            double currDistance = withSliderTravelDistance && !isCurrentSlider2B ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
             double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
+            if (osuLastObj.BaseObject is Slider && !isLastSlider2B && withSliderTravelDistance)
             {
                 double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
+
                 currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
             }
 
-            double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
+            double prevDistance = withSliderTravelDistance && !isLastSlider2B ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
             double snapDifficulty = currVelocity; // Start difficulty with regular velocity.
