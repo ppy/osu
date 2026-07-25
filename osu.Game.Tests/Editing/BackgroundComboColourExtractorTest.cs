@@ -25,9 +25,8 @@ namespace osu.Game.Tests.Editing
                 (false, false) => new Rgba32(220, 40, 40), // red
             });
 
-            var colours = BackgroundComboColourExtractor.Extract(stream, BackgroundComboColourExtractor.MAX_COLOUR_COUNT);
+            var colours = BackgroundComboColourExtractor.Extract(stream);
 
-            Assert.That(colours, Has.Count.EqualTo(BackgroundComboColourExtractor.MAX_COLOUR_COUNT));
             Assert.That(colours.Any(c => c.B > c.R && c.B > c.G), Is.True); // blue
             Assert.That(colours.Any(c => c.R > c.B && c.G > c.B), Is.True); // yellow
             Assert.That(colours.Any(c => c.G > c.R && c.G > c.B), Is.True); // green

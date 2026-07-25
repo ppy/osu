@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Skinning;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -20,7 +19,6 @@ namespace osu.Game.Utils
     /// </summary>
     public static class BackgroundComboColourExtractor
     {
-        public const int MIN_COLOUR_COUNT = 2;
         public const int MAX_COLOUR_COUNT = LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT;
 
         // Resolution to downscale to before quantizing.
@@ -30,11 +28,8 @@ namespace osu.Game.Utils
         private const float min_lightness = 50 / 255f;
         private const float max_lightness = 220 / 255f;
 
-        public static IReadOnlyList<Colour4> Extract(Stream imageStream, int colourCount)
+        public static IReadOnlyList<Colour4> Extract(Stream imageStream)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(colourCount, MIN_COLOUR_COUNT);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(colourCount, MAX_COLOUR_COUNT);
-
             using var image = Image.Load<Rgba32>(imageStream);
 
             image.Mutate(context => context.Resize(new ResizeOptions
@@ -51,32 +46,16 @@ namespace osu.Game.Utils
             using var frameQuantizer = quantizer.CreatePixelSpecificQuantizer<Rgba32>(SixLabors.ImageSharp.Configuration.Default);
             using var result = frameQuantizer.BuildPaletteAndQuantizeFrame(image.Frames.RootFrame, image.Bounds);
 
-            var colours = result.Palette.ToArray()
-                                .Where(p => p.A >= 128)
-                                .Select(p => clampLightness(new Colour4(p.R, p.G, p.B, 255)))
-                                .ToList();
-
-            padWithDefaults(colours, MAX_COLOUR_COUNT);
-
-            // Always quantize to the max palette size, then randomly keep the requested count.
-            return colours.OrderBy(_ => Random.Shared.Next()).Take(colourCount).ToList();
+            return result.Palette.ToArray()
+                         .Where(p => p.A >= 128)
+                         .Select(p => clampLightness(new Colour4(p.R, p.G, p.B, 255)))
+                         .ToList();
         }
 
         private static Colour4 clampLightness(Colour4 colour)
         {
             var hsl = colour.ToHSL();
             return Colour4.FromHSL(hsl.X, hsl.Y, Math.Clamp(hsl.Z, min_lightness, max_lightness));
-        }
-
-        private static void padWithDefaults(List<Colour4> colours, int colourCount)
-        {
-            var defaults = SkinConfiguration.DefaultComboColours;
-
-            while (colours.Count < colourCount)
-            {
-                var fallback = defaults[colours.Count % defaults.Count];
-                colours.Add(new Colour4(fallback.R, fallback.G, fallback.B, 1f));
-            }
         }
     }
 }

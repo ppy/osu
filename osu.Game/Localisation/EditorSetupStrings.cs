@@ -30,26 +30,6 @@ namespace osu.Game.Localisation
         public static LocalisableString HitCircleSliderCombos => new TranslatableString(getKey(@"hit_circle_slider_combos"), @"Hit circle / Slider Combos");
 
         /// <summary>
-        /// "Colours to extract"
-        /// </summary>
-        public static LocalisableString ColoursToExtract => new TranslatableString(getKey(@"colours_to_extract"), @"Colours to extract");
-
-        /// <summary>
-        /// "How many colours to extract from the background."
-        /// </summary>
-        public static LocalisableString ColoursToExtractDescription => new TranslatableString(getKey(@"colours_to_extract_description"), @"How many colours to extract from the background.");
-
-        /// <summary>
-        /// "Pick from background"
-        /// </summary>
-        public static LocalisableString PickComboColoursFromBackground => new TranslatableString(getKey(@"pick_combo_colours_from_background"), @"Pick from background");
-
-        /// <summary>
-        /// "Selects combo colours from the most prominent colours in the beatmap's background image."
-        /// </summary>
-        public static LocalisableString PickComboColoursFromBackgroundDescription => new TranslatableString(getKey(@"pick_combo_colours_from_background_description"), @"Selects combo colours from the most prominent colours in the beatmap's background image.");
-
-        /// <summary>
         /// "Design"
         /// </summary>
         public static LocalisableString DesignHeader => new TranslatableString(getKey(@"design_header"), @"Design");

@@ -28,6 +28,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
     {
         public BindableList<Colour4> Colours { get; } = new BindableList<Colour4>();
 
+        /// <summary>
+        /// Optional colours offered as presets in each colour picker popover.
+        /// </summary>
+        public BindableList<Colour4> Suggestions { get; } = new BindableList<Colour4>();
+
         public LocalisableString Caption { get; init; }
         public LocalisableString HintText { get; init; }
 
@@ -149,7 +154,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 // copy to avoid accesses to modified closure.
                 int colourIndex = i;
-                var colourButton = new ColourButton { Current = { Value = Colours[colourIndex] } };
+                var colourButton = new ColourButton(Suggestions) { Current = { Value = Colours[colourIndex] } };
                 colourButton.Current.BindValueChanged(colour => Colours[colourIndex] = colour.NewValue);
                 colourButton.DeleteRequested = () => Colours.RemoveAt(colourIndex);
                 flow.Add(colourButton);
@@ -161,8 +166,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
             public Bindable<Colour4> Current { get; } = new Bindable<Colour4>();
             public Action? DeleteRequested { get; set; }
 
+            private readonly BindableList<Colour4> suggestions;
+
             private Box background = null!;
             private OsuSpriteText hexCode = null!;
+
+            public ColourButton(BindableList<Colour4> suggestions)
+            {
+                this.suggestions = suggestions;
+            }
 
             [BackgroundDependencyLoader]
             private void load()
@@ -195,7 +207,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Current.BindValueChanged(_ => updateState(), true);
             }
 
-            public Popover GetPopover() => new ColourPickerPopover
+            public Popover GetPopover() => new ColourPickerPopover(suggestions)
             {
                 Current = { BindTarget = Current }
             };
@@ -222,19 +234,23 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
 
             private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>();
+            private readonly BindableList<Colour4> suggestions;
 
-            public ColourPickerPopover()
+            public ColourPickerPopover(BindableList<Colour4> suggestions)
                 : base(false)
             {
+                this.suggestions = suggestions;
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                Child = new OsuColourPicker
+                var picker = new OsuColourPicker
                 {
-                    Current = { BindTarget = Current }
+                    Current = { BindTarget = Current },
                 };
+                picker.Suggestions.BindTo(suggestions);
+                Child = picker;
 
                 Body.BorderThickness = 2;
                 Body.BorderColour = colourProvider.Highlight1;
