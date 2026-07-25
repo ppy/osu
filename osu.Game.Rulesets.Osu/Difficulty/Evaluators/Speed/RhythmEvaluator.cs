@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                        DeltaCount == other.DeltaCount;
             }
 
-            public readonly override string ToString()
+            public override readonly string ToString()
             {
                 return $"{Delta}x{DeltaCount}";
             }
