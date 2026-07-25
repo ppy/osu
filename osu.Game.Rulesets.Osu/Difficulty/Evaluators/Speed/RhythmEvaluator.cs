@@ -134,13 +134,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                         bool found = false;
 
-                        foreach (var existingIsland in islands)
+                        for (int j = 0; j < islands.Count; j++)
                         {
+                            var existingIsland = islands[j];
+
                             if (existingIsland.AlmostEquals(island, deltaDifferenceEpsilon))
                             {
                                 // only increase island occurrences if they're going one after another
                                 if (previousIsland.AlmostEquals(island, deltaDifferenceEpsilon))
+                                {
                                     existingIsland.Occurrences++;
+                                    islands[j] = existingIsland;
+                                }
 
                                 // repeated island (ex: triplet -> triplet)
                                 double power = DiffUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
@@ -219,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         /// <summary>
         /// An island is a group of consecutive objects with the same delta time.
         /// </summary>
-        private class Island
+        private struct Island
         {
             /// <summary>
             /// Delta time of every object in this island
@@ -229,16 +234,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             /// <summary>
             /// How long the island is
             /// </summary>
-            public int DeltaCount { get; private set; } = 1;
+            public int DeltaCount { get; private set; }
 
             /// <summary>
             /// How many times island already occured
             /// </summary>
-            public int Occurrences { get; set; } = 1;
+            public int Occurrences { get; set; }
 
             public Island(int delta)
             {
                 Delta = Math.Max(delta, OsuDifficultyHitObject.MIN_DELTA_TIME);
+                DeltaCount = 1;
+                Occurrences = 1;
             }
 
             public void AddDelta(int delta)
@@ -249,7 +256,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 DeltaCount++;
             }
 
-            public bool IsSimilarPolarity(Island other, double epsilon)
+            public readonly bool IsSimilarPolarity(in Island other, double epsilon)
             {
                 // single delta islands shouldn't be compared
                 if (DeltaCount <= 1 || other.DeltaCount <= 1)
@@ -259,13 +266,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                        DeltaCount % 2 == other.DeltaCount % 2;
             }
 
-            public bool AlmostEquals(Island other, double epsilon)
+            public readonly bool AlmostEquals(in Island other, double epsilon)
             {
                 return Math.Abs(Delta - other.Delta) < epsilon &&
                        DeltaCount == other.DeltaCount;
             }
 
-            public override string ToString()
+            public readonly override string ToString()
             {
                 return $"{Delta}x{DeltaCount}";
             }
