@@ -126,7 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void updateVisibility()
         {
-            bool shouldDisplay = userScore != null && (leaderboardVisibility.Value.ShouldDisplay(true) || localUserPlayingState.Value == LocalUserPlayingState.Break);
+            bool shouldDisplay = userScore != null && (leaderboardVisibility.Value.ShouldDisplay(isMultiplayer: true) || localUserPlayingState.Value == LocalUserPlayingState.Break);
 
             State.Value = shouldDisplay ? Visibility.Visible : Visibility.Hidden;
         }
