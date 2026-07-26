@@ -250,9 +250,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
 
         /// <summary>
-        /// "Toggle in-game leaderboard"
+        /// "Cycle in-game leaderboard visibility mode"
         /// </summary>
-        public static LocalisableString ToggleInGameLeaderboard => new TranslatableString(getKey(@"toggle_in_game_leaderboard"), @"Toggle in-game leaderboard");
+        public static LocalisableString CycleInGameLeaderboardVisibilityMode => new TranslatableString(getKey(@"cycle_in_game_leaderboard_visibility_mode"), @"Cycle in-game leaderboard visibility mode");
 
         /// <summary>
         /// "Toggle mod select"

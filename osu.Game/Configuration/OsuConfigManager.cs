@@ -270,9 +270,9 @@ namespace osu.Game.Configuration
                 ),
                 new TrackedSetting<GameplayLeaderboardVisibilityMode>(OsuSetting.GameplayLeaderboardVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
-                    name: GlobalActionKeyBindingStrings.ToggleInGameLeaderboard,
+                    name: GlobalActionKeyBindingStrings.CycleInGameLeaderboardVisibilityMode,
                     value: visibilityMode.GetLocalisableDescription(),
-                    shortcut: LookupKeyBindings(GlobalAction.ToggleInGameLeaderboard))
+                    shortcut: LookupKeyBindings(GlobalAction.CycleInGameLeaderboardVisibilityMode))
                 ),
                 new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
