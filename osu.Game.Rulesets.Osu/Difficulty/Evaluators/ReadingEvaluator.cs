@@ -31,17 +31,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double constantAngleNerfFactor = getConstantAngleNerfFactor(currObj);
 
             double noteDensityDifficulty = calculateDensityDifficulty(nextObj, velocity, constantAngleNerfFactor, pastObjectDifficultyInfluence, currentVisibleObjectDensity);
+            noteDensityDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             double hiddenDifficulty = hidden
                 ? calculateHiddenDifficulty(currObj, pastObjectDifficultyInfluence, currentVisibleObjectDensity, velocity, constantAngleNerfFactor)
                 : 0;
+            hiddenDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
-            double preemptDifficulty = calculatePreemptDifficulty(velocity, constantAngleNerfFactor, currObj.Preempt);
+            double preemptDifficulty = calculatePreemptDifficulty(currObj, constantAngleNerfFactor, currObj.Preempt / 1000);
 
             double readingDifficulty = DiffUtils.Norm(1.5, preemptDifficulty, hiddenDifficulty, noteDensityDifficulty);
-
-            // Having less time to process information is harder
-            readingDifficulty *= highBpmBonus(currObj.AdjustedDeltaTime);
 
             return readingDifficulty;
         }
@@ -87,21 +86,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// <list type="bullet">
         /// <item><description>cursor velocity to the current object,</description></item>
         /// <item><description>how many times the current object's angle was repeated,</description></item>
-        /// <item><description>how many milliseconds elapse between the approach circle appearing and touching the inner circle</description></item>
+        /// <item><description>how many seconds elapse between the approach circle appearing and touching the inner circle</description></item>
         /// </list>
         /// </summary>
-        private static double calculatePreemptDifficulty(double velocity, double constantAngleNerfFactor, double preempt)
+        private static double calculatePreemptDifficulty(OsuDifficultyHitObject currObj, double constantAngleNerfFactor, double preempt)
         {
-            const double preempt_balancing_factor = 140000;
-            const double preempt_starting_point = 500; // AR 9.66 in milliseconds
+            const double preempt_multiplier = 230;
+            const double preempt_starting_point = 0.5; // AR 9.66 in seconds
 
             // Arbitrary curve for the base value preempt difficulty should have as approach rate increases.
             // https://www.desmos.com/calculator/c175335a71
-            double preemptDifficulty = DiffUtils.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) / preempt_balancing_factor;
+            double preemptDifficulty = DiffUtils.Pow((preempt_starting_point - preempt + Math.Abs(preempt - preempt_starting_point)) / 2, 2.5) * preempt_multiplier;
 
-            preemptDifficulty *= constantAngleNerfFactor * velocity;
+            // Base difficulty for reading high AR, starting from raw preempt difficulty
+            double baseDifficulty = preemptDifficulty;
 
-            return preemptDifficulty;
+            // Velocity bonus, as harder patterns are harder to read
+            double velocityFactor = (currObj.LazyJumpDistance / currObj.AdjustedDeltaTime) * highBpmBonus(currObj.AdjustedDeltaTime);
+
+            // Safeguard against easy maps with extremely high AR
+            double reduceBaseline = velocityFactor * 10;
+
+            if (baseDifficulty > reduceBaseline)
+            {
+                // Scale logarithmically past the baseline
+                double delta = baseDifficulty - reduceBaseline;
+                baseDifficulty = reduceBaseline + Math.Log(delta + 1);
+            }
+
+            // Apply multipliers to base difficulty and velocity factor
+            double difficulty = 30 * baseDifficulty + 0.5 * velocityFactor * preemptDifficulty;
+
+            return difficulty * constantAngleNerfFactor;
         }
 
         /// <summary>
