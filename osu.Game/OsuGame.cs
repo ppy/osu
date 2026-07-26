@@ -1376,6 +1376,16 @@ namespace osu.Game
 
                 dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
             }
+
+            if (combined < 20260723)
+            {
+                bool oldValue = LocalConfig.Get<bool>(OsuSetting.GameplayLeaderboard);
+
+                LocalConfig.SetValue(
+                    OsuSetting.GameplayLeaderboardVisibilityMode,
+                    oldValue ? GameplayLeaderboardVisibilityMode.Always : GameplayLeaderboardVisibilityMode.Never
+                );
+            }
         }
 
         private void handleBackButton()

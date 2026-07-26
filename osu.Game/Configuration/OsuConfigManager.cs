@@ -152,6 +152,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
+            SetDefault(OsuSetting.GameplayLeaderboard, true); // legacy migration only
             SetDefault(OsuSetting.GameplayLeaderboardVisibilityMode, GameplayLeaderboardVisibilityMode.Always);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
@@ -339,7 +340,6 @@ namespace osu.Game.Configuration
         ShowStoryboard,
         KeyOverlay,
         GameplayLeaderboard, // only used for migrating to `GameplayLeaderboardVisibilityMode`
-        GameplayLeaderboardVisibilityMode,
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
@@ -470,5 +470,7 @@ namespace osu.Game.Configuration
 
         DashboardSortMode,
         DashboardDisplayStyle,
+
+        GameplayLeaderboardVisibilityMode,
     }
 }
