@@ -31,17 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        /// <summary>
-        /// The number of sections with the highest strains, which the peak strain reductions will apply to.
-        /// This is done in order to decrease their impact on the overall difficulty of the map for this skill.
-        /// </summary>
-        private int reducedSectionTime => 4000;
-
-        /// <summary>
-        /// The baseline multiplier applied to the section with the biggest strain.
-        /// </summary>
-        private const double reduced_strain_baseline = 0.727;
-
         private readonly List<double> sliderStrains = new List<double>();
 
         private double strainDecay(double ms) => DiffUtils.Pow(0.2, ms / 1000);
@@ -151,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (maxSliderStrain == 0)
                 return 0;
 
-            return sliderStrains.Sum(strain => 1.0 / (1.0 + Math.Exp(-(strain / maxSliderStrain * 12.0 - 6.0))));
+            return sliderStrains.Sum(strain => DiffUtils.Logistic(strain / maxSliderStrain, 0.5, 12.0));
         }
 
         public double CountTopWeightedSliders(double difficultyValue)
@@ -212,9 +201,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <returns></returns>
         private IEnumerable<StrainPeak> getReducedStrainPeaks()
         {
+            const int reduced_section_time = 4000;
+            const double reduced_strain_baseline = 0.727;
+
             // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
             // These sections will not contribute to the difficulty.
-
             List<StrainPeak> strains = GetCurrentStrainPeaks()
                                        .Where(p => p.Value > 0)
                                        .ToList();
@@ -225,13 +216,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
             // Strains are split into 20ms chunks to try to mitigate inconsistencies caused by reducing strains
-            while (strains.Count > skipCount && time < reducedSectionTime)
+            while (strains.Count > skipCount && time < reduced_section_time)
             {
                 StrainPeak strain = strains[skipCount];
 
                 for (double addedTime = 0; addedTime < strain.SectionLength; addedTime += chunk_size)
                 {
-                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / reducedSectionTime, 0, 1)));
+                    double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((time + addedTime) / reduced_section_time, 0, 1)));
 
                     // intentionally add at end and sort afterwards, should be cheaper.
                     strains.Add(new StrainPeak(

@@ -60,7 +60,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = ExtendedHeight ? 48 : 0,
+                    Height = ExtendedHeight ? 52 : 0,
                     AutoSizeAxes = ExtendedHeight ? Axes.None : Axes.Y,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
