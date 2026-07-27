@@ -86,8 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var difficulties = GetTransformedDifficulties(ObjectDifficulties);
 
-            (double difficulty, double weight) = HarmonicSeries.Aggregate(difficulties);
-            harmonicWeightSum = weight;
+            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(difficulties);
 
             return difficulty;
         }
