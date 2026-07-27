@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (current.BaseObject is Spinner || current.Index <= 1 || osuLastObj.BaseObject is Spinner)
                 return 0;
 
-            const double wide_angle_multiplier = 9.67;
+            const double wide_angle_multiplier = 9.0;
             const double acute_angle_multiplier = 2.41;
             const double slider_multiplier = 1.5;
             const double velocity_change_multiplier = 0.9;
@@ -83,9 +83,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 }
 
                 double wideAngleBonus = calcAngleWideness(currAngle);
-
-                // Penalize angle repetition. It is important to do it _before_ multiplying by velocity because we compare raw wideness here
-                wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, DiffUtils.Pow(calcAngleWideness(lastAngle), 3)));
 
                 // Rescaling velocity for the wide angle bonus
                 const double wide_angle_time_scale = 1.45;
