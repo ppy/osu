@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Difficulty.Aggregation;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -15,11 +16,10 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class Reading : HarmonicSkill
+    public class Reading : Skill
     {
-        private readonly List<DifficultyHitObject> objectList = new List<DifficultyHitObject>();
-
         private readonly bool hasHiddenMod;
+        private double harmonicWeightSum;
 
         public Reading(Mod[] mods)
             : base(mods)
@@ -29,13 +29,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
+        private double reducedNoteCount;
+        private double? reducedDuration;
+
         private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
-        protected override double ObjectDifficultyOf(DifficultyHitObject current)
+        protected override double ProcessInternal(DifficultyHitObject current)
         {
             const double skill_multiplier = 2.5;
-
-            objectList.Add(current);
 
             double decay = strainDecay(current.DeltaTime);
 
@@ -65,6 +66,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 difficulty *= 0.1;
 
             difficulty *= 0.825 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2.2) / 1125.0;
+
+            return difficulty;
+        }
+
+        public override double CountTopWeightedObjectDifficulties(double difficultyValue)
+
+        public override double DifficultyValue()
+        {
+            if (ObjectDifficulties.Count == 0)
+                return 0;
+
+            var difficulties = GetTransformedDifficulties(ObjectDifficulties);
+
+            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(difficulties);
 
             return difficulty;
         }
@@ -121,15 +136,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulties;
         }
 
-        public override double CountTopWeightedObjectDifficulties(double difficultyValue)
+        public double CountTopWeightedObjectDifficulties(double difficultyValue)
         {
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            if (ObjectWeightSum == 0)
+            if (harmonicWeightSum == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / ObjectWeightSum; // What would the top difficulty be if all object difficulties were identical
+            double consistentTopNote = difficultyValue / harmonicWeightSum; // What would the top difficulty be if all object difficulties were identical
 
             if (consistentTopNote == 0)
                 return 0;

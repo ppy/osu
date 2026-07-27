@@ -23,6 +23,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => current.Current = value;
         }
 
+        /// <summary>
+        /// Whether this checkbox should be extra tall to match up with other form controls in vertical sizing scenarios.
+        /// </summary>
+        public bool ExtendedHeight { get; init; }
+
         private readonly BindableWithCurrent<bool> current = new BindableWithCurrent<bool>();
 
         /// <summary>
@@ -55,7 +60,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    Height = ExtendedHeight ? 52 : 0,
+                    AutoSizeAxes = ExtendedHeight ? Axes.None : Axes.Y,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {

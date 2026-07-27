@@ -421,6 +421,12 @@ namespace osu.Game.Rulesets.Difficulty
                 set => baseBeatmap.Bookmarks = value;
             }
 
+            public double[] SliderVelocityPresets
+            {
+                get => baseBeatmap.SliderVelocityPresets;
+                set => baseBeatmap.SliderVelocityPresets = value;
+            }
+
             #endregion
         }
     }
