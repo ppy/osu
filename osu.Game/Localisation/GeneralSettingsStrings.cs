@@ -115,6 +115,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeReleaseStreamConfirmationInfo => new TranslatableString(getKey(@"change_release_stream_confirmation_info"), @"If you run into issues starting the game, you can usually run the installer from the official site to recover.");
 
         /// <summary>
+        /// "Note that when using a non-stable release stream, the game may still update to a stable release if it is newer."
+        /// </summary>
+        public static LocalisableString ReleaseStreamNonStableUpgradeInformation => new TranslatableString(getKey(@"release_stream_non_stable_upgrade_information"), @"Note that when using a non-stable release stream, the game may still update to a stable release if it is newer.");
+
+        /// <summary>
         /// "You are running the latest release ({0})"
         /// </summary>
         public static LocalisableString RunningLatestRelease(string version) => new TranslatableString(getKey(@"running_latest_release"), @"You are running the latest release ({0})", version);
