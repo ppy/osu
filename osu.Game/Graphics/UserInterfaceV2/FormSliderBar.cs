@@ -64,8 +64,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 tabbableContentContainer = value;
 
-                if (textBox.IsNotNull())
-                    textBox.TabbableContentContainer = tabbableContentContainer;
+                if (TextBox.IsNotNull())
+                    TextBox.TabbableContentContainer = tabbableContentContainer;
             }
         }
 
@@ -133,8 +133,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public Func<T, LocalisableString> TooltipFormat { get; init; }
 
+        internal FormTextBox.InnerTextBox TextBox { get; private set; } = null!;
+
         private FormControlBackground background = null!;
-        private FormTextBox.InnerTextBox textBox = null!;
         private OsuSpriteText valueLabel = null!;
         private FormFieldCaption captionText = null!;
         private IFocusManager focusManager = null!;
@@ -144,7 +145,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
 
-        public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(textBox) == true;
+        public bool TakeFocus() => GetContainingFocusManager()?.ChangeFocus(TextBox) == true;
 
         public FormSliderBar()
         {
@@ -248,7 +249,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                     AutoSizeAxes = Axes.Y,
                                     Children = new Drawable[]
                                     {
-                                        textBox = CreateTextBox().With(box =>
+                                        TextBox = CreateTextBox().With(box =>
                                         {
                                             box.RelativeSizeAxes = Axes.X;
                                             // the textbox is hidden when the control is unfocused,
@@ -294,9 +295,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             focusManager = GetContainingFocusManager()!;
 
-            textBox.Focused.BindValueChanged(_ => updateState());
-            textBox.OnCommit += textCommitted;
-            textBox.Current.BindValueChanged(textChanged);
+            TextBox.Focused.BindValueChanged(_ => updateState());
+            TextBox.OnCommit += textCommitted;
+            TextBox.Current.BindValueChanged(textChanged);
 
             slider.IsDragging.BindValueChanged(_ => updateState());
             slider.Focused.BindValueChanged(_ => updateState());
@@ -339,19 +340,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 switch (currentNumberInstantaneous)
                 {
                     case Bindable<int> bindableInt:
-                        bindableInt.Value = int.Parse(textBox.Current.Value);
+                        bindableInt.Value = int.Parse(TextBox.Current.Value);
                         break;
 
                     case Bindable<double> bindableDouble:
-                        bindableDouble.Value = double.Parse(textBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
+                        bindableDouble.Value = double.Parse(TextBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
                         break;
 
                     case Bindable<float> bindableFloat:
-                        bindableFloat.Value = float.Parse(textBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
+                        bindableFloat.Value = float.Parse(TextBox.Current.Value) / (DisplayAsPercentage ? 100 : 1);
                         break;
 
                     default:
-                        currentNumberInstantaneous.Parse(textBox.Current.Value, CultureInfo.CurrentCulture);
+                        currentNumberInstantaneous.Parse(TextBox.Current.Value, CultureInfo.CurrentCulture);
                         break;
                 }
             }
@@ -379,20 +380,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
         protected override bool OnClick(ClickEvent e)
         {
             if (!Current.Disabled)
-                focusManager.ChangeFocus(textBox);
+                focusManager.ChangeFocus(TextBox);
             return true;
         }
 
         private void updateState()
         {
-            bool childHasFocus = slider.Focused.Value || textBox.Focused.Value;
+            bool childHasFocus = slider.Focused.Value || TextBox.Focused.Value;
 
-            textBox.ReadOnly = currentNumberInstantaneous.Disabled;
-            textBox.Alpha = textBox.Focused.Value ? 1 : 0;
-            valueLabel.Alpha = textBox.Focused.Value ? 0 : 1;
+            TextBox.ReadOnly = currentNumberInstantaneous.Disabled;
+            TextBox.Alpha = TextBox.Focused.Value ? 1 : 0;
+            valueLabel.Alpha = TextBox.Focused.Value ? 0 : 1;
 
             captionText.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content2;
-            textBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
+            TextBox.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
             valueLabel.Colour = currentNumberInstantaneous.Disabled ? colourProvider.Background1 : colourProvider.Content1;
 
             if (Current.Disabled)
@@ -429,10 +430,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 if (currentNumberInstantaneous.Value is not int)
                     floatValue *= 100;
 
-                textBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
+                TextBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
             }
             else
-                textBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
+                TextBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
 
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
