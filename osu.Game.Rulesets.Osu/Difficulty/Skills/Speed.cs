@@ -69,8 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0;
 
-            (double difficulty, double weight) = HarmonicSeries.Aggregate(ObjectDifficulties, harmonicScale: 20);
-            harmonicWeightSum = weight;
+            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(ObjectDifficulties, harmonicScale: 20);
 
             return difficulty;
         }
