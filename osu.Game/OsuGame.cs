@@ -1374,6 +1374,13 @@ namespace osu.Game
 
                 dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
             }
+
+            if (combined < 20270727)
+            {
+#pragma warning disable CS0612 // Type or member is obsolete (MenuParallax exists solely to make this migration work, it should not be used anywhere else)
+                LocalConfig.SetValue(OsuSetting.MenuParallaxScale, LocalConfig.Get<bool>(OsuSetting.MenuParallax) ? 1 : 0);
+#pragma warning restore CS0612 // Type or member is obsolete
+            }
         }
 
         private void handleBackButton()

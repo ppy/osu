@@ -132,7 +132,10 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.CursorRotation, true);
 
+#pragma warning disable CS0612 // Type or member is obsolete (setting default value to avoid risk of any future crashes)
             SetDefault(OsuSetting.MenuParallax, true);
+#pragma warning restore CS0612 // Type or member is obsolete
+            SetDefault(OsuSetting.MenuParallaxScale, 1.0f, 0.1f, 4f, 0.01f);
 
             // See https://stackoverflow.com/a/63307411 for default sourcing.
             SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
@@ -365,7 +368,11 @@ namespace osu.Game.Configuration
         MenuVoice,
         MenuTips,
         CursorRotation,
+
+        [Obsolete]
         MenuParallax,
+
+        MenuParallaxScale,
         Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapLeaderboardSortMode,
