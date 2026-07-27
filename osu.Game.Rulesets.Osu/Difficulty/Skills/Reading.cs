@@ -70,8 +70,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        public override double CountTopWeightedObjectDifficulties(double difficultyValue)
-
         public override double DifficultyValue()
         {
             if (ObjectDifficulties.Count == 0)
@@ -84,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        protected override List<double> GetTransformedDifficulties(List<double> difficulties)
+        protected List<double> GetTransformedDifficulties(List<double> difficulties)
         {
             if (difficulties.Count == 0)
                 return difficulties;
