@@ -17,8 +17,8 @@ namespace osu.Game.Beatmaps.Formats
 
         public static float ParseFloat(string input, float parseLimit = (float)MAX_PARSE_VALUE, bool allowNaN = false)
         {
-            string sanitizedInput = input.Replace(',','.');
-            float output = float.Parse(sanitizedInput, NumberStyles.Float,CultureInfo.InvariantCulture);
+            string sanitizedInput = input.Replace(',', '.');
+            float output = float.Parse(sanitizedInput, NumberStyles.Float, CultureInfo.InvariantCulture);
 
             if (output < -parseLimit) throw new OverflowException("Value is too low");
             if (output > parseLimit) throw new OverflowException("Value is too high");
