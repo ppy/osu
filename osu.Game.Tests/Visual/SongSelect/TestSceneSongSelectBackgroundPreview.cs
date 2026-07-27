@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestLeaderboardWedgeDeadSpaceBlocksBackgroundPreview()
+        public void TestLeaderboardWedgeEmptySpaceBlocksBackgroundPreview()
         {
             LoadSongSelect();
             ImportBeatmapForRuleset(0);
@@ -223,11 +223,57 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for leaderboard controls", () => SongSelect.ChildrenOfType<BeatmapDetailsArea.Header>().Any());
 
             double? clickTime = null;
-            AddStep("click dead space left of first score", () =>
+            AddStep("click empty space left of first score", () =>
             {
-                // Empty dead space area to the left of the first few scores
+                // Empty space to the left of the first few scores
                 var score = SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().First();
                 InputManager.MoveMouseTo(new Vector2(score.ScreenSpaceDrawQuad.BottomLeft.X - 5f, score.ScreenSpaceDrawQuad.Centre.Y));
+                InputManager.PressButton(MouseButton.Left);
+                clickTime = InputManager.Time.Current;
+            });
+            AddUntilStep("wait for background preview", () => InputManager.Time.Current, () => Is.GreaterThan((clickTime + 3 * Screens.Select.SongSelect.REVEAL_BACKGROUND_DELAY) ?? double.PositiveInfinity));
+            AddAssert("background preview not triggered", () => this.ChildrenOfType<ScreenFooter>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+        }
+
+        [Test]
+        public void TestLeaderboardHeaderSpacingBlocksBackgroundPreview()
+        {
+            LoadSongSelect();
+            ImportBeatmapForRuleset(0);
+
+            AddAssert("beatmap imported", () => Beatmaps.GetAllUsableBeatmapSets().Any(), () => Is.True);
+
+            AddAssert("beatmap selected", () => !Beatmap.IsDefault);
+
+            AddStep("import score", () =>
+            {
+                var beatmapInfo = Beatmaps.GetAllUsableBeatmapSets().Single().Beatmaps.First();
+                ScoreManager.Import(new ScoreInfo
+                {
+                    Hash = Guid.NewGuid().ToString(),
+                    BeatmapHash = beatmapInfo.Hash,
+                    BeatmapInfo = beatmapInfo,
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                    User = new GuestUser(),
+                });
+            });
+
+            AddStep("select ranking tab", () =>
+            {
+                InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapDetailsArea.WedgeSelector<BeatmapDetailsArea.Header.Selection>>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for leaderboard controls", () => SongSelect.ChildrenOfType<BeatmapDetailsArea.Header>().Any());
+
+            double? clickTime = null;
+            AddStep("click empty spacing above leaderboard controls and below beatmap info", () =>
+            {
+                var header = SongSelect.ChildrenOfType<BeatmapDetailsArea.Header>().Single();
+                var toggleButton = header.ChildrenOfType<ShearedToggleButton>().Single();
+                var emptySpace = new Vector2(toggleButton.ScreenSpaceDrawQuad.Centre.X, toggleButton.ScreenSpaceDrawQuad.TopLeft.Y - 5f);
+                InputManager.MoveMouseTo(emptySpace);
                 InputManager.PressButton(MouseButton.Left);
                 clickTime = InputManager.Time.Current;
             });
