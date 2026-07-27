@@ -610,6 +610,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
         }
 
+        [Test]
+        public void TestFooterRandomF5()
+        {
+            LoadSongSelect();
+
+            bool nextRandomCalled = false;
+            bool previousRandomCalled = false;
+            AddStep("hook events", () =>
+            {
+                randomButton.NextRandom = () => nextRandomCalled = true;
+                randomButton.PreviousRandom = () => previousRandomCalled = true;
+            });
+
+            AddStep("press F5", () => InputManager.Key(Key.F5));
+            AddAssert("next random invoked", () => nextRandomCalled && !previousRandomCalled);
+        }
+
         private FooterButtonRandom randomButton => ScreenFooter.ChildrenOfType<FooterButtonRandom>().Single();
 
         [Test]

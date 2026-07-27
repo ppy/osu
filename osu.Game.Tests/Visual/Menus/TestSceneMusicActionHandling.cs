@@ -11,6 +11,7 @@ using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Tests.Resources;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Menus
 {
@@ -78,6 +79,25 @@ namespace osu.Game.Tests.Visual.Menus
                 trackChangeQueue.Count == 3 &&
                 trackChangeQueue.Peek().changeDirection == TrackChangeDirection.Next);
             AddAssert("track actually changed", () => !trackChangeQueue.First().working.BeatmapInfo.Equals(trackChangeQueue.Last().working.BeatmapInfo));
+        }
+
+        [Test]
+        public void TestMusicNextChangesTrack()
+        {
+            Queue<(IWorkingBeatmap working, TrackChangeDirection changeDirection)> trackChangeQueue = null!;
+
+            // ensure we have at least two tracks to switch between.
+            AddRepeatStep("import beatmap", () => Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo()), 3);
+
+            AddStep("bind to track change", () =>
+            {
+                trackChangeQueue = new Queue<(IWorkingBeatmap, TrackChangeDirection)>();
+                Game.MusicController.TrackChanged += (working, changeDirection) => trackChangeQueue.Enqueue((working, changeDirection));
+            });
+
+            AddStep("press F5", () => InputManager.Key(Key.F5));
+            AddUntilStep("track changed", () => trackChangeQueue.Count == 1);
+            AddAssert("direction is next", () => trackChangeQueue.Peek().changeDirection, () => Is.EqualTo(TrackChangeDirection.Next));
         }
 
         [Test]
