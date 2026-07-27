@@ -57,6 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 })
                 {
                     Keywords = new[] { @"version" },
+                    Note = { BindTarget = releaseStreamDropdownNote },
                     ShowRevertToDefaultButton = updateManager!.FixedReleaseStream == null
                 });
 
@@ -65,7 +66,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
 
                     releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
-                    releaseStreamDropdownNote.Value = new SettingsNote.Data(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning, SettingsNote.Type.Warning);
+                    releaseStreamDropdownNote.Value = new SettingsNote.Data(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning, SettingsNote.Type.Informational);
+                    releaseStreamDropdown.Current.Disabled = true;
                 }
 
                 releaseStreamDropdown.Current.BindValueChanged(releaseStreamChanged);
