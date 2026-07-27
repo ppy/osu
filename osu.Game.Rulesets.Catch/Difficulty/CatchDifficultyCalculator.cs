@@ -23,7 +23,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         private const double difficulty_multiplier = 4.59;
 
+<<<<<<< HEAD
         public override int Version => 20250306;
+=======
+        public override int Version => 20251020;
+>>>>>>> 76e5eca6ae4a32860c5fc2263d3483e82f50f66d
 
         public CatchDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)

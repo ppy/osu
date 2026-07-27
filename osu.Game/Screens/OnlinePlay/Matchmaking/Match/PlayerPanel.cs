@@ -153,6 +153,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
         protected Drawable? Background { get; private set; }
 
+        private enum InteractionSampleType
+        {
+            PlayerJump,
+            PlayerReJump,
+            OtherPlayerJump,
+        }
+
+        private Dictionary<InteractionSampleType, Sample?> interactionSamples = new Dictionary<InteractionSampleType, Sample?>();
+        private readonly Dictionary<InteractionSampleType, SampleChannel?> interactionSampleChannels = new Dictionary<InteractionSampleType, SampleChannel?>();
+        private double samplePitch;
+        private double? lastSamplePlayback;
+
         public PlayerPanel(MultiplayerRoomUser user)
             : base(HoverSampleSet.Button)
         {

@@ -81,6 +81,11 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20250809.osk",
             // Covers legacy style performance points counter
             "Archives/modified-classic-20250827.osk",
+<<<<<<< HEAD
+=======
+            // Covers "Argon" judgement counter
+            "Archives/modified-argon-20250308.osk",
+>>>>>>> 76e5eca6ae4a32860c5fc2263d3483e82f50f66d
         };
 
         /// <summary>
