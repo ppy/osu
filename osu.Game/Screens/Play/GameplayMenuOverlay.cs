@@ -65,6 +65,8 @@ namespace osu.Game.Screens.Play
 
         public abstract LocalisableString Header { get; }
 
+        public Container FooterContent { get; private set; } = null!;
+
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons = null!;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
@@ -94,36 +96,63 @@ namespace osu.Game.Screens.Play
                     Colour = Color4.Black,
                     Alpha = background_alpha,
                 },
-                new OsuSpriteText
+                new GridContainer
                 {
-                    Text = Header,
-                    Font = OsuFont.GetFont(typeface: Typeface.TorusAlternate, size: 48, weight: FontWeight.SemiBold),
-                    Spacing = new Vector2(5),
-                    RelativePositionAxes = Axes.Y,
-                    Y = 0.15f,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.TopCentre,
-                    Colour = colours.Yellow,
-                },
-                InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Width = 0.8f,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2),
-                    Masking = true,
-                },
-                playInfoText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: 18))
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.Y,
-                    Y = -0.2f,
-                    TextAnchor = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = Header,
+                                Font = OsuFont.GetFont(typeface: Typeface.TorusAlternate, size: 48, weight: FontWeight.SemiBold),
+                                Spacing = new Vector2(5),
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Colour = colours.Yellow,
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Width = 0.8f,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(2),
+                                Masking = true,
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            playInfoText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: 18))
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                TextAnchor = Anchor.Centre,
+                                AutoSizeAxes = Axes.Both,
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            FooterContent = new Container
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        }
+                    }
                 }
             };
 
