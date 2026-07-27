@@ -115,8 +115,7 @@ namespace osu.Game.Screens.Play.HUD
             if (Flow.Alpha < 1)
                 scroll.ScrollToStart(false);
 
-            Flow.FadeTo(player?.Configuration.ShowLeaderboard != false
-                && configVisibility.Value.ShouldDisplay(leaderboardProvider is MultiplayerLeaderboardProvider) ? 1 : 0, 100, Easing.OutQuint);
+            Flow.FadeTo(player?.Configuration.ShowLeaderboard != false && configVisibility.Value.ShouldDisplay(leaderboardProvider is MultiplayerLeaderboardProvider) ? 1 : 0, 100, Easing.OutQuint);
 
             expanded.Value = !CollapseDuringGameplay.Value || userPlayingState.Value != LocalUserPlayingState.Playing || holdingForHUD.Value;
         }

@@ -421,9 +421,11 @@ namespace osu.Game.Screens.Play
                         case GameplayLeaderboardVisibilityMode.Never:
                             configLeaderboardVisibilityMode.Value = GameplayLeaderboardVisibilityMode.Always;
                             break;
+
                         case GameplayLeaderboardVisibilityMode.Always:
                             configLeaderboardVisibilityMode.Value = GameplayLeaderboardVisibilityMode.Multiplayer;
                             break;
+
                         case GameplayLeaderboardVisibilityMode.Multiplayer:
                             configLeaderboardVisibilityMode.Value = GameplayLeaderboardVisibilityMode.Never;
                             break;

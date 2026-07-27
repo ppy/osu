@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         private readonly IBindable<APIUser> user = new Bindable<APIUser>();
         private readonly IBindableList<GameplayLeaderboardScore> scores = new BindableList<GameplayLeaderboardScore>();
-        private readonly Bindable<GameplayLeaderboardVisibilityMode> leaderboardVisibility = new();
+        private readonly Bindable<GameplayLeaderboardVisibilityMode> leaderboardVisibility = new Bindable<GameplayLeaderboardVisibilityMode>();
         private readonly IBindable<LocalUserPlayingState> localUserPlayingState = new Bindable<LocalUserPlayingState>();
 
         private readonly Bindable<int?> position = new Bindable<int?>();
