@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Difficulty.Aggregation;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -15,9 +16,10 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class Reading : HarmonicSkill
+    public class Reading : Skill
     {
         private readonly bool hasHiddenMod;
+        private double harmonicWeightSum;
 
         public Reading(Mod[] mods)
             : base(mods)
@@ -32,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
-        protected override double ObjectDifficultyOf(DifficultyHitObject current)
+        protected override double ProcessInternal(DifficultyHitObject current)
         {
             const double skill_multiplier = 2.5;
             const double reduced_difficulty_duration = 60 * 1000;
@@ -77,7 +79,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        protected override List<double> GetTransformedDifficulties(List<double> difficulties)
+        public override double DifficultyValue()
+        {
+            if (ObjectDifficulties.Count == 0)
+                return 0;
+
+            var difficulties = GetTransformedDifficulties(ObjectDifficulties);
+
+            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(difficulties);
+
+            return difficulty;
+        }
+
+        protected List<double> GetTransformedDifficulties(List<double> difficulties)
         {
             difficulties = difficulties.Where(v => v > 0).ToList();
 
@@ -92,15 +106,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulties;
         }
 
-        public override double CountTopWeightedObjectDifficulties(double difficultyValue)
+        public double CountTopWeightedObjectDifficulties(double difficultyValue)
         {
             if (ObjectDifficulties.Count == 0)
                 return 0.0;
 
-            if (ObjectWeightSum == 0)
+            if (harmonicWeightSum == 0)
                 return 0.0;
 
-            double consistentTopNote = difficultyValue / ObjectWeightSum; // What would the top difficulty be if all object difficulties were identical
+            double consistentTopNote = difficultyValue / harmonicWeightSum; // What would the top difficulty be if all object difficulties were identical
 
             if (consistentTopNote == 0)
                 return 0;
