@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.Centre,
                     RelativePositionAxes = Axes.Y,
-                    Y = -0.15f,
+                    Y = -0.2f,
                     TextAnchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
                 }
