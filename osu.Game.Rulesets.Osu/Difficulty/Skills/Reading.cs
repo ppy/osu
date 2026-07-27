@@ -71,41 +71,63 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override List<double> GetTransformedDifficulties(List<double> difficulties)
         {
-            difficulties = difficulties.Where(v => v > 0).ToList();
+            if (difficulties.Count == 0)
+                return difficulties;
 
-            const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
+            const double reduced_difficulty_duration = 40 * 1000;
+            const double reduced_difficulty_base_line = 0.5; // Assume the first seconds are completely memorised
 
-            int reducedNoteCount = calculateReducedNoteCount();
+            double firstStartTime = objectList.First().StartTime;
+            double reducedDuration = firstStartTime + reduced_difficulty_duration;
 
-            for (int i = 0; i < Math.Min(difficulties.Count, reducedNoteCount); i++)
+            if (objectList.Count == 0 || difficulties.Count == 0)
+                return difficulties;
+
+            for (int i = 0; i < Math.Min(objectList.Count, difficulties.Count); i++)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((double)i / reducedNoteCount, 0, 1)));
-                difficulties[i] *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
-            }
+                DifficultyHitObject hitObject = objectList[i];
 
-            return difficulties;
-        }
-
-        private int calculateReducedNoteCount()
-        {
-            const double reduced_difficulty_duration = 60 * 1000;
-
-            if (objectList.Count == 0)
-                return 0;
-
-            double reducedDuration = objectList.First().StartTime + reduced_difficulty_duration;
-
-            int reducedNoteCount = 0;
-
-            foreach (var hitObject in objectList)
-            {
                 if (hitObject.StartTime > reducedDuration)
                     break;
 
-                reducedNoteCount++;
+                double ratio = (hitObject.StartTime - firstStartTime) / (reducedDuration - firstStartTime);
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp(ratio, 0, 1)));
+                difficulties[i] *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
             }
 
-            return reducedNoteCount;
+            const double memory_per_object = 0.02;
+            const double memory_over_time = 0.04 / 1000;
+            const int maximum_sections_memorised = 40;
+            const int minimum_sections_memorised = 10;
+
+            int sectionsMemorised = Math.Max((int)(memory_per_object * difficulties.Count), (int)(memory_over_time * (objectList[0].StartTime - objectList[^1].StartTime)));
+            sectionsMemorised = Math.Clamp(sectionsMemorised, minimum_sections_memorised, maximum_sections_memorised);
+
+            for (int i = 0; i < sectionsMemorised; i++)
+            {
+
+                int index = 0;
+
+                for (int j = 1; j < difficulties.Count; j++)
+                {
+                    if (difficulties[j] > difficulties[index])
+                    {
+                        index = j;
+                    }
+                }
+
+                int lower = Math.Max(0, index - 9);
+                int upper = Math.Min(difficulties.Count - 1, index + 9);
+
+                for (int j = lower; j <= upper; j++)
+                {
+                    difficulties[j] *= 1 - ((10 - Math.Abs(index - j)) / 200.0);
+                }
+            }
+
+            difficulties = difficulties.Where(v => v > 0).ToList();
+
+            return difficulties;
         }
 
         public override double CountTopWeightedObjectDifficulties(double difficultyValue)
