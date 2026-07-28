@@ -75,6 +75,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location...");
 
         /// <summary>
+        /// "Move your current data to a new folder, or point osu! to backed-up data at an existing location."
+        /// </summary>
+        public static LocalisableString ChangeFolderLocationTooltip => new TranslatableString(getKey(@"change_folder_location_tooltip"), @"Move your current data to a new folder, or point osu! to backed-up data at an existing location.");
+
+        /// <summary>
         /// "Run setup wizard"
         /// </summary>
         public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"run_setup_wizard"), @"Run setup wizard");
