@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
     {
         protected override bool ApplyHorizontalCentering => false;
 
-        private Bindable<bool> limitedDistanceSnap = null!;
+        private Bindable<bool> limitPlacementToCurrentTime = null!;
 
         public TaikoHitObjectComposer(TaikoRuleset ruleset)
             : base(ruleset)
@@ -32,12 +32,12 @@ namespace osu.Game.Rulesets.Taiko.Edit
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            limitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
+            limitPlacementToCurrentTime = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
         }
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
-            if (limitedDistanceSnap.Value
+            if (limitPlacementToCurrentTime.Value
                 && BlueprintContainer.CurrentHitObjectPlacement?.PlacementActive == PlacementBlueprint.PlacementState.Waiting)
             {
                 var playfield = (TaikoPlayfield)Playfield;
