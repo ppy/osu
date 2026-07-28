@@ -142,7 +142,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Limit placement to current time"
         /// </summary>
-        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit placement to current time");
+        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limit_placement_to_current_time"), @"Limit placement to current time");
 
         /// <summary>
         /// "Contract sidebars when not hovered"
