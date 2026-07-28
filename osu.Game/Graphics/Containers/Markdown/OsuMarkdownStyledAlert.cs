@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Markdig.Extensions.CustomContainers;
 using Markdig.Syntax;
@@ -151,11 +150,8 @@ namespace osu.Game.Graphics.Containers.Markdown
             public bool BlockTitle { get; set; }
             public Func<bool>? CheckFirstBold { get; set; }
 
-            protected override void AddEmphasis(string text, List<string> emphases)
+            protected override void AddEmphasis(string text, bool hasBold, bool hasItalic)
             {
-                bool hasBold = emphases.Any(s => s == "**" || s == "__");
-                bool hasItalic = emphases.Any(s => s == "*" || s == "_");
-
                 if (hasBold && CheckFirstBold?.Invoke() == true)
                 {
                     if (AlertIcon is IconUsage icon)
@@ -177,7 +173,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     });
                 }
                 else
-                    base.AddEmphasis(text, emphases);
+                    base.AddEmphasis(text, hasBold, hasItalic);
             }
         }
 
