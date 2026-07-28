@@ -203,7 +203,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorAutoSeekOnPlacement, true);
             SetDefault(OsuSetting.EditorLimitedDistanceSnap, false);
             SetDefault(OsuSetting.EditorShowSpeedChanges, false);
-            SetDefault(OsuSetting.EditorTaikoLockPlacementToHitArea, false);
             SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
@@ -431,7 +430,6 @@ namespace osu.Game.Configuration
         ReplayPlaybackControlsExpanded,
         AutomaticallyDownloadMissingBeatmaps,
         EditorShowSpeedChanges,
-        EditorTaikoLockPlacementToHitArea,
         TouchDisableGameplayTaps,
         ModSelectTextSearchStartsActive,
 

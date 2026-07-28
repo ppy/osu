@@ -40,12 +40,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
         }
 
         [Test]
-        public void TestLockPlacementToHitAreaUsesClockTime()
+        public void TestLimitedDistanceSnapUsesClockTime()
         {
             TaikoPlayfield playfield = null!;
             double placementTime = 0;
 
-            AddStep("enable lock", () => config.SetValue(OsuSetting.EditorTaikoLockPlacementToHitArea, true));
+            AddStep("enable limited distance snap", () => config.SetValue(OsuSetting.EditorLimitedDistanceSnap, true));
             AddStep("disable auto seek", () => config.SetValue(OsuSetting.EditorAutoSeekOnPlacement, false));
             AddStep("clear objects", () => EditorBeatmap.Clear());
             AddStep("seek to first timing point", () =>

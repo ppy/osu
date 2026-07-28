@@ -140,14 +140,9 @@ namespace osu.Game.Localisation
         public static LocalisableString RotationSnapped(float newRotation) => new TranslatableString(getKey(@"rotation_snapped"), @"{0:0}° (snapped)", newRotation);
 
         /// <summary>
-        /// "Limit distance snap placement to current time"
+        /// "Limit placement to current time"
         /// </summary>
-        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
-
-        /// <summary>
-        /// "Lock to hit area"
-        /// </summary>
-        public static LocalisableString TaikoLockPlacementToHitArea => new TranslatableString(getKey(@"taiko_lock_to_hit_area"), @"Lock to hit area");
+        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit placement to current time");
 
         /// <summary>
         /// "Contract sidebars when not hovered"

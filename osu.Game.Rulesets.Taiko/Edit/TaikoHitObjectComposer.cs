@@ -4,18 +4,14 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Localisation;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -26,8 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
     {
         protected override bool ApplyHorizontalCentering => false;
 
-        private Bindable<bool> lockPlacementToHitArea = null!;
-        private readonly Bindable<TernaryState> lockPlacementState = new Bindable<TernaryState>();
+        private Bindable<bool> limitedDistanceSnap = null!;
 
         public TaikoHitObjectComposer(TaikoRuleset ruleset)
             : base(ruleset)
@@ -37,24 +32,12 @@ namespace osu.Game.Rulesets.Taiko.Edit
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            LeftToolbox.Add(new EditorToolboxGroup("placement")
-            {
-                Child = new DrawableTernaryButton
-                {
-                    Current = lockPlacementState,
-                    Description = EditorStrings.TaikoLockPlacementToHitArea,
-                    CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Lock },
-                }
-            });
-
-            lockPlacementToHitArea = config.GetBindable<bool>(OsuSetting.EditorTaikoLockPlacementToHitArea);
-            lockPlacementToHitArea.BindValueChanged(enabled => lockPlacementState.Value = enabled.NewValue ? TernaryState.True : TernaryState.False, true);
-            lockPlacementState.BindValueChanged(state => lockPlacementToHitArea.Value = state.NewValue == TernaryState.True, true);
+            limitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
         }
 
         public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
-            if (lockPlacementToHitArea.Value
+            if (limitedDistanceSnap.Value
                 && BlueprintContainer.CurrentHitObjectPlacement?.PlacementActive == PlacementBlueprint.PlacementState.Waiting)
             {
                 var playfield = (TaikoPlayfield)Playfield;
