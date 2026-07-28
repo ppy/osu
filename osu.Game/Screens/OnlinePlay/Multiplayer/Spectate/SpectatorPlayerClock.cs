@@ -40,9 +40,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public bool IsRunning { get; set; }
 
+        /// <summary>
+        /// The master clock time last seen by <see cref="ProcessFrame"/>. As <see cref="ProcessFrame"/> accumulates
+        /// elapsed time, it must only apply the master clock's elapsed time when the master clock has advanced.
+        /// </summary>
+        private double lastSeenMasterTime;
+
         public SpectatorPlayerClock(IFrameBasedClock masterClock)
         {
             this.masterClock = masterClock;
+            lastSeenMasterTime = masterClock.CurrentTime;
         }
 
         public void Reset() => CurrentTime = 0;
@@ -78,12 +85,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public void ProcessFrame()
         {
+            // ProcessFrame can get called more than once in a single update loop. Save the last seen master time
+            // to prevent double-accumulating elapsed time.
+            bool masterAdvanced = masterClock.CurrentTime != lastSeenMasterTime;
+            lastSeenMasterTime = masterClock.CurrentTime;
+
             if (IsRunning)
             {
-                // When in catch-up mode, the source is usually not running.
-                // In such a case, its elapsed time may be zero, which would cause catch-up to get stuck.
-                // To avoid this, calculate the "elapsed" time manually based on the difference with the master clock.
-                double elapsedSource = masterClock.ElapsedFrameTime != 0 ? masterClock.ElapsedFrameTime : Math.Clamp(masterClock.CurrentTime - CurrentTime, 0, 16);
+                double elapsedSource;
+
+                if (masterClock.ElapsedFrameTime != 0)
+                    elapsedSource = masterAdvanced ? masterClock.ElapsedFrameTime : 0;
+                else
+                {
+                    // When in catch-up mode, the source is usually not running.
+                    // In such a case, its elapsed time may be zero, which would cause catch-up to get stuck.
+                    // To avoid this, calculate the "elapsed" time manually based on the difference with the master clock.
+                    elapsedSource = Math.Clamp(masterClock.CurrentTime - CurrentTime, 0, 16);
+                }
+
                 double elapsed = elapsedSource * catchUpMultiplier;
 
                 CurrentTime += elapsed;

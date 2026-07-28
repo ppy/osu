@@ -58,6 +58,24 @@ namespace osu.Game.Tests.OnlinePlay
             assertCurrentTime(20 * SpectatorPlayerClock.CATCHUP_RATE);
         }
 
+        [Test]
+        public void TestRepeatProcessFrameDoesNotAccumulateTwice()
+        {
+            setMasterElapsed(20);
+
+            assertElapsedTime(0);
+
+            processFrame();
+            assertCurrentTime(20);
+            assertElapsedTime(20);
+
+            // `ProcessFrame` may run more than once without the master clock advancing, as `FramedBeatmapClock`
+            // calls `ProcessFrame` on its source on Start, Stop, Seek, Reset in addition to its own Update
+            processFrame();
+            assertCurrentTime(20);
+            assertElapsedTime(0);
+        }
+
         private void setMasterRate(double rate)
             => AddStep($"set master rate = {rate}", () => masterSource.Rate = rate);
 
@@ -79,5 +97,8 @@ namespace osu.Game.Tests.OnlinePlay
 
         private void assertCurrentTime(double expected)
             => AddAssert($"current time is {expected}", () => clock.CurrentTime, () => Is.EqualTo(expected));
+
+        private void assertElapsedTime(double expected)
+            => AddAssert($"elapsed time is {expected}", () => clock.ElapsedFrameTime, () => Is.EqualTo(expected));
     }
 }
