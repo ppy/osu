@@ -41,10 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Caption = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<float>(OsuSetting.MenuParallaxScale),
                     LabelFormat = v => $"{Math.Round(v * 100)}%",
-                })
-                {
-                    Keywords = [@"parallax", @"nausea", @"motion"]
-                },
+                }),
                 new SettingsItemV2(new FormSliderBar<double>
                 {
                     Caption = UserInterfaceStrings.HoldToConfirmActivationTime,
