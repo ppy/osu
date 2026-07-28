@@ -154,13 +154,15 @@ namespace osu.Game.Graphics.Containers.Markdown
             {
                 if (hasBold && CheckFirstBold?.Invoke() == true)
                 {
+                    int marginBottom = BlockTitle ? 5 : 0;
+
                     if (AlertIcon is IconUsage icon)
                     {
                         AddDrawable(new SpriteIcon
                         {
                             Icon = icon,
                             Size = new Vector2(14),
-                            Margin = new MarginPadding { Right = 5, Bottom = BlockTitle ? 5 : 0 },
+                            Margin = new MarginPadding { Right = 5, Bottom = marginBottom },
                             Colour = AlertColour,
                         });
                     }
@@ -169,7 +171,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     {
                         base.ApplyEmphasisedCreationParameters(t, hasBold, hasItalic);
                         t.Colour = AlertColour;
-                        t.Margin = new MarginPadding { Bottom = BlockTitle ? 5 : 0 };
+                        t.Margin = new MarginPadding { Bottom = marginBottom };
                     });
                 }
                 else
