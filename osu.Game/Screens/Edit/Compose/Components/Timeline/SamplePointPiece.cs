@@ -734,24 +734,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 LabelFormat = isMultipleValues
                     ? static _ => "(multiple)"
                     : v => LocalisableString.Interpolate($"{v / 100.0:P0}");
+                TextBox.PlaceholderText = isMultipleValues ? "(multiple)" : string.Empty;
             }
 
             public VolumeControl()
             {
-                updateLabelFormat();
-
-                // The `IsMultipleValues` / `updateLabelFormat()` hack above to jam an indicator of multiple active values does not work for tooltip
+                // The `IsMultipleValues` / `updateLabelFormat()` hack to jam an indicator of multiple active values does not work for tooltip
                 // because the tooltip machinery framework-side is too smart for it (the tooltip text is only regenerated on direct changes to `Current`).
                 // Just disable it to hide the skeleton. It's of little use anyhow.
                 TooltipFormat = _ => default;
                 TransferValueOnCommit = true;
             }
 
-            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new TextBox();
-
-            private partial class TextBox : FormNumberBox.InnerNumberBox
+            protected override void LoadComplete()
             {
-                public TextBox()
+                base.LoadComplete();
+                updateLabelFormat();
+                TextBox.Focused.BindValueChanged(focused =>
+                {
+                    if (focused.NewValue && IsMultipleValues)
+                        TextBox.Text = string.Empty;
+                });
+            }
+
+            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new VolumeTextBox();
+
+            private partial class VolumeTextBox : FormNumberBox.InnerNumberBox
+            {
+                public VolumeTextBox()
                     : base(true)
                 {
                 }
