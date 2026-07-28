@@ -191,7 +191,8 @@ namespace osu.Game.Skinning
 
         private float undoPositionScaleFactor(float f) => f / LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
 
-        private string enumerableToString<T>(IEnumerable<T> ts)
-            => string.Join(',', ts.Select(t => t?.ToString()));
+        private string enumerableToString<T>(IEnumerable<T?> ts)
+            where T : IFormattable
+            => string.Join(',', ts.Select(t => t?.ToString(null, CultureInfo.InvariantCulture)));
     }
 }
