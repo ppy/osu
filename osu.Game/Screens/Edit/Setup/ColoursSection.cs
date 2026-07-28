@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -22,14 +24,13 @@ namespace osu.Game.Screens.Edit.Setup
 
         private FormColourPalette comboColours = null!;
 
+        private CancellationTokenSource? cancellationSource;
+
         [Resolved]
         private IBindable<WorkingBeatmap> working { get; set; } = null!;
 
-        [Resolved]
-        private Editor? editor { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SetupScreen? setupScreen)
         {
             Children = new Drawable[]
             {
@@ -38,6 +39,11 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.HitCircleSliderCombos,
                 },
             };
+
+            if (setupScreen != null)
+                setupScreen.BackgroundChanged += refreshSuggestions;
+
+            refreshSuggestions();
         }
 
         private bool syncingColours;
@@ -89,11 +95,6 @@ namespace osu.Game.Screens.Edit.Setup
                 syncingColours = false;
             });
 
-            working.BindValueChanged(_ => refreshSuggestions(), true);
-
-            if (editor != null)
-                editor.Saved += refreshSuggestions;
-
             updateAddButtonVisibility();
 
             void updateAddButtonVisibility() => comboColours.CanAdd.Value = comboColours.Colours.Count < LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT;
@@ -101,27 +102,54 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void refreshSuggestions()
         {
-            comboColours.Suggestions.Clear();
+            cancellationSource?.Cancel();
+            cancellationSource = new CancellationTokenSource();
+
+            var cancellationToken = cancellationSource.Token;
 
             string backgroundFile = working.Value.Metadata.BackgroundFile;
 
             if (string.IsNullOrEmpty(backgroundFile))
+            {
+                comboColours.Suggestions.Clear();
                 return;
+            }
 
             string? storagePath = working.Value.BeatmapSetInfo.GetPathForFile(backgroundFile);
 
             if (storagePath == null)
+            {
+                comboColours.Suggestions.Clear();
                 return;
+            }
 
-            try
+            var beatmap = working.Value;
+
+            Task.Run(() =>
             {
-                using var stream = working.Value.GetStream(storagePath);
-                comboColours.Suggestions.AddRange(BackgroundComboColourExtractor.Extract(stream));
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, @"Failed to extract combo colours from background");
-            }
+                try
+                {
+                    using var stream = beatmap.GetStream(storagePath);
+
+                    if (stream == null)
+                        return;
+
+                    var colours = BackgroundComboColourExtractor.Extract(stream);
+
+                    Schedule(() =>
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+
+                        comboColours.Suggestions.Clear();
+                        comboColours.Suggestions.AddRange(colours);
+                    });
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, @"Failed to extract combo colours from background");
+                }
+            }, cancellationToken);
         }
     }
 }
