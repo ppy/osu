@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override HSVColourPicker CreateHSVColourPicker() => new OsuHSVColourPicker();
 
-        protected override SwatchColourPicker? CreateSwatchColourPicker() => new OsuSwatchColourPicker(Suggestions);
+        protected override SwatchColourPicker CreateSwatchColourPicker() => new OsuSwatchColourPicker(Suggestions);
 
         protected override HexColourPicker CreateHexColourPicker() => new OsuHexColourPicker();
     }
