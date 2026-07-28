@@ -25,6 +25,7 @@ namespace osu.Game.Graphics.Containers
         public float ParallaxAmount = DEFAULT_PARALLAX_AMOUNT;
 
         private float effectiveParallaxAmount => ParallaxAmount * parallaxScale.Value;
+        private float previousEffectiveParallaxAmount = 0f; // If there is no parallax, this will still work, as the default position with zero offset is what effective-parallax zero would generate.
 
         private Bindable<float> parallaxScale;
 
@@ -61,6 +62,10 @@ namespace osu.Game.Graphics.Containers
         protected override void Update()
         {
             base.Update();
+
+            if (previousEffectiveParallaxAmount == effectiveParallaxAmount && effectiveParallaxAmount == 0) return;
+
+            previousEffectiveParallaxAmount = effectiveParallaxAmount;
 
             Vector2 offset = Vector2.Zero;
 
