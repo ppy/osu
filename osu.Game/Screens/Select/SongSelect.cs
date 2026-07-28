@@ -245,8 +245,7 @@ namespace osu.Game.Screens.Select
                                                             new InputBlockingContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Height = 4,
-                                                                Depth = float.MaxValue
+                                                                Height = 4
                                                             },
                                                             new ShearAligningWrapper(detailsArea = new BeatmapDetailsArea()),
                                                         },
