@@ -26,6 +26,7 @@ using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Input.Handlers.Touch;
 using osu.Framework.IO.Stores;
@@ -589,7 +590,7 @@ namespace osu.Game
         /// <param name="path">The path to migrate to.</param>
         /// <returns>Whether migration succeeded to completion. If <c>false</c>, some files were left behind.</returns>
         /// <exception cref="TimeoutException"></exception>
-        public bool Migrate(string path)
+        public bool MigrateUserData(string path)
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
 
@@ -670,6 +671,9 @@ namespace osu.Game
 
                 case TouchHandler th:
                     return new TouchSettings(th);
+
+                case PenHandler ph:
+                    return new PenSettings(ph);
 
                 case MidiHandler:
                     return new InputSubsection(handler);

@@ -13,11 +13,13 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -140,6 +142,44 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("hide overlay", () => screen.Overlay.Hide());
             contentHidden();
             AddAssert("other buttons returned", () => ScreenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.ChildrenOfType<Container>().First().Y == 0));
+        }
+
+        [Test]
+        public void TestButtonsHiddenByExternalOverlayContentCannotBeTriggered()
+        {
+            TestScreen screen = null!;
+            bool buttonTriggered = false;
+
+            AddStep("push screen", () =>
+            {
+                ShearedOverlayContainer overlay = new TestShearedOverlayContainer();
+
+                LoadScreen(screen = new TestScreen
+                {
+                    Overlay = overlay,
+                    CreateButtons = () => new[]
+                    {
+                        new ScreenFooterButton(overlay)
+                        {
+                            AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                            Icon = FontAwesome.Solid.Toolbox,
+                            Text = "One",
+                        },
+                        new ScreenFooterButton { Text = "Two", Hotkey = GlobalAction.Select, Action = () => buttonTriggered = true },
+                        new ScreenFooterButton { Text = "Three", Action = () => { } },
+                    },
+                });
+            });
+            AddUntilStep("wait until screen is loaded", () => screen.IsCurrentScreen(), () => Is.True);
+
+            AddStep("show overlay", () => screen.Overlay.Show());
+            contentDisplayed();
+
+            AddStep("try direct click", () => ScreenFooter.ChildrenOfType<ScreenFooterButton>().ElementAt(1).TriggerClick());
+            AddAssert("action not triggered", () => buttonTriggered, () => Is.False);
+
+            AddStep("try hotkey", () => InputManager.Key(Key.Enter));
+            AddAssert("action not triggered", () => buttonTriggered, () => Is.False);
         }
 
         [Test]

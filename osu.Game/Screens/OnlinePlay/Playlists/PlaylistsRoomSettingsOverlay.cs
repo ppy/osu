@@ -441,7 +441,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 room.Name = NameField.Text;
                 room.Availability = AvailabilityPicker.Current.Value;
-                room.MaxParticipants = int.TryParse(MaxParticipantsField.Text, out int maxParticipants) ? maxParticipants : null;
+                room.MaxParticipants = !string.IsNullOrWhiteSpace(MaxParticipantsField.Text) && byte.TryParse(MaxParticipantsField.Text, out byte maxParticipants) ? maxParticipants : null;
                 room.MaxAttempts = int.TryParse(MaxAttemptsField.Text, out int maxAttempts) ? maxAttempts : null;
                 room.Duration = DurationField.Current.Value;
 

@@ -22,6 +22,8 @@ namespace osu.Game.Audio
 
         protected TrackManagerPreviewTrack? CurrentTrack;
 
+        public readonly BindableBool IsPlayingPreview = new BindableBool();
+
         public PreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
         {
             this.mainTrackAdjustments = mainTrackAdjustments;
@@ -47,6 +49,7 @@ namespace osu.Game.Audio
                 CurrentTrack?.Stop();
                 CurrentTrack = track;
                 mainTrackAdjustments.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                IsPlayingPreview.Value = true;
             });
 
             track.Stopped += () => Schedule(() =>
@@ -56,6 +59,7 @@ namespace osu.Game.Audio
 
                 CurrentTrack = null;
                 mainTrackAdjustments.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+                IsPlayingPreview.Value = false;
             });
 
             return track;

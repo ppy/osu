@@ -226,10 +226,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             });
 
             if (BeatmapSet.HasVideo)
-                leftIconArea.Add(new VideoIconPill { IconSize = new Vector2(16) });
+                leftIconArea.Add(new VideoIconPill());
 
             if (BeatmapSet.HasStoryboard)
-                leftIconArea.Add(new StoryboardIconPill { IconSize = new Vector2(16) });
+                leftIconArea.Add(new StoryboardIconPill());
 
             if (BeatmapSet.FeaturedInSpotlight)
             {

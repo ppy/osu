@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Ranking
     [Cached]
     public abstract partial class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
-        protected const float BACKGROUND_BLUR = 20;
+        protected const float BACKGROUND_BLUR = 10;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;

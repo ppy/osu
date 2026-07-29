@@ -208,13 +208,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
                 => new DifficultyAttributes(mods, mods.OfType<TestMod>().SingleOrDefault()?.Difficulty.Value ?? 0);
 
-            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
                 => Array.Empty<DifficultyHitObject>();
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
+            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
                 => Array.Empty<Skill>();
         }
 
@@ -244,7 +244,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public override string Name => string.Empty;
             public override LocalisableString Description => string.Empty;
-            public override double ScoreMultiplier => 1.0;
             public override string Acronym => "Test";
         }
     }

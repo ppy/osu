@@ -50,7 +50,7 @@ jobs:
           exit $exit_code
 
       - name: InspectCode
-        uses: JetBrains/ReSharper-InspectCode@v0.11
+        uses: JetBrains/ReSharper-InspectCode@v0.12
         with:
           # this is WTF tier but if you don't specify *both* of these the defaults assume `build: true`
           build: false
@@ -101,13 +101,41 @@ jobs:
           NUnit.ConsoleOut=0
 
       # Attempt to upload results even if test fails.
-      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
+      # https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#cancelled
       - name: Upload Test Results
         uses: actions/upload-artifact@v7
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
           path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+
+  test-results:
+    name: Test results
+    runs-on: ubuntu-latest
+    # we want to wait for the `test` job to complete, but run regardless of whether it succeeds or fails
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#example-not-requiring-successful-dependent-jobs
+    if: ${{ !cancelled() }}
+    needs: test
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: osu-test-results-*
+          merge-multiple: true
+
+      - name: Add test results summary to workflow run
+        uses: dorny/test-reporter@v3.0.0
+        with:
+          name: Results
+          path: "*.trx"
+          reporter: dotnet-trx
+          list-suites: 'failed'
+          list-tests: 'failed'
+          use-actions-summary: 'true'
 
   build-only-android:
     name: Build only (Android)

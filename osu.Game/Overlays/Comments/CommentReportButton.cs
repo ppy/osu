@@ -14,8 +14,6 @@ using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -28,9 +26,6 @@ namespace osu.Game.Overlays.Comments
 
         private LinkFlowContainer link = null!;
         private LoadingSpinner loading = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
@@ -60,19 +55,17 @@ namespace osu.Game.Overlays.Comments
             link.AddLink(ReportStrings.CommentButton.ToLower(), this.ShowPopover);
         }
 
-        public Popover GetPopover() => new ReportCommentPopover(comment)
+        public Popover GetPopover()
         {
-            Action = report
-        };
+            var popover = new ReportCommentPopover(comment);
 
-        private void report(CommentReportReason reason, string comments)
-        {
-            var request = new CommentReportRequest(comment.Id, reason, comments);
+            popover.Submitted += () =>
+            {
+                link.Hide();
+                loading.Show();
+            };
 
-            link.Hide();
-            loading.Show();
-
-            request.Success += () => Schedule(() =>
+            popover.Success += () => Schedule(() =>
             {
                 loading.Hide();
 
@@ -83,13 +76,13 @@ namespace osu.Game.Overlays.Comments
                 this.FadeOut(2000, Easing.InQuint).Expire();
             });
 
-            request.Failure += _ => Schedule(() =>
+            popover.Failure += () => Schedule(() =>
             {
                 loading.Hide();
                 link.Show();
             });
 
-            api.Queue(request);
+            return popover;
         }
 
         public float LineBaseHeight => link.ChildrenOfType<IHasLineBaseHeight>().FirstOrDefault()?.LineBaseHeight ?? DrawHeight;

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -49,6 +49,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected abstract double StrainValueOf(DifficultyHitObject current);
 
-        private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
+        private double strainDecay(double ms) => DiffUtils.Pow(StrainDecayBase, ms / 1000);
     }
 }

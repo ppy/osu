@@ -44,10 +44,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("store composer", () => oldComposer = this.ChildrenOfType<HitObjectComposer>().Single());
             AddUntilStep("composer stored", () => oldComposer, () => Is.Not.Null);
             AddStep("switch to timing tab", () => InputManager.Key(Key.F3));
-            AddUntilStep("wait for loaded", () => this.ChildrenOfType<TimingAdjustButton>().ElementAtOrDefault(1), () => Is.Not.Null);
+            AddUntilStep("wait for loaded", () => this.ChildrenOfType<DiscreteAdjustmentControl<double>>().ElementAtOrDefault(1), () => Is.Not.Null);
             AddStep("change timing point BPM", () =>
             {
-                var bpmControl = this.ChildrenOfType<TimingAdjustButton>().ElementAt(1);
+                var bpmControl = this.ChildrenOfType<DiscreteAdjustmentControl<double>>().ElementAt(1);
                 InputManager.MoveMouseTo(bpmControl);
                 InputManager.Click(MouseButton.Left);
             });
@@ -61,12 +61,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("store composer", () => oldComposer = this.ChildrenOfType<HitObjectComposer>().Single());
             AddUntilStep("composer stored", () => oldComposer, () => Is.Not.Null);
-            AddStep("undo", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.Z);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("undo", () => Editor.Undo());
             AddUntilStep("composer reloaded", () =>
             {
                 var composer = this.ChildrenOfType<HitObjectComposer>().SingleOrDefault();

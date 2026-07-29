@@ -4,7 +4,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        # osu! bug report
+        **THIS IS ONLY FOR *ACTUAL BUG REPORTS*.**
+        YOU WILL BE REQUIRED TO **PROVIDE LOGS**.
+        YOU WILL BE REQUIRED TO **SEARCH FOR DUPLICATES**.
+
+        ANY ISSUE WHICH IS NOT A VALID BUG REPORT WILL BE CLOSED WITHOUT EXPLANATION.
+
+        USE DISCUSSIONS FOR ANYTHING YOU'RE NOT SURE ABOUT SOMETHING.
 
         Important to note that your issue may have already been reported before. Please check:
         - Pinned issues, at the top of https://github.com/ppy/osu/issues.
@@ -21,8 +27,6 @@ body:
       options:
         - Crash to desktop
         - Game behaviour
-        - Performance
-        - Cosmetic
         - Other
     validations:
       required: true
@@ -38,11 +42,11 @@ body:
       description: Add screenshots or videos that show the bug here.
       placeholder: Drag and drop the screenshots/videos into this box.
     validations:
-      required: false
+      required: true
   - type: input
     attributes:
       label: Version
-      description: The version you encountered this bug on. This is shown at the end of the settings overlay.
+      description: The version you encountered this bug on. This is shown at the bottom of the settings overlay.
     validations:
       required: true
   - type: markdown

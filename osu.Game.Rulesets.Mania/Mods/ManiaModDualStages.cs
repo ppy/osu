@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override LocalisableString Description => @"Double the stages, double the fun!";
         public override IconUsage? Icon => OsuIcon.ModDualStages;
         public override ModType Type => ModType.Conversion;
-        public override double ScoreMultiplier => 1;
 
         private bool isForCurrentRuleset;
 

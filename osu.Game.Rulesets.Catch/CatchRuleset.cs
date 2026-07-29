@@ -155,6 +155,7 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModMuted(),
                         new CatchModNoScope(),
                         new CatchModMovingFast(),
+                        new CatchModSynesthesia(),
                     };
 
                 case ModType.System:
@@ -167,6 +168,8 @@ namespace osu.Game.Rulesets.Catch
                     return Array.Empty<Mod>();
             }
         }
+
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new CatchScoreMultiplierCalculator(context);
 
         public override string Description => "osu!catch";
 

@@ -137,10 +137,15 @@ namespace osu.Game.Beatmaps
                 Value = new StarDifficulty(beatmapInfo.StarRating, 0)
             };
 
-            updateBindable(bindable, currentRuleset.Value, currentMods.Value, cancellationToken, computationDelay);
-
             lock (bindableUpdateLock)
+            {
+                var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, cancellationToken);
+                linkedCancellationSources.Add(linkedSource);
+
+                updateBindable(bindable, currentRuleset.Value, currentMods.Value, linkedSource, computationDelay);
+
                 trackedBindables.Add(bindable);
+            }
 
             return bindable;
         }
@@ -212,7 +217,7 @@ namespace osu.Game.Beatmaps
                     var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
                     linkedCancellationSources.Add(linkedSource);
 
-                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource);
                 }
             }
         }
@@ -243,27 +248,45 @@ namespace osu.Game.Beatmaps
         /// <param name="bindable">The <see cref="BindableStarDifficulty"/> to update.</param>
         /// <param name="rulesetInfo">The <see cref="IRulesetInfo"/> to update with.</param>
         /// <param name="mods">The <see cref="Mod"/>s to update with.</param>
-        /// <param name="cancellationToken">A token that may be used to cancel this update.</param>
+        /// <param name="linkedCancellationTokenSource">
+        /// A cancellation token source that may be used to cancel this update.
+        /// This token will be cancelled in one of two scenarios:
+        /// <list type="bullet">
+        /// <item>The owner of the bindable has requested the cancellation.</item>
+        /// <item>An <see cref="Invalidate"/> call has been issued, and as such ongoing calculations must be aborted to avoid stale values being potentially written to bindables.</item>
+        /// </list>
+        /// </param>
         /// <param name="computationDelay">In the case a cached lookup was not possible, a value in milliseconds of to wait until performing potentially intensive lookup.</param>
-        private void updateBindable(BindableStarDifficulty bindable, IRulesetInfo? rulesetInfo, IEnumerable<Mod>? mods, CancellationToken cancellationToken = default, int computationDelay = 0)
+        private void updateBindable(BindableStarDifficulty bindable, IRulesetInfo? rulesetInfo, IEnumerable<Mod>? mods, CancellationTokenSource linkedCancellationTokenSource, int computationDelay = 0)
         {
             // GetDifficultyAsync will fall back to existing data from IBeatmapInfo if not locally available
             // (contrary to GetAsync)
-            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, cancellationToken, computationDelay)
+            GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, linkedCancellationTokenSource.Token, computationDelay)
                 .ContinueWith(task =>
-                {
-                    // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
-                    Schedule(() =>
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
+                        // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
+                        Schedule(() =>
+                        {
+                            if (!linkedCancellationTokenSource.IsCancellationRequested)
+                            {
+                                StarDifficulty? starDifficulty = task.GetResultSafely();
 
-                        StarDifficulty? starDifficulty = task.GetResultSafely();
+                                if (starDifficulty != null)
+                                    bindable.Value = starDifficulty.Value;
+                            }
 
-                        if (starDifficulty != null)
-                            bindable.Value = starDifficulty.Value;
-                    });
-                }, cancellationToken);
+                            // Once the linked cancellation token source is of no remaining use to anybody, clean it up.
+                            lock (bindableUpdateLock)
+                            {
+                                linkedCancellationSources.Remove(linkedCancellationTokenSource);
+                                linkedCancellationTokenSource.Dispose();
+                            }
+                        });
+                    },
+                    // This continuation MUST run even if the antecedent `GetDifficultyAsync()` call was canceled in order to clean up `linkedCancellationTokenSource`.
+                    // Due to this, `ContinueWith()` CANNOT accept `linkedCancellationTokenSource.Token` here, because if it did, then in an event of a cancellation,
+                    // the continuation would never be scheduled for execution.
+                    CancellationToken.None);
         }
 
         /// <summary>

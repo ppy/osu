@@ -3,11 +3,16 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -21,6 +26,29 @@ namespace osu.Game.Rulesets.Mania.Edit
             : base(composer)
         {
         }
+
+        protected override Drawable CreateNewComboButton() => new NewComboTernaryButton
+        {
+            Current = NewCombo,
+            CreateIcon = () => new Container
+            {
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Icon = OsuIcon.EditorNote,
+                        Size = new Vector2(15),
+                    },
+                    new SpriteIcon
+                    {
+                        Icon = OsuIcon.EditorNewComboSparkles,
+                        Size = new Vector2(20),
+                    }
+                },
+            },
+        };
 
         public override HitObjectSelectionBlueprint? CreateHitObjectBlueprintFor(HitObject hitObject)
         {

@@ -120,7 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 });
             }
 
-            if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && multiplayerClient.IsHost)
+            if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && (multiplayerClient.IsHost || multiplayerClient.IsReferee))
             {
                 flow.Add(new RoundedButton
                 {
