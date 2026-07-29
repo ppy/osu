@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         [BackgroundDependencyLoader]
         private void load()
         {
-            border.Colour = getAlertColour().Opacity(0.75f);
+            border.Colour = getAlertColour();
         }
 
         private Colour4 getAlertColour()
