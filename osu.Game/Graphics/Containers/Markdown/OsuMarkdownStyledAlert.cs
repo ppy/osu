@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             else
                 alertType = AlertType.None;
 
-            if (customContainer.First() is ParagraphBlock paragraphBlock &&
+            if (customContainer.FirstOrDefault() is ParagraphBlock paragraphBlock &&
                 paragraphBlock.Inline.FirstChild is EmphasisInline emphasisInline &&
                 emphasisInline.NextSibling is LineBreakInline)
             {
