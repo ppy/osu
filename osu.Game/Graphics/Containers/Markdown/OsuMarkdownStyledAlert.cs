@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         private readonly AlertType alertType;
         private readonly Box border;
         private readonly bool blockTitle;
-        private bool firstBold = true;
+        private bool alertTitle;
 
         private const int border_width = 4;
 
@@ -124,15 +124,15 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
         }
 
-        private bool checkFirstBold()
+        private bool foundAlertTitle()
         {
-            if (firstBold)
+            if (!alertTitle)
             {
-                firstBold = false;
-                return true;
+                alertTitle = true;
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         MarkdownTextFlowContainer IMarkdownTextFlowComponent.CreateTextFlow() => new StyledAlertTextFlowContainer
@@ -140,7 +140,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             AlertColour = getAlertColour(),
             AlertIcon = getAlertIcon(),
             BlockTitle = blockTitle,
-            CheckFirstBold = checkFirstBold
+            FoundAlertTitle = foundAlertTitle
         };
 
         private partial class StyledAlertTextFlowContainer : OsuMarkdownTextFlowContainer
@@ -148,11 +148,11 @@ namespace osu.Game.Graphics.Containers.Markdown
             public Colour4 AlertColour { get; set; }
             public IconUsage? AlertIcon { get; set; }
             public bool BlockTitle { get; set; }
-            public Func<bool>? CheckFirstBold { get; set; }
+            public Func<bool>? FoundAlertTitle { get; set; }
 
             protected override void AddEmphasis(string text, bool hasBold, bool hasItalic)
             {
-                if (hasBold && CheckFirstBold?.Invoke() == true)
+                if (hasBold && FoundAlertTitle?.Invoke() == false)
                 {
                     int marginBottom = BlockTitle ? 5 : 0;
 
