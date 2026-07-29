@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
 
                 case CustomContainer customContainer:
-                    if (customContainer.Info.StartsWith("alert-", StringComparison.Ordinal))
+                    if (customContainer.Info.StartsWith(@"alert-", StringComparison.Ordinal))
                     {
                         var alertContainer = CreateStyledAlert(customContainer);
 
