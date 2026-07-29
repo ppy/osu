@@ -242,6 +242,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox.HandleDrag(lastDragEvent);
                 UpdateSelectionFromDragBox(selectionBeforeDrag);
             }
+
+            SelectionBlueprints.AddRange(blueprintsToAdd);
+            blueprintsToAdd.Clear();
+
+            SelectionBlueprints.RemoveRange(blueprintsToRemove, true);
+            blueprintsToRemove.Clear();
         }
 
         /// <summary>
@@ -311,6 +317,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Blueprint Addition/Removal
 
+        private List<SelectionBlueprint<T>> blueprintsToAdd = new List<SelectionBlueprint<T>>();
+        private List<SelectionBlueprint<T>> blueprintsToRemove = new List<SelectionBlueprint<T>>();
+
         protected virtual void AddBlueprintFor(T item)
         {
             if (blueprintMap.ContainsKey(item))
@@ -325,7 +334,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected += OnBlueprintSelected;
             blueprint.Deselected += OnBlueprintDeselected;
 
-            SelectionBlueprints.Add(blueprint);
+            blueprintsToAdd.Add(blueprint);
 
             if (SelectionHandler.SelectedItems.Contains(item))
                 blueprint.Select();
@@ -342,7 +351,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprintToRemove.Selected -= OnBlueprintSelected;
             blueprintToRemove.Deselected -= OnBlueprintDeselected;
 
-            SelectionBlueprints.Remove(blueprintToRemove, true);
+            blueprintsToRemove.Add(blueprintToRemove);
 
             if (movementBlueprints?.Any(m => m.blueprint == blueprintToRemove) == true)
                 finishSelectionMovement();
