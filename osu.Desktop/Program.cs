@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Runtime.Versioning;
-using System.Threading;
 using osu.Desktop.LegacyIpc;
 using osu.Desktop.Windows;
 using osu.Framework;
@@ -187,8 +186,10 @@ namespace osu.Desktop
             // See https://docs.velopack.io/integrating/hooks#command-line-hooks.
             if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
             {
-                using (var _ = new Mutex(false, $"Global\\osu-framework-{OsuGame.IPC_PIPE_NAME}", out bool createdNew))
+                using (var namedPipeIpcProvider = new NamedPipeIpcProvider(OsuGame.IPC_PIPE_NAME))
                 {
+                    bool createdNew = namedPipeIpcProvider.Bind();
+
                     if (!createdNew)
                     {
                         Logger.Log("Handling arguments, not running as primary instance, skipping velopack setup.");
