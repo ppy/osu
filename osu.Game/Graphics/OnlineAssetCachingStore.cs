@@ -29,12 +29,14 @@ namespace osu.Game.Graphics
     /// as it both makes the caching ineffective <b>AND</b> trashes the cache with entries that will never be used again.
     /// </para>
     /// </summary>
-    public class OnlineAssetCachingStore
+    public sealed class OnlineAssetCachingStore
     {
         private readonly RealmAccess realmAccess;
         private readonly OnlineStore onlineStore;
         private readonly RealmFileStore fileStore;
         private readonly LargeTextureStore largeTextureStore;
+
+        private bool disposed;
 
         public OnlineAssetCachingStore(GameHost host, RealmAccess realmAccess)
         {
@@ -46,6 +48,8 @@ namespace osu.Game.Graphics
 
         public Texture? Get(string url)
         {
+            ObjectDisposedException.ThrowIf(disposed, this);
+
             var existingAsset = realmAccess.Write(r =>
             {
                 var a = r.All<RealmOnlineAsset>().Filter($@"{nameof(RealmOnlineAsset.File)}.{nameof(RealmNamedFileUsage.Filename)} == $0", url).FirstOrDefault();
@@ -82,6 +86,7 @@ namespace osu.Game.Graphics
         {
             onlineStore.Dispose();
             largeTextureStore.Dispose();
+            disposed = true;
         }
     }
 }

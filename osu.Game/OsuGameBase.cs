@@ -208,6 +208,8 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
         private IBeatmapUpdater beatmapUpdater;
 
+        private OnlineAssetCachingStore onlineAssetCache;
+
         private UserLookupCache userCache;
         private BeatmapLookupCache beatmapCache;
         protected LeaderboardManager LeaderboardManager { get; private set; }
@@ -291,7 +293,7 @@ namespace osu.Game
             largeStore.AddTextureSource(Host.CreateTextureLoaderStore(CreateOnlineStore()));
             dependencies.Cache(largeStore);
 
-            dependencies.Cache(new OnlineAssetCachingStore(Host, realm));
+            dependencies.Cache(onlineAssetCache = new OnlineAssetCachingStore(Host, realm));
 
             dependencies.CacheAs(LocalConfig);
             dependencies.CacheAs<IGameplaySettings>(LocalConfig);
@@ -790,6 +792,7 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             beatmapUpdater?.Dispose();
+            onlineAssetCache?.Dispose();
 
             realm?.Dispose();
 
