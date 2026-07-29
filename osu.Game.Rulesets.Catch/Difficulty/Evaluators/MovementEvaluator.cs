@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             }
 
             // Linear spacing nerf.
-            double linearSpacingCount = 0;
+            int linearSpacingCount = 0;
 
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
