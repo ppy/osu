@@ -317,8 +317,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Blueprint Addition/Removal
 
-        private List<SelectionBlueprint<T>> blueprintsToAdd = new List<SelectionBlueprint<T>>();
-        private List<SelectionBlueprint<T>> blueprintsToRemove = new List<SelectionBlueprint<T>>();
+        private readonly List<SelectionBlueprint<T>> blueprintsToAdd = new List<SelectionBlueprint<T>>();
+        private readonly List<SelectionBlueprint<T>> blueprintsToRemove = new List<SelectionBlueprint<T>>();
 
         protected virtual void AddBlueprintFor(T item)
         {
