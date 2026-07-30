@@ -293,7 +293,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             assertCollectionName(0, "1");
             assertCollectionName(1, "2");
 
-            AddStep("change first collection name", () => Realm.Write(_ => first.Name = "First"));
+            AddStep("change first collection name", () => Realm.Write(_ =>
+            {
+                first.Name = "First";
+                first.UpdateNameSortKey();
+            }));
 
             // Item will have moved due to alphabetical sorting.
             assertCollectionName(0, "2");
@@ -370,7 +374,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             assertCollectionCount(1);
 
-            AddStep("change first collection name", () => Realm.Write(_ => first.Name = "First"));
+            AddStep("change first collection name", () => Realm.Write(_ =>
+            {
+                first.Name = "First";
+                first.UpdateNameSortKey();
+            }));
 
             assertCollectionCount(0);
 

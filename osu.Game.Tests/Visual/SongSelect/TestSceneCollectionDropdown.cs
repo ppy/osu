@@ -121,7 +121,12 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             addExpandHeaderStep();
 
-            AddStep("change name", () => writeAndRefresh(_ => getFirstCollection().Name = "First"));
+            AddStep("change name", () => writeAndRefresh(_ =>
+            {
+                var collection = getFirstCollection();
+                collection.Name = "First";
+                collection.UpdateNameSortKey();
+            }));
 
             assertCollectionDropdownContains("First");
             assertCollectionHeaderDisplays("First");

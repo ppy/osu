@@ -177,6 +177,7 @@ namespace osu.Game.Tests.Collections.IO
 
                         // Rename the second collecction.
                         collections[1].Name = "Another";
+                        collections[1].UpdateNameSortKey();
                     });
                 }
                 finally
