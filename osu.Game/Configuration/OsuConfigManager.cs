@@ -370,7 +370,7 @@ namespace osu.Game.Configuration
         CursorRotation,
 
         [Obsolete]
-        MenuParallax, // todo: can be removed 202070101
+        MenuParallax, // todo: can be removed 20270101
 
         MenuParallaxScale,
         Prefer24HourTime,
