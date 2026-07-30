@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         private readonly AlertType alertType;
         private readonly Box border;
         private readonly bool blockTitle;
-        private bool alertTitle;
+        private bool alertTitleFound;
 
         private const int border_width = 4;
 
@@ -124,11 +124,26 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
         }
 
+        /// <remarks>
+        /// <para>
+        /// This ugly construction is done to ensure that only the first emphasis block
+        /// of this entire alert gets its special colour applied to it.
+        /// The field cannot live inside <see cref="StyledAlertTextFlowContainer"/>
+        /// as one <see cref="StyledAlertTextFlowContainer"/> exists for every paragraph of the alert content,
+        /// so the first emphasis <i>of every paragraph</i> would get the special colour.
+        /// </para>
+        /// <para>
+        /// Web uses a similarly repulsive CSS selector construction of
+        /// <c>&amp;:first-child > strong:first-of-type</c>
+        /// (https://github.com/ppy/osu-web/blob/ad92032fd45eaf9bef748fd37ebde2eeb0a17370/resources/css/bem/osu-md.less#L398-L401)
+        /// and not much more can be done about that.
+        /// </para>
+        /// </remarks>
         private bool foundAlertTitle()
         {
-            if (!alertTitle)
+            if (!alertTitleFound)
             {
-                alertTitle = true;
+                alertTitleFound = true;
                 return false;
             }
 
