@@ -24,6 +24,18 @@ namespace osu.Game.Collections
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
+        /// A case-insensitive sort key derived from <see cref="Name"/>.
+        /// </summary>
+        [Indexed]
+        public string NameSortKey { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Recomputes <see cref="NameSortKey"/> from the current <see cref="Name"/>. Must be called after any
+        /// change to <see cref="Name"/> (inside the same write transaction).
+        /// </summary>
+        public void UpdateNameSortKey() => NameSortKey = Name.ToUpperInvariant();
+
+        /// <summary>
         /// The <see cref="BeatmapInfo.MD5Hash"/>es of beatmaps contained by the collection.
         /// </summary>
         /// <remarks>
@@ -44,6 +56,7 @@ namespace osu.Game.Collections
         {
             ID = Guid.NewGuid();
             Name = name ?? string.Empty;
+            UpdateNameSortKey();
             BeatmapMD5Hashes = beatmapMD5Hashes ?? new List<string>();
 
             LastModified = DateTimeOffset.UtcNow;
