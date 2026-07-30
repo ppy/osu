@@ -451,6 +451,10 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
+                                            new EditorMenuItem(EditorStrings.SyncToAllDifficulties, MenuItemType.Destructive, confirmSyncTimingToAllDifficulties)
+                                            {
+                                                Action = { Disabled = loadableBeatmap.BeatmapSetInfo.Beatmaps.Count < 2 }
+                                            },
                                             new EditorMenuItem(EditorStrings.SnapAllNotesToCurrentSnapDivisor, MenuItemType.Destructive, confirmSnapAllHitObjectsToCurrentDivisor),
                                             bookmarkController.Menu,
                                         }
@@ -1035,6 +1039,52 @@ namespace osu.Game.Screens.Edit
         protected void SetPreviewPointToCurrentTime()
         {
             editorBeatmap.PreviewTime.Value = (int)clock.CurrentTime;
+        }
+
+        private void confirmSyncTimingToAllDifficulties()
+        {
+            dialogOverlay.Push(new SyncTimingConfirmationDialog(syncTimingToAllOtherDifficulties));
+        }
+
+        private void syncTimingToAllOtherDifficulties(bool syncBookmarks, bool syncPreviewPoint)
+        {
+            if (Beatmap.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
+                return;
+
+            if (!syncBookmarks && !syncPreviewPoint)
+                return;
+
+            var set = Beatmap.Value.BeatmapSetInfo;
+            var current = editorBeatmap.BeatmapInfo;
+            int[] sourceBookmarks = editorBeatmap.Bookmarks.ToArray();
+            int sourcePreviewTime = editorBeatmap.BeatmapInfo.Metadata.PreviewTime;
+
+            foreach (var beatmapInfo in set.Beatmaps)
+            {
+                if (beatmapInfo.Equals(current))
+                    continue;
+
+                try
+                {
+                    var targetWorking = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+                    var playable = targetWorking.GetPlayableBeatmap(beatmapInfo.Ruleset);
+
+                    if (syncBookmarks)
+                        playable.Bookmarks = sourceBookmarks.ToArray();
+
+                    if (syncPreviewPoint)
+                        beatmapInfo.Metadata.PreviewTime = sourcePreviewTime;
+
+                    beatmapManager.Save(beatmapInfo, playable, targetWorking.GetSkin(), targetWorking.Storyboard);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Failed to sync bookmarks/preview to {beatmapInfo.GetDisplayTitle()}");
+                    return;
+                }
+            }
+
+            SaveAndReload(withDialog: false);
         }
 
         private void confirmSnapAllHitObjectsToCurrentDivisor()
