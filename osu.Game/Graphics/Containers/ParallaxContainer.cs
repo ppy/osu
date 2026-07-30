@@ -4,14 +4,14 @@
 #nullable disable
 
 using System;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Framework.Input;
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
+using osuTK;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -22,10 +22,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// The amount of parallax movement. Negative values will reverse the direction of parallax relative to user input.
         /// </summary>
-        public float ParallaxAmount = DEFAULT_PARALLAX_AMOUNT;
-
-        private float effectiveParallaxAmount => ParallaxAmount * parallaxScale.Value;
-        private float previousEffectiveParallaxAmount; // Zero-by-default as zero-offset (default position) is the same as what zero effectiveParallaxAmount would generate
+        public float ParallaxAmount { get; set; } = DEFAULT_PARALLAX_AMOUNT;
 
         private Bindable<float> parallaxScale;
 
@@ -63,16 +60,17 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            if (previousEffectiveParallaxAmount == effectiveParallaxAmount && effectiveParallaxAmount == 0) return;
+            float amount = ParallaxAmount * parallaxScale.Value;
 
-            previousEffectiveParallaxAmount = effectiveParallaxAmount;
+            if (amount == 0 && content.Position == Vector2.Zero && content.Scale == Vector2.One)
+                return;
 
             Vector2 offset = Vector2.Zero;
+            Vector2 scale = new Vector2(1 + Math.Abs(amount));
 
             if (input.CurrentState.Mouse != null)
             {
-                var sizeDiv2 = DrawSize / 2;
-
+                Vector2 sizeDiv2 = DrawSize / 2;
                 Vector2 relativeAmount = ToLocalSpace(input.CurrentState.Mouse.Position) - sizeDiv2;
 
                 const float base_factor = 0.999f;
@@ -80,13 +78,18 @@ namespace osu.Game.Graphics.Containers
                 relativeAmount.X = (float)(Math.Sign(relativeAmount.X) * Interpolation.Damp(0, 1, base_factor, Math.Abs(relativeAmount.X)));
                 relativeAmount.Y = (float)(Math.Sign(relativeAmount.Y) * Interpolation.Damp(0, 1, base_factor, Math.Abs(relativeAmount.Y)));
 
-                offset = relativeAmount * sizeDiv2 * effectiveParallaxAmount;
+                offset = relativeAmount * sizeDiv2 * amount;
             }
 
             double elapsed = Math.Clamp(Clock.ElapsedFrameTime, 0, parallax_duration);
 
-            content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, parallax_duration, Easing.OutQuint);
-            content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + Math.Abs(effectiveParallaxAmount)), 0, 1000, Easing.OutQuint);
+            content.Position = Precision.AlmostEquals(content.Position, offset)
+                ? offset
+                : Interpolation.ValueAt(elapsed, content.Position, offset, 0, parallax_duration, Easing.OutQuint);
+
+            content.Scale = Precision.AlmostEquals(content.Scale, scale)
+                ? scale
+                : Interpolation.ValueAt(elapsed, content.Scale, scale, 0, 1000, Easing.OutQuint);
         }
     }
 }
