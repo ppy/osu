@@ -79,6 +79,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private double savedMasterVolume;
         private bool savedMutedState;
 
+        private int leaderboardRequestsHandled;
+
         public TestScenePlayerLoader()
         {
             AddRange(new Drawable[]
@@ -117,6 +119,28 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("set up request handling", () =>
+            {
+                leaderboardRequestsHandled = 0;
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetScoresRequest getScores:
+                            leaderboardRequestsHandled++;
+                            getScores.TriggerSuccess(new APIScoresCollection { Scores = [] });
+                            return true;
+
+                        case CreateSoloScoreRequest createSoloScoreRequest:
+                            createSoloScoreRequest.TriggerSuccess(new APIScoreToken { ID = 123456 });
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
 
             AddStep("read all notifications", () =>
             {
@@ -377,25 +401,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLeaderboardForciblyRefetchedOnRestart([Values] bool quickRestart)
         {
-            int leaderboardRequestsHandled = 0;
-            AddStep("set up request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
-            {
-                switch (req)
-                {
-                    case GetScoresRequest getScores:
-                        leaderboardRequestsHandled++;
-                        getScores.TriggerSuccess(new APIScoresCollection { Scores = [] });
-                        return true;
-
-                    case CreateSoloScoreRequest createSoloScoreRequest:
-                        createSoloScoreRequest.TriggerSuccess(new APIScoreToken { ID = 123456 });
-                        return true;
-
-                    default:
-                        return false;
-                }
-            });
-
             AddStep("load player", () => resetPlayer(true));
 
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
@@ -432,11 +437,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             saveVolumes();
 
-            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
+            AddUntilStep("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
 
             clickNotification();
 
-            AddAssert("check " + volumeName, assert);
+            AddUntilStep("check " + volumeName, assert);
 
             restoreVolumes();
 
@@ -456,7 +461,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Count(), () => Is.EqualTo(warning ? 1 : 0));
+            AddUntilStep($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Count(), () => Is.EqualTo(warning ? 1 : 0));
 
             restoreVolumes();
         }
