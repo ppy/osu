@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 comboColours = new FormColourPalette
                 {
+                    PaletteHeaderText = EditorSetupStrings.AccentColoursInBeatmapBackground,
                     Caption = EditorSetupStrings.HitCircleSliderCombos,
                 },
             };
