@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.NameSortKey), collectionsChanged);
 
             Current.BindValueChanged(selectionChanged);
         }

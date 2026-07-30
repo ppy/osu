@@ -54,7 +54,7 @@ namespace osu.Game.Collections
         {
             base.LoadComplete();
 
-            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.NameSortKey), collectionsChanged);
         }
 
         /// <summary>

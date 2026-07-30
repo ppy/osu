@@ -828,7 +828,7 @@ namespace osu.Game.Screens.Select
         /// because they use the sorting operation inside subscription queries for efficient drawable management,
         /// so this usage kind of has to follow suit.
         /// </remarks>
-        protected virtual List<BeatmapCollection> GetAllCollections() => realm.Run(r => r.All<BeatmapCollection>().OrderBy(c => c.Name).AsEnumerable().Detach());
+        protected virtual List<BeatmapCollection> GetAllCollections() => realm.Run(r => r.All<BeatmapCollection>().OrderBy(c => c.NameSortKey).AsEnumerable().Detach());
 
         protected virtual Dictionary<Guid, ScoreRank> GetBeatmapInfoGuidToTopRankMapping(FilterCriteria criteria) => realm.Run(r =>
         {
