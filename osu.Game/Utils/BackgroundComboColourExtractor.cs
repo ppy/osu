@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps.Formats;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -19,7 +17,7 @@ namespace osu.Game.Utils
     /// </summary>
     public static class BackgroundComboColourExtractor
     {
-        public const int MAX_COLOUR_COUNT = LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT;
+        public const int MAX_COLOUR_COUNT = 8;
 
         // Resolution to downscale to before quantizing.
         private const int max_dimension = 128;
@@ -28,7 +26,7 @@ namespace osu.Game.Utils
         private const float min_lightness = 50 / 255f;
         private const float max_lightness = 220 / 255f;
 
-        public static IReadOnlyList<Colour4> Extract(Stream imageStream)
+        public static Colour4[] Extract(Stream imageStream)
         {
             using var image = Image.Load<Rgba32>(imageStream);
 
@@ -49,7 +47,7 @@ namespace osu.Game.Utils
             return result.Palette.ToArray()
                          .Where(p => p.A >= 128)
                          .Select(p => clampLightness(new Colour4(p.R, p.G, p.B, 255)))
-                         .ToList();
+                         .ToArray();
         }
 
         private static Colour4 clampLightness(Colour4 colour)
