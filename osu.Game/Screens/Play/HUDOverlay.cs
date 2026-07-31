@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHud { get; } = new BindableBool();
 
         private Bindable<HUDVisibilityMode> configVisibilityMode;
-        private Bindable<bool> configLeaderboardVisibility;
+        private Bindable<GameplayLeaderboardVisibilityMode> configLeaderboardVisibilityMode;
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Play
             ModDisplay.Current.Value = mods;
 
             configVisibilityMode = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
-            configLeaderboardVisibility = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard);
+            configLeaderboardVisibilityMode = config.GetBindable<GameplayLeaderboardVisibilityMode>(OsuSetting.GameplayLeaderboardVisibilityMode);
 
             if (configVisibilityMode.Value == HUDVisibilityMode.Never && !hasShownNotificationOnce)
             {
@@ -415,8 +415,21 @@ namespace osu.Game.Screens.Play
 
                     return true;
 
-                case GlobalAction.ToggleInGameLeaderboard:
-                    configLeaderboardVisibility.Value = !configLeaderboardVisibility.Value;
+                case GlobalAction.CycleInGameLeaderboardVisibilityMode:
+                    switch (configLeaderboardVisibilityMode.Value)
+                    {
+                        case GameplayLeaderboardVisibilityMode.Never:
+                            configLeaderboardVisibilityMode.Value = GameplayLeaderboardVisibilityMode.Always;
+                            break;
+
+                        case GameplayLeaderboardVisibilityMode.Always:
+                            configLeaderboardVisibilityMode.Value = GameplayLeaderboardVisibilityMode.Multiplayer;
+                            break;
+
+                        case GameplayLeaderboardVisibilityMode.Multiplayer:
+                            configLeaderboardVisibilityMode.Value = GameplayLeaderboardVisibilityMode.Never;
+                            break;
+                    }
                     return true;
             }
 

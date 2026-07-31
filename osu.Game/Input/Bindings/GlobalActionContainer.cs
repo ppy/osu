@@ -177,7 +177,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F3 }, GlobalAction.DecreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
-            new KeyBinding(InputKey.Tab, GlobalAction.ToggleInGameLeaderboard),
+            new KeyBinding(InputKey.Tab, GlobalAction.CycleInGameLeaderboardVisibilityMode),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
             new KeyBinding(InputKey.Enter, GlobalAction.ToggleChatFocus),
@@ -442,8 +442,8 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleReplaySettings))]
         ToggleReplaySettings,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleInGameLeaderboard))]
-        ToggleInGameLeaderboard,
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.CycleInGameLeaderboardVisibilityMode))]
+        CycleInGameLeaderboardVisibilityMode,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorToggleRotateControl))]
         EditorToggleRotateControl,

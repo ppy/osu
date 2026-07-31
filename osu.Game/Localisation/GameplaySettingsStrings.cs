@@ -85,9 +85,24 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
 
         /// <summary>
-        /// "Always show gameplay leaderboard"
+        /// "Gameplay leaderboard visibility mode"
         /// </summary>
-        public static LocalisableString AlwaysShowGameplayLeaderboard => new TranslatableString(getKey(@"gameplay_leaderboard"), @"Always show gameplay leaderboard");
+        public static LocalisableString GameplayLeaderboardVisibilityMode => new TranslatableString(getKey(@"gameplay_leaderboard_visibility_mode"), @"Gameplay leaderboard visibility mode");
+
+        /// <summary>
+        /// "Always"
+        /// </summary>
+        public static LocalisableString ShowLeaderboardAlways => new TranslatableString(getKey(@"show_leaderboard_always"), @"Always");
+
+        /// <summary>
+        /// "Multiplayer"
+        /// </summary>
+        public static LocalisableString ShowLeaderboardMultiplayer => new TranslatableString(getKey(@"show_leaderboard_multiplayer"), @"Multiplayer");
+
+        /// <summary>
+        /// "Disabled"
+        /// </summary>
+        public static LocalisableString ShowLeaderboardNever => new TranslatableString(getKey(@"show_leaderboard_never"), @"Disabled");
 
         /// <summary>
         /// "Always show hold for menu button"

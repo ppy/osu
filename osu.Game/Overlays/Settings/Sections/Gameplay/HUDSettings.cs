@@ -41,10 +41,10 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     Keywords = new[] { "counter" },
                 },
-                new SettingsItemV2(new FormCheckBox
+                new SettingsItemV2(new FormEnumDropdown<GameplayLeaderboardVisibilityMode>
                 {
-                    Caption = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
-                    Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
+                    Caption = GameplaySettingsStrings.GameplayLeaderboardVisibilityMode,
+                    Current = config.GetBindable<GameplayLeaderboardVisibilityMode>(OsuSetting.GameplayLeaderboardVisibilityMode)
                 }),
                 new SettingsItemV2(new FormCheckBox
                 {

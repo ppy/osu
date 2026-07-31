@@ -152,7 +152,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.ReplaySettingsOverlay, true);
             SetDefault(OsuSetting.ReplayPlaybackControlsExpanded, true);
-            SetDefault(OsuSetting.GameplayLeaderboard, true);
+            SetDefault(OsuSetting.GameplayLeaderboard, true); // legacy migration only
+            SetDefault(OsuSetting.GameplayLeaderboardVisibilityMode, GameplayLeaderboardVisibilityMode.Always);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -267,11 +268,11 @@ namespace osu.Game.Configuration
                     value: disabledState ? CommonStrings.Disabled.ToLower() : CommonStrings.Enabled.ToLower(),
                     shortcut: LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))
                 ),
-                new TrackedSetting<bool>(OsuSetting.GameplayLeaderboard, state => new SettingDescription(
-                    rawValue: state,
-                    name: GlobalActionKeyBindingStrings.ToggleInGameLeaderboard,
-                    value: state ? CommonStrings.Enabled.ToLower() : CommonStrings.Disabled.ToLower(),
-                    shortcut: LookupKeyBindings(GlobalAction.ToggleInGameLeaderboard))
+                new TrackedSetting<GameplayLeaderboardVisibilityMode>(OsuSetting.GameplayLeaderboardVisibilityMode, visibilityMode => new SettingDescription(
+                    rawValue: visibilityMode,
+                    name: GlobalActionKeyBindingStrings.CycleInGameLeaderboardVisibilityMode,
+                    value: visibilityMode.GetLocalisableDescription(),
+                    shortcut: LookupKeyBindings(GlobalAction.CycleInGameLeaderboardVisibilityMode))
                 ),
                 new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, visibilityMode => new SettingDescription(
                     rawValue: visibilityMode,
@@ -338,7 +339,7 @@ namespace osu.Game.Configuration
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
-        GameplayLeaderboard,
+        GameplayLeaderboard, // only used for migrating to `GameplayLeaderboardVisibilityMode`
         PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
@@ -469,5 +470,7 @@ namespace osu.Game.Configuration
 
         DashboardSortMode,
         DashboardDisplayStyle,
+
+        GameplayLeaderboardVisibilityMode,
     }
 }
