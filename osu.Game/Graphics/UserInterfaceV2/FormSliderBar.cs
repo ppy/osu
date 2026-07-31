@@ -16,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -104,6 +105,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// Whether to format the tooltip as a percentage or the actual value.
         /// </summary>
         public bool DisplayAsPercentage { get; init; }
+
+        /// <summary>
+        /// Whether to show "Disabled" text when a zero value is set.
+        /// </summary>
+        public bool DisplayZeroAsDisabled { get; init; }
 
         /// <summary>
         /// Whether sound effects should play when adjusting this slider.
@@ -412,7 +418,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             if (DisplayAsPercentage)
             {
-                double floatValue = double.CreateTruncating(currentNumberInstantaneous.Value);
+                double doubleValue = double.CreateTruncating(currentNumberInstantaneous.Value);
 
                 // if `DisplayAsPercentage` is true and `T` is not `int`, then `Current` / `currentNumberInstantaneous` are in the range of [0,1].
                 // in the text box, we want to show the percentage in the range of [0,100], but without the percentage sign.
@@ -428,9 +434,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 // (https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings#the--custom-specifier-3).
                 // it's all very confusing.
                 if (currentNumberInstantaneous.Value is not int)
-                    floatValue *= 100;
+                    doubleValue *= 100;
 
-                TextBox.Text = floatValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
+                TextBox.Text = doubleValue.ToStandardFormattedString(Math.Max(0, OsuSliderBar<T>.MAX_DECIMAL_DIGITS - 2));
             }
             else
                 TextBox.Text = currentNumberInstantaneous.Value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS);
@@ -438,7 +444,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
-        public LocalisableString DefaultLabelFormat(T value) => value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
+        public LocalisableString DefaultLabelFormat(T value)
+        {
+            if (Precision.AlmostEquals(double.CreateTruncating(value), 0))
+                return CommonStrings.Disabled;
+
+            return value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
+        }
 
         public partial class InnerSlider : OsuSliderBar<T>
         {

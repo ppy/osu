@@ -25,7 +25,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Caption = AudioSettingsStrings.PositionalLevel,
                     Current = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel),
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
+                    DisplayZeroAsDisabled = true,
                 })
                 {
                     Keywords = new[] { @"positional", @"balance" },

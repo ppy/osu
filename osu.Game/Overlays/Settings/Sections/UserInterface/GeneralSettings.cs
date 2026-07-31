@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -40,7 +39,8 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 {
                     Caption = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<float>(OsuSetting.MenuParallaxScale),
-                    LabelFormat = v => $"{Math.Round(v * 100)}%",
+                    DisplayAsPercentage = true,
+                    DisplayZeroAsDisabled = true,
                 }),
                 new SettingsItemV2(new FormSliderBar<double>
                 {
