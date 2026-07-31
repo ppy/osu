@@ -778,7 +778,7 @@ namespace osu.Game.Database
                 // Ensure that the thread that currently has the `realmRetrievalLock` can retrieve nested contexts and not deadlock on itself.
                 if (!currentThreadHasRealmRetrievalLock.Value)
                 {
-                    realmRetrievalLock.Wait(10000);
+                    realmRetrievalLock.Wait();
                     currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
                 }
