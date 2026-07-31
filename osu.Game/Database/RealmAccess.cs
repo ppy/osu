@@ -781,6 +781,8 @@ namespace osu.Game.Database
                     realmRetrievalLock.Wait();
                     currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
+
+                    ObjectDisposedException.ThrowIf(isDisposed, this);
                 }
                 else
                 {
