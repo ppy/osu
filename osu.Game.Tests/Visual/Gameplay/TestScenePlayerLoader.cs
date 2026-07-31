@@ -432,7 +432,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
-            AddStep("load player", () => resetPlayer(false, beforeLoad));
+            AddStep("load player", () =>
+            {
+                resetPlayer(false, beforeLoad);
+
+                // block load to test notifications
+                loader.BlockPlayerLoad = true;
+            });
+
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
             saveVolumes();
@@ -445,6 +452,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             restoreVolumes();
 
+            AddStep("unblock load", () => loader.BlockPlayerLoad = false);
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
@@ -530,11 +538,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).Value = false);
 
             // set charge status and level
-            AddStep("load player", () => resetPlayer(false, () =>
+            AddStep("load player", () =>
             {
-                batteryInfo.SetOnBattery(onBattery);
-                batteryInfo.SetChargeLevel(chargeLevel);
-            }));
+                resetPlayer(false, () =>
+                {
+                    batteryInfo.SetOnBattery(onBattery);
+                    batteryInfo.SetChargeLevel(chargeLevel);
+                });
+
+                // block load to test notifications
+                loader.BlockPlayerLoad = true;
+            });
+
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
             if (shouldWarn)
@@ -542,6 +557,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             else
                 AddAssert("notification not triggered", () => notificationOverlay.UnreadCount.Value == 0);
 
+            AddStep("unblock load", () => loader.BlockPlayerLoad = false);
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
@@ -622,6 +638,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new Task DisposalTask => base.DisposalTask;
 
             public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods.Value;
+
+            public bool BlockPlayerLoad { get; set; }
+
+            protected override bool ReadyForGameplay => base.ReadyForGameplay && !BlockPlayerLoad;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
