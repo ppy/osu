@@ -438,7 +438,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             valueLabel.Text = LabelFormat(currentNumberInstantaneous.Value);
         }
 
-        public LocalisableString DefaultLabelFormat(T value) => value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, DisplayAsPercentage);
+        public LocalisableString DefaultLabelFormat(T value) => DefaultLabelFormat(value, DisplayAsPercentage);
+
+        public static LocalisableString DefaultLabelFormat(T value, bool displayAsPercentage) => value.ToStandardFormattedString(OsuSliderBar<T>.MAX_DECIMAL_DIGITS, displayAsPercentage);
 
         public partial class InnerSlider : OsuSliderBar<T>
         {
