@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Caption = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<float>(OsuSetting.MenuParallaxScale),
                     DisplayAsPercentage = true,
-                    DisplayZeroAsDisabled = true,
+                    LabelFormat = v => v == 0 ? CommonStrings.Disabled : FormSliderBar<float>.DefaultLabelFormat(v, true),
                 }),
                 new SettingsItemV2(new FormSliderBar<double>
                 {

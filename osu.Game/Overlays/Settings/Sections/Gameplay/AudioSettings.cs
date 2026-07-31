@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Current = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true,
-                    DisplayZeroAsDisabled = true,
+                    LabelFormat = v => v == 0 ? CommonStrings.Disabled : FormSliderBar<float>.DefaultLabelFormat(v, true),
                 })
                 {
                     Keywords = new[] { @"positional", @"balance" },
