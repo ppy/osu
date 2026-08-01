@@ -117,8 +117,8 @@ namespace osu.Game.Rulesets.Catch.Mods
                 palpableObject.HyperDashTarget = null;
                 // Setting distance to hyperdash to 0 results in highly inflated calculated difficulty of the map.
                 // This is caused by the fact that difficulty calculations treat distance closer to 0 as harder.
-                // Becasue of that, the distance is set to half of the size of the playfield to avoid big star rating divination.
-                // This can (and should) be replaced in a case where the mod is better handled by the difficulty calculation.
+                // Not setting the distance here still results in star rating increase.
+                // Because of that, the distance is set to half of the size of the playfield to avoid big star rating deviation.
                 palpableObject.DistanceToHyperDash = 206;
             }
 
