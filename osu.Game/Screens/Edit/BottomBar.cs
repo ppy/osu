@@ -14,6 +14,7 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
@@ -94,7 +95,8 @@ namespace osu.Game.Screens.Edit
             }, true);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
-        protected override bool OnClick(ClickEvent e) => true;
+        // Prevent click-through only for left button for now, otherwise it breaks the TimestampControl context menu.
+        protected override bool OnMouseDown(MouseDownEvent e) => e.Button == MouseButton.Left;
+        protected override bool OnClick(ClickEvent e) => e.Button == MouseButton.Left;
     }
 }
