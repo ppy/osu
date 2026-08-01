@@ -33,6 +33,7 @@ namespace osu.Game.Overlays
         public Color4 Colour4 => getColour(0.4f, 0.3f);
 
         public Color4 Highlight1 => getColour(1, 0.7f);
+        public Color4 Highlight2 => getColour(0.5f, 0.45f);
         public Color4 Content1 => getColour(0.4f, 1);
         public Color4 Content2 => getColour(0.4f, 0.9f);
         public Color4 Light1 => getColour(0.4f, 0.8f);
