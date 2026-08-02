@@ -79,7 +79,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("load match", () =>
             {
-                room = new Room { Name = "Test Room" };
+                room = new Room
+                {
+                    Name = "Test Room",
+                    Description = "This multiplayer room has a short description!",
+                };
                 LoadScreen(screen = new TestMultiplayerMatchSubScreen(room));
             });
 
