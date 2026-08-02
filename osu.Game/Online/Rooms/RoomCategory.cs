@@ -13,5 +13,8 @@ namespace osu.Game.Online.Rooms
 
         [Description("Featured Artist")]
         FeaturedArtist,
+
+        [Description("Daily Challenge")]
+        DailyChallenge,
     }
 }

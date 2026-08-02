@@ -154,6 +154,9 @@ namespace osu.Game.Skinning
         {
             bool wasPlaying = IsPlaying;
 
+            if (wasPlaying && Looping)
+                Stop();
+
             // Remove all pooled samples (return them to the pool), and dispose the rest.
             samplesContainer.RemoveAll(s => s.IsInPool, false);
             samplesContainer.Clear();
@@ -194,9 +197,33 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Whether any samples are currently playing.
         /// </summary>
-        public bool IsPlaying => samplesContainer.Any(s => s.Playing);
+        public bool IsPlaying
+        {
+            get
+            {
+                foreach (PoolableSkinnableSample s in samplesContainer)
+                {
+                    if (s.Playing)
+                        return true;
+                }
 
-        public bool IsPlayed => samplesContainer.Any(s => s.Played);
+                return false;
+            }
+        }
+
+        public bool IsPlayed
+        {
+            get
+            {
+                foreach (PoolableSkinnableSample s in samplesContainer)
+                {
+                    if (s.Played)
+                        return true;
+                }
+
+                return false;
+            }
+        }
 
         public IBindable<double> AggregateVolume => samplesContainer.AggregateVolume;
 

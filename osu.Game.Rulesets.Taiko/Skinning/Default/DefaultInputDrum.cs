@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
     {
         public DefaultInputDrum()
         {
-            RelativeSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]

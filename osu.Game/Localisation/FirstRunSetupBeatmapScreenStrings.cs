@@ -40,14 +40,19 @@ namespace osu.Game.Localisation
         public static LocalisableString BundledButton => new TranslatableString(getKey(@"bundled_button"), @"Get recommended beatmaps");
 
         /// <summary>
+        /// "Beatmaps will be downloaded in the background. You can continue with setup while this happens!"
+        /// </summary>
+        public static LocalisableString DownloadingInBackground => new TranslatableString(getKey(@"downloading_in_background"), @"Beatmaps will be downloaded in the background. You can continue with setup while this happens!");
+
+        /// <summary>
         /// "You can also obtain more beatmaps from the main menu &quot;browse&quot; button at any time."
         /// </summary>
         public static LocalisableString ObtainMoreBeatmaps => new TranslatableString(getKey(@"obtain_more_beatmaps"), @"You can also obtain more beatmaps from the main menu ""browse"" button at any time.");
 
         /// <summary>
-        /// "You currently have {0} beatmap(s) loaded!"
+        /// "You currently have {0} beatmap loaded!|You currently have {0} beatmaps loaded!"
         /// </summary>
-        public static LocalisableString CurrentlyLoadedBeatmaps(int beatmaps) => new TranslatableString(getKey(@"currently_loaded_beatmaps"), @"You currently have {0} beatmap(s) loaded!", beatmaps);
+        public static LocalisableString CurrentlyLoadedBeatmaps(int beatmaps) => new PluralisableString(new TranslatableString(getKey(@"currently_loaded_beatmaps"), @"You currently have {0} beatmap loaded!|You currently have {0} beatmaps loaded!", beatmaps), beatmaps, '|');
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

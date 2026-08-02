@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -10,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
+using osu.Framework.Lists;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.Beatmaps
@@ -26,8 +26,7 @@ namespace osu.Game.Beatmaps
             {
                 difficulty = value;
 
-                if (beatmapInfo != null)
-                    beatmapInfo.Difficulty = difficulty.Clone();
+                beatmapInfo.Difficulty = difficulty.Clone();
             }
         }
 
@@ -40,8 +39,7 @@ namespace osu.Game.Beatmaps
             {
                 beatmapInfo = value;
 
-                if (beatmapInfo?.Difficulty != null)
-                    Difficulty = beatmapInfo.Difficulty.Clone();
+                Difficulty = beatmapInfo.Difficulty.Clone();
             }
         }
 
@@ -65,7 +63,7 @@ namespace osu.Game.Beatmaps
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 
-        public List<BreakPeriod> Breaks { get; set; } = new List<BreakPeriod>();
+        public SortedList<BreakPeriod> Breaks { get; set; } = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
 
         [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
@@ -105,6 +103,7 @@ namespace osu.Game.Beatmaps
                                     return (beatLength: t.BeatLength, duration: nextTime - currentTime);
                                 })
                                 // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
+                                // Rounding is applied here (to 1e-3 milliseconds) to neutralise potential effects of floating point inaccuracies
                                 .GroupBy(t => Math.Round(t.beatLength * 1000) / 1000)
                                 .Select(g => (beatLength: g.Key, duration: g.Sum(t => t.duration)))
                                 // Get the most common one, or 0 as a suitable default (see handling below)
@@ -113,18 +112,52 @@ namespace osu.Game.Beatmaps
             if (mostCommon.beatLength == 0)
                 return TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
-            return mostCommon.beatLength;
+            // Because of the rounding applied to the beat length above, it is possible for the "most common" beat length as determined by the linq query above
+            // to actually be less or more than the raw range of unrounded beat lengths present in the map
+            // To ensure this does not become a problem anywhere else further, clamp the result to the known raw range
+            double minBeatLength = ControlPointInfo.TimingPoints.Min(t => t.BeatLength);
+            double maxBeatLength = ControlPointInfo.TimingPoints.Max(t => t.BeatLength);
+            return Math.Clamp(mostCommon.beatLength, minBeatLength, maxBeatLength);
         }
+
+        public double AudioLeadIn { get; set; }
+
+        public float StackLeniency { get; set; } = 0.7f;
+
+        public bool SpecialStyle { get; set; }
+
+        public bool LetterboxInBreaks { get; set; }
+
+        public bool WidescreenStoryboard { get; set; } = true;
+
+        public bool EpilepsyWarning { get; set; }
+
+        public bool SamplesMatchPlaybackRate { get; set; }
+
+        public double DistanceSpacing { get; set; } = 1.0;
+
+        public int GridSize { get; set; }
+
+        public double TimelineZoom { get; set; } = 1.0;
+
+        public CountdownType Countdown { get; set; } = CountdownType.None;
+
+        public int CountdownOffset { get; set; }
+
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
+
+        public double[] SliderVelocityPresets { get; set; } = [0.75, 1, 1.5];
+
+        public int BeatmapVersion { get; set; } = LegacyBeatmapEncoder.FIRST_LAZER_VERSION;
 
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
+
+        public override string ToString() => BeatmapInfo.ToString();
     }
 
     public class Beatmap : Beatmap<HitObject>
     {
-        public new Beatmap Clone() => (Beatmap)base.Clone();
-
-        public override string ToString() => BeatmapInfo?.ToString() ?? base.ToString();
     }
 }

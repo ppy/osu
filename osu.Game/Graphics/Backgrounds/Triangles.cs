@@ -14,9 +14,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
+using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Rendering.Vertices;
-using osu.Framework.Lists;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -67,7 +66,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// <summary>
         /// The amount of triangles we want compared to the default distribution.
         /// </summary>
-        protected virtual float SpawnRatio => 1;
+        public float SpawnRatio { get; set; } = 1;
 
         private readonly BindableFloat triangleScale = new BindableFloat(1f);
 
@@ -78,10 +77,10 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         /// <summary>
-        /// If enabled, only the portion of triangles that falls within this <see cref="Drawable"/>'s
-        /// shape is drawn to the screen.
+        /// Controls on which <see cref="Axes"/> the portion of triangles that falls within this <see cref="Drawable"/>'s
+        /// shape is drawn to the screen. Default is Axes.Both.
         /// </summary>
-        public bool Masking { get; set; }
+        public Axes ClampAxes { get; set; } = Axes.Both;
 
         /// <summary>
         /// Whether we should drop-off alpha values of triangles more quickly to improve
@@ -95,7 +94,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         public float Velocity = 1;
 
-        private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
+        private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
 
         private Random stableRandom;
         private IShader shader;
@@ -128,36 +127,49 @@ namespace osu.Game.Graphics.Backgrounds
         {
             base.Update();
 
-            Invalidate(Invalidation.DrawNode);
-
-            if (CreateNewTriangles)
-                addTriangles(false);
-
             float adjustedAlpha = HideAlphaDiscrepancies
                 // Cubically scale alpha to make it drop off more sharply.
                 ? MathF.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3)
                 : 1;
 
             float elapsedSeconds = (float)Time.Elapsed / 1000;
+
+            if (elapsedSeconds == 0)
+                return;
+
             // Since position is relative, the velocity needs to scale inversely with DrawHeight.
             // Since we will later multiply by the scale of individual triangles we normalize by
             // dividing by triangleScale.
             float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * TriangleScale);
 
-            for (int i = 0; i < parts.Count; i++)
+            for (int i = parts.Count - 1; i >= 0; i--)
             {
-                TriangleParticle newParticle = parts[i];
+                TriangleParticle particle = parts[i];
 
                 // Scale moved distance by the size of the triangle. Smaller triangles should move more slowly.
-                newParticle.Position.Y += Math.Max(0.5f, parts[i].Scale) * movedDistance;
-                newParticle.Colour.A = adjustedAlpha;
+                float newY = particle.Position.Y + Math.Max(0.5f, particle.Scale) * movedDistance;
+                float bottomY = newY + triangle_size * particle.Scale * equilateral_triangle_ratio / DrawHeight;
 
-                parts[i] = newParticle;
+                if (bottomY < 0)
+                {
+                    if (!CreateNewTriangles)
+                    {
+                        parts.RemoveAt(i);
+                        continue;
+                    }
 
-                float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * equilateral_triangle_ratio / DrawHeight;
-                if (bottomPos < 0)
-                    parts.RemoveAt(i);
+                    particle.Position = getRandomPosition(false, particle.Scale);
+                }
+                else
+                {
+                    particle.Position.Y = newY;
+                }
+
+                particle.Colour.A = adjustedAlpha;
+                parts[i] = particle;
             }
+
+            Invalidate(Invalidation.DrawNode);
         }
 
         /// <summary>
@@ -169,24 +181,32 @@ namespace osu.Game.Graphics.Backgrounds
             if (seed != null)
                 stableRandom = new Random(seed.Value);
 
-            parts.Clear();
-            addTriangles(true);
-        }
-
-        protected int AimCount { get; private set; }
-
-        private void addTriangles(bool randomY)
-        {
             // Limited by the maximum size of QuadVertexBuffer for safety.
             const int max_triangles = ushort.MaxValue / (IRenderer.VERTICES_PER_QUAD + 2);
 
             AimCount = (int)Math.Min(max_triangles, DrawWidth * DrawHeight * 0.002f / (TriangleScale * TriangleScale) * SpawnRatio);
 
-            int currentCount = parts.Count;
+            if (parts.Count == AimCount)
+            {
+                var span = parts.AsSpan();
 
-            for (int i = 0; i < AimCount - currentCount; i++)
-                parts.Add(createTriangle(randomY));
+                for (int i = 0; i < span.Length; i++)
+                    span[i].Position = getRandomPosition(true, span[i].Scale);
+            }
+            else
+            {
+                parts.Clear();
+
+                for (int i = 0; i < AimCount; i++)
+                    parts.Add(createTriangle(true));
+
+                parts.Sort(Comparer<TriangleParticle>.Default);
+            }
+
+            Invalidate(Invalidation.DrawNode);
         }
+
+        protected int AimCount { get; private set; }
 
         private TriangleParticle createTriangle(bool randomY)
         {
@@ -258,13 +278,12 @@ namespace osu.Game.Graphics.Backgrounds
 
             private IShader shader;
             private Texture texture;
-            private bool masking;
+            private Axes clampAxes;
 
             private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
             private readonly Vector2 triangleSize = new Vector2(1f, equilateral_triangle_ratio) * triangle_size;
 
             private Vector2 size;
-            private IVertexBatch<TexturedVertex2D> vertexBatch;
 
             public TrianglesDrawNode(Triangles source)
                 : base(source)
@@ -278,7 +297,7 @@ namespace osu.Game.Graphics.Backgrounds
                 shader = Source.shader;
                 texture = Source.texture;
                 size = Source.DrawSize;
-                masking = Source.Masking;
+                clampAxes = Source.ClampAxes;
 
                 parts.Clear();
                 parts.AddRange(Source.parts);
@@ -286,15 +305,9 @@ namespace osu.Game.Graphics.Backgrounds
 
             private IUniformBuffer<TriangleBorderData> borderDataBuffer;
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
-
-                if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
-                {
-                    vertexBatch?.Dispose();
-                    vertexBatch = renderer.CreateQuadBatch<TexturedVertex2D>(Source.AimCount, 1);
-                }
 
                 borderDataBuffer ??= renderer.CreateUniformBuffer<TriangleBorderData>();
                 borderDataBuffer.Data = borderDataBuffer.Data with
@@ -314,7 +327,7 @@ namespace osu.Game.Graphics.Backgrounds
 
                     Vector2 topLeft = particle.Position - new Vector2(relativeSize.X * 0.5f, 0f);
 
-                    Quad triangleQuad = masking ? clampToDrawable(topLeft, relativeSize) : new Quad(topLeft.X, topLeft.Y, relativeSize.X, relativeSize.Y);
+                    Quad triangleQuad = getClampedQuad(clampAxes, topLeft, relativeSize);
 
                     var drawQuad = new Quad(
                         Vector2Extensions.Transform(triangleQuad.TopLeft * size, DrawInfo.Matrix),
@@ -333,30 +346,35 @@ namespace osu.Game.Graphics.Backgrounds
                         triangleQuad.Height
                     ) / relativeSize;
 
-                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), vertexBatch.AddAction, textureCoords: textureCoords);
+                    renderer.DrawQuad(texture, drawQuad, colourInfo, new RectangleF(0, 0, 1, 1), textureCoords: textureCoords);
                 }
 
                 shader.Unbind();
             }
 
-            private static Quad clampToDrawable(Vector2 topLeft, Vector2 size)
+            private static Quad getClampedQuad(Axes clampAxes, Vector2 topLeft, Vector2 size)
             {
-                float leftClamped = Math.Clamp(topLeft.X, 0f, 1f);
-                float topClamped = Math.Clamp(topLeft.Y, 0f, 1f);
+                Vector2 clampedTopLeft = topLeft;
 
-                return new Quad(
-                    leftClamped,
-                    topClamped,
-                    Math.Clamp(topLeft.X + size.X, 0f, 1f) - leftClamped,
-                    Math.Clamp(topLeft.Y + size.Y, 0f, 1f) - topClamped
-                );
+                if (clampAxes == Axes.X || clampAxes == Axes.Both)
+                {
+                    clampedTopLeft.X = Math.Clamp(topLeft.X, 0f, 1f);
+                    size.X = Math.Clamp(topLeft.X + size.X, 0f, 1f) - clampedTopLeft.X;
+                }
+
+                if (clampAxes == Axes.Y || clampAxes == Axes.Both)
+                {
+                    clampedTopLeft.Y = Math.Clamp(topLeft.Y, 0f, 1f);
+                    size.Y = Math.Clamp(topLeft.Y + size.Y, 0f, 1f) - clampedTopLeft.Y;
+                }
+
+                return new Quad(clampedTopLeft.X, clampedTopLeft.Y, size.X, size.Y);
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch?.Dispose();
                 borderDataBuffer?.Dispose();
             }
         }

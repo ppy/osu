@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
@@ -64,5 +65,12 @@ namespace osu.Game.Rulesets.Catch.Replays
 
             return new LegacyReplayFrame(Time, Position, null, state);
         }
+
+        public override bool IsEquivalentTo(ReplayFrame other)
+            => other is CatchReplayFrame catchFrame
+               && Time == catchFrame.Time
+               && Position == catchFrame.Position
+               && Dashing == catchFrame.Dashing
+               && Actions.SequenceEqual(catchFrame.Actions);
     }
 }

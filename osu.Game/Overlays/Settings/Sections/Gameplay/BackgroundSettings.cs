@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
@@ -18,30 +19,33 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double>
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundDim,
+                    Caption = GameplaySettingsStrings.BackgroundDim,
                     Current = config.GetBindable<double>(OsuSetting.DimLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
-                },
-                new SettingsSlider<double>
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundBlur,
+                    Caption = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<double>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.LightenDuringBreaks,
-                    Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
-                },
-                new SettingsCheckbox
+                    Caption = GameplaySettingsStrings.LightenDuringBreaks,
+                    Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks),
+                })
                 {
-                    LabelText = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
+                    Keywords = new[] { "dim", "level" }
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
                     Current = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
-                },
+                }),
             };
         }
     }

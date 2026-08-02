@@ -10,9 +10,11 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -40,7 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("disallow all lookups", () =>
             {
                 storyboard.UseSkinSprites = false;
-                storyboard.AlwaysProvideTexture = false;
+                storyboard.ProvideResources = false;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -50,12 +52,51 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestSpriteFadeOverflowBehaviour()
+        {
+            ManualClock manualClock = new ManualClock();
+
+            AddStep("allow storyboard lookup", () =>
+            {
+                storyboard.UseSkinSprites = false;
+                storyboard.ProvideResources = true;
+            });
+
+            AddStep("create sprite", () => SetContents(_ =>
+            {
+                var layer = storyboard.GetLayer("Background");
+
+                var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, lookup_name, Anchor.TopLeft, new Vector2(256, 192));
+                sprite.Commands.AddAlpha(Easing.None, 0, 2000, 0, 2);
+
+                layer.Elements.Clear();
+                layer.Add(sprite);
+
+                return new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        storyboard.CreateDrawable().With(d => d.Clock = new FramedClock(manualClock))
+                    }
+                };
+            }));
+
+            AddStep("seek to 1000 ms", () => manualClock.CurrentTime = 900);
+            AddUntilStep("sprite reached high opacity once", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha > 0.8f)));
+            AddStep("seek to 2000 ms", () => manualClock.CurrentTime = 1100);
+            AddUntilStep("sprite reset to low opacity", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha < 0.2f)));
+            AddStep("seek to 2000 ms", () => manualClock.CurrentTime = 1900);
+            AddUntilStep("sprite reached high opacity twice", () => sprites.All(sprite => sprite.ChildrenOfType<Sprite>().All(s => s.Alpha > 0.8f)));
+        }
+
+        [Test]
         public void TestLookupFromStoryboard()
         {
             AddStep("allow storyboard lookup", () =>
             {
                 storyboard.UseSkinSprites = false;
-                storyboard.AlwaysProvideTexture = true;
+                storyboard.ProvideResources = true;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -67,13 +108,48 @@ namespace osu.Game.Tests.Visual.Gameplay
             assertStoryboardSourced();
         }
 
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestVideo(bool scaleTransformProvided)
+        {
+            AddStep("allow storyboard lookup", () =>
+            {
+                storyboard.ProvideResources = true;
+            });
+
+            AddStep("create video", () => SetContents(_ =>
+            {
+                var layer = storyboard.GetLayer("Video");
+
+                var sprite = new StoryboardVideo(StoryboardElementSource.Beatmap, "Videos/test-video.mp4", Time.Current);
+
+                if (scaleTransformProvided)
+                {
+                    sprite.Commands.AddScale(Easing.None, Time.Current, Time.Current + 1000, 1, 2);
+                    sprite.Commands.AddScale(Easing.None, Time.Current + 1000, Time.Current + 2000, 2, 1);
+                }
+
+                layer.Elements.Clear();
+                layer.Add(sprite);
+
+                return new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        storyboard.CreateDrawable()
+                    }
+                };
+            }));
+        }
+
         [Test]
         public void TestSkinLookupPreferredOverStoryboard()
         {
             AddStep("allow all lookups", () =>
             {
                 storyboard.UseSkinSprites = true;
-                storyboard.AlwaysProvideTexture = true;
+                storyboard.ProvideResources = true;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -91,7 +167,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("allow skin lookup", () =>
             {
                 storyboard.UseSkinSprites = true;
-                storyboard.AlwaysProvideTexture = false;
+                storyboard.ProvideResources = false;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -109,7 +185,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("allow all lookups", () =>
             {
                 storyboard.UseSkinSprites = true;
-                storyboard.AlwaysProvideTexture = true;
+                storyboard.ProvideResources = true;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -127,7 +203,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("allow all lookups", () =>
             {
                 storyboard.UseSkinSprites = true;
-                storyboard.AlwaysProvideTexture = true;
+                storyboard.ProvideResources = true;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -142,7 +218,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("allow all lookups", () =>
             {
                 storyboard.UseSkinSprites = true;
-                storyboard.AlwaysProvideTexture = true;
+                storyboard.ProvideResources = true;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -156,7 +232,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("allow all lookups", () =>
             {
                 storyboard.UseSkinSprites = true;
-                storyboard.AlwaysProvideTexture = true;
+                storyboard.ProvideResources = true;
             });
 
             AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
@@ -170,17 +246,25 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("origin back", () => sprites.All(s => s.Origin == Anchor.TopLeft));
         }
 
-        private DrawableStoryboard createSprite(string lookupName, Anchor origin, Vector2 initialPosition)
+        private Drawable createSprite(string lookupName, Anchor origin, Vector2 initialPosition)
         {
             var layer = storyboard.GetLayer("Background");
 
-            var sprite = new StoryboardSprite(lookupName, origin, initialPosition);
-            sprite.AddLoop(Time.Current, 100).Alpha.Add(Easing.None, 0, 10000, 1, 1);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, lookupName, origin, initialPosition);
+            var loop = sprite.AddLoopingGroup(Time.Current, 100);
+            loop.AddAlpha(Easing.None, 0, 10000, 1, 1);
 
             layer.Elements.Clear();
             layer.Add(sprite);
 
-            return storyboard.CreateDrawable().With(s => s.RelativeSizeAxes = Axes.Both);
+            return new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    storyboard.CreateDrawable()
+                }
+            };
         }
 
         private void assertStoryboardSourced()
@@ -202,42 +286,52 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return new TestDrawableStoryboard(this, mods);
             }
 
-            public bool AlwaysProvideTexture { get; set; }
+            public bool ProvideResources { get; set; }
 
-            public override string GetStoragePathFromStoryboardPath(string path) => AlwaysProvideTexture ? path : string.Empty;
+            public override string GetStoragePathFromStoryboardPath(string path) => ProvideResources ? path : string.Empty;
 
             private partial class TestDrawableStoryboard : DrawableStoryboard
             {
-                private readonly bool alwaysProvideTexture;
+                private readonly bool provideResources;
 
                 public TestDrawableStoryboard(TestStoryboard storyboard, IReadOnlyList<Mod>? mods)
                     : base(storyboard, mods)
                 {
-                    alwaysProvideTexture = storyboard.AlwaysProvideTexture;
+                    provideResources = storyboard.ProvideResources;
                 }
 
-                protected override IResourceStore<byte[]> CreateResourceLookupStore() => alwaysProvideTexture
-                    ? new AlwaysReturnsTextureStore()
+                protected override IResourceStore<byte[]> CreateResourceLookupStore() => provideResources
+                    ? new ResourcesTextureStore()
                     : new ResourceStore<byte[]>();
 
-                internal class AlwaysReturnsTextureStore : IResourceStore<byte[]>
+                internal class ResourcesTextureStore : IResourceStore<byte[]>
                 {
-                    private const string test_image = "Resources/Textures/test-image.png";
-
                     private readonly DllResourceStore store;
 
-                    public AlwaysReturnsTextureStore()
+                    public ResourcesTextureStore()
                     {
                         store = TestResources.GetStore();
                     }
 
                     public void Dispose() => store.Dispose();
 
-                    public byte[] Get(string name) => store.Get(test_image);
+                    public byte[] Get(string name) => store.Get(map(name));
 
-                    public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) => store.GetAsync(test_image, cancellationToken);
+                    public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken()) => store.GetAsync(map(name), cancellationToken);
 
-                    public Stream GetStream(string name) => store.GetStream(test_image);
+                    public Stream GetStream(string name) => store.GetStream(map(name));
+
+                    private string map(string name)
+                    {
+                        switch (name)
+                        {
+                            case lookup_name:
+                                return "Resources/Textures/test-image.png";
+
+                            default:
+                                return $"Resources/{name}";
+                        }
+                    }
 
                     public IEnumerable<string> GetAvailableResources() => store.GetAvailableResources();
                 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
@@ -33,22 +34,22 @@ namespace osu.Game.Tests.NonVisual
         public void TestResultIfOnlyParentHitWindowIsEmpty()
         {
             var testObject = new TestHitObject(HitWindows.Empty);
-            HitObject nested = new TestHitObject(new HitWindows());
+            HitObject nested = new TestHitObject(new DefaultHitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
-            Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, nested.HitWindows);
+            ClassicAssert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, nested.HitWindows);
         }
 
         [Test]
         public void TestResultIfParentHitWindowsIsNotEmpty()
         {
-            var testObject = new TestHitObject(new HitWindows());
-            HitObject nested = new TestHitObject(new HitWindows());
+            var testObject = new TestHitObject(new DefaultHitWindows());
+            HitObject nested = new TestHitObject(new DefaultHitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
-            Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, testObject.HitWindows);
+            ClassicAssert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, testObject.HitWindows);
         }
 
         [Test]
@@ -58,10 +59,10 @@ namespace osu.Game.Tests.NonVisual
             HitObject nested = new TestHitObject(HitWindows.Empty);
             firstObject.AddNested(nested);
 
-            var secondObject = new TestHitObject(new HitWindows());
+            var secondObject = new TestHitObject(new DefaultHitWindows());
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject, secondObject };
 
-            Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, secondObject.HitWindows);
+            ClassicAssert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, secondObject.HitWindows);
         }
 
         [Test]
@@ -73,7 +74,7 @@ namespace osu.Game.Tests.NonVisual
 
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject };
 
-            Assert.IsNull(testDrawableRuleset.FirstAvailableHitWindows);
+            ClassicAssert.Null(testDrawableRuleset.FirstAvailableHitWindows);
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
@@ -96,6 +97,7 @@ namespace osu.Game.Tests.NonVisual
 
             public override IAdjustableAudioComponent Audio { get; }
             public override Playfield Playfield { get; }
+            public override PlayfieldAdjustmentContainer PlayfieldAdjustmentContainer { get; }
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }

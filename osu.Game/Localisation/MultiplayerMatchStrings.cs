@@ -24,6 +24,51 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString StartMatchWithCountdown(string humanReadableTime) => new TranslatableString(getKey(@"start_match_width_countdown"), @"Start match in {0}", humanReadableTime);
 
+        /// <summary>
+        /// "Choose the mods which all players should play with."
+        /// </summary>
+        public static LocalisableString RequiredModsButtonTooltip => new TranslatableString(getKey(@"required_mods_button_tooltip"), @"Choose the mods which all players should play with.");
+
+        /// <summary>
+        /// "Each player can choose their preferred mods from a selected list."
+        /// </summary>
+        public static LocalisableString FreeModsButtonTooltip => new TranslatableString(getKey(@"free_mods_button_tooltip"), @"Each player can choose their preferred mods from a selected list.");
+
+        /// <summary>
+        /// "Each player can choose their preferred difficulty, ruleset and mods."
+        /// </summary>
+        public static LocalisableString FreestyleButtonTooltip => new TranslatableString(getKey(@"freestyle_button_tooltip"), @"Each player can choose their preferred difficulty, ruleset and mods.");
+
+        /// <summary>
+        /// "Searching for opponents..."
+        /// </summary>
+        public static LocalisableString SearchingForOpponents => new TranslatableString(getKey(@"searching_for_opponents"), @"Searching for opponents...");
+
+        /// <summary>
+        /// "Your match is ready! Click to join."
+        /// </summary>
+        public static LocalisableString MatchIsReady => new TranslatableString(getKey(@"match_is_ready"), @"Your match is ready! Click to join.");
+
+        /// <summary>
+        /// "(empty slot)"
+        /// </summary>
+        public static LocalisableString EmptySlot => new TranslatableString(getKey(@"empty_slot"), @"(empty slot)");
+
+        /// <summary>
+        /// "Move to slot"
+        /// </summary>
+        public static LocalisableString MoveToSlot => new TranslatableString(getKey(@"move_to_slot"), @"Move to slot");
+
+        /// <summary>
+        /// "Give host"
+        /// </summary>
+        public static LocalisableString GiveHost => new TranslatableString(getKey(@"give_host"), @"Give host");
+
+        /// <summary>
+        /// "Kick"
+        /// </summary>
+        public static LocalisableString Kick => new TranslatableString(getKey(@"kick"), @"Kick");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

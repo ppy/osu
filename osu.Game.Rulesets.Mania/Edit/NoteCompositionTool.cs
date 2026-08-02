@@ -2,7 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
@@ -10,15 +11,15 @@ using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class NoteCompositionTool : HitObjectCompositionTool
+    public class NoteCompositionTool : CompositionTool
     {
         public NoteCompositionTool()
             : base(nameof(Note))
         {
         }
 
-        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorNote };
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new NotePlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new NotePlacementBlueprint();
     }
 }

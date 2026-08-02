@@ -2,14 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Net;
 
 namespace osu.Game.Online.API
 {
     public class APIException : InvalidOperationException
     {
-        public APIException(string message, Exception? innerException)
+        public HttpStatusCode? StatusCode { get; }
+
+        public APIException(string message, Exception? innerException, HttpStatusCode? statusCode = null)
             : base(message, innerException)
         {
+            StatusCode = statusCode;
         }
     }
 }

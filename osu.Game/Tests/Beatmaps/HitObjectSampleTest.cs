@@ -86,9 +86,7 @@ namespace osu.Game.Tests.Beatmaps
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
                     // populate ruleset for beatmap converters that require it to be present.
-                    var ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.Ruleset.OnlineID);
-
-                    Debug.Assert(ruleset != null);
+                    var ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.Ruleset.OnlineID) ?? new RulesetInfo { OnlineID = currentTestBeatmap.BeatmapInfo.Ruleset.OnlineID };
 
                     currentTestBeatmap.BeatmapInfo.Ruleset = ruleset;
                 });
@@ -132,8 +130,8 @@ namespace osu.Game.Tests.Beatmaps
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
-        public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
-        RealmAccess IStorageResourceProvider.RealmAccess => null;
+        public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null!;
+        RealmAccess IStorageResourceProvider.RealmAccess => null!;
 
         #endregion
 

@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
@@ -32,6 +33,8 @@ namespace osu.Game.Rulesets.Mania.Tests
     /// </summary>
     public partial class TestSceneHoldNoteInput : RateAdjustedBeatmapTestScene
     {
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+
         private const double time_before_head = 250;
         private const double time_head = 1500;
         private const double time_during_hold_1 = 2500;
@@ -200,12 +203,10 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            // judgement combo offset by perfect bonus judgement. see logic in DrawableNote.CheckForResult.
-            assertComboAtJudgement(1, 1);
+            assertComboAtJudgement(0, 1);
             assertTailJudgement(HitResult.Meh);
-            assertComboAtJudgement(2, 0);
-            // judgement combo offset by perfect bonus judgement. see logic in DrawableNote.CheckForResult.
-            assertComboAtJudgement(4, 1);
+            assertComboAtJudgement(1, 0);
+            assertComboAtJudgement(3, 1);
         }
 
         /// <summary>
@@ -476,8 +477,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddAssert("first hold note missed", () => judgementResults.Where(j => beatmap.HitObjects[0].NestedHitObjects.Contains(j.HitObject))
                                                                       .All(j => !j.Type.IsHit()));
 
-            AddAssert("second hold note missed", () => judgementResults.Where(j => beatmap.HitObjects[1].NestedHitObjects.Contains(j.HitObject))
-                                                                       .All(j => j.Type.IsHit()));
+            AddAssert("second hold note hit", () => judgementResults.Where(j => beatmap.HitObjects[1].NestedHitObjects.Contains(j.HitObject))
+                                                                    .All(j => j.Type.IsHit()));
         }
 
         [Test]
@@ -505,6 +506,29 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("hold note hit", () => judgementResults.Where(j => beatmap.HitObjects[0].NestedHitObjects.Contains(j.HitObject))
                                                              .All(j => j.Type.IsHit()));
+        }
+
+        /// <summary>
+        /// This ensures that the value of <see cref="DrawableHoldNote.MissingStartTime"/>
+        /// will be set correctly when the body receives a judgment during the hold.
+        ///
+        ///     -----[           ]-----
+        ///          x     o
+        /// </summary>
+        [Test]
+        public void TestReleaseDuringHoldMissingStartTime()
+        {
+            performTest([
+                new ManiaReplayFrame(time_head, ManiaAction.Key1),
+                new ManiaReplayFrame(time_during_hold_1)
+            ]);
+
+            assertHeadJudgement(HitResult.Perfect);
+            assertTailJudgement(HitResult.Miss);
+            assertNoteJudgement(HitResult.IgnoreMiss);
+
+            AddAssert("body judgement is miss", () => !judgementResults.Single(j => j.HitObject is HoldNoteBody).IsHit);
+            AddAssert("body judgement time indicates during hold", () => judgementResults.Single(j => j.HitObject is HoldNoteBody).TimeAbsolute, () => Is.EqualTo(time_during_hold_1).Within(100));
         }
 
         private void assertHitObjectJudgement(HitObject hitObject, HitResult result)

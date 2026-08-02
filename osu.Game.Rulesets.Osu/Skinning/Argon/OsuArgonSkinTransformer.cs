@@ -16,14 +16,30 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
+            bool isPro = Skin is ArgonProSkin;
+
             switch (lookup)
             {
-                case GameplaySkinComponentLookup<HitResult> resultComponent:
+                case SkinComponentLookup<HitResult> resultComponent:
+                    HitResult result = resultComponent.Component;
+
                     // This should eventually be moved to a skin setting, when supported.
-                    if (Skin is ArgonProSkin && resultComponent.Component >= HitResult.Great)
+                    if (isPro && (result == HitResult.Great || result == HitResult.Perfect))
                         return Drawable.Empty();
 
-                    return new ArgonJudgementPiece(resultComponent.Component);
+                    switch (result)
+                    {
+                        case HitResult.LargeTickHit:
+                        case HitResult.SliderTailHit:
+                            return null;
+
+                        case HitResult.IgnoreMiss:
+                        case HitResult.LargeTickMiss:
+                            return new ArgonJudgementPieceSliderTickMiss(result);
+
+                        default:
+                            return new ArgonJudgementPiece(result);
+                    }
 
                 case OsuSkinComponentLookup osuComponent:
                     // TODO: Once everything is finalised, consider throwing UnsupportedSkinComponentException on missing entries.
@@ -36,7 +52,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                             return new ArgonMainCirclePiece(false);
 
                         case OsuSkinComponents.SliderBody:
-                            return new ArgonSliderBody();
+                            return new ArgonSliderBody
+                            {
+                                BodyAlpha = isPro ? 0.92f : 0.98f
+                            };
 
                         case OsuSkinComponents.SliderBall:
                             return new ArgonSliderBall();

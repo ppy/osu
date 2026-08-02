@@ -83,9 +83,25 @@ namespace osu.Game.Storyboards.Drawables
             Origin = animation.Origin;
             Position = animation.InitialPosition;
             Loop = animation.LoopType == AnimationLoopType.LoopForever;
+            Name = animation.Path;
 
             LifetimeStart = animation.StartTime;
             LifetimeEnd = animation.EndTimeForDisplay;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // In stable, alpha transforms exceeding values of 1 would result in sprites disappearing from view.
+            // See https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/Graphics/Sprites/pSprite.cs#L413-L414
+            //
+            // Over the years, storyboard(ers) have taken advantage of this to create "flicker" patterns.
+            // This is quite a common technique, so we are reproducing it here for now.
+            //
+            // NOTE TO FUTURE VISTIORS: If we do ever update the storyboard spec, we may want to move such flicker effects to their
+            // own transform type, and make this a legacy behaviour. It feels very flimsy.
+            if (Alpha > 1) Alpha %= 1;
         }
 
         [Resolved]
@@ -129,7 +145,7 @@ namespace osu.Game.Storyboards.Drawables
 
             // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
             // and resources are retrieved until the end of the animation.
-            var skinTextures = skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path)!, default, default, true, string.Empty, null, out _);
+            var skinTextures = skin.GetTextures(Path.ChangeExtension(Animation.Path, null), default, default, true, string.Empty, null, out _);
 
             if (skinTextures.Length > 0)
             {

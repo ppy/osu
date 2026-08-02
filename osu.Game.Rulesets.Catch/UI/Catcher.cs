@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -113,19 +114,15 @@ namespace osu.Game.Rulesets.Catch.UI
         public Vector2 BodyScale => Scale * body.Scale;
 
         /// <summary>
-        /// Whether the contents of the catcher plate should be visually flipped when the catcher direction is changed.
-        /// </summary>
-        private bool flipCatcherPlate;
-
-        /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
-        public readonly float CatchWidth;
+        public float CatchWidth { get; private set; }
 
         private readonly SkinnableCatcher body;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
 
+        private double? lastHyperDashStartTime;
         private double hyperDashModifier = 1;
         private int hyperDashDirection;
         private float hyperDashTargetPosition;
@@ -145,10 +142,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Size = new Vector2(BASE_SIZE);
 
-            if (difficulty != null)
-                Scale = calculateScale(difficulty);
-
-            CatchWidth = CalculateCatchWidth(Scale);
+            ApplyDifficulty(difficulty);
 
             InternalChildren = new Drawable[]
             {
@@ -230,23 +224,9 @@ namespace osu.Game.Rulesets.Catch.UI
                     addLighting(result, drawableObject.AccentColour.Value, positionInStack.X);
             }
 
-            // droplet doesn't affect the catcher state
-            if (hitObject is TinyDroplet) return;
-
-            if (result.IsHit && hitObject.HyperDashTarget is CatchHitObject target)
-            {
-                double timeDifference = target.StartTime - hitObject.StartTime;
-                double positionDifference = target.EffectiveX - X;
-                double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
-
-                SetHyperDashState(Math.Abs(velocity) / BASE_DASH_SPEED, target.EffectiveX);
-            }
-            else
-                SetHyperDashState();
-
             if (result.IsHit)
                 CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
-            else if (!(hitObject is Banana))
+            else if (hitObject is not Banana)
                 CurrentState = CatcherAnimationState.Fail;
 
             if (palpableObject.HitObject.LastInCombo)
@@ -255,6 +235,27 @@ namespace osu.Game.Rulesets.Catch.UI
                     Explode();
                 else
                     Drop();
+            }
+
+            // droplet doesn't affect hyperdash state
+            if (hitObject is TinyDroplet) return;
+
+            // if a hyper fruit was already handled this frame, just go where it says to go.
+            // this special-cases some aspire maps that have doubled-up objects (one hyper, one not) at the same time instant.
+            // handling this "properly" elsewhere is impossible as there is no feasible way to ensure
+            // that the hyperfruit gets judged second (especially if it coincides with a last fruit in a juice stream).
+            if (lastHyperDashStartTime != Time.Current)
+            {
+                if (result.IsHit && hitObject.HyperDashTarget is CatchHitObject target)
+                {
+                    double timeDifference = target.StartTime - hitObject.StartTime;
+                    double positionDifference = target.EffectiveX - X;
+                    double velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
+
+                    SetHyperDashState(Math.Abs(velocity) / BASE_DASH_SPEED, target.EffectiveX);
+                }
+                else
+                    SetHyperDashState();
             }
         }
 
@@ -292,6 +293,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (wasHyperDashing)
                     runHyperDashStateTransition(false);
+
+                lastHyperDashStartTime = null;
             }
             else
             {
@@ -301,7 +304,20 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!wasHyperDashing)
                     runHyperDashStateTransition(true);
+
+                lastHyperDashStartTime = Time.Current;
             }
+        }
+
+        /// <summary>
+        /// Set the scale and catch width.
+        /// </summary>
+        public void ApplyDifficulty(IBeatmapDifficultyInfo? difficulty)
+        {
+            if (difficulty != null)
+                Scale = calculateScale(difficulty);
+
+            CatchWidth = CalculateCatchWidth(Scale);
         }
 
         /// <summary>
@@ -327,8 +343,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
                 DEFAULT_HYPER_DASH_COLOUR;
 
-            flipCatcherPlate = skin.GetConfig<CatchSkinConfiguration, bool>(CatchSkinConfiguration.FlipCatcherPlate)?.Value ?? true;
-
             runHyperDashStateTransition(HyperDashing);
         }
 
@@ -340,8 +354,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             body.Scale = scaleFromDirection;
             // Inverse of catcher scale is applied here, as catcher gets scaled by circle size and so do the incoming fruit.
-            caughtObjectContainer.Scale = (1 / Scale.X) * (flipCatcherPlate ? scaleFromDirection : Vector2.One);
-            hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
+            caughtObjectContainer.Scale = new Vector2(1 / Scale.X);
 
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
@@ -358,7 +371,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (caughtObject == null) return;
 
-            caughtObject.CopyStateFrom(drawableObject);
+            caughtObject.RestoreState(drawableObject.SaveState());
             caughtObject.Anchor = Anchor.TopCentre;
             caughtObject.Position = position;
             caughtObject.Scale *= caught_fruit_scale_adjust;
@@ -407,41 +420,50 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private CaughtObject getDroppedObject(CaughtObject caughtObject)
+        private CaughtObject getDroppedObject(CatchObjectState state)
         {
-            var droppedObject = getCaughtObject(caughtObject.HitObject);
+            var droppedObject = getCaughtObject(state.HitObject);
             Debug.Assert(droppedObject != null);
 
-            droppedObject.CopyStateFrom(caughtObject);
+            droppedObject.RestoreState(state);
             droppedObject.Anchor = Anchor.TopLeft;
-            droppedObject.Position = caughtObjectContainer.ToSpaceOfOtherDrawable(caughtObject.DrawPosition, droppedObjectTarget);
+            droppedObject.Position = caughtObjectContainer.ToSpaceOfOtherDrawable(state.DisplayPosition, droppedObjectTarget);
 
             return droppedObject;
         }
 
         private void clearPlate(DroppedObjectAnimation animation)
         {
-            var caughtObjects = caughtObjectContainer.Children.ToArray();
+            int caughtCount = caughtObjectContainer.Children.Count;
+            CatchObjectState[] states = ArrayPool<CatchObjectState>.Shared.Rent(caughtCount);
 
-            caughtObjectContainer.Clear(false);
+            try
+            {
+                for (int i = 0; i < caughtCount; i++)
+                    states[i] = caughtObjectContainer.Children[i].SaveState();
 
-            // Use the already returned PoolableDrawables for new objects
-            var droppedObjects = caughtObjects.Select(getDroppedObject).ToArray();
+                caughtObjectContainer.Clear(false);
 
-            droppedObjectTarget.AddRange(droppedObjects);
-
-            foreach (var droppedObject in droppedObjects)
-                applyDropAnimation(droppedObject, animation);
+                for (int i = 0; i < caughtCount; i++)
+                {
+                    CaughtObject obj = getDroppedObject(states[i]);
+                    droppedObjectTarget.Add(obj);
+                    applyDropAnimation(obj, animation);
+                }
+            }
+            finally
+            {
+                ArrayPool<CatchObjectState>.Shared.Return(states);
+            }
         }
 
         private void removeFromPlate(CaughtObject caughtObject, DroppedObjectAnimation animation)
         {
+            CatchObjectState state = caughtObject.SaveState();
             caughtObjectContainer.Remove(caughtObject, false);
 
-            var droppedObject = getDroppedObject(caughtObject);
-
+            var droppedObject = getDroppedObject(state);
             droppedObjectTarget.Add(droppedObject);
-
             applyDropAnimation(droppedObject, animation);
         }
 

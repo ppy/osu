@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override CountryCode GetCountryCode(CountryStatistics item) => item.Code;
 
-        protected override Drawable CreateFlagContent(CountryStatistics item) => new CountryName(item.Code);
+        protected override Drawable[] CreateFlagContent(CountryStatistics item) => [new CountryName(item.Code)];
 
         protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new Drawable[]
         {

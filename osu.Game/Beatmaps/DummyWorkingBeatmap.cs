@@ -30,8 +30,8 @@ namespace osu.Game.Beatmaps
             {
                 Metadata = new BeatmapMetadata
                 {
-                    Artist = "please load a beatmap!",
-                    Title = "no beatmaps available!"
+                    Artist = "please select or load a beatmap!",
+                    Title = "no beatmap selected!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
                 Difficulty = new BeatmapDifficulty
@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps
 
         protected override IBeatmap GetBeatmap() => new Beatmap();
 
-        public override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
+        public override Texture GetBackground() => textures?.Get(@"Backgrounds/bg2");
 
         protected override Track GetBeatmapTrack() => GetVirtualTrack();
 

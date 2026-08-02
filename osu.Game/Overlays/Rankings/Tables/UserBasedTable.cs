@@ -14,6 +14,8 @@ using osu.Game.Users;
 using osu.Game.Scoring;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -61,7 +63,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected sealed override CountryCode GetCountryCode(UserStatistics item) => item.User.CountryCode;
 
-        protected sealed override Drawable CreateFlagContent(UserStatistics item)
+        protected sealed override Drawable[] CreateFlagContent(UserStatistics item)
         {
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true))
             {
@@ -70,7 +72,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 TextAnchor = Anchor.CentreLeft
             };
             username.AddUserLink(item.User);
-            return username;
+            return [new UpdateableTeamFlag(item.User.Team) { Size = new Vector2(40, 20) }, username];
         }
 
         protected sealed override Drawable[] CreateAdditionalContent(UserStatistics item) => new[]

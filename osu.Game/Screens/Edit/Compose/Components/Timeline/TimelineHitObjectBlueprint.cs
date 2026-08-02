@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public partial class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
-        private const float circle_size = 38;
+        private const float circle_size = 32;
 
         private Container? repeatsContainer;
 
@@ -49,6 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Border border;
 
         private readonly Container colouredComponents;
+        private readonly Container sampleComponents;
         private readonly OsuSpriteText comboIndexText;
         private readonly SamplePointPiece samplePointPiece;
         private readonly DifficultyPointPiece? difficultyPointPiece;
@@ -106,7 +109,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 samplePointPiece = new SamplePointPiece(Item)
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopCentre
+                    Origin = Anchor.TopCentre,
+                    RelativePositionAxes = Axes.X,
+                    AlternativeColor = Item is IHasRepeats
+                },
+                sampleComponents = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
 
@@ -235,6 +244,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     X = (float)(i + 1) / (repeats.RepeatCount + 1)
                 });
             }
+
+            // Add node sample pieces
+            sampleComponents.Clear();
+
+            for (int i = 0; i < repeats.RepeatCount + 2; i++)
+            {
+                sampleComponents.Add(new NodeSamplePointPiece(Item, i)
+                {
+                    X = (float)i / (repeats.RepeatCount + 1),
+                    RelativePositionAxes = Axes.X,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopCentre
+                });
+            }
+
+            samplePointPiece.X = 1f / (repeats.RepeatCount + 1) / 2;
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
@@ -265,6 +290,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return !Precision.AlmostIntersects(maskingBounds, rect);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin.IsNotNull())
+                skin.SourceChanged -= updateColour;
+        }
+
         private partial class Tick : Circle
         {
             public Tick()
@@ -279,6 +312,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public partial class DragArea : Circle
         {
             private readonly HitObject? hitObject;
+
+            private readonly List<HitObject> objsToAdjust = new List<HitObject>();
 
             [Resolved]
             private EditorBeatmap beatmap { get; set; } = null!;
@@ -372,6 +407,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             protected override bool OnDragStart(DragStartEvent e)
             {
                 changeHandler?.BeginChange();
+
+                var selectionItems = beatmap.SelectedHitObjects;
+
+                if (!selectionItems.Contains(hitObject))
+                    return true;
+
+                foreach (var item in selectionItems)
+                {
+                    if (item == hitObject || item is not IHasDuration durationItem) continue;
+
+                    if (Precision.AlmostEquals(durationItem.Duration, (hitObject as IHasDuration)!.Duration, 1) &&
+                        Precision.AlmostEquals(item.StartTime, hitObject!.StartTime, 1))
+                    {
+                        objsToAdjust.Add(item);
+                    }
+                }
+
                 return true;
             }
 
@@ -409,7 +461,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     double lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
                                     int proposedCount = Math.Max(0, (int)Math.Round(proposedDuration / lengthOfOneRepeat) - 1);
 
-                                    if (proposedCount == repeatHitObject.RepeatCount || lengthOfOneRepeat == 0)
+                                    if (proposedCount == repeatHitObject.RepeatCount || Precision.AlmostEquals(lengthOfOneRepeat, 0, 1))
                                         return;
 
                                     repeatHitObject.RepeatCount = proposedCount;
@@ -424,8 +476,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 if (endTimeHitObject.EndTime == snappedTime)
                                     return;
 
-                                endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
-                                beatmap.Update(hitObject);
+                                if (!objsToAdjust.Contains(hitObject))
+                                    objsToAdjust.Add(hitObject);
+
+                                foreach (var obj in objsToAdjust)
+                                {
+                                    (obj as IHasDuration)!.Duration = snappedTime - obj.StartTime;
+                                    beatmap.Update(obj);
+                                }
+
                                 break;
                         }
                     }
@@ -441,6 +500,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 changeHandler?.EndChange();
                 OnDragHandled?.Invoke(null);
+                objsToAdjust.Clear();
             }
         }
 
@@ -462,6 +522,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public partial class ExtendableCircle : CompositeDrawable
         {
+            public new ColourInfo Colour
+            {
+                get => Content.Colour;
+                set => Content.Colour = value;
+            }
+
             protected readonly Circle Content;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
@@ -481,7 +547,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = 5,
-                        Colour = Color4.Black.Opacity(0.4f)
+                        Colour = Color4.Black.Opacity(0.05f)
                     }
                 };
             }

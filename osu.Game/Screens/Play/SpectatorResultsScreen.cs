@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
     public partial class SpectatorResultsScreen : SoloResultsScreen
     {
         public SpectatorResultsScreen(ScoreInfo score)
-            : base(score, false)
+            : base(score)
         {
         }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private void userBeganPlaying(int userId, SpectatorState state)
         {
-            if (userId == Score.UserID)
+            if (userId == Score?.UserID)
             {
                 Schedule(() =>
                 {

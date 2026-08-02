@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -23,11 +24,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public int TotalColumns => Stages.Sum(g => g.Columns);
 
         /// <summary>
-        /// The total number of columns that were present in this <see cref="ManiaBeatmap"/> before any user adjustments.
-        /// </summary>
-        public readonly int OriginalTotalColumns;
-
-        /// <summary>
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
         /// <param name="defaultStage">The initial stages.</param>
@@ -35,27 +31,29 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public ManiaBeatmap(StageDefinition defaultStage, int? originalTotalColumns = null)
         {
             Stages.Add(defaultStage);
-            OriginalTotalColumns = originalTotalColumns ?? defaultStage.Columns;
         }
 
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
             int notes = HitObjects.Count(s => s is Note);
             int holdNotes = HitObjects.Count(s => s is HoldNote);
+            int sum = Math.Max(1, notes + holdNotes);
 
             return new[]
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Note Count",
+                    Name = BeatmapStatisticStrings.Notes,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
+                    BarDisplayLength = notes / (float)sum,
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Hold Note Count",
+                    Name = BeatmapStatisticStrings.HoldNotes,
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdNotes.ToString(),
+                    BarDisplayLength = holdNotes / (float)sum,
                 },
             };
         }

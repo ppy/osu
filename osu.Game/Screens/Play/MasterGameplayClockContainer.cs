@@ -7,11 +7,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Overlays;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Screens.Play
 {
@@ -34,27 +35,28 @@ namespace osu.Game.Screens.Play
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
-            MinValue = 0.5,
+            MinValue = 0.05,
             MaxValue = 2,
-            Precision = 0.1,
+            Precision = 0.01,
         };
 
-        private readonly WorkingBeatmap beatmap;
-
-        private Track track;
-
-        private readonly double skipTargetTime;
+        /// <summary>
+        /// Whether the audio playback rate should be validated.
+        /// Mostly disabled for tests.
+        /// </summary>
+        internal bool ShouldValidatePlaybackRate { get; init; }
 
         /// <summary>
-        /// Stores the time at which the last <see cref="StopGameplayClock"/> call was triggered.
-        /// This is used to ensure we resume from that precise point in time, ignoring the proceeding frequency ramp.
-        ///
-        /// Optimally, we'd have gameplay ramp down with the frequency, but I believe this was intentionally disabled
-        /// to avoid fails occurring after the pause screen has been shown.
-        ///
-        /// In the future I want to change this.
+        /// Whether the audio playback is within acceptable ranges.
+        /// Will become false if audio playback is not going as expected.
         /// </summary>
-        internal double? LastStopTime;
+        public IBindable<bool> PlaybackRateValid => playbackRateValid;
+
+        private readonly Bindable<bool> playbackRateValid = new Bindable<bool>(true);
+
+        private readonly IBeatmap beatmap;
+
+        private Track track;
 
         [Resolved]
         private MusicController musicController { get; set; } = null!;
@@ -62,119 +64,66 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Create a new master gameplay clock container.
         /// </summary>
-        /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
-        /// <param name="skipTargetTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
-            : base(beatmap.Track, applyOffsets: true, requireDecoupling: true)
+        /// <param name="working">The beatmap to be used for time and metadata references.</param>
+        /// <param name="gameplayStartTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
+        public MasterGameplayClockContainer(WorkingBeatmap working, double gameplayStartTime)
+            : base(working.Track, applyOffsets: true, requireDecoupling: true)
         {
-            this.beatmap = beatmap;
-            this.skipTargetTime = skipTargetTime;
+            beatmap = working.Beatmap;
+            track = working.Track;
 
-            track = beatmap.Track;
-
-            StartTime = findEarliestStartTime();
+            GameplayStartTime = gameplayStartTime;
+            StartTime = findEarliestStartTime(gameplayStartTime, beatmap, working.Storyboard);
         }
 
-        private double findEarliestStartTime()
+        private static double findEarliestStartTime(double gameplayStartTime, IBeatmap beatmap, Storyboard storyboard)
         {
             // here we are trying to find the time to start playback from the "zero" point.
             // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
 
             // start with the originally provided latest time (if before zero).
-            double time = Math.Min(0, skipTargetTime);
+            double time = Math.Min(0, gameplayStartTime);
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
-            double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
+            double? firstStoryboardEvent = storyboard.EarliestEventTime;
             if (firstStoryboardEvent != null)
                 time = Math.Min(time, firstStoryboardEvent.Value);
 
             // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
             // this is not available as an option in the live editor but can still be applied via .osu editing.
-            double firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
-            if (beatmap.BeatmapInfo.AudioLeadIn > 0)
-                time = Math.Min(time, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+            double firstHitObjectTime = beatmap.HitObjects.First().StartTime;
+            if (beatmap.AudioLeadIn > 0)
+                time = Math.Min(time, firstHitObjectTime - beatmap.AudioLeadIn);
 
             return time;
         }
 
-        protected override void StopGameplayClock()
-        {
-            LastStopTime = GameplayClock.CurrentTime;
-
-            if (IsLoaded)
-            {
-                // During normal operation, the source is stopped after performing a frequency ramp.
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 0, 200, Easing.Out).OnComplete(_ =>
-                {
-                    if (IsPaused.Value)
-                        base.StopGameplayClock();
-                });
-            }
-            else
-            {
-                base.StopGameplayClock();
-
-                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
-                GameplayClock.ExternalPauseFrequencyAdjust.Value = 0;
-
-                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
-                // Without doing this, an initial seek may be performed with the wrong offset.
-                GameplayClock.ProcessFrame();
-            }
-        }
-
         public override void Seek(double time)
         {
-            // Safety in case the clock is seeked while stopped.
-            LastStopTime = null;
+            elapsedValidationTime = null;
 
             base.Seek(time);
-        }
-
-        protected override void PrepareStart()
-        {
-            if (LastStopTime != null)
-            {
-                Seek(LastStopTime.Value);
-                LastStopTime = null;
-            }
-            else
-                base.PrepareStart();
         }
 
         protected override void StartGameplayClock()
         {
             addAdjustmentsToTrack();
-
             base.StartGameplayClock();
-
-            if (IsLoaded)
-            {
-                this.TransformBindableTo(GameplayClock.ExternalPauseFrequencyAdjust, 1, 200, Easing.In);
-            }
-            else
-            {
-                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
-                GameplayClock.ExternalPauseFrequencyAdjust.Value = 1;
-
-                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
-                // Without doing this, an initial seek may be performed with the wrong offset.
-                GameplayClock.ProcessFrame();
-            }
         }
 
         /// <summary>
         /// Skip forward to the next valid skip point.
         /// </summary>
-        public void Skip()
+        /// <param name="fullLength"><c>true</c> to skip as close to gameplay as possible, or <c>false</c> to skip only to the next valid skip point.</param>
+        public void Skip(bool fullLength = false)
         {
-            if (GameplayClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
+            if (GameplayClock.CurrentTime > GameplayStartTime - MINIMUM_SKIP_TIME)
                 return;
 
-            double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
+            double skipTarget = GameplayStartTime - MINIMUM_SKIP_TIME;
 
-            if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
+            if (!fullLength && StartTime < -10000 && GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
                 skipTarget = 0;
 
@@ -188,7 +137,7 @@ namespace osu.Game.Screens.Play
         {
             removeAdjustmentsFromTrack();
 
-            track = new TrackVirtual(beatmap.Track.Length);
+            track = new TrackVirtual(track.Length);
             track.Seek(CurrentTime);
             if (IsRunning)
                 track.Start();
@@ -196,6 +145,57 @@ namespace osu.Game.Screens.Play
 
             addAdjustmentsToTrack();
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            checkPlaybackValidity();
+        }
+
+        #region Clock validation (ensure things are running correctly for local gameplay)
+
+        private double elapsedGameplayClockTime;
+        private double? elapsedValidationTime;
+        private int playbackDiscrepancyCount;
+
+        private const int allowed_playback_discrepancies = 5;
+
+        private void checkPlaybackValidity()
+        {
+            if (!ShouldValidatePlaybackRate)
+                return;
+
+            if (GameplayClock.IsRunning)
+            {
+                elapsedGameplayClockTime += GameplayClock.ElapsedFrameTime;
+
+                if (elapsedValidationTime == null)
+                    elapsedValidationTime = elapsedGameplayClockTime;
+                else
+                    elapsedValidationTime += GameplayClock.Rate * Time.Elapsed;
+
+                if (Math.Abs(elapsedGameplayClockTime - elapsedValidationTime!.Value) > 300)
+                {
+                    if (playbackDiscrepancyCount++ > allowed_playback_discrepancies)
+                    {
+                        if (playbackRateValid.Value)
+                        {
+                            playbackRateValid.Value = false;
+                            Logger.Log("System audio playback is not working as expected. Some online functionality will not work.\n\nPlease check your audio drivers.", level: LogLevel.Important);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Log(
+                            $"Playback discrepancy detected ({playbackDiscrepancyCount} of allowed {allowed_playback_discrepancies}): {elapsedGameplayClockTime:N1} vs {elapsedValidationTime:N1}");
+                    }
+
+                    elapsedValidationTime = null;
+                }
+            }
+        }
+
+        #endregion
 
         private bool speedAdjustmentsApplied;
 
@@ -207,8 +207,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             track.BindAdjustments(AdjustmentsFromMods);
-            track.AddAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.AddAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -219,8 +218,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             track.UnbindAdjustments(AdjustmentsFromMods);
-            track.RemoveAdjustment(AdjustableProperty.Frequency, GameplayClock.ExternalPauseFrequencyAdjust);
-            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
@@ -231,9 +229,8 @@ namespace osu.Game.Screens.Play
             removeAdjustmentsFromTrack();
         }
 
-        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.Beatmap.ControlPointInfo;
+        ControlPointInfo IBeatSyncProvider.ControlPoints => beatmap.ControlPointInfo;
+        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => track.CurrentAmplitudes;
         IClock IBeatSyncProvider.Clock => this;
-
-        ChannelAmplitudes IHasAmplitudes.CurrentAmplitudes => beatmap.TrackLoaded ? beatmap.Track.CurrentAmplitudes : ChannelAmplitudes.Empty;
     }
 }

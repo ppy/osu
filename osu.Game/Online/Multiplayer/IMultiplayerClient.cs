@@ -13,7 +13,7 @@ namespace osu.Game.Online.Multiplayer
     /// <summary>
     /// An interface defining a multiplayer client instance.
     /// </summary>
-    public interface IMultiplayerClient
+    public interface IMultiplayerClient : IStatefulUserHubClient
     {
         /// <summary>
         /// Signals that the room has changed state.
@@ -96,6 +96,14 @@ namespace osu.Game.Online.Multiplayer
         Task UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability);
 
         /// <summary>
+        /// Signals that a user in this room changed their style.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose style changed.</param>
+        /// <param name="beatmapId">The user's beatmap.</param>
+        /// <param name="rulesetId">The user's ruleset.</param>
+        Task UserStyleChanged(int userId, int? beatmapId, int? rulesetId);
+
+        /// <summary>
         /// Signals that a user in this room changed their local mods.
         /// </summary>
         /// <param name="userId">The ID of the user whose mods have changed.</param>
@@ -108,15 +116,16 @@ namespace osu.Game.Online.Multiplayer
         Task LoadRequested();
 
         /// <summary>
-        /// Signals that loading of gameplay is to be aborted.
-        /// </summary>
-        Task LoadAborted();
-
-        /// <summary>
         /// Signals that gameplay has started.
         /// All users in the <see cref="MultiplayerUserState.Loaded"/> or <see cref="MultiplayerUserState.ReadyForGameplay"/> states should begin gameplay as soon as possible.
         /// </summary>
         Task GameplayStarted();
+
+        /// <summary>
+        /// Signals that gameplay has been aborted.
+        /// </summary>
+        /// <param name="reason">The reason why gameplay was aborted.</param>
+        Task GameplayAborted(GameplayAbortReason reason);
 
         /// <summary>
         /// Signals that the match has ended, all players have finished and results are ready to be displayed.
@@ -140,5 +149,15 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="item">The changed item.</param>
         Task PlaylistItemChanged(MultiplayerPlaylistItem item);
+
+        /// <summary>
+        /// Signals that a user has requested to skip the beatmap intro.
+        /// </summary>
+        Task UserVotedToSkipIntro(int userId, bool voted);
+
+        /// <summary>
+        /// Signals that the vote to skip the beatmap intro has passed.
+        /// </summary>
+        Task VoteToSkipIntroPassed();
     }
 }

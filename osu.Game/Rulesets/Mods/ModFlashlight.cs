@@ -6,12 +6,14 @@ using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Layout;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -33,6 +35,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Restricted view area.";
+        public override bool Ranked => UsesDefaultConfiguration;
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public abstract BindableFloat SizeMultiplier { get; }
@@ -56,9 +59,6 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             Combo.BindTo(scoreProcessor.Combo);
-
-            // Default value of ScoreProcessor's Rank in Flashlight Mod should be SS+
-            scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
@@ -82,12 +82,24 @@ namespace osu.Game.Rulesets.Mods
 
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
-            // Flashlight mods should always draw above any other mod adding overlays.
-            flashlight.Depth = float.MinValue;
 
             flashlight.Combo.BindTo(Combo);
 
-            drawableRuleset.Overlays.Add(flashlight);
+            var playfieldDrawInfoTracker = new PlayfieldDrawInfoTracker();
+
+            drawableRuleset.PlayfieldAdjustmentContainer.Add(playfieldDrawInfoTracker);
+            flashlight.PlayfieldDrawInfoTracker = playfieldDrawInfoTracker;
+
+            drawableRuleset.Overlays.Add(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                // workaround for 1px gaps on the edges of the playfield which would sometimes show with "gameplay" screen scaling active.
+                Padding = new MarginPadding(-1),
+                Child = flashlight,
+                // Flashlight mods should always draw above any other mod adding overlays.
+                // NegativeInfinity is not used to allow one more thing drawn on top (used in replay analysis overlay in osu!).
+                Depth = float.MinValue,
+            });
         }
 
         protected abstract Flashlight CreateFlashlight();
@@ -101,6 +113,10 @@ namespace osu.Game.Rulesets.Mods
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
 
             public override bool RemoveCompletedTransforms => false;
+
+            internal PlayfieldDrawInfoTracker PlayfieldDrawInfoTracker { get; set; } = null!;
+
+            private DrawInfo playfieldDrawInfo => PlayfieldDrawInfoTracker.DrawInfo;
 
             private readonly float defaultFlashlightSize;
             private readonly float sizeMultiplier;
@@ -135,13 +151,15 @@ namespace osu.Game.Rulesets.Mods
                     isBreakTime.BindTo(player.IsBreakTime);
                     isBreakTime.BindValueChanged(_ => UpdateFlashlightSize(GetSize()), true);
                 }
+
+                PlayfieldDrawInfoTracker.OnDrawInfoInvalidate += () => Invalidate(Invalidation.DrawNode);
             }
 
             protected abstract void UpdateFlashlightSize(float size);
 
             protected abstract string FragmentShader { get; }
 
-            protected float GetSize()
+            public float GetSize()
             {
                 float size = defaultFlashlightSize * sizeMultiplier;
 
@@ -245,14 +263,18 @@ namespace osu.Game.Rulesets.Mods
                     shader = Source.shader;
                     screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
                     flashlightPosition = Vector2Extensions.Transform(Source.FlashlightPosition, DrawInfo.Matrix);
-                    flashlightSize = Source.FlashlightSize * DrawInfo.Matrix.ExtractScale().Xy;
+
+                    // scale the flashlight based on the playfield to match gameplay components scale.
+                    Vector2 drawInfoScale = Source.playfieldDrawInfo.Matrix.ExtractScale().Xy;
+                    flashlightSize = Source.FlashlightSize * drawInfoScale;
+
                     flashlightDim = Source.FlashlightDim;
                     flashlightSmoothness = Source.flashlightSmoothness;
                 }
 
                 private IUniformBuffer<FlashlightParameters>? flashlightParametersBuffer;
 
-                public override void Draw(IRenderer renderer)
+                protected override void Draw(IRenderer renderer)
                 {
                     base.Draw(renderer);
 
@@ -298,6 +320,34 @@ namespace osu.Game.Rulesets.Mods
                     public UniformFloat Dim;
                     public UniformFloat Smoothness;
                     private readonly UniformPadding8 pad1;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The purpose of this component is to track any changes to <c>Playfield.Parent.DrawInfo</c>
+        /// (by being added to the content of <see cref="PlayfieldAdjustmentContainer"/>).
+        /// All in order for the flashlight to invalidate its draw node and read any changes in the playfield's scaling.
+        /// </summary>
+        internal partial class PlayfieldDrawInfoTracker : Component
+        {
+            private readonly LayoutValue drawInfoLayout = new LayoutValue(Invalidation.DrawInfo);
+
+            public Action? OnDrawInfoInvalidate;
+
+            public PlayfieldDrawInfoTracker()
+            {
+                AddLayout(drawInfoLayout);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (!drawInfoLayout.IsValid)
+                {
+                    OnDrawInfoInvalidate?.Invoke();
+                    drawInfoLayout.Validate();
                 }
             }
         }

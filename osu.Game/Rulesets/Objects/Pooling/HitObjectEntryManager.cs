@@ -47,11 +47,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
         {
             HitObject hitObject = entry.HitObject;
 
-            if (entryMap.ContainsKey(hitObject))
+            if (!entryMap.TryAdd(hitObject, entry))
                 throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is already added to this {nameof(HitObjectEntryManager)}.");
-
-            // Add the entry.
-            entryMap[hitObject] = entry;
 
             // If the entry has a parent, set it and add the entry to the parent's children.
             if (parent != null)
@@ -72,10 +69,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
             HitObject hitObject = entry.HitObject;
 
-            if (!entryMap.ContainsKey(hitObject))
+            if (!entryMap.Remove(hitObject))
                 throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is not contained in this {nameof(HitObjectEntryManager)}.");
-
-            entryMap.Remove(hitObject);
 
             // If the entry has a parent, unset it and remove the entry from the parents' children.
             if (parentMap.Remove(entry, out var parent) && entryMap.TryGetValue(parent, out var parentEntry))

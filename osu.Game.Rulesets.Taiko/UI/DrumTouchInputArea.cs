@@ -59,11 +59,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 350,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.45f,
                     Y = 20,
                     Masking = true,
-                    FillMode = FillMode.Fit,
                     Children = new Drawable[]
                     {
                         mainContent = new Container
@@ -179,10 +178,9 @@ namespace osu.Game.Rulesets.Taiko.UI
             TaikoAction taikoAction = getTaikoActionFromPosition(position);
 
             // Not too sure how this can happen, but let's avoid throwing.
-            if (trackedActions.ContainsKey(source))
+            if (!trackedActions.TryAdd(source, taikoAction))
                 return;
 
-            trackedActions.Add(source, taikoAction);
             keyBindingContainer.TriggerPressed(taikoAction);
         }
 

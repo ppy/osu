@@ -14,15 +14,16 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => CommonStrings.Beatmaps;
 
-        private SettingsButton deleteBeatmapsButton = null!;
-        private SettingsButton deleteBeatmapVideosButton = null!;
-        private SettingsButton restoreButton = null!;
-        private SettingsButton undeleteButton = null!;
+        private SettingsButtonV2 deleteBeatmapsButton = null!;
+        private SettingsButtonV2 deleteBeatmapVideosButton = null!;
+        private SettingsButtonV2 resetOffsetsButton = null!;
+        private SettingsButtonV2 restoreButton = null!;
+        private SettingsButtonV2 undeleteButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps, IDialogOverlay? dialogOverlay)
         {
-            Add(deleteBeatmapsButton = new DangerousSettingsButton
+            Add(deleteBeatmapsButton = new DangerousSettingsButtonV2
             {
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmaps,
                 Action = () =>
@@ -31,25 +32,39 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete()).ContinueWith(_ => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.Beatmaps));
                 }
             });
 
-            Add(deleteBeatmapVideosButton = new DangerousSettingsButton
+            Add(deleteBeatmapVideosButton = new DangerousSettingsButtonV2
             {
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmapVideos,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new MassVideoDeleteConfirmationDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteBeatmapVideosButton.Enabled.Value = false;
                         Task.Run(beatmaps.DeleteAllVideos).ContinueWith(_ => Schedule(() => deleteBeatmapVideosButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.BeatmapVideos));
                 }
             });
+
+            Add(resetOffsetsButton = new DangerousSettingsButtonV2
+            {
+                Text = MaintenanceSettingsStrings.ResetAllOffsets,
+                Action = () =>
+                {
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
+                    {
+                        resetOffsetsButton.Enabled.Value = false;
+                        Task.Run(beatmaps.ResetAllOffsets).ContinueWith(_ => Schedule(() => resetOffsetsButton.Enabled.Value = true));
+                    }, DeleteConfirmationContentStrings.Offsets));
+                }
+            });
+
             AddRange(new Drawable[]
             {
-                restoreButton = new SettingsButton
+                restoreButton = new SettingsButtonV2
                 {
                     Text = MaintenanceSettingsStrings.RestoreAllHiddenDifficulties,
                     Action = () =>
@@ -58,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Task.Run(beatmaps.RestoreAll).ContinueWith(_ => Schedule(() => restoreButton.Enabled.Value = true));
                     }
                 },
-                undeleteButton = new SettingsButton
+                undeleteButton = new SettingsButtonV2
                 {
                     Text = MaintenanceSettingsStrings.RestoreAllRecentlyDeletedBeatmaps,
                     Action = () =>

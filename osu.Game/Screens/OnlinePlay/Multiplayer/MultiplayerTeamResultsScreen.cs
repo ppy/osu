@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,8 +26,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     {
         private readonly SortedDictionary<int, BindableLong> teamScores;
 
-        private Container winnerBackground;
-        private Drawable winnerText;
+        private Container winnerBackground = null!;
+        private Drawable winnerText = null!;
 
         public MultiplayerTeamResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, SortedDictionary<int, BindableLong> teamScores)
             : base(score, roomId, playlistItem)
@@ -41,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()

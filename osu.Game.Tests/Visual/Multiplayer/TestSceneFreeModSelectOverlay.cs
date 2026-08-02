@@ -1,34 +1,46 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay;
+using osu.Game.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public partial class TestSceneFreeModSelectOverlay : MultiplayerTestScene
+    public partial class TestSceneFreeModSelectOverlay : ScreenTestScene
     {
-        private FreeModSelectOverlay freeModSelectOverlay;
+        private TestFreeModSelectOverlayScreen screen = null!;
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+        private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>([]);
+
+        private FreeModSelectOverlay freeModSelectOverlay => screen.Overlay;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGameBase)
         {
             availableMods.BindTo(osuGameBase.AvailableMods);
+        }
+
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("reset selected mods", () => freeMods.Value = []);
         }
 
         [Test]
@@ -40,12 +52,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 () => this.ChildrenOfType<ModPanel>()
                           .Where(panel => panel.IsPresent)
                           .All(panel => panel.Mod.HasImplementation && panel.Mod.UserPlayable));
-
-            AddToggleStep("toggle visibility", visible =>
-            {
-                if (freeModSelectOverlay != null)
-                    freeModSelectOverlay.State.Value = visible ? Visibility.Visible : Visibility.Hidden;
-            });
         }
 
         [Test]
@@ -55,7 +61,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("select difficulty adjust", () => freeModSelectOverlay.SelectedMods.Value = new[] { new OsuModDifficultyAdjust() });
             AddWaitStep("wait some", 3);
-            AddAssert("customisation area not expanded", () => this.ChildrenOfType<ModSettingsArea>().Single().Height == 0);
+            AddAssert("customisation area not expanded",
+                () => this.ChildrenOfType<ModCustomisationPanel>().Single().ExpandedState.Value,
+                () => Is.EqualTo(ModCustomisationPanel.ModCustomisationPanelState.Collapsed));
         }
 
         [Test]
@@ -67,18 +75,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
 
-            AddStep("click select all button", navigateAndClick<SelectAllModsButton>);
+            AddStep("click select all button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectAllModsButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
             AddAssert("select all button disabled", () => !this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
 
             AddStep("change search term", () => freeModSelectOverlay.SearchTerm = "e");
 
             AddAssert("select all button enabled", () => this.ChildrenOfType<SelectAllModsButton>().Single().Enabled.Value);
-
-            void navigateAndClick<T>() where T : Drawable
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<T>().Single());
-                InputManager.Click(MouseButton.Left);
-            }
         }
 
         [Test]
@@ -121,10 +127,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createFreeModSelect()
         {
-            AddStep("create free mod select screen", () => Child = freeModSelectOverlay = new FreeModSelectOverlay
+            AddStep("create free mod select screen", () => LoadScreen(screen = new TestFreeModSelectOverlayScreen
             {
-                State = { Value = Visibility.Visible }
-            });
+                FreeMods = { BindTarget = freeMods },
+            }));
+            AddUntilStep("wait until screen is loaded", () => screen.IsLoaded, () => Is.True);
+            AddStep("show overlay", () => freeModSelectOverlay.Show());
             AddUntilStep("all column content loaded",
                 () => freeModSelectOverlay.ChildrenOfType<ModColumn>().Any()
                       && freeModSelectOverlay.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
@@ -134,9 +142,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             var allAvailableMods = availableMods.Value
                                                 .Where(pair => pair.Key != ModType.System)
-                                                .SelectMany(pair => pair.Value)
+                                                .SelectMany(pair => ModUtils.FlattenMods(pair.Value))
                                                 .Where(mod => mod.UserPlayable && mod.HasImplementation)
                                                 .ToList();
+
+            if (freeModSelectOverlay.SelectedMods.Value.Count != allAvailableMods.Count)
+                return false;
 
             foreach (var availableMod in allAvailableMods)
             {
@@ -145,6 +156,52 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             return true;
+        }
+
+        private partial class TestFreeModSelectOverlayScreen : OsuScreen
+        {
+            public override bool ShowFooter => true;
+
+            public FreeModSelectOverlay Overlay = null!;
+            private IDisposable? overlayRegistration;
+
+            public readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>([]);
+
+            [Resolved]
+            private IOverlayManager? overlayManager { get; set; }
+
+            [Cached]
+            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(Overlay = new FreeModSelectOverlay
+                {
+                    SelectedMods = { BindTarget = FreeMods },
+                    Ruleset = { BindTarget = Ruleset }
+                });
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() =>
+            [
+                new FooterButtonFreeMods(Overlay)
+                {
+                    FreeMods = { BindTarget = FreeMods },
+                },
+            ];
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                overlayRegistration?.Dispose();
+            }
         }
     }
 }

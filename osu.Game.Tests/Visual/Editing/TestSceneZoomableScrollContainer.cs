@@ -128,12 +128,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Press alt down", () => InputManager.PressKey(Key.AltLeft));
             AddStep("Scroll by 3", () => InputManager.ScrollBy(new Vector2(0, 3)));
             AddAssert("Box not at 0", () => !Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
-            AddAssert("Box 1/4 at 1/4", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.25f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X));
+            AddAssert("Box 1/2 at 1/2", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.5f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.5f * scrollQuad.Size.X));
 
             // Scroll out at 0.25
             AddStep("Scroll by -3", () => InputManager.ScrollBy(new Vector2(0, -3)));
             AddAssert("Box at 0", () => Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
-            AddAssert("Box 1/4 at 1/4", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.25f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X));
+            AddAssert("Box 1/2 at 1/2", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.5f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.5f * scrollQuad.Size.X));
             AddStep("Release alt", () => InputManager.ReleaseKey(Key.AltLeft));
         }
 

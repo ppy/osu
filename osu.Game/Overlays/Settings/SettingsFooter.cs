@@ -1,15 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -24,7 +27,7 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding { Top = 20, Bottom = 30, Horizontal = SettingsPanel.CONTENT_MARGINS };
+            Padding = new MarginPadding { Top = 20, Bottom = 30, Left = SettingsPanel.CONTENT_PADDING.Left, Right = SettingsPanel.CONTENT_PADDING.Right };
 
             FillFlowContainer modes;
 
@@ -69,19 +72,22 @@ namespace osu.Game.Overlays.Settings
 
                     modes.Add(icon);
                 }
-                catch
+                catch (Exception e)
                 {
-                    Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                    RulesetStore.LogRulesetFailure(ruleset, e);
                 }
             }
         }
 
-        private partial class BuildDisplay : OsuAnimatedButton
+        private partial class BuildDisplay : OsuAnimatedButton, IHasContextMenu
         {
             private readonly string version;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
+
+            [Resolved]
+            private OsuGame? game { get; set; }
 
             public BuildDisplay(string version)
             {
@@ -95,7 +101,7 @@ namespace osu.Game.Overlays.Settings
             [BackgroundDependencyLoader]
             private void load(ChangelogOverlay? changelog)
             {
-                Action = () => changelog?.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
+                Action = () => changelog?.ShowBuild(version);
 
                 Add(new OsuSpriteText
                 {
@@ -108,6 +114,11 @@ namespace osu.Game.Overlays.Settings
                     Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
                 });
             }
+
+            public MenuItem[] ContextMenuItems => new MenuItem[]
+            {
+                new OsuMenuItem(SettingsStrings.CopyVersion, MenuItemType.Standard, () => game?.CopyToClipboard(version))
+            };
         }
     }
 }

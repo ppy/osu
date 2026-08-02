@@ -67,14 +67,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Enter mode", performEnterMode);
         }
 
-        [TestCase(Key.P, true)]
-        [TestCase(Key.M, true)]
-        [TestCase(Key.L, true)]
-        [TestCase(Key.E, false)]
-        [TestCase(Key.D, false)]
-        [TestCase(Key.Q, false)]
-        [TestCase(Key.O, false)]
-        public void TestShortcutKeys(Key key, bool entersPlay)
+        [TestCase(Key.P, Key.P)]
+        [TestCase(Key.M, Key.M, Key.L)]
+        [TestCase(Key.M, Key.M, Key.M)]
+        [TestCase(Key.L, Key.L)]
+        [TestCase(Key.B, Key.E, Key.B)]
+        [TestCase(Key.S, Key.E, Key.S)]
+        [TestCase(Key.D)]
+        [TestCase(Key.Q)]
+        [TestCase(Key.O)]
+        public void TestShortcutKeys(params Key[] keys)
         {
             int activationCount = -1;
             AddStep("set up action", () =>
@@ -82,7 +84,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 activationCount = 0;
                 void action() => activationCount++;
 
-                switch (key)
+                switch (keys.First())
                 {
                     case Key.P:
                         buttons.OnSolo = action;
@@ -96,8 +98,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                         buttons.OnPlaylists = action;
                         break;
 
-                    case Key.E:
-                        buttons.OnEdit = action;
+                    case Key.B:
+                        buttons.OnEditBeatmap = action;
+                        break;
+
+                    case Key.S:
+                        buttons.OnEditSkin = action;
                         break;
 
                     case Key.D:
@@ -105,7 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         break;
 
                     case Key.Q:
-                        buttons.OnExit = action;
+                        buttons.OnExit = _ => action();
                         break;
 
                     case Key.O:
@@ -114,16 +120,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
-            AddStep($"press {key}", () => InputManager.Key(key));
+            // trigger out of idle state
+            AddStep($"press {keys.First()}", () => InputManager.Key(keys.First()));
             AddAssert("state is top level", () => buttons.State == ButtonSystemState.TopLevel);
 
-            if (entersPlay)
+            for (int i = 0; i < keys.Length; i++)
             {
-                AddStep("press P", () => InputManager.Key(Key.P));
-                AddAssert("state is play", () => buttons.State == ButtonSystemState.Play);
+                var key = keys[i];
+                AddStep($"press {key}", () => InputManager.Key(key));
+
+                if (i > 0)
+                    AddAssert("state is not top menu", () => buttons.State != ButtonSystemState.TopLevel);
             }
 
-            AddStep($"press {key}", () => InputManager.Key(key));
             AddAssert("action triggered", () => activationCount == 1);
         }
 

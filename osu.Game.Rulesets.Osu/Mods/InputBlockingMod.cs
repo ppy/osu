@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public abstract partial class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IUpdatableByPlayfield
     {
-        public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModRelax), typeof(OsuModCinema) };
         public override ModType Type => ModType.Conversion;
 
@@ -66,6 +65,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void Update(Playfield playfield)
         {
             if (LastAcceptedAction != null && nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
+                LastAcceptedAction = null;
+
+            if (LastAcceptedAction != null && gameplayClock.IsRewinding)
                 LastAcceptedAction = null;
         }
 

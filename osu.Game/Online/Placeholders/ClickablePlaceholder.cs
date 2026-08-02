@@ -17,17 +17,19 @@ namespace osu.Game.Online.Placeholders
 
         public ClickablePlaceholder(LocalisableString actionMessage, IconUsage icon)
         {
+            OsuAnimatedButton button;
             OsuTextFlowContainer textFlow;
 
-            AddArbitraryDrawable(new OsuAnimatedButton
+            AddArbitraryDrawable(button = new OsuAnimatedButton
             {
                 AutoSizeAxes = Framework.Graphics.Axes.Both,
-                Child = textFlow = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
-                {
-                    AutoSizeAxes = Framework.Graphics.Axes.Both,
-                    Margin = new Framework.Graphics.MarginPadding(5)
-                },
                 Action = () => Action?.Invoke()
+            });
+
+            button.Add(textFlow = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
+            {
+                AutoSizeAxes = Framework.Graphics.Axes.Both,
+                Margin = new Framework.Graphics.MarginPadding(5)
             });
 
             textFlow.AddIcon(icon, i =>

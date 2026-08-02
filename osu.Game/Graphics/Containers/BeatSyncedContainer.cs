@@ -73,6 +73,16 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
+        /// <summary>
+        /// The most valid timing point, updated every frame.
+        /// </summary>
+        protected TimingControlPoint TimingPoint { get; private set; } = TimingControlPoint.DEFAULT;
+
+        /// <summary>
+        /// The most valid effect point, updated every frame.
+        /// </summary>
+        protected EffectControlPoint EffectPoint { get; private set; } = EffectControlPoint.DEFAULT;
+
         [Resolved]
         protected IBeatSyncProvider BeatSyncSource { get; private set; } = null!;
 
@@ -82,19 +92,25 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Update()
         {
-            TimingControlPoint timingPoint;
-            EffectControlPoint effectPoint;
-
             IsBeatSyncedWithTrack = BeatSyncSource.Clock.IsRunning;
 
             double currentTrackTime;
 
             if (IsBeatSyncedWithTrack)
             {
-                currentTrackTime = BeatSyncSource.Clock.CurrentTime + EarlyActivationMilliseconds;
+                double early = EarlyActivationMilliseconds;
 
-                timingPoint = BeatSyncSource.ControlPoints?.TimingPointAt(currentTrackTime) ?? TimingControlPoint.DEFAULT;
-                effectPoint = BeatSyncSource.ControlPoints?.EffectPointAt(currentTrackTime) ?? EffectControlPoint.DEFAULT;
+                // In the case of gameplay, we are usually within a hierarchy with the correct rate applied to our `Drawable.Clock`.
+                // This means that the amount of early adjustment is adjusted in line with audio track rate changes.
+                // But other cases like the osu! logo at the main menu won't correctly have this rate information.
+                // We can adjust here to ensure the applied early activation always matches expectations.
+                if (Clock.Rate > 0)
+                    early *= BeatSyncSource.Clock.Rate / Clock.Rate;
+
+                currentTrackTime = BeatSyncSource.Clock.CurrentTime + early;
+
+                TimingPoint = BeatSyncSource.ControlPoints?.TimingPointAt(currentTrackTime) ?? TimingControlPoint.DEFAULT;
+                EffectPoint = BeatSyncSource.ControlPoints?.EffectPointAt(currentTrackTime) ?? EffectControlPoint.DEFAULT;
             }
             else
             {
@@ -102,28 +118,28 @@ namespace osu.Game.Graphics.Containers
                 // we still want to show an idle animation, so use this container's time instead.
                 currentTrackTime = Clock.CurrentTime + EarlyActivationMilliseconds;
 
-                timingPoint = TimingControlPoint.DEFAULT;
-                effectPoint = EffectControlPoint.DEFAULT;
+                TimingPoint = TimingControlPoint.DEFAULT;
+                EffectPoint = EffectControlPoint.DEFAULT;
             }
 
-            double beatLength = timingPoint.BeatLength / Divisor;
+            double beatLength = TimingPoint.BeatLength / Divisor;
 
             while (beatLength < MinimumBeatLength)
                 beatLength *= 2;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (timingPoint.OmitFirstBarLine ? 1 : 0);
+            int beatIndex = (int)((currentTrackTime - TimingPoint.Time) / beatLength) - (TimingPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
-            if (currentTrackTime < timingPoint.Time)
+            if (currentTrackTime < TimingPoint.Time)
                 beatIndex--;
 
-            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % beatLength;
+            TimeUntilNextBeat = (TimingPoint.Time - currentTrackTime) % beatLength;
             if (TimeUntilNextBeat <= 0)
                 TimeUntilNextBeat += beatLength;
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
-            if (ReferenceEquals(timingPoint, lastTimingPoint) && beatIndex == lastBeat)
+            if (ReferenceEquals(TimingPoint, lastTimingPoint) && beatIndex == lastBeat)
                 return;
 
             // as this event is sometimes used for sound triggers where `BeginDelayedSequence` has no effect, avoid firing it if too far away from the beat.
@@ -131,13 +147,13 @@ namespace osu.Game.Graphics.Containers
             if (AllowMistimedEventFiring || Math.Abs(TimeSinceLastBeat) < MISTIMED_ALLOWANCE)
             {
                 using (BeginDelayedSequence(-TimeSinceLastBeat))
-                    OnNewBeat(beatIndex, timingPoint, effectPoint, BeatSyncSource.CurrentAmplitudes);
+                    OnNewBeat(beatIndex, TimingPoint, EffectPoint, BeatSyncSource.CurrentAmplitudes);
             }
 
             lastBeat = beatIndex;
-            lastTimingPoint = timingPoint;
+            lastTimingPoint = TimingPoint;
 
-            IsKiaiTime = effectPoint.KiaiMode;
+            IsKiaiTime = EffectPoint.KiaiMode;
         }
     }
 }

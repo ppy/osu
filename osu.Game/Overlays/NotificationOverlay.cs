@@ -13,9 +13,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays
 {
     public partial class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
-        public string IconTexture => "Icons/Hexacons/notification";
+        public IconUsage Icon => OsuIcon.Notification;
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
         public LocalisableString Description => NotificationsStrings.HeaderDescription;
 
@@ -160,16 +162,17 @@ namespace osu.Game.Overlays
         private int runningDepth;
 
         private readonly Scheduler postScheduler = new Scheduler();
+        private readonly Scheduler criticalPostScheduler = new Scheduler();
 
         public override bool IsPresent =>
             // Delegate presence as we need to consider the toast tray in addition to the main overlay.
-            State.Value == Visibility.Visible || mainContent.IsPresent || toastTray.IsPresent || postScheduler.HasPendingTasks;
+            State.Value == Visibility.Visible || mainContent.IsPresent || toastTray.IsPresent || postScheduler.HasPendingTasks || criticalPostScheduler.HasPendingTasks;
 
         private bool processingPosts = true;
 
         private double? lastSamplePlayback;
 
-        public void Post(Notification notification) => postScheduler.Add(() =>
+        public void Post(Notification notification) => (notification.IsCritical ? criticalPostScheduler : postScheduler).Add(() =>
         {
             ++runningDepth;
 
@@ -178,7 +181,7 @@ namespace osu.Game.Overlays
             notification.Closed += () => notificationClosed(notification);
 
             if (notification is IHasCompletionTarget hasCompletionTarget)
-                hasCompletionTarget.CompletionTarget = Post;
+                hasCompletionTarget.CompletionTarget ??= Post;
 
             playDebouncedSample(notification.PopInSampleName);
 
@@ -218,6 +221,8 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
+            criticalPostScheduler.Update();
+
             if (processingPosts)
                 postScheduler.Update();
         }
@@ -225,10 +230,10 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             this.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            mainContent.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(1, TRANSITION_LENGTH / 2, Easing.OutQuint);
             mainContent.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
-            toastTray.FlushAllToasts();
+            toastTray.FlushAllToasts(true);
         }
 
         protected override void PopOut()
@@ -238,7 +243,7 @@ namespace osu.Game.Overlays
             markAllRead();
 
             this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
-            mainContent.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
+            mainContent.FadeTo(0, TRANSITION_LENGTH / 2, Easing.OutQuint);
             mainContent.FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.In);
         }
 

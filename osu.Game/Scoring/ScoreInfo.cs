@@ -47,8 +47,15 @@ namespace osu.Game.Scoring
         public BeatmapInfo? BeatmapInfo { get; set; }
 
         /// <summary>
+        /// The version of the client this score was set using.
+        /// Sourced from <see cref="OsuGameBase.Version"/> at the point of score submission.
+        /// </summary>
+        public string ClientVersion { get; set; } = string.Empty;
+
+        /// <summary>
         /// The <see cref="osu.Game.Beatmaps.BeatmapInfo.Hash"/> at the point in time when the score was set.
         /// </summary>
+        [Indexed]
         public string BeatmapHash { get; set; } = string.Empty;
 
         public RulesetInfo Ruleset { get; set; } = null!;
@@ -59,7 +66,18 @@ namespace osu.Game.Scoring
 
         public bool DeletePending { get; set; }
 
+        /// <summary>
+        /// The total number of points awarded for the score.
+        /// </summary>
         public long TotalScore { get; set; }
+
+        /// <summary>
+        /// The total number of points awarded for the score without including mod multipliers.
+        /// </summary>
+        /// <remarks>
+        /// The purpose of this property is to enable future lossless rebalances of mod multipliers.
+        /// </remarks>
+        public long TotalScoreWithoutMods { get; set; }
 
         /// <summary>
         /// The version of processing applied to calculate total score as stored in the database.
@@ -102,6 +120,12 @@ namespace osu.Game.Scoring
         public double? PP { get; set; }
 
         /// <summary>
+        /// Whether the performance points in this score is awarded to the player. This is used for online display purposes (see <see cref="SoloScoreInfo.Ranked"/>).
+        /// </summary>
+        [Ignored]
+        public bool Ranked { get; set; }
+
+        /// <summary>
         /// The online ID of this score.
         /// </summary>
         /// <remarks>
@@ -132,6 +156,8 @@ namespace osu.Game.Scoring
         [MapTo("MaximumStatistics")]
         public string MaximumStatisticsJson { get; set; } = string.Empty;
 
+        public IList<int> Pauses { get; } = null!;
+
         public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
             Ruleset = ruleset ?? new RulesetInfo();
@@ -142,7 +168,7 @@ namespace osu.Game.Scoring
         }
 
         [UsedImplicitly] // Realm
-        private ScoreInfo()
+        protected ScoreInfo()
         {
         }
 
@@ -201,6 +227,7 @@ namespace osu.Game.Scoring
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
             clone.MaximumStatistics = new Dictionary<HitResult, int>(clone.MaximumStatistics);
+            clone.HitEvents = new List<HitEvent>(clone.HitEvents);
 
             // Ensure we have fresh mods to avoid any references (ie. after gameplay).
             clone.clearAllMods();
@@ -335,30 +362,15 @@ namespace osu.Game.Scoring
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
-            foreach (var r in Ruleset.CreateInstance().GetHitResults())
+            foreach (var r in Ruleset.CreateInstance().GetHitResultsForDisplay())
             {
                 int value = Statistics.GetValueOrDefault(r.result);
 
                 switch (r.result)
                 {
                     case HitResult.SmallTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
-
-                        break;
-                    }
-
                     case HitResult.LargeTickHit:
-                    {
-                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
-                        if (total > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
-
-                        break;
-                    }
-
+                    case HitResult.SliderTailHit:
                     case HitResult.LargeBonus:
                     case HitResult.SmallBonus:
                         if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)

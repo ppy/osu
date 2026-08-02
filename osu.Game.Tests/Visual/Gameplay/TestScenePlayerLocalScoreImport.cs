@@ -41,6 +41,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private BeatmapSetInfo? importedSet;
 
+        [Resolved]
+        private OsuGameBase osu { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
@@ -135,8 +138,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
 
             // Player creates new instance of mods after gameplay to ensure any runtime references to drawables etc. are not retained.
-            AddAssert("results screen score has copied mods", () => (Player.GetChildScreen() as ResultsScreen)?.Score.Mods.First(), () => Is.Not.SameAs(playerMods.First()));
-            AddAssert("results screen score has matching", () => (Player.GetChildScreen() as ResultsScreen)?.Score.Mods.First(), () => Is.EqualTo(playerMods.First()));
+            AddAssert("results screen score has copied mods", () => (Player.GetChildScreen() as ResultsScreen)?.Score?.Mods.First(), () => Is.Not.SameAs(playerMods.First()));
+            AddAssert("results screen score has matching", () => (Player.GetChildScreen() as ResultsScreen)?.Score?.Mods.First(), () => Is.EqualTo(playerMods.First()));
 
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
             AddUntilStep("databased score has correct mods", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID))!.Mods.First(), () => Is.EqualTo(playerMods.First()));
@@ -153,6 +156,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+            AddUntilStep("score has correct version", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID)!.ClientVersion), () => Is.EqualTo(osu.Version));
         }
 
         [Test]
@@ -180,7 +184,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest();
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
-            AddStep("log back in", () => API.Login("username", "password"));
+            AddStep("log back in", () =>
+            {
+                API.Login("username", "password");
+                ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
+            });
 
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
@@ -213,7 +221,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             string? filePath = null;
 
             // Files starting with _ are temporary, created by CreateFileSafely call.
-            AddUntilStep("wait for export file", () => filePath = LocalStorage.GetFiles("exports").SingleOrDefault(f => !Path.GetFileName(f).StartsWith("_", StringComparison.Ordinal)), () => Is.Not.Null);
+            AddUntilStep("wait for export file", () => filePath = LocalStorage.GetFiles("exports").SingleOrDefault(f => !Path.GetFileName(f).StartsWith('_')), () => Is.Not.Null);
             AddUntilStep("filesize is non-zero", () =>
             {
                 try
@@ -247,6 +255,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddUntilStep("score in database", () => Realm.Run(r => r.Find<ScoreInfo>(Player.Score.ScoreInfo.ID) != null));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private class CustomRuleset : OsuRuleset, ILegacyRuleset

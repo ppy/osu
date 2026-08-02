@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -32,51 +33,65 @@ namespace osu.Game.Overlays.Toolbar
 
         private IBindable<APIState> apiState = null!;
 
+        private OsuSpriteText usernameText = null!;
+
         public ToolbarUserButton()
         {
-            AutoSizeAxes = Axes.X;
+            ButtonContent.AutoSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IAPIProvider api, LoginOverlay? login)
         {
-            Add(new OpaqueBackground { Depth = 1 });
-
-            Flow.Add(new Container
+            Flow.AddRange(new Drawable[]
             {
-                Masking = true,
-                CornerRadius = 4,
-                Size = new Vector2(32),
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                EdgeEffect = new EdgeEffectParameters
+                usernameText = new OsuSpriteText
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 4,
-                    Colour = Color4.Black.Opacity(0.1f),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Margin = new MarginPadding { Right = 5 },
                 },
-                Children = new Drawable[]
+                new Container
                 {
-                    avatar = new UpdateableAvatar(isInteractive: false)
+                    Masking = true,
+                    CornerRadius = 4,
+                    Size = new Vector2(32),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 4,
+                        Colour = Color4.Black.Opacity(0.1f),
                     },
-                    spinner = new LoadingLayer(dimBackground: true, withBox: false, blockInput: false)
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    failingIcon = new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Alpha = 0,
-                        Size = new Vector2(0.3f),
-                        Icon = FontAwesome.Solid.ExclamationTriangle,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.YellowLight,
-                    },
+                        avatar = new UpdateableAvatar(isInteractive: false)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        spinner = new LoadingLayer(dimBackground: true, withBox: false)
+                        {
+                            BlockPositionalInput = false,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        failingIcon = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+                            Size = new Vector2(0.3f),
+                            Icon = FontAwesome.Solid.ExclamationTriangle,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.YellowLight,
+                        },
+                    }
+                },
+                new TransientUserStatisticsUpdateDisplay
+                {
+                    Alpha = 0,
                 }
             });
 
@@ -91,13 +106,13 @@ namespace osu.Game.Overlays.Toolbar
 
         private void userChanged(ValueChangedEvent<APIUser> user) => Schedule(() =>
         {
-            Text = user.NewValue.Username;
+            usernameText.Text = user.NewValue.Username;
             avatar.User = user.NewValue;
         });
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            failingIcon.FadeTo(state.NewValue == APIState.Failing ? 1 : 0, 200, Easing.OutQuint);
+            failingIcon.FadeTo(state.NewValue == APIState.Failing || state.NewValue == APIState.RequiresSecondFactorAuth ? 1 : 0, 200, Easing.OutQuint);
 
             switch (state.NewValue)
             {
@@ -109,6 +124,13 @@ namespace osu.Game.Overlays.Toolbar
                 case APIState.Failing:
                     TooltipText = ToolbarStrings.AttemptingToReconnect;
                     spinner.Show();
+                    failingIcon.Icon = FontAwesome.Solid.ExclamationTriangle;
+                    break;
+
+                case APIState.RequiresSecondFactorAuth:
+                    TooltipText = ToolbarStrings.VerificationRequired;
+                    spinner.Show();
+                    failingIcon.Icon = FontAwesome.Solid.Key;
                     break;
 
                 case APIState.Offline:
@@ -118,7 +140,7 @@ namespace osu.Game.Overlays.Toolbar
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(state.NewValue));
             }
         });
     }

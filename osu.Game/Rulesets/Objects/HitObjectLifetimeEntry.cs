@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -41,7 +40,22 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Whether <see cref="HitObject"/> and all of its nested objects have been judged.
         /// </summary>
-        public bool AllJudged => Judged && NestedEntries.All(h => h.AllJudged);
+        public bool AllJudged
+        {
+            get
+            {
+                if (!Judged)
+                    return false;
+
+                foreach (var entry in NestedEntries)
+                {
+                    if (!entry.AllJudged)
+                        return false;
+                }
+
+                return true;
+            }
+        }
 
         private readonly IBindable<double> startTimeBindable = new BindableDouble();
 

@@ -471,7 +471,7 @@ namespace osu.Game.Tests.Visual.Online
 
             public DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
 
-            public ChannelScrollContainer ScrollContainer => (ChannelScrollContainer)((Container)DrawableChannel.Child).Child;
+            public ChannelScrollContainer ScrollContainer => DrawableChannel.ChildrenOfType<ChannelScrollContainer>().Single();
 
             public FillFlowContainer FillFlow => (FillFlowContainer)ScrollContainer.Child;
 

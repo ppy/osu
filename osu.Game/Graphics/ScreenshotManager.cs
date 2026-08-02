@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Threading;
@@ -19,11 +17,14 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Graphics
 {
@@ -37,30 +38,26 @@ namespace osu.Game.Graphics
         /// </summary>
         public IBindable<bool> CursorVisibility => cursorVisibility;
 
-        private Bindable<ScreenshotFormat> screenshotFormat;
-        private Bindable<bool> captureMenuCursor;
+        [Resolved]
+        private GameHost host { get; set; } = null!;
 
         [Resolved]
-        private GameHost host { get; set; }
+        private Clipboard clipboard { get; set; } = null!;
 
         [Resolved]
-        private Clipboard clipboard { get; set; }
-
-        private Storage storage;
+        private INotificationOverlay notificationOverlay { get; set; } = null!;
 
         [Resolved]
-        private INotificationOverlay notificationOverlay { get; set; }
+        private OsuConfigManager config { get; set; } = null!;
 
-        private Sample shutter;
+        private Storage storage = null!;
+
+        private Sample? shutter;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Storage storage, AudioManager audio)
+        private void load(Storage storage, AudioManager audio)
         {
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-
-            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
-            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
-
             shutter = audio.Samples.Get("UI/shutter");
         }
 
@@ -72,7 +69,7 @@ namespace osu.Game.Graphics
             switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
-                    shutter.Play();
+                    shutter?.Play();
                     TakeScreenshotAsync().FireAndForget();
                     return true;
             }
@@ -90,9 +87,12 @@ namespace osu.Game.Graphics
         {
             Interlocked.Increment(ref screenShotTasks);
 
+            ScreenshotFormat screenshotFormat = config.Get<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            bool captureMenuCursor = config.Get<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
+
             try
             {
-                if (!captureMenuCursor.Value)
+                if (!captureMenuCursor)
                 {
                     cursorVisibility.Value = false;
 
@@ -101,7 +101,7 @@ namespace osu.Game.Graphics
 
                     int framesWaited = 0;
 
-                    using (var framesWaitedEvent = new ManualResetEventSlim(false))
+                    using (ManualResetEventSlim framesWaitedEvent = new ManualResetEventSlim(false))
                     {
                         ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
                         {
@@ -117,17 +117,41 @@ namespace osu.Game.Graphics
                     }
                 }
 
-                using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
+                using (Image<Rgba32>? image = await host.TakeScreenshotAsync().ConfigureAwait(false))
                 {
+                    if (config.Get<ScalingMode>(OsuSetting.Scaling) == ScalingMode.Everything)
+                    {
+                        float posX = config.Get<float>(OsuSetting.ScalingPositionX);
+                        float posY = config.Get<float>(OsuSetting.ScalingPositionY);
+                        float sizeX = config.Get<float>(OsuSetting.ScalingSizeX);
+                        float sizeY = config.Get<float>(OsuSetting.ScalingSizeY);
+
+                        image.Mutate(m =>
+                        {
+                            Rectangle rect = new Rectangle(Point.Empty, m.GetCurrentSize());
+
+                            // Reduce size by user scale settings...
+                            int sx = (rect.Width - (int)(rect.Width * sizeX)) / 2;
+                            int sy = (rect.Height - (int)(rect.Height * sizeY)) / 2;
+                            rect.Inflate(-sx, -sy);
+
+                            // ...then adjust the region based on their positional offset.
+                            rect.X = (int)(rect.X * posX) * 2;
+                            rect.Y = (int)(rect.Y * posY) * 2;
+
+                            m.Crop(rect);
+                        });
+                    }
+
                     clipboard.SetImage(image);
 
-                    (string filename, var stream) = getWritableStream();
+                    (string? filename, Stream? stream) = getWritableStream(screenshotFormat);
 
                     if (filename == null) return;
 
                     using (stream)
                     {
-                        switch (screenshotFormat.Value)
+                        switch (screenshotFormat)
                         {
                             case ScreenshotFormat.Png:
                                 await image.SaveAsPngAsync(stream).ConfigureAwait(false);
@@ -140,13 +164,13 @@ namespace osu.Game.Graphics
                                 break;
 
                             default:
-                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat}.");
                         }
                     }
 
                     notificationOverlay.Post(new SimpleNotification
                     {
-                        Text = $"Screenshot {filename} saved!",
+                        Text = NotificationsStrings.ScreenshotSaved(filename),
                         Activated = () =>
                         {
                             storage.PresentFileExternally(filename);
@@ -164,12 +188,12 @@ namespace osu.Game.Graphics
 
         private static readonly object filename_reservation_lock = new object();
 
-        private (string filename, Stream stream) getWritableStream()
+        private (string? filename, Stream? stream) getWritableStream(ScreenshotFormat format)
         {
             lock (filename_reservation_lock)
             {
-                var dt = DateTime.Now;
-                string fileExt = screenshotFormat.ToString().ToLowerInvariant();
+                DateTime dt = DateTime.Now;
+                string fileExt = format.ToString().ToLowerInvariant();
 
                 string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
                 if (!storage.Exists(withoutIndex))

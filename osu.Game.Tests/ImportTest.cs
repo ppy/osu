@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
@@ -41,7 +43,7 @@ namespace osu.Game.Tests
                 while (!result()) Thread.Sleep(200);
             });
 
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
+            ClassicAssert.True(task.Wait(timeout), failureMessage);
         }
 
         public partial class TestOsuGameBase : OsuGameBase
@@ -64,6 +66,10 @@ namespace osu.Game.Tests
                 // Beatmap must be imported before the collection manager is loaded.
                 if (withBeatmap)
                     BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely();
+
+                // the logic for setting the initial ruleset exists in OsuGame rather than OsuGameBase.
+                // the ruleset bindable is not meant to be nullable, so assign any ruleset in here.
+                Ruleset.Value = RulesetStore.AvailableRulesets.First();
             }
         }
     }

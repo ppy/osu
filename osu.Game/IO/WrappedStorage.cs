@@ -80,8 +80,7 @@ namespace osu.Game.IO
 
         public override Storage GetStorageForDirectory(string path)
         {
-            if (string.IsNullOrEmpty(path))
-                throw new ArgumentException("Must be non-null and not empty string", nameof(path));
+            ArgumentException.ThrowIfNullOrEmpty(path);
 
             if (!path.EndsWith(Path.DirectorySeparatorChar))
                 path += Path.DirectorySeparatorChar;

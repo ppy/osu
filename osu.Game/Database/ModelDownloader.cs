@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Logging;
 using osu.Game.Extensions;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
@@ -55,7 +56,7 @@ namespace osu.Game.Database
 
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"Downloading {request.Model.GetDisplayString()}",
+                Text = NotificationsStrings.Downloading(request.Model.GetDisplayString()),
             };
 
             request.DownloadProgressed += progress =>
@@ -68,18 +69,23 @@ namespace osu.Game.Database
             {
                 Task.Factory.StartNew(async () =>
                 {
-                    bool importSuccessful;
+                    bool importSuccessful = false;
 
-                    if (originalModel != null)
-                        importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel).ConfigureAwait(false)) != null;
-                    else
-                        importSuccessful = (await importer.Import(notification, new[] { new ImportTask(filename) }).ConfigureAwait(false)).Any();
+                    try
+                    {
+                        if (originalModel != null)
+                            importSuccessful = (await importer.ImportAsUpdate(notification, new ImportTask(filename), originalModel).ConfigureAwait(false)) != null;
+                        else
+                            importSuccessful = (await importer.Import(notification, new[] { new ImportTask(filename) }).ConfigureAwait(false)).Any();
+                    }
+                    finally
+                    {
+                        // for now a failed import will be marked as a failed download for simplicity.
+                        if (!importSuccessful)
+                            DownloadFailed?.Invoke(request);
 
-                    // for now a failed import will be marked as a failed download for simplicity.
-                    if (!importSuccessful)
-                        DownloadFailed?.Invoke(request);
-
-                    CurrentDownloads.Remove(request);
+                        CurrentDownloads.Remove(request);
+                    }
                 }, TaskCreationOptions.LongRunning);
             };
 
@@ -126,8 +132,6 @@ namespace osu.Game.Database
 
         private partial class DownloadNotification : ProgressNotification
         {
-            public override bool IsImportant => false;
-
             protected override Notification CreateCompletionNotification() => new SilencedProgressCompletionNotification
             {
                 Activated = CompletionClickAction,
@@ -136,7 +140,10 @@ namespace osu.Game.Database
 
             private partial class SilencedProgressCompletionNotification : ProgressCompletionNotification
             {
-                public override bool IsImportant => false;
+                public SilencedProgressCompletionNotification()
+                {
+                    IsImportant = false;
+                }
             }
         }
     }

@@ -2,6 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Ranking.Statistics
@@ -15,12 +18,12 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// Creates and computes an <see cref="UnstableRate"/> statistic.
         /// </summary>
         /// <param name="hitEvents">Sequence of <see cref="HitEvent"/>s to calculate the unstable rate based on.</param>
-        public UnstableRate(IEnumerable<HitEvent> hitEvents)
-            : base("Unstable Rate")
+        public UnstableRate(IReadOnlyList<HitEvent> hitEvents)
+            : base(RankingStatisticsStrings.UnstableRateTitle)
         {
-            Value = hitEvents.CalculateUnstableRate();
+            Value = hitEvents.CalculateUnstableRate()?.Result;
         }
 
-        protected override string DisplayValue(double? value) => value == null ? "(not available)" : value.Value.ToString(@"N2");
+        protected override LocalisableString DisplayValue(double? value) => value?.ToLocalisableString(@"N2") ?? RankingStatisticsStrings.NotAvailable;
     }
 }

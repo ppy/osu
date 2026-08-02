@@ -13,5 +13,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             : base(stages)
         {
         }
+
+        protected override Stage CreateStage(int firstColumnIndex, StageDefinition stageDefinition, ref ManiaAction columnAction)
+            => new EditorStage(firstColumnIndex, stageDefinition, ref columnAction);
     }
 }

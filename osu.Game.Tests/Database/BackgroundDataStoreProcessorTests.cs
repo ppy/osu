@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,7 +9,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Play;
@@ -20,9 +23,9 @@ namespace osu.Game.Tests.Database
     [HeadlessTest]
     public partial class BackgroundDataStoreProcessorTests : OsuTestScene, ILocalUserPlayInfo
     {
-        public IBindable<bool> IsPlaying => isPlaying;
+        public IBindable<LocalUserPlayingState> PlayingState => isPlaying;
 
-        private readonly Bindable<bool> isPlaying = new Bindable<bool>();
+        private readonly Bindable<LocalUserPlayingState> isPlaying = new Bindable<LocalUserPlayingState>();
 
         private BeatmapSetInfo importedSet = null!;
 
@@ -35,7 +38,7 @@ namespace osu.Game.Tests.Database
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Set not playing", () => isPlaying.Value = false);
+            AddStep("Set not playing", () => isPlaying.Value = LocalUserPlayingState.NotPlaying);
         }
 
         [Test]
@@ -60,12 +63,11 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Run background processor", () =>
-            {
-                Add(new TestBackgroundDataStoreProcessor());
-            });
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
 
-            AddUntilStep("wait for difficulties repopulated", () =>
+            AddAssert("Difficulties repopulated", () =>
             {
                 return Realm.Run(r =>
                 {
@@ -87,7 +89,7 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Set playing", () => isPlaying.Value = true);
+            AddStep("Set playing", () => isPlaying.Value = LocalUserPlayingState.Playing);
 
             AddStep("Reset difficulty", () =>
             {
@@ -99,13 +101,10 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Run background processor", () =>
-            {
-                Add(new TestBackgroundDataStoreProcessor());
-            });
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
 
             AddWaitStep("wait some", 500);
-
             AddAssert("Difficulty still not populated", () =>
             {
                 return Realm.Run(r =>
@@ -115,9 +114,10 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Set not playing", () => isPlaying.Value = false);
+            AddStep("Set not playing", () => isPlaying.Value = LocalUserPlayingState.NotPlaying);
+            AddUntilStep("Wait for completion", () => processor.Completed);
 
-            AddUntilStep("wait for difficulties repopulated", () =>
+            AddAssert("Difficulties repopulated", () =>
             {
                 return Realm.Run(r =>
                 {
@@ -127,8 +127,11 @@ namespace osu.Game.Tests.Database
             });
         }
 
+        [TestCase(30000001)]
         [TestCase(30000002)]
         [TestCase(30000003)]
+        [TestCase(30000004)]
+        [TestCase(30000005)]
         public void TestScoreUpgradeSuccess(int scoreVersion)
         {
             ScoreInfo scoreInfo = null!;
@@ -146,14 +149,17 @@ namespace osu.Game.Tests.Database
                 });
             });
 
-            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
 
-            AddUntilStep("Score version upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(LegacyScoreEncoder.LATEST_VERSION));
+            AddAssert("Score version upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(LegacyScoreEncoder.LATEST_VERSION));
             AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
         }
 
-        [Test]
-        public void TestScoreUpgradeFailed()
+        [TestCase(30000002)]
+        [TestCase(30000013)]
+        public void TestScoreUpgradeFailed(int scoreVersion)
         {
             ScoreInfo scoreInfo = null!;
 
@@ -167,21 +173,81 @@ namespace osu.Game.Tests.Database
                         Ruleset = r.All<RulesetInfo>().First(),
                     })
                     {
-                        TotalScoreVersion = 30000002,
+                        TotalScoreVersion = scoreVersion,
                         IsLegacyScore = true,
                     });
                 });
             });
 
-            AddStep("Run background processor", () => Add(new TestBackgroundDataStoreProcessor()));
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
 
-            AddUntilStep("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.True);
-            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000002));
+            AddAssert("Score marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.True);
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(scoreVersion));
+        }
+
+        [Test]
+        [FlakyTest]
+        public void TestCustomRulesetScoreNotSubjectToUpgrades([Values] bool available)
+        {
+            RulesetInfo rulesetInfo = null!;
+            ScoreInfo scoreInfo = null!;
+            TestBackgroundDataStoreProcessor processor = null!;
+
+            AddStep("Add unavailable ruleset", () => Realm.Write(r => r.Add(rulesetInfo = new RulesetInfo
+            {
+                ShortName = Guid.NewGuid().ToString(),
+                Available = available
+            })));
+
+            AddStep("Add score for unavailable ruleset", () => Realm.Write(r => r.Add(scoreInfo = new ScoreInfo(
+                ruleset: rulesetInfo,
+                beatmap: r.All<BeatmapInfo>().First())
+            {
+                TotalScoreVersion = 30000001
+            })));
+
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
+
+            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
+            AddAssert("Score version not upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(30000001));
+        }
+
+        [Test]
+        public void TestModMultiplierUpgrade()
+        {
+            ScoreInfo scoreInfo = null!;
+
+            AddStep("Add score which requires upgrade (and has beatmap)", () =>
+            {
+                Realm.Write(r =>
+                {
+                    r.Add(scoreInfo = new ScoreInfo(ruleset: r.All<RulesetInfo>().First(), beatmap: r.All<BeatmapInfo>().First())
+                    {
+                        TotalScoreVersion = 30000016,
+                        TotalScore = 1_040_000,
+                        TotalScoreWithoutMods = 1_000_000,
+                        Mods = [new OsuModDoubleTime { SpeedChange = { Value = 1.25 } }]
+                    });
+                });
+            });
+
+            TestBackgroundDataStoreProcessor processor = null!;
+            AddStep("Run background processor", () => Add(processor = new TestBackgroundDataStoreProcessor()));
+            AddUntilStep("Wait for completion", () => processor.Completed);
+
+            AddAssert("Score version upgraded", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScoreVersion), () => Is.EqualTo(LegacyScoreEncoder.LATEST_VERSION));
+            AddAssert("Total score corrected", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.TotalScore), () => Is.EqualTo(1_082_000));
+            AddAssert("Score not marked as failed", () => Realm.Run(r => r.Find<ScoreInfo>(scoreInfo.ID)!.BackgroundReprocessingFailed), () => Is.False);
         }
 
         public partial class TestBackgroundDataStoreProcessor : BackgroundDataStoreProcessor
         {
             protected override int TimeToSleepDuringGameplay => 10;
+
+            public bool Completed => ProcessingTask.IsCompleted;
         }
     }
 }

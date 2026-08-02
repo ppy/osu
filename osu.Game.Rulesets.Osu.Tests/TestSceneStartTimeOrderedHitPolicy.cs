@@ -5,21 +5,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
@@ -31,6 +36,56 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private const double early_miss_window = 1000; // time after -1000 to -500 is considered a miss
         private const double late_miss_window = 500; // time after +500 is considered a miss
+
+        [Test]
+        public void TestClickJustBeforeHitWindowStart()
+        {
+            const double time_circle = 1500;
+            Vector2 positionCircle = OsuPlayfield.BASE_SIZE / 2;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new TestHitCircle
+                {
+                    StartTime = time_circle,
+                    Position = positionCircle,
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_circle - early_miss_window - 10, Position = positionCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_circle - early_miss_window, Position = positionCircle },
+            });
+            AddAssert("hit object shook", () => testPolicy.ClickActions, () => Is.EquivalentTo([ClickAction.Shake]));
+            addJudgementAssert(hitObjects[0], HitResult.Miss);
+            addJudgementOffsetAssert(hitObjects[0], late_miss_window);
+        }
+
+        [Test]
+        public void TestClickJustAfterHitWindowStart()
+        {
+            const double time_circle = 1500;
+            Vector2 positionCircle = OsuPlayfield.BASE_SIZE / 2;
+
+            var hitObjects = new List<OsuHitObject>
+            {
+                new TestHitCircle
+                {
+                    StartTime = time_circle,
+                    Position = positionCircle,
+                }
+            };
+
+            performTest(hitObjects, new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Time = time_circle - early_miss_window + 10, Position = positionCircle, Actions = { OsuAction.LeftButton } },
+                new OsuReplayFrame { Time = time_circle - early_miss_window + 20, Position = positionCircle },
+            });
+            AddAssert("hit object hit", () => testPolicy.ClickActions, () => Is.EquivalentTo([ClickAction.Hit]));
+            addJudgementAssert(hitObjects[0], HitResult.Miss);
+            addJudgementOffsetAssert(hitObjects[0], -early_miss_window + 10);
+        }
 
         /// <summary>
         /// Tests clicking a future circle before the first circle's start time, while the first circle HAS NOT been judged.
@@ -196,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -238,7 +293,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -318,7 +373,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -352,7 +407,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_first_slider,
                     Position = positionFirstSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -362,7 +417,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_second_slider,
                     Position = positionSecondSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -409,6 +464,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private ScoreAccessibleReplayPlayer currentPlayer;
         private List<JudgementResult> judgementResults;
+        private HitPolicyResultInterceptor testPolicy;
 
         private void performTest(List<OsuHitObject> hitObjects, List<ReplayFrame> frames)
         {
@@ -440,6 +496,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
+            AddStep("Substitute hit policy", () =>
+            {
+                var playfield = currentPlayer.ChildrenOfType<OsuPlayfield>().Single();
+                var currentPolicy = playfield.HitPolicy;
+                playfield.HitPolicy = testPolicy = new HitPolicyResultInterceptor(currentPolicy);
+            });
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
@@ -476,15 +538,24 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestHitWindows : HitWindows
         {
-            private static readonly DifficultyRange[] ranges =
-            {
-                new DifficultyRange(HitResult.Great, 500, 500, 500),
-                new DifficultyRange(HitResult.Miss, early_miss_window, early_miss_window, early_miss_window),
-            };
-
             public override bool IsHitResultAllowed(HitResult result) => result == HitResult.Great || result == HitResult.Miss;
 
-            protected override DifficultyRange[] GetRanges() => ranges;
+            public override void SetDifficulty(double difficulty) { }
+
+            public override double WindowFor(HitResult result)
+            {
+                switch (result)
+                {
+                    case HitResult.Great:
+                        return 500;
+
+                    case HitResult.Miss:
+                        return early_miss_window;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(result), result, null);
+                }
+            }
         }
 
         private partial class ScoreAccessibleReplayPlayer : ReplayPlayer
@@ -501,6 +572,34 @@ namespace osu.Game.Rulesets.Osu.Tests
                 })
             {
             }
+        }
+
+        private class HitPolicyResultInterceptor : IHitPolicy
+        {
+            public List<ClickAction> ClickActions { get; } = new List<ClickAction>();
+
+            private readonly IHitPolicy policy;
+
+            public HitPolicyResultInterceptor(IHitPolicy policy)
+            {
+                Debug.Assert(policy is StartTimeOrderedHitPolicy);
+                this.policy = policy;
+            }
+
+            public IHitObjectContainer HitObjectContainer
+            {
+                set => policy.HitObjectContainer = value;
+            }
+
+            public ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result)
+            {
+                var action = policy.CheckHittable(hitObject, time, result);
+                ClickActions.Add(action);
+                return action;
+            }
+
+            public void HandleHit(DrawableHitObject hitObject)
+                => policy.HandleHit(hitObject);
         }
     }
 }

@@ -31,6 +31,9 @@ namespace osu.Game.Screens.Edit.Compose
         [Resolved]
         private IGameplaySettings globalGameplaySettings { get; set; }
 
+        [Resolved]
+        private IBeatSnapProvider beatSnapProvider { get; set; }
+
         private Bindable<string> clipboard { get; set; }
 
         private HitObjectComposer composer;
@@ -69,7 +72,26 @@ namespace osu.Game.Screens.Edit.Compose
             if (ruleset == null || composer == null)
                 return base.CreateTimelineContent();
 
-            return wrapSkinnableContent(new TimelineBlueprintContainer(composer));
+            TimelineBreakDisplay breakDisplay = new TimelineBreakDisplay
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Height = 0.75f,
+            };
+
+            return wrapSkinnableContent(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
+                {
+                    // We want to display this below hitobjects to better expose placement objects visually.
+                    // It needs to be above the blueprint container to handle drags on breaks though.
+                    breakDisplay.CreateProxy(),
+                    new TimelineBlueprintContainer(composer),
+                    breakDisplay
+                }
+            });
         }
 
         private Drawable wrapSkinnableContent(Drawable content)
@@ -116,6 +138,8 @@ namespace osu.Game.Screens.Edit.Compose
             // regardless of whether anything was even selected at all.
             // UX-wise this is generally strange and unexpected, but make it work anyways to preserve muscle memory.
             // note that this means that `getTimestamp()` must handle no-selection case, too.
+            // additionally, note we're intentionally not using `OsuGame.CopyToClipboard()`
+            // because we do not want toasts to pop up on every Ctrl-C press - it'd be disruptive to mappers.
             hostClipboard.SetText(getTimestamp());
 
             if (CanCopy.Value)
@@ -131,7 +155,7 @@ namespace osu.Game.Screens.Edit.Compose
 
             Debug.Assert(objects.Any());
 
-            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
+            double timeOffset = beatSnapProvider.SnapTime(clock.CurrentTime) - objects.Min(o => o.StartTime);
 
             foreach (var h in objects)
                 h.StartTime += timeOffset;

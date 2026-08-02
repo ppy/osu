@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModHardRock : ModHardRock, IApplicableToBeatmapProcessor
     {
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
-
         public void ApplyToBeatmapProcessor(IBeatmapProcessor beatmapProcessor)
         {
             var catchProcessor = (CatchBeatmapProcessor)beatmapProcessor;
@@ -22,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             base.ApplyToDifficulty(difficulty);
 
+            difficulty.OverallDifficulty = Math.Min(difficulty.OverallDifficulty * ADJUST_RATIO, 10.0f);
             difficulty.CircleSize = Math.Min(difficulty.CircleSize * 1.3f, 10.0f); // CS uses a custom 1.3 ratio.
             difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ADJUST_RATIO, 10.0f);
         }

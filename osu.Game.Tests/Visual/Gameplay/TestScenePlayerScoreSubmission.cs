@@ -8,21 +8,28 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -34,12 +41,19 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Func<RulesetInfo, IBeatmap> createCustomBeatmap;
         private Func<Ruleset> createCustomRuleset;
+        private Func<Mod[]> createCustomMods;
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         protected override bool HasCustomSteps => true;
 
-        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new FakeImportingPlayer(false);
+        protected override TestPlayer CreatePlayer(Ruleset ruleset)
+        {
+            if (createCustomMods != null)
+                SelectedMods.Value = SelectedMods.Value.Concat(createCustomMods()).ToList();
+
+            return new FakeImportingPlayer(false);
+        }
 
         protected new FakeImportingPlayer Player => (FakeImportingPlayer)base.Player;
 
@@ -168,6 +182,30 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestEmptyFailStillImports()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(true);
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
+            AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("attempt import", () =>
+            {
+                InputManager.MoveMouseTo(Player.ChildrenOfType<SaveFailedScoreButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for import to start", () => Player.ScoreImportStarted);
+            AddStep("allow import", () => Player.AllowImportCompletion.Release());
+
+            AddUntilStep("import completed", () => Player.ImportedScore, () => Is.Not.Null);
+            AddAssert("ensure no submission", () => Player.SubmittedScore, () => Is.Null);
+        }
+
+        [Test]
         public void TestSubmissionOnFail()
         {
             prepareTestAPI(true);
@@ -179,7 +217,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             addFakeHit();
 
             AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
-            AddStep("exit", () => Player.Exit());
 
             AddUntilStep("wait for submission", () => Player.SubmittedScore != null);
             AddAssert("ensure failing submission", () => Player.SubmittedScore.ScoreInfo.Passed == false);
@@ -193,6 +230,31 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        [Test]
+        public void TestNoSubmissionWhenScoreZero()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest();
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+            AddUntilStep("wait for first result", () => Player.Results.Count > 0);
+
+            AddStep("add fake non-scoring hit", () =>
+            {
+                Player.ScoreProcessor.RevertResult(Player.Results.First());
+                Player.ScoreProcessor.ApplyResult(new OsuJudgementResult(Beatmap.Value.Beatmap.HitObjects.First(), new IgnoreJudgement())
+                {
+                    Type = HitResult.IgnoreHit,
+                });
+            });
 
             AddStep("exit", () => Player.Exit());
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
@@ -254,6 +316,26 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
+        [Test]
+        public void TestNoSubmissionOnLocallyModifiedBeatmapWithOnlineId()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(false, r =>
+            {
+                var beatmap = createTestBeatmap(r);
+                beatmap.BeatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+                return beatmap;
+            });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            addFakeHit();
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
         [TestCase(null)]
         [TestCase(10)]
         public void TestNoSubmissionOnCustomRuleset(int? rulesetId)
@@ -278,13 +360,28 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
-        private void createPlayerTest(bool allowFail = false, Func<RulesetInfo, IBeatmap> createBeatmap = null, Func<Ruleset> createRuleset = null)
+        [Test]
+        public void TestNoSubmissionWithModsOfDifferentRuleset()
+        {
+            prepareTestAPI(true);
+
+            createPlayerTest(createRuleset: () => new OsuRuleset(), createMods: () => new Mod[] { new TaikoModHidden() });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+            AddAssert("gameplay not loaded", () => Player.DrawableRuleset == null);
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        private void createPlayerTest(bool allowFail = false, Func<RulesetInfo, IBeatmap> createBeatmap = null, Func<Ruleset> createRuleset = null, Func<Mod[]> createMods = null)
         {
             CreateTest(() => AddStep("set up requirements", () =>
             {
                 this.allowFail = allowFail;
                 createCustomBeatmap = createBeatmap;
                 createCustomRuleset = createRuleset;
+                createCustomMods = createMods;
             }));
         }
 
@@ -354,11 +451,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             public SemaphoreSlim AllowImportCompletion { get; }
             public Score ImportedScore { get; private set; }
 
+            public new FailOverlay FailOverlay => base.FailOverlay;
+
             public FakeImportingPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
                 : base(allowPause, showResults, pauseOnFocusLost)
             {
                 AllowImportCompletion = new SemaphoreSlim(1);
             }
+
+            protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart)
+            {
+                ShouldValidatePlaybackRate = false,
+            };
 
             protected override async Task ImportScore(Score score)
             {

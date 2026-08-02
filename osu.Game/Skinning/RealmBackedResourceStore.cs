@@ -16,6 +16,8 @@ namespace osu.Game.Skinning
     public class RealmBackedResourceStore<T> : ResourceStore<byte[]>
         where T : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey
     {
+        public event Action? CacheInvalidated;
+
         private Lazy<Dictionary<string, string>> fileToStoragePathMapping;
 
         private readonly Live<T> liveSource;
@@ -29,7 +31,10 @@ namespace osu.Game.Skinning
             invalidateCache();
             Debug.Assert(fileToStoragePathMapping != null);
 
-            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == source.ID), skinChanged);
+            // Required local for iOS. Will cause runtime crash if inlined.
+            Guid id = source.ID;
+
+            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == id), skinChanged);
         }
 
         protected override void Dispose(bool disposing)
@@ -50,15 +55,14 @@ namespace osu.Game.Skinning
             }
         }
 
-        private string? getPathForFile(string filename)
+        private string? getPathForFile(string filename) =>
+            fileToStoragePathMapping.Value.GetValueOrDefault(filename.ToLowerInvariant());
+
+        private void invalidateCache()
         {
-            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string? path))
-                return path;
-
-            return null;
+            fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache);
+            CacheInvalidated?.Invoke();
         }
-
-        private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache);
 
         private Dictionary<string, string> initialiseFileCache() => liveSource.PerformRead(source =>
         {

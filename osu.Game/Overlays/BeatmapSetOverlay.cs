@@ -3,8 +3,6 @@
 
 #nullable disable
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,8 +14,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Overlays.Comments;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Select.Details;
 using osuTK;
 using osuTK.Graphics;
 
@@ -37,14 +33,6 @@ namespace osu.Game.Overlays
 
         private (BeatmapSetLookupType type, int id)? lastLookup;
 
-        /// <remarks>
-        /// Isolates the beatmap set overlay from the game-wide selected mods bindable
-        /// to avoid affecting the beatmap details section (i.e. <see cref="AdvancedStats.StatisticRow"/>).
-        /// </remarks>
-        [Cached]
-        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
         public BeatmapSetOverlay()
             : base(OverlayColourScheme.Blue)
         {
@@ -59,7 +47,10 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
-                    info = new Info(),
+                    info = new Info
+                    {
+                        Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
+                    },
                     new ScoresContainer
                     {
                         Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
@@ -72,11 +63,7 @@ namespace osu.Game.Overlays
             info.BeatmapSet.BindTo(beatmapSet);
             comments.BeatmapSet.BindTo(beatmapSet);
 
-            Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
-            {
-                info.BeatmapInfo = b.NewValue;
-                ScrollFlow.ScrollToStart();
-            };
+            Header.HeaderContent.Picker.Beatmap.ValueChanged += b => ScrollFlow.ScrollToStart();
         }
 
         [BackgroundDependencyLoader]

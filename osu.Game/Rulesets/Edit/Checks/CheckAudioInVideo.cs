@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.IO.FileAbstraction;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Storyboards;
+using osu.Game.Utils;
 using TagLib;
 using File = TagLib.File;
 
@@ -14,7 +16,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckAudioInVideo : ICheck
     {
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Audio track in video files");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Audio track in video files", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -25,10 +27,10 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
             var videoPaths = new List<string>();
 
-            foreach (var layer in context.WorkingBeatmap.Storyboard.Layers)
+            foreach (var layer in context.CurrentDifficulty.Working.Storyboard.Layers)
             {
                 foreach (var element in layer.Elements)
                 {
@@ -58,8 +60,8 @@ namespace osu.Game.Rulesets.Edit.Checks
                 try
                 {
                     // We use TagLib here for platform invariance; BASS cannot detect audio presence on Linux.
-                    using (Stream data = context.WorkingBeatmap.GetStream(storagePath))
-                    using (File tagFile = File.Create(new StreamFileAbstraction(filename, data)))
+                    using (Stream data = context.CurrentDifficulty.Working.GetStream(storagePath))
+                    using (File tagFile = TagLibUtils.GetTagLibFile(filename, data))
                     {
                         if (tagFile.Properties.AudioChannels == 0)
                             continue;
@@ -74,6 +76,11 @@ namespace osu.Game.Rulesets.Edit.Checks
                 catch (UnsupportedFormatException)
                 {
                     issue = new IssueTemplateFileError(this).Create(filename, "Unsupported format");
+                }
+                catch (Exception ex)
+                {
+                    issue = new IssueTemplateFileError(this).Create(filename, "Internal failure - see logs for more info");
+                    Logger.Log($"Failed when running {nameof(CheckAudioInVideo)}: {ex}");
                 }
 
                 yield return issue;

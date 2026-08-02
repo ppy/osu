@@ -8,7 +8,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -23,28 +22,36 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             client.RoomUpdated += onRoomUpdated;
-            client.LoadAborted += onLoadAborted;
+            client.GameplayAborted += onGameplayAborted;
             onRoomUpdated();
         }
 
         private void onRoomUpdated()
         {
-            if (client.Room == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
-
-            Debug.Assert(client.LocalUser != null);
 
             // If the user exits gameplay before score submission completes, we'll transition to idle when results has been prepared.
             if (client.LocalUser.State == MultiplayerUserState.Results && this.IsCurrentScreen())
                 transitionFromResults();
         }
 
-        private void onLoadAborted()
+        private void onGameplayAborted(GameplayAbortReason reason)
         {
             // If the server aborts gameplay for this user (due to loading too slow), exit gameplay screens.
             if (!this.IsCurrentScreen())
             {
-                Logger.Log("Gameplay aborted because loading the beatmap took too long.", LoggingTarget.Runtime, LogLevel.Important);
+                switch (reason)
+                {
+                    case GameplayAbortReason.LoadTookTooLong:
+                        Logger.Log("Gameplay aborted because loading the beatmap took too long.", LoggingTarget.Runtime, LogLevel.Important);
+                        break;
+
+                    case GameplayAbortReason.HostAbortedTheMatch:
+                        Logger.Log("The host aborted the match.", LoggingTarget.Runtime, LogLevel.Important);
+                        break;
+                }
+
                 this.MakeCurrent();
             }
         }
@@ -53,10 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnResuming(e);
 
-            if (client.Room == null)
+            if (client.Room == null || client.LocalUser == null)
                 return;
-
-            Debug.Assert(client.LocalUser != null);
 
             if (!(e.Last is MultiplayerPlayerLoader playerLoader))
                 return;
@@ -82,12 +87,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(client.LocalUser != null);
 
             if (client.LocalUser.State == MultiplayerUserState.Results)
-                client.ChangeState(MultiplayerUserState.Idle);
+                client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            client.LeaveRoom().FireAndForget();
+            return false;
         }
 
         protected override string ScreenTitle => "Multiplayer";
-
-        protected override RoomManager CreateRoomManager() => new MultiplayerRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
 
@@ -98,7 +110,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
+            {
                 client.RoomUpdated -= onRoomUpdated;
+                client.GameplayAborted -= onGameplayAborted;
+            }
         }
     }
 }

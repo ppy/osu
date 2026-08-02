@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             const float vertical_offset = 13;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 label = new OsuSpriteText
                 {
@@ -115,7 +115,9 @@ namespace osu.Game.Graphics.UserInterface
                     KeyboardStep = 0.1f,
                     RelativeSizeAxes = Axes.X,
                     Y = vertical_offset,
-                }
+                },
+                upperBound.Nub.CreateProxy(),
+                lowerBound.Nub.CreateProxy(),
             };
         }
 
@@ -160,6 +162,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected partial class BoundSlider : RoundedSliderBar<double>
         {
+            public override bool AcceptsFocus => false;
+
+            public new Nub Nub => base.Nub;
+
             public string? DefaultString;
             public LocalisableString? DefaultTooltip;
             public string? TooltipSuffix;

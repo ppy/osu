@@ -74,6 +74,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestDisplayModes()
+        {
+            AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
+
+            foreach (JudgementCounterDisplay.DisplayMode mode in Enum.GetValues<JudgementCounterDisplay.DisplayMode>())
+                AddStep($"Change mode to {mode}", () => counterDisplay.Mode.Value = mode);
+        }
+
+        [Test]
         public void TestAddJudgementsToCounters()
         {
             AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
@@ -148,6 +157,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestNoDuplicates()
+        {
+            AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
+            AddStep("Show all judgements", () => counterDisplay.Mode.Value = JudgementCounterDisplay.DisplayMode.All);
+            AddAssert("Check no duplicates",
+                () => counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().Count(),
+                () => Is.EqualTo(counterDisplay.CounterFlow.ChildrenOfType<JudgementCounter>().Select(c => c.ResultName.Text).Distinct().Count()));
+        }
+
+        [Test]
         public void TestCycleDisplayModes()
         {
             AddStep("create counter", () => Child = counterDisplay = new TestJudgementCounterDisplay());
@@ -163,7 +182,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private int hiddenCount()
         {
-            var num = counterDisplay.CounterFlow.Children.First(child => child.Result.Type == HitResult.LargeTickHit);
+            var num = counterDisplay.CounterFlow.Children.First(child => child.Result.Types.Contains(HitResult.LargeTickHit));
             return num.Result.ResultCount.Value;
         }
 

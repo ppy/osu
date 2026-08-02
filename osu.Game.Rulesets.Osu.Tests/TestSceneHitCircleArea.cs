@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void scheduleHit() => AddStep("schedule action", () =>
         {
             double delay = hitCircle.StartTime - hitCircle.HitWindows.WindowFor(HitResult.Great) - Time.Current;
-            Scheduler.AddDelayed(() => hitAreaReceptor.OnPressed(new KeyBindingPressEvent<OsuAction>(GetContainingInputManager().CurrentState, OsuAction.LeftButton)), delay);
+            Scheduler.AddDelayed(() => hitAreaReceptor.OnPressed(new KeyBindingPressEvent<OsuAction>(GetContainingInputManager()!.CurrentState, OsuAction.LeftButton)), delay);
         });
     }
 }

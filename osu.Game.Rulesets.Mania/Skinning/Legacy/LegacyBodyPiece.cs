@@ -25,19 +25,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
         private readonly IBindable<bool> isHitting = new Bindable<bool>();
-
-        /// <summary>
-        /// Stores the start time of the fade animation that plays when any of the nested
-        /// hitobjects of the hold note are missed.
-        /// </summary>
-        private readonly Bindable<double?> missFadeTime = new Bindable<double?>();
+        private readonly IBindable<double?> missingStartTime = new Bindable<double?>();
 
         private Drawable? bodySprite;
-
         private Drawable? lightContainer;
-
         private Drawable? light;
-        private LegacyNoteBodyStyle? bodyStyle;
+        private LegacyManiaSkinConfiguration.LegacyNoteBodyStyle? bodyStyle;
 
         public LegacyBodyPiece()
         {
@@ -65,11 +58,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             if (tmp is IFramedAnimation tmpAnimation && tmpAnimation.FrameCount > 0)
                 frameLength = Math.Max(1000 / 60.0, 170.0 / tmpAnimation.FrameCount);
 
-            light = skin.GetAnimation(lightImage, true, true, frameLength: frameLength).With(d =>
+            light = skin.GetAnimation(lightImage, true, true, frameLength: frameLength)?.With(d =>
             {
-                if (d == null)
-                    return;
-
                 d.Origin = Anchor.Centre;
                 d.Blending = BlendingParameters.Additive;
                 d.Scale = new Vector2(lightScale);
@@ -84,18 +74,16 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 };
             }
 
-            bodyStyle = skin.GetConfig<ManiaSkinConfigurationLookup, LegacyNoteBodyStyle>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.NoteBodyStyle))?.Value;
+            bodyStyle = skin.GetConfig<ManiaSkinConfigurationLookup, LegacyManiaSkinConfiguration.LegacyNoteBodyStyle>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.NoteBodyStyle))?.Value;
 
-            var wrapMode = bodyStyle == LegacyNoteBodyStyle.Stretch ? WrapMode.ClampToEdge : WrapMode.Repeat;
+            var wrapMode = bodyStyle == LegacyManiaSkinConfiguration.LegacyNoteBodyStyle.Stretch ? WrapMode.ClampToEdge : WrapMode.Repeat;
 
             direction.BindTo(scrollingInfo.Direction);
-            isHitting.BindTo(holdNote.IsHitting);
+            isHitting.BindTo(holdNote.IsHolding);
+            missingStartTime.BindTo(holdNote.MissingStartTime);
 
-            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30).With(d =>
+            bodySprite = skin.GetAnimation(imageName, wrapMode, wrapMode, true, true, frameLength: 30)?.With(d =>
             {
-                if (d == null)
-                    return;
-
                 if (d is TextureAnimation animation)
                     animation.IsPlaying = false;
 
@@ -115,35 +103,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             direction.BindValueChanged(onDirectionChanged, true);
             isHitting.BindValueChanged(onIsHittingChanged, true);
-            missFadeTime.BindValueChanged(onMissFadeTimeChanged, true);
+            missingStartTime.BindValueChanged(onMissingStartTimeChanged, true);
 
-            holdNote.ApplyCustomUpdateState += applyCustomUpdateState;
-            applyCustomUpdateState(holdNote, holdNote.State.Value);
-        }
-
-        private void applyCustomUpdateState(DrawableHitObject hitObject, ArmedState state)
-        {
-            switch (hitObject)
-            {
-                // Ensure that the hold note is also faded out when the head/tail/body is missed.
-                // Importantly, we filter out unrelated objects like DrawableNotePerfectBonus.
-                case DrawableHoldNoteTail:
-                case DrawableHoldNoteHead:
-                case DrawableHoldNoteBody:
-                    if (state == ArmedState.Miss)
-                        missFadeTime.Value ??= hitObject.HitStateUpdateTime;
-
-                    break;
-            }
+            holdNote.ApplyCustomUpdateState += onApplyCustomUpdateState;
         }
 
         private void onIsHittingChanged(ValueChangedEvent<bool> isHitting)
         {
             if (bodySprite is TextureAnimation bodyAnimation)
-            {
-                bodyAnimation.GotoFrame(0);
                 bodyAnimation.IsPlaying = isHitting.NewValue;
-            }
 
             if (lightContainer == null)
                 return;
@@ -196,45 +164,41 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             }
         }
 
-        private void onMissFadeTimeChanged(ValueChangedEvent<double?> missFadeTimeChange)
+        private void onMissingStartTimeChanged(ValueChangedEvent<double?> startTime)
+            => applyMissingDim();
+
+        private void onApplyCustomUpdateState(DrawableHitObject obj, ArmedState state)
+            => applyMissingDim();
+
+        private void applyMissingDim()
         {
-            if (missFadeTimeChange.NewValue == null)
+            if (missingStartTime.Value == null)
                 return;
 
-            // this update could come from any nested object of the hold note (or even from an input).
-            // make sure the transforms are consistent across all affected parts.
-            using (BeginAbsoluteSequence(missFadeTimeChange.NewValue.Value))
-            {
-                // colour and duration matches stable
-                // transforms not applied to entire hold note in order to not affect hit lighting
-                const double fade_duration = 60;
-
-                holdNote.Head.FadeColour(Colour4.DarkGray, fade_duration);
-                holdNote.Tail.FadeColour(Colour4.DarkGray, fade_duration);
-                bodySprite?.FadeColour(Colour4.DarkGray, fade_duration);
-            }
+            using (BeginAbsoluteSequence(missingStartTime.Value.Value))
+                this.FadeColour(Colour4.DarkGray, 60);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (holdNote.Body.HasHoldBreak)
-                missFadeTime.Value = holdNote.Body.Result.TimeAbsolute;
+            if (!isHitting.Value)
+                (bodySprite as TextureAnimation)?.GotoFrame(0);
 
             int scaleDirection = (direction.Value == ScrollingDirection.Down ? 1 : -1);
 
             // here we go...
             switch (bodyStyle)
             {
-                case LegacyNoteBodyStyle.Stretch:
+                case LegacyManiaSkinConfiguration.LegacyNoteBodyStyle.Stretch:
                     // this is how lazer works by default. nothing required.
                     if (bodySprite != null)
                         bodySprite.Scale = new Vector2(1, scaleDirection);
                     break;
 
                 default:
-                    // this is where things get fucked up.
+                    // this is where things get a bit messed up.
                     // honestly there's three modes to handle here but they seem really pointless?
                     // let's wait to see if anyone actually uses them in skins.
                     if (bodySprite != null)
@@ -243,7 +207,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         bodySprite.FillMode = FillMode.Stretch;
                         // i dunno this looks about right??
-                        bodySprite.Scale = new Vector2(1, scaleDirection * 32800 / sprite.DrawHeight);
+                        // the guard against zero draw height is intended for zero-length hold notes. yes, such cases have been spotted in the wild.
+                        if (sprite.DrawHeight > 0)
+                            bodySprite.Scale = new Vector2(1, scaleDirection * MathF.Max(1, 32800 / sprite.DrawHeight));
                     }
 
                     break;
@@ -255,7 +221,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             base.Dispose(isDisposing);
 
             if (holdNote.IsNotNull())
-                holdNote.ApplyCustomUpdateState -= applyCustomUpdateState;
+                holdNote.ApplyCustomUpdateState -= onApplyCustomUpdateState;
 
             lightContainer?.Expire();
         }

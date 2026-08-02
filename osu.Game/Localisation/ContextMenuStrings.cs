@@ -20,9 +20,29 @@ namespace osu.Game.Localisation
         public static LocalisableString ViewBeatmap => new TranslatableString(getKey(@"view_beatmap"), @"View beatmap");
 
         /// <summary>
-        /// "Invite player"
+        /// "Invite to room"
         /// </summary>
-        public static LocalisableString InvitePlayer => new TranslatableString(getKey(@"invite_player"), @"Invite player");
+        public static LocalisableString InvitePlayer => new TranslatableString(getKey(@"invite_player"), @"Invite to room");
+
+        /// <summary>
+        /// "Spectate"
+        /// </summary>
+        public static LocalisableString SpectatePlayer => new TranslatableString(getKey(@"spectate_player"), @"Spectate");
+
+        /// <summary>
+        /// "Duel"
+        /// </summary>
+        public static LocalisableString DuelPlayer => new TranslatableString(getKey(@"duel_player"), @"Duel");
+
+        /// <summary>
+        /// "Are you sure you want to block {0}?"
+        /// </summary>
+        public static LocalisableString ConfirmBlockUser(string username) => new TranslatableString(getKey(@"confirm_block_user"), @"Are you sure you want to block {0}?", username);
+
+        /// <summary>
+        /// "Are you sure you want to unblock {0}?"
+        /// </summary>
+        public static LocalisableString ConfirmUnblockUser(string username) => new TranslatableString(getKey(@"confirm_unblock_user"), @"Are you sure you want to unblock {0}?", username);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

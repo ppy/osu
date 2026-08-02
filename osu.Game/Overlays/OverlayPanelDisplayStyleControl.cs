@@ -11,6 +11,8 @@ using osuTK;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays
 
         protected override bool AddEnumEntriesAutomatically => false;
 
-        public OverlayPanelDisplayStyleControl()
+        public OverlayPanelDisplayStyleControl(bool supportsBrickMode)
         {
             AutoSizeAxes = Axes.Both;
 
@@ -39,10 +41,14 @@ namespace osu.Game.Overlays
             {
                 Icon = FontAwesome.Solid.Bars
             });
-            AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.Brick)
+
+            if (supportsBrickMode)
             {
-                Icon = FontAwesome.Solid.Th
-            });
+                AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.Brick)
+                {
+                    Icon = FontAwesome.Solid.Th
+                });
+            }
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
@@ -65,6 +71,8 @@ namespace osu.Game.Overlays
 
             private readonly SpriteIcon icon;
 
+            private Sample selectSample = null!;
+
             public PanelDisplayTabItem(OverlayPanelDisplayStyle value)
                 : base(value)
             {
@@ -78,13 +86,21 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fit
                     },
-                    new HoverClickSounds()
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 });
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected override void OnActivated() => updateState();
 
             protected override void OnDeactivated() => updateState();
+
+            protected override void OnActivatedByUser() => selectSample.Play();
 
             protected override bool OnHover(HoverEvent e)
             {

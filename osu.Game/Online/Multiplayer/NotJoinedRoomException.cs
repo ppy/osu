@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Runtime.Serialization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace osu.Game.Online.Multiplayer
@@ -12,11 +11,6 @@ namespace osu.Game.Online.Multiplayer
     {
         public NotJoinedRoomException()
             : base("This user has not yet joined a multiplayer room.")
-        {
-        }
-
-        protected NotJoinedRoomException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

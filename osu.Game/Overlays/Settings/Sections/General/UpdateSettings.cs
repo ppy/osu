@@ -1,84 +1,134 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
-using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Updater;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
     public partial class UpdateSettings : SettingsSubsection
     {
-        [Resolved(CanBeNull = true)]
-        private UpdateManager updateManager { get; set; }
-
         protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
-        private SettingsButton checkForUpdatesButton;
+        private SettingsButtonV2 checkForUpdatesButton = null!;
+        private FormEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
 
-        [Resolved(CanBeNull = true)]
-        private INotificationOverlay notifications { get; set; }
+        private readonly Bindable<SettingsNote.Data?> releaseStreamDropdownNote = new Bindable<SettingsNote.Data?>();
 
-        [BackgroundDependencyLoader(true)]
-        private void load(Storage storage, OsuConfigManager config, OsuGame game)
+        private readonly Bindable<ReleaseStream> configReleaseStream = new Bindable<ReleaseStream>();
+
+        [Resolved]
+        private UpdateManager? updateManager { get; set; }
+
+        [Resolved]
+        private INotificationOverlay? notifications { get; set; }
+
+        [Resolved]
+        private OsuGame? game { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
-            Add(new SettingsEnumDropdown<ReleaseStream>
-            {
-                LabelText = GeneralSettingsStrings.ReleaseStream,
-                Current = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
-            });
+            config.BindWith(OsuSetting.ReleaseStream, configReleaseStream);
 
-            if (updateManager?.CanCheckForUpdate == true)
+            bool isDesktop = RuntimeInfo.IsDesktop;
+
+            // For simplicity, hide the concept of release streams from mobile users.
+            if (isDesktop)
             {
-                Add(checkForUpdatesButton = new SettingsButton
+                Add(new SettingsItemV2(releaseStreamDropdown = new FormEnumDropdown<ReleaseStream>
                 {
-                    Text = GeneralSettingsStrings.CheckUpdate,
-                    Action = () =>
-                    {
-                        checkForUpdatesButton.Enabled.Value = false;
-                        Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(task => Schedule(() =>
-                        {
-                            if (!task.GetResultSafely())
-                            {
-                                notifications?.Post(new SimpleNotification
-                                {
-                                    Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
-                                    Icon = FontAwesome.Solid.CheckCircle,
-                                });
-                            }
-
-                            checkForUpdatesButton.Enabled.Value = true;
-                        }));
-                    }
+                    Caption = GeneralSettingsStrings.ReleaseStream,
+                    Current = { Value = configReleaseStream.Value },
+                })
+                {
+                    Keywords = new[] { @"version" },
+                    ShowRevertToDefaultButton = updateManager!.FixedReleaseStream == null
                 });
+
+                if (updateManager!.FixedReleaseStream != null)
+                {
+                    configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
+
+                    releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
+                    releaseStreamDropdownNote.Value = new SettingsNote.Data(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning, SettingsNote.Type.Warning);
+                }
+
+                releaseStreamDropdown.Current.BindValueChanged(releaseStreamChanged);
             }
 
-            if (RuntimeInfo.IsDesktop)
+            Add(checkForUpdatesButton = new SettingsButtonV2
             {
-                Add(new SettingsButton
-                {
-                    Text = GeneralSettingsStrings.OpenOsuFolder,
-                    Keywords = new[] { @"logs", @"files", @"access", "directory" },
-                    Action = () => storage.PresentExternally(),
-                });
+                Text = GeneralSettingsStrings.CheckUpdate,
+                Action = () => checkForUpdates().FireAndForget()
+            });
+        }
 
-                Add(new SettingsButton
+        private void releaseStreamChanged(ValueChangedEvent<ReleaseStream> stream)
+        {
+            if (stream.NewValue == ReleaseStream.Tachyon)
+            {
+                dialogOverlay?.Push(
+                    new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation,
+                        () => configReleaseStream.Value = ReleaseStream.Tachyon,
+                        () => releaseStreamDropdown.Current.Value = ReleaseStream.Lazer)
+                    {
+                        BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo
+                    });
+
+                return;
+            }
+
+            configReleaseStream.Value = stream.NewValue;
+        }
+
+        private async Task checkForUpdates()
+        {
+            if (updateManager == null || game == null)
+                return;
+
+            checkForUpdatesButton.Enabled.Value = false;
+
+            var checkingNotification = new ProgressNotification
+            {
+                Text = GeneralSettingsStrings.CheckingForUpdates,
+            };
+            notifications?.Post(checkingNotification);
+
+            try
+            {
+                bool foundUpdate = await updateManager.CheckForUpdateAsync(checkingNotification.CancellationToken).ConfigureAwait(true);
+
+                if (!foundUpdate)
                 {
-                    Text = GeneralSettingsStrings.ChangeFolderLocation,
-                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
-                });
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = GeneralSettingsStrings.RunningLatestRelease(game.Version),
+                        Icon = FontAwesome.Solid.CheckCircle,
+                    });
+                }
+            }
+            catch
+            {
+            }
+            finally
+            {
+                checkingNotification.CompleteSilently();
+                checkForUpdatesButton.Enabled.Value = true;
             }
         }
     }

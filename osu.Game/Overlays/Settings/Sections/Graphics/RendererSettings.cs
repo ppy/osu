@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
@@ -28,33 +28,47 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
-            SettingsEnumDropdown<RendererType> rendererDropdown;
+            IEnumerable<RendererType> availableRenderers = host.GetPreferredRenderersForCurrentPlatform().Order();
+
+            // Vulkan renderers are pretty broken to the point it may result in a startup crash at worst.
+            // If a user isn't already using it let's hide it until we can fix.
+            if (renderer.Value != RendererType.Deferred_Vulkan)
+                availableRenderers = availableRenderers.Where(t => t != RendererType.Deferred_Vulkan);
+            if (renderer.Value != RendererType.Vulkan)
+                availableRenderers = availableRenderers.Where(t => t != RendererType.Vulkan);
 
             Children = new Drawable[]
             {
-                rendererDropdown = new RendererSettingsDropdown
+                new SettingsItemV2(new RendererDropdown
                 {
-                    LabelText = GraphicsSettingsStrings.Renderer,
+                    Caption = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
-                    Items = host.GetPreferredRenderersForCurrentPlatform().OrderBy(t => t).Where(t => t != RendererType.Vulkan),
+                    Items = availableRenderers,
+                })
+                {
                     Keywords = new[] { @"compatibility", @"directx" },
                 },
                 // TODO: this needs to be a custom dropdown at some point
-                new SettingsEnumDropdown<FrameSync>
+                new SettingsItemV2(new FormEnumDropdown<FrameSync>
                 {
-                    LabelText = GraphicsSettingsStrings.FrameLimiter,
+                    Caption = GraphicsSettingsStrings.FrameLimiter,
                     Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
-                    Keywords = new[] { @"fps" },
-                },
-                new SettingsEnumDropdown<ExecutionMode>
+                })
                 {
-                    LabelText = GraphicsSettingsStrings.ThreadingMode,
+                    Keywords = new[] { @"fps", @"framerate" },
+                },
+                new SettingsItemV2(new FormEnumDropdown<ExecutionMode>
+                {
+                    Caption = GraphicsSettingsStrings.ThreadingMode,
                     Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GraphicsSettingsStrings.ShowFPS,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
+                    Caption = GraphicsSettingsStrings.ShowFPS,
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay),
+                })
+                {
+                    Keywords = new[] { @"framerate", @"counter" },
                 },
             };
 
@@ -79,39 +93,27 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     }));
                 }
             });
-
-            // TODO: remove this once we support SDL+android.
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Android)
-            {
-                rendererDropdown.Items = new[] { RendererType.Automatic, RendererType.OpenGLLegacy };
-                rendererDropdown.SetNoticeText("New renderer support for android is coming soon!", true);
-            }
         }
 
-        private partial class RendererSettingsDropdown : SettingsEnumDropdown<RendererType>
+        private partial class RendererDropdown : FormEnumDropdown<RendererType>
         {
-            protected override OsuDropdown<RendererType> CreateDropdown() => new RendererDropdown();
+            private RendererType hostResolvedRenderer;
+            private bool automaticRendererInUse;
 
-            protected partial class RendererDropdown : DropdownControl
+            [BackgroundDependencyLoader]
+            private void load(FrameworkConfigManager config, GameHost host)
             {
-                private RendererType hostResolvedRenderer;
-                private bool automaticRendererInUse;
+                var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
+                automaticRendererInUse = renderer.Value == RendererType.Automatic;
+                hostResolvedRenderer = host.ResolvedRenderer;
+            }
 
-                [BackgroundDependencyLoader]
-                private void load(FrameworkConfigManager config, GameHost host)
-                {
-                    var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
-                    automaticRendererInUse = renderer.Value == RendererType.Automatic;
-                    hostResolvedRenderer = host.ResolvedRenderer;
-                }
+            protected override LocalisableString GenerateItemText(RendererType item)
+            {
+                if (item == RendererType.Automatic && automaticRendererInUse)
+                    return LocalisableString.Interpolate($"{base.GenerateItemText(item)} ({hostResolvedRenderer.GetDescription()})");
 
-                protected override LocalisableString GenerateItemText(RendererType item)
-                {
-                    if (item == RendererType.Automatic && automaticRendererInUse)
-                        return LocalisableString.Interpolate($"{base.GenerateItemText(item)} ({hostResolvedRenderer.GetDescription()})");
-
-                    return base.GenerateItemText(item);
-                }
+                return base.GenerateItemText(item);
             }
         }
     }

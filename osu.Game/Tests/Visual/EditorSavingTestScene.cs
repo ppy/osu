@@ -35,6 +35,8 @@ namespace osu.Game.Tests.Visual
         {
             base.SetUpSteps();
 
+            AddStep("set ruleset", () => Game.Ruleset.Value = CreateRuleset()?.RulesetInfo ?? Game.Ruleset.Value);
+
             if (CreateInitialBeatmap == null)
                 AddStep("set default beatmap", () => Game.Beatmap.SetDefault());
             else
@@ -74,15 +76,14 @@ namespace osu.Game.Tests.Visual
 
             AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
 
-            SongSelect songSelect = null;
+            SoloSongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new PlaySongSelect());
-            AddUntilStep("wait for carousel load", () => songSelect.BeatmapSetsLoaded);
+            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            AddUntilStep("wait for carousel load", () => songSelect.CarouselItemsPresented && !songSelect.IsFiltering);
 
             AddStep("Present same beatmap", () => Game.PresentBeatmap(Game.BeatmapManager.QueryBeatmapSet(set => set.ID == beatmapSetGuid)!.Value, beatmap => beatmap.ID == beatmapGuid));
             AddUntilStep("Wait for beatmap selected", () => Game.Beatmap.Value.BeatmapInfo.ID == beatmapGuid);
-            AddStep("Open options", () => InputManager.Key(Key.F3));
-            AddStep("Enter editor", () => InputManager.Key(Key.Number5));
+            AddStep("Open editor", () => songSelect.Edit(Game.Beatmap.Value.BeatmapInfo));
 
             AddUntilStep("Wait for editor load", () => Editor != null);
         }

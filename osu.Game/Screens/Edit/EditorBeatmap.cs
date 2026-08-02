@@ -10,13 +10,17 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Screens.Edit
 {
@@ -80,6 +84,8 @@ namespace osu.Game.Screens.Edit
         [CanBeNull]
         public readonly EditorBeatmapSkin BeatmapSkin;
 
+        public readonly Storyboard Storyboard;
+
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
@@ -92,23 +98,47 @@ namespace osu.Game.Screens.Edit
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, BeatmapInfo beatmapInfo = null)
+        public EditorBeatmap(IBeatmap playableBeatmap, ISkin beatmapSkin = null, Storyboard storyboard = null, BeatmapInfo beatmapInfo = null)
         {
             PlayableBeatmap = playableBeatmap;
             PlayableBeatmap.ControlPointInfo = ConvertControlPoints(PlayableBeatmap.ControlPointInfo);
 
             this.beatmapInfo = beatmapInfo ?? playableBeatmap.BeatmapInfo;
 
-            if (beatmapSkin is Skin skin)
-            {
-                BeatmapSkin = new EditorBeatmapSkin(skin);
-                BeatmapSkin.BeatmapSkinChanged += SaveState;
-            }
+            if (beatmapSkin is LegacyBeatmapSkin skin)
+                BeatmapSkin = new EditorBeatmapSkin(this, skin);
 
-            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
+            Storyboard = storyboard ?? new Storyboard();
+            Storyboard.Beatmap = this;
+            Storyboard.BeatmapInfo = this.beatmapInfo;
+
+            beatmapProcessor = new EditorBeatmapProcessor(this, playableBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
+
+            Breaks = new BindableList<BreakPeriod>(playableBeatmap.Breaks);
+            Breaks.BindCollectionChanged((_, _) =>
+            {
+                playableBeatmap.Breaks.Clear();
+                playableBeatmap.Breaks.AddRange(Breaks);
+            });
+
+            Bookmarks = new BindableList<int>(playableBeatmap.Bookmarks);
+            Bookmarks.BindCollectionChanged((_, _) =>
+            {
+                BeginChange();
+                playableBeatmap.Bookmarks = Bookmarks.OrderBy(x => x).Distinct().ToArray();
+                EndChange();
+            });
+
+            SliderVelocityPresets = new BindableList<double>(playableBeatmap.SliderVelocityPresets);
+            SliderVelocityPresets.BindCollectionChanged((_, _) =>
+            {
+                BeginChange();
+                playableBeatmap.SliderVelocityPresets = SliderVelocityPresets.OrderBy(x => x).Distinct().ToArray();
+                EndChange();
+            });
 
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
@@ -117,6 +147,8 @@ namespace osu.Game.Screens.Edit
                 BeatmapInfo.Metadata.PreviewTime = s.NewValue;
                 EndChange();
             });
+
+            BeatmapVersion = PlayableBeatmap.BeatmapVersion;
         }
 
         /// <summary>
@@ -172,7 +204,13 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.ControlPointInfo = value;
         }
 
-        public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
+        public readonly BindableList<BreakPeriod> Breaks;
+
+        SortedList<BreakPeriod> IBeatmap.Breaks
+        {
+            get => PlayableBeatmap.Breaks;
+            set => PlayableBeatmap.Breaks = value;
+        }
 
         public double TotalBreakTime => PlayableBeatmap.TotalBreakTime;
 
@@ -181,6 +219,96 @@ namespace osu.Game.Screens.Edit
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
         public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
+
+        public double AudioLeadIn
+        {
+            get => PlayableBeatmap.AudioLeadIn;
+            set => PlayableBeatmap.AudioLeadIn = value;
+        }
+
+        public float StackLeniency
+        {
+            get => PlayableBeatmap.StackLeniency;
+            set => PlayableBeatmap.StackLeniency = value;
+        }
+
+        public bool SpecialStyle
+        {
+            get => PlayableBeatmap.SpecialStyle;
+            set => PlayableBeatmap.SpecialStyle = value;
+        }
+
+        public bool LetterboxInBreaks
+        {
+            get => PlayableBeatmap.LetterboxInBreaks;
+            set => PlayableBeatmap.LetterboxInBreaks = value;
+        }
+
+        public bool WidescreenStoryboard
+        {
+            get => PlayableBeatmap.WidescreenStoryboard;
+            set => PlayableBeatmap.WidescreenStoryboard = value;
+        }
+
+        public bool EpilepsyWarning
+        {
+            get => PlayableBeatmap.EpilepsyWarning;
+            set => PlayableBeatmap.EpilepsyWarning = value;
+        }
+
+        public bool SamplesMatchPlaybackRate
+        {
+            get => PlayableBeatmap.SamplesMatchPlaybackRate;
+            set => PlayableBeatmap.SamplesMatchPlaybackRate = value;
+        }
+
+        public double DistanceSpacing
+        {
+            get => PlayableBeatmap.DistanceSpacing;
+            set => PlayableBeatmap.DistanceSpacing = value;
+        }
+
+        public int GridSize
+        {
+            get => PlayableBeatmap.GridSize;
+            set => PlayableBeatmap.GridSize = value;
+        }
+
+        public double TimelineZoom
+        {
+            get => PlayableBeatmap.TimelineZoom;
+            set => PlayableBeatmap.TimelineZoom = value;
+        }
+
+        public CountdownType Countdown
+        {
+            get => PlayableBeatmap.Countdown;
+            set => PlayableBeatmap.Countdown = value;
+        }
+
+        public int CountdownOffset
+        {
+            get => PlayableBeatmap.CountdownOffset;
+            set => PlayableBeatmap.CountdownOffset = value;
+        }
+
+        public readonly BindableList<int> Bookmarks;
+
+        int[] IBeatmap.Bookmarks
+        {
+            get => PlayableBeatmap.Bookmarks;
+            set => PlayableBeatmap.Bookmarks = value;
+        }
+
+        public readonly BindableList<double> SliderVelocityPresets;
+
+        double[] IBeatmap.SliderVelocityPresets
+        {
+            get => PlayableBeatmap.SliderVelocityPresets;
+            set => PlayableBeatmap.SliderVelocityPresets = value;
+        }
+
+        public int BeatmapVersion { get; set; }
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
@@ -196,6 +324,11 @@ namespace osu.Game.Screens.Edit
         /// Perform the provided action on every selected hitobject.
         /// Changes will be grouped as one history action.
         /// </summary>
+        /// <remarks>
+        /// Note that this incurs a full state save, and as such requires the entire beatmap to be encoded, etc.
+        /// Very frequent use of this method (e.g. once a frame) is most discouraged.
+        /// If there is need to do so, use local precondition checks to eliminate changes that are known to be no-ops.
+        /// </remarks>
         /// <param name="action">The action to perform.</param>
         public void PerformOnSelection(Action<HitObject> action)
         {
@@ -203,8 +336,13 @@ namespace osu.Game.Screens.Edit
                 return;
 
             BeginChange();
+
             foreach (var h in SelectedHitObjects)
+            {
                 action(h);
+                Update(h);
+            }
+
             EndChange();
         }
 
@@ -342,13 +480,17 @@ namespace osu.Game.Screens.Edit
             if (batchPendingUpdates.Count == 0 && batchPendingDeletes.Count == 0 && batchPendingInserts.Count == 0)
                 return;
 
-            beatmapProcessor?.PreProcess();
+            // if the user is doing edits to this beatmaps via this flow, we better bump the beatmap version
+            // because the beatmap encoder can only output this specific beatmap version anyway,
+            // so *not* bumping it could lead to results that look misleading at best.
+            BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION;
+            beatmapProcessor.PreProcess();
 
             foreach (var h in batchPendingDeletes) processHitObject(h);
             foreach (var h in batchPendingInserts) processHitObject(h);
             foreach (var h in batchPendingUpdates) processHitObject(h);
 
-            beatmapProcessor?.PostProcess();
+            beatmapProcessor.PostProcess();
 
             BeatmapReprocessed?.Invoke();
 
@@ -406,8 +548,60 @@ namespace osu.Game.Screens.Edit
 
         public double SnapTime(double time, double? referenceTime) => ControlPointInfo.GetClosestSnappedTime(time, BeatDivisor, referenceTime);
 
+        /// <summary>
+        /// Snaps every hit object's start time (and end time when applicable) to the current snap divisor.
+        /// </summary>
+        public void SnapAllHitObjectsToCurrentDivisor()
+        {
+            if (HitObjects.Count == 0)
+                return;
+
+            BeginChange();
+
+            foreach (var hitObject in HitObjects.ToArray())
+            {
+                double oldStart = hitObject.StartTime;
+                double oldEnd = hitObject.GetEndTime();
+
+                double newStart = SnapTime(oldStart, null);
+                double newEnd = Math.Max(newStart + GetBeatLengthAtTime(newStart), SnapTime(oldEnd, newStart));
+
+                hitObject.StartTime = newStart;
+
+                switch (hitObject)
+                {
+                    // Sliders and juice streams: end time comes from path length and velocity, so scale slider velocity to match the snapped duration.
+                    case IHasPathWithRepeats and IHasSliderVelocity sv:
+                    {
+                        double oldDuration = oldEnd - oldStart;
+                        double newDurationTarget = newEnd - newStart;
+
+                        if (oldDuration > 0)
+                            sv.SliderVelocityMultiplier *= oldDuration / newDurationTarget;
+
+                        break;
+                    }
+
+                    // Long notes with a real duration (spinners, hold notes, swells, etc.).
+                    case IHasDuration hasDuration:
+                        hasDuration.Duration = newEnd - newStart;
+                        break;
+                }
+            }
+
+            UpdateAllHitObjects();
+
+            EndChange();
+        }
+
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            BeatmapSkin?.Dispose();
+            base.Dispose(isDisposing);
+        }
     }
 }

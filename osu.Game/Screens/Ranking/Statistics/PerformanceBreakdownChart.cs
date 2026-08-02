@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using JetBrains.Annotations;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,7 +19,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
@@ -29,26 +26,21 @@ namespace osu.Game.Screens.Ranking.Statistics
     public partial class PerformanceBreakdownChart : Container
     {
         private readonly ScoreInfo score;
-        private readonly IBeatmap playableBeatmap;
 
-        private Drawable spinner;
-        private Drawable content;
-        private GridContainer chart;
-        private OsuSpriteText achievedPerformance;
-        private OsuSpriteText maximumPerformance;
+        private Drawable spinner = null!;
+        private Drawable content = null!;
+        private GridContainer chart = null!;
+        private OsuSpriteText achievedPerformance = null!;
+        private OsuSpriteText maximumPerformance = null!;
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         [Resolved]
-        private ScorePerformanceCache performanceCache { get; set; }
-
-        [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
+        private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
         public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
         {
             this.score = score;
-            this.playableBeatmap = playableBeatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -61,86 +53,94 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre
                 },
-                content = new FillFlowContainer
+                content = new GridContainer
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Width = 0.6f,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
-                    Spacing = new Vector2(15, 15),
-                    Children = new Drawable[]
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    ColumnDimensions = new[]
                     {
-                        new GridContainer
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 50),
+                        new Dimension()
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Width = 0.8f,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            ColumnDimensions = new[]
+                            chart = new GridContainer
                             {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                ColumnDimensions = new[]
                                 {
-                                    new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "Achieved PP",
-                                        Colour = Color4Extensions.FromHex("#66FFCC")
-                                    },
-                                    achievedPerformance = new OsuSpriteText
-                                    {
-                                        Origin = Anchor.CentreRight,
-                                        Anchor = Anchor.CentreRight,
-                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: StatisticItem.FONT_SIZE),
-                                        Colour = Color4Extensions.FromHex("#66FFCC")
-                                    }
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize)
+                                }
+                            },
+                            new SimpleStatisticTable.Spacer(),
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize)
                                 },
-                                new Drawable[]
+                                RowDimensions = new[]
                                 {
-                                    new OsuSpriteText
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(GridSizeMode.AutoSize)
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
                                     {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Text = "Maximum",
-                                        Colour = OsuColour.Gray(0.7f)
+                                        new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreLeft,
+                                            Anchor = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Text = "Achieved PP",
+                                            Colour = Color4Extensions.FromHex("#66FFCC")
+                                        },
+                                        achievedPerformance = new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreRight,
+                                            Anchor = Anchor.CentreRight,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Colour = Color4Extensions.FromHex("#66FFCC")
+                                        }
                                     },
-                                    maximumPerformance = new OsuSpriteText
+                                    new Drawable[]
                                     {
-                                        Origin = Anchor.CentreLeft,
-                                        Anchor = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
-                                        Colour = OsuColour.Gray(0.7f)
+                                        new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreLeft,
+                                            Anchor = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Text = "Maximum",
+                                            Colour = OsuColour.Gray(0.7f)
+                                        },
+                                        maximumPerformance = new OsuSpriteText
+                                        {
+                                            Origin = Anchor.CentreLeft,
+                                            Anchor = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: StatisticItem.FONT_SIZE),
+                                            Colour = OsuColour.Gray(0.7f)
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        chart = new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize)
-                            }
+                            },
                         }
                     }
                 }
@@ -148,12 +148,33 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             spinner.Show();
 
-            new PerformanceBreakdownCalculator(playableBeatmap, difficultyCache, performanceCache)
-                .CalculateAsync(score, cancellationTokenSource.Token)
-                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())));
+            computePerformance(cancellationTokenSource.Token)
+                .ContinueWith(t => Schedule(() =>
+                {
+                    if (t.GetResultSafely() is PerformanceBreakdown breakdown)
+                        setPerformance(breakdown);
+                }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
-        private void setPerformanceValue(PerformanceBreakdown breakdown)
+        private async Task<PerformanceBreakdown?> computePerformance(CancellationToken token)
+        {
+            var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
+            if (performanceCalculator == null)
+                return null;
+
+            var starsTask = difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, token).ConfigureAwait(false);
+            if (await starsTask is not StarDifficulty stars)
+                return null;
+
+            if (stars.DifficultyAttributes == null || stars.PerformanceAttributes == null)
+                return null;
+
+            return new PerformanceBreakdown(
+                await performanceCalculator.CalculateAsync(score, stars.DifficultyAttributes, token).ConfigureAwait(false),
+                stars.PerformanceAttributes);
+        }
+
+        private void setPerformance(PerformanceBreakdown breakdown)
         {
             spinner.Hide();
             content.FadeIn(200);
@@ -192,8 +213,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             maximumPerformance.Text = Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString();
         }
 
-        [CanBeNull]
-        private Drawable[] createAttributeRow(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
+        private Drawable[]? createAttributeRow(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
         {
             // Don't display the attribute if its maximum is 0
             // For example, flashlight bonus would be zero if flashlight mod isn't on
@@ -242,7 +262,9 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         protected override void Dispose(bool isDisposing)
         {
-            cancellationTokenSource?.Cancel();
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource.Dispose();
+
             base.Dispose(isDisposing);
         }
     }

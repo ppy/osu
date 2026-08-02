@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     public interface IBeatmapVerifier
     {
-        public IEnumerable<Issue> Run(BeatmapVerifierContext context);
+        IEnumerable<Issue> Run(BeatmapVerifierContext context);
     }
 }

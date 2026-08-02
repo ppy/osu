@@ -264,7 +264,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(50, 0),
@@ -308,7 +308,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(50, 0),
@@ -391,7 +391,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_slider,
                     Position = positionSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -428,7 +428,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_first_slider,
                     Position = positionFirstSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -438,7 +438,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_second_slider,
                     Position = positionSecondSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -475,7 +475,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_stack_start - 450, Position = new Vector2(55), Actions = { OsuAction.LeftButton } },
-            });
+            }, extraMods: [new OsuModNoFail()]);
 
             addClickActionAssert(0, ClickAction.Ignore);
         }
@@ -521,7 +521,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_first_slider,
                     Position = positionFirstSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -531,7 +531,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_second_slider,
                     Position = positionSecondSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -571,7 +571,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_first_slider,
                     Position = positionFirstSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -581,7 +581,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     StartTime = time_second_slider,
                     Position = positionSecondSlider,
-                    Path = new SliderPath(PathType.Linear, new[]
+                    Path = new SliderPath(PathType.LINEAR, new[]
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
@@ -759,9 +759,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     BeatmapInfo =
                     {
                         Ruleset = new OsuRuleset().RulesetInfo,
-                        BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION // for correct offset treatment by score encoder
                     },
-                    ControlPointInfo = cpi
+                    ControlPointInfo = cpi,
+                    BeatmapVersion = LegacyBeatmapEncoder.FIRST_LAZER_VERSION // for correct offset treatment by score encoder
                 });
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(new OsuRuleset().RulesetInfo);
             });
@@ -792,7 +792,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 AddStep("export beatmap", () =>
                 {
-                    var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null);
+                    var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null, null);
 
                     using (var stream = File.Open(Path.Combine(exportLocation, $"{testCaseName}.osu"), FileMode.Create))
                     {

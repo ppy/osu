@@ -16,17 +16,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
-        public override bool DisplayResult
-        {
-            get
-            {
-                if (HitObject?.ClassicSliderBehaviour == true)
-                    return false;
-
-                return base.DisplayResult;
-            }
-        }
-
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
@@ -59,6 +48,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             pathVersion.BindTo(DrawableSlider.PathVersion);
 
             CheckHittable = (d, t, r) => DrawableSlider.CheckHittable?.Invoke(d, t, r) ?? ClickAction.Hit;
+        }
+
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        {
+            base.CheckForResult(userTriggered, timeOffset);
+            DrawableSlider.SliderInputManager.PostProcessHeadJudgement(this);
         }
 
         protected override HitResult ResultFor(double timeOffset)

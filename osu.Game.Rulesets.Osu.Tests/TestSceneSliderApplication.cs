@@ -32,12 +32,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             DrawableSlider dho = null;
 
-            AddStep("create slider", () => Child = dho = new DrawableSlider(prepareObject(new Slider
+            AddStep("create slider", () => Child = dho = new DrawableSlider(applyDefaults(new Slider
             {
                 Position = new Vector2(256, 192),
                 IndexInCurrentCombo = 0,
                 StartTime = Time.Current,
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 100),
@@ -47,12 +47,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddWaitStep("wait for progression", 1);
 
-            AddStep("apply new slider", () => dho.Apply(prepareObject(new Slider
+            AddStep("apply new slider", () => dho.Apply(applyDefaults(new Slider
             {
                 Position = new Vector2(256, 192),
                 ComboIndex = 1,
                 StartTime = dho.HitObject.StartTime,
-                Path = new SliderPath(PathType.Bezier, new[]
+                Path = new SliderPath(PathType.BEZIER, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 100),
@@ -75,12 +75,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Child = new SkinProvidingContainer(provider)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = dho = new DrawableSlider(prepareObject(new Slider
+                    Child = dho = new DrawableSlider(applyDefaults(new Slider
                     {
                         Position = new Vector2(256, 192),
                         IndexInCurrentCombo = 0,
                         StartTime = Time.Current,
-                        Path = new SliderPath(PathType.Linear, new[]
+                        Path = new SliderPath(PathType.LINEAR, new[]
                         {
                             Vector2.Zero,
                             new Vector2(150, 100),
@@ -97,7 +97,38 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("ball is red", () => dho.ChildrenOfType<LegacySliderBall>().Single().BallColour == Color4.Red);
         }
 
-        private Slider prepareObject(Slider slider)
+        [Test]
+        public void TestIncreaseRepeatCount()
+        {
+            DrawableSlider dho = null;
+
+            AddStep("create slider", () =>
+            {
+                Child = dho = new DrawableSlider(applyDefaults(new Slider
+                {
+                    Position = new Vector2(256, 192),
+                    IndexInCurrentCombo = 0,
+                    StartTime = Time.Current,
+                    Path = new SliderPath(PathType.LINEAR, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(150, 100),
+                        new Vector2(300, 0),
+                    })
+                }));
+            });
+
+            AddStep("increase repeat count", () =>
+            {
+                dho.HitObject.RepeatCount++;
+                applyDefaults(dho.HitObject);
+            });
+
+            AddAssert("repeat got custom anchor", () =>
+                dho.ChildrenOfType<DrawableSliderRepeat>().Single().RelativeAnchorPosition == Vector2.Divide(dho.SliderBody!.PathOffset, dho.DrawSize));
+        }
+
+        private Slider applyDefaults(Slider slider)
         {
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
             return slider;

@@ -156,6 +156,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 slider = (DrawableSlider)createSlider(repeats: 1);
                 Add(slider);
+                slider.HitObject.NodeSamples.Clear();
             });
 
             AddStep("change samples", () => slider.HitObject.Samples = new[]
@@ -219,7 +220,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(239, 176),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(154, 28),
@@ -255,7 +256,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 SliderVelocityMultiplier = speedMultiplier,
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(0, -(distance / 2)),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(0, distance),
@@ -273,7 +274,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(-max_length / 2, 0),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
+                Path = new SliderPath(PathType.PERFECT_CURVE, new[]
                 {
                     Vector2.Zero,
                     new Vector2(max_length / 2, max_length / 2),
@@ -293,7 +294,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(-max_length / 2, 0),
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(max_length * 0.375f, max_length * 0.18f),
@@ -316,7 +317,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(-max_length / 2, 0),
-                Path = new SliderPath(PathType.Bezier, new[]
+                Path = new SliderPath(PathType.BEZIER, new[]
                 {
                     Vector2.Zero,
                     new Vector2(max_length * 0.375f, max_length * 0.18f),
@@ -338,7 +339,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(0, 0),
-                Path = new SliderPath(PathType.Linear, new[]
+                Path = new SliderPath(PathType.LINEAR, new[]
                 {
                     Vector2.Zero,
                     new Vector2(-max_length / 2, 0),
@@ -365,7 +366,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + time_offset,
                 Position = new Vector2(-max_length / 4, 0),
-                Path = new SliderPath(PathType.Catmull, new[]
+                Path = new SliderPath(PathType.CATMULL, new[]
                 {
                     Vector2.Zero,
                     new Vector2(max_length * 0.125f, max_length * 0.125f),

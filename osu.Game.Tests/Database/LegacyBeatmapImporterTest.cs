@@ -7,11 +7,13 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Database
@@ -77,6 +79,7 @@ namespace osu.Game.Tests.Database
             {
                 using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
                 using (var tmpStorage = new TemporaryNativeStorage("stable-songs-folder"))
+                using (new RealmRulesetStore(realm, storage))
                 {
                     var stableStorage = new StableStorage(tmpStorage.GetFullPath(""), host);
                     var songsStorage = stableStorage.GetStorageForDirectory(StableStorage.STABLE_DEFAULT_SONGS_PATH);
@@ -91,8 +94,8 @@ namespace osu.Game.Tests.Database
 
                     var importedSet = realm.Realm.All<BeatmapSetInfo>().Single();
 
-                    Assert.NotNull(importedSet);
-                    Assert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), importedSet.DateAdded);
+                    ClassicAssert.NotNull(importedSet);
+                    ClassicAssert.AreEqual(new DateTimeOffset(new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc)), importedSet.DateAdded);
                 }
             });
         }

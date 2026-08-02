@@ -52,8 +52,6 @@ namespace osu.Game.Graphics.UserInterface
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
-            const float nub_padding = 5;
-
             Children = new Drawable[]
             {
                 LabelTextFlowContainer = new OsuTextFlowContainer(ApplyLabelParameters)
@@ -69,15 +67,13 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Nub.Anchor = Anchor.CentreRight;
                 Nub.Origin = Anchor.CentreRight;
-                Nub.Margin = new MarginPadding { Right = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Right = Nub.DEFAULT_EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Right = Nub.DEFAULT_EXPANDED_SIZE + 10f };
             }
             else
             {
                 Nub.Anchor = Anchor.CentreLeft;
                 Nub.Origin = Anchor.CentreLeft;
-                Nub.Margin = new MarginPadding { Left = nub_padding };
-                LabelTextFlowContainer.Padding = new MarginPadding { Left = Nub.DEFAULT_EXPANDED_SIZE + nub_padding * 2 };
+                LabelTextFlowContainer.Padding = new MarginPadding { Left = Nub.DEFAULT_EXPANDED_SIZE + 10f };
             }
 
             Nub.Current.BindTo(Current);

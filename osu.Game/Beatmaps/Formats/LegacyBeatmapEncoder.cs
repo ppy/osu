@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,15 +24,9 @@ namespace osu.Game.Beatmaps.Formats
     {
         public const int FIRST_LAZER_VERSION = 128;
 
-        /// <summary>
-        /// osu! is generally slower than taiko, so a factor is added to increase
-        /// speed. This must be used everywhere slider length or beat length is used.
-        /// </summary>
-        public const float LEGACY_TAIKO_VELOCITY_MULTIPLIER = 1.4f;
-
         private readonly IBeatmap beatmap;
-
         private readonly ISkin? skin;
+        private readonly LegacyStoryboardEncoder? storyboardEncoder;
 
         private readonly int onlineRulesetID;
 
@@ -40,10 +35,17 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
+        /// <param name="storyboard">
+        /// The combined storyboard, loaded from both the <c>.osu</c> and the <c>.osz</c>.
+        /// Only elements from the <c>.osu</c> (marked via <see cref="StoryboardElementSource.Beatmap"/>) will be encoded to the beatmap.
+        /// </param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin, Storyboard? storyboard)
         {
             this.beatmap = beatmap;
             this.skin = skin;
+
+            if (storyboard != null)
+                storyboardEncoder = new LegacyStoryboardEncoder(storyboard);
 
             onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
@@ -85,14 +87,14 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("[General]");
 
             if (!string.IsNullOrEmpty(beatmap.Metadata.AudioFile)) writer.WriteLine(FormattableString.Invariant($"AudioFilename: {Path.GetFileName(beatmap.Metadata.AudioFile)}"));
-            writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
+            writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
-            writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.BeatmapInfo.Countdown}"));
+            writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
                 $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
-            writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
+            writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
-            writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
+            writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.LetterboxInBreaks ? '1' : '0')}"));
             // if (beatmap.BeatmapInfo.UseSkinSprites)
             //     writer.WriteLine(@"UseSkinSprites: 1");
             // if (b.AlwaysShowPlayfield)
@@ -101,14 +103,19 @@ namespace osu.Game.Beatmaps.Formats
             //     writer.WriteLine(@"OverlayPosition: " + b.OverlayPosition);
             // if (!string.IsNullOrEmpty(b.SkinPreference))
             //     writer.WriteLine(@"SkinPreference:" + b.SkinPreference);
-            if (beatmap.BeatmapInfo.EpilepsyWarning)
+            if (beatmap.EpilepsyWarning)
                 writer.WriteLine(@"EpilepsyWarning: 1");
-            if (beatmap.BeatmapInfo.CountdownOffset > 0)
-                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.BeatmapInfo.CountdownOffset}"));
+            if (beatmap.CountdownOffset > 0)
+                writer.WriteLine(FormattableString.Invariant($@"CountdownOffset: {beatmap.CountdownOffset}"));
             if (onlineRulesetID == 3)
-                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.BeatmapInfo.SpecialStyle ? '1' : '0')}"));
-            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.BeatmapInfo.WidescreenStoryboard ? '1' : '0')}"));
-            if (beatmap.BeatmapInfo.SamplesMatchPlaybackRate)
+                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.SpecialStyle ? '1' : '0')}"));
+
+            if (storyboardEncoder != null)
+                storyboardEncoder.EncodeGeneralToBeatmap(writer);
+            else
+                writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
+
+            if (beatmap.SamplesMatchPlaybackRate)
                 writer.WriteLine(@"SamplesMatchPlaybackRate: 1");
         }
 
@@ -116,12 +123,13 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Editor]");
 
-            if (beatmap.BeatmapInfo.Bookmarks.Length > 0)
-                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.BeatmapInfo.Bookmarks)}"));
-            writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.BeatmapInfo.DistanceSpacing}"));
+            if (beatmap.Bookmarks.Length > 0)
+                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks)}"));
+            writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.DistanceSpacing}"));
             writer.WriteLine(FormattableString.Invariant($"BeatDivisor: {beatmap.BeatmapInfo.BeatDivisor}"));
-            writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.BeatmapInfo.GridSize}"));
-            writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.BeatmapInfo.TimelineZoom}"));
+            writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
+            writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
+            writer.WriteLine(FormattableString.Invariant($@"VelocityPresets: {string.Join(',', beatmap.SliderVelocityPresets)}"));
         }
 
         private void handleMetadata(TextWriter writer)
@@ -149,11 +157,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"OverallDifficulty: {beatmap.Difficulty.OverallDifficulty}"));
             writer.WriteLine(FormattableString.Invariant($"ApproachRate: {beatmap.Difficulty.ApproachRate}"));
 
-            // Taiko adjusts the slider multiplier (see: LEGACY_TAIKO_VELOCITY_MULTIPLIER)
-            writer.WriteLine(onlineRulesetID == 1
-                ? FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier / LEGACY_TAIKO_VELOCITY_MULTIPLIER}")
-                : FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier}"));
-
+            writer.WriteLine(FormattableString.Invariant($"SliderMultiplier: {beatmap.Difficulty.SliderMultiplier}"));
             writer.WriteLine(FormattableString.Invariant($"SliderTickRate: {beatmap.Difficulty.SliderTickRate}"));
         }
 
@@ -161,9 +165,17 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Events]");
 
-            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            if (storyboardEncoder != null)
+            {
+                storyboardEncoder.EncodeEventsToBeatmap(writer);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                    writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            }
 
+            writer.WriteLine("// Break Periods");
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
         }
@@ -190,7 +202,17 @@ namespace osu.Game.Beatmaps.Formats
             if (scrollSpeedEncodedAsSliderVelocity)
             {
                 foreach (var point in legacyControlPoints.EffectPoints)
-                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint { SliderVelocity = point.ScrollSpeed });
+                {
+                    legacyControlPoints.Add(point.Time, new DifficultyControlPoint
+                    {
+                        SliderVelocityBindable =
+                        {
+                            MinValue = point.ScrollSpeedBindable.MinValue,
+                            MaxValue = point.ScrollSpeedBindable.MaxValue,
+                            Value = point.ScrollSpeedBindable.Value,
+                        }
+                    });
+                }
             }
 
             LegacyControlPointProperties lastControlPointProperties = new LegacyControlPointProperties();
@@ -205,9 +227,34 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.Time},"));
                     writer.Write(FormattableString.Invariant($"{groupTimingPoint.BeatLength},"));
-                    outputControlPointAt(controlPointProperties, true);
-                    lastControlPointProperties = controlPointProperties;
-                    lastControlPointProperties.SliderVelocity = 1;
+
+                    // `LegacyControlPointProperties` is a struct, thus it has by-value semantics,
+                    // thus assigning `controlPointProperties` to a local creates a copy.
+                    var timingPointProperties = controlPointProperties;
+
+                    // Slider velocity cannot be encoded in a timing point,
+                    // as the legacy format writes it out as "negative beat length".
+                    // Setting it to the default value of 1 ensures that any non-default slider velocity
+                    // will not be subject to the `IsRedundant()` guard lower down and thus still be output correctly.
+                    timingPointProperties.SliderVelocity = 1;
+
+                    // Kiai flag cannot be specified on the first timing point in the beatmap:
+                    // https://github.com/peppy/osu-stable-reference/blob/0b8b19af621dbb282773c22b36cc0453942b98d8/osu!/GameModes/Edit/Forms/TimingEntry.cs#L492-L495
+                    // That fact is also codified in the ranking criteria (https://osu.ppy.sh/wiki/en/Ranking_criteria#rules.2).
+                    // This is doing a thing slightly different from that in two major aspects:
+                    // - It applies to only groups with timing points, not to any control point groups.
+                    // - It applies to all groups with timing points that specify kiai time, not only the first one.
+                    // However, the two above conditions are acceptable, because:
+                    // - The ranking criteria also specifies that an inherited timing point cannot precede an uninherited timing point.
+                    //   Thus, the case of "first timing point group of beatmap does not have timing point" is fundamentally unsound,
+                    //   and guarded against via other measures such as preventing placement of objects before the first timing point.
+                    //   Therefore, checking only groups with timing points is sufficient.
+                    // - It's fine to enforce this for all uninherited timing points because an inherited point will be emitted below if necessary for kiai anyway.
+                    //   At worst doing so will result in some extra inherited points being output.
+                    timingPointProperties.EffectFlags &= ~LegacyEffectFlags.Kiai;
+
+                    outputControlPointAt(timingPointProperties, true);
+                    lastControlPointProperties = timingPointProperties;
                 }
 
                 if (controlPointProperties.IsRedundant(lastControlPointProperties))
@@ -289,18 +336,52 @@ namespace osu.Game.Beatmaps.Formats
             {
                 foreach (var hitObject in hitObjects)
                 {
-                    if (hitObject.Samples.Count > 0)
+                    if (hitObject is IHasRepeats hasNodeSamples)
                     {
-                        int volume = hitObject.Samples.Max(o => o.Volume);
-                        int customIndex = hitObject.Samples.Any(o => o is ConvertHitObjectParser.LegacyHitSampleInfo)
-                            ? hitObject.Samples.OfType<ConvertHitObjectParser.LegacyHitSampleInfo>().Max(o => o.CustomSampleBank)
-                            : -1;
+                        double spanDuration = hasNodeSamples.Duration / hasNodeSamples.SpanCount();
 
-                        yield return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = hitObject.GetEndTime(), SampleVolume = volume, CustomSampleBank = customIndex };
+                        for (int i = 0; i < hasNodeSamples.NodeSamples.Count; ++i)
+                        {
+                            double nodeTime = hitObject.StartTime + i * spanDuration;
+
+                            if (hasNodeSamples.NodeSamples[i].Count > 0)
+                                yield return createSampleControlPointFor(nodeTime, hasNodeSamples.NodeSamples[i]);
+
+                            if (spanDuration > LegacyBeatmapDecoder.CONTROL_POINT_LENIENCY + 1 && hitObject.Samples.Count > 0 && i < hasNodeSamples.NodeSamples.Count - 1)
+                                yield return createSampleControlPointFor(nodeTime + LegacyBeatmapDecoder.CONTROL_POINT_LENIENCY + 1, hitObject.Samples);
+                        }
+                    }
+                    else if (hitObject.Samples.Count > 0)
+                    {
+                        yield return createSampleControlPointFor(hitObject.GetEndTime(), hitObject.Samples);
                     }
 
                     foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
                         yield return nested;
+                }
+
+                SampleControlPoint createSampleControlPointFor(double time, IList<HitSampleInfo> samples)
+                {
+                    int volume = samples.Max(o => o.Volume);
+                    string bank = samples.Where(s => s.Name == HitSampleInfo.HIT_NORMAL).Select(s => s.Bank).FirstOrDefault()
+                                  ?? samples.Select(s => s.Bank).First();
+
+                    int customIndex = samples.Max(s =>
+                    {
+                        switch (s)
+                        {
+                            case ConvertHitObjectParser.LegacyHitSampleInfo legacy:
+                                return legacy.CustomSampleBank;
+
+                            default:
+                                if (int.TryParse(s.Suffix, out int index))
+                                    return index;
+
+                                return s.UseBeatmapSamples ? 1 : -1;
+                        }
+                    });
+
+                    return new LegacyBeatmapDecoder.LegacySampleControlPoint { Time = time, SampleVolume = volume, SampleBank = bank, CustomSampleBank = customIndex };
                 }
             }
 
@@ -326,7 +407,7 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[Colours]");
 
-            for (int i = 0; i < colours.Count; i++)
+            for (int i = 0; i < Math.Min(colours.Count, LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT); i++)
             {
                 var comboColour = colours[i];
 
@@ -363,7 +444,8 @@ namespace osu.Game.Beatmaps.Formats
 
                 case 3:
                     int totalColumns = (int)Math.Max(1, beatmap.Difficulty.CircleSize);
-                    position.X = (int)Math.Ceiling(((IHasXPosition)hitObject).X * (512f / totalColumns));
+                    // compare: https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameModes/Play/Rulesets/Mania/Stage/StageMania_Calculations.cs#L159
+                    position.X = (int)Math.Floor((((IHasXPosition)hitObject).X + 0.5f) * (512f / totalColumns));
                     break;
             }
 
@@ -424,60 +506,31 @@ namespace osu.Game.Beatmaps.Formats
 
         private void addPathData(TextWriter writer, IHasPath pathData, Vector2 position)
         {
-            PathType? lastType = null;
-
             for (int i = 0; i < pathData.Path.ControlPoints.Count; i++)
             {
                 PathControlPoint point = pathData.Path.ControlPoints[i];
 
+                // Note that lazer's encoding format supports specifying multiple curve types for a slider path, which is not supported by stable.
+                // Backwards compatibility with stable is handled by `LegacyBeatmapExporter` and `BezierConverter.ConvertToModernBezier()`.
                 if (point.Type != null)
                 {
-                    // We've reached a new (explicit) segment!
-
-                    // Explicit segments have a new format in which the type is injected into the middle of the control point string.
-                    // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
-                    // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
-                    bool needsExplicitSegment = point.Type != lastType || point.Type == PathType.PerfectCurve;
-
-                    // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
-                    // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
-                    if (i > 1)
+                    switch (point.Type?.Type)
                     {
-                        // We need to use the absolute control point position to determine equality, otherwise floating point issues may arise.
-                        Vector2 p1 = position + pathData.Path.ControlPoints[i - 1].Position;
-                        Vector2 p2 = position + pathData.Path.ControlPoints[i - 2].Position;
+                        case SplineType.BSpline:
+                            writer.Write(point.Type.Value.Degree > 0 ? $"B{point.Type.Value.Degree}|" : "B|");
+                            break;
 
-                        if ((int)p1.X == (int)p2.X && (int)p1.Y == (int)p2.Y)
-                            needsExplicitSegment = true;
-                    }
+                        case SplineType.Catmull:
+                            writer.Write("C|");
+                            break;
 
-                    if (needsExplicitSegment)
-                    {
-                        switch (point.Type)
-                        {
-                            case PathType.Bezier:
-                                writer.Write("B|");
-                                break;
+                        case SplineType.PerfectCurve:
+                            writer.Write("P|");
+                            break;
 
-                            case PathType.Catmull:
-                                writer.Write("C|");
-                                break;
-
-                            case PathType.PerfectCurve:
-                                writer.Write("P|");
-                                break;
-
-                            case PathType.Linear:
-                                writer.Write("L|");
-                                break;
-                        }
-
-                        lastType = point.Type;
-                    }
-                    else
-                    {
-                        // New segment with the same type - duplicate the control point
-                        writer.Write(FormattableString.Invariant($"{position.X + point.Position.X}:{position.Y + point.Position.Y}|"));
+                        case SplineType.Linear:
+                            writer.Write("L|");
+                            break;
                     }
                 }
 
@@ -526,7 +579,7 @@ namespace osu.Game.Beatmaps.Formats
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
             LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
-            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
+            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL && !s.EditorAutoBank)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 
@@ -536,7 +589,7 @@ namespace osu.Game.Beatmaps.Formats
             if (!banksOnly)
             {
                 int customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name)));
-                string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
+                string sampleFilename = samples.FirstOrDefault(s => s is ConvertHitObjectParser.FileHitSampleInfo)?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
                 // We want to ignore custom sample banks and volume when not encoding to the mania game mode,
@@ -614,7 +667,7 @@ namespace osu.Game.Beatmaps.Formats
             internal int SampleBank { get; init; }
             internal int CustomSampleBank { get; init; }
             internal int SampleVolume { get; init; }
-            internal LegacyEffectFlags EffectFlags { get; init; }
+            internal LegacyEffectFlags EffectFlags { get; set; }
 
             internal bool IsRedundant(LegacyControlPointProperties other) =>
                 SliderVelocity == other.SliderVelocity &&

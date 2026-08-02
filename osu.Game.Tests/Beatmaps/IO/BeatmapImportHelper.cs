@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -62,16 +62,16 @@ namespace osu.Game.Tests.Beatmaps.IO
             // TODO: add back some extra checks outside of the realm ones?
             // var set = queryBeatmapSets().First();
             // foreach (BeatmapInfo b in set.Beatmaps)
-            //     Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineID == b.OnlineID));
-            // Assert.IsTrue(set.Beatmaps.Count > 0);
+            //     ClassicAssert.True(set.Beatmaps.Any(c => c.OnlineID == b.OnlineID));
+            // ClassicAssert.True(set.Beatmaps.Count > 0);
             // var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
-            // Assert.IsTrue(beatmap?.HitObjects.Any() == true);
+            // ClassicAssert.True(beatmap?.HitObjects.Any() == true);
             // beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
-            // Assert.IsTrue(beatmap?.HitObjects.Any() == true);
+            // ClassicAssert.True(beatmap?.HitObjects.Any() == true);
             // beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
-            // Assert.IsTrue(beatmap?.HitObjects.Any() == true);
+            // ClassicAssert.True(beatmap?.HitObjects.Any() == true);
             // beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
-            // Assert.IsTrue(beatmap?.HitObjects.Any() == true);
+            // ClassicAssert.True(beatmap?.HitObjects.Any() == true);
         }
 
         private static void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 while (!result()) Thread.Sleep(200);
             });
 
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
+            ClassicAssert.True(task.Wait(timeout), failureMessage);
         }
     }
 }

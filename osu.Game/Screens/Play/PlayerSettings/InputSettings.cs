@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public partial class InputSettings : PlayerSettingsGroup
     {
         public InputSettings()
-            : base("Input Settings")
+            : base(PlayerSettingsOverlayStrings.InputSettingsTitle)
         {
         }
 

@@ -1,18 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
@@ -22,23 +21,21 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public abstract partial class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
-        public Bindable<Room> SelectedRoom => OnlinePlayDependencies?.SelectedRoom;
-        public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
-        public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
-        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies?.UserLookupCache;
-        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies?.BeatmapLookupCache;
+        public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies.OngoingOperationTracker;
+        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies.UserLookupCache;
+        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies.BeatmapLookupCache;
 
         /// <summary>
         /// All dependencies required for online play components and screens.
         /// </summary>
-        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
+        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies.OnlinePlayDependencies!;
 
         protected override Container<Drawable> Content => content;
 
         private readonly Container content;
         private readonly Container drawableDependenciesContainer;
-        private DelegatedDependencyContainer dependencies;
+        private DelegatedDependencyContainer dependencies = null!;
+        private int currentRoomId;
 
         protected OnlinePlayTestScene()
         {
@@ -49,11 +46,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             });
         }
 
-        protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
-            return dependencies;
-        }
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
 
         public override void SetUpSteps()
         {
@@ -62,9 +56,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             AddStep("setup dependencies", () =>
             {
                 // Reset the room dependencies to a fresh state.
-                drawableDependenciesContainer.Clear();
                 dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
-                drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
+                drawableDependenciesContainer.Clear();
+                drawableDependenciesContainer.AddRange(dependencies.OnlinePlayDependencies.DrawableComponents);
 
                 var handler = OnlinePlayDependencies.RequestsHandler;
 
@@ -98,6 +92,35 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// </remarks>
         protected virtual OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new OnlinePlayTestSceneDependencies();
 
+        protected Room[] GenerateRooms(int count, RulesetInfo? ruleset = null, bool withPassword = false, bool withPinnedRooms = false)
+        {
+            Room[] rooms = new Room[count];
+
+            // Can't reference Osu ruleset project here.
+            if (ruleset == null)
+            {
+                using var assemblyRulesetStore = new AssemblyRulesetStore();
+                ruleset = assemblyRulesetStore.GetRuleset(0)!;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                rooms[i] = new Room
+                {
+                    RoomID = currentRoomId++,
+                    Name = $@"Room {currentRoomId}",
+                    Host = new APIUser { Username = @"Host" },
+                    Duration = TimeSpan.FromSeconds(10),
+                    Password = withPassword ? @"password" : null,
+                    PlaylistItemStats = new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
+                    Playlist = [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }],
+                    Pinned = withPinnedRooms && i % 2 == 0,
+                };
+            }
+
+            return rooms;
+        }
+
         /// <summary>
         /// A <see cref="IReadOnlyDependencyContainer"/> providing a mutable lookup source for online play dependencies.
         /// </summary>
@@ -106,7 +129,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             /// <summary>
             /// The online play dependencies.
             /// </summary>
-            public OnlinePlayTestSceneDependencies OnlinePlayDependencies { get; set; }
+            public OnlinePlayTestSceneDependencies? OnlinePlayDependencies { get; set; }
 
             private readonly IReadOnlyDependencyContainer parent;
             private readonly DependencyContainer injectableDependencies;

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Online.Rooms;
@@ -19,21 +20,44 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             playlist.BindCollectionChanged((_, _) => PlaylistItem = playlist.GetCurrentItem());
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            SelectedRoom.BindValueChanged(onSelectedRoomChanged, true);
+        }
+
         private void onSelectedRoomChanged(ValueChangedEvent<Room?> room)
         {
             if (room.OldValue != null)
-                playlist.UnbindFrom(room.OldValue.Playlist);
+                room.OldValue.PropertyChanged -= onRoomPropertyChanged;
 
             if (room.NewValue != null)
-                playlist.BindTo(room.NewValue.Playlist);
-            else
-                playlist.Clear();
+                room.NewValue.PropertyChanged += onRoomPropertyChanged;
+
+            updateCurrentItem();
         }
+
+        private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Room.Playlist))
+                updateCurrentItem();
+        }
+
+        private void updateCurrentItem()
+            => PlaylistItem = SelectedRoom.Value?.Playlist.GetCurrentItem();
 
         public override bool OnExiting(ScreenExitEvent e)
         {
             // This screen never exits.
             return true;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (SelectedRoom.Value != null)
+                SelectedRoom.Value.PropertyChanged -= onRoomPropertyChanged;
         }
     }
 }

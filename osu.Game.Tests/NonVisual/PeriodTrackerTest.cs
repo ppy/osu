@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Utils;
 using osu.Game.Utils;
 
@@ -28,9 +29,9 @@ namespace osu.Game.Tests.NonVisual
             var tracker = new PeriodTracker(single_period);
 
             var period = single_period.Single();
-            Assert.IsTrue(tracker.IsInAny(period.Start));
-            Assert.IsTrue(tracker.IsInAny(getMidpoint(period)));
-            Assert.IsTrue(tracker.IsInAny(period.End));
+            ClassicAssert.True(tracker.IsInAny(period.Start));
+            ClassicAssert.True(tracker.IsInAny(getMidpoint(period)));
+            ClassicAssert.True(tracker.IsInAny(period.End));
         }
 
         [Test]
@@ -39,7 +40,7 @@ namespace osu.Game.Tests.NonVisual
             var tracker = new PeriodTracker(unordered_periods);
 
             foreach (var period in unordered_periods)
-                Assert.IsTrue(tracker.IsInAny(getMidpoint(period)));
+                ClassicAssert.True(tracker.IsInAny(getMidpoint(period)));
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace osu.Game.Tests.NonVisual
             var tracker = new PeriodTracker(unordered_periods);
 
             foreach (var period in unordered_periods.OrderBy(_ => RNG.Next()))
-                Assert.IsTrue(tracker.IsInAny(getMidpoint(period)));
+                ClassicAssert.True(tracker.IsInAny(getMidpoint(period)));
         }
 
         [Test]
@@ -60,12 +61,12 @@ namespace osu.Game.Tests.NonVisual
                 new Period(3.0, 4.0)
             });
 
-            Assert.IsFalse(tracker.IsInAny(0.9), "Time before first period is being considered inside");
+            ClassicAssert.False(tracker.IsInAny(0.9), "Time before first period is being considered inside");
 
-            Assert.IsFalse(tracker.IsInAny(2.1), "Time right after first period is being considered inside");
-            Assert.IsFalse(tracker.IsInAny(2.9), "Time right before second period is being considered inside");
+            ClassicAssert.False(tracker.IsInAny(2.1), "Time right after first period is being considered inside");
+            ClassicAssert.False(tracker.IsInAny(2.9), "Time right before second period is being considered inside");
 
-            Assert.IsFalse(tracker.IsInAny(4.1), "Time after last period is being considered inside");
+            ClassicAssert.False(tracker.IsInAny(4.1), "Time after last period is being considered inside");
         }
 
         [Test]

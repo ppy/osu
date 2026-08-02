@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -35,8 +36,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 if (bigButton)
                 {
-                    Child = button = new ShearedButton(400)
+                    Child = button = new ShearedButton
                     {
+                        Width = 400,
+                        Height = 80,
                         LighterColour = Colour4.FromHex("#FFFFFF"),
                         DarkerColour = Colour4.FromHex("#FFCC22"),
                         TextColour = Colour4.Black,
@@ -44,21 +47,21 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Text = "Let's GO!",
-                        Height = 80,
                         Action = () => actionFired = true,
                     };
                 }
                 else
                 {
-                    Child = button = new ShearedButton(200)
+                    Child = button = new ShearedButton
                     {
+                        Width = 200,
+                        Height = 80,
                         LighterColour = Colour4.FromHex("#FF86DD"),
                         DarkerColour = Colour4.FromHex("#DE31AE"),
                         TextColour = Colour4.White,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Text = "Press me",
-                        Height = 80,
                         Action = () => actionFired = true,
                     };
                 }
@@ -80,8 +83,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(200)
+                Child = button = new ShearedToggleButton
                 {
+                    Width = 200,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
@@ -97,8 +101,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             ShearedToggleButton toggleButton = null;
 
-            AddStep("create fixed width button", () => Child = toggleButton = new ShearedToggleButton(200)
+            AddStep("create fixed width button", () => Child = toggleButton = new ShearedToggleButton
             {
+                Width = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "Fixed width"
@@ -110,6 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create auto-sizing button", () => Child = toggleButton = new ShearedToggleButton
             {
+                AutoSizeAxes = Axes.X,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "This button autosizes to its text!"
@@ -131,8 +137,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(200)
+                Child = button = new ShearedToggleButton
                 {
+                    Width = 200,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
@@ -170,6 +177,51 @@ namespace osu.Game.Tests.Visual.UserInterface
             void assertToggleState(bool active) => AddAssert($"toggle is {(active ? "" : "not ")}active", () => button.Active.Value == active);
 
             void setToggleDisabledState(bool disabled) => AddStep($"{(disabled ? "disable" : "enable")} toggle", () => button.Active.Disabled = disabled);
+        }
+
+        [Test]
+        public void TestButtons()
+        {
+            AddStep("create buttons", () => Children = new[]
+            {
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Direction = FillDirection.Horizontal,
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new ShearedButton
+                        {
+                            AutoSizeAxes = Axes.X,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Text = "Button",
+                            Action = () => { },
+                            Height = 30,
+                        },
+                        new ShearedButton
+                        {
+                            AutoSizeAxes = Axes.X,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Text = "Button",
+                            Action = () => { },
+                            Height = 30,
+                        },
+                        new ShearedButton
+                        {
+                            AutoSizeAxes = Axes.X,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Text = "Button",
+                            Action = () => { },
+                            Height = 30,
+                        },
+                    }
+                }
+            });
         }
     }
 }

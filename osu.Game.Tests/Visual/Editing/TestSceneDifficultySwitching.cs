@@ -10,9 +10,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Storyboards;
@@ -31,6 +34,9 @@ namespace osu.Game.Tests.Visual.Editing
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         private BeatmapSetInfo importedBeatmapSet;
 
@@ -60,17 +66,21 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestClockPositionPreservedBetweenSwitches()
         {
+            AddStep("Set user audio offset", () => config.SetValue(OsuSetting.AudioOffset, 500.0));
+
             BeatmapInfo targetDifficulty = null;
             AddStep("seek editor to 00:05:00", () => EditorClock.Seek(5000));
 
             AddStep("set target difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.Last(beatmap => !beatmap.Equals(Beatmap.Value.BeatmapInfo)));
             switchToDifficulty(() => targetDifficulty);
             confirmEditingBeatmap(() => targetDifficulty);
-            AddAssert("editor clock at 00:05:00", () => EditorClock.CurrentTime == 5000);
+            AddAssert("editor clock at 00:05:00", () => EditorClock.CurrentTime, () => Is.EqualTo(5000));
 
             AddStep("exit editor", () => Stack.Exit());
             // ensure editor loader didn't resume.
             AddAssert("stack empty", () => Stack.CurrentScreen == null);
+
+            AddStep("Revert user audio offset", () => config.SetValue(OsuSetting.AudioOffset, 0.0));
         }
 
         [Test]
@@ -104,7 +114,7 @@ namespace osu.Game.Tests.Visual.Editing
             if (sameRuleset)
             {
                 AddUntilStep("prompt for save dialog shown", () => DialogOverlay.CurrentDialog is PromptForSaveDialog);
-                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog).PerformOkAction());
+                AddStep("discard changes", () => ((PromptForSaveDialog)DialogOverlay.CurrentDialog)?.PerformOkAction());
             }
 
             // ensure editor loader didn't resume.
@@ -163,6 +173,24 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             confirmEditingBeatmap(() => targetDifficulty);
+
+            AddStep("exit editor forcefully", () => Stack.Exit());
+            // ensure editor loader didn't resume.
+            AddAssert("stack empty", () => Stack.CurrentScreen == null);
+        }
+
+        [Test]
+        public void TestSwitchToDifficultyOfAnotherRuleset()
+        {
+            BeatmapInfo targetDifficulty = null;
+
+            AddAssert("ruleset is catch", () => Ruleset.Value.CreateInstance() is CatchRuleset);
+
+            AddStep("set taiko difficulty", () => targetDifficulty = importedBeatmapSet.Beatmaps.First(b => b.Ruleset.OnlineID == 1));
+            switchToDifficulty(() => targetDifficulty);
+            confirmEditingBeatmap(() => targetDifficulty);
+
+            AddAssert("ruleset switched to taiko", () => Ruleset.Value.CreateInstance() is TaikoRuleset);
 
             AddStep("exit editor forcefully", () => Stack.Exit());
             // ensure editor loader didn't resume.

@@ -16,14 +16,64 @@ namespace osu.Game.Graphics
         public const float DEFAULT_FONT_SIZE = 16;
 
         /// <summary>
+        /// Template font styles which should be preferred whenever possible for UI elements.
+        /// </summary>
+        public static class Style
+        {
+            /// <summary>
+            /// Equivalent to Torus with 32px size and semi-bold weight.
+            /// </summary>
+            public static FontUsage Title => GetFont(Typeface.TorusAlternate, size: 32, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 28px size and semi-bold weight.
+            /// </summary>
+            public static FontUsage Subtitle => GetFont(size: 28, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 22px size and bold weight.
+            /// </summary>
+            public static FontUsage Heading1 => GetFont(size: 22, weight: FontWeight.Bold);
+
+            /// <summary>
+            /// Torus with 18px size and semi-bold weight.
+            /// </summary>
+            public static FontUsage Heading2 => GetFont(size: 18, weight: FontWeight.SemiBold);
+
+            /// <summary>
+            /// Torus with 16px size and regular weight.
+            /// </summary>
+            public static FontUsage Body => GetFont(size: DEFAULT_FONT_SIZE, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 14px size and regular weight.
+            /// </summary>
+            public static FontUsage Caption1 => GetFont(size: 14, weight: FontWeight.Regular);
+
+            /// <summary>
+            /// Torus with 12px size and regular weight.
+            /// </summary>
+            public static FontUsage Caption2 => GetFont(size: 12, weight: FontWeight.Regular);
+        }
+
+        /// <summary>
         /// The default font.
         /// </summary>
-        public static FontUsage Default => GetFont();
+        public static FontUsage Default => GetFont(weight: FontWeight.Medium);
 
+        /// <summary>
+        /// Font face for numeric display.
+        /// </summary>
         public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Bold);
 
+        /// <summary>
+        /// Default font face for UI and game elements.
+        /// </summary>
         public static FontUsage Torus => GetFont(Typeface.Torus, weight: FontWeight.Regular);
 
+        /// <summary>
+        /// Default font face with alternate character set for headings and flair text.
+        /// </summary>
         public static FontUsage TorusAlternate => GetFont(Typeface.TorusAlternate, weight: FontWeight.Regular);
 
         public static FontUsage Inter => GetFont(Typeface.Inter, weight: FontWeight.Regular);

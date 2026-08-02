@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString MenuCursorSize => new TranslatableString(getKey(@"menu_cursor_size"), @"Menu cursor size");
 
         /// <summary>
+        /// "Menu tips"
+        /// </summary>
+        public static LocalisableString ShowMenuTips => new TranslatableString(getKey(@"show_menu_tips"), @"Menu tips");
+
+        /// <summary>
         /// "Parallax"
         /// </summary>
         public static LocalisableString Parallax => new TranslatableString(getKey(@"parallax"), @"Parallax");
@@ -55,6 +60,11 @@ namespace osu.Game.Localisation
         public static LocalisableString IntroSequence => new TranslatableString(getKey(@"intro_sequence"), @"Intro sequence");
 
         /// <summary>
+        /// "Random"
+        /// </summary>
+        public static LocalisableString IntroRandom => new TranslatableString(getKey(@"intro_random"), @"Random");
+
+        /// <summary>
         /// "Background source"
         /// </summary>
         public static LocalisableString BackgroundSource => new TranslatableString(getKey(@"background_source"), @"Background source");
@@ -80,6 +90,11 @@ namespace osu.Game.Localisation
         public static LocalisableString RightMouseScroll => new TranslatableString(getKey(@"right_mouse_scroll"), @"Right mouse drag to absolute scroll");
 
         /// <summary>
+        /// "Show converts"
+        /// </summary>
+        public static LocalisableString ShowConverts => new TranslatableString(getKey(@"show_converts"), @"Show converts");
+
+        /// <summary>
         /// "Show converted beatmaps"
         /// </summary>
         public static LocalisableString ShowConvertedBeatmaps => new TranslatableString(getKey(@"show_converted_beatmaps"), @"Show converted beatmaps");
@@ -103,6 +118,11 @@ namespace osu.Game.Localisation
         /// "Mod select hotkey style"
         /// </summary>
         public static LocalisableString ModSelectHotkeyStyle => new TranslatableString(getKey(@"mod_select_hotkey_style"), @"Mod select hotkey style");
+
+        /// <summary>
+        /// "Automatically focus search text box in mod select"
+        /// </summary>
+        public static LocalisableString ModSelectTextSearchStartsActive => new TranslatableString(getKey(@"mod_select_text_search_starts_active"), @"Automatically focus search text box in mod select");
 
         /// <summary>
         /// "no limit"
@@ -145,10 +165,45 @@ namespace osu.Game.Localisation
         public static LocalisableString NeverRepeat => new TranslatableString(getKey(@"never_repeat_random"), @"Never repeat");
 
         /// <summary>
-        /// "True Random"
+        /// "True random"
         /// </summary>
-        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True Random");
+        public static LocalisableString TrueRandom => new TranslatableString(getKey(@"true_random"), @"True random");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Selected Mods"
+        /// </summary>
+        public static LocalisableString SelectedMods => new TranslatableString(getKey(@"selected_mods"), @"Selected Mods");
+
+        /// <summary>
+        /// "hold for menu"
+        /// </summary>
+        public static LocalisableString HoldForMenu => new TranslatableString(getKey(@"hold_for_menu"), @"hold for menu");
+
+        /// <summary>
+        /// "press for menu"
+        /// </summary>
+        public static LocalisableString PressForMenu => new TranslatableString(getKey(@"press_for_menu"), @"press for menu");
+
+        /// <summary>
+        /// "Device"
+        /// </summary>
+        public static LocalisableString Device => new TranslatableString(getKey(@"device"), @"Device");
+
+        /// <summary>
+        /// "Show hidden"
+        /// </summary>
+        public static LocalisableString ShowHidden => new TranslatableString(getKey(@"show_hidden"), @"Show hidden");
+
+        /// <summary>
+        /// "Currently online"
+        /// </summary>
+        public static LocalisableString CurrentlyOnline => new TranslatableString(getKey(@"currently_online"), @"Currently online");
+
+        /// <summary>
+        /// "User search"
+        /// </summary>
+        public static LocalisableString UserSearch => new TranslatableString(getKey(@"user_search"), @"User search");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

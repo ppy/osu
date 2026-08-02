@@ -31,7 +31,11 @@ namespace osu.Game.Overlays.Chat.Listing
 
         public bool FilteringActive { get; set; }
         public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Channel.Name, Channel.Topic ?? string.Empty };
-        public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
+
+        public bool MatchingFilter
+        {
+            set => this.FadeTo(value ? 1f : 0f, 100);
+        }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
@@ -44,7 +48,7 @@ namespace osu.Game.Overlays.Chat.Listing
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        private const float text_size = 18;
+        private const float text_size = 14;
         private const float icon_size = 14;
 
         private const float vertical_margin = 1.5f;

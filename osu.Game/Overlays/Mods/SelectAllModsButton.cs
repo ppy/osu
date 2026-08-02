@@ -18,8 +18,9 @@ namespace osu.Game.Overlays.Mods
         private readonly Bindable<string> searchTerm = new Bindable<string>();
 
         public SelectAllModsButton(FreeModSelectOverlay modSelectOverlay)
-            : base(ModSelectOverlay.BUTTON_WIDTH)
         {
+            Width = ModSelectOverlay.BUTTON_WIDTH;
+
             Text = CommonStrings.SelectAll;
             Action = modSelectOverlay.SelectAll;
 
@@ -41,8 +42,8 @@ namespace osu.Game.Overlays.Mods
         private void updateEnabledState()
         {
             Enabled.Value = availableMods.Value
-                                         .Where(pair => pair.Key != ModType.System)
                                          .SelectMany(pair => pair.Value)
+                                         .Where(modState => modState.ValidForSelection.Value)
                                          .Any(modState => !modState.Active.Value && modState.Visible);
         }
     }

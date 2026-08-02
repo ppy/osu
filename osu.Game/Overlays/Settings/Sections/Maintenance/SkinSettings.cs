@@ -13,12 +13,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => CommonStrings.Skins;
 
-        private SettingsButton deleteSkinsButton = null!;
+        private SettingsButtonV2 deleteSkinsButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(SkinManager skins, IDialogOverlay? dialogOverlay)
         {
-            Add(deleteSkinsButton = new DangerousSettingsButton
+            Add(deleteSkinsButton = new DangerousSettingsButtonV2
             {
                 Text = MaintenanceSettingsStrings.DeleteAllSkins,
                 Action = () =>
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         deleteSkinsButton.Enabled.Value = false;
                         Task.Run(() => skins.Delete()).ContinueWith(_ => Schedule(() => deleteSkinsButton.Enabled.Value = true));
-                    }));
+                    }, DeleteConfirmationContentStrings.Skins));
                 }
             });
         }

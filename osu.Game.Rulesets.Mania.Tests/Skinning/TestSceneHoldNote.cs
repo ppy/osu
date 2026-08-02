@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
             {
                 foreach (var holdNote in CreatedDrawables.SelectMany(d => d.ChildrenOfType<DrawableHoldNote>()))
                 {
-                    ((Bindable<bool>)holdNote.IsHitting).Value = v;
+                    ((Bindable<bool>)holdNote.IsHolding).Value = v;
                 }
             });
         }

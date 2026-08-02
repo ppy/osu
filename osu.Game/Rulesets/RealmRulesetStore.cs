@@ -3,8 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -13,17 +16,20 @@ namespace osu.Game.Rulesets
 {
     public class RealmRulesetStore : RulesetStore
     {
+        private readonly RealmAccess realmAccess;
         public override IEnumerable<RulesetInfo> AvailableRulesets => availableRulesets;
 
         private readonly List<RulesetInfo> availableRulesets = new List<RulesetInfo>();
 
-        public RealmRulesetStore(RealmAccess realm, Storage? storage = null)
+        public RealmRulesetStore(RealmAccess realmAccess, Storage? storage = null)
             : base(storage)
         {
-            prepareDetachedRulesets(realm);
+            this.realmAccess = realmAccess;
+            prepareDetachedRulesets();
+            informUserAboutBrokenRulesets();
         }
 
-        private void prepareDetachedRulesets(RealmAccess realmAccess)
+        private void prepareDetachedRulesets()
         {
             realmAccess.Write(realm =>
             {
@@ -87,6 +93,12 @@ namespace osu.Game.Rulesets
                                 $"Ruleset API version is too old (was {instance.RulesetAPIVersionSupported}, expected {Ruleset.CURRENT_RULESET_API_VERSION})");
                         }
 
+                        if (r.OnlineID != instanceInfo.OnlineID)
+                            throw new InvalidOperationException($@"Online ID mismatch for ruleset {r.ShortName}: database has {r.OnlineID}, constructed instance has {instanceInfo.OnlineID}");
+
+                        if (r.OnlineID > 0 && rulesets.Any(otherRuleset => otherRuleset.ShortName != r.ShortName && otherRuleset.OnlineID == r.OnlineID))
+                            throw new InvalidOperationException($@"Ruleset {r.ShortName} shares online ID {r.OnlineID} with another ruleset");
+
                         // If a ruleset isn't up-to-date with the API, it could cause a crash at an arbitrary point of execution.
                         // To eagerly handle cases of missing implementations, enumerate all types here and mark as non-available on throw.
                         resolvedType.Assembly.GetTypes();
@@ -103,11 +115,11 @@ namespace osu.Game.Rulesets
                     catch (Exception ex)
                     {
                         r.Available = false;
-                        LogFailedLoad(r.Name, ex);
+                        LogRulesetFailure(r, ex);
                     }
                 }
 
-                availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
+                availableRulesets.AddRange(detachedRulesets.Order());
             });
         }
 
@@ -142,6 +154,49 @@ namespace osu.Game.Rulesets
             var converter = instance.CreateBeatmapConverter(beatmap);
 
             instance.CreateBeatmapProcessor(converter.Convert());
+        }
+
+        private void informUserAboutBrokenRulesets()
+        {
+            if (RulesetStorage == null)
+                return;
+
+            foreach (string brokenRulesetDll in RulesetStorage.GetFiles(@".", @"*.dll.broken"))
+            {
+                Logger.Log($"Ruleset '{Path.GetFileNameWithoutExtension(brokenRulesetDll)}' has been disabled due to causing a crash.\n\n"
+                           + "Please update the ruleset or report the issue to the developers of the ruleset if no updates are available.", level: LogLevel.Important);
+            }
+        }
+
+        internal void TryDisableCustomRulesetsCausing(Exception exception)
+        {
+            try
+            {
+                var stackTrace = new StackTrace(exception);
+
+                foreach (var frame in stackTrace.GetFrames())
+                {
+                    var declaringAssembly = frame.GetMethod()?.DeclaringType?.Assembly;
+                    if (declaringAssembly == null)
+                        continue;
+
+                    if (UserRulesetAssemblies.Contains(declaringAssembly))
+                    {
+                        string sourceLocation = declaringAssembly.Location;
+                        string destinationLocation = Path.ChangeExtension(sourceLocation, @".dll.broken");
+
+                        if (File.Exists(sourceLocation))
+                        {
+                            Logger.Log($"Unhandled exception traced back to custom ruleset {Path.GetFileNameWithoutExtension(sourceLocation)}. Marking as broken.");
+                            File.Move(sourceLocation, destinationLocation);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Attempt to trace back crash to custom ruleset failed: {ex}");
+            }
         }
     }
 }

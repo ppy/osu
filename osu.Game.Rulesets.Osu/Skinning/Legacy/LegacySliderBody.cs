@@ -15,37 +15,32 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     {
         protected override DrawableSliderPath CreateSliderPath() => new LegacyDrawableSliderPath();
 
+        protected override Color4 GetBorderColour(ISkinSource skin)
+            => skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
+
         protected override Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour)
-        {
             // legacy skins use a constant value for slider track alpha, regardless of the source colour.
-            return base.GetBodyAccentColour(skin, hitObjectAccentColour).Opacity(0.7f);
-        }
+            => (skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? hitObjectAccentColour).Opacity(0.7f);
 
         private partial class LegacyDrawableSliderPath : DrawableSliderPath
         {
-            private const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
-
-            protected new float CalculatedBorderPortion
-                // Roughly matches osu!stable's slider border portions.
-                => base.CalculatedBorderPortion * 0.77f;
-
             protected override Color4 ColourAt(float position)
             {
-                float realBorderPortion = shadow_portion + CalculatedBorderPortion;
-                float realGradientPortion = 1 - realBorderPortion;
-
-                if (position <= shadow_portion)
-                    return new Color4(0f, 0f, 0f, 0.25f * position / shadow_portion);
-
-                if (position <= realBorderPortion)
-                    return BorderColour;
-
-                position -= realBorderPortion;
-
+                Color4 shadow = new Color4(0, 0, 0, 0.25f);
                 Color4 outerColour = AccentColour.Darken(0.1f);
                 Color4 innerColour = lighten(AccentColour, 0.5f);
 
-                return LegacyUtils.InterpolateNonLinear(position / realGradientPortion, outerColour, innerColour, 0, 1);
+                // https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Renderers/MmSliderRendererGL.cs#L59-L70
+                const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
+                const float border_portion = 0.1875f;
+
+                if (position <= shadow_portion)
+                    return LegacyUtils.InterpolateNonLinear(position, Color4.Black.Opacity(0f), shadow, 0, shadow_portion);
+
+                if (position <= border_portion)
+                    return BorderColour;
+
+                return LegacyUtils.InterpolateNonLinear(position, outerColour, innerColour, border_portion, 1);
             }
 
             /// <summary>

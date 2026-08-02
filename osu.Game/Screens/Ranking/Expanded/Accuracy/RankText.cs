@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,9 +21,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
     {
         private readonly ScoreRank rank;
 
-        private BufferedContainer flash;
-        private BufferedContainer superFlash;
-        private GlowingSpriteText rankText;
+        private BufferedContainer flash = null!;
+        private BufferedContainer superFlash = null!;
+        private GlowingSpriteText rankText = null!;
 
         public RankText(ScoreRank rank)
         {
@@ -49,7 +47,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Origin = Anchor.Centre,
                     GlowColour = OsuColour.ForRank(rank),
                     Spacing = new Vector2(-15, 0),
-                    Text = DrawableRank.GetRankName(rank),
+                    Text = DrawableRank.GetRankLetter(rank),
                     Font = OsuFont.Numeric.With(size: 76),
                     UseFullGlyphHeight = false
                 },
@@ -89,7 +87,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Spacing = new Vector2(-15, 0),
-                            Text = DrawableRank.GetRankName(rank),
+                            Text = DrawableRank.GetRankLetter(rank),
                             Font = OsuFont.Numeric.With(size: 76),
                             UseFullGlyphHeight = false,
                             Shadow = false

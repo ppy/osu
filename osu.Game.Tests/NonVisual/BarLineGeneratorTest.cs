@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -54,13 +55,13 @@ namespace osu.Game.Tests.NonVisual
                 // every seventh bar's start time should be at least greater than the whole number we expect.
                 // It cannot be less, as that can affect overlapping scroll algorithms
                 // (the previous timing point might be chosen incorrectly if this is not the case)
-                Assert.GreaterOrEqual(barLine.StartTime, expectedTime);
+                ClassicAssert.GreaterOrEqual(barLine.StartTime, expectedTime);
 
                 // on the other side, make sure we don't stray too far from the expected time either.
-                Assert.IsTrue(Precision.AlmostEquals(barLine.StartTime, expectedTime));
+                ClassicAssert.True(Precision.AlmostEquals(barLine.StartTime, expectedTime));
 
                 // check major/minor lines for good measure too
-                Assert.AreEqual(i % signature.Numerator == 0, barLine.Major);
+                ClassicAssert.AreEqual(i % signature.Numerator == 0, barLine.Major);
             }
         }
 

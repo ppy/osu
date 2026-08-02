@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Localisation;
 using osu.Game.Database;
+using osu.Game.Localisation;
 
 namespace osu.Game.Collections
 {
@@ -20,7 +22,7 @@ namespace osu.Game.Collections
         /// <summary>
         /// The name of the collection.
         /// </summary>
-        public string CollectionName { get; }
+        public LocalisableString CollectionName { get; }
 
         /// <summary>
         /// Creates a new <see cref="CollectionFilterMenuItem"/>.
@@ -32,42 +34,45 @@ namespace osu.Game.Collections
             Collection = collection;
         }
 
-        protected CollectionFilterMenuItem(string name)
+        protected CollectionFilterMenuItem(LocalisableString name)
         {
             CollectionName = name;
         }
 
-        public bool Equals(CollectionFilterMenuItem? other)
+        public virtual bool Equals(CollectionFilterMenuItem? other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
 
-            // collections may have the same name, so compare first on reference equality.
-            // this relies on the assumption that only one instance of the BeatmapCollection exists game-wide, managed by CollectionManager.
-            if (Collection != null)
-                return Collection.ID == other.Collection?.ID;
+            if (Collection == null) return false;
 
-            // fallback to name-based comparison.
-            // this is required for special dropdown items which don't have a collection (all beatmaps / manage collections items below).
-            return CollectionName == other.CollectionName;
+            return Collection.ID == other.Collection?.ID;
         }
 
-        public override int GetHashCode() => CollectionName.GetHashCode();
+        public override int GetHashCode() => Collection?.ID.GetHashCode() ?? 0;
     }
 
     public class AllBeatmapsCollectionFilterMenuItem : CollectionFilterMenuItem
     {
         public AllBeatmapsCollectionFilterMenuItem()
-            : base("All beatmaps")
+            : base(CollectionsStrings.AllBeatmaps)
         {
         }
+
+        public override bool Equals(CollectionFilterMenuItem? other) => other is AllBeatmapsCollectionFilterMenuItem;
+
+        public override int GetHashCode() => 1;
     }
 
     public class ManageCollectionsFilterMenuItem : CollectionFilterMenuItem
     {
         public ManageCollectionsFilterMenuItem()
-            : base("Manage collections...")
+            : base(CollectionsStrings.ManageCollections)
         {
         }
+
+        public override bool Equals(CollectionFilterMenuItem? other) => other is ManageCollectionsFilterMenuItem;
+
+        public override int GetHashCode() => 2;
     }
 }

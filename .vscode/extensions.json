@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "ms-dotnettools.csharp"
+        "editorconfig.editorconfig",
+        "ms-dotnettools.csdevkit"
     ]
 }

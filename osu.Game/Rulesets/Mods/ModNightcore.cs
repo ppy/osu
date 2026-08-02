@@ -8,12 +8,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -27,8 +28,9 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override ModType Type => ModType.DifficultyIncrease;
         public override LocalisableString Description => "Uguuuuuuuu...";
+        public override bool Ranked => UsesDefaultConfiguration;
 
-        [SettingSource("Speed increase", "The actual increase to apply")]
+        [SettingSource("Speed increase", "The actual increase to apply", SettingControlType = typeof(MultiplierSettingsSlider))]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble(1.5)
         {
             MinValue = 1.01,
@@ -39,13 +41,9 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
-        private readonly RateAdjustModHelper rateAdjustHelper;
-
         protected ModNightcore()
         {
-            rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
-
-            // intentionally not deferring the speed change handling to `RateAdjustModHelper`
+            // intentionally not using `RateAdjustModHelper`
             // as the expected result of operation is not the same (nightcore should preserve constant pitch).
             SpeedChange.BindValueChanged(val =>
             {
@@ -59,8 +57,6 @@ namespace osu.Game.Rulesets.Mods
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
-
-        public override double ScoreMultiplier => rateAdjustHelper.ScoreMultiplier;
     }
 
     public abstract partial class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
@@ -68,7 +64,11 @@ namespace osu.Game.Rulesets.Mods
     {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
+            // from stable:
+            // > (in a perfect world) tick rates other than 2 imply there isn't a regular offbeat, so offbeat hats would stand out.
+            // > only enable them if tick rate is a multiple of 2.
+            bool playHats = Precision.AlmostEquals(drawableRuleset.Beatmap.Difficulty.SliderTickRate % 2, 0);
+            drawableRuleset.Overlays.Add(new NightcoreBeatContainer(playHats));
         }
 
         public partial class NightcoreBeatContainer : BeatSyncedContainer
@@ -79,9 +79,13 @@ namespace osu.Game.Rulesets.Mods
             private PausableSkinnableSound? finishSample;
 
             private int? firstBeat;
+            private int lastBeat = -1;
 
-            public NightcoreBeatContainer()
+            private readonly bool playHats;
+
+            public NightcoreBeatContainer(bool playHats = true)
             {
+                this.playHats = playHats;
                 Divisor = 2;
             }
 
@@ -114,21 +118,35 @@ namespace osu.Game.Rulesets.Mods
 
                 if (!firstBeat.HasValue || beatIndex < firstBeat)
                     // decide on a good starting beat index if once has not yet been decided.
-                    firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
+                    firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength) * segmentLength;
 
                 if (beatIndex >= firstBeat)
-                    playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
+                    playBeatFor(beatIndex, segmentLength, timingPoint);
             }
 
-            private void playBeatFor(int beatIndex, TimeSignature signature)
+            private void playBeatFor(int beatIndex, int segmentLength, TimingControlPoint timingPoint)
             {
-                if (beatIndex == 0)
-                    finishSample?.Play();
+                // https://github.com/peppy/osu-stable-reference/blob/6ab0cf1f9f7b3449f5c0d8defcd458aae72cdb88/osu!/Audio/NightcoreBeat.cs#L41
+                if (lastBeat == beatIndex)
+                    return;
 
-                switch (signature.Numerator)
+                lastBeat = beatIndex;
+
+                int beatInSegment = beatIndex % segmentLength;
+
+                if (beatInSegment == 0)
+                {
+                    // https://github.com/peppy/osu-stable-reference/blob/6ab0cf1f9f7b3449f5c0d8defcd458aae72cdb88/osu!/Audio/NightcoreBeat.cs#L53
+                    bool playFinish = beatIndex > 0 || !timingPoint.OmitFirstBarLine;
+
+                    if (playFinish)
+                        finishSample?.Play();
+                }
+
+                switch (timingPoint.TimeSignature.Numerator)
                 {
                     case 3:
-                        switch (beatIndex % 6)
+                        switch (beatInSegment % 6)
                         {
                             case 0:
                                 kickSample?.Play();
@@ -139,14 +157,15 @@ namespace osu.Game.Rulesets.Mods
                                 break;
 
                             default:
-                                hatSample?.Play();
+                                if (playHats)
+                                    hatSample?.Play();
                                 break;
                         }
 
                         break;
 
                     case 4:
-                        switch (beatIndex % 4)
+                        switch (beatInSegment % 4)
                         {
                             case 0:
                                 kickSample?.Play();
@@ -157,7 +176,8 @@ namespace osu.Game.Rulesets.Mods
                                 break;
 
                             default:
-                                hatSample?.Play();
+                                if (playHats)
+                                    hatSample?.Play();
                                 break;
                         }
 

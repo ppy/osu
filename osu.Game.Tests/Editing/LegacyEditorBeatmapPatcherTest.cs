@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Editing
                     {
                         new PathControlPoint(Vector2.Zero),
                         new PathControlPoint(Vector2.One),
-                        new PathControlPoint(new Vector2(2), PathType.Bezier),
+                        new PathControlPoint(new Vector2(2), PathType.BEZIER),
                         new PathControlPoint(new Vector2(3)),
                     }, 50)
                 },
@@ -179,7 +179,7 @@ namespace osu.Game.Tests.Editing
                         StartTime = 2000,
                         Path = new SliderPath(new[]
                         {
-                            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+                            new PathControlPoint(Vector2.Zero, PathType.BEZIER),
                             new PathControlPoint(new Vector2(4)),
                             new PathControlPoint(new Vector2(5)),
                         }, 100)
@@ -362,7 +362,7 @@ namespace osu.Game.Tests.Editing
             using (var encoded = new MemoryStream())
             {
                 using (var sw = new StreamWriter(encoded))
-                    new LegacyBeatmapEncoder(beatmap, null).Encode(sw);
+                    new LegacyBeatmapEncoder(beatmap, null, null).Encode(sw);
 
                 return encoded.ToArray();
             }

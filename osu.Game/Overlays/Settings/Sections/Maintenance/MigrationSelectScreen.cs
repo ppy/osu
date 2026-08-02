@@ -54,11 +54,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.TargetDirectoryAlreadyInstalledOsu, () =>
                             {
-                                dialogOverlay.Push(new ConfirmDialog(MaintenanceSettingsStrings.RestartAndReOpenRequiredForCompletion, () =>
-                                {
-                                    (storage as OsuStorage)?.ChangeDataPath(target.FullName);
-                                    game.Exit();
-                                }, () => { }));
+                                (storage as OsuStorage)?.ChangeDataPath(target.FullName);
+                                game.RestartAppWhenExited();
+                                game.Exit();
                             },
                             () => { }));
 

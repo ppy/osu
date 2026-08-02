@@ -8,8 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -34,16 +32,15 @@ namespace osu.Game.Screens.Ranking.Statistics
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Masking = true,
-                CornerRadius = 6,
+                CornerRadius = 10,
                 Children = new Drawable[]
                 {
                     new Box
                     {
                         Colour = ColourInfo.GradientVertical(
-                            OsuColour.Gray(0.25f),
-                            OsuColour.Gray(0.18f)
+                            OsuColour.Gray(0.25f).Opacity(0.8f),
+                            OsuColour.Gray(0.18f).Opacity(0.95f)
                         ),
-                        Alpha = 0.95f,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new Container
@@ -53,48 +50,18 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Padding = new MarginPadding(5),
                         Children = new[]
                         {
-                            createHeader(item),
+                            LocalisableString.IsNullOrEmpty(item.Name)
+                                ? Empty()
+                                : new StatisticItemHeader { Text = item.Name },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding(10) { Top = 30 },
+                                Padding = new MarginPadding(20) { Top = 45 },
                                 Child = item.CreateContent()
                             }
                         }
                     },
-                }
-            };
-        }
-
-        private static Drawable createHeader(StatisticItem item)
-        {
-            if (LocalisableString.IsNullOrEmpty(item.Name))
-                return Empty();
-
-            return new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 20,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5, 0),
-                Children = new Drawable[]
-                {
-                    new Circle
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Height = 9,
-                        Width = 4,
-                        Colour = Color4Extensions.FromHex("#00FFAA")
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Text = item.Name,
-                        Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold),
-                    }
                 }
             };
         }

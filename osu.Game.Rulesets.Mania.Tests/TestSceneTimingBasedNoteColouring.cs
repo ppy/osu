@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public partial class TestSceneTimingBasedNoteColouring : OsuTestScene
     {
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+
         private Bindable<bool> configTimingBasedNoteColouring;
 
         private ManualClock clock;
@@ -34,16 +36,19 @@ namespace osu.Game.Rulesets.Mania.Tests
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("setup hierarchy", () => Child = new Container
+            AddStep("setup hierarchy", () =>
             {
-                Clock = new FramedClock(clock = new ManualClock()),
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new[]
+                Child = new Container
                 {
-                    drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
-                }
+                    Clock = new FramedClock(clock = new ManualClock()),
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new[]
+                    {
+                        drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
+                    }
+                };
             });
             AddStep("retrieve config bindable", () =>
             {

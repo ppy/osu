@@ -13,7 +13,6 @@ using Android.Graphics;
 using Android.OS;
 using Android.Views;
 using osu.Framework.Android;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Database;
 using Debug = System.Diagnostics.Debug;
 using Uri = Android.Net.Uri;
@@ -21,13 +20,24 @@ using Uri = Android.Net.Uri;
 namespace osu.Android
 {
     [Activity(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataMimeType = "application/x-osu-replay")]
-    [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, DataMimeTypes = new[]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, Label = "Import beatmap", DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*",
+        DataMimeType = "*/*")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, Label = "Import skin", DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*",
+        DataMimeType = "*/*")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, Label = "Import replay", DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*",
+        DataMimeType = "*/*")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, Label = "Import beatmap", DataScheme = "content", DataMimeType = "application/x-osu-beatmap-archive")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, Label = "Import skin", DataScheme = "content", DataMimeType = "application/x-osu-skin-archive")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, Label = "Import replay", DataScheme = "content", DataMimeType = "application/x-osu-replay")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, Label = "Import file", DataScheme = "content", DataMimeTypes = new[]
+    {
+        "application/zip",
+        "application/octet-stream",
+        "application/download",
+        "application/x-zip",
+        "application/x-zip-compressed",
+    })]
+    [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, Label = "Import", DataMimeTypes = new[]
     {
         "application/zip",
         "application/octet-stream",
@@ -50,9 +60,25 @@ namespace osu.Android
         /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
         public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
 
-        private OsuGameAndroid game = null!;
+        public new bool IsTablet { get; private set; }
 
-        protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
+        private readonly OsuGameAndroid game;
+
+        private bool gameCreated;
+
+        protected override Framework.Game CreateGame()
+        {
+            if (gameCreated)
+                throw new InvalidOperationException("Framework tried to create a game twice.");
+
+            gameCreated = true;
+            return game;
+        }
+
+        public OsuGameActivity()
+        {
+            game = new OsuGameAndroid(this);
+        }
 
         protected override void OnCreate(Bundle? savedInstanceState)
         {
@@ -72,13 +98,13 @@ namespace osu.Android
             Debug.Assert(Resources?.DisplayMetrics != null);
 
             Point displaySize = new Point();
-#pragma warning disable 618 // GetSize is deprecated
+#pragma warning disable CA1422 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
-#pragma warning restore 618
+#pragma warning restore CA1422
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
-            bool isTablet = smallestWidthDp >= 600f;
+            IsTablet = smallestWidthDp >= 600f;
 
-            RequestedOrientation = DefaultOrientation = isTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+            RequestedOrientation = DefaultOrientation = IsTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
 
             // Currently (SDK 6.0.200), BundleAssemblies is not runnable for net6-android.
             // The assembly files are not available as files either after native AOT.
@@ -95,25 +121,38 @@ namespace osu.Android
 
         private void handleIntent(Intent? intent)
         {
-            switch (intent?.Action)
+            if (intent == null)
+                return;
+
+            switch (intent.Action)
             {
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUris(intent.Data.AsNonNull());
+                    {
+                        if (intent.Data != null)
+                            handleImportFromUris(intent.Data);
+                    }
                     else if (osu_url_schemes.Contains(intent.Scheme))
-                        game.HandleLink(intent.DataString);
+                    {
+                        if (intent.DataString != null)
+                            game.HandleLink(intent.DataString);
+                    }
+
                     break;
 
                 case Intent.ActionSend:
                 case Intent.ActionSendMultiple:
                 {
+                    if (intent.ClipData == null)
+                        break;
+
                     var uris = new List<Uri>();
 
-                    for (int i = 0; i < intent.ClipData?.ItemCount; i++)
+                    for (int i = 0; i < intent.ClipData.ItemCount; i++)
                     {
-                        var content = intent.ClipData?.GetItemAt(i);
-                        if (content != null)
-                            uris.Add(content.Uri.AsNonNull());
+                        var item = intent.ClipData.GetItemAt(i);
+                        if (item?.Uri != null)
+                            uris.Add(item.Uri);
                     }
 
                     handleImportFromUris(uris.ToArray());

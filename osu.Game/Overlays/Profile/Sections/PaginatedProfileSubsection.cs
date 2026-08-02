@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
             CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
-            retrievalRequest = CreateRequest(User.Value, CurrentPage.Value);
+            retrievalRequest = CreateRequest(User.Value, new PaginationParameters(CurrentPage.Value.Offset, CurrentPage.Value.Limit + 1));
             retrievalRequest.Success += items => UpdateItems(items, loadCancellation);
 
             api.Queue(retrievalRequest);
@@ -124,8 +124,6 @@ namespace osu.Game.Overlays.Profile.Sections
 
         protected virtual void UpdateItems(List<TModel> items, CancellationTokenSource cancellationTokenSource) => Schedule(() =>
         {
-            OnItemsReceived(items);
-
             if (!items.Any() && CurrentPage?.Offset == 0)
             {
                 moreButton.Hide();
@@ -137,11 +135,18 @@ namespace osu.Game.Overlays.Profile.Sections
                 return;
             }
 
+            bool hasMore = items.Count > CurrentPage?.Limit;
+
+            if (hasMore)
+                items.RemoveAt(items.Count - 1);
+
+            OnItemsReceived(items);
+
             LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null).Cast<Drawable>(), drawables =>
             {
                 missing.Hide();
 
-                moreButton.FadeTo(items.Count == CurrentPage?.Limit ? 1 : 0);
+                moreButton.FadeTo(hasMore ? 1 : 0);
                 moreButton.IsLoading = false;
 
                 ItemsContainer.AddRange(drawables);

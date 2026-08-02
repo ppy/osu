@@ -8,6 +8,7 @@ namespace osu.Game.Rulesets.Taiko
         InputDrum,
         CentreHit,
         RimHit,
+        DrumRollHead,
         DrumRollBody,
         DrumRollTick,
         Swell,

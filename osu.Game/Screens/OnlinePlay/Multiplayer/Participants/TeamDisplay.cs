@@ -1,16 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -20,27 +22,31 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
-    internal partial class TeamDisplay : MultiplayerRoomComposite
+    internal partial class TeamDisplay : CompositeDrawable, IHasCurrentValue<Slot>
     {
-        private readonly MultiplayerRoomUser user;
+        public Bindable<Slot> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
 
-        private Drawable box;
-
-        private Sample sampleTeamSwap;
+        private readonly BindableWithCurrent<Slot> current = new BindableWithCurrent<Slot>(Slot.FromUser(new MultiplayerRoomUser(-1)));
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private OsuColour colours { get; set; } = null!;
 
-        private OsuClickableContainer clickableContent;
+        [Resolved]
+        private MultiplayerClient client { get; set; } = null!;
 
-        public TeamDisplay(MultiplayerRoomUser user)
+        private OsuClickableContainer clickableContent = null!;
+        private Drawable box = null!;
+        private SpriteIcon lockIcon = null!;
+        private Sample? sampleTeamSwap;
+
+        public TeamDisplay()
         {
-            this.user = user;
-
             RelativeSizeAxes = Axes.Y;
-
             AutoSizeAxes = Axes.X;
-
             Margin = new MarginPadding { Horizontal = 3 };
         }
 
@@ -53,52 +59,82 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 Alpha = 0,
                 Scale = new Vector2(0, 1),
                 RelativeSizeAxes = Axes.Y,
-                Child = box = new Container
+                Children = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(0, 1),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Child = new Box
+                    box = new Container
                     {
-                        Colour = Color4.White,
                         RelativeSizeAxes = Axes.Both,
+                        CornerRadius = 5,
+                        Masking = true,
+                        Scale = new Vector2(0, 1),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Child = new Box
+                        {
+                            Colour = Color4.White,
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    },
+                    lockIcon = new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(12),
+                        Icon = FontAwesome.Solid.Lock,
+                        Colour = Colour4.Black,
+                        Alpha = 0,
                     }
                 }
             };
 
-            if (Client.LocalUser?.Equals(user) == true)
-            {
-                clickableContent.Action = changeTeam;
-                clickableContent.TooltipText = "Change team";
-            }
-
             sampleTeamSwap = audio.Samples.Get(@"Multiplayer/team-swap");
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            client.RoomUpdated += onRoomUpdated;
+            current.BindValueChanged(_ => updateState(false), true);
         }
 
         private void changeTeam()
         {
-            Client.SendMatchRequest(new ChangeTeamRequest
+            client.SendMatchRequest(new ChangeTeamRequest
             {
-                TeamID = ((Client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
+                TeamID = ((client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
             }).FireAndForget();
         }
 
         public int? DisplayedTeam { get; private set; }
 
-        protected override void OnRoomUpdated()
-        {
-            base.OnRoomUpdated();
+        private void onRoomUpdated() => Scheduler.AddOnce(() => updateState(true));
 
+        private void updateState(bool playSamples)
+        {
             // we don't have a way of knowing when an individual user's state has updated, so just handle on RoomUpdated for now.
 
-            var userRoomState = Room?.Users.FirstOrDefault(u => u.Equals(user))?.MatchState;
+            var slot = current.Value;
+            var userRoomState = slot.IsEmpty ? null : client.Room?.Users.FirstOrDefault(u => u.Equals(slot.User))?.MatchState;
+
+            bool roomLocked = (client.Room?.MatchState as TeamVersusRoomState)?.Locked == true;
+
+            if (!slot.IsEmpty && client.LocalUser?.Equals(slot.User) == true && !roomLocked)
+            {
+                clickableContent.Action = changeTeam;
+                clickableContent.TooltipText = "Change team";
+            }
+            else
+            {
+                clickableContent.Action = null;
+                clickableContent.TooltipText = default;
+            }
 
             const double duration = 400;
+
+            lockIcon.FadeTo(roomLocked ? 0.4f : 0, duration, Easing.OutQuint);
 
             int? newTeam = (userRoomState as TeamVersusUserState)?.TeamID;
 
@@ -107,7 +143,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // only play the sample if an already valid team changes to another valid team.
             // this avoids playing a sound for each user if the match type is changed to/from a team mode.
-            if (newTeam != null && DisplayedTeam != null)
+            if (playSamples && newTeam != null && DisplayedTeam != null)
                 sampleTeamSwap?.Play();
 
             DisplayedTeam = newTeam;
@@ -137,6 +173,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 case 1:
                     return colours.Blue;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client.IsNotNull())
+                client.RoomUpdated -= onRoomUpdated;
         }
     }
 }

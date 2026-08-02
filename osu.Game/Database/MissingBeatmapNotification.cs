@@ -28,7 +28,7 @@ namespace osu.Game.Database
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
 
-        private readonly ArchiveReader scoreArchive;
+        private readonly ArchiveReader? scoreArchive;
         private readonly APIBeatmapSet beatmapSetInfo;
         private readonly string beatmapHash;
 
@@ -38,7 +38,13 @@ namespace osu.Game.Database
 
         private IDisposable? realmSubscription;
 
-        public MissingBeatmapNotification(APIBeatmap beatmap, ArchiveReader scoreArchive, string beatmapHash)
+        /// <summary>
+        /// Creates a new notification about a missing beatmap that needs to be downloaded to proceed with an action.
+        /// </summary>
+        /// <param name="beatmap">The online-retrieved beatmap to download.</param>
+        /// <param name="beatmapHash">The hash of the beatmap that is required to proceed.</param>
+        /// <param name="scoreArchive">Optional archive with a score. If not <see langword="null"/>, a re-import of this archive will be attempted after the missing beatmap is downloaded.</param>
+        public MissingBeatmapNotification(APIBeatmap beatmap, string beatmapHash, ArchiveReader? scoreArchive)
         {
             beatmapSetInfo = beatmap.BeatmapSet!;
 
@@ -86,9 +92,13 @@ namespace osu.Game.Database
 
             if (sender.Any(s => s.Beatmaps.Any(b => b.MD5Hash == beatmapHash)))
             {
-                string name = scoreArchive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
-                var importTask = new ImportTask(scoreArchive.GetStream(name), name);
-                scoreManager.Import(new[] { importTask });
+                if (scoreArchive != null)
+                {
+                    string name = scoreArchive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase));
+                    var importTask = new ImportTask(scoreArchive.GetStream(name), name);
+                    scoreManager.Import(new[] { importTask });
+                }
+
                 realmSubscription?.Dispose();
                 Close(false);
             }

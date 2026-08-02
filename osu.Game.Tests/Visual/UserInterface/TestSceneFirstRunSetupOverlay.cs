@@ -11,23 +11,27 @@ using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneFirstRunSetupOverlay : OsuManualInputManagerTestScene
+    public partial class TestSceneFirstRunSetupOverlay : ScreenTestScene
     {
-        private FirstRunSetupOverlay overlay;
+        private TestFirstRunSetupOverlayScreen screen = null!;
+        private FirstRunSetupOverlay overlay => screen.Overlay;
 
         private readonly Mock<TestPerformerFromScreenRunner> performer = new Mock<TestPerformerFromScreenRunner>();
 
@@ -43,11 +47,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
             Dependencies.CacheAs<IPerformFromScreenRunner>(performer.Object);
             Dependencies.CacheAs<INotificationOverlay>(notificationOverlay.Object);
+            Dependencies.CacheAs<BeatmapStore>(new TestBeatmapStore());
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep("setup dependencies", () =>
             {
                 performer.Reset();
@@ -60,19 +67,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                                    .Callback((Notification n) => lastNotification = n);
             });
 
-            AddStep("add overlay", () =>
-            {
-                Child = overlay = new FirstRunSetupOverlay
-                {
-                    State = { Value = Visibility.Visible }
-                };
-            });
+            AddStep("reset first run", () => LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, true));
+
+            createScreen();
         }
 
         [Test]
         public void TestBasic()
         {
             AddAssert("overlay visible", () => overlay.State.Value == Visibility.Visible);
+            AddAssert("footer visible", () => ScreenFooter.State.Value == Visibility.Visible);
         }
 
         [Test]
@@ -82,16 +86,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("step through", () =>
             {
-                if (overlay.CurrentScreen?.IsLoaded != false) overlay.NextButton.TriggerClick();
+                if (overlay.CurrentScreen?.IsLoaded != false) overlay.NextButton.AsNonNull().TriggerClick();
                 return overlay.State.Value == Visibility.Hidden;
             });
 
             AddAssert("first run false", () => !LocalConfig.Get<bool>(OsuSetting.ShowFirstRunSetup));
 
-            AddStep("add overlay", () =>
-            {
-                Child = overlay = new FirstRunSetupOverlay();
-            });
+            AddStep("exit screen", () => Stack.Exit());
+            createScreen();
 
             AddWaitStep("wait some", 5);
 
@@ -109,7 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     if (keyboard)
                         InputManager.Key(Key.Enter);
                     else
-                        overlay.NextButton.TriggerClick();
+                        overlay.NextButton.AsNonNull().TriggerClick();
                 }
 
                 return overlay.State.Value == Visibility.Hidden;
@@ -128,11 +130,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase(true)]
         public void TestBackButton(bool keyboard)
         {
-            AddAssert("back button disabled", () => !overlay.BackButton.Enabled.Value);
-
             AddUntilStep("step to last", () =>
             {
-                var nextButton = overlay.NextButton;
+                var nextButton = overlay.NextButton.AsNonNull();
 
                 if (overlay.CurrentScreen?.IsLoaded != false)
                     nextButton.TriggerClick();
@@ -142,22 +142,27 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("step back to start", () =>
             {
-                if (overlay.CurrentScreen?.IsLoaded != false)
+                if (overlay.CurrentScreen?.IsLoaded != false && !(overlay.CurrentScreen is ScreenWelcome))
                 {
                     if (keyboard)
                         InputManager.Key(Key.Escape);
                     else
-                        overlay.BackButton.TriggerClick();
+                        ScreenFooter.BackButton.TriggerClick();
                 }
 
                 return overlay.CurrentScreen is ScreenWelcome;
             });
 
-            AddAssert("back button disabled", () => !overlay.BackButton.Enabled.Value);
+            AddAssert("overlay not dismissed", () => overlay.State.Value == Visibility.Visible);
 
             if (keyboard)
             {
                 AddStep("exit via keyboard", () => InputManager.Key(Key.Escape));
+                AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
+            }
+            else
+            {
+                AddStep("press back button", () => ScreenFooter.BackButton.TriggerClick());
                 AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
             }
         }
@@ -185,7 +190,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestResumeViaNotification()
         {
-            AddStep("step to next", () => overlay.NextButton.TriggerClick());
+            AddStep("step to next", () => overlay.NextButton.AsNonNull().TriggerClick());
 
             AddAssert("is at known screen", () => overlay.CurrentScreen is ScreenUIScale);
 
@@ -198,6 +203,47 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("overlay shown", () => overlay.State.Value == Visibility.Visible);
             AddAssert("is resumed", () => overlay.CurrentScreen is ScreenUIScale);
+        }
+
+        private void createScreen()
+        {
+            AddStep("push screen", () => LoadScreen(screen = new TestFirstRunSetupOverlayScreen()));
+            AddUntilStep("wait until screen is loaded", () => screen.IsLoaded, () => Is.True);
+        }
+
+        private partial class TestFirstRunSetupOverlayScreen : OsuScreen
+        {
+            public override bool ShowFooter => true;
+
+            public FirstRunSetupOverlay Overlay = null!;
+
+            [CanBeNull]
+            private IDisposable overlayRegistration;
+
+            [CanBeNull]
+            [Resolved]
+            private IOverlayManager overlayManager { get; set; }
+
+            [Cached]
+            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(Overlay = new FirstRunSetupOverlay());
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                overlayRegistration?.Dispose();
+            }
         }
 
         // interface mocks break hot reload, mocking this stub implementation instead works around it.
@@ -213,7 +259,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            public virtual IBindable<int> UnreadCount => null;
+            public virtual IBindable<int> UnreadCount { get; } = new Bindable<int>();
 
             public IEnumerable<Notification> AllNotifications => Enumerable.Empty<Notification>();
         }

@@ -18,21 +18,15 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class OsuPasswordTextBox : OsuTextBox, ISuppressKeyEventLogging
+    public partial class OsuPasswordTextBox : OsuTextBox
     {
         protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
-            Child = new PasswordMaskChar(CalculatedTextSize),
+            Child = new PasswordMaskChar(FontSize),
         };
 
         protected override bool AllowUniqueCharacterSamples => false;
-
-        protected override bool AllowClipboardExport => false;
-
-        protected override bool AllowWordNavigation => false;
-
-        protected override bool AllowIme => false;
 
         private readonly CapsWarning warning;
 
@@ -41,6 +35,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuPasswordTextBox()
         {
+            InputProperties = new TextInputProperties(TextInputType.Password, false);
+
             Add(warning = new CapsWarning
             {
                 Size = new Vector2(20),

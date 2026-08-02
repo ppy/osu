@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         StartTime = time_slider_start,
                         Position = new Vector2(0, 0),
                         SliderVelocityMultiplier = velocity,
-                        Path = new SliderPath(PathType.Linear, new[]
+                        Path = new SliderPath(PathType.LINEAR, new[]
                         {
                             Vector2.Zero,
                             new Vector2(followCircleRadius, 0),

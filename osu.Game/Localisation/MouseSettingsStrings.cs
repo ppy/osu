@@ -25,9 +25,9 @@ namespace osu.Game.Localisation
         public static LocalisableString HighPrecisionMouse => new TranslatableString(getKey(@"high_precision_mouse"), @"High precision mouse");
 
         /// <summary>
-        /// "Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as &quot;Raw Input&quot;."
+        /// "Attempts to bypass any operating system mouse acceleration. On Windows, this is equivalent to what used to be known as &quot;Raw Input&quot;."
         /// </summary>
-        public static LocalisableString HighPrecisionMouseTooltip => new TranslatableString(getKey(@"high_precision_mouse_tooltip"), @"Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as ""Raw Input"".");
+        public static LocalisableString HighPrecisionMouseTooltip => new TranslatableString(getKey(@"high_precision_mouse_tooltip"), @"Attempts to bypass any operating system mouse acceleration. On Windows, this is equivalent to what used to be known as ""Raw Input"".");
 
         /// <summary>
         /// "Confine mouse cursor to window"
@@ -78,6 +78,12 @@ namespace osu.Game.Localisation
         /// "Never"
         /// </summary>
         public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never_confine"), @"Never");
+
+        /// <summary>
+        /// "Looking to change your pen tablet&#39;s sensitivity? Search for pen sensitivity instead."
+        /// </summary>
+        public static LocalisableString CursorSensitivityForTabletsElsewhere => new TranslatableString(getKey(@"cursor_sensitivity_for_tablets_elsewhere"),
+            @"Looking to change your pen tablet's sensitivity? Search for pen sensitivity instead.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

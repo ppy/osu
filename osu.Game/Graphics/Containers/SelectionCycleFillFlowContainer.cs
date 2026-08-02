@@ -52,9 +52,9 @@ namespace osu.Game.Graphics.Containers
 
         public override void Add(T drawable)
         {
-            base.Add(drawable);
-
             Debug.Assert(drawable != null);
+
+            base.Add(drawable);
 
             drawable.StateChanged += state => selectionChanged(drawable, state);
         }

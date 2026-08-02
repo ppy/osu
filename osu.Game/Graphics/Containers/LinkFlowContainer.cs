@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Online;
 using osu.Game.Users;
@@ -32,14 +33,14 @@ namespace osu.Game.Graphics.Containers
         [Resolved]
         private GameHost host { get; set; }
 
-        public void AddLinks(string text, List<Link> links)
+        public void AddLinks(string text, List<Link> links, Action<SpriteText> creationParameters = null)
         {
             if (string.IsNullOrEmpty(text) || links == null)
                 return;
 
             if (links.Count == 0)
             {
-                AddText(text);
+                AddText(text, creationParameters);
                 return;
             }
 
@@ -47,17 +48,24 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
-                AddText(text[previousLinkEnd..link.Index]);
-
                 string displayText = text.Substring(link.Index, link.Length);
+
+                if (previousLinkEnd > link.Index)
+                {
+                    Logger.Log($@"Link ""{link.Url}"" with text ""{displayText}"" overlaps previous link, ignoring.");
+                    continue;
+                }
+
+                AddText(text[previousLinkEnd..link.Index], creationParameters);
+
                 object linkArgument = link.Argument;
                 string tooltip = displayText == link.Url ? null : link.Url;
 
-                AddLink(displayText, link.Action, linkArgument, tooltip);
+                AddLink(displayText, link.Action, linkArgument, tooltip, creationParameters);
                 previousLinkEnd = link.Index + link.Length;
             }
 
-            AddText(text.Substring(previousLinkEnd));
+            AddText(text.Substring(previousLinkEnd), creationParameters);
         }
 
         public void AddLink(LocalisableString text, string url, Action<SpriteText> creationParameters = null) =>
@@ -126,9 +134,14 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart);
 
-        // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
-        // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.
-        // Since the compilers don't display any content and don't affect the layout, it's simplest to exclude them from the flow.
-        public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Where(c => !(c is DrawableLinkCompiler));
+        protected override InnerFlow CreateFlow() => new LinkFlow();
+
+        private partial class LinkFlow : InnerFlow
+        {
+            // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
+            // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.
+            // Since the compilers don't display any content and don't affect the layout, it's simplest to exclude them from the flow.
+            public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Where(c => !(c is DrawableLinkCompiler));
+        }
     }
 }

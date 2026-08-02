@@ -46,10 +46,15 @@ namespace osu.Game.Online
             Downloader.DownloadBegan += downloadBegan;
             Downloader.DownloadFailed += downloadFailed;
 
+            // Required local for iOS. Will cause runtime crash if inlined.
+            long onlineId = TrackedItem.OnlineID;
+            long legacyOnlineId = TrackedItem.LegacyOnlineID;
+            string hash = TrackedItem.Hash;
+
             realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s =>
-                ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID)
-                 || (s.LegacyOnlineID > 0 && s.LegacyOnlineID == TrackedItem.LegacyOnlineID)
-                 || (!string.IsNullOrEmpty(s.Hash) && s.Hash == TrackedItem.Hash))
+                ((s.OnlineID > 0 && s.OnlineID == onlineId)
+                 || (s.LegacyOnlineID > 0 && s.LegacyOnlineID == legacyOnlineId)
+                 || (!string.IsNullOrEmpty(s.Hash) && s.Hash == hash))
                 && !s.DeletePending), (items, _) =>
             {
                 if (items.Any())

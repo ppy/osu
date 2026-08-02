@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets
         private const string ruleset_library_prefix = @"osu.Game.Rulesets";
 
         protected readonly Dictionary<Assembly, Type> LoadedAssemblies = new Dictionary<Assembly, Type>();
+        protected readonly HashSet<Assembly> UserRulesetAssemblies = new HashSet<Assembly>();
+        protected readonly Storage? RulesetStorage;
 
         /// <summary>
         /// All available rulesets.
@@ -41,9 +43,9 @@ namespace osu.Game.Rulesets
             // to load as unable to locate the game core assembly.
             AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
 
-            var rulesetStorage = storage?.GetStorageForDirectory(@"rulesets");
-            if (rulesetStorage != null)
-                loadUserRulesets(rulesetStorage);
+            RulesetStorage = storage?.GetStorageForDirectory(@"rulesets");
+            if (RulesetStorage != null)
+                loadUserRulesets(RulesetStorage);
         }
 
         /// <summary>
@@ -105,17 +107,18 @@ namespace osu.Game.Rulesets
             var rulesets = rulesetStorage.GetFiles(@".", @$"{ruleset_library_prefix}.*.dll");
 
             foreach (string? ruleset in rulesets.Where(f => !f.Contains(@"Tests")))
-                loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
+            {
+                var assembly = loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
+                if (assembly != null)
+                    UserRulesetAssemblies.Add(assembly);
+            }
         }
 
         private void loadFromDisk()
         {
             try
             {
-                // On net6-android (Debug), StartupDirectory can be different from where assemblies are placed.
-                // Search sub-directories too.
-
-                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll", SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
@@ -126,21 +129,25 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private void loadRulesetFromFile(string file)
+        private Assembly? loadRulesetFromFile(string file)
         {
             string filename = Path.GetFileNameWithoutExtension(file);
 
             if (LoadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
-                return;
+                return null;
 
             try
             {
-                addRuleset(Assembly.LoadFrom(file));
+                var assembly = Assembly.LoadFrom(file);
+                addRuleset(assembly);
+                return assembly;
             }
             catch (Exception e)
             {
-                LogFailedLoad(filename, e);
+                logRulesetFailure(filename, e);
             }
+
+            return null;
         }
 
         private void addRuleset(Assembly assembly)
@@ -159,7 +166,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                LogFailedLoad(assembly.GetName().Name!.Split('.').Last(), e);
+                logRulesetFailure(assembly.GetName().Name!.Split('.').Last(), e);
             }
         }
 
@@ -174,10 +181,12 @@ namespace osu.Game.Rulesets
             AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
 
-        protected void LogFailedLoad(string name, Exception exception)
+        public static void LogRulesetFailure(RulesetInfo ruleset, Exception e) => logRulesetFailure(ruleset.Name, e);
+
+        private static void logRulesetFailure(string name, Exception exception)
         {
-            Logger.Log($"Could not load ruleset \"{name}\". Please check for an update from the developer.", level: LogLevel.Error);
-            Logger.Log($"Ruleset load failed: {exception}");
+            Logger.Log($"An issue with ruleset \"{name}\" occurred. Please check for an update from the developer.", level: LogLevel.Error);
+            Logger.Log(exception.ToString());
         }
 
         #region Implementation of IRulesetStore

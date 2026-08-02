@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual int SectionLength => 400;
 
         private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
-
         private double currentSectionEnd;
 
         private readonly List<double> strainPeaks = new List<double>();
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        public sealed override void Process(DifficultyHitObject current)
+        protected sealed override double ProcessInternal(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (current.Index == 0)
@@ -57,7 +56,28 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd += SectionLength;
             }
 
-            currentSectionPeak = Math.Max(StrainValueAt(current), currentSectionPeak);
+            double strain = StrainValueAt(current);
+            currentSectionPeak = Math.Max(strain, currentSectionPeak);
+
+            return strain;
+        }
+
+        /// <summary>
+        /// Calculates the number of strains weighted against the top strain.
+        /// The result is scaled by clock rate as it affects the total number of strains.
+        /// </summary>
+        public double CountTopWeightedStrains(double difficultyValue)
+        {
+            if (ObjectDifficulties.Count == 0)
+                return 0.0;
+
+            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return ObjectDifficulties.Count;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
         }
 
         /// <summary>
@@ -108,7 +128,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             // Difficulty is the weighted sum of the highest strains from every section.
             // We're sorting from highest to lowest strain.
-            foreach (double strain in peaks.OrderByDescending(d => d))
+            foreach (double strain in peaks.OrderDescending())
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;

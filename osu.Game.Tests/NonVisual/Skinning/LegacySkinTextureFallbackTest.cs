@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Dummy;
@@ -57,24 +58,6 @@ namespace osu.Game.Tests.NonVisual.Skinning
             },
             new object[]
             {
-                new[] { "followpoint@2x", "followpoint" },
-                "Gameplay/osu/followpoint",
-                "followpoint@2x", 2
-            },
-            new object[]
-            {
-                new[] { "followpoint@2x" },
-                "Gameplay/osu/followpoint",
-                "followpoint@2x", 2
-            },
-            new object[]
-            {
-                new[] { "followpoint" },
-                "Gameplay/osu/followpoint",
-                "followpoint", 1
-            },
-            new object[]
-            {
                 // Looking up a filename with extension specified should work.
                 new[] { "followpoint.png" },
                 "followpoint.png",
@@ -111,9 +94,9 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
             var texture = legacySkin.GetTexture(requestedComponent);
 
-            Assert.IsNotNull(texture);
-            Assert.AreEqual(textureStore.Textures[expectedTexture].Width, texture.Width);
-            Assert.AreEqual(expectedScale, texture.ScaleAdjust);
+            Assert.That(texture, Is.Not.Null);
+            ClassicAssert.AreEqual(textureStore.Textures[expectedTexture].Width, texture.Width);
+            ClassicAssert.AreEqual(expectedScale, texture.ScaleAdjust);
         }
 
         [Test]
@@ -124,11 +107,53 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
             var texture = legacySkin.GetTexture("Gameplay/osu/followpoint");
 
-            Assert.IsNull(texture);
+            ClassicAssert.Null(texture);
+        }
+
+        [Test]
+        public void TestDisallowHighResolutionSprites()
+        {
+            var textureStore = new TestTextureStore("hitcircle", "hitcircle@2x");
+            var legacySkin = new TestLegacySkin(textureStore) { HighResolutionSprites = false };
+
+            var texture = legacySkin.GetTexture("hitcircle");
+
+            Assert.That(texture, Is.Not.Null);
+            Assert.That(texture.ScaleAdjust, Is.EqualTo(1));
+
+            var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
+
+            Assert.That(twoTimesTexture, Is.Not.Null);
+            Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(1));
+
+            ClassicAssert.AreNotEqual(texture, twoTimesTexture);
+        }
+
+        [Test]
+        public void TestAllowHighResolutionSprites()
+        {
+            var textureStore = new TestTextureStore("hitcircle", "hitcircle@2x");
+            var legacySkin = new TestLegacySkin(textureStore) { HighResolutionSprites = true };
+
+            var texture = legacySkin.GetTexture("hitcircle");
+
+            Assert.That(texture, Is.Not.Null);
+            Assert.That(texture.ScaleAdjust, Is.EqualTo(2));
+
+            var twoTimesTexture = legacySkin.GetTexture("hitcircle@2x");
+
+            Assert.That(twoTimesTexture, Is.Not.Null);
+            Assert.That(twoTimesTexture.ScaleAdjust, Is.EqualTo(2));
+
+            ClassicAssert.AreEqual(texture, twoTimesTexture);
         }
 
         private class TestLegacySkin : LegacySkin
         {
+            public bool HighResolutionSprites { get; set; } = true;
+
+            protected override bool AllowHighResolutionSprites => HighResolutionSprites;
+
             public TestLegacySkin(IResourceStore<TextureUpload> textureStore)
                 : base(new SkinInfo(), new TestResourceProvider(textureStore), null, string.Empty)
             {
@@ -145,9 +170,9 @@ namespace osu.Game.Tests.NonVisual.Skinning
 
                 public IRenderer Renderer => new DummyRenderer();
                 public AudioManager AudioManager => null;
-                public IResourceStore<byte[]> Files => null;
-                public IResourceStore<byte[]> Resources => null;
-                public RealmAccess RealmAccess => null;
+                public IResourceStore<byte[]> Files => null!;
+                public IResourceStore<byte[]> Resources => null!;
+                public RealmAccess RealmAccess => null!;
                 public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => textureStore;
             }
         }

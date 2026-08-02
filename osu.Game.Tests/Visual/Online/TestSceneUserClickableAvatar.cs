@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -30,9 +31,9 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(10f),
                 Children = new[]
                 {
-                    generateUser(@"peppy", 2, CountryCode.AU, @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg", false, "99EB47"),
-                    generateUser(@"flyte", 3103765, CountryCode.JP, @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg", true),
-                    generateUser(@"joshika39", 17032217, CountryCode.RS, @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg", false),
+                    generateUser(@"peppy", 2, CountryCode.AU, TestResources.COVER_IMAGE_3, false, "99EB47"),
+                    generateUser(@"flyte", 3103765, CountryCode.JP, TestResources.COVER_IMAGE_4, true),
+                    generateUser(@"joshika39", 17032217, CountryCode.RS, TestResources.COVER_IMAGE_3, false),
                     new UpdateableAvatar(),
                     new UpdateableAvatar()
                 },
@@ -43,9 +44,9 @@ namespace osu.Game.Tests.Visual.Online
         public void TestClickableAvatarHover()
         {
             AddStep("hover avatar with user panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<ClickableAvatar>().ElementAt(1)));
-            AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<ClickableAvatar.UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
+            AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
             AddStep("hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
-            AddUntilStep("wait for tooltip to hide", () => this.ChildrenOfType<ClickableAvatar.UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Hidden);
+            AddUntilStep("wait for tooltip to hide", () => this.ChildrenOfType<UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Hidden);
 
             AddStep("hover avatar without user panel", () => InputManager.MoveMouseTo(this.ChildrenOfType<ClickableAvatar>().ElementAt(0)));
             AddUntilStep("wait for tooltip to show", () => this.ChildrenOfType<OsuTooltipContainer.OsuTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
@@ -62,10 +63,7 @@ namespace osu.Game.Tests.Visual.Online
                 CountryCode = countryCode,
                 CoverUrl = cover,
                 Colour = color ?? "000000",
-                Status =
-                {
-                    Value = new UserStatusOnline()
-                },
+                WasRecentlyOnline = true
             };
 
             return new ClickableAvatar(user, showPanel)

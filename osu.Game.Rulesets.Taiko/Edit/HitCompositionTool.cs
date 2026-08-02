@@ -2,7 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Taiko.Edit.Blueprints;
@@ -10,15 +11,15 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class HitCompositionTool : HitObjectCompositionTool
+    public class HitCompositionTool : CompositionTool
     {
         public HitCompositionTool()
             : base(nameof(Hit))
         {
         }
 
-        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorHit };
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new HitPlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new HitPlacementBlueprint();
     }
 }

@@ -1,0 +1,39 @@
+{
+  "Mappings": [
+    {
+      "StartTime": 7493.0,
+      "Objects": [
+        {
+          "StartTime": 7493.0,
+          "EndTime": 7493.0,
+          "X": 130.0,
+          "Y": 232.0,
+          "StackOffset": {
+            "X": 0.0,
+            "Y": 0.0
+          }
+        },
+        {
+          "StartTime": 7843.0,
+          "EndTime": 7843.0,
+          "X": 33.7820168,
+          "Y": 208.9957,
+          "StackOffset": {
+            "X": 0.0,
+            "Y": 0.0
+          }
+        },
+        {
+          "StartTime": 7817.0,
+          "EndTime": 7817.0,
+          "X": 30.9946651,
+          "Y": 208.5157,
+          "StackOffset": {
+            "X": 0.0,
+            "Y": 0.0
+          }
+        }
+      ]
+    }
+  ]
+}

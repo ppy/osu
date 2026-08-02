@@ -1,0 +1,10 @@
+[General]
+Mode: 0
+
+[Difficulty]
+HPDrainRate:25
+CircleSize:25
+OverallDifficulty:25
+ApproachRate:30
+SliderMultiplier:30
+SliderTickRate:30

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -32,10 +30,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         private readonly double displayPosition;
 
-        private readonly ScoreRank rank;
+        public readonly ScoreRank Rank;
 
-        private Drawable rankContainer;
-        private Drawable overlay;
+        private Drawable rankContainer = null!;
+        private Drawable overlay = null!;
 
         /// <summary>
         /// Creates a new <see cref="RankBadge"/>.
@@ -47,7 +45,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         {
             Accuracy = accuracy;
             displayPosition = position;
-            this.rank = rank;
+            Rank = rank;
 
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
@@ -62,7 +60,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 Size = new Vector2(28, 14),
                 Children = new[]
                 {
-                    new DrawableRank(rank),
+                    new DrawableRank(Rank),
                     overlay = new CircularContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -71,7 +69,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Glow,
-                            Colour = OsuColour.ForRank(rank).Opacity(0.2f),
+                            Colour = OsuColour.ForRank(Rank).Opacity(0.2f),
                             Radius = 10,
                         },
                         Child = new Box

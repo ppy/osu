@@ -44,6 +44,11 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => SliderVelocityBindable.Value = value;
         }
 
+        public DifficultyControlPoint()
+        {
+            SliderVelocityBindable.BindValueChanged(_ => RaiseChanged());
+        }
+
         public override bool IsRedundant(ControlPoint? existing)
             => existing is DifficultyControlPoint existingDifficulty
                && GenerateTicks == existingDifficulty.GenerateTicks

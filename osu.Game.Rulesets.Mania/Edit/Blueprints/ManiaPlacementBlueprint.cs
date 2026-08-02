@@ -1,32 +1,39 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public abstract partial class ManiaPlacementBlueprint<T> : PlacementBlueprint
+    public abstract partial class ManiaPlacementBlueprint<T> : HitObjectPlacementBlueprint
         where T : ManiaHitObject
     {
         protected new T HitObject => (T)base.HitObject;
 
-        private Column column;
+        [Resolved]
+        private ManiaHitObjectComposer? composer { get; set; }
 
-        public Column Column
+        private Column? column;
+
+        public Column? Column
         {
             get => column;
             set
             {
+                ArgumentNullException.ThrowIfNull(value);
+
                 if (value == column)
                     return;
 
@@ -53,9 +60,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             return true;
         }
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
-            base.UpdateTimeAndPosition(result);
+            var result = composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
+
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 
             if (result.Playfield is Column col)
             {
@@ -76,10 +85,15 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 if (PlacementActive == PlacementState.Waiting)
                     Column = col;
             }
+
+            return result;
         }
 
         private float getNoteHeight(Column resultPlayfield) =>
             resultPlayfield.ToScreenSpace(new Vector2(DefaultNotePiece.NOTE_HEIGHT)).Y -
             resultPlayfield.ToScreenSpace(Vector2.Zero).Y;
+
+        public override bool ReplacesExistingObject(HitObject existing)
+            => base.ReplacesExistingObject(existing) && HitObject.Column == ((IHasColumn)existing).Column;
     }
 }

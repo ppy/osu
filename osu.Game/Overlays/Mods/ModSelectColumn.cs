@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,9 +9,11 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using System.Linq;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -34,7 +37,7 @@ namespace osu.Game.Overlays.Mods
 
                 var hsv = new Colour4(value.R, value.G, value.B, 1f).ToHSV();
                 var trianglesColour = Colour4.FromHSV(hsv.X, hsv.Y + 0.2f, hsv.Z - 0.1f);
-                triangles.Colour = ColourInfo.GradientVertical(trianglesColour, trianglesColour.MultiplyAlpha(0f));
+                triangles.Colour = ColourInfo.GradientVertical(trianglesColour, value);
             }
         }
 
@@ -67,7 +70,7 @@ namespace osu.Game.Overlays.Mods
         {
             Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
-            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+            Shear = OsuGame.SHEAR;
 
             InternalChildren = new Drawable[]
             {
@@ -93,8 +96,9 @@ namespace osu.Game.Overlays.Mods
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Height = header_height,
-                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    Shear = -OsuGame.SHEAR,
                                     Velocity = 0.7f,
+                                    ClampAxes = Axes.Y
                                 },
                                 headerText = new OsuTextFlowContainer(t =>
                                 {
@@ -107,7 +111,7 @@ namespace osu.Game.Overlays.Mods
                                     AutoSizeAxes = Axes.Y,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
+                                    Shear = -OsuGame.SHEAR,
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = 17,
@@ -134,6 +138,7 @@ namespace osu.Game.Overlays.Mods
                                     },
                                     new GridContainer
                                     {
+                                        Padding = new MarginPadding { Top = 1, Bottom = 3 },
                                         RelativeSizeAxes = Axes.Both,
                                         RowDimensions = new[]
                                         {
@@ -180,17 +185,15 @@ namespace osu.Game.Overlays.Mods
         {
             headerText.Clear();
 
-            int wordIndex = 0;
+            ITextPart part = headerText.AddText(text);
+            part.DrawablePartsRecreated += applySemiBoldToFirstWord;
+            applySemiBoldToFirstWord(part.Drawables);
 
-            ITextPart part = headerText.AddText(text, t =>
+            void applySemiBoldToFirstWord(IEnumerable<Drawable> d)
             {
-                if (wordIndex == 0)
-                    t.Font = t.Font.With(weight: FontWeight.SemiBold);
-                wordIndex += 1;
-            });
-
-            // Reset the index so that if the parts are refreshed (e.g. through changes in localisation) the correct word is re-emboldened.
-            part.DrawablePartsRecreated += _ => wordIndex = 0;
+                if (d.FirstOrDefault() is OsuSpriteText firstWord)
+                    firstWord.Font = firstWord.Font.With(weight: FontWeight.SemiBold);
+            }
         }
 
         [BackgroundDependencyLoader]

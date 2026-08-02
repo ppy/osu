@@ -4,12 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
@@ -48,12 +49,12 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     Padding = new MarginPadding(8),
                     Children = new Drawable[]
                     {
-                        new Sprite
+                        new SpriteIcon
                         {
                             Size = new Vector2(26),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Texture = textures.Get("Icons/Hexacons/editor"),
+                            Icon = OsuIcon.EditCircle,
                         },
                         text = new TextFlowContainer
                         {
@@ -73,12 +74,18 @@ namespace osu.Game.Screens.Edit.Components.Menus
             });
         }
 
-        protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
+        protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu
+        {
+            MaxHeight = MaxHeight,
+        };
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
 
-        private partial class DrawableEditorBarMenuItem : DrawableOsuMenuItem
+        internal partial class DrawableEditorBarMenuItem : DrawableMenuItem
         {
+            private HoverClickSounds hoverClickSounds = null!;
+            private TextContainer text = null!;
+
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
@@ -91,6 +98,8 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 BackgroundColour = colourProvider.Background2;
                 ForegroundColourHover = colourProvider.Content1;
                 BackgroundColourHover = colourProvider.Background1;
+
+                AddInternal(hoverClickSounds = new HoverClickSounds(HoverSampleSet.MenuOpen));
             }
 
             protected override void LoadComplete()
@@ -99,6 +108,36 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
                 Foreground.Anchor = Anchor.CentreLeft;
                 Foreground.Origin = Anchor.CentreLeft;
+                Item.Action.BindDisabledChanged(_ => updateState(), true);
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateState();
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateState();
+                base.OnHoverLost(e);
+            }
+
+            private void updateState()
+            {
+                hoverClickSounds.Enabled.Value = IsActionable;
+                Alpha = IsActionable ? 1 : 0.2f;
+
+                if (IsHovered && IsActionable)
+                {
+                    text.BoldText.FadeIn(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                    text.NormalText.FadeOut(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                }
+                else
+                {
+                    text.BoldText.FadeOut(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                    text.NormalText.FadeIn(DrawableOsuMenuItem.TRANSITION_LENGTH, Easing.OutQuint);
+                }
             }
 
             protected override void UpdateBackgroundColour()
@@ -117,15 +156,55 @@ namespace osu.Game.Screens.Edit.Components.Menus
                     base.UpdateForegroundColour();
             }
 
-            protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
+            protected sealed override Drawable CreateContent() => text = new TextContainer();
+        }
 
-            private new partial class TextContainer : DrawableOsuMenuItem.TextContainer
+        private partial class TextContainer : Container, IHasText
+        {
+            public LocalisableString Text
             {
-                public TextContainer()
+                get => NormalText.Text;
+                set
                 {
-                    NormalText.Font = OsuFont.TorusAlternate;
-                    BoldText.Font = OsuFont.TorusAlternate.With(weight: FontWeight.Bold);
+                    NormalText.Text = value;
+                    BoldText.Text = value;
                 }
+            }
+
+            public readonly SpriteText NormalText;
+            public readonly SpriteText BoldText;
+
+            public TextContainer()
+            {
+                AutoSizeAxes = Axes.Both;
+
+                Child = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+
+                    AutoSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = 17, Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL, },
+
+                    Children = new Drawable[]
+                    {
+                        NormalText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: DrawableOsuMenuItem.TEXT_SIZE),
+                        },
+                        BoldText = new OsuSpriteText
+                        {
+                            AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
+                            Alpha = 0,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: DrawableOsuMenuItem.TEXT_SIZE, weight: FontWeight.Bold),
+                        }
+                    }
+                };
             }
         }
 
@@ -145,13 +224,16 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 BackgroundColour = colourProvider.Background2;
             }
 
-            protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
+            protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu
+            {
+                MaxHeight = MaxHeight,
+            };
 
             protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
             {
                 switch (item)
                 {
-                    case EditorMenuItemSpacer spacer:
+                    case OsuMenuItemSpacer spacer:
                         return new DrawableSpacer(spacer);
 
                     case StatefulMenuItem stateful:
@@ -194,29 +276,6 @@ namespace osu.Game.Screens.Edit.Components.Menus
 
                     Foreground.Padding = new MarginPadding { Vertical = 2 };
                 }
-            }
-
-            private partial class DrawableSpacer : DrawableOsuMenuItem
-            {
-                public DrawableSpacer(MenuItem item)
-                    : base(item)
-                {
-                    Scale = new Vector2(1, 0.6f);
-
-                    AddInternal(new Box
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = BackgroundColourHover,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 2f,
-                        Width = 0.8f,
-                    });
-                }
-
-                protected override bool OnHover(HoverEvent e) => true;
-
-                protected override bool OnClick(ClickEvent e) => true;
             }
         }
     }

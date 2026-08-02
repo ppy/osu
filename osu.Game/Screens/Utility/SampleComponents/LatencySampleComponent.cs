@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Utility.SampleComponents
         {
             base.LoadComplete();
 
-            inputManager = GetContainingInputManager();
+            inputManager = GetContainingInputManager()!;
             IsActive.BindTo(latencyArea.IsActiveArea);
         }
 

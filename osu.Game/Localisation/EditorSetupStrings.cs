@@ -160,6 +160,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Creator => new TranslatableString(getKey(@"creator"), @"Creator");
 
         /// <summary>
+        /// "Source"
+        /// </summary>
+        public static LocalisableString Source => new TranslatableString(getKey(@"source"), @"Source");
+
+        /// <summary>
         /// "Difficulty Name"
         /// </summary>
         public static LocalisableString DifficultyName => new TranslatableString(getKey(@"difficulty_name"), @"Difficulty Name");
@@ -175,14 +180,29 @@ namespace osu.Game.Localisation
         public static LocalisableString AudioTrack => new TranslatableString(getKey(@"audio_track"), @"Audio Track");
 
         /// <summary>
+        /// "Video"
+        /// </summary>
+        public static LocalisableString Video => new TranslatableString(getKey(@"video"), @"Video");
+
+        /// <summary>
+        /// "The video will be used instead of the static background, if present. Beatmap downloads are offered both with and without video, so if adding a video, a matching background should also be provided."
+        /// </summary>
+        public static LocalisableString VideoHint => new TranslatableString(getKey(@"video_hint"), @"The video will be used instead of the static background, if present. Beatmap downloads are offered both with and without video, so if adding a video, a matching background should also be provided.");
+
+        /// <summary>
+        /// "Custom sample sets"
+        /// </summary>
+        public static LocalisableString CustomSampleSets => new TranslatableString(getKey(@"custom_sample_sets"), @"Custom sample sets");
+
+        /// <summary>
         /// "Click to select a track"
         /// </summary>
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
 
         /// <summary>
-        /// "Click to replace the track"
+        /// "Click to select a video"
         /// </summary>
-        public static LocalisableString ClickToReplaceTrack => new TranslatableString(getKey(@"click_to_replace_track"), @"Click to replace the track");
+        public static LocalisableString ClickToSelectVideo => new TranslatableString(getKey(@"click_to_select_video"), @"Click to select a video");
 
         /// <summary>
         /// "Click to select a background image"
@@ -190,9 +210,29 @@ namespace osu.Game.Localisation
         public static LocalisableString ClickToSelectBackground => new TranslatableString(getKey(@"click_to_select_background"), @"Click to select a background image");
 
         /// <summary>
-        /// "Click to replace the background image"
+        /// "Apply this change to all difficulties?"
         /// </summary>
-        public static LocalisableString ClickToReplaceBackground => new TranslatableString(getKey(@"click_to_replace_background"), @"Click to replace the background image");
+        public static LocalisableString ApplicationScopeSelectionTitle => new TranslatableString(getKey(@"application_scope_selection_title"), @"Apply this change to all difficulties?");
+
+        /// <summary>
+        /// "Apply to all difficulties"
+        /// </summary>
+        public static LocalisableString ApplyToAllDifficulties => new TranslatableString(getKey(@"apply_to_all_difficulties"), @"Apply to all difficulties");
+
+        /// <summary>
+        /// "Only apply to this difficulty"
+        /// </summary>
+        public static LocalisableString ApplyToThisDifficulty => new TranslatableString(getKey(@"apply_to_this_difficulty"), @"Only apply to this difficulty");
+
+        /// <summary>
+        /// "Sync metadata with all difficulties"
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficulties => new TranslatableString(getKey(@"sync_metadata_with_all_difficulties"), @"Sync metadata with all difficulties");
+
+        /// <summary>
+        /// "Copies artist, title, source, and tags to all difficulties."
+        /// </summary>
+        public static LocalisableString SyncMetadataWithAllDifficultiesTooltip => new TranslatableString(getKey(@"sync_metadata_with_all_difficulties_tooltip"), @"Copies artist, title, source, and tags to all difficulties.");
 
         /// <summary>
         /// "Ruleset ({0})"
@@ -223,6 +263,11 @@ namespace osu.Game.Localisation
         /// "Drag image here to set beatmap background!"
         /// </summary>
         public static LocalisableString DragToSetBackground => new TranslatableString(getKey(@"drag_to_set_background"), @"Drag image here to set beatmap background!");
+
+        /// <summary>
+        /// "Drag video here to set beatmap video!"
+        /// </summary>
+        public static LocalisableString DragToSetVideo => new TranslatableString(getKey(@"drag_to_set_video"), @"Drag video here to set beatmap video!");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -221,7 +221,7 @@ namespace osu.Game.Graphics.UserInterface
                 tierColours.AddRange(Source.tierColours);
             }
 
-            public override void Draw(IRenderer renderer)
+            protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
 

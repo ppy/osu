@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual
             PauseOnFocusLost = pauseOnFocusLost;
         }
 
-        protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
+        protected override bool ShouldExitOnTokenRetrievalFailure(Exception exception) => false;
 
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {

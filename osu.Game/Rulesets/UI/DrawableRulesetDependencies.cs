@@ -157,6 +157,8 @@ namespace osu.Game.Rulesets.UI
 
             public IBindable<double> AggregateTempo => throw new NotSupportedException();
 
+            public void Invalidate(string name) => throw new NotSupportedException();
+
             public int PlaybackConcurrency
             {
                 get => throw new NotSupportedException();

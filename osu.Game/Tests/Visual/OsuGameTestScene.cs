@@ -59,6 +59,12 @@ namespace osu.Game.Tests.Visual
         [SetUpSteps]
         public virtual void SetUpSteps()
         {
+            CreateNewGame();
+            ConfirmAtMainMenu();
+        }
+
+        protected void CreateNewGame()
+        {
             AddStep("Create new game instance", () =>
             {
                 if (Game?.Parent != null)
@@ -71,17 +77,16 @@ namespace osu.Game.Tests.Visual
 
             AddUntilStep("Wait for load", () => Game.IsLoaded);
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
-
-            ConfirmAtMainMenu();
         }
 
         [TearDownSteps]
         public virtual void TearDownSteps()
         {
-            if (DebugUtils.IsNUnitRunning && Game != null)
+            if (DebugUtils.IsNUnitRunning)
             {
-                AddStep("exit game", () => Game.Exit());
-                AddUntilStep("wait for game exit", () => Game.Parent == null);
+                AddStep("exit game", () => Game?.Exit());
+                AddUntilStep("wait for game exit", () => Game?.Parent == null);
+                AddStep("dispose game", () => Game?.Dispose());
             }
         }
 
@@ -119,8 +124,6 @@ namespace osu.Game.Tests.Visual
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
 
-            public new ScreenStack ScreenStack => base.ScreenStack;
-
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 
             public new GlobalCursorDisplay GlobalCursorDisplay => base.GlobalCursorDisplay;
@@ -149,6 +152,8 @@ namespace osu.Game.Tests.Visual
 
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
+            public new Storage Storage => base.Storage;
+
             public new SpectatorClient SpectatorClient => base.SpectatorClient;
 
             // if we don't apply these changes, when running under nUnit the version that gets populated is that of nUnit.
@@ -162,7 +167,7 @@ namespace osu.Game.Tests.Visual
             public TestOsuGame(Storage storage, IAPIProvider api, string[] args = null)
                 : base(args)
             {
-                Storage = storage;
+                base.Storage = storage;
                 API = api;
             }
 
@@ -174,6 +179,7 @@ namespace osu.Game.Tests.Visual
                 LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, false);
 
                 API.Login("Rhythm Champion", "osu!");
+                ((DummyAPIAccess)API).AuthenticateSecondFactor("abcdefgh");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
 

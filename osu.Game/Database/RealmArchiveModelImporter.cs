@@ -17,6 +17,7 @@ using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Database
@@ -105,7 +106,6 @@ namespace osu.Game.Database
             }
 
             notification.Progress = 0;
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
@@ -113,71 +113,133 @@ namespace osu.Game.Database
 
             parameters.Batch |= tasks.Length >= minimum_items_considered_batch_import;
 
-            await Task.WhenAll(tasks.Select(async task =>
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
+            notification.State = ProgressNotificationState.Active;
+
+            await pauseIfNecessaryAsync(parameters, notification, notification.CancellationToken).ConfigureAwait(false);
+
+            try
             {
-                if (notification.CancellationToken.IsCancellationRequested)
-                    return;
-
-                try
+                await Parallel.ForEachAsync(tasks, notification.CancellationToken, async (task, cancellation) =>
                 {
-                    var model = await Import(task, parameters, notification.CancellationToken).ConfigureAwait(false);
+                    cancellation.ThrowIfCancellationRequested();
 
-                    lock (imported)
+                    try
                     {
-                        if (model != null)
-                            imported.Add(model);
-                        current++;
+                        await pauseIfNecessaryAsync(parameters, notification, cancellation).ConfigureAwait(false);
 
-                        notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / tasks.Length;
+                        var model = await Import(task, parameters, cancellation).ConfigureAwait(false);
+
+                        lock (imported)
+                        {
+                            if (model != null)
+                                imported.Add(model);
+                            current++;
+
+                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                            notification.Progress = (float)current / tasks.Length;
+                        }
+                    }
+                    catch (OperationCanceledException cancelled)
+                    {
+                        // We don't want to abort the full import process based off difficulty calculator's internal cancellation
+                        // see https://github.com/ppy/osu/blob/91f3be5feaab0c73c17e1a8c270516aa9bee1e14/osu.Game/Rulesets/Difficulty/DifficultyCalculator.cs#L65.
+                        if (cancelled.CancellationToken == notification.CancellationToken)
+                            throw;
+
+                        Logger.Error(cancelled, $@"Timed out importing ({task})", LoggingTarget.Database);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
+                    }
+                }).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (imported.Count == 0)
+                {
+                    if (notification.CancellationToken.IsCancellationRequested)
+                    {
+                        notification.State = ProgressNotificationState.Cancelled;
+                    }
+                    else
+                    {
+                        notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
+                        notification.State = ProgressNotificationState.Cancelled;
                     }
                 }
-                catch (OperationCanceledException)
-                {
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
-                }
-            })).ConfigureAwait(false);
-
-            if (imported.Count == 0)
-            {
-                if (notification.CancellationToken.IsCancellationRequested)
-                {
-                    notification.State = ProgressNotificationState.Cancelled;
-                    return imported;
-                }
-
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed! Check logs for more information.";
-                notification.State = ProgressNotificationState.Cancelled;
-            }
-            else
-            {
-                if (tasks.Length > imported.Count)
-                    notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
-                else if (imported.Count > 1)
-                    notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
                 else
-                    notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
-
-                if (imported.Count > 0 && PresentImport != null)
                 {
-                    notification.CompletionText += " Click to view.";
-                    notification.CompletionClickAction = () =>
-                    {
-                        PresentImport?.Invoke(imported);
-                        return true;
-                    };
-                }
+                    if (tasks.Length > imported.Count)
+                        notification.CompletionText = $"Imported {imported.Count} of {tasks.Length} {HumanisedModelName}s.";
+                    else if (imported.Count > 1)
+                        notification.CompletionText = $"Imported {imported.Count} {HumanisedModelName}s!";
+                    else
+                        notification.CompletionText = $"Imported {imported.First().GetDisplayString()}!";
 
-                notification.State = ProgressNotificationState.Completed;
+                    if (imported.Count > 0 && PresentImport != null)
+                    {
+                        notification.CompletionText += " Click to view.";
+                        notification.CompletionClickAction = () =>
+                        {
+                            PresentImport?.Invoke(imported);
+                            return true;
+                        };
+                    }
+
+                    notification.State = ProgressNotificationState.Completed;
+                }
             }
 
             return imported;
         }
 
         public virtual Task<Live<TModel>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, TModel original) => throw new NotImplementedException();
+
+        public async Task<ExternalEditOperation<TModel>> BeginExternalEditing(TModel model)
+        {
+            string mountedPath = Path.Join(Path.GetTempPath(), model.Hash);
+
+            if (Directory.Exists(mountedPath))
+                Directory.Delete(mountedPath, true);
+
+            Directory.CreateDirectory(mountedPath);
+
+            foreach (var realmFile in model.Files)
+            {
+                string sourcePath = Files.Storage.GetFullPath(realmFile.File.GetStoragePath());
+                // there are edge cases where externalising an imported model to the filesystem could fail due to invalid filenames.
+                // one scenario where this happens goes something like this:
+                // - stable user exports an archive, which contains filenames that get mangled by stable's default zip encoding codepage (Shift-JIS)
+                // - said archive is imported to lazer, but the invalid filename is not actually an issue due to lazer file store structure
+                //   (the file is stored under a filename correspondent to its SHA instead, and its real filename is only stored in realm)
+                // - however attempts to externally edit the model fail as the external edit attempts and fails to produce the file's "real" filename in the mounted path
+                // to prevent this bricking external edit, strip invalid characters on external edit.
+                // the presumption here is that whatever produced the mangled archive is primarily at fault here, and we're just trying to trudge on locally as best as possible.
+                // if there are further troubles related to similar issues, reevaluate moving this sort of check to the import side instead (sanitising filenames on import from archive).
+                string destinationPath = mountedPath;
+                foreach (string piece in realmFile.Filename.Split('/').Select(f => f.GetValidFilename()))
+                    destinationPath = Path.Combine(destinationPath, piece);
+
+                string destinationDirectory = Path.GetDirectoryName(destinationPath)!;
+
+                if (!FilesystemSanityCheckHelpers.IsSubDirectory(parent: mountedPath, child: destinationDirectory))
+                {
+                    Logger.Log($@"Skipping attempt to mount {realmFile.Filename} due to detected escape out of mounted path.", LoggingTarget.Database);
+                    continue;
+                }
+
+                Directory.CreateDirectory(destinationDirectory);
+
+                // Consider using hard links here to make this instant.
+                using (var inStream = Files.Storage.GetStream(sourcePath))
+                using (var outStream = File.Create(destinationPath))
+                    await inStream.CopyToAsync(outStream).ConfigureAwait(false);
+            }
+
+            return new ExternalEditOperation<TModel>(this, model, mountedPath);
+        }
 
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
@@ -261,8 +323,6 @@ namespace osu.Game.Database
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Live<TModel>? ImportModel(TModel item, ArchiveReader? archive = null, ImportParameters parameters = default, CancellationToken cancellationToken = default) => Realm.Run(realm =>
         {
-            pauseIfNecessary(parameters, cancellationToken);
-
             TModel? existing;
 
             if (parameters.Batch && archive != null)
@@ -279,7 +339,7 @@ namespace osu.Game.Database
                     // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                     // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                     if (CanSkipImport(existing, item) &&
-                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).Order()) &&
                         checkAllFilesExist(existing))
                     {
                         LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
@@ -310,6 +370,9 @@ namespace osu.Game.Database
                     // We intentionally delay adding to realm to avoid blocking on a write during disk operations.
                     foreach (var filenames in getShortenedFilenames(archive))
                     {
+                        if (FilesystemSanityCheckHelpers.IncursPathTraversalRisk(filenames.shortened))
+                            throw new InvalidOperationException($@"Filename ""{filenames.original}"" is not allowed.");
+
                         using (Stream s = archive.GetStream(filenames.original))
                             files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false, parameters.PreferHardLinks), filenames.shortened));
                     }
@@ -423,8 +486,10 @@ namespace osu.Game.Database
 
             foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
             {
-                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
-                    s.CopyTo(hashable);
+                using (Stream? s = Files.Store.GetStream(file.File.GetStoragePath()))
+                {
+                    s?.CopyTo(hashable);
+                }
             }
 
             if (hashable.Length > 0)
@@ -437,7 +502,7 @@ namespace osu.Game.Database
         {
             MemoryStream hashable = new MemoryStream();
 
-            foreach (string? file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            foreach (string? file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).Order())
             {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
@@ -447,16 +512,6 @@ namespace osu.Game.Database
                 return hashable.ComputeSHA2Hash();
 
             return reader.Name.ComputeSHA2Hash();
-        }
-
-        /// <summary>
-        /// Create all required <see cref="File"/>s for the provided archive, adding them to the global file store.
-        /// </summary>
-        private List<RealmNamedFileUsage> createFileInfos(ArchiveReader reader, RealmFileStore files, Realm realm)
-        {
-            var fileInfos = new List<RealmNamedFileUsage>();
-
-            return fileInfos;
         }
 
         private IEnumerable<(string original, string shortened)> getShortenedFilenames(ArchiveReader reader)
@@ -513,7 +568,8 @@ namespace osu.Game.Database
         /// <param name="model">The new model proposed for import.</param>
         /// <param name="realm">The current realm context.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected TModel? CheckForExisting(TModel model, Realm realm) => string.IsNullOrEmpty(model.Hash) ? null : realm.All<TModel>().FirstOrDefault(b => b.Hash == model.Hash);
+        protected TModel? CheckForExisting(TModel model, Realm realm) =>
+            string.IsNullOrEmpty(model.Hash) ? null : realm.All<TModel>().OrderBy(b => b.DeletePending).FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.
@@ -560,21 +616,29 @@ namespace osu.Game.Database
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
 
-        private void pauseIfNecessary(ImportParameters importParameters, CancellationToken cancellationToken)
+        private async Task pauseIfNecessaryAsync(ImportParameters importParameters, ProgressNotification notification, CancellationToken cancellationToken)
         {
             if (!PauseImports || importParameters.ImportImmediately)
                 return;
 
             Logger.Log($@"{GetType().Name} is being paused.");
 
+            // A paused state could obviously be entered mid-import (during the `Task.WhenAll` below),
+            // but in order to keep things simple let's focus on the most common scenario.
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is paused due to gameplay...";
+            notification.State = ProgressNotificationState.Queued;
+
             while (PauseImports)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                Thread.Sleep(500);
+                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
             Logger.Log($@"{GetType().Name} is being resumed.");
+
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is resuming...";
+            notification.State = ProgressNotificationState.Active;
         }
 
         private IEnumerable<string> getIDs(IEnumerable<INamedFile> files)

@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public partial class TestSceneMaximumScore : RateAdjustedBeatmapTestScene
     {
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
 
         private List<JudgementResult> judgementResults = new List<JudgementResult>();
@@ -54,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddAssert("all objects perfectly judged",
                 () => judgementResults.Select(result => result.Type),
                 () => Is.EquivalentTo(judgementResults.Select(result => result.Judgement.MaxResult)));
-            AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_030));
+            AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
         }
 
         [Test]
@@ -87,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddAssert("all objects perfectly judged",
                 () => judgementResults.Select(result => result.Type),
                 () => Is.EquivalentTo(judgementResults.Select(result => result.Judgement.MaxResult)));
-            AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_040));
+            AddAssert("score is correct", () => currentPlayer.ScoreProcessor.TotalScore.Value, () => Is.EqualTo(1_000_000));
         }
 
         private void performTest(List<ManiaHitObject> hitObjects, List<ReplayFrame> frames)

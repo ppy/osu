@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -42,13 +41,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             isStrong.UnbindFrom(HitObject.IsStrongBindable);
             // ensure the next application does not accidentally overwrite samples.
             isStrong.UnbindEvents();
-        }
-
-        protected override void RecreatePieces()
-        {
-            base.RecreatePieces();
-            if (HitObject.IsStrong)
-                Size = BaseSize = new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE);
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)

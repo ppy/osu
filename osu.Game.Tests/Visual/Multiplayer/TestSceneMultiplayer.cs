@@ -19,6 +19,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -29,7 +30,9 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -48,13 +51,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneMultiplayer : ScreenTestScene
     {
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmaps = null!;
         private BeatmapSetInfo importedSet = null!;
+        private BeatmapSetInfo importedSet2 = null!;
 
         private TestMultiplayerComponents multiplayerComponents = null!;
 
         private TestMultiplayerClient multiplayerClient => multiplayerComponents.MultiplayerClient;
-        private TestMultiplayerRoomManager roomManager => multiplayerComponents.RoomManager;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -62,9 +66,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            BeatmapStore beatmapStore;
+
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.CacheAs(beatmapStore = new RealmDetachedBeatmapStore());
             Dependencies.Cache(Realm);
+
+            Add(beatmapStore);
         }
 
         public override void SetUpSteps()
@@ -74,7 +83,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+                importedSet2 = beatmaps.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet!)!.Value.Detach();
+
+                Realm.Write(r =>
+                {
+                    foreach (var beatmapInfo in r.All<BeatmapInfo>())
+                        beatmapInfo.OnlineMD5Hash = beatmapInfo.MD5Hash;
+                });
             });
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerComponents = new TestMultiplayerComponents()));
@@ -94,14 +111,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
             AddRepeatStep("random stuff happens", performRandomAction, 30);
@@ -136,8 +153,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addRandomPlayer()
         {
-            int randomUser = RNG.Next(200000, 500000);
-            multiplayerClient.AddUser(new APIUser { Id = randomUser, Username = $"user {randomUser}" });
+            int id = TestResources.GetNextTestID();
+            multiplayerClient.AddUser(new APIUser { Id = id, Username = $"user {id}" });
         }
 
         private void removeLastUser()
@@ -211,7 +228,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // edit playlist item
             AddStep("Press select", () => InputManager.Key(Key.Enter));
-            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             // select beatmap
             AddStep("Press select", () => InputManager.Key(Key.Enter));
@@ -229,17 +246,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
-            AddUntilStep("Check participant count correct", () => multiplayerClient.ClientAPIRoom?.ParticipantCount.Value == 1);
+            AddUntilStep("Check participant count correct", () => multiplayerClient.ClientAPIRoom?.ParticipantCount == 1);
             AddUntilStep("Check participant list contains user", () => multiplayerClient.ClientAPIRoom?.RecentParticipants.Count(u => u.Id == API.LocalUser.Value.Id) == 1);
         }
 
@@ -248,21 +265,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                roomManager.AddServerSideRoom(new Room
+                multiplayerClient.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                         }
-                    }
+                    ]
                 }, API.LocalUser.Value);
             });
 
             AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
-            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<RoomPanel>().Any());
 
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room and immediately exit select", () =>
@@ -277,21 +294,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                roomManager.AddServerSideRoom(new Room
+                multiplayerClient.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
+                    Name = "Test Room",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                         }
-                    }
+                    ]
                 }, API.LocalUser.Value);
             });
 
             AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
-            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<RoomPanel>().Any());
 
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
@@ -299,7 +316,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
 
-            AddUntilStep("Check participant count correct", () => multiplayerClient.ClientAPIRoom?.ParticipantCount.Value == 1);
+            AddUntilStep("Check participant count correct", () => multiplayerClient.ClientAPIRoom?.ParticipantCount == 1);
             AddUntilStep("Check participant list contains user", () => multiplayerClient.ClientAPIRoom?.RecentParticipants.Count(u => u.Id == API.LocalUser.Value.Id) == 1);
         }
 
@@ -308,18 +325,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                Password = { Value = "password" },
+                Name = "Test Room",
+                Password = "password",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
-            AddUntilStep("room has password", () => multiplayerClient.ClientAPIRoom?.Password.Value == "password");
+            AddUntilStep("room has password", () => multiplayerClient.ClientAPIRoom?.Password == "password");
         }
 
         [Test]
@@ -327,28 +344,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                roomManager.AddServerSideRoom(new Room
+                multiplayerClient.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
-                    Password = { Value = "password" },
+                    Name = "Test Room",
+                    Password = "password",
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                         }
-                    }
+                    ]
                 }, API.LocalUser.Value);
             });
 
             AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
-            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<RoomPanel>().Any());
 
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
-            DrawableLoungeRoom.PasswordEntryPopover? passwordEntryPopover = null;
-            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableLoungeRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            LoungeRoomPanel.PasswordEntryPopover? passwordEntryPopover = null;
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<LoungeRoomPanel.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
 
@@ -361,19 +378,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                Password = { Value = "password" },
+                Name = "Test Room",
+                Password = "password",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
             AddStep("change password", () => multiplayerClient.ChangeSettings(password: "password2"));
-            AddUntilStep("local password changed", () => multiplayerClient.ClientAPIRoom?.Password.Value == "password2");
+            AddUntilStep("local password changed", () => multiplayerClient.ClientAPIRoom?.Password == "password2");
         }
 
         [Test]
@@ -392,14 +409,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
             pressReadyButton();
@@ -421,8 +438,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
                 return new Room
                 {
-                    Name = { Value = "Test Room" },
-                    Playlist = { item }
+                    Name = "Test Room",
+                    Playlist = [item]
                 };
             });
 
@@ -431,10 +448,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Beatmap matches current item", () => Beatmap.Value.BeatmapInfo.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().BeatmapID);
 
@@ -462,8 +479,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
                 return new Room
                 {
-                    Name = { Value = "Test Room" },
-                    Playlist = { item }
+                    Name = "Test Room",
+                    Playlist = [item]
                 };
             });
 
@@ -472,10 +489,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Ruleset matches current item", () => Ruleset.Value.OnlineID == multiplayerClient.ClientRoom?.Playlist.First().RulesetID);
 
@@ -503,8 +520,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
                 return new Room
                 {
-                    Name = { Value = "Test Room" },
-                    Playlist = { item }
+                    Name = "Test Room",
+                    Playlist = [item]
                 };
             });
 
@@ -513,10 +530,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
-                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(item);
+                ((MultiplayerMatchSubScreen)currentSubScreen).ShowSongSelect(item);
             });
 
-            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+            waitForSongSelect();
 
             AddUntilStep("Mods match current item",
                 () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.ClientRoom.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
@@ -539,14 +556,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
             AddStep("join other user (ready, host)", () =>
@@ -572,14 +589,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
             AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
@@ -611,14 +628,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
             AddStep("disconnect", () => multiplayerClient.Disconnect());
@@ -630,22 +647,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                         AllowedMods = new[] { new APIMod(new OsuModHidden()) }
                     }
-                }
+                ]
             });
 
-            AddStep("open mod overlay", () => this.ChildrenOfType<RoomSubScreen.UserModSelectButton>().Single().TriggerClick());
+            AddStep("open mod overlay", () => this.ChildrenOfType<UserModSelectButton>().Single().TriggerClick());
 
             AddStep("invoke on back button", () => multiplayerComponents.OnBackButton());
 
-            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<RoomSubScreen>().Single().UserModsSelectOverlay.State.Value == Visibility.Hidden);
+            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<MultiplayerUserModSelectOverlay>().All(o => o.State.Value == Visibility.Hidden));
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
@@ -670,14 +687,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
             enterGameplay();
@@ -690,6 +707,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+
+            AddAssert("check is fail", () =>
+            {
+                var scoreInfo = ((ResultsScreen)multiplayerComponents.CurrentScreen).Score;
+
+                return scoreInfo?.Passed == false && scoreInfo.Rank == ScoreRank.F;
+            });
         }
 
         [Test]
@@ -708,14 +732,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
             enterGameplay();
@@ -738,14 +762,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
             pressReadyButton();
@@ -773,45 +797,44 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                roomManager.AddServerSideRoom(new Room
+                multiplayerClient.AddServerSideRoom(new Room
                 {
-                    Name = { Value = "Test Room" },
-                    QueueMode = { Value = QueueMode.AllPlayers },
+                    Name = "Test Room",
+                    QueueMode = QueueMode.AllPlayers,
                     Playlist =
-                    {
+                    [
                         new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                         {
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                         }
-                    }
+                    ]
                 }, API.LocalUser.Value);
             });
 
             AddStep("refresh rooms", () => this.ChildrenOfType<LoungeSubScreen>().Single().UpdateFilter());
-            AddUntilStep("wait for room", () => this.ChildrenOfType<DrawableRoom>().Any());
+            AddUntilStep("wait for room", () => this.ChildrenOfType<RoomPanel>().Any());
             AddStep("select room", () => InputManager.Key(Key.Down));
 
-            AddStep("disable polling", () => this.ChildrenOfType<ListingPollingComponent>().Single().TimeBetweenPolls.Value = 0);
+            AddStep("disable polling", () => this.ChildrenOfType<LoungeListingPoller>().Single().TimeBetweenPolls.Value = 0);
             AddStep("change server-side settings", () =>
             {
-                roomManager.ServerSideRooms[0].Name.Value = "New name";
-                roomManager.ServerSideRooms[0].Playlist.Add(new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
-                {
-                    ID = 2,
-                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
-                });
+                multiplayerClient.ServerSideRooms[0].Name = "New name";
+                multiplayerClient.ServerSideRooms[0].Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        ID = 2,
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    }
+                ];
             });
 
             AddStep("join room", () => InputManager.Key(Key.Enter));
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
 
-            AddAssert("local room has correct settings", () =>
-            {
-                var localRoom = this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().Room;
-                return localRoom.Name.Value == roomManager.ServerSideRooms[0].Name.Value
-                       && localRoom.Playlist.SequenceEqual(roomManager.ServerSideRooms[0].Playlist);
-            });
+            AddAssert("local room has correct name", () => this.ChildrenOfType<MultiplayerRoomPanel>().Single().Room.Name, () => Is.EqualTo(multiplayerClient.ServerSideRooms[0].Name));
+            AddAssert("local room has correct playlist", () => this.ChildrenOfType<MultiplayerQueueList>().Single().Items.Single().ID, () => Is.EqualTo(2));
         }
 
         [Test]
@@ -820,15 +843,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                QueueMode = { Value = QueueMode.AllPlayers },
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
             AddStep("set spectating state", () => multiplayerClient.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
@@ -856,15 +879,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                QueueMode = { Value = QueueMode.AllPlayers },
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
             AddStep("set spectating state", () => multiplayerClient.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
@@ -895,20 +918,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                QueueMode = { Value = QueueMode.AllPlayers },
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
             enterGameplay();
             AddStep("join other user", () => multiplayerClient.AddUser(new APIUser { Id = 1234 }));
-            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, TestMultiplayerClient.CreateMultiplayerPlaylistItem(
+            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(
                 new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
@@ -926,21 +949,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
-                QueueMode = { Value = QueueMode.AllPlayers },
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     }
-                }
+                ]
             });
 
             enterGameplay();
 
             AddStep("join other user", () => multiplayerClient.AddUser(new APIUser { Id = 1234 }));
-            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, TestMultiplayerClient.CreateMultiplayerPlaylistItem(
+            AddStep("add item as other user", () => multiplayerClient.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(
                 new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                 {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
@@ -960,14 +983,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createRoom(() => new Room
             {
-                Name = { Value = "Test Room" },
+                Name = "Test Room",
                 Playlist =
-                {
+                [
                     new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
                     {
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
-                }
+                ]
             });
 
             AddStep("join other user and make host", () =>
@@ -999,6 +1022,209 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddUntilStep("wait for gameplay to start", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.Playing);
                 AddUntilStep("wait for local user to enter spectator", () => multiplayerComponents.CurrentScreen is MultiSpectatorScreen);
             }
+        }
+
+        [Test]
+        public void TestGameplayStartsWhileInSongSelectWithDifferentRuleset()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 1)).BeatmapInfo)
+                    {
+                        RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                ]
+            });
+
+            AddStep("select hidden", () => multiplayerClient.ChangeUserMods(new[] { new APIMod { Acronym = "HD" } }));
+            AddStep("make user ready", () => multiplayerClient.ChangeState(MultiplayerUserState.Ready));
+            AddStep("press edit on second item", () => this.ChildrenOfType<DrawableRoomPlaylistItem>().Single(i => i.Item.RulesetID == 1)
+                                                           .ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().Single().TriggerClick());
+
+            waitForSongSelect();
+            AddAssert("ruleset is taiko", () => Ruleset.Value.OnlineID == 1);
+
+            AddStep("start match", () => multiplayerClient.StartMatch().WaitSafely());
+
+            AddUntilStep("wait for loading", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.WaitingForLoad);
+            AddUntilStep("wait for gameplay to start", () => multiplayerClient.ClientRoom?.State == MultiplayerRoomState.Playing);
+            AddAssert("hidden is selected", () => SelectedMods.Value, () => Has.One.TypeOf(typeof(OsuModHidden)));
+        }
+
+        [FlakyTest]
+        [Test]
+        public void TestGlobalBeatmapDoesNotChangeAtResults()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 1)).BeatmapInfo)
+                    {
+                        RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = new[] { new APIMod { Acronym = "HD" } },
+                    },
+                ]
+            });
+
+            enterGameplay();
+
+            // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
+            for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
+            {
+                double time = i;
+                AddUntilStep($"wait for time > {i}", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.CurrentTime > time);
+            }
+
+            AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+
+            AddAssert("global beatmap still matches first playlist item", () => Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(multiplayerClient.ClientRoom!.Playlist[0].BeatmapID));
+            AddStep("return to match", () => multiplayerComponents.Exit());
+            AddAssert("global beatmap matches second playlist item", () => Beatmap.Value.BeatmapInfo.OnlineID, () => Is.EqualTo(multiplayerClient.ClientRoom!.Playlist[1].BeatmapID));
+        }
+
+        /// <summary>
+        /// Tests that the local user is not able to change their play style if they haven't downloaded the beatmap (beatmap carousel will be empty).
+        /// </summary>
+        [Test]
+        public void TestCanNotEditDifficultyIfNotDownloaded()
+        {
+            IBeatmap roomBeatmap = null!;
+
+            createRoom(() =>
+            {
+                roomBeatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
+
+                return new Room
+                {
+                    Name = "Test Room",
+                    QueueMode = QueueMode.AllPlayers,
+                    Playlist =
+                    [
+                        new PlaylistItem(CreateAPIBeatmap(roomBeatmap.BeatmapInfo))
+                        {
+                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                            Freestyle = true
+                        }
+                    ]
+                };
+            });
+
+            AddAssert("editing disallowed", () => !this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().UserStyleEditingEnabled);
+            AddStep("import beatmap", () => beatmaps.Import(roomBeatmap.BeatmapInfo.BeatmapSet!));
+            AddAssert("editing allowed", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().UserStyleEditingEnabled);
+        }
+
+        /// <summary>
+        /// Test that the user selection screen is not exited when the beatmap is changed to the same set.
+        /// </summary>
+        [Test]
+        public void TestUserStyleSelectionDoesNotExitWhenBeatmapSetNotChanged()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
+                Playlist =
+                [
+                    new PlaylistItem(importedSet.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        Freestyle = true
+                    }
+                ]
+            });
+
+            AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
+
+            AddStep("change beatmap", () =>
+            {
+                var newItem = multiplayerClient.ServerRoom!.Playlist[0].Clone();
+                var newBeatmap = importedSet.Beatmaps.Last();
+                newItem.BeatmapID = newBeatmap.OnlineID;
+                newItem.BeatmapChecksum = newBeatmap.MD5Hash;
+
+                multiplayerClient.EditPlaylistItem(newItem);
+            });
+
+            AddWaitStep("wait for potential beatmap change", 2);
+            AddAssert("style selection screen still open", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
+        }
+
+        /// <summary>
+        /// Tests that the user selection screen is exited when the beatmap is changed to another set.
+        /// </summary>
+        [Test]
+        public void TestUserStyleSelectionExitedWhenBeatmapSetChanged()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                QueueMode = QueueMode.AllPlayers,
+                Playlist =
+                [
+                    new PlaylistItem(importedSet.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        Freestyle = true
+                    }
+                ]
+            });
+
+            AddStep("open user style selection", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().ShowUserStyleSelect());
+            AddUntilStep("style selection screen opened", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() == true);
+
+            AddStep("change beatmap set", () =>
+            {
+                var newItem = multiplayerClient.ServerRoom!.Playlist[0].Clone();
+                var newBeatmap = importedSet2.Beatmaps.Last();
+                newItem.BeatmapID = newBeatmap.OnlineID;
+                newItem.BeatmapChecksum = newBeatmap.MD5Hash;
+
+                multiplayerClient.EditPlaylistItem(newItem);
+            });
+
+            AddUntilStep("selected beatmap changed", () => Beatmap.Value.BeatmapInfo.Equals(importedSet2.Beatmaps.First()));
+            AddUntilStep("style selection screen closed", () => this.ChildrenOfType<MultiplayerMatchFreestyleSelect>().SingleOrDefault()?.IsCurrentScreen() != true);
+        }
+
+        [Test]
+        public void TestMaxParticipantsAndSlots()
+        {
+            createRoom(() => new Room
+            {
+                Name = "Test Room",
+                Password = "password",
+                Playlist =
+                [
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
+                    }
+                ],
+                MaxParticipants = 10
+            });
+
+            AddStep("turn max participants off", () => multiplayerClient.ChangeSettings(maxParticipants: null));
+            AddStep("turn max participants back on", () => multiplayerClient.ChangeSettings(maxParticipants: 8));
         }
 
         private void enterGameplay()
@@ -1042,6 +1268,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => multiplayerClient.RoomJoined);
+        }
+
+        private void waitForSongSelect()
+        {
+            AddUntilStep("wait for song select", () =>
+            {
+                var songSelect = InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault();
+                return songSelect != null && songSelect.IsCurrentScreen() && !songSelect.IsFiltering;
+            });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
     }
 }

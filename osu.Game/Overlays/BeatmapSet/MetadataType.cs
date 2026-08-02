@@ -8,8 +8,11 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public enum MetadataType
     {
-        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoTags))]
-        Tags,
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoUserTags))]
+        UserTags,
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoMapperTags))]
+        MapperTags,
 
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoSource))]
         Source,

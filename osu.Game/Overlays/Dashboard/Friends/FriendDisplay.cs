@@ -1,9 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -14,37 +11,28 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Users;
-using osuTK;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dashboard.Friends
 {
     public partial class FriendDisplay : CompositeDrawable
     {
-        private List<APIUser> users = new List<APIUser>();
+        public IBindable<bool> Loading => loading;
+        private readonly BindableBool loading = new BindableBool();
 
-        public List<APIUser> Users
-        {
-            get => users;
-            set
-            {
-                users = value;
-                onlineStreamControl.Populate(value);
-            }
-        }
+        private readonly IBindableList<APIRelation> apiFriends = new BindableList<APIRelation>();
 
-        private CancellationTokenSource cancellationToken;
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
-        private Drawable currentContent;
+        private FriendOnlineStreamControl streamControl = null!;
+        private Box background = null!;
+        private Box controlBackground = null!;
+        private UserListToolbar userListToolbar = null!;
+        private Container<FriendsList> listContainer = null!;
+        private BasicSearchTextBox searchTextBox = null!;
 
-        private FriendOnlineStreamControl onlineStreamControl;
-        private Box background;
-        private Box controlBackground;
-        private UserListToolbar userListToolbar;
-        private Container itemsPlaceholder;
-        private LoadingLayer loading;
-
-        private readonly IBindableList<APIUser> apiFriends = new BindableList<APIUser>();
+        private CancellationTokenSource? listLoadCancellation;
 
         public FriendDisplay()
         {
@@ -52,8 +40,8 @@ namespace osu.Game.Overlays.Dashboard.Friends
             AutoSizeAxes = Axes.Y;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             InternalChild = new FillFlowContainer
             {
@@ -81,7 +69,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                     Top = 20,
                                     Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING - FriendsOnlineStatusItem.PADDING
                                 },
-                                Child = onlineStreamControl = new FriendOnlineStreamControl(),
+                                Child = streamControl = new FriendOnlineStreamControl(),
                             }
                         }
                     },
@@ -104,7 +92,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                 Margin = new MarginPadding { Bottom = 20 },
                                 Children = new Drawable[]
                                 {
-                                    new Container
+                                    new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
@@ -113,11 +101,38 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                             Horizontal = 40,
                                             Vertical = 20
                                         },
-                                        Child = userListToolbar = new UserListToolbar
+                                        ColumnDimensions = new[]
                                         {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                        }
+                                            new Dimension(),
+                                            new Dimension(GridSizeMode.Absolute, 50),
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        RowDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        Content = new[]
+                                        {
+                                            new[]
+                                            {
+                                                searchTextBox = new BasicSearchTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    Height = 40,
+                                                    ReleaseFocusOnCommit = false,
+                                                    HoldFocus = true,
+                                                    PlaceholderText = HomeStrings.SearchPlaceholder,
+                                                },
+                                                Empty(),
+                                                userListToolbar = new UserListToolbar
+                                                {
+                                                    Anchor = Anchor.CentreRight,
+                                                    Origin = Anchor.CentreRight,
+                                                },
+                                            },
+                                        },
                                     },
                                     new Container
                                     {
@@ -125,13 +140,12 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                         AutoSizeAxes = Axes.Y,
                                         Children = new Drawable[]
                                         {
-                                            itemsPlaceholder = new Container
+                                            listContainer = new Container<FriendsList>
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
                                                 Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING }
                                             },
-                                            loading = new LoadingLayer(true)
                                         }
                                     }
                                 }
@@ -143,121 +157,57 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
             background.Colour = colourProvider.Background4;
             controlBackground.Colour = colourProvider.Background5;
-
-            apiFriends.BindTo(api.Friends);
-            apiFriends.BindCollectionChanged((_, _) => Schedule(() => Users = apiFriends.ToList()), true);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
-            userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
-            userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
+            apiFriends.BindTo(api.LocalUserState.Friends);
+            apiFriends.BindCollectionChanged((_, _) => reloadList());
+
+            userListToolbar.DisplayStyle.BindValueChanged(_ => reloadList(), true);
         }
 
-        private void recreatePanels()
+        private void reloadList()
         {
-            if (!users.Any())
-                return;
+            listLoadCancellation?.Cancel();
+            var cancellationSource = listLoadCancellation = new CancellationTokenSource();
 
-            cancellationToken?.Cancel();
+            // There may be more than one active list in the container due to the delayed fade out.
+            FriendsList? currentList = listContainer.SingleOrDefault(d => d.LifetimeEnd == double.MaxValue);
 
-            if (itemsPlaceholder.Any())
-                loading.Show();
-
-            var sortedUsers = sortUsers(getUsersInCurrentGroup());
-
-            LoadComponentAsync(createTable(sortedUsers), addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
-        }
-
-        private List<APIUser> getUsersInCurrentGroup()
-        {
-            switch (onlineStreamControl.Current.Value?.Status)
+            FriendsList newList = new FriendsList(userListToolbar.DisplayStyle.Value, apiFriends.Select(f => f.TargetUser!).ToArray())
             {
-                default:
-                case OnlineStatus.All:
-                    return users;
-
-                case OnlineStatus.Offline:
-                    return users.Where(u => !u.IsOnline).ToList();
-
-                case OnlineStatus.Online:
-                    return users.Where(u => u.IsOnline).ToList();
-            }
-        }
-
-        private void addContentToPlaceholder(Drawable content)
-        {
-            loading.Hide();
-
-            var lastContent = currentContent;
-
-            if (lastContent != null)
-            {
-                lastContent.FadeOut(100, Easing.OutQuint).Expire();
-                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
-            }
-
-            itemsPlaceholder.Add(currentContent = content);
-            currentContent.FadeIn(200, Easing.OutQuint);
-        }
-
-        private FillFlowContainer createTable(List<APIUser> users)
-        {
-            var style = userListToolbar.DisplayStyle.Value;
-
-            return new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
-                Children = users.Select(u => createUserPanel(u, style)).ToList()
+                StatusFilter = { BindTarget = streamControl.Current },
+                SortCriteria = { BindTarget = userListToolbar.SortCriteria },
+                SearchText = { BindTarget = searchTextBox.Current }
             };
-        }
 
-        private UserPanel createUserPanel(APIUser user, OverlayPanelDisplayStyle style)
-        {
-            switch (style)
+            loading.Value = true;
+            LoadComponentAsync(newList, finishLoad, cancellationSource.Token);
+
+            void finishLoad(FriendsList list)
             {
-                default:
-                case OverlayPanelDisplayStyle.Card:
-                    return new UserGridPanel(user).With(panel =>
-                    {
-                        panel.Anchor = Anchor.TopCentre;
-                        panel.Origin = Anchor.TopCentre;
-                        panel.Width = 290;
-                    });
+                loading.Value = false;
 
-                case OverlayPanelDisplayStyle.List:
-                    return new UserListPanel(user);
+                if (currentList != null)
+                {
+                    currentList.FadeOut(100, Easing.OutQuint).Expire();
+                    currentList.Delay(25).Schedule(() => currentList.BypassAutoSizeAxes = Axes.Y);
+                }
 
-                case OverlayPanelDisplayStyle.Brick:
-                    return new UserBrickPanel(user);
-            }
-        }
-
-        private List<APIUser> sortUsers(List<APIUser> unsorted)
-        {
-            switch (userListToolbar.SortCriteria.Value)
-            {
-                default:
-                case UserSortCriteria.LastVisit:
-                    return unsorted.OrderByDescending(u => u.LastVisit).ToList();
-
-                case UserSortCriteria.Rank:
-                    return unsorted.OrderByDescending(u => u.Statistics.GlobalRank.HasValue).ThenBy(u => u.Statistics.GlobalRank ?? 0).ToList();
-
-                case UserSortCriteria.Username:
-                    return unsorted.OrderBy(u => u.Username).ToList();
+                listContainer.Add(newList);
+                newList.FadeIn(200, Easing.OutQuint);
             }
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            cancellationToken?.Cancel();
             base.Dispose(isDisposing);
+
+            listLoadCancellation?.Cancel();
+            listLoadCancellation?.Dispose();
         }
     }
 }

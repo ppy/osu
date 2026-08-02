@@ -1,16 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
@@ -27,10 +26,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private readonly APIBeatmapSet beatmapSet;
 
-        private PostBeatmapFavouriteRequest favouriteRequest;
+        private PostBeatmapFavouriteRequest? favouriteRequest;
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private INotificationOverlay? notifications { get; set; }
 
         public FavouriteButton(APIBeatmapSet beatmapSet)
         {
@@ -53,19 +55,26 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             favouriteRequest?.Cancel();
             favouriteRequest = new PostBeatmapFavouriteRequest(beatmapSet.OnlineID, actionType);
 
-            Enabled.Value = false;
+            SetLoading(true);
+
             favouriteRequest.Success += () =>
             {
                 bool favourited = actionType == BeatmapFavouriteAction.Favourite;
 
                 current.Value = new BeatmapSetFavouriteState(favourited, current.Value.FavouriteCount + (favourited ? 1 : -1));
 
-                Enabled.Value = true;
+                SetLoading(false);
+                api.LocalUserState.UpdateFavouriteBeatmapSets();
             };
             favouriteRequest.Failure += e =>
             {
-                Logger.Error(e, $"Failed to {actionType.ToString().ToLowerInvariant()} beatmap: {e.Message}");
-                Enabled.Value = true;
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = e.Message,
+                    Icon = FontAwesome.Solid.Times,
+                });
+
+                SetLoading(false);
             };
 
             api.Queue(favouriteRequest);

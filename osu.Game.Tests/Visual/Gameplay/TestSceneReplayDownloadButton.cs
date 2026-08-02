@@ -117,6 +117,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("state entered downloading", () => downloadStarted);
             AddUntilStep("state left downloading", () => downloadFinished);
+
+            AddStep("change score to null", () => downloadButton.Score.Value = null);
+            AddUntilStep("state changed to unknown", () => downloadButton.State.Value, () => Is.EqualTo(DownloadState.Unknown));
         }
 
         [Test]

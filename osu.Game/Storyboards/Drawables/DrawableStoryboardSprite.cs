@@ -74,6 +74,21 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
+        protected override void Update()
+        {
+            base.Update();
+
+            // In stable, alpha transforms exceeding values of 1 would result in sprites disappearing from view.
+            // See https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/Graphics/Sprites/pSprite.cs#L413-L414
+            //
+            // Over the years, storyboard(ers) have taken advantage of this to create "flicker" patterns.
+            // This is quite a common technique, so we are reproducing it here for now.
+            //
+            // NOTE TO FUTURE VISITORS: If we do ever update the storyboard spec, we may want to move such flicker effects to their
+            // own transform type, and make this a legacy behaviour. It feels very flimsy.
+            if (Alpha > 1) Alpha %= 1;
+        }
+
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
 
@@ -85,6 +100,7 @@ namespace osu.Game.Storyboards.Drawables
             Sprite = sprite;
             Origin = sprite.Origin;
             Position = sprite.InitialPosition;
+            Name = sprite.Path;
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTimeForDisplay;
@@ -99,14 +115,15 @@ namespace osu.Game.Storyboards.Drawables
                 skinSourceChanged();
             }
             else
-                Texture = textureStore.Get(Sprite.Path);
+                Texture = textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
             Sprite.ApplyTransforms(this);
         }
 
         private void skinSourceChanged()
         {
-            Texture = skin.GetTexture(Sprite.Path) ?? textureStore.Get(Sprite.Path);
+            Texture = skin.GetTexture(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge) ??
+                      textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
             // Setting texture will only update the size if it's zero.
             // So let's force an explicit update.

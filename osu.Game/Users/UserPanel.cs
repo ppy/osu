@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -13,17 +15,26 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
+using osu.Game.Screens.Play;
+using osu.Game.Users.Drawables;
+using osuTK;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Users
 {
-    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu
+    public abstract partial class UserPanel : OsuClickableContainer, IHasContextMenu, IFilterable
     {
         public readonly APIUser User;
 
@@ -58,7 +69,13 @@ namespace osu.Game.Users
         private ChatOverlay? chatOverlay { get; set; }
 
         [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
+        [Resolved]
         protected OverlayColourProvider? ColourProvider { get; private set; }
+
+        [Resolved]
+        private IPerformFromScreenRunner? performer { get; set; }
 
         [Resolved]
         protected OsuColour Colours { get; private set; } = null!;
@@ -66,27 +83,28 @@ namespace osu.Game.Users
         [Resolved]
         private MultiplayerClient? multiplayerClient { get; set; }
 
+        [Resolved]
+        private MetadataClient? metadataClient { get; set; }
+
+        [Resolved]
+        private QueueController? queueController { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Masking = true;
 
-            AddRange(new[]
+            Add(new Box
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider?.Background5 ?? Colours.Gray1
-                },
-                Background = new UserCoverBackground
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    User = User,
-                },
-                CreateLayout()
+                RelativeSizeAxes = Axes.Both,
+                Colour = ColourProvider?.Background5 ?? Colours.Gray1
             });
+
+            var background = CreateBackground();
+            if (background != null)
+                Add(background);
+
+            Add(CreateLayout());
 
             base.Action = ViewProfile = () =>
             {
@@ -95,13 +113,49 @@ namespace osu.Game.Users
             };
         }
 
+        // TODO: this whole api is messy. half these Create methods are expected to by the implementation and half are implictly called.
+
         protected abstract Drawable CreateLayout();
+
+        /// <summary>
+        /// Panel background container. Can be null if a panel doesn't want a background under it's layout
+        /// </summary>
+        protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
+        {
+            RelativeSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            User = User
+        };
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
         {
             Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
             Shadow = false,
             Text = User.Username,
+        };
+
+        protected OsuSpriteText CreateRank() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
+            Shadow = false,
+            // We can't colour the properly because we don't have the required percentile data.
+
+            Colour = Colours.BlueLighter,
+            Text = (User.Rank?.Rank ?? User.Statistics.GlobalRank)?.ToLocalisableString("\\##,##0") ?? string.Empty,
+        };
+
+        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
+
+        protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.CountryCode)
+        {
+            Size = new Vector2(36, 26),
+            Action = Action,
+        };
+
+        protected Drawable CreateTeamLogo() => new UpdateableTeamFlag(User.Team)
+        {
+            Size = new Vector2(52, 26),
         };
 
         public MenuItem[] ContextMenuItems
@@ -113,27 +167,68 @@ namespace osu.Game.Users
                     new OsuMenuItem(ContextMenuStrings.ViewProfile, MenuItemType.Highlighted, ViewProfile)
                 };
 
-                if (!User.Equals(api.LocalUser.Value))
-                {
-                    items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
-                    {
-                        channelManager?.OpenPrivateChannel(User);
-                        chatOverlay?.Show();
-                    }));
-                }
+                if (User.Equals(api.LocalUser.Value))
+                    return items.ToArray();
 
-                if (
-                    // TODO: uncomment this once lazer / osu-web is updating online states
-                    // User.IsOnline &&
-                    multiplayerClient?.Room != null &&
-                    multiplayerClient.Room.Users.All(u => u.UserID != User.Id)
-                )
+                items.Add(new OsuMenuItem(UsersStrings.CardSendMessage, MenuItemType.Standard, () =>
                 {
-                    items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () => multiplayerClient.InvitePlayer(User.Id)));
+                    channelManager?.OpenPrivateChannel(User);
+                    chatOverlay?.Show();
+                }));
+
+                items.Add(!isUserBlocked()
+                    ? new OsuMenuItem(UsersStrings.BlocksButtonBlock, MenuItemType.Destructive, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Block(User)))
+                    : new OsuMenuItem(UsersStrings.BlocksButtonUnblock, MenuItemType.Standard, () => dialogOverlay?.Push(ConfirmBlockActionDialog.Unblock(User))));
+
+                if (isUserOnline())
+                {
+                    items.Add(new OsuMenuItem(ContextMenuStrings.SpectatePlayer, MenuItemType.Standard, () =>
+                    {
+                        if (isUserOnline())
+                            performer?.PerformFromScreen(s => s.Push(new SoloSpectatorScreen(User)));
+                    }));
+
+                    if (canInviteUser())
+                    {
+                        items.Add(new OsuMenuItem(ContextMenuStrings.InvitePlayer, MenuItemType.Standard, () =>
+                        {
+                            if (canInviteUser())
+                                multiplayerClient!.InvitePlayer(User.Id);
+                        }));
+                    }
+
+                    if (canDuelUser())
+                    {
+                        items.Add(new OsuMenuItem(ContextMenuStrings.DuelPlayer, MenuItemType.Standard, () =>
+                        {
+                            if (canDuelUser())
+                                queueController?.IssueDuel(queueController.SelectedPool.Value!, User.Id);
+                        }));
+                    }
                 }
 
                 return items.ToArray();
+
+                bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
+                bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true && multiplayerClient?.Room?.Settings.MatchType.IsMatchmakingType() != true;
+                bool isUserBlocked() => api.LocalUserState.Blocks.Any(b => b.TargetID == User.OnlineID);
+                bool canDuelUser() => isUserOnline() && queueController?.SelectedPool.Value != null && multiplayerClient?.Room?.Settings.MatchType.IsMatchmakingType() != true;
             }
         }
+
+        public IEnumerable<LocalisableString> FilterTerms => [User.Username];
+
+        public bool MatchingFilter
+        {
+            set
+            {
+                if (value)
+                    Show();
+                else
+                    Hide();
+            }
+        }
+
+        public bool FilteringActive { get; set; }
     }
 }

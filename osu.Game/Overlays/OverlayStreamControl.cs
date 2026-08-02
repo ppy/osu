@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnHover(HoverEvent e)
         {
-            foreach (var streamBadge in TabContainer.Children.OfType<OverlayStreamItem<T>>())
+            foreach (var streamBadge in TabContainer.OfType<OverlayStreamItem<T>>())
                 streamBadge.UserHoveringArea = true;
 
             return base.OnHover(e);
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            foreach (var streamBadge in TabContainer.Children.OfType<OverlayStreamItem<T>>())
+            foreach (var streamBadge in TabContainer.OfType<OverlayStreamItem<T>>())
                 streamBadge.UserHoveringArea = false;
 
             base.OnHoverLost(e);

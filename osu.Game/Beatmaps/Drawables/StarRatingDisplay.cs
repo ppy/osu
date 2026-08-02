@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,7 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -36,6 +35,18 @@ namespace osu.Game.Beatmaps.Drawables
             set => current.Current = value;
         }
 
+        /// <summary>
+        /// The difficulty colour currently displayed.
+        /// Can be used to have other components match the spectrum animation.
+        /// </summary>
+        public Color4 DisplayedDifficultyColour => background.Colour;
+
+        /// <summary>
+        /// The difficulty text colour currently displayed.
+        /// Can be used to have other components match the spectrum animation.
+        /// </summary>
+        public Color4 DisplayedDifficultyTextColour => starsText.Colour;
+
         private readonly Bindable<double> displayedStars = new BindableDouble();
 
         /// <summary>
@@ -46,9 +57,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -121,9 +129,8 @@ namespace osu.Game.Beatmaps.Drawables
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Margin = new MarginPadding { Bottom = 1.5f },
-                                    // todo: this should be size: 12f, but to match up with the design, it needs to be 14.4f
-                                    // see https://github.com/ppy/osu-framework/issues/3271.
-                                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
+                                    Spacing = new Vector2(-1.4f),
+                                    Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold, fixedWidth: true),
                                     Shadow = false,
                                 },
                             }
@@ -140,7 +147,8 @@ namespace osu.Game.Beatmaps.Drawables
             Current.BindValueChanged(c =>
             {
                 if (animated)
-                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 750, Easing.OutQuint);
+                    // Animation roughly matches `StarCounter`'s implementation.
+                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 100 + 80 * Math.Abs(c.NewValue.Stars - c.OldValue.Stars), Easing.OutQuint);
                 else
                     displayedStars.Value = c.NewValue.Stars;
             });
@@ -149,12 +157,12 @@ namespace osu.Game.Beatmaps.Drawables
 
             displayedStars.BindValueChanged(s =>
             {
-                starsText.Text = s.NewValue < 0 ? "-" : s.NewValue.ToLocalisableString("0.00");
+                starsText.Text = s.NewValue < 0 ? "-" : s.NewValue.FormatStarRating();
 
                 background.Colour = colours.ForStarDifficulty(s.NewValue);
 
-                starIcon.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
-                starsText.Colour = s.NewValue >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
+                starIcon.Colour = colours.ForStarDifficultyText(s.NewValue);
+                starsText.Colour = colours.ForStarDifficultyText(s.NewValue);
             }, true);
         }
     }

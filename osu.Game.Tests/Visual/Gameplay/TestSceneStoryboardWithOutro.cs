@@ -31,6 +31,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected override bool HasCustomSteps => true;
 
+        protected override bool AllowBackwardsSeeks => true;
+
         protected new OutroPlayer Player => (OutroPlayer)base.Player;
 
         private double currentBeatmapDuration;
@@ -213,15 +215,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Storyboard createStoryboard(double duration)
         {
             var storyboard = new Storyboard();
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-            sprite.TimelineGroup.Alpha.Add(Easing.None, 0, duration, 1, 0);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
+            sprite.Commands.AddAlpha(Easing.None, 0, duration, 1, 0);
             storyboard.GetLayer("Background").Add(sprite);
             return storyboard;
         }
 
         protected partial class OutroPlayer : TestPlayer
         {
-            public void ExitViaPause() => PerformExit(true);
+            public void ExitViaPause() => PerformExitWithConfirmation();
 
             public new FailOverlay FailOverlay => base.FailOverlay;
 

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Dashboard
             {
                 Title = PageTitleStrings.MainHomeControllerIndex;
                 Description = NamedOverlayComponentStrings.DashboardDescription;
-                IconTexture = "Icons/Hexacons/social";
+                Icon = OsuIcon.Global;
             }
         }
     }
@@ -28,7 +28,10 @@ namespace osu.Game.Overlays.Dashboard
         [LocalisableDescription(typeof(FriendsStrings), nameof(FriendsStrings.TitleCompact))]
         Friends,
 
-        [Description("Currently Playing")]
-        CurrentlyPlaying
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.CurrentlyOnline))]
+        CurrentlyPlaying,
+
+        [LocalisableDescription(typeof(UserInterfaceStrings), nameof(UserInterfaceStrings.UserSearch))]
+        UserSearch
     }
 }

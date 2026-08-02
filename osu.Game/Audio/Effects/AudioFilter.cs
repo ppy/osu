@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using ManagedBass.Fx;
 using osu.Framework.Audio.Mixing;
 using osu.Framework.Graphics;
@@ -16,11 +15,14 @@ namespace osu.Game.Audio.Effects
         /// </summary>
         public const int MAX_LOWPASS_CUTOFF = 22049; // nyquist - 1hz
 
+        /// <summary>
+        /// Whether this filter is currently attached to the audio track and thus applying an adjustment.
+        /// </summary>
+        public bool IsAttached { get; private set; }
+
         private readonly AudioMixer mixer;
         private readonly BQFParameters filter;
         private readonly BQFType type;
-
-        private bool isAttached;
 
         private int cutoff;
 
@@ -36,7 +38,7 @@ namespace osu.Game.Audio.Effects
                     return;
 
                 cutoff = value;
-                updateFilter(cutoff);
+                updateFilter();
             }
         }
 
@@ -58,7 +60,9 @@ namespace osu.Game.Audio.Effects
                 fQ = 0.7f
             };
 
-            Cutoff = getInitialCutoff(type);
+            cutoff = getInitialCutoff(type);
+
+            updateFilter();
         }
 
         private int getInitialCutoff(BQFType type)
@@ -76,13 +80,13 @@ namespace osu.Game.Audio.Effects
             }
         }
 
-        private void updateFilter(int newValue)
+        private void updateFilter()
         {
             switch (type)
             {
                 case BQFType.LowPass:
                     // Workaround for weird behaviour when rapidly setting fCenter of a low-pass filter to nyquist - 1hz.
-                    if (newValue >= MAX_LOWPASS_CUTOFF)
+                    if (Cutoff >= MAX_LOWPASS_CUTOFF)
                     {
                         ensureDetached();
                         return;
@@ -92,7 +96,7 @@ namespace osu.Game.Audio.Effects
 
                 // Workaround for weird behaviour when rapidly setting fCenter of a high-pass filter to 1hz.
                 case BQFType.HighPass:
-                    if (newValue <= 1)
+                    if (Cutoff <= 1)
                     {
                         ensureDetached();
                         return;
@@ -103,37 +107,26 @@ namespace osu.Game.Audio.Effects
 
             ensureAttached();
 
-            int filterIndex = mixer.Effects.IndexOf(filter);
-
-            if (filterIndex < 0) return;
-
-            if (mixer.Effects[filterIndex] is BQFParameters existingFilter)
-            {
-                existingFilter.fCenter = newValue;
-
-                // required to update effect with new parameters.
-                mixer.Effects[filterIndex] = existingFilter;
-            }
+            filter.fCenter = Cutoff;
+            mixer.UpdateEffect(filter);
         }
 
         private void ensureAttached()
         {
-            if (isAttached)
+            if (IsAttached)
                 return;
 
-            Debug.Assert(!mixer.Effects.Contains(filter));
-            mixer.Effects.Add(filter);
-            isAttached = true;
+            mixer.AddEffect(filter);
+            IsAttached = true;
         }
 
         private void ensureDetached()
         {
-            if (!isAttached)
+            if (!IsAttached)
                 return;
 
-            Debug.Assert(mixer.Effects.Contains(filter));
-            mixer.Effects.Remove(filter);
-            isAttached = false;
+            mixer.RemoveEffect(filter);
+            IsAttached = false;
         }
 
         protected override void Dispose(bool isDisposing)

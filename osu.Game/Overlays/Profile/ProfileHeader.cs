@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
@@ -18,6 +19,8 @@ namespace osu.Game.Overlays.Profile
 
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
+
+        private TopHeaderContainer topHeaderContainer = null!;
 
         public ProfileHeader()
         {
@@ -42,7 +45,7 @@ namespace osu.Game.Overlays.Profile
             Direction = FillDirection.Vertical,
             Children = new Drawable[]
             {
-                new TopHeaderContainer
+                topHeaderContainer = new TopHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
@@ -61,6 +64,7 @@ namespace osu.Game.Overlays.Profile
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
                 },
+                new ProfileProcessingNotice(),
                 centreHeaderContainer = new CentreHeaderContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -74,6 +78,15 @@ namespace osu.Game.Overlays.Profile
             }
         };
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // This is basically a tooltip display on hover, so we should display above everything.
+            // If this ever breaks let's just trash the design and make it a standard tooltip.
+            AddInternal(topHeaderContainer.PreviousUsernamesDisplay.CreateProxy());
+        }
+
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();
 
         protected override Drawable CreateTabControlContent() => new ProfileRulesetSelector
@@ -86,7 +99,7 @@ namespace osu.Game.Overlays.Profile
             public ProfileHeaderTitle()
             {
                 Title = PageTitleStrings.MainUsersControllerDefault;
-                IconTexture = "Icons/Hexacons/profile";
+                Icon = OsuIcon.Player;
             }
         }
     }

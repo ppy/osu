@@ -9,7 +9,10 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -17,6 +20,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
@@ -26,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public partial class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public partial class SkipOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The total number of successful skips performed by this overlay.
@@ -37,21 +41,26 @@ namespace osu.Game.Screens.Play
 
         public Action RequestSkip;
 
-        private Button button;
-        private ButtonContainer buttonContainer;
-        private Box remainingTimeBox;
+        protected FadeContainer FadingContent { get; private set; }
 
-        private FadeContainer fadeContainer;
+        private OsuClickableContainer button;
+
+        private ButtonContainer buttonContainer;
+        protected Circle RemainingTimeBox { get; private set; }
+
         private double displayTime;
 
-        private bool isClickable;
+        /// <summary>
+        /// Whether the gameplay clock is currently at the skippable period.
+        /// </summary>
+        private readonly BindableBool inSkipPeriod = new BindableBool();
+
         private bool skipQueued;
 
         [Resolved]
         private IGameplayClock gameplayClock { get; set; }
 
-        internal bool IsButtonVisible => fadeContainer.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
-
+        internal bool IsButtonVisible => FadingContent.State == Visibility.Visible && buttonContainer.State.Value == Visibility.Visible;
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
@@ -77,28 +86,35 @@ namespace osu.Game.Screens.Play
             InternalChild = buttonContainer = new ButtonContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = fadeContainer = new FadeContainer
+                Child = FadingContent = new FadeContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        button = new Button
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        remainingTimeBox = new Box
+                        button = CreateButton(inSkipPeriod),
+                        RemainingTimeBox = new Circle
                         {
                             Height = 5,
-                            RelativeSizeAxes = Axes.X,
-                            Colour = colours.Yellow,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
+                            Colour = colours.Orange3,
+                            RelativeSizeAxes = Axes.X
                         }
                     }
                 }
             };
         }
+
+        /// <summary>
+        /// Creates a skip button.
+        /// </summary>
+        /// <param name="inSkipPeriod">Whether the gameplay clock is currently at the skippable period.</param>
+        protected virtual OsuClickableContainer CreateButton(IBindable<bool> inSkipPeriod) => new Button
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Enabled = { BindTarget = inSkipPeriod },
+        };
 
         private const double fade_time = 300;
 
@@ -107,13 +123,13 @@ namespace osu.Game.Screens.Play
         public override void Hide()
         {
             base.Hide();
-            fadeContainer.Hide();
+            FadingContent.Hide();
         }
 
         public override void Show()
         {
             base.Show();
-            fadeContainer.TriggerShow();
+            FadingContent.TriggerShow();
         }
 
         protected override void LoadComplete()
@@ -136,7 +152,7 @@ namespace osu.Game.Screens.Play
                 RequestSkip?.Invoke();
             };
 
-            fadeContainer.TriggerShow();
+            FadingContent.TriggerShow();
         }
 
         /// <summary>
@@ -173,17 +189,16 @@ namespace osu.Game.Screens.Play
 
             double progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
-            remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
+            RemainingTimeBox.Width = (float)Interpolation.DampContinuously(RemainingTimeBox.Width, progress, 40, Math.Abs(Time.Elapsed));
 
-            isClickable = progress > 0;
-            button.Enabled.Value = isClickable;
-            buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
+            inSkipPeriod.Value = progress > 0;
+            buttonContainer.State.Value = inSkipPeriod.Value ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (isClickable && !e.HasAnyButtonPressed)
-                fadeContainer.TriggerShow();
+            if (inSkipPeriod.Value && !e.HasAnyButtonPressed)
+                FadingContent.TriggerShow();
 
             return base.OnMouseMove(e);
         }
@@ -315,8 +330,8 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audio)
             {
-                colourNormal = colours.Yellow;
-                colourHover = colours.YellowDark;
+                colourNormal = colours.Orange3;
+                colourHover = colours.Orange3.Lighten(0.2f);
 
                 sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
@@ -342,6 +357,11 @@ namespace osu.Game.Screens.Play
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = colourNormal,
+                            },
+                            new TrianglesV2
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = ColourInfo.GradientVertical(colourNormal.Lighten(0.2f), colourNormal)
                             },
                             flow = new FillFlowContainer
                             {

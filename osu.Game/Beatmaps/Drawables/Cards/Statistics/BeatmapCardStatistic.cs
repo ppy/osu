@@ -46,21 +46,21 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5, 0),
+                Spacing = new Vector2(4, 0),
                 Children = new Drawable[]
                 {
                     spriteIcon = new SpriteIcon
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Size = new Vector2(10),
+                        Size = new Vector2(8),
                         Margin = new MarginPadding { Top = 1 }
                     },
                     spriteText = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.Default.With(size: 14)
+                        Font = OsuFont.Default.With(size: 11)
                     }
                 }
             };

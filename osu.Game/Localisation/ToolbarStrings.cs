@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Connecting => new TranslatableString(getKey(@"connecting"), @"Connecting...");
 
         /// <summary>
+        /// "Verification required"
+        /// </summary>
+        public static LocalisableString VerificationRequired => new TranslatableString(getKey(@"verification_required"), @"Verification required");
+
+        /// <summary>
         /// "home"
         /// </summary>
         public static LocalisableString HomeHeaderTitle => new TranslatableString(getKey(@"home_header_title"), @"home");
@@ -33,6 +38,11 @@ namespace osu.Game.Localisation
         /// "play some {0}"
         /// </summary>
         public static LocalisableString PlaySomeRuleset(string arg0) => new TranslatableString(getKey(@"play_some_ruleset"), @"play some {0}", arg0);
+
+        /// <summary>
+        /// "running"
+        /// </summary>
+        public static LocalisableString TimeRunning => new TranslatableString(getKey(@"time_running"), @"running");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

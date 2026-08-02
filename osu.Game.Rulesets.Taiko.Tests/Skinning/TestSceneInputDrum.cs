@@ -30,8 +30,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(200),
-                    Child = new InputDrum()
+                    Size = new Vector2(180f, 200f),
+                    Child = new InputDrum
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
                 }
             });
         }

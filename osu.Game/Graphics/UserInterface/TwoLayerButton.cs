@@ -1,22 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Graphics.Containers;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.Audio.Track;
-using System;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Screens.Select;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -32,7 +31,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private const float shear_width = 5f;
 
-        private static readonly Vector2 shear = new Vector2(shear_width / Footer.HEIGHT, 0);
+        public const float HEIGHT = 50;
+
+        private static readonly Vector2 shear = new Vector2(shear_width / HEIGHT, 0);
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
@@ -57,15 +58,15 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 base.Origin = value;
-                c1.Origin = c1.Anchor = value.HasFlagFast(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
-                c2.Origin = c2.Anchor = value.HasFlagFast(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
+                c1.Origin = c1.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
+                c2.Origin = c2.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
 
-                X = value.HasFlagFast(Anchor.x2) ? SIZE_RETRACTED.X * shear.X * 0.5f : 0;
+                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * shear.X * 0.5f : 0;
 
                 Remove(c1, false);
                 Remove(c2, false);
-                c1.Depth = value.HasFlagFast(Anchor.x2) ? 0 : 1;
-                c2.Depth = value.HasFlagFast(Anchor.x2) ? 1 : 0;
+                c1.Depth = value.HasFlag(Anchor.x2) ? 0 : 1;
+                c2.Depth = value.HasFlag(Anchor.x2) ? 1 : 0;
                 Add(c1);
                 Add(c2);
             }
@@ -161,7 +162,7 @@ namespace osu.Game.Graphics.UserInterface
             set => bouncingIcon.Icon = value;
         }
 
-        public string Text
+        public LocalisableString Text
         {
             set => text.Text = value;
         }

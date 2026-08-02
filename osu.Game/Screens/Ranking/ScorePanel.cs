@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -35,7 +33,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 385;
+        public const float CONTRACTED_HEIGHT = 385;
 
         /// <summary>
         /// Width of the panel when expanded.
@@ -50,7 +48,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the top layer when the panel is expanded.
         /// </summary>
-        private const float expanded_top_layer_height = 53;
+        public const float EXPANDED_TOP_LAYER_HEIGHT = 53;
 
         /// <summary>
         /// Height of the top layer when the panel is contracted.
@@ -82,7 +80,7 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_top_layer_colour = Color4Extensions.FromHex("#353535");
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
-        public event Action<PanelState> StateChanged;
+        public event Action<PanelState>? StateChanged;
 
         /// <summary>
         /// The position of the score in the rankings.
@@ -92,28 +90,30 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// An action to be invoked if this <see cref="ScorePanel"/> is clicked while in an expanded state.
         /// </summary>
-        public Action PostExpandAction;
+        public Action? PostExpandAction;
 
         public readonly ScoreInfo Score;
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private OsuGameBase game { get; set; } = null!;
 
-        private AudioContainer audioContent;
+        private AudioContainer audioContent = null!;
 
         private bool displayWithFlair;
 
-        private Container topLayerContainer;
-        private Drawable topLayerBackground;
-        private Container topLayerContentContainer;
-        private Drawable topLayerContent;
+        private Container topLayerContainer = null!;
+        private Drawable topLayerBackground = null!;
+        private Container topLayerContentContainer = null!;
+        private Drawable? topLayerContent;
 
-        private Container middleLayerContainer;
-        private Drawable middleLayerBackground;
-        private Container middleLayerContentContainer;
-        private Drawable middleLayerContent;
+        private Container middleLayerContainer = null!;
+        private Drawable middleLayerBackground = null!;
+        private Container middleLayerContentContainer = null!;
+        private Drawable? middleLayerContent;
 
-        private DrawableSample samplePanelFocus;
+        private ScorePanelTrackingContainer? trackingContainer;
+
+        private DrawableSample? samplePanelFocus;
 
         public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Ranking
         protected override void Update()
         {
             base.Update();
-            audioContent.Balance.Value = ((ScreenSpaceDrawQuad.Centre.X / game.ScreenSpaceDrawQuad.Width) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
+            audioContent.Balance.Value = (Math.Clamp(ScreenSpaceDrawQuad.Centre.X / game.ScreenSpaceDrawQuad.Width, -1, 1) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
         }
 
         private void playAppearSample()
@@ -259,7 +259,7 @@ namespace osu.Game.Screens.Ranking
                     break;
 
                 case PanelState.Contracted:
-                    Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
+                    Size = new Vector2(CONTRACTED_WIDTH, CONTRACTED_HEIGHT);
 
                     topLayerBackground.FadeColour(contracted_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
@@ -286,8 +286,8 @@ namespace osu.Game.Screens.Ranking
                 switch (state)
                 {
                     case PanelState.Expanded:
-                        topLayerContainer.MoveToY(-expanded_top_layer_height / 2, top_layer_expand_duration, Easing.OutQuint);
-                        middleLayerContainer.MoveToY(expanded_top_layer_height / 2, top_layer_expand_duration, Easing.OutQuint);
+                        topLayerContainer.MoveToY(-EXPANDED_TOP_LAYER_HEIGHT / 2, top_layer_expand_duration, Easing.OutQuint);
+                        middleLayerContainer.MoveToY(EXPANDED_TOP_LAYER_HEIGHT / 2, top_layer_expand_duration, Easing.OutQuint);
                         break;
 
                     case PanelState.Contracted:
@@ -331,8 +331,6 @@ namespace osu.Game.Screens.Ranking
             => base.ReceivePositionalInputAt(screenSpacePos)
                || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
                || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
-
-        private ScorePanelTrackingContainer trackingContainer;
 
         /// <summary>
         /// Creates a <see cref="ScorePanelTrackingContainer"/> which this <see cref="ScorePanel"/> can reside inside.

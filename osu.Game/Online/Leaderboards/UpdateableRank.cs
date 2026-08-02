@@ -1,28 +1,45 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.Leaderboards
 {
     public partial class UpdateableRank : ModelBackedDrawable<ScoreRank?>
     {
+        private readonly bool animate;
+
+        protected override double TransformDuration => animate ? 600 : 0;
+        protected override bool TransformImmediately => true;
+
         public ScoreRank? Rank
         {
             get => Model;
             set => Model = value;
         }
 
-        public UpdateableRank(ScoreRank? rank = null)
+        public UpdateableRank(ScoreRank? rank = null, bool animate = true)
         {
+            this.animate = animate;
+
             Rank = rank;
         }
 
-        protected override Drawable CreateDrawable(ScoreRank? rank)
+        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
+        {
+            return base.CreateDelayedLoadWrapper(createContentFunc, timeBeforeLoad)
+                       .With(w =>
+                       {
+                           w.Anchor = Anchor.Centre;
+                           w.Origin = Anchor.Centre;
+                       });
+        }
+
+        protected override Drawable? CreateDrawable(ScoreRank? rank)
         {
             if (rank.HasValue)
             {
@@ -34,6 +51,18 @@ namespace osu.Game.Online.Leaderboards
             }
 
             return null;
+        }
+
+        protected override TransformSequence<Drawable> ApplyShowTransforms(Drawable drawable)
+        {
+            drawable.ScaleTo(1);
+            return base.ApplyShowTransforms(drawable);
+        }
+
+        protected override TransformSequence<Drawable> ApplyHideTransforms(Drawable drawable)
+        {
+            drawable.ScaleTo(1.8f, TransformDuration, Easing.Out);
+            return base.ApplyHideTransforms(drawable);
         }
     }
 }

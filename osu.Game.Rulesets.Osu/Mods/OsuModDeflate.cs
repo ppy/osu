@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Acronym => "DF";
 
-        public override IconUsage? Icon => FontAwesome.Solid.CompressArrowsAlt;
+        public override IconUsage? Icon => OsuIcon.ModDeflate;
 
         public override LocalisableString Description => "Hit them at the right size!";
 

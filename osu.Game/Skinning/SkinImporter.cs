@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -13,6 +15,7 @@ using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays.Notifications;
 using Realms;
 
 namespace osu.Game.Skinning
@@ -37,11 +40,55 @@ namespace osu.Game.Skinning
 
         protected override string[] HashableFileTypes => new[] { ".ini", ".json" };
 
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == @".osk";
+        protected override bool ShouldDeleteArchive(string path) => string.Equals(Path.GetExtension(path), @".osk", StringComparison.OrdinalIgnoreCase);
 
         protected override SkinInfo CreateModel(ArchiveReader archive, ImportParameters parameters) => new SkinInfo { Name = archive.Name ?? @"No name" };
 
         private const string unknown_creator_string = @"Unknown";
+
+        /// <summary>
+        /// Update an existing skin with the contents of a path
+        /// </summary>
+        /// <param name="notification">The progress notification</param>
+        /// <param name="task">The <see cref="ImportTask"/> to update the <paramref name="original"/> with</param>
+        /// <param name="original">The <see cref="SkinInfo"/> to update</param>
+        /// <returns></returns>
+        public override async Task<Live<SkinInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask task, SkinInfo original)
+        {
+            return await Realm.WriteAsync<Live<SkinInfo>?>(r =>
+            {
+                var skinInfo = r.Find<SkinInfo>(original.ID)!;
+                skinInfo.Files.Clear();
+
+                string[] filesInMountedDirectory = Directory.EnumerateFiles(task.Path, "*.*", SearchOption.AllDirectories).Select(f => Path.GetRelativePath(task.Path, f)).ToArray();
+
+                foreach (string file in filesInMountedDirectory)
+                {
+                    using var stream = File.OpenRead(Path.Combine(task.Path, file));
+
+                    modelManager.AddFile(skinInfo, stream, file, r);
+                }
+
+                string skinIniPath = Path.Combine(task.Path, "skin.ini");
+
+                if (File.Exists(skinIniPath))
+                {
+                    using (var stream = File.OpenRead(skinIniPath))
+                    using (var lineReader = new LineBufferedReader(stream))
+                    {
+                        var decodedSkinIni = new LegacySkinDecoder().Decode(lineReader);
+
+                        if (!string.IsNullOrEmpty(decodedSkinIni.SkinInfo.Name))
+                            skinInfo.Name = decodedSkinIni.SkinInfo.Name;
+
+                        if (!string.IsNullOrEmpty(decodedSkinIni.SkinInfo.Creator))
+                            skinInfo.Creator = decodedSkinIni.SkinInfo.Creator;
+                    }
+                }
+
+                return skinInfo.ToLive(Realm);
+            }).ConfigureAwait(false);
+        }
 
         protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
@@ -110,76 +157,41 @@ namespace osu.Game.Skinning
             // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
             // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
             if (skinIniSourcedName != item.Name)
-                updateSkinIniMetadata(item, realm);
+                UpdateSkinIniMetadata(item, realm);
         }
 
-        private void updateSkinIniMetadata(SkinInfo item, Realm realm)
+        public void UpdateSkinIniMetadata(SkinInfo item, Realm realm)
         {
-            string nameLine = @$"Name: {item.Name}";
-            string authorLine = @$"Author: {item.Creator}";
-
-            List<string> newLines = new List<string>
-            {
-                @"// The following content was automatically added by osu! during import, based on filename / folder metadata.",
-                @"[General]",
-                nameLine,
-                authorLine,
-            };
-
             var existingFile = item.GetFile(@"skin.ini");
 
+            // create a working instance of the skin.
+            // this implicitly decodes all contents of `skin.ini` into `skin.Configuration` and others.
+            // of note, `item` and `skin.Configuration.SkinInfo` are not the same object.
+            var skin = createInstance(item);
+
+            // `skin.Configuration.SkinInfo` will be in a post-decoding state,
+            // which means it will potentially be in a different state than `item`.
+            // write changes from `item` to `skin.SkinInfo` to definitively apply them.
+            skin.Configuration.SkinInfo.Name = item.Name;
+            skin.Configuration.SkinInfo.Creator = item.Creator;
+
+            using var outStream = new MemoryStream();
+
+            // now with the skin having the updated metadata, write out the full `skin.ini`.
+            using (var outWriter = new StreamWriter(outStream, Encoding.UTF8, 1024, true))
+            {
+                var encoder = new LegacySkinEncoder(skin);
+                encoder.Encode(outWriter);
+            }
+
             if (existingFile == null)
-            {
-                // skins without a skin.ini are supposed to import using the "latest version" spec.
-                // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
-                newLines.Add($"Version: {SkinConfiguration.LATEST_VERSION}");
-
-                // In the case a skin doesn't have a skin.ini yet, let's create one.
-                writeNewSkinIni();
-            }
+                modelManager.AddFile(item, outStream, @"skin.ini", realm);
             else
-            {
-                using (Stream stream = new MemoryStream())
-                {
-                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    {
-                        using (var existingStream = Files.Storage.GetStream(existingFile.File.GetStoragePath()))
-                        using (var sr = new StreamReader(existingStream))
-                        {
-                            string? line;
-                            while ((line = sr.ReadLine()) != null)
-                                sw.WriteLine(line);
-                        }
-
-                        sw.WriteLine();
-
-                        foreach (string line in newLines)
-                            sw.WriteLine(line);
-                    }
-
-                    modelManager.ReplaceFile(existingFile, stream, realm);
-                }
-            }
+                modelManager.ReplaceFile(existingFile, outStream, realm);
 
             // The hash is already populated at this point in import.
             // As we have changed files, it needs to be recomputed.
             item.Hash = ComputeHash(item);
-
-            void writeNewSkinIni()
-            {
-                using (Stream stream = new MemoryStream())
-                {
-                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    {
-                        foreach (string line in newLines)
-                            sw.WriteLine(line);
-                    }
-
-                    modelManager.AddFile(item, stream, @"skin.ini", realm);
-                }
-
-                item.Hash = ComputeHash(item);
-            }
         }
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);

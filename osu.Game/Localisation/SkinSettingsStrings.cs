@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString CurrentSkin => new TranslatableString(getKey(@"current_skin"), @"Current skin");
 
         /// <summary>
+        /// "Skin name"
+        /// </summary>
+        public static LocalisableString SkinName => new TranslatableString(getKey(@"skin_name"), @"Skin name");
+
+        /// <summary>
         /// "Skin layout editor"
         /// </summary>
         public static LocalisableString SkinLayoutEditor => new TranslatableString(getKey(@"skin_layout_editor"), @"Skin layout editor");
@@ -53,16 +58,6 @@ namespace osu.Game.Localisation
         /// "Beatmap hitsounds"
         /// </summary>
         public static LocalisableString BeatmapHitsounds => new TranslatableString(getKey(@"beatmap_hitsounds"), @"Beatmap hitsounds");
-
-        /// <summary>
-        /// "Export selected skin"
-        /// </summary>
-        public static LocalisableString ExportSkinButton => new TranslatableString(getKey(@"export_skin_button"), @"Export selected skin");
-
-        /// <summary>
-        /// "Delete selected skin"
-        /// </summary>
-        public static LocalisableString DeleteSkinButton => new TranslatableString(getKey(@"delete_skin_button"), @"Delete selected skin");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

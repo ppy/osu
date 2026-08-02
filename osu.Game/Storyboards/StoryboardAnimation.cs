@@ -13,16 +13,15 @@ namespace osu.Game.Storyboards
         public double FrameDelay;
         public AnimationLoopType LoopType;
 
-        public StoryboardAnimation(string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
-            : base(path, origin, initialPosition)
+        public StoryboardAnimation(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
+            : base(source, path, origin, initialPosition)
         {
             FrameCount = frameCount;
             FrameDelay = frameDelay;
             LoopType = loopType;
         }
 
-        public override Drawable CreateDrawable()
-            => new DrawableStoryboardAnimation(this);
+        public override Drawable CreateDrawable() => new DrawableStoryboardAnimation(this);
     }
 
     public enum AnimationLoopType

@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -12,7 +14,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Rulesets.UI;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mods
@@ -20,6 +21,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
     public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
     {
         [JsonIgnore]
@@ -40,58 +42,41 @@ namespace osu.Game.Rulesets.Mods
         public abstract LocalisableString Description { get; }
 
         /// <summary>
-        /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.
-        /// </summary>
-        /// <remarks>
-        /// Differs from <see cref="Name"/>, as the value of attributes (AR, CS, etc) changeable via the mod
-        /// are displayed in the tooltip.
-        /// </remarks>
-        [JsonIgnore]
-        public string IconTooltip
-        {
-            get
-            {
-                string description = SettingDescription;
-
-                return string.IsNullOrEmpty(description) ? Name : $"{Name} ({description})";
-            }
-        }
-
-        /// <summary>
-        /// The description of editable settings of a mod to use in the <see cref="IconTooltip"/>.
+        /// The description of editable settings of a mod.
         /// </summary>
         /// <remarks>
         /// Parentheses are added to the tooltip, surrounding the value of this property. If this property is <c>string.Empty</c>,
         /// the tooltip will not have parentheses.
         /// </remarks>
-        public virtual string SettingDescription
+        public virtual IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
         {
             get
             {
-                var tooltipTexts = new List<string>();
-
                 foreach ((SettingSourceAttribute attr, PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
                     var bindable = (IBindable)property.GetValue(this)!;
 
-                    string valueText;
+                    if (bindable.IsDefault)
+                        continue;
 
-                    switch (bindable)
-                    {
-                        case Bindable<bool> b:
-                            valueText = b.Value ? "on" : "off";
-                            break;
-
-                        default:
-                            valueText = bindable.ToString() ?? string.Empty;
-                            break;
-                    }
-
-                    if (!bindable.IsDefault)
-                        tooltipTexts.Add($"{attr.Label}: {valueText}");
+                    yield return (attr.Label, GetSettingTooltipText(bindable));
                 }
+            }
+        }
 
-                return string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
+        /// <summary>
+        /// Gets the tooltip text for a specific mod setting.
+        /// Can be overridden to provide custom formatting for specific settings.
+        /// </summary>
+        protected virtual LocalisableString GetSettingTooltipText(IBindable bindable)
+        {
+            switch (bindable)
+            {
+                case Bindable<bool> b:
+                    return b.Value ? "On" : "Off";
+
+                default:
+                    return bindable.ToString() ?? string.Empty;
             }
         }
 
@@ -99,7 +84,8 @@ namespace osu.Game.Rulesets.Mods
         /// The score multiplier of this mod.
         /// </summary>
         [JsonIgnore]
-        public abstract double ScoreMultiplier { get; }
+        [Obsolete("This property is no longer used to calculate the score multiplier. Use `Ruleset.CreateScoreMultiplierCalculator()` instead.")]
+        public virtual double ScoreMultiplier => 1;
 
         /// <summary>
         /// Returns true if this mod is implemented (and playable).
@@ -107,56 +93,17 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool HasImplementation => this is IApplicableMod;
 
-        /// <summary>
-        /// Whether this mod can be played by a real human user.
-        /// Non-user-playable mods are not viable for single-player score submission.
-        /// </summary>
-        /// <example>
-        /// <list type="bullet">
-        /// <item><see cref="ModDoubleTime"/> is user-playable.</item>
-        /// <item><see cref="ModAutoplay"/> is not user-playable.</item>
-        /// </list>
-        /// </example>
         [JsonIgnore]
         public virtual bool UserPlayable => true;
 
-        /// <summary>
-        /// Whether this mod can be specified as a "required" mod in a multiplayer context.
-        /// </summary>
-        /// <example>
-        /// <list type="bullet">
-        /// <item><see cref="ModHardRock"/> is valid for multiplayer.</item>
-        /// <item>
-        /// <see cref="ModDoubleTime"/> is valid for multiplayer as long as it is a <b>required</b> mod,
-        /// as that ensures the same duration of gameplay for all users in the room.
-        /// </item>
-        /// <item>
-        /// <see cref="ModAdaptiveSpeed"/> is not valid for multiplayer, as it leads to varying
-        /// gameplay duration depending on how the users in the room play.
-        /// </item>
-        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer.</item>
-        /// </list>
-        /// </example>
         [JsonIgnore]
         public virtual bool ValidForMultiplayer => true;
 
-        /// <summary>
-        /// Whether this mod can be specified as a "free" or "allowed" mod in a multiplayer context.
-        /// </summary>
-        /// <example>
-        /// <list type="bullet">
-        /// <item><see cref="ModHardRock"/> is valid for multiplayer as a free mod.</item>
-        /// <item>
-        /// <see cref="ModDoubleTime"/> is <b>not</b> valid for multiplayer as a free mod,
-        /// as it could to varying gameplay duration between users in the room depending on whether they picked it.
-        /// </item>
-        /// <item><see cref="ModAutoplay"/> is not valid for multiplayer as a free mod.</item>
-        /// </list>
-        /// </example>
+        public virtual bool ValidForFreestyleAsRequiredMod => false;
+
         [JsonIgnore]
         public virtual bool ValidForMultiplayerAsFreeMod => true;
 
-        /// <inheritdoc/>
         [JsonIgnore]
         public virtual bool AlwaysValidForSubmission => false;
 
@@ -165,6 +112,9 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         [JsonIgnore]
         public virtual bool RequiresConfiguration => false;
+
+        [JsonIgnore]
+        public virtual bool Ranked => false;
 
         /// <summary>
         /// The mods this mod cannot be enabled with.
@@ -194,7 +144,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether all settings in this mod are set to their default state.
         /// </summary>
-        protected virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
+        public virtual bool UsesDefaultConfiguration => SettingsBindables.All(s => s.IsDefault);
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
@@ -257,8 +207,7 @@ namespace osu.Game.Rulesets.Mods
 
                 // TODO: special case for handling number types
 
-                PropertyInfo property = targetSetting.GetType().GetProperty(nameof(Bindable<bool>.Value))!;
-                property.SetValue(targetSetting, property.GetValue(sourceSetting));
+                BindableValueAccessor.SetValue(targetSetting, BindableValueAccessor.GetValue(sourceSetting));
             }
         }
 
@@ -284,7 +233,7 @@ namespace osu.Game.Rulesets.Mods
                 if (!(target is IParseable parseable))
                     throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
 
-                parseable.Parse(source);
+                parseable.Parse(source, CultureInfo.InvariantCulture);
             }
         }
 

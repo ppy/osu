@@ -1,0 +1,73 @@
+osu file format v14
+
+[General]
+AudioFilename: 03. Renatus - Soleily 192kbps.mp3
+AudioLeadIn: 0
+PreviewTime: 164471
+Countdown: 0
+SampleSet: Soft
+StackLeniency: 0.7
+Mode: 0
+LetterboxInBreaks: 0
+WidescreenStoryboard: 0
+
+[Editor]
+Bookmarks: 11505,22054,32604,43153,53703,64252,74802,85351,95901,106450,116999,119637,130186,140735,151285,161834,164471,175020,185570,196119,206669,209306
+DistanceSpacing: 1.8
+BeatDivisor: 4
+GridSize: 4
+TimelineZoom: 2
+
+[Metadata]
+Title:Renatus
+TitleUnicode:Renatus
+Artist:Soleily
+ArtistUnicode:Soleily
+Creator:Gamu
+Version:Insane
+Source:
+Tags:MBC7 Unisphere 地球ヤバイEP Chikyu Yabai
+BeatmapID:557821
+BeatmapSetID:241526
+
+[Difficulty]
+HPDrainRate:6.5
+CircleSize:4
+OverallDifficulty:8
+ApproachRate:9
+SliderMultiplier:1.8
+SliderTickRate:2
+
+[Events]
+//Background and Video events
+0,0,"machinetop_background.jpg",0,0
+//Break Periods
+2,122474,140135
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Sound Samples
+
+[TimingPoints]
+956,329.67032967033,4,2,0,60,1,0
+
+
+[Colours]
+Combo1:142,199,255
+Combo2:255,128,128
+Combo3:128,255,255
+Combo4:128,255,128
+Combo5:255,187,255
+Combo6:255,177,140
+Combo7:100,100,100
+Combo8:142,199,255
+Combo9:255,128,128
+Combo10:128,255,255
+Combo11:128,255,128
+Combo12:255,187,255
+Combo13:255,177,140
+Combo14:100,100,100
+
+[HitObjects]
+192,168,956,6,0,P|184:128|200:80,1,90,4|0,1:2|0:0,0:0:0:0:

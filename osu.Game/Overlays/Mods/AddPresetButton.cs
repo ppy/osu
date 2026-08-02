@@ -27,13 +27,12 @@ namespace osu.Game.Overlays.Mods
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; } = null!;
 
         public AddPresetButton()
-            : base(1)
         {
             RelativeSizeAxes = Axes.X;
             Height = ModSelectPanel.HEIGHT;
 
             // shear will be applied at a higher level in `ModPresetColumn`.
-            Content.Shear = Vector2.Zero;
+            Shear = Vector2.Zero;
             Padding = new MarginPadding();
 
             Text = "+";

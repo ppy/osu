@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -27,14 +27,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public SliderBodyPiece()
         {
-            InternalChild = body = new ManualSliderBody
-            {
-                AccentColour = Color4.Transparent
-            };
+            AutoSizeAxes = Axes.Both;
 
             // SliderSelectionBlueprint relies on calling ReceivePositionalInputAt on this drawable to determine whether selection should occur.
             // Without AlwaysPresent, a movement in a parent container (ie. the editor composer area resizing) could cause incorrect input handling.
             AlwaysPresent = true;
+
+            InternalChild = body = new ManualSliderBody
+            {
+                AccentColour = Color4.Transparent
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -54,14 +56,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (lastVersion != hitObject.Path.Version.Value)
             {
                 lastVersion = hitObject.Path.Version.Value;
-
-                var vertices = new List<Vector2>();
-                hitObject.Path.GetPathToProgress(vertices, 0, 1);
-
-                body.SetVertices(vertices);
+                body.SetVertices(hitObject.Path.CalculatedPath);
             }
 
-            Size = body.Size;
             OriginPosition = body.PathOffset;
         }
 

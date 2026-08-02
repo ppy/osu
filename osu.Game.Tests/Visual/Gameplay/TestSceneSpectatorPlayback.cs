@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             foreach (var legacyFrame in frames.Frames)
             {
                 var frame = new TestReplayFrame();
-                frame.FromLegacy(legacyFrame, null);
+                frame.FromLegacy(legacyFrame, null!);
                 playbackReplay.Frames.Add(frame);
             }
 
@@ -353,6 +353,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 return new LegacyReplayFrame(Time, Position.X, Position.Y, state);
             }
+
+            public override bool IsEquivalentTo(ReplayFrame other)
+                => other is TestReplayFrame testFrame && Time == testFrame.Time && Position == testFrame.Position && Actions.SequenceEqual(testFrame.Actions);
         }
 
         public enum TestAction

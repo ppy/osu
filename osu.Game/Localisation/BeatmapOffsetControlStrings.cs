@@ -10,9 +10,9 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.BeatmapOffsetControl";
 
         /// <summary>
-        /// "Beatmap offset"
+        /// "Audio offset (this beatmap)"
         /// </summary>
-        public static LocalisableString BeatmapOffset => new TranslatableString(getKey(@"beatmap_offset"), @"Beatmap offset");
+        public static LocalisableString AudioOffsetThisBeatmap => new TranslatableString(getKey(@"beatmap_offset"), @"Audio offset (this beatmap)");
 
         /// <summary>
         /// "Previous play:"
@@ -38,6 +38,11 @@ namespace osu.Game.Localisation
         /// "(hit objects appear earlier)"
         /// </summary>
         public static LocalisableString HitObjectsAppearEarlier => new TranslatableString(getKey(@"hit_objects_appear_earlier"), @"(hit objects appear earlier)");
+
+        /// <summary>
+        /// "Beatmap offset was adjusted to {0} ms."
+        /// </summary>
+        public static LocalisableString BeatmapOffsetWasAdjustedTo(string offset) => new TranslatableString(getKey(@"beatmap_offset_was_adjusted_to"), @"Beatmap offset was adjusted to {0} ms.", offset);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

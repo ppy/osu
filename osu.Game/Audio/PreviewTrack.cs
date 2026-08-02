@@ -32,8 +32,12 @@ namespace osu.Game.Audio
         private void load()
         {
             Track = GetTrack();
+
             if (Track != null)
+            {
                 Track.Completed += Stop;
+                Track.Looping = looping;
+            }
         }
 
         /// <summary>
@@ -55,6 +59,23 @@ namespace osu.Game.Audio
         /// Whether the track is playing.
         /// </summary>
         public bool IsRunning => Track?.IsRunning ?? false;
+
+        private bool looping;
+
+        /// <summary>
+        /// Whether the track should loop.
+        /// </summary>
+        public bool Looping
+        {
+            get => looping;
+            set
+            {
+                looping = value;
+
+                if (Track != null)
+                    Track.Looping = looping;
+            }
+        }
 
         private ScheduledDelegate? startDelegate;
 
@@ -96,10 +117,14 @@ namespace osu.Game.Audio
 
             hasStarted = false;
 
-            Track.Stop();
+            // This pre-check is important, fixes a BASS deadlock in some scenarios.
+            if (!Track.HasCompleted)
+            {
+                Track.Stop();
 
-            // Ensure the track is reset immediately on stopping, so the next time it is started it has a correct time value.
-            Track.Seek(0);
+                // Ensure the track is reset immediately on stopping, so the next time it is started it has a correct time value.
+                Track.Seek(0);
+            }
 
             Stopped?.Invoke();
         }

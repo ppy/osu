@@ -1,0 +1,8 @@
+[Events]
+//Storyboard Layer 0 (Background)
+Sprite,Background,TopCentre,"img.jpg",320,240
+ F,0,1000,1000,0,0 // should be ignored
+ F,0,1500,1600,0,1
+Sprite,Background,TopCentre,"img.jpg",320,240
+ F,0,1000,1000,0,0 // should be ignored
+ F,0,1500,1600,1,1

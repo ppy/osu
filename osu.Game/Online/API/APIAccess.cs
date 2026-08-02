@@ -11,23 +11,26 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Notifications;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Notifications.WebSocket;
-using osu.Game.Users;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Online.API
 {
-    public partial class APIAccess : Component, IAPIProvider
+    public partial class APIAccess : CompositeComponent, IAPIProvider
     {
         private readonly OsuGameBase game;
         private readonly OsuConfigManager config;
@@ -38,58 +41,81 @@ namespace osu.Game.Online.API
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
 
-        public string APIEndpointUrl { get; }
+        public EndpointConfiguration Endpoints { get; }
 
-        public string WebsiteRootUrl { get; }
-
-        public int APIVersion => 20220705; // We may want to pull this from the game version eventually.
+        /// <summary>
+        /// The API response version.
+        /// See: https://osu.ppy.sh/docs/index.html#api-versions
+        /// </summary>
+        public int APIVersion { get; }
 
         public Exception LastLoginError { get; private set; }
 
         public string ProvidedUsername { get; private set; }
 
+        public string ScoreProcessingNoticeUrl { get; private set; } = string.Empty;
+
+        public SessionVerificationMethod? SessionVerificationMethod { get; private set; }
+
+        public string SecondFactorCode { get; private set; }
+
         private string password;
 
-        public IBindable<APIUser> LocalUser => localUser;
-        public IBindableList<APIUser> Friends => friends;
-        public IBindable<UserActivity> Activity => activity;
+        public IBindable<APIUser> LocalUser => localUserState.User;
+
+        public ILocalUserState LocalUserState => localUserState;
+        private readonly LocalUserState localUserState;
+
+        public INotificationsClient NotificationsClient { get; }
 
         public Language Language => game.CurrentLanguage.Value;
-
-        private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
-
-        private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
-
-        private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
         protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
-
         private readonly Logger log;
 
-        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
+        [CanBeNull]
+        public Action<Notification> PostNotification { get; set; }
+
+        public APIAccess(OsuGameBase game, OsuConfigManager config, EndpointConfiguration endpoints, string versionHash)
         {
             this.game = game;
             this.config = config;
             this.versionHash = versionHash;
 
-            APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
-            WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
+            if (game.IsDeployedBuild)
+                APIVersion = game.AssemblyVersion.Major * 10000 + game.AssemblyVersion.Minor;
+            else
+            {
+                var now = DateTimeOffset.Now;
+                APIVersion = now.Year * 10000 + now.Month * 100 + now.Day;
+            }
 
-            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
+            Endpoints = endpoints;
+            NotificationsClient = setUpNotificationsClient();
+
+            authentication = new OAuth(endpoints.APIClientID, endpoints.APIClientSecret, Endpoints.APIUrl);
+
             log = Logger.GetLogger(LoggingTarget.Network);
+            log.Add($@"API endpoint root: {Endpoints.APIUrl}");
+            log.Add($@"API request version: {APIVersion}");
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
 
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            localUser.BindValueChanged(u =>
+            AddInternal(localUserState = new LocalUserState(this, config));
+
+            if (HasLogin)
             {
-                u.OldValue?.Activity.UnbindFrom(activity);
-                u.NewValue.Activity.BindTo(activity);
-            }, true);
+                // Early call to ensure the local user / "logged in" state is correct immediately.
+                localUserState.SetPlaceholderLocalUser(ProvidedUsername);
+
+                // This is required so that Queue() requests during startup sequence don't fail due to "not logged in".
+                state.Value = APIState.Connecting;
+            }
 
             var thread = new Thread(run)
             {
@@ -97,19 +123,54 @@ namespace osu.Game.Online.API
                 IsBackground = true
             };
 
+            state.BindValueChanged(val =>
+            {
+                // assume that any change from a failing state means that the previously set outage message is no longer valid.
+                if (val.NewValue != APIState.Failing)
+                    userFacingOutageMessage.Value = null;
+            });
+
             thread.Start();
+        }
+
+        private WebSocketNotificationsClientConnector setUpNotificationsClient()
+        {
+            var connector = new WebSocketNotificationsClientConnector(this);
+
+            connector.MessageReceived += msg =>
+            {
+                switch (msg.Event)
+                {
+                    case @"verified":
+                        if (state.Value == APIState.RequiresSecondFactorAuth)
+                            state.Value = APIState.Online;
+                        break;
+
+                    case @"logout":
+                        if (state.Value == APIState.Online)
+                            Logout();
+
+                        break;
+                }
+            };
+
+            return connector;
         }
 
         private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
-        internal new void Schedule(Action action) => base.Schedule(action);
+        void IAPIProvider.Schedule(Action action) => base.Schedule(action);
 
         public string AccessToken => authentication.RequestAccessToken();
+
+        public Guid SessionIdentifier { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Number of consecutive requests which failed due to network issues.
         /// </summary>
         private int failureCount;
+
+        private readonly Stopwatch livenessStopwatch = new Stopwatch();
 
         /// <summary>
         /// The main API thread loop, which will continue to run until the game is shut down.
@@ -120,10 +181,14 @@ namespace osu.Game.Online.API
             {
                 if (state.Value == APIState.Failing)
                 {
-                    // To recover from a failing state, falling through and running the full reconnection process seems safest for now.
-                    // This could probably be replaced with a ping-style request if we want to avoid the reconnection overheads.
                     log.Add($@"{nameof(APIAccess)} is in a failing state, waiting a bit before we try again...");
                     Thread.Sleep(5000);
+
+                    // if the liveness probe actively returns a failure state, there's no need to be retrying anything
+                    if (!probeLiveness(out _))
+                        continue;
+
+                    // In any other circumstance, let's attempt the full reconnection flow.
                 }
 
                 // Ensure that we have valid credentials.
@@ -137,13 +202,16 @@ namespace osu.Game.Online.API
 
                 Debug.Assert(HasLogin);
 
-                // Ensure that we are in an online state. If not, attempt a connect.
+                // Ensure that we are in an online state. If not, attempt to connect.
                 if (state.Value != APIState.Online)
                 {
                     attemptConnect();
 
                     if (state.Value != APIState.Online)
+                    {
+                        Thread.Sleep(50);
                         continue;
+                    }
                 }
 
                 // hard bail if we can't get a valid access token.
@@ -153,9 +221,77 @@ namespace osu.Game.Online.API
                     continue;
                 }
 
+                if (livenessStopwatch.Elapsed.TotalMinutes >= 1)
+                {
+                    bool alive = probeLiveness(out string reason);
+
+                    if (!alive)
+                    {
+                        triggerOutage(reason);
+                        livenessStopwatch.Stop();
+                        continue;
+                    }
+
+                    livenessStopwatch.Restart();
+                }
+
                 processQueuedRequests();
                 Thread.Sleep(50);
             }
+        }
+
+        /// <summary>
+        /// Query the liveness probe to check whether to transition to / remain in <see cref="APIState.Failing"/> state.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> if the liveness probe is disabled, returns that online functions are available, returns an unknown response, or cannot be reached.
+        /// <see langword="false"/> if the liveness probe explicitly returns that online functions are not available. A user-facing message may be returned via <paramref name="reason"/>.
+        /// </returns>
+        private bool probeLiveness([CanBeNull] out string reason)
+        {
+            if (Endpoints.LivenessProbeUrl == null)
+            {
+                reason = null;
+                return true;
+            }
+
+            var req = new OsuJsonWebRequest<LivenessProbeResponse>(Endpoints.LivenessProbeUrl);
+
+            try
+            {
+                req.Perform();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Liveness probe failed: {ex}", LoggingTarget.Network);
+                reason = null;
+                return true;
+            }
+
+            if (req.Aborted || req.ResponseObject == null)
+            {
+                reason = null;
+                return true;
+            }
+
+            reason = req.ResponseObject.Reason;
+            return req.ResponseObject.Status != LivenessProbeResponse.LivenessStatus.Down;
+        }
+
+        private void triggerOutage(string reason)
+        {
+            state.Value = APIState.Failing;
+            string userFacingMessage = reason ?? "Online functionality is not available due to an outage. Sorry for the inconvenience.";
+
+            userFacingOutageMessage.Value = userFacingMessage;
+
+            Schedule(() =>
+            {
+                if (PostNotification != null)
+                    PostNotification?.Invoke(new OutageNotification(userFacingMessage));
+                else
+                    log.Add(userFacingMessage, LogLevel.Important);
+            });
         }
 
         /// <summary>
@@ -183,6 +319,7 @@ namespace osu.Game.Online.API
         /// </summary>
         /// <remarks>
         /// This method takes control of <see cref="state"/> and transitions from <see cref="APIState.Connecting"/> to either
+        /// - <see cref="APIState.RequiresSecondFactorAuth"/> (pending 2fa)
         /// - <see cref="APIState.Online"/>  (successful connection)
         /// - <see cref="APIState.Failing"/> (failed connection but retrying)
         /// - <see cref="APIState.Offline"/> (failed and can't retry, clear credentials and require user interaction)
@@ -190,29 +327,33 @@ namespace osu.Game.Online.API
         /// <returns>Whether the connection attempt was successful.</returns>
         private void attemptConnect()
         {
-            state.Value = APIState.Connecting;
-
-            if (localUser.IsDefault)
-            {
-                // Show a placeholder user if saved credentials are available.
-                // This is useful for storing local scores and showing a placeholder username after starting the game,
-                // until a valid connection has been established.
-                setLocalUser(new APIUser
-                {
-                    Username = ProvidedUsername,
-                });
-            }
+            if (LocalUser.IsDefault)
+                Scheduler.Add(localUserState.SetPlaceholderLocalUser, ProvidedUsername, false);
 
             // save the username at this point, if the user requested for it to be.
             config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
+            // only check the liveness probe when actually connecting, and not when waiting for the second factor.
+            // `attemptConnect()` runs on a tight 50ms loop while waiting for the second factor,
+            // so probing during that time would result in a lot of traffic hitting the probe.
+            if (state.Value != APIState.RequiresSecondFactorAuth && !probeLiveness(out string reason))
+            {
+                triggerOutage(reason);
+                return;
+            }
+
             if (!authentication.HasValidAccessToken)
             {
+                state.Value = APIState.Connecting;
                 LastLoginError = null;
 
                 try
                 {
                     authentication.AuthenticateWithLogin(ProvidedUsername, password);
+                }
+                catch (WebRequestFlushedException)
+                {
+                    return;
                 }
                 catch (Exception e)
                 {
@@ -225,55 +366,91 @@ namespace osu.Game.Online.API
                 }
             }
 
-            var userReq = new GetUserRequest();
-            userReq.Failure += ex =>
+            switch (state.Value)
             {
-                if (ex is APIException)
+                case APIState.RequiresSecondFactorAuth:
                 {
-                    LastLoginError = ex;
-                    log.Add($@"Login failed for username {ProvidedUsername} on user retrieval ({LastLoginError.Message})!");
-                    Logout();
+                    if (string.IsNullOrEmpty(SecondFactorCode))
+                        return;
+
+                    state.Value = APIState.Connecting;
+                    LastLoginError = null;
+
+                    var verificationRequest = new VerifySessionRequest(SecondFactorCode);
+
+                    verificationRequest.Success += () => state.Value = APIState.Online;
+                    verificationRequest.Failure += ex =>
+                    {
+                        state.Value = APIState.RequiresSecondFactorAuth;
+
+                        if (verificationRequest.RequiredVerificationMethod != null)
+                        {
+                            SessionVerificationMethod = verificationRequest.RequiredVerificationMethod;
+                            LastLoginError = new APIException($"Must use {SessionVerificationMethod.GetDescription().ToLowerInvariant()} to complete verification.", ex);
+                        }
+                        else
+                        {
+                            LastLoginError = ex;
+                        }
+
+                        SecondFactorCode = null;
+                    };
+
+                    if (!handleRequest(verificationRequest))
+                    {
+                        state.Value = APIState.Failing;
+                        return;
+                    }
+
+                    if (state.Value != APIState.Online)
+                        return;
+
+                    break;
                 }
-                else if (ex is WebException webException && webException.Message == @"Unauthorized")
+
+                default:
                 {
-                    log.Add(@"Login no longer valid");
-                    Logout();
+                    var userReq = new GetMeRequest();
+
+                    userReq.Failure += ex =>
+                    {
+                        if (ex is APIException apiException && apiException.StatusCode < HttpStatusCode.InternalServerError)
+                        {
+                            LastLoginError = ex;
+                            log.Add($@"Login failed for username {ProvidedUsername} on user retrieval ({LastLoginError.Message})!");
+                            Logout();
+                        }
+                        else if (ex is WebException webException && webException.Message == @"Unauthorized")
+                        {
+                            log.Add(@"Login no longer valid");
+                            Logout();
+                        }
+                        else if (ex is not WebRequestFlushedException)
+                        {
+                            state.Value = APIState.Failing;
+                        }
+                    };
+
+                    userReq.Success += me =>
+                    {
+                        Debug.Assert(ThreadSafety.IsUpdateThread);
+
+                        localUserState.SetLocalUser(me);
+                        ScoreProcessingNoticeUrl = me.ScoreProcessingNoticeUrl;
+                        SessionVerificationMethod = me.SessionVerificationMethod;
+                        state.Value = SessionVerificationMethod == null ? APIState.Online : APIState.RequiresSecondFactorAuth;
+                        livenessStopwatch.Restart();
+                        failureCount = 0;
+                    };
+
+                    if (!handleRequest(userReq))
+                    {
+                        state.Value = APIState.Failing;
+                        return;
+                    }
+
+                    break;
                 }
-                else
-                {
-                    state.Value = APIState.Failing;
-                }
-            };
-            userReq.Success += user =>
-            {
-                // todo: save/pull from settings
-                user.Status.Value = new UserStatusOnline();
-
-                setLocalUser(user);
-
-                // we're connected!
-                state.Value = APIState.Online;
-                failureCount = 0;
-            };
-
-            if (!handleRequest(userReq))
-            {
-                state.Value = APIState.Failing;
-                return;
-            }
-
-            var friendsReq = new GetFriendsRequest();
-            friendsReq.Failure += _ => state.Value = APIState.Failing;
-            friendsReq.Success += res =>
-            {
-                friends.Clear();
-                friends.AddRange(res);
-            };
-
-            if (!handleRequest(friendsReq))
-            {
-                state.Value = APIState.Failing;
-                return;
             }
 
             // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
@@ -287,7 +464,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                request.Perform(this);
+                request.AttachAPI(this);
+                request.Perform();
             }
             catch (Exception e)
             {
@@ -307,11 +485,17 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
-            new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
+        public void AuthenticateSecondFactor(string code)
+        {
+            Debug.Assert(State.Value == APIState.RequiresSecondFactorAuth);
 
-        public NotificationsClientConnector GetNotificationsConnector() =>
-            new WebSocketNotificationsClientConnector(this);
+            SecondFactorCode = code;
+        }
+
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash);
+
+        public IChatClient GetChatClient() => new WebSocketChatClient(this);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
@@ -319,7 +503,7 @@ namespace osu.Game.Online.API
 
             var req = new RegistrationRequest
             {
-                Url = $@"{APIEndpointUrl}/users",
+                Url = $@"{Endpoints.APIUrl}/users",
                 Method = HttpMethod.Post,
                 Username = username,
                 Email = email,
@@ -343,10 +527,10 @@ namespace osu.Game.Online.API
                         // attempt to parse a non-form error message
                         var response = JObject.Parse(req.GetResponseString().AsNonNull());
 
-                        string redirect = (string)response.SelectToken(@"url", true);
+                        string redirect = (string)response.SelectToken(@"url", false);
                         string message = (string)response.SelectToken(@"error", false);
 
-                        if (!string.IsNullOrEmpty(redirect))
+                        if (!string.IsNullOrEmpty(redirect) || !string.IsNullOrEmpty(message))
                         {
                             return new RegistrationRequest.RegistrationRequestErrors
                             {
@@ -379,7 +563,8 @@ namespace osu.Game.Online.API
         {
             try
             {
-                req.Perform(this);
+                req.AttachAPI(this);
+                req.Perform();
 
                 if (req.CompletionState != APIRequestCompletionState.Completed)
                     return false;
@@ -406,6 +591,11 @@ namespace osu.Game.Online.API
                 handleWebException(we);
                 return false;
             }
+            catch (WebRequestFlushedException wrf)
+            {
+                log.Add(wrf.Message);
+                return false;
+            }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error occurred while handling an API request.");
@@ -419,6 +609,10 @@ namespace osu.Game.Online.API
         /// The current connectivity state of the API.
         /// </summary>
         public IBindable<APIState> State => state;
+
+        public IBindable<string> UserFacingOutageMessage => userFacingOutageMessage;
+
+        private readonly Bindable<string> userFacingOutageMessage = new Bindable<string>(string.Empty);
 
         private void handleWebException(WebException we)
         {
@@ -464,6 +658,8 @@ namespace osu.Game.Online.API
         {
             lock (queue)
             {
+                request.AttachAPI(this);
+
                 if (state.Value == APIState.Offline)
                 {
                     request.Fail(new WebException(@"User not logged in"));
@@ -485,7 +681,7 @@ namespace osu.Game.Online.API
                 if (failOldRequests)
                 {
                     foreach (var req in oldQueueRequests)
-                        req.Fail(new WebException($@"Request failed from flush operation (state {state.Value})"));
+                        req.Fail(new WebRequestFlushedException(state.Value));
                 }
             }
         }
@@ -493,22 +689,14 @@ namespace osu.Game.Online.API
         public void Logout()
         {
             password = null;
+            SecondFactorCode = null;
             authentication.Clear();
 
-            // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
-            Schedule(() =>
-            {
-                setLocalUser(createGuestUser());
-                friends.Clear();
-            });
+            localUserState.ClearLocalUser();
 
             state.Value = APIState.Offline;
             flushQueue();
         }
-
-        private static APIUser createGuestUser() => new GuestUser();
-
-        private void setLocalUser(APIUser user) => Scheduler.Add(() => localUser.Value = user, false);
 
         protected override void Dispose(bool isDisposing)
         {
@@ -516,6 +704,14 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+
+        internal class WebRequestFlushedException : Exception
+        {
+            public WebRequestFlushedException(APIState state)
+                : base($@"Request failed from flush operation (state {state})")
+            {
+            }
         }
     }
 
@@ -539,6 +735,11 @@ namespace osu.Game.Online.API
         /// We are having connectivity issues.
         /// </summary>
         Failing,
+
+        /// <summary>
+        /// Waiting on second factor authentication.
+        /// </summary>
+        RequiresSecondFactorAuth,
 
         /// <summary>
         /// We are in the process of (re-)connecting.

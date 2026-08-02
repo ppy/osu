@@ -1,0 +1,7 @@
+# Higher global_level has higher priority, the default global_level
+# is 100 for root .globalconfig and 0 for others
+# https://learn.microsoft.com/dotnet/fundamentals/code-analysis/configuration-files#precedence
+is_global = true
+global_level = 101
+
+dotnet_diagnostic.CA2007.severity = none

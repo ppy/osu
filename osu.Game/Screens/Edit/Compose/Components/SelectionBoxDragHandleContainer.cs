@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -52,6 +51,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             scaleHandles.Add(handle);
         }
 
+        public void ClearScaleHandles()
+        {
+            foreach (var scaleHandle in scaleHandles)
+                unbindDragHandle(scaleHandle);
+            scaleHandles.Clear();
+        }
+
         public void AddRotationHandle(SelectionBoxRotationHandle handle)
         {
             handle.Alpha = 0;
@@ -59,6 +65,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             bindDragHandle(handle);
             rotationHandles.Add(handle);
+        }
+
+        public void ClearRotationHandles()
+        {
+            foreach (var rotationHandle in rotationHandles)
+                unbindDragHandle(rotationHandle);
+            rotationHandles.Clear();
         }
 
         private void bindDragHandle(SelectionBoxDragHandle handle)
@@ -70,13 +83,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
             allDragHandles.Add(handle);
         }
 
+        private void unbindDragHandle(SelectionBoxDragHandle handle)
+        {
+            handle.HoverGained -= updateRotationHandlesVisibility;
+            handle.HoverLost -= updateRotationHandlesVisibility;
+            handle.MouseDown -= updateRotationHandlesVisibility;
+            handle.MouseUp -= updateRotationHandlesVisibility;
+            allDragHandles.Remove(handle);
+        }
+
         public void FlipScaleHandles(Direction direction)
         {
             foreach (var handle in scaleHandles)
             {
-                if (direction == Direction.Horizontal && !handle.Anchor.HasFlagFast(Anchor.x1))
+                if (direction == Direction.Horizontal && !handle.Anchor.HasFlag(Anchor.x1))
                     handle.Anchor ^= Anchor.x0 | Anchor.x2;
-                if (direction == Direction.Vertical && !handle.Anchor.HasFlagFast(Anchor.y1))
+                if (direction == Direction.Vertical && !handle.Anchor.HasFlag(Anchor.y1))
                     handle.Anchor ^= Anchor.y0 | Anchor.y2;
             }
         }

@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
@@ -19,8 +21,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public const double FINAL_RATE_PROGRESS = 0.75f;
 
-        public override double ScoreMultiplier => 0.5;
-
         [SettingSource("Initial rate", "The starting speed of the track", SettingControlType = typeof(MultiplierSettingsSlider))]
         public abstract BindableNumber<double> InitialRate { get; }
 
@@ -30,11 +30,22 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
+        public sealed override bool ValidForFreestyleAsRequiredMod => true;
         public sealed override bool ValidForMultiplayerAsFreeMod => false;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
 
-        public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
+        public override IEnumerable<(LocalisableString setting, LocalisableString value)> SettingDescription
+        {
+            get
+            {
+                if (!InitialRate.IsDefault || !FinalRate.IsDefault)
+                    yield return ("Speed change", $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x");
+
+                if (!AdjustPitch.IsDefault)
+                    yield return ("Adjust pitch", AdjustPitch.Value ? "On" : "Off");
+            }
+        }
 
         private double finalRateTime;
         private double beginRampTime;

@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Mods.Input
 {
     /// <summary>
     /// This implementation of <see cref="IModHotkeyHandler"/> receives a sequence of <see cref="Key"/>s,
-    /// and maps the sequence of keys onto the items it is provided in <see cref="HandleHotkeyPressed"/>.
+    /// and maps the sequence of keys onto the items it is provided in <see cref="HandleModHotkeyPressed"/>.
     /// In this case, particular mods are not bound to particular keys, the hotkeys are a byproduct of mod ordering.
     /// </summary>
     public class SequentialModHotkeyHandler : IModHotkeyHandler
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Mods.Input
             toggleKeys = keys;
         }
 
-        public bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
+        public bool HandleModHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
         {
             int index = Array.IndexOf(toggleKeys, e.Key);
             if (index < 0)

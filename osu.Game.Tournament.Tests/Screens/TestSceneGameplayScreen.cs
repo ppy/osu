@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Gameplay;
@@ -66,6 +67,6 @@ namespace osu.Game.Tournament.Tests.Screens
                 () => this.ChildrenOfType<TeamScore>().All(score => score.Alpha == (visible ? 1 : 0)));
 
         private void toggleWarmup()
-            => AddStep("toggle warmup", () => this.ChildrenOfType<TourneyButton>().First().TriggerClick());
+            => AddStep("toggle warmup", () => this.ChildrenOfType<LabelledSwitchButton>().First().ChildrenOfType<SwitchButton>().First().TriggerClick());
     }
 }

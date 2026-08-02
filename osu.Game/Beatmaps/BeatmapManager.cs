@@ -15,16 +15,19 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Utils;
 using Realms;
 
@@ -94,7 +97,7 @@ namespace osu.Game.Beatmaps
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
                                                                         GameHost? host)
         {
-            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
+            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host, Realm);
         }
 
         protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm);
@@ -153,11 +156,26 @@ namespace osu.Game.Beatmaps
             {
                 DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
             };
-            var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
+            var newBeatmap = new Beatmap
+            {
+                BeatmapInfo = newBeatmapInfo,
+                Bookmarks = referenceWorkingBeatmap.Beatmap.Bookmarks.ToArray()
+            };
+
             foreach (var timingPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
-            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
+            foreach (var effectPoint in referenceWorkingBeatmap.Beatmap.ControlPointInfo.EffectPoints)
+            {
+                var clonedEffectPoint = (EffectControlPoint)effectPoint.DeepClone();
+
+                if (!rulesetInfo.Equals(referenceWorkingBeatmap.BeatmapInfo.Ruleset))
+                    clonedEffectPoint.ScrollSpeedBindable.SetDefault();
+
+                newBeatmap.ControlPointInfo.Add(clonedEffectPoint.Time, clonedEffectPoint);
+            }
+
+            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin, referenceWorkingBeatmap.Storyboard);
         }
 
         /// <summary>
@@ -188,10 +206,10 @@ namespace osu.Game.Beatmaps
             // clear online properties.
             newBeatmapInfo.ResetOnlineInfo();
 
-            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
+            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin, referenceWorkingBeatmap.Storyboard);
         }
 
-        private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin)
+        private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin, Storyboard storyboard)
         {
             // populate circular beatmap set info <-> beatmap info references manually.
             // several places like `Save()` or `GetWorkingBeatmap()`
@@ -199,30 +217,43 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, transferCollections: false);
+            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, storyboard, transferCollections: false);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
         }
 
         /// <summary>
-        /// Delete a beatmap difficulty.
+        /// Hide a beatmap difficulty.
+        /// Will fail if all difficulties are about to be hidden.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmapInfo)
+        public bool Hide(BeatmapInfo beatmapInfo)
         {
-            Realm.Run(r =>
+            return Realm.Run(r =>
             {
                 using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
                         beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
+                    if (!CanHide(beatmapInfo))
+                        return false;
+
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
+                    return true;
                 }
             });
         }
+
+        public bool CanHide(BeatmapInfo beatmapInfo) => Realm.Run(r =>
+        {
+            if (!beatmapInfo.IsManaged)
+                beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
+
+            return beatmapInfo.BeatmapSet!.Beatmaps.Count(b => !b.Hidden) > 1;
+        });
 
         /// <summary>
         /// Restore a beatmap difficulty.
@@ -259,6 +290,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// IMPORTANT: This should not be used outside of tests. Consider using <see cref="RealmDetachedBeatmapStore"/> instead.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
@@ -266,7 +298,7 @@ namespace osu.Game.Beatmaps
             return Realm.Run(r =>
             {
                 r.Refresh();
-                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).AsEnumerable().Detach();
             });
         }
 
@@ -285,7 +317,34 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r => r.All<BeatmapInfo>().Filter($"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
+        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => Realm.Run(r =>
+            r.All<BeatmapInfo>().Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false").FirstOrDefault(query)?.Detach());
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
+        /// Use this overload instead of <see cref="QueryBeatmap(System.Linq.Expressions.Expression{System.Func{osu.Game.Beatmaps.BeatmapInfo,bool}})"/>
+        /// when Realm is unable to transform an expression to the internal Realm query syntax.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="arguments">The arguments for the query.</param>
+        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        public BeatmapInfo? QueryBeatmap(string query, params QueryArgument[] arguments) => Realm.Run(r =>
+            r.All<BeatmapInfo>()
+             .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
+             .Filter(query, arguments)
+             .FirstOrDefault()?.Detach());
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s for a specific online ID.
+        /// </summary>
+        /// <returns>A matching local beatmap info if existing and in a valid state.</returns>
+        public BeatmapInfo? QueryOnlineBeatmapId(int id) => Realm.Run(r =>
+            r.All<BeatmapInfo>()
+             .ForOnlineId(id)
+             // See https://github.com/ppy/osu/issues/36234 for why this isn't a SingleOrDefault().
+             .FirstOrDefault()
+             ?.Detach()
+        );
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -301,8 +360,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null) =>
-            save(beatmapInfo, beatmapContent, beatmapSkin, transferCollections: true);
+        /// <param name="storyboard">The storyboard content to write, null if to be omitted.</param>
+        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null, Storyboard? storyboard = null) =>
+            save(beatmapInfo, beatmapContent, beatmapSkin, storyboard, transferCollections: true);
 
         public void DeleteAllVideos()
         {
@@ -310,6 +370,22 @@ namespace osu.Game.Beatmaps
             {
                 var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
                 DeleteVideos(items.ToList());
+            });
+        }
+
+        public void ResetAllOffsets()
+        {
+            Realm.Write(r =>
+            {
+                var items = r.All<BeatmapInfo>();
+
+                foreach (var beatmap in items)
+                {
+                    if (beatmap.UserSettings.Offset != 0)
+                        beatmap.UserSettings.Offset = 0;
+                }
+
+                PostNotification?.Invoke(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.AllOffsetsReset });
             });
         }
 
@@ -361,13 +437,18 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void DeleteVideos(List<BeatmapSetInfo> items, bool silent = false)
         {
-            if (items.Count == 0) return;
+            if (items.Count == 0)
+            {
+                if (!silent)
+                    PostNotification?.Invoke(new ProgressCompletionNotification { Text = MaintenanceSettingsStrings.NoVideosFoundToDelete });
+                return;
+            }
 
             var notification = new ProgressNotification
             {
                 Progress = 0,
                 Text = $"Preparing to delete all {HumanisedModelName} videos...",
-                CompletionText = "No videos found to delete!",
+                CompletionText = MaintenanceSettingsStrings.NoVideosFoundToDelete,
                 State = ProgressNotificationState.Active,
             };
 
@@ -383,7 +464,7 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                var video = b.Files.FirstOrDefault(f => OsuGameBase.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
+                var video = b.Files.FirstOrDefault(f => SupportedExtensions.VIDEO_EXTENSIONS.Any(ex => f.Filename.EndsWith(ex, StringComparison.OrdinalIgnoreCase)));
 
                 if (video != null)
                 {
@@ -408,9 +489,14 @@ namespace osu.Game.Beatmaps
         public Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original) =>
             beatmapImporter.ImportAsUpdate(notification, importTask, original);
 
-        public Task Export(BeatmapSetInfo beatmap) => beatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task<ExternalEditOperation<BeatmapSetInfo>> BeginExternalEditing(BeatmapSetInfo model) =>
+            beatmapImporter.BeginExternalEditing(model);
 
-        public Task ExportLegacy(BeatmapSetInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
+        public Task Export(BeatmapSetInfo beatmapSet) => beatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapSetInfo beatmapSet) => legacyBeatmapExporter.ExportAsync(beatmapSet.ToLive(Realm));
+
+        public Task ExportLegacy(BeatmapInfo beatmap) => legacyBeatmapExporter.ExportAsync(beatmap.ToLive(Realm));
 
         private void updateHashAndMarkDirty(BeatmapSetInfo setInfo)
         {
@@ -418,7 +504,7 @@ namespace osu.Game.Beatmaps
             setInfo.Status = BeatmapOnlineStatus.LocallyModified;
         }
 
-        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, bool transferCollections)
+        private void save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin, Storyboard? storyboard, bool transferCollections)
         {
             var setInfo = beatmapInfo.BeatmapSet;
             Debug.Assert(setInfo != null);
@@ -435,17 +521,14 @@ namespace osu.Game.Beatmaps
             beatmapContent.BeatmapInfo = beatmapInfo;
 
             // Since now this is a locally-modified beatmap, we also set all relevant flags to indicate this.
-            // Importantly, the `ResetOnlineInfo()` call must happen before encoding, as online ID is encoded into the `.osu` file,
-            // which influences the beatmap checksums.
             beatmapInfo.LastLocalUpdate = DateTimeOffset.Now;
             beatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
-            beatmapInfo.ResetOnlineInfo();
 
             Realm.Write(r =>
             {
                 using var stream = new MemoryStream();
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin).Encode(sw);
+                    new LegacyBeatmapEncoder(beatmapContent, beatmapSkin, storyboard).Encode(sw);
 
                 stream.Seek(0, SeekOrigin.Begin);
 
@@ -493,6 +576,26 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public void MarkPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = DateTimeOffset.Now;
+
+            transaction.Commit();
+        });
+
+        public void MarkNotPlayed(BeatmapInfo beatmapSetInfo) => Realm.Run(r =>
+        {
+            using var transaction = r.BeginWrite();
+
+            var beatmap = r.Find<BeatmapInfo>(beatmapSetInfo.ID)!;
+            beatmap.LastPlayed = null;
+
+            transaction.Commit();
+        });
+
         #region Implementation of ICanAcceptFiles
 
         public Task Import(params string[] paths) => beatmapImporter.Import(paths);
@@ -531,7 +634,11 @@ namespace osu.Game.Beatmaps
                 // If we seem to be missing files, now is a good time to re-fetch.
                 bool missingFiles = beatmapInfo.BeatmapSet?.Files.Count == 0;
 
-                if (refetch || beatmapInfo.IsManaged || missingFiles)
+                if (beatmapInfo.IsManaged)
+                {
+                    beatmapInfo = beatmapInfo.Detach();
+                }
+                else if (refetch || missingFiles)
                 {
                     Guid id = beatmapInfo.ID;
                     beatmapInfo = Realm.Run(r => r.Find<BeatmapInfo>(id)?.Detach()) ?? beatmapInfo;
@@ -553,7 +660,18 @@ namespace osu.Game.Beatmaps
             remove => workingBeatmapCache.OnInvalidated -= value;
         }
 
-        public override bool IsAvailableLocally(BeatmapSetInfo model) => Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
+        public override bool IsAvailableLocally(BeatmapSetInfo model)
+        {
+            throw new InvalidOperationException($"Use overload with {nameof(IBeatmapInfo)} parameter instead.");
+        }
+
+        public bool IsAvailableLocally(IBeatmapInfo model)
+        {
+            return Realm.Run(r => r.All<BeatmapInfo>()
+                                   .Filter($@"{nameof(BeatmapInfo.BeatmapSet)}.{nameof(BeatmapSetInfo.DeletePending)} == false")
+                                   .Filter($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", model.OnlineID)
+                                   .Any());
+        }
 
         #endregion
 

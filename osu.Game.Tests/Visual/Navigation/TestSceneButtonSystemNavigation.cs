@@ -29,6 +29,21 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestFastShortcutKeys()
+        {
+            AddAssert("state is initial", () => buttons.State == ButtonSystemState.Initial);
+
+            AddStep("press P three times", () =>
+            {
+                InputManager.Key(Key.P);
+                InputManager.Key(Key.P);
+                InputManager.Key(Key.P);
+            });
+
+            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect);
+        }
+
+        [Test]
         public void TestShortcutKeys()
         {
             AddAssert("state is initial", () => buttons.State == ButtonSystemState.Initial);
@@ -40,7 +55,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("state is play", () => buttons.State == ButtonSystemState.Play);
 
             AddStep("press P", () => InputManager.Key(Key.P));
-            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect);
         }
     }
 }

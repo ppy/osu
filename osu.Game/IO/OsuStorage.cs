@@ -39,6 +39,11 @@ namespace osu.Game.IO
         {
             "framework.ini",
             "storage.ini",
+
+            // These may not be safe to move around.
+            "AuthNative.dll",
+            "AuthNative.so",
+            "AuthNative.dylib"
         };
 
         public override string[] IgnoreSuffixes => new[]
@@ -60,6 +65,11 @@ namespace osu.Game.IO
             if (!string.IsNullOrEmpty(CustomStoragePath))
                 TryChangeToCustomStorage(out Error);
         }
+
+        /// <summary>
+        /// Returns the <see cref="Storage"/> used for storing exported files.
+        /// </summary>
+        public virtual Storage GetExportStorage() => GetStorageForDirectory(@"exports");
 
         /// <summary>
         /// Resets the custom storage path, changing the target storage to the default location.

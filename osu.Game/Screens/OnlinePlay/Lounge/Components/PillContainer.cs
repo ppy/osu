@@ -40,35 +40,31 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Colour = Color4.Black,
                         Alpha = 0.5f
                     },
-                    new Container
+                    new GridContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Horizontal = padding },
-                        Child = new GridContainer
+                        ColumnDimensions = new[]
                         {
-                            AutoSizeAxes = Axes.Both,
-                            ColumnDimensions = new[]
+                            new Dimension(GridSizeMode.AutoSize, minSize: 80 - 2 * padding)
+                        },
+                        Content = new[]
+                        {
+                            new[]
                             {
-                                new Dimension(GridSizeMode.AutoSize, minSize: 80 - 2 * padding)
-                            },
-                            Content = new[]
-                            {
-                                new[]
+                                new Container
                                 {
-                                    new Container
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Padding = new MarginPadding { Bottom = 2 },
+                                    Child = content = new Container
                                     {
                                         AutoSizeAxes = Axes.Both,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Padding = new MarginPadding { Bottom = 2 },
-                                        Child = content = new Container
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                        }
                                     }
                                 }
                             }

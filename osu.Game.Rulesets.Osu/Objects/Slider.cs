@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        private readonly SliderPath path = new SliderPath();
+        private readonly SliderPath path = new SliderPath { OptimiseCatmull = true };
 
         public SliderPath Path
         {
@@ -66,24 +67,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                 updateNestedPositions();
             }
         }
-
-        /// <summary>
-        /// The position of the cursor at the point of completion of this <see cref="Slider"/> if it was hit
-        /// with as few movements as possible. This is set and used by difficulty calculation.
-        /// </summary>
-        internal Vector2? LazyEndPosition;
-
-        /// <summary>
-        /// The distance travelled by the cursor upon completion of this <see cref="Slider"/> if it was hit
-        /// with as few movements as possible. This is set and used by difficulty calculation.
-        /// </summary>
-        internal float LazyTravelDistance;
-
-        /// <summary>
-        /// The time taken by the cursor upon completion of this <see cref="Slider"/> if it was hit
-        /// with as few movements as possible. This is set and used by difficulty calculation.
-        /// </summary>
-        internal double LazyTravelTime;
 
         public IList<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
@@ -162,6 +145,10 @@ namespace osu.Game.Rulesets.Osu.Objects
         [JsonIgnore]
         public SliderTailCircle TailCircle { get; protected set; }
 
+        [JsonIgnore]
+        [CanBeNull]
+        public SliderRepeat LastRepeat { get; protected set; }
+
         public Slider()
         {
             SamplesBindable.CollectionChanged += (_, _) => UpdateNestedSamples();
@@ -199,6 +186,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             SpanStartTime = e.SpanStartTime,
                             StartTime = e.Time,
                             Position = Position + Path.PositionAt(e.PathProgress),
+                            PathProgress = e.PathProgress,
                             StackHeight = StackHeight,
                         });
                         break;
@@ -225,12 +213,13 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat(this)
+                        AddNested(LastRepeat = new SliderRepeat(this)
                         {
                             RepeatIndex = e.SpanIndex,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
+                            PathProgress = e.PathProgress,
                         });
                         break;
                 }
@@ -243,27 +232,52 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             endPositionCache.Invalidate();
 
-            if (HeadCircle != null)
-                HeadCircle.Position = Position;
+            foreach (var nested in NestedHitObjects)
+            {
+                switch (nested)
+                {
+                    case SliderHeadCircle headCircle:
+                        headCircle.Position = Position;
+                        break;
 
-            if (TailCircle != null)
-                TailCircle.Position = EndPosition;
+                    case SliderTailCircle tailCircle:
+                        tailCircle.Position = EndPosition;
+                        break;
+
+                    case SliderRepeat repeat:
+                        repeat.Position = Position + Path.PositionAt(repeat.PathProgress);
+                        break;
+
+                    case SliderTick tick:
+                        tick.Position = Position + Path.PositionAt(tick.PathProgress);
+                        break;
+                }
+            }
         }
 
         protected void UpdateNestedSamples()
         {
-            var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
-                              ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-            var sampleList = new List<HitSampleInfo>();
+            this.PopulateNodeSamples();
 
-            if (firstSample != null)
-                sampleList.Add(firstSample.With("slidertick"));
+            // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+            HitSampleInfo tickSample = (Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault())?.With("slidertick");
 
-            foreach (var tick in NestedHitObjects.OfType<SliderTick>())
-                tick.Samples = sampleList;
+            foreach (var nested in NestedHitObjects)
+            {
+                switch (nested)
+                {
+                    case SliderTick tick:
+                        tick.SamplesBindable.Clear();
 
-            foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
+                        if (tickSample != null)
+                            tick.SamplesBindable.Add(tickSample);
+                        break;
+
+                    case SliderRepeat repeat:
+                        repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
+                        break;
+                }
+            }
 
             if (HeadCircle != null)
                 HeadCircle.Samples = this.GetNodeSamples(0);

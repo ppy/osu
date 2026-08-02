@@ -6,6 +6,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using static osu.Game.Online.API.Requests.Responses.APIBeatmap;
 
 namespace osu.Game.Tournament.Models
 {
@@ -21,11 +22,17 @@ namespace osu.Game.Tournament.Models
 
         public double StarRating { get; set; }
 
+        public int EndTimeObjectCount { get; set; }
+
+        public int TotalObjectCount { get; set; }
+
         public IBeatmapMetadataInfo Metadata { get; set; } = new BeatmapMetadata();
 
         public IBeatmapDifficultyInfo Difficulty { get; set; } = new BeatmapDifficulty();
 
         public BeatmapSetOnlineCovers Covers { get; set; }
+
+        public IRulesetInfo Ruleset { get; set; } = new APIRuleset();
 
         public TournamentBeatmap()
         {
@@ -41,6 +48,9 @@ namespace osu.Game.Tournament.Models
             Metadata = beatmap.Metadata;
             Difficulty = beatmap.Difficulty;
             Covers = beatmap.BeatmapSet?.Covers ?? new BeatmapSetOnlineCovers();
+            EndTimeObjectCount = beatmap.EndTimeObjectCount;
+            TotalObjectCount = beatmap.TotalObjectCount;
+            Ruleset = beatmap.Ruleset;
         }
 
         public bool Equals(IBeatmapInfo? other) => other is TournamentBeatmap b && this.MatchesOnlineID(b);
@@ -77,7 +87,7 @@ namespace osu.Game.Tournament.Models
 
         string IBeatmapInfo.MD5Hash => throw new NotImplementedException();
 
-        IRulesetInfo IBeatmapInfo.Ruleset => throw new NotImplementedException();
+        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
 
         DateTimeOffset IBeatmapSetOnlineInfo.Submitted => throw new NotImplementedException();
 

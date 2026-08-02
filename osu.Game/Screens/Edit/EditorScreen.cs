@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Screens;
 
 namespace osu.Game.Screens.Edit
 {
@@ -36,6 +37,10 @@ namespace osu.Game.Screens.Edit
         protected override void PopIn() => this.FadeIn();
 
         protected override void PopOut() => this.FadeOut();
+
+        public virtual void OnExiting(ScreenExitEvent e)
+        {
+        }
 
         #region Clipboard operations
 

@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
             currentConfig = null;
         }
 
-        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line)
+        protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line, bool isPrimaryStream)
         {
             switch (section)
             {
@@ -86,6 +86,10 @@ namespace osu.Game.Skinning
                         parseArrayValue(pair.Value, currentConfig.ColumnWidth);
                         break;
 
+                    case "BarlineHeight":
+                        currentConfig.BarLineHeight = float.Parse(pair.Value, CultureInfo.InvariantCulture);
+                        break;
+
                     case "HitPosition":
                         currentConfig.HitPosition = (480 - Math.Clamp(float.Parse(pair.Value, CultureInfo.InvariantCulture), 240, 480)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
@@ -94,8 +98,12 @@ namespace osu.Game.Skinning
                         currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
+                    case "ComboPosition":
+                        currentConfig.ComboPosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
                     case "ScorePosition":
-                        currentConfig.ScorePosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.ScorePosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "JudgementLine":
@@ -115,17 +123,51 @@ namespace osu.Game.Skinning
                         break;
 
                     case "NoteBodyStyle":
-                        if (Enum.TryParse<LegacyNoteBodyStyle>(pair.Value, out var style))
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacyNoteBodyStyle>(pair.Value, out var style))
                             currentConfig.NoteBodyStyle = style;
                         break;
 
                     case "WidthForNoteHeightScale":
-                        currentConfig.WidthForNoteHeightScale = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.WidthForNoteHeightScale = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightFramePerSecond":
                         int lightFramePerSecond = int.Parse(pair.Value, CultureInfo.InvariantCulture);
                         currentConfig.LightFramePerSecond = lightFramePerSecond > 0 ? lightFramePerSecond : 24;
+                        break;
+
+                    case @"SpecialStyle":
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacySpecialStyle>(pair.Value, out var specialStyle))
+                            currentConfig.SpecialStyle = specialStyle;
+                        break;
+
+                    case @"ColumnStart":
+                        currentConfig.ColumnStart = float.Parse(pair.Value, CultureInfo.InvariantCulture); // TODO: likely needs POSITION_SCALE_FACTOR
+                        break;
+
+                    case @"ColumnRight":
+                        currentConfig.ColumnRight = float.Parse(pair.Value, CultureInfo.InvariantCulture); // TODO: likely needs POSITION_SCALE_FACTOR
+                        break;
+
+                    case @"UpsideDown":
+                        currentConfig.UpsideDown = pair.Value == "1";
+                        break;
+
+                    case @"SeparateScore":
+                        currentConfig.SeparateScore = pair.Value == "1";
+                        break;
+
+                    case @"SplitStages":
+                        currentConfig.SplitStages = pair.Value == "1";
+                        break;
+
+                    case @"StageSeparation":
+                        currentConfig.StageSeparation = float.Parse(pair.Value, CultureInfo.InvariantCulture);
+                        break;
+
+                    case @"ComboBurstStyle":
+                        if (Enum.TryParse<LegacyManiaSkinConfiguration.LegacyComboBurstStyle>(pair.Value, out var comboBurstStyle))
+                            currentConfig.ComboBurstStyle = comboBurstStyle;
                         break;
 
                     case string when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
@@ -138,7 +180,13 @@ namespace osu.Game.Skinning
                     case string when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
                     case string when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
                     case string when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
+                    case @"WarningArrow":
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
+                        break;
+
+                    case string when pair.Key.StartsWith(@"KeyFlipWhenUpsideDown", StringComparison.Ordinal):
+                    case string when pair.Key.StartsWith(@"NoteFlipWhenUpsideDown", StringComparison.Ordinal):
+                        currentConfig.FlipSettings[pair.Key] = pair.Value;
                         break;
                 }
             }
@@ -155,7 +203,15 @@ namespace osu.Game.Skinning
                 if (i >= output.Length)
                     break;
 
-                output[i] = float.Parse(values[i], CultureInfo.InvariantCulture) * (applyScaleFactor ? LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR : 1);
+                if (!float.TryParse(values[i], NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedValue))
+                    // some skins may provide incorrect entries in array values. to match stable behaviour, read such entries as zero.
+                    // see: https://github.com/ppy/osu/issues/26464, stable code: https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Skinning/Components/Section.cs#L134-L137
+                    parsedValue = 0;
+
+                if (applyScaleFactor)
+                    parsedValue *= LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+
+                output[i] = parsedValue;
             }
         }
     }

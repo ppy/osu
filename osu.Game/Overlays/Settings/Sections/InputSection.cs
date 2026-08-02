@@ -4,9 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Handlers;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Input;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Keyboard
+            Icon = OsuIcon.Input
         };
 
         public InputSection(KeyBindingPanel keyConfig)
@@ -43,31 +43,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 if (handlerSection != null)
                     Add(handlerSection);
             }
-        }
-
-        public partial class HandlerSection : SettingsSubsection
-        {
-            private readonly InputHandler handler;
-
-            public HandlerSection(InputHandler handler)
-            {
-                this.handler = handler;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Children = new Drawable[]
-                {
-                    new SettingsCheckbox
-                    {
-                        LabelText = CommonStrings.Enabled,
-                        Current = handler.Enabled
-                    },
-                };
-            }
-
-            protected override LocalisableString Header => handler.Description;
         }
     }
 }

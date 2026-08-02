@@ -19,14 +19,12 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 1;
-
         [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
         public abstract BindableNumber<float> StartScale { get; }
 
         protected virtual float EndScale => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween), typeof(OsuModDepth) };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {

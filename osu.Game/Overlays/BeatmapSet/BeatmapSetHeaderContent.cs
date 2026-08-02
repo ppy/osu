@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -46,6 +47,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly LinkFlowContainer title, artist;
         private readonly AuthorInfo author;
+        private readonly VideoIconPill videoIconPill;
+        private readonly StoryboardIconPill storyboardIconPill;
 
         private ExternalLinkButton externalLink;
 
@@ -98,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         {
                             Vertical = BeatmapSetOverlay.Y_PADDING,
                             Left = WaveOverlayContainer.HORIZONTAL_PADDING,
-                            Right = WaveOverlayContainer.HORIZONTAL_PADDING + BeatmapSetOverlay.RIGHT_WIDTH,
+                            Right = WaveOverlayContainer.HORIZONTAL_PADDING + BeatmapSetOverlay.RIGHT_WIDTH + 10,
                         },
                         Children = new Drawable[]
                         {
@@ -175,14 +178,42 @@ namespace osu.Game.Overlays.BeatmapSet
                         Spacing = new Vector2(10),
                         Children = new Drawable[]
                         {
-                            onlineStatusPill = new BeatmapSetOnlineStatusPill
+                            new FillFlowContainer
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                TextSize = 14,
-                                TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(10),
+                                Children = new Drawable[]
+                                {
+                                    onlineStatusPill = new BeatmapSetOnlineStatusPill
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        TextSize = 14,
+                                        TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
+                                    },
+                                    storyboardIconPill = new StoryboardIconPill
+                                    {
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        IconSize = new Vector2(34),
+                                        IconPadding = new MarginPadding(10),
+                                    },
+                                    videoIconPill = new VideoIconPill
+                                    {
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        IconSize = new Vector2(34),
+                                        IconPadding = new MarginPadding(10),
+                                    },
+                                }
                             },
+
                             Details = new Details(),
                         },
                     },
@@ -200,7 +231,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateExternalLink()
         {
-            if (externalLink != null) externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineID}#{Picker.Beatmap.Value?.Ruleset.ShortName}/{Picker.Beatmap.Value?.OnlineID}";
+            if (externalLink != null)
+                externalLink.Link = Picker.Beatmap.Value?.GetOnlineURL(api) ?? BeatmapSet.Value?.GetOnlineURL(api);
         }
 
         [BackgroundDependencyLoader]
@@ -210,14 +242,18 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = rulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
-                cover.OnlineInfo = setInfo.NewValue;
+                var newBeatmapSet = setInfo.NewValue;
+
+                Picker.BeatmapSet = rulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = newBeatmapSet;
+                cover.OnlineInfo = newBeatmapSet;
 
                 downloadTracker?.RemoveAndDisposeImmediately();
 
-                if (setInfo.NewValue == null)
+                if (newBeatmapSet == null)
                 {
                     onlineStatusPill.FadeTo(0.5f, 500, Easing.OutQuint);
+                    videoIconPill.Hide();
+                    storyboardIconPill.Hide();
                     fadeContent.Hide();
 
                     loading.Show();
@@ -227,7 +263,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
                 else
                 {
-                    downloadTracker = new BeatmapDownloadTracker(setInfo.NewValue);
+                    foreach (var beatmap in newBeatmapSet.Beatmaps)
+                        beatmap.BeatmapSet = newBeatmapSet;
+
+                    downloadTracker = new BeatmapDownloadTracker(newBeatmapSet);
                     downloadTracker.State.BindValueChanged(_ => updateDownloadButtons());
                     AddInternal(downloadTracker);
 
@@ -235,32 +274,42 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     loading.Hide();
 
-                    var titleText = new RomanisableString(setInfo.NewValue.TitleUnicode, setInfo.NewValue.Title);
-                    var artistText = new RomanisableString(setInfo.NewValue.ArtistUnicode, setInfo.NewValue.Artist);
+                    if (newBeatmapSet.HasVideo)
+                        videoIconPill.Show();
+                    else
+                        videoIconPill.Hide();
+
+                    if (newBeatmapSet.HasStoryboard)
+                        storyboardIconPill.Show();
+                    else
+                        storyboardIconPill.Hide();
+
+                    var titleText = new RomanisableString(newBeatmapSet.TitleUnicode, newBeatmapSet.Title);
+                    var artistText = new RomanisableString(newBeatmapSet.ArtistUnicode, newBeatmapSet.Artist);
 
                     title.Clear();
                     artist.Clear();
 
-                    title.AddLink(titleText, LinkAction.SearchBeatmapSet, titleText);
+                    title.AddLink(titleText, LinkAction.SearchBeatmapSet, LocalisableString.Interpolate($@"title=""""{titleText}"""""));
 
                     title.AddArbitraryDrawable(Empty().With(d => d.Width = 5));
                     title.AddArbitraryDrawable(externalLink = new ExternalLinkButton());
 
-                    if (setInfo.NewValue.HasExplicitContent)
+                    if (newBeatmapSet.HasExplicitContent)
                     {
                         title.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
                         title.AddArbitraryDrawable(new ExplicitContentBeatmapBadge());
                     }
 
-                    if (setInfo.NewValue.FeaturedInSpotlight)
+                    if (newBeatmapSet.FeaturedInSpotlight)
                     {
                         title.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
                         title.AddArbitraryDrawable(new SpotlightBeatmapBadge());
                     }
 
-                    artist.AddLink(artistText, LinkAction.SearchBeatmapSet, artistText);
+                    artist.AddLink(artistText, LinkAction.SearchBeatmapSet, LocalisableString.Interpolate($@"artist=""""{artistText}"""""));
 
-                    if (setInfo.NewValue.TrackId != null)
+                    if (newBeatmapSet.TrackId != null)
                     {
                         artist.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
                         artist.AddArbitraryDrawable(new FeaturedArtistBeatmapBadge());

@@ -7,6 +7,8 @@ using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -53,6 +55,8 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
+            private Sample selectSample = null!;
+
             public PageTabItem(T value)
                 : base(value)
             {
@@ -78,10 +82,16 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverSounds(HoverSampleSet.TabSelect)
                 };
 
                 Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Torus, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                selectSample = audio.Samples.Get(@"UI/tabselect-select");
             }
 
             protected virtual LocalisableString CreateText() => (Value as Enum)?.GetLocalisableDescription() ?? Value.ToString();
@@ -112,6 +122,8 @@ namespace osu.Game.Graphics.UserInterface
             protected override void OnActivated() => slideActive();
 
             protected override void OnDeactivated() => slideInactive();
+
+            protected override void OnActivatedByUser() => selectSample.Play();
         }
     }
 }

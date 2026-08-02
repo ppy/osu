@@ -10,25 +10,24 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
-using osu.Game.Resources.Localisation.Web;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Input;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -74,13 +73,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public bool FilteringActive { get; set; }
 
-        public IEnumerable<LocalisableString> FilterTerms => KeyBindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(text.Text);
+        public IEnumerable<LocalisableString> FilterTerms => KeyBindings.Select(b => (LocalisableString)keyCombinationProvider.GetReadableString(b.KeyCombination)).Prepend(caption.Caption);
 
         #endregion
 
         public readonly object Action;
 
-        private Bindable<bool> isDefault { get; } = new BindableBool(true);
+        public IBindable<bool> IsDefault => isDefault;
+        private readonly Bindable<bool> isDefault = new BindableBool(true);
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
@@ -93,7 +93,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Container content = null!;
 
-        private OsuSpriteText text = null!;
+        private FormControlBackground background = null!;
+        private FormFieldCaption caption = null!;
+        private SettingsRevertToDefaultButton revertButton = null!;
         private FillFlowContainer cancelAndClearButtons = null!;
         private FillFlowContainer<KeyButton> buttons = null!;
 
@@ -101,9 +103,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Sample?[]? keypressSamples;
 
-        private const float transition_time = 150;
-        private const float height = 20;
-        private const float padding = 5;
+        private const float spacing = 5;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             content.ReceivePositionalInputAt(screenSpacePos);
@@ -122,80 +122,115 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             AutoSizeAxes = Axes.Y;
         }
 
+        private OsuSpriteText pendingBindingText = null!;
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, AudioManager audioManager)
+        private void load(AudioManager audioManager)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
+            Padding = SettingsPanel.CONTENT_PADDING;
 
             InternalChildren = new Drawable[]
             {
-                new Container
+                revertButton = new SettingsRevertToDefaultButton
                 {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
-                    Width = SettingsPanel.CONTENT_MARGINS,
-                    Child = new RevertToDefaultButton<bool>
-                    {
-                        Current = isDefault,
-                        Action = RestoreDefaults,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
+                    Action = RestoreDefaults,
                 },
-                new Container
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
                     Children = new Drawable[]
                     {
-                        content = new Container
+                        background = new FormControlBackground(),
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Masking = true,
-                            CornerRadius = padding,
-                            EdgeEffect = new EdgeEffectParameters
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(spacing),
+                            Padding = new MarginPadding
                             {
-                                Radius = 2,
-                                Colour = colourProvider.Highlight1.Opacity(0),
-                                Type = EdgeEffectType.Shadow,
-                                Hollow = true,
+                                Vertical = 5,
+                                Left = 9,
+                                Right = 5,
                             },
                             Children = new Drawable[]
                             {
-                                new Box
+                                new GridContainer
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background5,
-                                },
-                                text = new OsuSpriteText
-                                {
-                                    Text = Action.GetLocalisableDescription(),
-                                    Margin = new MarginPadding(1.5f * padding),
-                                },
-                                buttons = new FillFlowContainer<KeyButton>
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, size: 9),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    Content = new[]
+                                    {
+                                        new Drawable?[]
+                                        {
+                                            caption = new FormFieldCaption
+                                            {
+                                                Caption = Action.GetLocalisableDescription(),
+                                                Margin = new MarginPadding { Vertical = 4 },
+                                            },
+                                            null,
+                                            buttons = new FillFlowContainer<KeyButton>
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Spacing = new Vector2(spacing),
+                                            },
+                                        },
+                                    },
                                 },
                                 cancelAndClearButtons = new FillFlowContainer
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding(padding) { Top = height + padding * 2 },
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Full,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Alpha = 0,
                                     Spacing = new Vector2(5),
+                                    Padding = new MarginPadding(5) { Top = 0 },
                                     Children = new Drawable[]
                                     {
-                                        new CancelButton { Action = () => finalise(false) },
-                                        new ClearButton { Action = clear },
+                                        pendingBindingText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Alpha = 0.4f,
+                                            Text = InputSettingsStrings.PendingBinding,
+                                            Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
+                                        },
+                                        new RoundedButton
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Text = CommonStrings.ButtonsCancel,
+                                            Size = new Vector2(120, 30),
+                                            Action = () => finalise(false)
+                                        },
+                                        new DangerousRoundedButton
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Text = InputSettingsStrings.ClearBindingButton,
+                                            Size = new Vector2(120, 30),
+                                            Action = clear
+                                        },
                                     },
                                 },
-                                new HoverClickSounds()
                             }
                         }
                     }
@@ -213,6 +248,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 keypressSamples[i] = audioManager.Samples.Get($@"Keyboard/key-press-{1 + i}");
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isDefault.BindValueChanged(d =>
+            {
+                if (d.NewValue)
+                    revertButton.Hide();
+                else
+                    revertButton.Show();
+            }, true);
+        }
+
         public void RestoreDefaults()
         {
             int i = 0;
@@ -222,7 +270,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
 
-                tryPersistKeyBinding(button.KeyBinding.Value, advanceToNextBinding: false);
+                tryPersistKeyBinding(button.KeyBinding.Value, advanceToNextBinding: false, restoringDefaults: true);
             }
 
             isDefault.Value = true;
@@ -230,16 +278,22 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override bool OnHover(HoverEvent e)
         {
-            content.FadeEdgeEffectTo(1, transition_time, Easing.OutQuint);
-
+            updateState();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            content.FadeEdgeEffectTo(0, transition_time, Easing.OutQuint);
-
             base.OnHoverLost(e);
+            updateState();
+        }
+
+        private void updateState()
+        {
+            if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
+            else
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         protected override bool OnClick(ClickEvent e) => true;
@@ -465,7 +519,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }
 
             if (HasFocus)
-                GetContainingInputManager().ChangeFocus(null);
+                GetContainingFocusManager()!.ChangeFocus(null);
 
             cancelAndClearButtons.FadeOut(300, Easing.OutQuint);
             cancelAndClearButtons.BypassAutoSizeAxes |= Axes.Y;
@@ -473,11 +527,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         protected override void OnFocus(FocusEvent e)
         {
-            content.AutoSizeDuration = 500;
+            content.AutoSizeDuration = 250;
             content.AutoSizeEasing = Easing.OutQuint;
 
             cancelAndClearButtons.FadeIn(300, Easing.OutQuint);
             cancelAndClearButtons.BypassAutoSizeAxes &= ~Axes.Y;
+
+            pendingBindingText.FadeTo(1, 500).Then().FadeTo(0.4f, 500).Loop();
 
             updateBindTarget();
             base.OnFocus(e);
@@ -489,12 +545,25 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             base.OnFocusLost(e);
         }
 
-        private void tryPersistKeyBinding(RealmKeyBinding keyBinding, bool advanceToNextBinding)
+        private bool isConflictingBinding(RealmKeyBinding first, RealmKeyBinding second, bool restoringDefaults)
+        {
+            if (first.ID == second.ID)
+                return false;
+
+            // ignore conflicts with same action bindings during revert. the assumption is that the other binding will be reverted subsequently in the same higher-level operation.
+            // this happens if the bindings for an action are rebound to the same keys, but the ordering of the bindings itself is different.
+            if (restoringDefaults && first.ActionInt == second.ActionInt)
+                return false;
+
+            return first.KeyCombination.Equals(second.KeyCombination);
+        }
+
+        private void tryPersistKeyBinding(RealmKeyBinding keyBinding, bool advanceToNextBinding, bool restoringDefaults = false)
         {
             List<RealmKeyBinding> bindings = GetAllSectionBindings();
             RealmKeyBinding? existingBinding = keyBinding.KeyCombination.Equals(new KeyCombination(InputKey.None))
                 ? null
-                : bindings.FirstOrDefault(other => other.ID != keyBinding.ID && other.KeyCombination.Equals(keyBinding.KeyCombination));
+                : bindings.FirstOrDefault(other => isConflictingBinding(keyBinding, other, restoringDefaults));
 
             if (existingBinding == null)
             {
@@ -524,24 +593,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private void updateIsDefaultValue()
         {
             isDefault.Value = KeyBindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
-        }
-
-        private partial class CancelButton : RoundedButton
-        {
-            public CancelButton()
-            {
-                Text = CommonStrings.ButtonsCancel;
-                Size = new Vector2(80, 20);
-            }
-        }
-
-        public partial class ClearButton : DangerousRoundedButton
-        {
-            public ClearButton()
-            {
-                Text = CommonStrings.ButtonsClear;
-                Size = new Vector2(80, 20);
-            }
         }
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
@@ -27,14 +28,9 @@ namespace osu.Game.Beatmaps
     {
         private readonly bool applyOffsets;
 
-        /// <summary>
-        /// The total frequency adjustment from pause transforms. Should eventually be handled in a better way.
-        /// </summary>
-        public readonly BindableDouble ExternalPauseFrequencyAdjust = new BindableDouble(1);
-
         private readonly OffsetCorrectionClock? userGlobalOffsetClock;
         private readonly OffsetCorrectionClock? platformOffsetClock;
-        private readonly OffsetCorrectionClock? userBeatmapOffsetClock;
+        private readonly FramedOffsetClock? userBeatmapOffsetClock;
 
         private readonly IFrameBasedClock finalClockSource;
 
@@ -43,6 +39,7 @@ namespace osu.Game.Beatmaps
         private IDisposable? beatmapOffsetSubscription;
 
         private readonly DecouplingFramedClock decoupledTrack;
+        private readonly InterpolatingFramedClock interpolatedTrack;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -52,6 +49,21 @@ namespace osu.Game.Beatmaps
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        [Resolved]
+        private AudioManager audioManager { get; set; } = null!;
+
+        private Bindable<bool> experimentalAudio = null!;
+
+        /// <summary>
+        /// Store seek target for any <see cref="Seek"/> performed before <see cref="LoadState.Loaded"/>.
+        /// </summary>
+        /// <remarks>
+        /// Initial seeks must be delayed until the <see cref="FramedBeatmapClock"/> instance is fully loaded.
+        ///
+        /// If not, <see cref="TotalAppliedOffset"/> will not be in a correct state and result in a potentially
+        /// incorrect seek target.</remarks>
+        private double? initialSeek;
 
         public bool IsRewinding { get; private set; }
 
@@ -63,19 +75,20 @@ namespace osu.Game.Beatmaps
 
             // An interpolating clock is used to ensure precise time values even when the host audio subsystem is not reporting
             // high precision times (on windows there's generally only 5-10ms reporting intervals, as an example).
-            var interpolatedTrack = new InterpolatingFramedClock(decoupledTrack);
+            interpolatedTrack = new InterpolatingFramedClock(decoupledTrack)
+            {
+                DriftRecoveryHalfLife = 80,
+            };
 
             if (applyOffsets)
             {
-                // Audio timings in general with newer BASS versions don't match stable.
-                // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack, ExternalPauseFrequencyAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
+                platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack);
 
                 // User global offset (set in settings) should also be applied.
-                userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock, ExternalPauseFrequencyAdjust);
+                userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock);
 
                 // User per-beatmap offset will be applied to this final clock.
-                finalClockSource = userBeatmapOffsetClock = new OffsetCorrectionClock(userGlobalOffsetClock, ExternalPauseFrequencyAdjust);
+                finalClockSource = userBeatmapOffsetClock = new FramedOffsetClock(userGlobalOffsetClock);
             }
             else
             {
@@ -95,6 +108,9 @@ namespace osu.Game.Beatmaps
                 userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
                 userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
 
+                experimentalAudio = audioManager.UseExperimentalWasapi.GetBoundCopy();
+                experimentalAudio.BindValueChanged(_ => updatePlatformOffset(), true);
+
                 // TODO: this doesn't update when using ChangeSource() to change beatmap.
                 beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
                     r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
@@ -103,6 +119,45 @@ namespace osu.Game.Beatmaps
                     {
                         userBeatmapOffsetClock.Offset = val;
                     });
+            }
+
+            if (initialSeek != null)
+            {
+                Seek(initialSeek.Value);
+                initialSeek = null;
+            }
+        }
+
+        /// <summary>
+        /// Audio timings in general with newer BASS versions don't match stable.
+        /// This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+        /// </summary>
+        public const double WINDOWS_BASE_AUDIO_OFFSET = 15;
+
+        /// <summary>
+        /// An additional offset applied to account for experimental mode being much better.
+        /// </summary>
+        public const double WINDOWS_EXPERIMENTAL_AUDIO_OFFSET = -25;
+
+        private void updatePlatformOffset()
+        {
+            if (!applyOffsets)
+                return;
+
+            Debug.Assert(platformOffsetClock != null);
+
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    platformOffsetClock.Offset = WINDOWS_BASE_AUDIO_OFFSET;
+
+                    if (audioManager.UseExperimentalWasapi.Value)
+                        platformOffsetClock.Offset += WINDOWS_EXPERIMENTAL_AUDIO_OFFSET;
+                    return;
+
+                default:
+                    platformOffsetClock.Offset = 0;
+                    break;
             }
         }
 
@@ -127,7 +182,7 @@ namespace osu.Game.Beatmaps
                 Debug.Assert(userBeatmapOffsetClock != null);
                 Debug.Assert(platformOffsetClock != null);
 
-                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
+                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.Offset + platformOffsetClock.RateAdjustedOffset;
             }
         }
 
@@ -157,6 +212,13 @@ namespace osu.Game.Beatmaps
 
         public bool Seek(double position)
         {
+            // TotalAppliedOffset will not be correct until fully loaded.
+            if (applyOffsets && !IsLoaded)
+            {
+                initialSeek = position;
+                return true;
+            }
+
             bool success = decoupledTrack.Seek(position - TotalAppliedOffset);
             finalClockSource.ProcessFrame();
 
@@ -175,7 +237,7 @@ namespace osu.Game.Beatmaps
 
         #region Delegation of IFrameBasedClock to clock with all offsets applied
 
-        public double CurrentTime => finalClockSource.CurrentTime;
+        public double CurrentTime => initialSeek ?? finalClockSource.CurrentTime;
 
         public bool IsRunning => finalClockSource.IsRunning;
 
@@ -194,6 +256,29 @@ namespace osu.Game.Beatmaps
         {
             base.Dispose(isDisposing);
             beatmapOffsetSubscription?.Dispose();
+        }
+
+        public string GetSnapshot()
+        {
+            return
+                $"originalSource: {output(Source)}\n" +
+                $"userGlobalOffsetClock: {output(userGlobalOffsetClock)}\n" +
+                $"platformOffsetClock: {output(platformOffsetClock)}\n" +
+                $"userBeatmapOffsetClock: {output(userBeatmapOffsetClock)}\n" +
+                $"interpolatedTrack: {output(interpolatedTrack)}\n" +
+                $"decoupledTrack: {output(decoupledTrack)}\n" +
+                $"finalClockSource: {output(finalClockSource)}\n";
+
+            string output(IClock? clock)
+            {
+                if (clock == null)
+                    return "null";
+
+                if (clock is IFrameBasedClock framed)
+                    return $"current: {clock.CurrentTime:N2} running: {clock.IsRunning} rate: {clock.Rate} elapsed: {framed.ElapsedFrameTime:N2}";
+
+                return $"current: {clock.CurrentTime:N2} running: {clock.IsRunning} rate: {clock.Rate}";
+            }
         }
     }
 }

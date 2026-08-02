@@ -13,7 +13,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 {
     public partial class TestSceneHitCirclePlacementBlueprint : PlacementBlueprintTestScene
     {
+        protected sealed override Ruleset CreateRuleset() => new OsuRuleset();
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableHitCircle((HitCircle)hitObject);
-        protected override PlacementBlueprint CreateBlueprint() => new HitCirclePlacementBlueprint();
+        protected override HitObjectPlacementBlueprint CreateBlueprint() => new HitCirclePlacementBlueprint();
     }
 }

@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -21,6 +23,9 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class ScrollingHitObjectComposer<TObject> : HitObjectComposer<TObject>
         where TObject : HitObject
     {
+        [Resolved]
+        private Editor? editor { get; set; }
+
         private readonly Bindable<TernaryState> showSpeedChanges = new Bindable<TernaryState>();
         private Bindable<bool> configShowSpeedChanges = null!;
 
@@ -51,7 +56,12 @@ namespace osu.Game.Rulesets.Edit
                         Spacing = new Vector2(0, 5),
                         Children = new[]
                         {
-                            new DrawableTernaryButton(new TernaryButton(showSpeedChanges, "Show speed changes", () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt }))
+                            new DrawableTernaryButton
+                            {
+                                Current = showSpeedChanges,
+                                Description = "Show speed changes",
+                                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt },
+                            }
                         }
                     },
                 });
@@ -72,6 +82,8 @@ namespace osu.Game.Rulesets.Edit
 
             if (beatSnapGrid != null)
                 AddInternal(beatSnapGrid);
+
+            EditorBeatmap.ControlPointInfo.ControlPointsChanged += expireComposeScreenOnControlPointChange;
         }
 
         protected override void UpdateAfterChildren()
@@ -104,5 +116,32 @@ namespace osu.Game.Rulesets.Edit
                     beatSnapGrid.SelectionTimeRange = null;
             }
         }
+
+        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        {
+            var scrollingPlayfield = PlayfieldAtScreenSpacePosition(screenSpacePosition) as ScrollingPlayfield;
+            if (scrollingPlayfield == null)
+                return new SnapResult(screenSpacePosition, null);
+
+            double? targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+
+            // apply beat snapping
+            targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+
+            // convert back to screen space
+            screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+
+            return new SnapResult(screenSpacePosition, targetTime, scrollingPlayfield);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (EditorBeatmap.IsNotNull())
+                EditorBeatmap.ControlPointInfo.ControlPointsChanged -= expireComposeScreenOnControlPointChange;
+        }
+
+        private void expireComposeScreenOnControlPointChange() => editor?.ReloadComposeScreen();
     }
 }

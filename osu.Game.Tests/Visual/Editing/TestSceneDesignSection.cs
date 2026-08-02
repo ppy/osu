@@ -7,12 +7,14 @@ using System;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
@@ -24,6 +26,9 @@ namespace osu.Game.Tests.Visual.Editing
     {
         private TestDesignSection designSection;
         private EditorBeatmap editorBeatmap { get; set; }
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
         [SetUpSteps]
         public void SetUp()
@@ -42,7 +47,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     (typeof(EditorBeatmap), editorBeatmap)
                 },
-                Child = designSection = new TestDesignSection()
+                Child = designSection = new TestDesignSection { RelativeSizeAxes = Axes.X }
             });
         }
 
@@ -51,7 +56,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("turn countdown off", () => designSection.EnableCountdown.Current.Value = false);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.None);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.None);
             AddUntilStep("other controls hidden", () => !designSection.CountdownSettings.IsPresent);
         }
 
@@ -60,12 +65,12 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("turn countdown on", () => designSection.EnableCountdown.Current.Value = true);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.Normal);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.Normal);
             AddUntilStep("other controls shown", () => designSection.CountdownSettings.IsPresent);
 
             AddStep("change countdown speed", () => designSection.CountdownSpeed.Current.Value = CountdownType.DoubleSpeed);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.DoubleSpeed);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.DoubleSpeed);
             AddUntilStep("other controls still shown", () => designSection.CountdownSettings.IsPresent);
         }
 
@@ -74,7 +79,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             AddStep("turn countdown on", () => designSection.EnableCountdown.Current.Value = true);
 
-            AddAssert("beatmap has correct type", () => editorBeatmap.BeatmapInfo.Countdown == CountdownType.Normal);
+            AddAssert("beatmap has correct type", () => editorBeatmap.Countdown == CountdownType.Normal);
 
             checkOffsetAfter("1", 1);
             checkOffsetAfter(string.Empty, 0);
@@ -94,16 +99,16 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("commit text", () => InputManager.Key(Key.Enter));
 
             AddAssert($"displayed value is {expectedFinalValue}", () => designSection.CountdownOffset.Current.Value == expectedFinalValue.ToString(CultureInfo.InvariantCulture));
-            AddAssert($"beatmap value is {expectedFinalValue}", () => editorBeatmap.BeatmapInfo.CountdownOffset == expectedFinalValue);
+            AddAssert($"beatmap value is {expectedFinalValue}", () => editorBeatmap.CountdownOffset == expectedFinalValue);
         }
 
         private partial class TestDesignSection : DesignSection
         {
-            public new LabelledSwitchButton EnableCountdown => base.EnableCountdown;
+            public new FormCheckBox EnableCountdown => base.EnableCountdown;
 
             public new FillFlowContainer CountdownSettings => base.CountdownSettings;
-            public new LabelledEnumDropdown<CountdownType> CountdownSpeed => base.CountdownSpeed;
-            public new LabelledNumberBox CountdownOffset => base.CountdownOffset;
+            public new FormEnumDropdown<CountdownType> CountdownSpeed => base.CountdownSpeed;
+            public new FormTextBox CountdownOffset => base.CountdownOffset;
         }
     }
 }

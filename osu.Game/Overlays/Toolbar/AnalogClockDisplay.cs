@@ -70,8 +70,18 @@ namespace osu.Game.Overlays.Toolbar
 
             float rotation = fraction * 360 - 90;
 
+            // The case where a hand is completing a rotation.
+            // Animate and then move back one full rotation so we don't need to track outside of 0..360
             if (Math.Abs(hand.Rotation - rotation) > 180)
-                hand.RotateTo(rotation);
+            {
+                float animRotation = rotation;
+                while (animRotation < hand.Rotation)
+                    animRotation += 180;
+
+                hand.RotateTo(animRotation, duration, Easing.OutElastic)
+                    .Then()
+                    .RotateTo(rotation);
+            }
             else
                 hand.RotateTo(rotation, duration, Easing.OutElastic);
         }

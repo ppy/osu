@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
@@ -22,17 +23,59 @@ namespace osu.Game.Rulesets.Mania.Scoring
         }
 
         protected override IEnumerable<HitObject> EnumerateHitObjects(IBeatmap beatmap)
-            => base.EnumerateHitObjects(beatmap).OrderBy(ho => ho, JudgementOrderComparer.DEFAULT);
+            => base.EnumerateHitObjects(beatmap).Order(JudgementOrderComparer.DEFAULT);
 
         protected override double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
-            return 10000 * comboProgress
-                   + 990000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * accuracyProgress
+            return 150000 * comboProgress
+                   + 850000 * Math.Pow(Accuracy.Value, 2 + 2 * Accuracy.Value) * accuracyProgress
                    + bonusPortion;
         }
 
         protected override double GetComboScoreChange(JudgementResult result)
-            => Judgement.ToNumericResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+        {
+            return getBaseComboScoreForResult(result.Type) * Math.Min(Math.Max(0.5, Math.Log(result.ComboAfterJudgement, combo_base)), Math.Log(400, combo_base));
+        }
+
+        public override int GetBaseScoreForResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Perfect:
+                    return 305;
+            }
+
+            return base.GetBaseScoreForResult(result);
+        }
+
+        private int getBaseComboScoreForResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Perfect:
+                    return 300;
+            }
+
+            return GetBaseScoreForResult(result);
+        }
+
+        public override ScoreRank RankFromScore(double accuracy, IReadOnlyDictionary<HitResult, int> results)
+        {
+            ScoreRank rank = base.RankFromScore(accuracy, results);
+
+            if (rank != ScoreRank.S)
+                return rank;
+
+            // SS is expected as long as all hitobjects have been hit with either a GREAT or PERFECT result.
+
+            bool anyImperfect =
+                results.GetValueOrDefault(HitResult.Good) > 0
+                || results.GetValueOrDefault(HitResult.Ok) > 0
+                || results.GetValueOrDefault(HitResult.Meh) > 0
+                || results.GetValueOrDefault(HitResult.Miss) > 0;
+
+            return anyImperfect ? rank : ScoreRank.X;
+        }
 
         private class JudgementOrderComparer : IComparer<HitObject>
         {

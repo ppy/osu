@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -152,6 +153,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             newPreview.IsChosen.Value = applyNewButton.IsHovered;
         }
 
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Action == GlobalAction.Select && !e.Repeat)
+            {
+                applyNew();
+                return true;
+            }
+
+            return base.OnPressed(e);
+        }
+
         private partial class ConflictingKeyBindingPreview : CompositeDrawable
         {
             private readonly object action;
@@ -189,11 +201,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background5
-                        },
+                        new FormControlBackground(),
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -208,10 +216,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             {
                                 new Drawable[]
                                 {
-                                    new OsuSpriteText
+                                    new FormFieldCaption
                                     {
-                                        Text = action.GetLocalisableDescription(),
-                                        Margin = new MarginPadding(7.5f),
+                                        Caption = action.GetLocalisableDescription(),
+                                        Margin = new MarginPadding(9),
                                     },
                                     new Container
                                     {
@@ -228,13 +236,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                                 RelativeSizeAxes = Axes.Both,
                                                 Colour = colourProvider.Background6
                                             },
-                                            Empty().With(d => d.Width = 80), // poor man's min-width
+                                            Empty().With(d => d.Width = 60), // poor man's min-width
                                             newBindingText = new OsuSpriteText
                                             {
-                                                Font = OsuFont.Numeric.With(size: 10),
+                                                Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding(5),
                                                 Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre
+                                                Origin = Anchor.Centre,
                                             }
                                         }
                                     },
@@ -277,7 +285,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (LocalisableString.IsNullOrEmpty(keyCombinationText))
                     keyCombinationText = InputSettingsStrings.ActionHasNoKeyBinding;
 
-                newBindingText.Text = keyCombinationText;
+                newBindingText.Text = keyCombinationText.ToUpper();
             }
         }
 

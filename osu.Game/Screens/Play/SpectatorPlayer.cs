@@ -1,19 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
-using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
@@ -21,13 +20,13 @@ namespace osu.Game.Screens.Play
     public abstract partial class SpectatorPlayer : Player
     {
         [Resolved]
-        protected SpectatorClient SpectatorClient { get; private set; }
+        protected SpectatorClient SpectatorClient { get; private set; } = null!;
 
         private readonly Score score;
 
-        protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
+        public bool ShowSettingsOverlay { get; init; } = true;
 
-        protected SpectatorPlayer(Score score, PlayerConfiguration configuration = null)
+        protected SpectatorPlayer(Score score, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.score = score;
@@ -36,14 +35,27 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new OsuSpriteText
+            if (ShowSettingsOverlay && GameplayClockContainer != null)
             {
-                Text = $"Watching {score.ScoreInfo.User.Username} playing live!",
-                Font = OsuFont.Default.With(size: 30),
-                Y = 100,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            });
+                var replayOverlay = new ReplayOverlay();
+                GameplayClockContainer.Add(replayOverlay);
+
+                // TODO: This should be customised for `MultiplayerSpectatorPlayer` to be static and only show the player name.
+                // Or maybe we should completely redesign this to show the user avatar and other things if that happens.
+                OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
+                message.AddText("Watching ");
+                message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                message.AddText(" play ");
+                message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+                message.AddText(" live", s => s.Font = s.Font.With(weight: FontWeight.Bold));
+
+                replayOverlay.SetMessage(new ScrollingMessage(message)
+                {
+                    Y = 96,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -84,8 +96,7 @@ namespace osu.Game.Screens.Play
 
             foreach (var frame in bundle.Frames)
             {
-                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame();
-                Debug.Assert(convertibleFrame != null);
+                IConvertibleReplayFrame convertibleFrame = GameplayState.Ruleset.CreateConvertibleReplayFrame()!;
                 convertibleFrame.FromLegacy(frame, GameplayState.Beatmap);
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
@@ -120,7 +131,7 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (SpectatorClient != null)
+            if (SpectatorClient.IsNotNull())
                 SpectatorClient.OnNewFrames -= userSentFrames;
         }
     }

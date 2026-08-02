@@ -45,5 +45,19 @@ namespace osu.Game.Rulesets.Mania.Tests
             AssertBeatmapLookup(expected_sample);
             AssertNoLookup(unwanted_sample);
         }
+
+        [Test]
+        public void TestConvertHitObjectCustomSampleBank()
+        {
+            const string beatmap_sample = "normal-hitwhistle2";
+            const string user_skin_sample = "normal-hitnormal";
+
+            SetupSkins(beatmap_sample, user_skin_sample);
+
+            CreateTestWithBeatmap("convert-beatmap-custom-sample-bank.osu");
+
+            AssertBeatmapLookup(beatmap_sample);
+            AssertUserLookup(user_skin_sample);
+        }
     }
 }

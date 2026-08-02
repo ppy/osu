@@ -38,6 +38,9 @@ namespace osu.Game.Overlays.Notifications
 
         /// <summary>
         /// The function to post completion notifications back to.
+        ///
+        /// If not set, it will be assumed by <see cref="NotificationOverlay"/> when posting.
+        /// If set, it will override <see cref="NotificationOverlay"/>'s handling.
         /// </summary>
         public Action<Notification>? CompletionTarget { get; set; }
 
@@ -54,7 +57,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 text = value;
-                Schedule(() => textDrawable.Text = text);
+                Scheduler.AddOnce(t => textDrawable.Text = t, text);
             }
         }
 
@@ -191,8 +194,6 @@ namespace osu.Game.Overlays.Notifications
 
         public override bool DisplayOnTop => false;
 
-        public override bool IsImportant => false;
-
         private readonly ProgressBar progressBar;
         private Color4 colourQueued;
         private Color4 colourActive;
@@ -206,6 +207,8 @@ namespace osu.Game.Overlays.Notifications
 
         public ProgressNotification()
         {
+            IsImportant = false;
+
             Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14, weight: FontWeight.Medium))
             {
                 AutoSizeAxes = Axes.Y,
@@ -250,6 +253,14 @@ namespace osu.Game.Overlays.Notifications
             });
 
             cancelSample = audioManager.Samples.Get(@"UI/notification-cancel");
+        }
+
+        public void CompleteSilently()
+        {
+            // This sequence allows the notification to be immediately dismissed without posting a continuation message.
+            CompletionTarget = _ => { };
+            State = ProgressNotificationState.Completed;
+            Close(false);
         }
 
         public override void Close(bool runFlingAnimation)

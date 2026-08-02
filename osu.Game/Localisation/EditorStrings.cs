@@ -10,9 +10,19 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Editor";
 
         /// <summary>
+        /// "Beatmap editor"
+        /// </summary>
+        public static LocalisableString BeatmapEditor => new TranslatableString(getKey(@"beatmap_editor"), @"Beatmap editor");
+
+        /// <summary>
         /// "Waveform opacity"
         /// </summary>
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
+
+        /// <summary>
+        /// "Show storyboard"
+        /// </summary>
+        public static LocalisableString ShowStoryboard => new TranslatableString(getKey(@"show_storyboard"), @"Show storyboard");
 
         /// <summary>
         /// "Show hit markers"
@@ -35,6 +45,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
+        /// "Snap all notes to current snap divisor"
+        /// </summary>
+        public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor");
+
+        /// <summary>
+        /// "Move already placed objects when changing timing"
+        /// </summary>
+        public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
+
+        /// <summary>
         /// "For editing (.olz)"
         /// </summary>
         public static LocalisableString ExportForEditing => new TranslatableString(getKey(@"export_for_editing"), @"For editing (.olz)");
@@ -43,6 +63,11 @@ namespace osu.Game.Localisation
         /// "For compatibility (.osz)"
         /// </summary>
         public static LocalisableString ExportForCompatibility => new TranslatableString(getKey(@"export_for_compatibility"), @"For compatibility (.osz)");
+
+        /// <summary>
+        /// "Guest difficulty (.osu)"
+        /// </summary>
+        public static LocalisableString ExportGuestDifficulty => new TranslatableString(getKey(@"export_guest_difficulty"), @"Guest difficulty (.osu)");
 
         /// <summary>
         /// "Create new difficulty"
@@ -58,6 +83,16 @@ namespace osu.Game.Localisation
         /// "Delete difficulty"
         /// </summary>
         public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
+
+        /// <summary>
+        /// "Edit externally"
+        /// </summary>
+        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally");
+
+        /// <summary>
+        /// "Submit beatmap"
+        /// </summary>
+        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap");
 
         /// <summary>
         /// "setup"
@@ -95,16 +130,6 @@ namespace osu.Game.Localisation
         public static LocalisableString TestBeatmap => new TranslatableString(getKey(@"test_beatmap"), @"Test!");
 
         /// <summary>
-        /// "Waveform"
-        /// </summary>
-        public static LocalisableString TimelineWaveform => new TranslatableString(getKey(@"timeline_waveform"), @"Waveform");
-
-        /// <summary>
-        /// "Ticks"
-        /// </summary>
-        public static LocalisableString TimelineTicks => new TranslatableString(getKey(@"timeline_ticks"), @"Ticks");
-
-        /// <summary>
         /// "{0:0}&#176;"
         /// </summary>
         public static LocalisableString RotationUnsnapped(float newRotation) => new TranslatableString(getKey(@"rotation_unsnapped"), @"{0:0}°", newRotation);
@@ -118,6 +143,171 @@ namespace osu.Game.Localisation
         /// "Limit distance snap placement to current time"
         /// </summary>
         public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
+
+        /// <summary>
+        /// "Contract sidebars when not hovered"
+        /// </summary>
+        public static LocalisableString ContractSidebars => new TranslatableString(getKey(@"contract_sidebars"), @"Contract sidebars when not hovered");
+
+        /// <summary>
+        /// "Must be in edit mode to handle editor links"
+        /// </summary>
+        public static LocalisableString MustBeInEditorToHandleLinks => new TranslatableString(getKey(@"must_be_in_editor_to_handle_links"), @"Must be in edit mode to handle editor links");
+
+        /// <summary>
+        /// "Failed to parse editor link"
+        /// </summary>
+        public static LocalisableString FailedToParseEditorLink => new TranslatableString(getKey(@"failed_to_parse_edtior_link"), @"Failed to parse editor link");
+
+        /// <summary>
+        /// "Timeline"
+        /// </summary>
+        public static LocalisableString Timeline => new TranslatableString(getKey(@"timeline"), @"Timeline");
+
+        /// <summary>
+        /// "Show timing changes"
+        /// </summary>
+        public static LocalisableString TimelineShowTimingChanges => new TranslatableString(getKey(@"timeline_show_timing_changes"), @"Show timing changes");
+
+        /// <summary>
+        /// "Finish editing and import changes"
+        /// </summary>
+        public static LocalisableString FinishEditingExternally => new TranslatableString(getKey(@"Finish editing and import changes"), @"Finish editing and import changes");
+
+        /// <summary>
+        /// "Show breaks"
+        /// </summary>
+        public static LocalisableString TimelineShowBreaks => new TranslatableString(getKey(@"timeline_show_breaks"), @"Show breaks");
+
+        /// <summary>
+        /// "Show ticks"
+        /// </summary>
+        public static LocalisableString TimelineShowTicks => new TranslatableString(getKey(@"timeline_show_ticks"), @"Show ticks");
+
+        /// <summary>
+        /// "Bookmarks"
+        /// </summary>
+        public static LocalisableString Bookmarks => new TranslatableString(getKey(@"bookmarks"), @"Bookmarks");
+
+        /// <summary>
+        /// "Add bookmark"
+        /// </summary>
+        public static LocalisableString AddBookmark => new TranslatableString(getKey(@"add_bookmark"), @"Add bookmark");
+
+        /// <summary>
+        /// "Remove closest bookmark"
+        /// </summary>
+        public static LocalisableString RemoveClosestBookmark => new TranslatableString(getKey(@"remove_closest_bookmark"), @"Remove closest bookmark");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString SeekToPreviousBookmark => new TranslatableString(getKey(@"seek_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString SeekToNextBookmark => new TranslatableString(getKey(@"seek_to_next_bookmark"), @"Seek to next bookmark");
+
+        /// <summary>
+        /// "Reset bookmarks"
+        /// </summary>
+        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
+
+        /// <summary>
+        /// "Open beatmap info page"
+        /// </summary>
+        public static LocalisableString OpenInfoPage => new TranslatableString(getKey(@"open_info_page"), @"Open beatmap info page");
+
+        /// <summary>
+        /// "Open beatmap discussion page"
+        /// </summary>
+        public static LocalisableString OpenDiscussionPage => new TranslatableString(getKey(@"open_discussion_page"), @"Open beatmap discussion page");
+
+        /// <summary>
+        /// "Current difficulty"
+        /// </summary>
+        public static LocalisableString CheckCurrentDifficulty => new TranslatableString(getKey(@"check_current_difficulty"), @"Current difficulty");
+
+        /// <summary>
+        /// "Entire beatmap set"
+        /// </summary>
+        public static LocalisableString CheckEntireBeatmapSet => new TranslatableString(getKey(@"check_entire_beatmap_set"), @"Entire beatmap set");
+
+        /// <summary>
+        /// "Saving is not supported for this ruleset yet, sorry!"
+        /// </summary>
+        public static LocalisableString RulesetNotSupportSaving => new TranslatableString(getKey(@"ruleset_not_support_saving"), @"Saving is not supported for this ruleset yet, sorry!");
+
+        /// <summary>
+        /// "Export failed!"
+        /// </summary>
+        public static LocalisableString ExportFailed => new TranslatableString(getKey(@"export_failed"), @"Export failed!");
+
+        /// <summary>
+        /// "Import failed!"
+        /// </summary>
+        public static LocalisableString ImportFailed => new TranslatableString(getKey(@"import_failed"), @"Import failed!");
+
+        /// <summary>
+        /// "Open folder"
+        /// </summary>
+        public static LocalisableString OpenFolder => new TranslatableString(getKey(@"open_folder"), @"Open folder");
+
+        /// <summary>
+        /// "Cleaning up..."
+        /// </summary>
+        public static LocalisableString ExternalEditCleaningUp => new TranslatableString(getKey(@"external_edit_cleaning_up"), @"Cleaning up...");
+
+        /// <summary>
+        /// "Exporting for edit..."
+        /// </summary>
+        public static LocalisableString ExternalEditExporting => new TranslatableString(getKey(@"external_edit_exporting"), @"Exporting for edit...");
+
+        /// <summary>
+        /// "Beatmap is mounted externally"
+        /// </summary>
+        public static LocalisableString BeatmapMountedExternally => new TranslatableString(getKey(@"beatmap_mounted_externally"), @"Beatmap is mounted externally");
+
+        /// <summary>
+        /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
+        /// </summary>
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+
+        /// <summary>
+        /// "New combo"
+        /// </summary>
+        public static LocalisableString NewCombo => new TranslatableString(getKey(@"new_combo"), @"New combo");
+
+        /// <summary>
+        /// "Bank"
+        /// </summary>
+        public static LocalisableString Bank => new TranslatableString(getKey(@"bank"), @"Bank");
+
+        /// <summary>
+        /// "Normal bank"
+        /// </summary>
+        public static LocalisableString NormalBank => new TranslatableString(getKey(@"normal_bank"), @"Normal bank");
+
+        /// <summary>
+        /// "Addition bank"
+        /// </summary>
+        public static LocalisableString AdditionBank => new TranslatableString(getKey(@"addition_bank"), @"Addition bank");
+
+        /// <summary>
+        /// "Volume"
+        /// </summary>
+        public static LocalisableString SampleVolume => new TranslatableString(getKey(@"sample_volume"), @"Volume");
+
+        /// <summary>
+        /// "Sample"
+        /// </summary>
+        public static LocalisableString Sample => new TranslatableString(getKey(@"sample"), @"Sample");
+
+        /// <summary>
+        /// "Sample set"
+        /// </summary>
+        public static LocalisableString SampleSet => new TranslatableString(getKey(@"sample_set"), @"Sample set");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

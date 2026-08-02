@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
     public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
         public override LocalisableString Description => @"Beats fade out before you hit them!";
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(TaikoModColorBlind)).ToArray();
 
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            ApplyNormalVisibilityState(hitObject, state);
+            // intentional no-op
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)

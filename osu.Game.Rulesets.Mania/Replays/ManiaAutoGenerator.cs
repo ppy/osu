@@ -17,28 +17,9 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        private readonly ManiaAction[] columnActions;
-
         public ManiaAutoGenerator(ManiaBeatmap beatmap)
             : base(beatmap)
         {
-            columnActions = new ManiaAction[Beatmap.TotalColumns];
-
-            var normalAction = ManiaAction.Key1;
-            var specialAction = ManiaAction.Special1;
-            int totalCounter = 0;
-
-            foreach (var stage in Beatmap.Stages)
-            {
-                for (int i = 0; i < stage.Columns; i++)
-                {
-                    if (stage.IsSpecialColumn(i))
-                        columnActions[totalCounter] = specialAction++;
-                    else
-                        columnActions[totalCounter] = normalAction++;
-                    totalCounter++;
-                }
-            }
         }
 
         protected override void GenerateFrames()
@@ -57,11 +38,11 @@ namespace osu.Game.Rulesets.Mania.Replays
                     switch (point)
                     {
                         case HitPoint:
-                            actions.Add(columnActions[point.Column]);
+                            actions.Add(ManiaAction.Key1 + point.Column);
                             break;
 
                         case ReleasePoint:
-                            actions.Remove(columnActions[point.Column]);
+                            actions.Remove(ManiaAction.Key1 + point.Column);
                             break;
                     }
                 }
@@ -87,15 +68,22 @@ namespace osu.Game.Rulesets.Mania.Replays
         private double calculateReleaseTime(HitObject currentObject, HitObject? nextObject)
         {
             double endTime = currentObject.GetEndTime();
+            double releaseDelay = RELEASE_DELAY;
 
-            if (currentObject is HoldNote)
-                // hold note releases must be timed exactly.
-                return endTime;
+            if (currentObject is HoldNote hold)
+            {
+                if (hold.Duration > 0)
+                    // hold note releases must be timed exactly.
+                    return endTime;
+
+                // Special case for super short hold notes
+                releaseDelay = 1;
+            }
 
             bool canDelayKeyUpFully = nextObject == null ||
-                                      nextObject.StartTime > endTime + RELEASE_DELAY;
+                                      nextObject.StartTime > endTime + releaseDelay;
 
-            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject.AsNonNull().StartTime - endTime) * 0.9);
+            return endTime + (canDelayKeyUpFully ? releaseDelay : (nextObject.AsNonNull().StartTime - endTime) * 0.9);
         }
 
         protected override HitObject? GetNextObject(int currentIndex)

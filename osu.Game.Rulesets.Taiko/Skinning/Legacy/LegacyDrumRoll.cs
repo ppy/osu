@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
@@ -19,14 +20,17 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             get
             {
-                var headDrawQuad = headCircle.ScreenSpaceDrawQuad;
-                var tailDrawQuad = tailCircle.ScreenSpaceDrawQuad;
+                var headCentre = (body.ScreenSpaceDrawQuad.TopLeft + body.ScreenSpaceDrawQuad.BottomLeft) / 2;
+                var tailCentre = (tailCircle.ScreenSpaceDrawQuad.TopLeft + tailCircle.ScreenSpaceDrawQuad.BottomLeft) / 2;
 
-                return new Quad(headDrawQuad.TopLeft, tailDrawQuad.TopRight, headDrawQuad.BottomLeft, tailDrawQuad.BottomRight);
+                float radius = body.ScreenSpaceDrawQuad.Height / 2;
+
+                var rectangle = new RectangleF(headCentre.X, headCentre.Y, tailCentre.X - headCentre.X, 0).Inflate(radius);
+                return new Quad(rectangle.TopLeft, rectangle.TopRight, rectangle.BottomLeft, rectangle.BottomRight);
             }
         }
 
-        private LegacyCirclePiece headCircle = null!;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => ScreenSpaceDrawQuad.Contains(screenSpacePos);
 
         private Sprite body = null!;
 
@@ -54,10 +58,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     RelativeSizeAxes = Axes.Both,
                     Texture = skin.GetTexture("taiko-roll-middle", WrapMode.ClampToEdge, WrapMode.ClampToEdge),
-                },
-                headCircle = new LegacyCirclePiece
-                {
-                    RelativeSizeAxes = Axes.Y,
                 },
             };
 
@@ -90,7 +90,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             var colour = LegacyColourCompatibility.DisallowZeroAlpha(accentColour);
 
-            headCircle.AccentColour = colour;
             body.Colour = colour;
             tailCircle.Colour = colour;
         }

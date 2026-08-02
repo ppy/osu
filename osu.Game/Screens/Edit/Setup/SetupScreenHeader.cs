@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK.Graphics;
@@ -16,7 +17,7 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal partial class SetupScreenHeader : OverlayHeader
     {
-        public SetupScreenHeaderBackground Background { get; private set; } = null!;
+        public SetupScreenBackgroundPreview BackgroundPreview { get; private set; } = null!;
 
         [Resolved]
         private SectionsContainer<SetupSection> sections { get; set; } = null!;
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.Edit.Setup
                         RelativeSizeAxes = Axes.X,
                         Height = 30
                     },
-                    Background = new SetupScreenHeaderBackground
+                    BackgroundPreview = new SetupScreenBackgroundPreview
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 120
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 Title = EditorSetupStrings.BeatmapSetup.ToLower();
                 Description = EditorSetupStrings.BeatmapSetupDescription;
-                IconTexture = "Icons/Hexacons/social";
+                Icon = OsuIcon.Beatmap;
             }
         }
 

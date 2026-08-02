@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Graphics;
 
@@ -12,10 +13,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneBackButton : OsuTestScene
     {
+        private readonly BackButton? button;
+
         public TestSceneBackButton()
         {
-            BackButton button;
-            BackButton.Receptor receptor = new BackButton.Receptor();
+            ScreenFooter.BackReceptor receptor = new ScreenFooter.BackReceptor();
 
             Child = new Container
             {
@@ -33,13 +35,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                     button = new BackButton(receptor)
                     {
+                        Action = () => button?.Hide(),
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                     }
                 }
             };
-
-            button.Action = () => button.Hide();
 
             AddStep("show button", () => button.Show());
             AddStep("hide button", () => button.Hide());

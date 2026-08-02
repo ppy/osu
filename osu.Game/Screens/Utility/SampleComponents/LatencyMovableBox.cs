@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
@@ -55,22 +56,22 @@ namespace osu.Game.Screens.Utility.SampleComponents
                     {
                         case Key.F:
                         case Key.Up:
-                            box.Y = MathHelper.Clamp(box.Y - movementAmount, 0.1f, 0.9f);
+                            box.Y = Math.Clamp(box.Y - movementAmount, 0.1f, 0.9f);
                             break;
 
                         case Key.J:
                         case Key.Down:
-                            box.Y = MathHelper.Clamp(box.Y + movementAmount, 0.1f, 0.9f);
+                            box.Y = Math.Clamp(box.Y + movementAmount, 0.1f, 0.9f);
                             break;
 
                         case Key.Z:
                         case Key.Left:
-                            box.X = MathHelper.Clamp(box.X - movementAmount, 0.1f, 0.9f);
+                            box.X = Math.Clamp(box.X - movementAmount, 0.1f, 0.9f);
                             break;
 
                         case Key.X:
                         case Key.Right:
-                            box.X = MathHelper.Clamp(box.X + movementAmount, 0.1f, 0.9f);
+                            box.X = Math.Clamp(box.X + movementAmount, 0.1f, 0.9f);
                             break;
                     }
                 }

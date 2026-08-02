@@ -1,13 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Screens.Select.Leaderboards;
+using System;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -22,6 +25,7 @@ namespace osu.Game.Overlays.BeatmapSet
             AddItem(BeatmapLeaderboardScope.Global);
             AddItem(BeatmapLeaderboardScope.Country);
             AddItem(BeatmapLeaderboardScope.Friend);
+            AddItem(BeatmapLeaderboardScope.Team);
         }
 
         [BackgroundDependencyLoader]
@@ -36,6 +40,27 @@ namespace osu.Game.Overlays.BeatmapSet
             public ScopeSelectorTabItem(BeatmapLeaderboardScope value)
                 : base(value)
             {
+            }
+
+            protected override LocalisableString CreateText()
+            {
+                switch (Value)
+                {
+                    case BeatmapLeaderboardScope.Global:
+                        return BeatmapsetsStrings.ShowScoreboardGlobal;
+
+                    case BeatmapLeaderboardScope.Country:
+                        return BeatmapsetsStrings.ShowScoreboardCountry;
+
+                    case BeatmapLeaderboardScope.Friend:
+                        return BeatmapsetsStrings.ShowScoreboardFriend;
+
+                    case BeatmapLeaderboardScope.Team:
+                        return BeatmapsetsStrings.ShowScoreboardTeam;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
             protected override bool OnHover(HoverEvent e)
