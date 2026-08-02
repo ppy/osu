@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         int indexInBar = beat % (point.TimeSignature.Numerator * beatDivisor.Value);
 
                         int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
-                        var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
+                        var colour = BindableBeatDivisor.GetDefaultColourFor(divisor, colours);
 
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
 

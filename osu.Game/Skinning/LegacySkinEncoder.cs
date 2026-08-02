@@ -61,6 +61,14 @@ namespace osu.Game.Skinning
                 writeColour(textWriter, FormattableString.Invariant($@"Combo{i + 1}"), customColour, allowTransparency: false);
             }
 
+            writeColour(textWriter, @"SnapDefault", skin.Configuration.CustomTimingColours.ElementAtOrDefault(0));
+            // intentionally starting at 1 as 0 is used for default
+            for (int i = 1; i < LegacyDecoder<SkinConfiguration>.MAX_SNAP_COLOUR_COUNT; i++)
+            {
+                Color4? timingColour = i < skin.Configuration.CustomTimingColours.Count ? skin.Configuration.CustomTimingColours.ElementAtOrDefault(i) : null;
+                writeColour(textWriter, FormattableString.Invariant($@"Snap{i + 1}"), timingColour, allowTransparency: false);
+            }
+
             foreach (string key in skin.Configuration.CustomColours.Keys)
             {
                 Color4? customColour = skin.Configuration.CustomColours.GetValueOrDefault(key);

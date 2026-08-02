@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public partial class TestSceneDrawableJudgement : ManiaSkinnableTestScene
+    public partial class TestSceneDrawableJudgement : ManiaSkinnableTestSceneScrolling
     {
         public TestSceneDrawableJudgement()
         {

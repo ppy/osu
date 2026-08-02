@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
-using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -31,6 +30,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         [Resolved(canBeNull: true)]
         private IBeatmap beatmap { get; set; }
+
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
 
         private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
 
@@ -129,7 +131,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
 
-            Colour = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
+            Colour = configTimingBasedNoteColouring.Value
+                ? skin.GetConfig<SkinTimingColourLookup, Color4>(new SkinTimingColourLookup(snapDivisor)).Value
+                : Color4.White;
+
         }
     }
 }

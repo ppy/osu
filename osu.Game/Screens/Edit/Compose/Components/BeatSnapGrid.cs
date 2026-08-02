@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     timingPoint = nextTimingPoint;
                 }
 
-                Color4 colour = BindableBeatDivisor.GetColourFor(
+                Color4 colour = BindableBeatDivisor.GetDefaultColourFor(
                     BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value), colours);
 
                 foreach (var grid in grids)

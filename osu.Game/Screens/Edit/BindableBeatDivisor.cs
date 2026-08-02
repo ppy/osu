@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="beatDivisor">The beat divisor.</param>
         /// <param name="colours">The set of colours.</param>
         /// <returns>The applicable colour from <paramref name="colours"/> for <paramref name="beatDivisor"/>.</returns>
-        public static Color4 GetColourFor(int beatDivisor, OsuColour colours)
+        public static Color4 GetDefaultColourFor(int beatDivisor, OsuColour colours)
         {
             switch (beatDivisor)
             {
