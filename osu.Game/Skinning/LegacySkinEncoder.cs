@@ -62,6 +62,7 @@ namespace osu.Game.Skinning
             }
 
             writeColour(textWriter, @"SnapDefault", skin.Configuration.CustomTimingColours.ElementAtOrDefault(0));
+
             // intentionally starting at 1 as 0 is used for default
             for (int i = 1; i < LegacyDecoder<SkinConfiguration>.MAX_SNAP_COLOUR_COUNT; i++)
             {

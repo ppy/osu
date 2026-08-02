@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
@@ -25,9 +24,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public partial class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         [Resolved(canBeNull: true)]
         private IBeatmap beatmap { get; set; }
 
@@ -71,11 +67,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             skin.SourceChanged += updateSnapColour;
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
             CurrentSkin.SourceChanged -= updateSnapColour;
         }
+
         protected override void OnApply()
         {
             base.OnApply();
@@ -137,9 +135,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
 
             Colour = configTimingBasedNoteColouring.Value
-                ? skin.GetConfig<SkinTimingColourLookup, Color4>(new SkinTimingColourLookup(snapDivisor)).Value
+                ? skin.GetConfig<SkinTimingColourLookup, Color4>(new SkinTimingColourLookup(snapDivisor))?.Value ?? Color4.White
                 : Color4.White;
-
         }
     }
 }

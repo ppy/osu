@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     /// </summary>
     public abstract partial class ManiaSkinnableTestScene : SkinnableTestScene
     {
-
         [Cached]
         private readonly StageDefinition stage = new StageDefinition(4);
 

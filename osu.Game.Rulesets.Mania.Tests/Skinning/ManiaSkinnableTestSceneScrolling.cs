@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [Cached(Type = typeof(IScrollingInfo))]
         protected readonly TestScrollingInfo ScrollingInfo = new TestScrollingInfo();
 
-        protected ManiaSkinnableTestSceneScrolling() : base()
+        protected ManiaSkinnableTestSceneScrolling()
         {
             ScrollingInfo.Direction.Value = ScrollingDirection.Down;
         }

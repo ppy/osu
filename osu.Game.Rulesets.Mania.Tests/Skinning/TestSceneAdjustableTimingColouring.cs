@@ -23,10 +23,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     [TestFixture]
     public partial class TestSceneAdjustableTimingColouring : ManiaSkinnableTestScene
     {
-
         private Bindable<bool> configTimingBasedNoteColouring = null!;
-
-        private ManualClock clock = null!;
 
         private ManiaBeatmap testBeatmap = null!;
 
@@ -34,22 +31,24 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         private void load()
         {
             testBeatmap = createTestBeatmap();
-            SetContents((skin) =>
+            SetContents(skin =>
             {
                 var drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(testBeatmap);
-                drawableRuleset.Clock = new FramedClock(clock = new ManualClock());
+                drawableRuleset.Clock = new FramedClock(new ManualClock());
 
                 return drawableRuleset;
             });
             var config = (ManiaRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             configTimingBasedNoteColouring = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring);
         }
+
         [Test]
         public void TestColouring()
         {
             AddStep("disable colouring", () => configTimingBasedNoteColouring.Value = false);
             AddStep("enable colouring", () => configTimingBasedNoteColouring.Value = true);
         }
+
         [Test]
         public void TestCustomColouring()
         {
@@ -59,20 +58,24 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
             AddAssert("any notes coloured", () => this.ChildrenOfType<DrawableNote>().Any(note => note.Colour != Colour4.White));
             AddAssert("special-skin colours correct",
                 () => Cell(4).ChildrenOfType<DrawableNote>().All(note =>
-                snapColourIsAccurate(
-                    note.Colour,
-                    testBeatmap.ControlPointInfo.GetClosestBeatDivisor(note.HitObject.StartTime)
-                ))
+                    snapColourIsAccurate(
+                        note.Colour,
+                        testBeatmap.ControlPointInfo.GetClosestBeatDivisor(note.HitObject.StartTime)
+                    )
+                )
             );
         }
+
         private bool snapColourIsAccurate(Color4 color, int divisor)
         {
             switch (divisor)
             {
                 case 1:
                     return color == new Color4(255, 0, 0, 255);
+
                 case 2:
                     return color == new Color4(0, 0, 255, 255);
+
                 case 3:
                     return color == new Color4(0, 255, 0, 255);
 

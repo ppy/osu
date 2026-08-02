@@ -19,10 +19,12 @@ namespace osu.Game.Skinning
 
         public const decimal LATEST_VERSION = 2.7m;
 
-        private OsuColour colours;
+        private readonly OsuColour colours;
 
-        public SkinConfiguration() : this(null)
+        public SkinConfiguration()
+            : this(null)
         { }
+
         public SkinConfiguration(OsuColour? colours)
         {
             this.colours = colours ?? new OsuColour();
@@ -88,10 +90,10 @@ namespace osu.Game.Skinning
         public Color4 GetTimingColourFor(int beatDivisor)
         {
             return CustomTimingColours.ElementAtOrDefault(beatDivisor)
-            // if not specified, use the user-specified default snap colour
-            ?? CustomTimingColours[0]
-            // if not specified, use the normal snap colour
-            ?? BindableBeatDivisor.GetDefaultColourFor(beatDivisor, colours);
+                   // if not specified, use the user-specified default snap colour
+                   ?? CustomTimingColours[0]
+                   // if not specified, use the normal snap colour
+                   ?? BindableBeatDivisor.GetDefaultColourFor(beatDivisor, colours);
         }
     }
 }

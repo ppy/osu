@@ -16,6 +16,7 @@ namespace osu.Game.Beatmaps.Formats
         /// for unspecified indexes.
         /// </summary>
         List<Color4?> CustomTimingColours { get; set; }
+
         /// <summary>
         /// Get the colour corresponding to the specified beat divisor.
         /// </summary>
