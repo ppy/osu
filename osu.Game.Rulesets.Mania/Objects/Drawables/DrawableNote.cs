@@ -68,9 +68,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.LoadComplete();
 
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            skin.SourceChanged += updateSnapColour;
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
-
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            CurrentSkin.SourceChanged -= updateSnapColour;
+        }
         protected override void OnApply()
         {
             base.OnApply();
