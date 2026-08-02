@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override LocalisableString Description => @"What these notes color?";
 
-        public override double ScoreMultiplier => 1.03;
-
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override Type[] IncompatibleMods => new[] { typeof(TaikoModHidden) };
