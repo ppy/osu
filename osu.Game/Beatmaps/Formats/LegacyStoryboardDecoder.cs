@@ -396,19 +396,17 @@ namespace osu.Game.Beatmaps.Formats
         /// <summary>
         /// Decodes any beatmap variables present in a line into their real values.
         /// </summary>
+        /// <remarks>
+        /// Each defined variable is substituted a single time. Storyboard variables are plain text
+        /// substitutions and are not expected to reference other variables, so a single pass resolves
+        /// every well-formed reference. This intentionally avoids repeatedly re-scanning the line,
+        /// which would otherwise never terminate for a self-referential definition (e.g. <c>$a=x$a</c>).
+        /// </remarks>
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
-            while (line.Contains('$'))
-            {
-                string origLine = line;
-
-                foreach (var v in variables)
-                    line = line.Replace(v.Key, v.Value);
-
-                if (line == origLine)
-                    break;
-            }
+            foreach (var v in variables)
+                line = line.Replace(v.Key, v.Value);
         }
     }
 }
