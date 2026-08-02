@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override LocalisableString Description => @"Beats fade out before you hit them!";
 
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(TaikoModColorBlind)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(TaikoModColourBlind)).ToArray();
 
         /// <summary>
         /// How far away from the hit target should hitobjects start to fade out.

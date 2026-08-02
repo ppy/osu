@@ -14,12 +14,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModColorBlind : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<TaikoHitObject>
+    public class TaikoModColourBlind : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<TaikoHitObject>
     {
-        public override string Name => "ColorBlind";
+        public override string Name => "Colour Blind";
         public override string Acronym => "CB";
 
-        public override LocalisableString Description => @"What these notes color?";
+        public override LocalisableString Description => @"What these notes colour?";
 
         public override ModType Type => ModType.DifficultyIncrease;
 

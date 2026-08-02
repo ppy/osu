@@ -6,12 +6,12 @@ using osu.Game.Rulesets.Taiko.Mods;
 
 namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
-    public partial class TestSceneTaikoModColorBlind : TaikoModTestScene
+    public partial class TestSceneTaikoModColourBlind : TaikoModTestScene
     {
         [Test]
-        public void TestColorBlind() => CreateModTest(new ModTestData
+        public void TestColourBlind() => CreateModTest(new ModTestData
         {
-            Mod = new TaikoModColorBlind(),
+            Mod = new TaikoModColourBlind(),
             Autoplay = true,
             PassCondition = () => true,
         });
