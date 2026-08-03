@@ -20,8 +20,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             int index = 0;
 
-            // Make lines the same width independent of display resolution.
-            float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
+            float lineWidth = GetLineWidth();
             float rotation = MathHelper.RadiansToDegrees(MathF.Atan2(step.Y, step.X));
 
             List<Box> generatedLines = new List<Box>();
