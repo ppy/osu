@@ -445,7 +445,7 @@ namespace osu.Game.Rulesets.Osu
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  OsuRulesetStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).Concat([
@@ -457,7 +457,7 @@ namespace osu.Game.Rulesets.Osu
             // HP drain is thankfully simple enough.
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
             {
-                Description = OsuRulesetStrings.HPDrainDescription
+                Description = SongSelectStrings.HPDrainDescription
             };
         }
 

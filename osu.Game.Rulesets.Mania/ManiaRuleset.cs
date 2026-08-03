@@ -15,7 +15,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Localisation.Mania;
-using osu.Game.Localisation.Osu;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -477,7 +476,7 @@ namespace osu.Game.Rulesets.Mania
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  OsuRulesetStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).ToArray()
@@ -485,7 +484,7 @@ namespace osu.Game.Rulesets.Mania
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
             {
-                Description = OsuRulesetStrings.HPDrainDescription
+                Description = SongSelectStrings.HPDrainDescription
             };
         }
 

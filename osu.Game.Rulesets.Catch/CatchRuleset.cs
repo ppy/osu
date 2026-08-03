@@ -315,7 +315,7 @@ namespace osu.Game.Rulesets.Catch
             };
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
             {
-                Description = OsuRulesetStrings.HPDrainDescription
+                Description = SongSelectStrings.HPDrainDescription
             };
         }
 
