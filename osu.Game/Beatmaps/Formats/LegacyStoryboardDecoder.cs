@@ -402,6 +402,7 @@ namespace osu.Game.Beatmaps.Formats
         /// every well-formed reference. This intentionally avoids repeatedly re-scanning the line,
         /// which would otherwise never terminate for a self-referential definition (e.g. <c>$a=x$a</c>).
         /// </remarks>
+        /// <seealso href="https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1105-L1110"/>
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
