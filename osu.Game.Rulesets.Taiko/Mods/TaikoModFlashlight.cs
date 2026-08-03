@@ -25,25 +25,25 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override float DefaultFlashlightSize => 200;
 
-        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, Playfield);
+        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, DrawableRuleset);
 
-        protected TaikoPlayfield Playfield { get; private set; } = null!;
+        protected DrawableTaikoRuleset DrawableRuleset { get; private set; } = null!;
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            Playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            DrawableRuleset = (DrawableTaikoRuleset)drawableRuleset;
             base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
         public partial class TaikoFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
-            private readonly TaikoPlayfield taikoPlayfield;
+            private readonly DrawableTaikoRuleset drawableRuleset;
 
-            public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
+            public TaikoFlashlight(TaikoModFlashlight modFlashlight, DrawableTaikoRuleset drawableRuleset)
                 : base(modFlashlight)
             {
-                this.taikoPlayfield = taikoPlayfield;
+                this.drawableRuleset = drawableRuleset;
 
                 FlashlightSize = new Vector2(0, GetSize());
                 FlashlightSmoothness = 1.4f;
@@ -64,7 +64,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 if (!flashlightProperties.IsValid)
                 {
-                    FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
+                    // https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameModes/Play/Rulesets/Taiko/RulesetTaiko.cs#L480-L481
+                    // 1.6f is "magic factor" for matching stable positioning specs, see `OsuPlayfieldAdjustmentContainer` et al.
+                    // the final factor is attempting to compensate for the aspect ratio clamping logic in `TaikoPlayfieldAdjustmentContainer`
+                    // such that it does not change the visible range of objects.
+                    FlashlightPosition = new Vector2(208 * 1.6f * drawableRuleset.PlayfieldAdjustmentContainer.Scale.X);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
                     FlashlightSize = new Vector2(0, GetSize());

@@ -23,7 +23,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private static IEnumerable<string> allIniFiles = resource_store.GetAvailableResources().Where(res => res.EndsWith(".ini", StringComparison.Ordinal));
 
         [TestCaseSource(nameof(allIniFiles))]
-        public void TestEncodeDecodeStability(string name)
+        public void TestEncodeDecodeStability(string name) => runEncodeDecodeStabilityCheck(name);
+
+        [TestCaseSource(nameof(allIniFiles))]
+        [SetCulture("pl-PL")]
+        public void TestCultureInvariance(string name) => runEncodeDecodeStabilityCheck(name);
+
+        private void runEncodeDecodeStabilityCheck(string name)
         {
             using var sourceStream = resource_store.GetStream(name);
 

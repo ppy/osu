@@ -1129,7 +1129,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("editing disallowed", () => !this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().UserStyleEditingEnabled);
             AddStep("import beatmap", () => beatmaps.Import(roomBeatmap.BeatmapInfo.BeatmapSet!));
-            AddAssert("editing allowed", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().UserStyleEditingEnabled);
+            AddUntilStep("editing allowed", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().UserStyleEditingEnabled);
         }
 
         /// <summary>

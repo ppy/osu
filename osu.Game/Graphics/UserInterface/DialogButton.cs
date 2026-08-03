@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;
 
-        private const float hover_duration = 300;
+        private const float hover_duration = 400;
         private const float click_duration = 200;
 
         public event Action<SelectionState>? StateChanged;
@@ -47,12 +47,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected readonly Container ColourContainer;
 
-        private readonly Container backgroundContainer;
         private readonly Container glowContainer;
         private readonly Box leftGlow;
         private readonly Box centerGlow;
         private readonly Box rightGlow;
-        private readonly Box background;
         private readonly SpriteText spriteText;
         private Vector2 hoverSpacing => new Vector2(1.4f, 0f);
 
@@ -63,23 +61,13 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                backgroundContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 1f,
-                    Children = new Drawable[]
-                    {
-                        background = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = backgroundColour,
-                        },
-                    },
-                },
                 glowContainer = new Container
                 {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Width = 1f,
+                    Shear = OsuGame.SHEAR,
+                    Width = idle_width,
                     Alpha = 0f,
                     Children = new Drawable[]
                     {
@@ -116,17 +104,17 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         ColourContainer = new Container
                         {
+                            CornerRadius = 5,
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             Width = idle_width,
                             Masking = true,
-                            MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
-                                Radius = 5,
+                                Colour = Color4.Black.Opacity(0.05f),
+                                Radius = 6,
                             },
                             Colour = ButtonColour,
                             Shear = OsuGame.SHEAR,
@@ -144,11 +132,12 @@ namespace osu.Game.Graphics.UserInterface
                                     MaskingSmoothness = 0,
                                     Children = new[]
                                     {
-                                        new Triangles
+                                        new TrianglesV2
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            TriangleScale = 4,
-                                            ColourDark = OsuColour.Gray(0.88f),
+                                            Alpha = 0.1f,
+                                            Velocity = 0.7f,
+                                            Blending = BlendingParameters.Additive,
                                             Shear = -OsuGame.SHEAR,
                                             ClampAxes = Axes.Y
                                         },
@@ -188,18 +177,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private Color4 backgroundColour = OsuColour.Gray(34);
-
-        public Color4 BackgroundColour
-        {
-            get => backgroundColour;
-            set
-            {
-                backgroundColour = value;
-                background.Colour = value;
-            }
-        }
-
         private LocalisableString text;
 
         public LocalisableString Text
@@ -217,8 +194,6 @@ namespace osu.Game.Graphics.UserInterface
             get => spriteText.Font.Size;
             set => spriteText.Font = spriteText.Font.With(size: value);
         }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
 
         private bool clickAnimating;
 
@@ -281,13 +256,18 @@ namespace osu.Game.Graphics.UserInterface
             if (newState == SelectionState.Selected)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutQuint);
+                spriteText.ScaleTo(1.02f, hover_duration, Easing.OutQuint);
                 ColourContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutQuint);
+                glowContainer.ResizeWidthTo(hover_width * 1.08f, hover_duration, Easing.OutQuint);
                 glowContainer.FadeIn(hover_duration, Easing.OutQuint);
             }
             else
             {
                 ColourContainer.ResizeWidthTo(idle_width, hover_duration / 2, Easing.OutQuint);
+                glowContainer.ResizeWidthTo(idle_width * 1.08f, hover_duration, Easing.OutQuint);
+
                 spriteText.TransformSpacingTo(Vector2.Zero, hover_duration / 2, Easing.OutQuint);
+                spriteText.ScaleTo(1, hover_duration / 2, Easing.OutQuint);
                 glowContainer.FadeOut(hover_duration / 2, Easing.OutQuint);
             }
         }
