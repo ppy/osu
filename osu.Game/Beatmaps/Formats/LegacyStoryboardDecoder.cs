@@ -406,6 +406,9 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
+            if (!line.Contains('$'))
+                return;
+
             foreach (var v in variables)
                 line = line.Replace(v.Key, v.Value);
         }
