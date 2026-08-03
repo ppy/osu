@@ -10,7 +10,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -243,17 +242,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox.HandleDrag(lastDragEvent);
                 UpdateSelectionFromDragBox(selectionBeforeDrag);
             }
-
-            if (!blueprintsPending.IsValid)
-            {
-                SelectionBlueprints.AddRange(blueprintsToAdd);
-                blueprintsToAdd.Clear();
-
-                SelectionBlueprints.RemoveRange(blueprintsToRemove, true);
-                blueprintsToRemove.Clear();
-
-                blueprintsPending.Validate();
-            }
         }
 
         /// <summary>
@@ -323,10 +311,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Blueprint Addition/Removal
 
-        private readonly Cached blueprintsPending = new Cached();
-        private readonly List<SelectionBlueprint<T>> blueprintsToAdd = new List<SelectionBlueprint<T>>();
-        private readonly List<SelectionBlueprint<T>> blueprintsToRemove = new List<SelectionBlueprint<T>>();
-
         protected virtual void AddBlueprintFor(T item)
         {
             if (blueprintMap.ContainsKey(item))
@@ -341,8 +325,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected += OnBlueprintSelected;
             blueprint.Deselected += OnBlueprintDeselected;
 
-            blueprintsToAdd.Add(blueprint);
-            blueprintsPending.Invalidate();
+            SelectionBlueprints.Add(blueprint);
 
             if (SelectionHandler.SelectedItems.Contains(item))
                 blueprint.Select();
@@ -359,8 +342,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprintToRemove.Selected -= OnBlueprintSelected;
             blueprintToRemove.Deselected -= OnBlueprintDeselected;
 
-            blueprintsToRemove.Add(blueprintToRemove);
-            blueprintsPending.Invalidate();
+            SelectionBlueprints.Remove(blueprintToRemove, true);
 
             if (movementBlueprints?.Any(m => m.blueprint == blueprintToRemove) == true)
                 finishSelectionMovement();
