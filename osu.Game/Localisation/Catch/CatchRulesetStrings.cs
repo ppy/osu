@@ -15,6 +15,11 @@ namespace osu.Game.Localisation.Catch
         public static LocalisableString CircleSizeDescription => new TranslatableString(getKey(@"circle_size_description"), @"Affects the size of fruits.");
 
         /// <summary>
+        /// "Fruit radius"
+        /// </summary>
+        public static LocalisableString FruitRadius => new TranslatableString(getKey(@"fruit_radius"), @"Fruit radius");
+
+        /// <summary>
         /// "Affects how early fruits fade in on the screen."
         /// </summary>
         public static LocalisableString ApproachRateDescription => new TranslatableString(getKey(@"approach_rate_description"), @"Affects how early fruits fade in on the screen.");

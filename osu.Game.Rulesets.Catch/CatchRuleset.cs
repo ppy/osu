@@ -14,7 +14,6 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Localisation.Catch;
-using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
@@ -302,7 +301,7 @@ namespace osu.Game.Rulesets.Catch
                 Description = CatchRulesetStrings.CircleSizeDescription,
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.HitCircleRadius, (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("0.#"))
+                    new RulesetBeatmapAttribute.AdditionalMetric(CatchRulesetStrings.FruitRadius, (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("0.#"))
                 ]
             };
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
