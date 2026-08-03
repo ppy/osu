@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
 
             postLocalUserMessage("this is a message from the local user");
-            postOpponentMessage("this is a message from the opponent");
+            postOpponentMessage("this is a message from the opponent. your opponent has a lot to say about you. nice stuff, of course. they see your potential in this game and want to shower you with compliments.");
         }
 
         [Test]

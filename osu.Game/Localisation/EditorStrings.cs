@@ -140,9 +140,9 @@ namespace osu.Game.Localisation
         public static LocalisableString RotationSnapped(float newRotation) => new TranslatableString(getKey(@"rotation_snapped"), @"{0:0}° (snapped)", newRotation);
 
         /// <summary>
-        /// "Limit distance snap placement to current time"
+        /// "Limit placement to current time"
         /// </summary>
-        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
+        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limit_placement_to_current_time"), @"Limit placement to current time");
 
         /// <summary>
         /// "Contract sidebars when not hovered"

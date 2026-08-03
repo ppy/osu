@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
@@ -32,6 +34,29 @@ namespace osu.Game.Rulesets.Mania.Edit
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
+        }
+
+        private Bindable<bool> limitPlacementToCurrentTime = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            limitPlacementToCurrentTime = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
+        }
+
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        {
+            if (limitPlacementToCurrentTime.Value
+                && BlueprintContainer.CurrentHitObjectPlacement?.PlacementActive == PlacementBlueprint.PlacementState.Waiting)
+            {
+                if (PlayfieldAtScreenSpacePosition(screenSpacePosition) is ScrollingPlayfield playfield)
+                {
+                    double time = BeatSnapProvider.SnapTime(EditorClock.CurrentTime);
+                    return base.FindSnappedPositionAndTime(playfield.ScreenSpacePositionAtTime(time));
+                }
+            }
+
+            return base.FindSnappedPositionAndTime(screenSpacePosition);
         }
 
         public new ManiaPlayfield Playfield => drawableRuleset.Playfield;

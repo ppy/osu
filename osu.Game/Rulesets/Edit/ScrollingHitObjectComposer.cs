@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        public SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        public virtual SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
         {
             var scrollingPlayfield = PlayfieldAtScreenSpacePosition(screenSpacePosition) as ScrollingPlayfield;
             if (scrollingPlayfield == null)

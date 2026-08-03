@@ -436,6 +436,9 @@ namespace osu.Game.Screens.Select
             {
                 var beatmap = (BeatmapInfo)item.Model;
 
+                if (string.IsNullOrEmpty(beatmap.MD5Hash))
+                    continue;
+
                 // as a side note, even reading the `MD5Hash` off a realm model is slow if done enough times,
                 // so it definitely helps that thanks to the mapping it needs to only be retrieved once
                 if (md5ToCollectionsMap.TryGetValue(beatmap.MD5Hash, out var collections))

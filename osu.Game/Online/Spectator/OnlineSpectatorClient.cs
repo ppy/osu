@@ -62,7 +62,7 @@ namespace osu.Game.Online.Spectator
 
             try
             {
-                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySession), scoreToken, state).ConfigureAwait(false);
+                await connection.InvokeAsync(nameof(ISpectatorServer.BeginPlaySessionV2), scoreToken, state).ConfigureAwait(false);
                 return true;
             }
             catch (Exception exception)
@@ -83,24 +83,24 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        protected override Task SendFramesInternal(FrameDataBundle bundle)
+        protected override Task SendFramesInternal(long? scoreToken, FrameDataBundle bundle)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
+            return connection.SendAsync(nameof(ISpectatorServer.SendFrameDataV2), scoreToken, bundle);
         }
 
-        protected override Task EndPlayingInternal(SpectatorState state)
+        protected override Task EndPlayingInternal(long? scoreToken, SpectatedUserState finalState)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             Debug.Assert(connection != null);
 
-            return connection.InvokeAsync(nameof(ISpectatorServer.EndPlaySession), state);
+            return connection.InvokeAsync(nameof(ISpectatorServer.EndPlaySessionV2), scoreToken, finalState);
         }
 
         protected override Task WatchUserInternal(int userId)

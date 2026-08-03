@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Dialog
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
-                            Padding = new MarginPadding { Vertical = 60 },
+                            Padding = new MarginPadding { Top = 60, Bottom = 30 },
                             Children = new Drawable[]
                             {
                                 new Container
@@ -237,6 +237,7 @@ namespace osu.Game.Overlays.Dialog
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(5),
                                     Padding = new MarginPadding { Top = 30 },
                                 },
                             },

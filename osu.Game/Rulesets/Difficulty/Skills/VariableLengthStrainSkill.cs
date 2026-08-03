@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -36,10 +37,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         /// <summary>
         /// The number of `MaxSectionLength` sections calculated such that enough of the difficulty value is preserved.
-        /// WARNING: This should be overridden if strains are ever used outside of <see cref="Skill.DifficultyValue"/>,
-        /// or if <see cref="Skill.DifficultyValue"/> is overridden to not use the default geometric sum. This should be removed
-        /// in the future when a better memory-saving technique is implemented.
         /// </summary>
+        /// <remarks>
+        /// This variable operates under the assumption that final difficulty calculation uses a standard geometric sum,
+        /// and that <see cref="strainPeaks"/> is not required for any other purpose
+        /// </remarks>
         private readonly double maxStoredLength;
 
         private readonly List<StrainPeak> strainPeaks = new List<StrainPeak>();
@@ -240,7 +242,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 return ObjectDifficulties.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectDifficulties.Sum(s => 1.1 / (1 + Math.Exp(-10 * (s / consistentTopStrain - 0.88))));
+            return ObjectDifficulties.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
 
         /// <summary>
