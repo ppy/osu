@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
@@ -51,9 +52,17 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 AddLayout(flashlightProperties);
             }
 
+            // as per https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameModes/Play/Rulesets/Ruleset.cs#L532-L535,
+            // stable's animation speed is 0.1 "units" per 1 frame at 60 fps
+            // converting to local units here, this is:
+            // (0.1 / 3.2) * (1 / 60 [s]) = 1.875 [1 / s] = (1.875 / 1000) [1 / ms]
+            private const double scale_animation_speed = 1.875 / 1000;
+
             protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), FLASHLIGHT_FADE_DURATION);
+                double relativeDelta = Math.Abs(FlashlightSize.Y - size) / DefaultFlashlightSize;
+                double duration = relativeDelta / scale_animation_speed;
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), duration);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
