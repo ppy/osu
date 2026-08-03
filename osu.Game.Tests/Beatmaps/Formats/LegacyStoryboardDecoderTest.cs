@@ -210,6 +210,23 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeSelfReferencingVariableDoesNotHang()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("variable-with-self-reference.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                // a self-referential variable definition (e.g. $self=x$self) must not cause the decode to loop indefinitely.
+                var storyboard = decoder.Decode(stream);
+
+                // the remaining (well-formed) sprite is still decoded correctly.
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                ClassicAssert.AreEqual(320, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
+            }
+        }
+
+        [Test]
         public void TestDecodeVideoWithLowercaseExtension()
         {
             var decoder = new LegacyStoryboardDecoder();
