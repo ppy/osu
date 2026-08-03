@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Osu;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Edit.Setup;
 
@@ -119,8 +120,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
                 },
                 stackLeniency = new FormSliderBar<float>
                 {
-                    Caption = EditorSetupStrings.StackLeniency,
-                    HintText = EditorSetupStrings.StackLeniencyDescription,
+                    Caption = OsuEditorSetupStrings.StackLeniency,
+                    HintText = OsuEditorSetupStrings.StackLeniencyDescription,
                     KeyboardStep = 0.1f,
                     Current = new BindableFloat(Beatmap.StackLeniency)
                     {
