@@ -75,9 +75,19 @@ namespace osu.Game.Localisation
         public static LocalisableString Accuracy => new TranslatableString(getKey(@"accuracy"), @"Accuracy");
 
         /// <summary>
+        /// "{0} hit window"
+        /// </summary>
+        public static LocalisableString HitResultWindow(string hitResult) => new TranslatableString(getKey(@"hit_result_window"), @"{0} hit window", hitResult);
+
+        /// <summary>
         /// "HP Drain"
         /// </summary>
         public static LocalisableString HPDrain => new TranslatableString(getKey(@"hp_drain"), @"HP Drain");
+
+        /// <summary>
+        /// "Affects the harshness of health drain and the health penalties for missing."
+        /// </summary>
+        public static LocalisableString HPDrainDescription => new TranslatableString(getKey(@"hp_drain_description"), @"Affects the harshness of health drain and the health penalties for missing.");
 
         /// <summary>
         /// "Scroll Speed"
