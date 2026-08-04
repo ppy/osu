@@ -89,6 +89,35 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestSliderPlacementReplacesSliderAtSameStartTime()
+        {
+            Playfield playfield = null!;
+
+            AddStep("seek to 500", () => EditorClock.Seek(500));
+            AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
+            AddStep("grab playfield", () => playfield = this.ChildrenOfType<Playfield>().Single());
+
+            AddStep("start first slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(0)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(100))));
+            AddStep("end first slider", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("start second slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end second slider", () => InputManager.Click(MouseButton.Right));
+
+            AddAssert("only one hit object", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
+            AddAssert("slider at correct position", () => Precision.AlmostEquals(EditorBeatmap.HitObjects.OfType<Slider>().Single().Position, new Vector2(200)));
+        }
+
+        [Test]
         public void TestPlacementOnSliderBodyDoesNotRemoveSlider()
         {
             Slider originalSlider = null!;

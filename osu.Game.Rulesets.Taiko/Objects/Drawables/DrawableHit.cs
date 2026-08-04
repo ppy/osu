@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private TaikoRulesetConfigManager taikoConfig { get; set; }
 
         private readonly Bindable<bool> rateAdjustedHitAnimations = new Bindable<bool>(true);
+        private readonly Bindable<bool> hitAnimations = new Bindable<bool>(true);
         private readonly Bindable<HitType> type = new Bindable<HitType>();
 
         private bool validActionPressed;
@@ -61,6 +62,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private void load()
         {
             taikoConfig?.BindWith(TaikoRulesetSetting.RateAdjustedHitAnimation, rateAdjustedHitAnimations);
+            taikoConfig?.BindWith(TaikoRulesetSetting.HitAnimations, hitAnimations);
         }
 
         protected override void OnApply()
@@ -167,10 +169,20 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     break;
 
                 case ArmedState.Miss:
-                    this.FadeOut(100);
+                    this.FadeOut(hitAnimations.Value ? 100 : 60);
                     break;
 
                 case ArmedState.Hit:
+                    if (!hitAnimations.Value)
+                    {
+                        this.FadeOut();
+
+                        // despite being invisible, this object must stay alive long enough for its nested strong hit (if any) to be judged,
+                        // otherwise gameplay will never complete (see also: `TaikoModHidden.ApplyNormalVisibilityState()`).
+                        LifetimeEnd = HitStateUpdateTime + StrongNestedHit.SECOND_HIT_WINDOW;
+                        break;
+                    }
+
                     // If we're far enough away from the left stage, we should bring ourselves in front of it
                     ProxyContent();
 

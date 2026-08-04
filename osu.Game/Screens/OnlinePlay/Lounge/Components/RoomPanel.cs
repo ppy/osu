@@ -57,6 +57,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected bool ShowExternalLink { get; init; } = true;
 
+        public bool ShowDescription { get; init; }
+
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
         private CornerIcon? passwordIcon;
@@ -99,6 +101,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Colour = colourProvider.Background6.Opacity(0.4f),
                 Radius = 4,
             };
+
+            IEnumerable<Drawable> createNameAndStatus()
+            {
+                yield return roomName = new RoomNameLine();
+
+                if (ShowDescription && !string.IsNullOrEmpty(Room.Description))
+                {
+                    Height = height + 16;
+
+                    yield return new TruncatingSpriteText
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = Room.Description,
+                        Font = OsuFont.Style.Caption2,
+                        Colour = colourProvider.Content2,
+                    };
+                }
+
+                yield return new RoomStatusText(Room)
+                {
+                    Beatmap = { BindTarget = currentBeatmap }
+                };
+            }
 
             InternalChildren = new Drawable[]
             {
@@ -207,14 +232,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 AutoSizeAxes = Axes.Y,
                                                                 Padding = new MarginPadding { Top = 3 },
                                                                 Direction = FillDirection.Vertical,
-                                                                Children = new Drawable[]
-                                                                {
-                                                                    roomName = new RoomNameLine(),
-                                                                    new RoomStatusText(Room)
-                                                                    {
-                                                                        Beatmap = { BindTarget = currentBeatmap }
-                                                                    }
-                                                                }
+                                                                ChildrenEnumerable = createNameAndStatus()
                                                             }
                                                         },
                                                     },

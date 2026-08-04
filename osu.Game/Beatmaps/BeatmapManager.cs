@@ -274,6 +274,27 @@ namespace osu.Game.Beatmaps
             });
         }
 
+        /// <summary>
+        /// Restore a beatmap set.
+        /// </summary>
+        /// <param name="beatmapSetInfo">The beatmap set to restore.</param>
+        public void Restore(BeatmapSetInfo beatmapSetInfo)
+        {
+            Realm.Run(r =>
+            {
+                using (var transaction = r.BeginWrite())
+                {
+                    if (!beatmapSetInfo.IsManaged)
+                        beatmapSetInfo = r.Find<BeatmapSetInfo>(beatmapSetInfo.ID)!;
+
+                    foreach (var beatmapInfo in beatmapSetInfo.Beatmaps.Where(b => b.Hidden))
+                        beatmapInfo.Hidden = false;
+
+                    transaction.Commit();
+                }
+            });
+        }
+
         public void RestoreAll()
         {
             Realm.Run(r =>

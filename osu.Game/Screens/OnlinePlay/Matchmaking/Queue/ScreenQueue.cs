@@ -24,6 +24,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -893,7 +894,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 base.Update();
 
-                Text = queue.QueueTimer.Elapsed.ToString(@"mm\:ss");
+                Text = queue.QueueTimer.Elapsed.ToFormattedDuration();
             }
         }
     }

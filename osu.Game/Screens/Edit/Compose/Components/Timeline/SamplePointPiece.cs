@@ -734,24 +734,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 LabelFormat = isMultipleValues
                     ? static _ => "(multiple)"
                     : v => LocalisableString.Interpolate($"{v / 100.0:P0}");
+                TextBox.PlaceholderText = isMultipleValues ? "(multiple)" : string.Empty;
             }
 
             public VolumeControl()
             {
-                updateLabelFormat();
-
-                // The `IsMultipleValues` / `updateLabelFormat()` hack above to jam an indicator of multiple active values does not work for tooltip
+                // The `IsMultipleValues` / `updateLabelFormat()` hack to jam an indicator of multiple active values does not work for tooltip
                 // because the tooltip machinery framework-side is too smart for it (the tooltip text is only regenerated on direct changes to `Current`).
                 // Just disable it to hide the skeleton. It's of little use anyhow.
                 TooltipFormat = _ => default;
                 TransferValueOnCommit = true;
             }
 
-            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new TextBox();
-
-            private partial class TextBox : FormNumberBox.InnerNumberBox
+            protected override void LoadComplete()
             {
-                public TextBox()
+                base.LoadComplete();
+                updateLabelFormat();
+                TextBox.Focused.BindValueChanged(focused =>
+                {
+                    if (focused.NewValue && IsMultipleValues)
+                        TextBox.Text = string.Empty;
+                });
+            }
+
+            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new VolumeTextBox();
+
+            private partial class VolumeTextBox : FormNumberBox.InnerNumberBox
+            {
+                public VolumeTextBox()
                     : base(true)
                 {
                 }
@@ -762,6 +772,36 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         return false;
 
                     return base.OnPressed(e);
+                }
+
+                protected override bool OnKeyDown(KeyDownEvent e)
+                {
+                    // mappers wish to be able to use sample sound / bank toggles while this text box is focused
+                    // to facilitate this, only use standard text box handling for relevant inputs
+                    // and let all other inputs fall through unhandled so that overarching composer elements
+                    // can handle the hitsounding toggles
+                    switch (e.Key)
+                    {
+                        // inputting volume number
+                        case >= Key.Keypad0 and <= Key.Keypad9:
+                        case >= Key.Number0 and <= Key.Number9:
+                        // committing the number
+                        case Key.Enter:
+                        case Key.KeypadEnter:
+                        // releasing focus
+                        case Key.Escape:
+                            return base.OnKeyDown(e);
+
+                        default:
+                            return false;
+                    }
+                }
+
+                protected override void NotifyInputError()
+                {
+                    // base call intentionally suppressed.
+                    // as most keypresses are allowed to fall through this text box to allow other interactions via composer elements,
+                    // it feels wrong to have those fall-through inputs additionally flash this text box red as if something bad happened.
                 }
             }
         }
