@@ -487,11 +487,11 @@ namespace osu.Game.Screens.Select
                             // might be used for grouping, returning from gameplay
                             oldBeatmap.LastPlayed == newBeatmap.LastPlayed;
 
-                        if (equalForDisplayPurposes)
-                            return false;
+                        if (!equalForDisplayPurposes)
+                            return true;
                     }
 
-                    return true;
+                    return false;
 
                 default:
                     throw new ArgumentOutOfRangeException();
