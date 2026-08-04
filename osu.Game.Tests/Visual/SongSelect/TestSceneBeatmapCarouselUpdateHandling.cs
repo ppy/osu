@@ -440,7 +440,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestBeatmapSetReplacedWithMixedDifficultyMutations()
         {
             List<Guid> expectedIds = null!;
-            Guid removedId = default;
+            Guid removedId = Guid.Empty;
 
             AddStep("update set with mixed difficulty mutations", () =>
             {

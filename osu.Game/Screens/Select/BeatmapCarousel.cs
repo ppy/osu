@@ -269,9 +269,9 @@ namespace osu.Game.Screens.Select
                         // before the carousel processes them. Replacing an item with a stale beatmap converges via the follow-up update queued for the
                         // deletion, but selecting one would load a beatmap that no longer exists in realm. Only the selection path needs a freshness
                         // check, which limits this to a single realm round-trip per replace event.
-                        if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap) && matchingNewBeatmap.ID is Guid matchingID)
+                        if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap))
                         {
-                            var refreshedBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(matchingID)?.Detach());
+                            var refreshedBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(matchingNewBeatmap.ID)?.Detach());
 
                             if (refreshedBeatmap == null)
                             {
