@@ -19,6 +19,11 @@ namespace osu.Game.Localisation.Mania
         /// </summary>
         public static LocalisableString AccuracyDescription => new TranslatableString(getKey(@"accuracy_description"), @"Affects timing requirements for notes.");
 
+        /// <summary>
+        /// "Keys"
+        /// </summary>
+        public static LocalisableString VariantDescription => new TranslatableString(getKey(@"variant_description"), @"Keys");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
