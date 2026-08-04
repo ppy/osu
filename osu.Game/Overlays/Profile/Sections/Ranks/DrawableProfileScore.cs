@@ -263,7 +263,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
-            var ppTooltipText = Score.Preserve ? LocalisableString.Interpolate($@"{Score.PP:N1}pp") : ScoresStrings.StatusNonBest;
+            var ppTooltipText = Score.Preserve ? Score.PP.ToLocalisableString(@"N3") : ScoresStrings.StatusNonBest;
 
             return new FillFlowContainer
             {
