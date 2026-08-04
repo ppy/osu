@@ -40,6 +40,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Caption = GameplaySettingsStrings.StarFountains,
                     Current = config.GetBindable<bool>(OsuSetting.StarFountains)
                 }),
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = GameplaySettingsStrings.ShowSliderEndMiss,
+                    Current = config.GetBindable<bool>(OsuSetting.ShowSliderEndMiss)
+                }),
             };
         }
     }
