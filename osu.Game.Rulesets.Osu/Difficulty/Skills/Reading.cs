@@ -41,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double decay = strainDecay(current.DeltaTime);
 
             // This currently operates under the assumption that `ObjectDifficultyOf` is called once per object, and in order.
-            // Under that assumption, we can trust that `current.StartTime` refers to the start time of the first object in the case that `reducedDuration` is yet to be set.
+            // Under that assumption, we can trust that `current.StartTime` refers to the start time of the first object in the case that `firstObjectStartTime` is yet to be set.
             firstObjectStartTime ??= current.StartTime;
 
-            const double reduced_difficulty_base_line = 0.2; // Arbitrary value that seems to work.
+            const double reduced_difficulty_base_line = 0.2;
             double reduction = 1;
 
             if (current.StartTime <= firstObjectStartTime + reduced_difficulty_duration)
