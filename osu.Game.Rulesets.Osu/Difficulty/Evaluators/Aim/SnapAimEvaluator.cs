@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (current.BaseObject is Spinner || current.Index <= 1 || osuLastObj.BaseObject is Spinner)
                 return 0;
 
-            const double wide_angle_multiplier = 9.67;
+            const double wide_angle_multiplier = 11.0;
             const double acute_angle_multiplier = 2.41;
             const double slider_multiplier = 1.5;
-            const double velocity_change_multiplier = 0.9;
+            const double velocity_change_multiplier = 1.0;
 
             // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
             const double wiggle_multiplier = 1.02;
@@ -58,7 +58,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double snapDifficulty = currVelocity; // Start difficulty with regular velocity.
 
             // Penalize angle repetition.
-            snapDifficulty *= vectorAngleRepetition(osuCurrObj, osuLastObj);
+            if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.1 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime))
+                snapDifficulty *= vectorAngleRepetition(osuCurrObj, osuLastObj);
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
