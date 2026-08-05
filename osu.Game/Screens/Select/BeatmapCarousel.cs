@@ -248,72 +248,48 @@ namespace osu.Game.Screens.Select
                     // In the case of difficulty reprocessing, this will trigger multiple times per beatmap as it's always triggering a set update.
                     // We may want to look to improve this in the future either here or at the source (only trigger an update after all difficulties
                     // have been processed) if it becomes an issue for animation or performance reasons.
-                    //
-                    // A set's difficulties always occupy a contiguous range in `Items` (they are only ever added or replaced as a whole set),
-                    // so the entire diff is applied as a single replace operation below rather than one per difficulty. This avoids running
-                    // the carousel's change handling / relayout (and a linear `IndexOf` lookup) once per difficulty.
-                    List<BeatmapInfo> newBeatmaps = new List<BeatmapInfo>(oldSetBeatmaps.Count);
-
                     foreach (var beatmap in oldSetBeatmaps)
                     {
+                        int previousIndex = Items.IndexOf(beatmap);
+                        Debug.Assert(previousIndex >= 0);
+
                         // we're intentionally being lenient with there being two difficulties with equal online ID or difficulty name.
                         // this can be the case when the user modifies the beatmap using the editor's "external edit" feature.
                         BeatmapInfo? matchingNewBeatmap =
                             newSetBeatmaps.FirstOrDefault(b => b.OnlineID > 0 && b.OnlineID == beatmap.OnlineID) ??
                             newSetBeatmaps.FirstOrDefault(b => b.DifficultyName == beatmap.DifficultyName && b.Ruleset.Equals(beatmap.Ruleset));
 
-                        if (matchingNewBeatmap == null)
-                            continue;
-
-                        // The matched beatmap may have been deleted since the snapshot was taken, as multiple updates to the same set can be queued
-                        // before the carousel processes them. Replacing an item with a stale beatmap converges via the follow-up update queued for the
-                        // deletion, but selecting one would load a beatmap that no longer exists in realm. Only the selection path needs a freshness
-                        // check, which limits this to a single realm round-trip per replace event.
-                        if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap))
+                        if (matchingNewBeatmap != null)
                         {
-                            var refreshedBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(matchingNewBeatmap.ID)?.Detach());
-
-                            if (refreshedBeatmap == null)
+                            // TODO: should this exist in song select instead of here?
+                            // we need to ensure the global beatmap is also updated alongside changes.
+                            if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap))
                             {
-                                // The matched beatmap was deleted since the snapshot was taken. Retain the stale match in the list (it will be
-                                // removed by the queued follow-up update) and leave the current selection untouched rather than selecting a beatmap
-                                // that no longer exists in realm.
-                                newBeatmaps.Add(matchingNewBeatmap);
-                                newSetBeatmaps.Remove(matchingNewBeatmap);
-                                continue;
+                                // The matching beatmap may have been deleted or invalidated in some way since this event was fired.
+                                // Let's make sure we have the most up-to-date realm state of the current beatmap.
+                                var refreshedNewBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(matchingNewBeatmap.ID)?.Detach());
+                                if (refreshedNewBeatmap != null)
+                                {
+                                    matchingNewBeatmap = refreshedNewBeatmap;
+                                    // we don't know in which group the matching new beatmap is, but that's fine - we can keep the previous one for now.
+                                    // we are about to modify `Items`, which - if required - will trigger a re-filter,
+                                    // which will pick a correct group - if one is present - via `HandleFilterCompleted()`.
+                                    RequestSelection(new GroupedBeatmap(CurrentGroupedBeatmap?.Group, matchingNewBeatmap));
+                                }
                             }
 
-                            matchingNewBeatmap = refreshedBeatmap;
+                            Items.ReplaceRange(previousIndex, 1, [matchingNewBeatmap]);
+                            newSetBeatmaps.Remove(matchingNewBeatmap);
                         }
-
-                        // TODO: should this exist in song select instead of here?
-                        // we need to ensure the global beatmap is also updated alongside changes.
-                        if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap))
-                            // we don't know in which group the matching new beatmap is, but that's fine - we can keep the previous one for now.
-                            // we are about to modify `Items`, which - if required - will trigger a re-filter,
-                            // which will pick a correct group - if one is present - via `HandleFilterCompleted()`.
-                            RequestSelection(new GroupedBeatmap(CurrentGroupedBeatmap?.Group, matchingNewBeatmap));
-
-                        newBeatmaps.Add(matchingNewBeatmap);
-                        newSetBeatmaps.Remove(matchingNewBeatmap);
+                        else
+                        {
+                            Items.RemoveAt(previousIndex);
+                        }
                     }
 
                     // Add any items which weren't found in the previous pass (difficulty names didn't match).
-                    newBeatmaps.AddRange(newSetBeatmaps);
-
-                    if (oldSetBeatmaps.Count == 0)
-                    {
-                        foreach (var beatmap in newBeatmaps)
-                            Items.Add(beatmap);
-
-                        break;
-                    }
-
-                    int previousIndex = Items.IndexOf(oldSetBeatmaps[0]);
-                    Debug.Assert(previousIndex >= 0);
-                    Debug.Assert(Items.Skip(previousIndex).Take(oldSetBeatmaps.Count).SequenceEqual(oldSetBeatmaps), "the set's difficulties should occupy a contiguous range in the carousel items");
-
-                    Items.ReplaceRange(previousIndex, oldSetBeatmaps.Count, newBeatmaps);
+                    foreach (var beatmap in newSetBeatmaps)
+                        Items.Add(beatmap);
 
                     break;
 
@@ -454,11 +430,6 @@ namespace osu.Game.Screens.Select
                     var oldBeatmaps = args.OldItems!.OfType<BeatmapInfo>().ToList();
                     var newBeatmaps = args.NewItems!.OfType<BeatmapInfo>().ToList();
 
-                    // A replace may change the number of items, as the carousel replaces a whole set's difficulties in one operation
-                    // (see `beatmapSetsChanged`). Any count change requires a re-filter; only equal-sized replaces can be skipped.
-                    if (oldBeatmaps.Count != newBeatmaps.Count)
-                        return true;
-
                     for (int i = 0; i < oldBeatmaps.Count; i++)
                     {
                         var oldBeatmap = oldBeatmaps[i];
@@ -487,11 +458,11 @@ namespace osu.Game.Screens.Select
                             // might be used for grouping, returning from gameplay
                             oldBeatmap.LastPlayed == newBeatmap.LastPlayed;
 
-                        if (!equalForDisplayPurposes)
-                            return true;
+                        if (equalForDisplayPurposes)
+                            return false;
                     }
 
-                    return false;
+                    return true;
 
                 default:
                     throw new ArgumentOutOfRangeException();
