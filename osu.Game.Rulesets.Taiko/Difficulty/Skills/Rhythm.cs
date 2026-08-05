@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -9,6 +10,17 @@ using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
+    public class RhythmAttributes : StrainSkillAttributes
+    {
+        public RhythmAttributes(StrainSkillAttributes baseAttributes)
+        {
+            Difficulty = baseAttributes.Difficulty;
+            ObjectDifficulties = baseAttributes.ObjectDifficulties;
+            StrainPeaks = baseAttributes.StrainPeaks;
+            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
+        }
+    }
+
     /// <summary>
     /// Calculates the rhythm coefficient of taiko difficulty.
     /// </summary>
@@ -17,8 +29,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => 0.4;
 
-        public Rhythm(Mod[] mods)
-            : base(mods)
+        public Rhythm(Mod[] mods, DifficultyHitObject[] difficultyHitObjects)
+            : base(mods, difficultyHitObjects)
         {
         }
 
@@ -31,6 +43,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             difficulty *= DiffUtils.Logistic(staminaDifficulty, 1 / 15.0, 50.0);
 
             return difficulty;
+        }
+
+        public override ISkillAttributes Process() => new RhythmAttributes((StrainSkillAttributes)base.Process());
+
+        public override IEnumerable<TimedSkillAttributes> ProcessTimed()
+        {
+            foreach (var baseTimedAttributes in base.ProcessTimed())
+            {
+                var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
+
+                yield return new TimedSkillAttributes(new RhythmAttributes(baseAttributes), baseTimedAttributes.Time);
+            }
         }
     }
 }

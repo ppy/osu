@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -13,6 +14,17 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
+    public class FlashlightAttributes : StrainSkillAttributes
+    {
+        public FlashlightAttributes(StrainSkillAttributes baseAttributes)
+        {
+            Difficulty = baseAttributes.Difficulty;
+            ObjectDifficulties = baseAttributes.ObjectDifficulties;
+            StrainPeaks = baseAttributes.StrainPeaks;
+            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
+        }
+    }
+
     /// <summary>
     /// Represents the skill required to memorise and hit every object in a map with the Flashlight mod enabled.
     /// </summary>
@@ -20,8 +32,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private readonly int totalObjects;
 
-        public Flashlight(Mod[] mods, int totalObjects)
-            : base(mods)
+        public Flashlight(Mod[] mods, DifficultyHitObject[] difficultyHitObjects, int totalObjects)
+            : base(mods, difficultyHitObjects)
         {
             this.totalObjects = totalObjects;
         }
@@ -75,7 +87,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        public override double DifficultyValue()
+        public override ISkillAttributes Process()
+        {
+            return new FlashlightAttributes((StrainSkillAttributes)base.Process());
+        }
+
+        public override IEnumerable<TimedSkillAttributes> ProcessTimed()
+        {
+            foreach (var baseTimedAttributes in base.ProcessTimed())
+            {
+                var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
+
+                yield return new TimedSkillAttributes(new FlashlightAttributes(baseAttributes), baseTimedAttributes.Time);
+            }
+        }
+
+        protected override double Aggregate()
         {
             double sum = GetCurrentStrainPeaks().Sum();
 

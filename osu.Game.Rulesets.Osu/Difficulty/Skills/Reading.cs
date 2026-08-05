@@ -16,14 +16,24 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class Reading : Skill
+    public class ReadingAttributes : ISkillAttributes
     {
-        private readonly bool hasHiddenMod;
-        private double harmonicWeightSum;
+        public required double Difficulty { get; init; }
+        public required List<double> ObjectDifficulties { get; init; }
+        public required double TopWeightedObjectDifficultiesCount { get; init; }
+    }
 
-        public Reading(Mod[] mods)
-            : base(mods)
+    public class Reading : ISkill
+    {
+        public IReadOnlyList<Mod> Mods { get; init; }
+        public IReadOnlyList<DifficultyHitObject> DifficultyHitObjects { get; init; }
+
+        private readonly bool hasHiddenMod;
+
+        public Reading(Mod[] mods, DifficultyHitObject[] difficultyHitObjects)
         {
+            Mods = mods;
+            DifficultyHitObjects = difficultyHitObjects;
             hasHiddenMod = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
         }
 
@@ -34,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
-        protected override double ProcessInternal(DifficultyHitObject current)
+        private double objectDifficultyOf(DifficultyHitObject current)
         {
             const double skill_multiplier = 2.5;
             const double reduced_difficulty_duration = 60 * 1000;
@@ -79,18 +89,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty;
         }
 
-        public override double DifficultyValue()
-        {
-            if (ObjectDifficulties.Count == 0)
-                return 0;
-
-            var difficulties = GetTransformedDifficulties(ObjectDifficulties);
-
-            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(difficulties);
-
-            return difficulty;
-        }
-
         protected List<double> GetTransformedDifficulties(List<double> difficulties)
         {
             difficulties = difficulties.Where(v => v > 0).ToList();
@@ -106,9 +104,51 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulties;
         }
 
-        public double CountTopWeightedObjectDifficulties(double difficultyValue)
+        public ISkillAttributes Process()
         {
-            if (ObjectDifficulties.Count == 0)
+            var objectDifficulties = new List<double>();
+
+            foreach (var difficultyHitObject in DifficultyHitObjects)
+            {
+                objectDifficulties.Add(objectDifficultyOf(difficultyHitObject));
+            }
+
+            var difficulties = GetTransformedDifficulties(objectDifficulties);
+
+            (double difficulty, double harmonicWeightSum) = HarmonicSeries.Aggregate(difficulties);
+
+            return new ReadingAttributes
+            {
+                Difficulty = difficulty,
+                ObjectDifficulties = objectDifficulties,
+                TopWeightedObjectDifficultiesCount = countTopWeightedDifficulties(difficulties, harmonicWeightSum, difficulty)
+            };
+        }
+
+        public IEnumerable<TimedSkillAttributes> ProcessTimed()
+        {
+            var objectDifficulties = new List<double>();
+
+            foreach (var difficultyHitObject in DifficultyHitObjects)
+            {
+                objectDifficulties.Add(objectDifficultyOf(difficultyHitObject));
+
+                var difficulties = GetTransformedDifficulties(objectDifficulties);
+
+                (double difficulty, double harmonicWeightSum) = HarmonicSeries.Aggregate(difficulties);
+
+                yield return new TimedSkillAttributes(new ReadingAttributes
+                {
+                    Difficulty = difficulty,
+                    ObjectDifficulties = objectDifficulties,
+                    TopWeightedObjectDifficultiesCount = countTopWeightedDifficulties(difficulties, harmonicWeightSum, difficulty)
+                }, difficultyHitObject.EndTime);
+            }
+        }
+
+        private double countTopWeightedDifficulties(List<double> difficulties, double harmonicWeightSum, double difficultyValue)
+        {
+            if (difficulties.Count == 0)
                 return 0.0;
 
             if (harmonicWeightSum == 0)
@@ -119,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (consistentTopNote == 0)
                 return 0;
 
-            return ObjectDifficulties.Sum(d => DiffUtils.Logistic(d / consistentTopNote, 1.15, 5, 1.1));
+            return difficulties.Sum(d => DiffUtils.Logistic(d / consistentTopNote, 1.15, 5, 1.1));
         }
     }
 }
