@@ -139,7 +139,8 @@ namespace osu.Game.Skinning
 
         /// <summary>
         /// Returns the dropdown ordering for use mainly by the skin selection UI.
-        /// Inserts the defaults first, then 'random skin', then custom ones.
+        /// Pinned skins surface first (preserving the underlying defaults / random / alphabetical
+        /// ordering within the unpinned bucket).
         /// Returns a list of <see cref="Live{SkinInfo}"/> items.
         /// </summary>
         public IList<Live<SkinInfo>> GetAllUsableSkins()
@@ -164,10 +165,18 @@ namespace osu.Game.Skinning
 
                 foreach (var s in userSkins)
                     skins.Add(s);
+
+                // OrderBy is stable, so equal-Pinned entries keep the category ordering established above.
+                skins = skins.OrderByDescending(s => s.Value.Pinned).ToList();
             });
 
             return skins;
         }
+
+        /// <summary>
+        /// Toggles the pinned state of the given skin.
+        /// </summary>
+        public void TogglePinned(Live<SkinInfo> skin) => skin.PerformWrite(s => s.Pinned = !s.Pinned);
 
         public void SelectRandomSkin()
         {
@@ -197,7 +206,7 @@ namespace osu.Game.Skinning
             });
         }
 
-        private void cycleSkins(int direction)
+        private void cycleSkins(int direction, bool favouritesOnly)
         {
             Debug.Assert(direction != 0);
 
@@ -206,6 +215,16 @@ namespace osu.Game.Skinning
                 return;
 
             var skins = GetAllUsableSkins();
+
+            if (favouritesOnly)
+            {
+                var favourites = skins.Where(s => s.Value.Pinned).ToList();
+
+                // Fall back to the full list when there aren't enough pinned skins to cycle through;
+                // otherwise the keybind would silently no-op or lock onto a single entry.
+                if (favourites.Count >= 2)
+                    skins = favourites;
+            }
 
             int i = skins.IndexOf(CurrentSkinInfo.Value);
 
@@ -224,12 +243,14 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Cycle one skin backward.
         /// </summary>
-        public void SelectPreviousSkin() => cycleSkins(-1);
+        /// <param name="favouritesOnly">When <c>true</c>, restrict the cycle to pinned skins (with a fallback to all skins if fewer than two are pinned).</param>
+        public void SelectPreviousSkin(bool favouritesOnly = false) => cycleSkins(-1, favouritesOnly);
 
         /// <summary>
         /// Cycle one skin forward.
         /// </summary>
-        public void SelectNextSkin() => cycleSkins(1);
+        /// <param name="favouritesOnly">When <c>true</c>, restrict the cycle to pinned skins (with a fallback to all skins if fewer than two are pinned).</param>
+        public void SelectNextSkin(bool favouritesOnly = false) => cycleSkins(1, favouritesOnly);
 
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
