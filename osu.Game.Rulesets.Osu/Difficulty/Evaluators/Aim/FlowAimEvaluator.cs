@@ -60,9 +60,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             return flowDifficulty * DiffUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
         }
 
-        private static double calculateRhythmChangeBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj) =>
-            1 + Math.Min(0.25,
-                DiffUtils.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
+        private static double calculateRhythmChangeBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
+        {
+            const double maximum_rhythm_change_bonus = 0.25;
+
+            double bonus = DiffUtils.Pow(
+                (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50,
+                4);
+
+            return 1 + Math.Min(maximum_rhythm_change_bonus, bonus);
+        }
 
         /// <summary>
         /// Scales flow difficulty by angular velocity.
