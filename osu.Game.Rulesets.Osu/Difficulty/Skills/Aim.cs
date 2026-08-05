@@ -16,6 +16,13 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
+    public class AimAttributes : VariableLengthStrainSkillAttributes
+    {
+        public required bool WithSliders { get; init; }
+        public required double DifficultSlidersCount { get; init; }
+        public required double TopWeightedSlidersCount { get; init; }
+    }
+
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
@@ -23,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
-        public Aim(Mod[] mods, bool includeSliders)
-            : base(mods)
+        public Aim(Mod[] mods, DifficultyHitObject[] difficultyHitObjects, bool includeSliders)
+            : base(mods, difficultyHitObjects)
         {
             IncludeSliders = includeSliders;
         }
@@ -130,7 +137,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return DiffUtils.Logistic(-k * Math.Log(ratio));
         }
 
-        public double GetDifficultSliders()
+        public override ISkillAttributes Process()
+        {
+            var baseAttributes = (VariableLengthStrainSkillAttributes)base.Process();
+
+            return new AimAttributes
+            {
+                Difficulty = baseAttributes.Difficulty,
+                ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount,
+                WithSliders = IncludeSliders,
+                DifficultSlidersCount = getDifficultSliders(),
+                TopWeightedSlidersCount = countTopWeightedSliders(baseAttributes.Difficulty)
+            };
+        }
+
+        public override IEnumerable<TimedSkillAttributes> ProcessTimed()
+        {
+            foreach (var baseTimedAttributes in base.ProcessTimed())
+            {
+                var baseAttributes = (VariableLengthStrainSkillAttributes)baseTimedAttributes.Attributes;
+
+                yield return new TimedSkillAttributes(new AimAttributes
+                {
+                    Difficulty = baseAttributes.Difficulty,
+                    ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                    TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount,
+                    WithSliders = IncludeSliders,
+                    DifficultSlidersCount = getDifficultSliders(),
+                    TopWeightedSlidersCount = countTopWeightedSliders(baseAttributes.Difficulty)
+                }, baseTimedAttributes.Time);
+            }
+        }
+
+        private double getDifficultSliders()
         {
             if (sliderStrains.Count == 0)
                 return 0;
@@ -143,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return sliderStrains.Sum(strain => DiffUtils.Logistic(strain / maxSliderStrain, 0.5, 12.0));
         }
 
-        public double CountTopWeightedSliders(double difficultyValue)
+        private double countTopWeightedSliders(double difficultyValue)
         {
             if (sliderStrains.Count == 0)
                 return 0;
@@ -157,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return sliderStrains.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
 
-        public override double DifficultyValue()
+        protected override double Aggregate()
         {
             double difficulty = 0;
             double time = 0;
