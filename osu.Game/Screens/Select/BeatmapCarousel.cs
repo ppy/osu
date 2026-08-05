@@ -268,9 +268,11 @@ namespace osu.Game.Screens.Select
                                 // The matching beatmap may have been deleted or invalidated in some way since this event was fired.
                                 // Let's make sure we have the most up-to-date realm state of the current beatmap.
                                 var refreshedNewBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(matchingNewBeatmap.ID)?.Detach());
+
                                 if (refreshedNewBeatmap != null)
                                 {
                                     matchingNewBeatmap = refreshedNewBeatmap;
+
                                     // we don't know in which group the matching new beatmap is, but that's fine - we can keep the previous one for now.
                                     // we are about to modify `Items`, which - if required - will trigger a re-filter,
                                     // which will pick a correct group - if one is present - via `HandleFilterCompleted()`.

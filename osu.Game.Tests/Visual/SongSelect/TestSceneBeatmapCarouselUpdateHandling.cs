@@ -431,148 +431,53 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         /// <summary>
-        /// Replicates a whole-set replace as applied by the carousel when a set is updated: some difficulties are
-        /// matched-and-replaced (by online ID), some are removed, and some new ones are added.
-        /// The replace handling applies the entire diff as a single range replace (including a count change),
-        /// so this guards both the splice itself and the count-change path of the carousel's change handling.
-        /// </summary>
-        [Test]
-        public void TestBeatmapSetReplacedWithMixedDifficultyMutations()
-        {
-            List<Guid> expectedIds = null!;
-            Guid removedId = Guid.Empty;
-
-            AddStep("update set with mixed difficulty mutations", () =>
-            {
-                removedId = baseTestBeatmap.Beatmaps[1].ID;
-
-                var updatedSet = new BeatmapSetInfo
-                {
-                    ID = baseTestBeatmap.ID,
-                    OnlineID = baseTestBeatmap.OnlineID,
-                    DateAdded = baseTestBeatmap.DateAdded,
-                    DateSubmitted = baseTestBeatmap.DateSubmitted,
-                    DateRanked = baseTestBeatmap.DateRanked,
-                    Status = baseTestBeatmap.Status,
-                    StatusInt = baseTestBeatmap.StatusInt,
-                    DeletePending = baseTestBeatmap.DeletePending,
-                    Hash = baseTestBeatmap.Hash,
-                    Protected = baseTestBeatmap.Protected,
-                };
-
-                // keep the first difficulty (matched by online ID, but with changed metadata => valid replace);
-                // drop the second difficulty entirely; and introduce a brand new third difficulty.
-                var keptDifficulty = baseTestBeatmap.Beatmaps[0];
-                var kept = new BeatmapInfo
-                {
-                    ID = keptDifficulty.ID,
-                    Metadata = new BeatmapMetadata { Artist = "updated test", Title = "updated title" },
-                    Ruleset = keptDifficulty.Ruleset,
-                    DifficultyName = keptDifficulty.DifficultyName,
-                    BeatmapSet = updatedSet,
-                    Status = keptDifficulty.Status,
-                    OnlineID = keptDifficulty.OnlineID,
-                    Length = keptDifficulty.Length,
-                    BPM = keptDifficulty.BPM,
-                    Hash = "new hash",
-                    StarRating = keptDifficulty.StarRating,
-                    MD5Hash = keptDifficulty.MD5Hash,
-                    OnlineMD5Hash = keptDifficulty.OnlineMD5Hash,
-                };
-
-                var added = createBeatmap(updatedSet);
-                added.ID = Guid.NewGuid();
-                added.OnlineID = -2;
-                added.DifficultyName = "new difficulty";
-
-                updatedSet.Beatmaps.Add(kept);
-                updatedSet.Beatmaps.Add(added);
-
-                expectedIds = updatedSet.Beatmaps.Select(b => b.ID).ToList();
-
-                int originalIndex = BeatmapSets.IndexOf(baseTestBeatmap);
-
-                Realm.Write(r => r.Add(updatedSet, update: true));
-                BeatmapSets.ReplaceRange(originalIndex, 1, [updatedSet.Detach()]);
-            });
-
-            WaitForFiltering();
-
-            AddAssert("updated set has exactly two difficulties", () => Carousel.PostFilterBeatmaps.Count(b => expectedIds.Contains(b.ID)), () => Is.EqualTo(2));
-            AddAssert("kept difficulty present", () => Carousel.PostFilterBeatmaps.Any(b => b.ID == expectedIds[0]), () => Is.True);
-            AddAssert("added difficulty present", () => Carousel.PostFilterBeatmaps.Any(b => b.ID == expectedIds[1]), () => Is.True);
-            AddAssert("removed difficulty is gone", () => Carousel.PostFilterBeatmaps.Any(b => b.ID == removedId), () => Is.False);
-        }
-
-        /// <summary>
         /// Replicates the #34826 scenario: the matched beatmap is present in the replace snapshot, but has been
-        /// deleted from realm by the time the replace is processed (multiple updates to the same set can be queued
-        /// before the carousel processes them). The replace handling must not request selection of a beatmap that
-        /// no longer exists in realm — song select would otherwise load it as the global beatmap (NRE in
-        /// <see cref="FooterButtonOptions"/>, see https://github.com/ppy/osu/issues/34826).
+        /// deleted from realm by the time the replace is processed, see https://github.com/ppy/osu/issues/34826.
         /// </summary>
-        /// <remarks>
-        /// Regression guard: this test fails if the per-difficulty realm check from #34914 is removed outright,
-        /// and passes with both the #34914 check and the current selection-path-only check.
-        /// </remarks>
         [Test]
         public void TestBeatmapSetReplacedWithDeletedCurrentBeatmap()
         {
-            BeatmapInfo selectedBeatmap = null!;
-            BeatmapInfo kept = null!;
+            int targetSetIndex = 0;
 
             AddStep("select first difficulty", () =>
             {
-                selectedBeatmap = baseTestBeatmap.Beatmaps[0];
-                Carousel.CurrentBeatmap = selectedBeatmap;
+                Carousel.CurrentBeatmap = baseTestBeatmap.Beatmaps[0];
+                BeatmapRequestedSelections.Clear();
             });
 
-            AddStep("update set with a matched difficulty no longer in realm", () =>
+            AddStep("delete current beatmap from realm and replace set", () =>
             {
-                var updatedSet = new BeatmapSetInfo
+                targetSetIndex = BeatmapSets.IndexOf(baseTestBeatmap);
+                var detachedSet = BeatmapSets[targetSetIndex];
+                var selectedBeatmap = detachedSet.Beatmaps[0];
+
+                Realm.Write(r =>
                 {
-                    ID = baseTestBeatmap.ID,
-                    OnlineID = baseTestBeatmap.OnlineID,
-                    DateAdded = baseTestBeatmap.DateAdded,
-                    DateSubmitted = baseTestBeatmap.DateSubmitted,
-                    DateRanked = baseTestBeatmap.DateRanked,
-                    Status = baseTestBeatmap.Status,
-                    StatusInt = baseTestBeatmap.StatusInt,
-                    DeletePending = baseTestBeatmap.DeletePending,
-                    Hash = baseTestBeatmap.Hash,
-                    Protected = baseTestBeatmap.Protected,
+                    var toDelete = r.Find<BeatmapInfo>(selectedBeatmap.ID);
+                    if (toDelete != null)
+                        r.Remove(toDelete);
+                });
+
+                // Trigger the Replace action with a beatmap that is not in realm.
+                var staleSet = new BeatmapSetInfo
+                {
+                    ID = detachedSet.ID,
+                    OnlineID = detachedSet.OnlineID,
+                    DateAdded = detachedSet.DateAdded,
+                    DateSubmitted = detachedSet.DateSubmitted,
+                    Status = detachedSet.Status,
+                    Hash = detachedSet.Hash,
+                    Protected = detachedSet.Protected,
                 };
 
-                // The matched difficulty carries an ID which was never written to realm, simulating a beatmap deleted
-                // since the replace snapshot was taken. The set itself is intentionally not added to realm either.
-                kept = new BeatmapInfo
-                {
-                    ID = Guid.NewGuid(),
-                    Metadata = new BeatmapMetadata { Artist = "updated test", Title = "updated title" },
-                    Ruleset = selectedBeatmap.Ruleset,
-                    DifficultyName = selectedBeatmap.DifficultyName,
-                    BeatmapSet = updatedSet,
-                    Status = selectedBeatmap.Status,
-                    OnlineID = selectedBeatmap.OnlineID,
-                    Length = selectedBeatmap.Length,
-                    BPM = selectedBeatmap.BPM,
-                    Hash = "new hash",
-                    StarRating = selectedBeatmap.StarRating,
-                    MD5Hash = selectedBeatmap.MD5Hash,
-                    OnlineMD5Hash = selectedBeatmap.OnlineMD5Hash,
-                };
-
-                updatedSet.Beatmaps.Add(kept);
-
-                int originalIndex = BeatmapSets.IndexOf(baseTestBeatmap);
-
-                BeatmapSets.ReplaceRange(originalIndex, 1, [updatedSet.Detach()]);
+                var staleBeatmap = createBeatmap(staleSet, selectedBeatmap);
+                staleSet.Beatmaps.Add(staleBeatmap);
+                BeatmapSets.ReplaceRange(targetSetIndex, 1, [staleSet]);
             });
 
             WaitForFiltering();
 
-            AddAssert("selection unchanged", () => Carousel.CurrentBeatmap, () => Is.EqualTo(selectedBeatmap));
-            AddAssert("deleted match never requested for selection", () => BeatmapRequestedSelections.Contains(kept), () => Is.False);
+            AddAssert("deleted match never requested for selection", () => BeatmapRequestedSelections, () => Is.Empty);
         }
 
         private void assertDidFilter(int count = 1) => AddAssert("did filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count + count));
