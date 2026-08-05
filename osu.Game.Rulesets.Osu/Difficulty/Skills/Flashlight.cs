@@ -14,16 +14,7 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public class FlashlightAttributes : StrainSkillAttributes
-    {
-        public FlashlightAttributes(StrainSkillAttributes baseAttributes)
-        {
-            Difficulty = baseAttributes.Difficulty;
-            ObjectDifficulties = baseAttributes.ObjectDifficulties;
-            StrainPeaks = baseAttributes.StrainPeaks;
-            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
-        }
-    }
+    public class FlashlightAttributes : StrainSkillAttributes;
 
     /// <summary>
     /// Represents the skill required to memorise and hit every object in a map with the Flashlight mod enabled.
@@ -89,7 +80,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override ISkillAttributes Process()
         {
-            return new FlashlightAttributes((StrainSkillAttributes)base.Process());
+            var baseAttributes = (StrainSkillAttributes)base.Process();
+
+            return new FlashlightAttributes
+            {
+                Difficulty = baseAttributes.Difficulty,
+                ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                StrainPeaks = baseAttributes.StrainPeaks,
+                TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount
+            };
         }
 
         public override IEnumerable<TimedSkillAttributes> ProcessTimed()
@@ -98,7 +97,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
 
-                yield return new TimedSkillAttributes(new FlashlightAttributes(baseAttributes), baseTimedAttributes.Time);
+                yield return new TimedSkillAttributes(new FlashlightAttributes
+                {
+                    Difficulty = baseAttributes.Difficulty,
+                    ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                    StrainPeaks = baseAttributes.StrainPeaks,
+                    TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount
+                }, baseTimedAttributes.Time);
             }
         }
 

@@ -9,16 +9,7 @@ using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
-    public class ColourAttributes : StrainSkillAttributes
-    {
-        public ColourAttributes(StrainSkillAttributes baseAttributes)
-        {
-            Difficulty = baseAttributes.Difficulty;
-            ObjectDifficulties = baseAttributes.ObjectDifficulties;
-            StrainPeaks = baseAttributes.StrainPeaks;
-            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
-        }
-    }
+    public class ColourAttributes : StrainSkillAttributes;
 
     /// <summary>
     /// Calculates the colour coefficient of taiko difficulty.
@@ -42,7 +33,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return ColourEvaluator.EvaluateDifficultyOf(current);
         }
 
-        public override ISkillAttributes Process() => new ColourAttributes((StrainSkillAttributes)base.Process());
+        public override ISkillAttributes Process()
+        {
+            var baseAttributes = (StrainSkillAttributes)base.Process();
+
+            return new ColourAttributes
+            {
+                Difficulty = baseAttributes.Difficulty,
+                ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                StrainPeaks = baseAttributes.StrainPeaks,
+                TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount
+            };
+        }
 
         public override IEnumerable<TimedSkillAttributes> ProcessTimed()
         {
@@ -50,7 +52,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             {
                 var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
 
-                yield return new TimedSkillAttributes(new ColourAttributes(baseAttributes), baseTimedAttributes.Time);
+                yield return new TimedSkillAttributes(new ColourAttributes
+                {
+                    Difficulty = baseAttributes.Difficulty,
+                    ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                    StrainPeaks = baseAttributes.StrainPeaks,
+                    TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount
+                }, baseTimedAttributes.Time);
             }
         }
     }

@@ -12,16 +12,7 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
-    public class ReadingAttributes : StrainSkillAttributes
-    {
-        public ReadingAttributes(StrainSkillAttributes baseAttributes)
-        {
-            Difficulty = baseAttributes.Difficulty;
-            ObjectDifficulties = baseAttributes.ObjectDifficulties;
-            StrainPeaks = baseAttributes.StrainPeaks;
-            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
-        }
-    }
+    public class ReadingAttributes : StrainSkillAttributes;
 
     /// <summary>
     /// Calculates the reading coefficient of taiko difficulty.
@@ -57,7 +48,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             return currentStrain;
         }
 
-        public override ISkillAttributes Process() => new ReadingAttributes((StrainSkillAttributes)base.Process());
+        public override ISkillAttributes Process()
+        {
+            var baseAttributes = (StrainSkillAttributes)base.Process();
+
+            return new ReadingAttributes
+            {
+                Difficulty = baseAttributes.Difficulty,
+                ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                StrainPeaks = baseAttributes.StrainPeaks,
+                TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount
+            };
+        }
 
         public override IEnumerable<TimedSkillAttributes> ProcessTimed()
         {
@@ -65,7 +67,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             {
                 var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
 
-                yield return new TimedSkillAttributes(new ReadingAttributes(baseAttributes), baseTimedAttributes.Time);
+                yield return new TimedSkillAttributes(new ReadingAttributes
+                {
+                    Difficulty = baseAttributes.Difficulty,
+                    ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                    StrainPeaks = baseAttributes.StrainPeaks,
+                    TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount
+                }, baseTimedAttributes.Time);
             }
         }
     }

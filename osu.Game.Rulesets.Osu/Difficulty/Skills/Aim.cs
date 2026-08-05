@@ -21,13 +21,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public required bool WithSliders { get; init; }
         public required double DifficultSlidersCount { get; init; }
         public required double TopWeightedSlidersCount { get; init; }
-
-        public AimAttributes(VariableLengthStrainSkillAttributes baseAttributes)
-        {
-            Difficulty = baseAttributes.Difficulty;
-            ObjectDifficulties = baseAttributes.ObjectDifficulties;
-            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
-        }
     }
 
     /// <summary>
@@ -148,8 +141,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             var baseAttributes = (VariableLengthStrainSkillAttributes)base.Process();
 
-            return new AimAttributes(baseAttributes)
+            return new AimAttributes
             {
+                Difficulty = baseAttributes.Difficulty,
+                ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount,
                 WithSliders = IncludeSliders,
                 DifficultSlidersCount = getDifficultSliders(),
                 TopWeightedSlidersCount = countTopWeightedSliders(baseAttributes.Difficulty)
@@ -162,8 +158,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 var baseAttributes = (VariableLengthStrainSkillAttributes)baseTimedAttributes.Attributes;
 
-                yield return new TimedSkillAttributes(new AimAttributes(baseAttributes)
+                yield return new TimedSkillAttributes(new AimAttributes
                 {
+                    Difficulty = baseAttributes.Difficulty,
+                    ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                    TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount,
                     WithSliders = IncludeSliders,
                     DifficultSlidersCount = getDifficultSliders(),
                     TopWeightedSlidersCount = countTopWeightedSliders(baseAttributes.Difficulty)
