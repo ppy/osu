@@ -13,15 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
     public class StaminaAttributes : StrainSkillAttributes
     {
-        public bool SingleColourStamina { get; init; }
-
-        public StaminaAttributes(StrainSkillAttributes baseAttributes)
-        {
-            Difficulty = baseAttributes.Difficulty;
-            ObjectDifficulties = baseAttributes.ObjectDifficulties;
-            StrainPeaks = baseAttributes.StrainPeaks;
-            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
-        }
+        public required bool SingleColourStamina { get; init; }
     }
 
     /// <summary>
@@ -82,8 +74,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         public override ISkillAttributes Process()
         {
-            return new StaminaAttributes((StrainSkillAttributes)base.Process())
+            var baseAttributes = (StrainSkillAttributes)base.Process();
+
+            return new StaminaAttributes
             {
+                Difficulty = baseAttributes.Difficulty,
+                ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                StrainPeaks = baseAttributes.StrainPeaks,
+                TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount,
                 SingleColourStamina = SingleColourStamina
             };
         }
@@ -94,8 +92,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             {
                 var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
 
-                yield return new TimedSkillAttributes(new StaminaAttributes(baseAttributes)
+                yield return new TimedSkillAttributes(new StaminaAttributes
                 {
+                    Difficulty = baseAttributes.Difficulty,
+                    ObjectDifficulties = baseAttributes.ObjectDifficulties,
+                    StrainPeaks = baseAttributes.StrainPeaks,
+                    TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount,
                     SingleColourStamina = SingleColourStamina
                 }, baseTimedAttributes.Time);
             }

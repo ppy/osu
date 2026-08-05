@@ -13,9 +13,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 {
     public class VariableLengthStrainSkillAttributes : ISkillAttributes
     {
-        public double Difficulty { get; init; }
-        public List<double> ObjectDifficulties { get; init; } = new List<double>();
-        public double TopWeightedStrainsCount { get; init; }
+        public required double Difficulty { get; init; }
+        public required List<double> ObjectDifficulties { get; init; }
+        public required double TopWeightedStrainsCount { get; init; }
     }
 
     /// <summary>
