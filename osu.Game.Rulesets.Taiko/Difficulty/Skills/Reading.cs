@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -11,6 +12,17 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
+    public class ReadingAttributes : StrainSkillAttributes
+    {
+        public ReadingAttributes(StrainSkillAttributes baseAttributes)
+        {
+            Difficulty = baseAttributes.Difficulty;
+            ObjectDifficulties = baseAttributes.ObjectDifficulties;
+            StrainPeaks = baseAttributes.StrainPeaks;
+            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
+        }
+    }
+
     /// <summary>
     /// Calculates the reading coefficient of taiko difficulty.
     /// </summary>
@@ -21,8 +33,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private double currentStrain;
 
-        public Reading(Mod[] mods)
-            : base(mods)
+        public Reading(Mod[] mods, DifficultyHitObject[] difficultyHitObjects)
+            : base(mods, difficultyHitObjects)
         {
         }
 
@@ -43,6 +55,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject) * SkillMultiplier;
 
             return currentStrain;
+        }
+
+        public override ISkillAttributes Process() => new ReadingAttributes((StrainSkillAttributes)base.Process());
+
+        public override IEnumerable<TimedSkillAttributes> ProcessTimed()
+        {
+            foreach (var baseTimedAttributes in base.ProcessTimed())
+            {
+                var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
+
+                yield return new TimedSkillAttributes(new ReadingAttributes(baseAttributes), baseTimedAttributes.Time);
+            }
         }
     }
 }

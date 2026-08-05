@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -10,6 +11,19 @@ using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 {
+    public class StaminaAttributes : StrainSkillAttributes
+    {
+        public bool SingleColourStamina { get; init; }
+
+        public StaminaAttributes(StrainSkillAttributes baseAttributes)
+        {
+            Difficulty = baseAttributes.Difficulty;
+            ObjectDifficulties = baseAttributes.ObjectDifficulties;
+            StrainPeaks = baseAttributes.StrainPeaks;
+            TopWeightedStrainsCount = baseAttributes.TopWeightedStrainsCount;
+        }
+    }
+
     /// <summary>
     /// Calculates the stamina coefficient of taiko difficulty.
     /// </summary>
@@ -27,10 +41,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// Creates a <see cref="Stamina"/> skill.
         /// </summary>
         /// <param name="mods">Mods for use in skill calculations.</param>
+        /// <param name="difficultyHitObjects">Difficulty hit objects for use in skill calculations.</param>
         /// <param name="singleColourStamina">Reads when Stamina is from a single coloured pattern.</param>
         /// <param name="isConvert">Determines if the currently evaluated beatmap is converted.</param>
-        public Stamina(Mod[] mods, bool singleColourStamina, bool isConvert)
-            : base(mods)
+        public Stamina(Mod[] mods, DifficultyHitObject[] difficultyHitObjects, bool singleColourStamina, bool isConvert)
+            : base(mods, difficultyHitObjects)
         {
             SingleColourStamina = singleColourStamina;
             this.isConvert = isConvert;
@@ -64,5 +79,26 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             SingleColourStamina
                 ? 0
                 : currentStrain * strainDecay(time - current.Previous(0).StartTime);
+
+        public override ISkillAttributes Process()
+        {
+            return new StaminaAttributes((StrainSkillAttributes)base.Process())
+            {
+                SingleColourStamina = SingleColourStamina
+            };
+        }
+
+        public override IEnumerable<TimedSkillAttributes> ProcessTimed()
+        {
+            foreach (var baseTimedAttributes in base.ProcessTimed())
+            {
+                var baseAttributes = (StrainSkillAttributes)baseTimedAttributes.Attributes;
+
+                yield return new TimedSkillAttributes(new StaminaAttributes(baseAttributes)
+                {
+                    SingleColourStamina = SingleColourStamina
+                }, baseTimedAttributes.Time);
+            }
+        }
     }
 }

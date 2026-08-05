@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private double highestIndividualStrain;
         private double overallStrain;
 
-        public Strain(Mod[] mods, int totalColumns)
-            : base(mods)
+        public Strain(Mod[] mods, DifficultyHitObject[] difficultyHitObjects, int totalColumns)
+            : base(mods, difficultyHitObjects)
         {
             individualStrains = new double[totalColumns];
             overallStrain = 1;

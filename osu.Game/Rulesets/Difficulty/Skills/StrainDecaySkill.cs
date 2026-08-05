@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected double CurrentStrain { get; private set; }
 
-        protected StrainDecaySkill(Mod[] mods)
-            : base(mods)
+        protected StrainDecaySkill(Mod[] mods, DifficultyHitObject[] difficultyHitObjects)
+            : base(mods, difficultyHitObjects)
         {
         }
 
