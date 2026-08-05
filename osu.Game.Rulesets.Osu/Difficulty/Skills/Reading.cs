@@ -50,8 +50,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (current.StartTime <= firstObjectStartTime + reduced_difficulty_duration)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((current.StartTime - firstObjectStartTime.Value) / reduced_difficulty_duration, 0, 1)));
-                currentObjectStrain *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
+                double scale = Math.Log10(double.Lerp(1, 10, Math.Clamp((current.StartTime - firstObjectStartTime.Value) / reduced_difficulty_duration, 0, 1)));
+                currentObjectStrain *= double.Lerp(reduced_difficulty_base_line, 1.0, scale);
             }
 
             currentStrain *= decay;
