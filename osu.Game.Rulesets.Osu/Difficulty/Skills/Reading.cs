@@ -45,16 +45,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             firstObjectStartTime ??= current.StartTime;
 
             const double reduced_difficulty_base_line = 0.2;
-            double reduction = 1;
+
+            double currentObjectStrain = calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
 
             if (current.StartTime <= firstObjectStartTime + reduced_difficulty_duration)
             {
                 double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((current.StartTime - firstObjectStartTime.Value) / (reduced_difficulty_duration), 0, 1)));
-                reduction = Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
+                currentObjectStrain *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
             }
 
             currentStrain *= decay;
-            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier * reduction;
+            currentStrain += currentObjectStrain;
 
             return currentStrain;
         }
