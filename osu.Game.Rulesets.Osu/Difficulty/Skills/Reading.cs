@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Aggregation;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -29,28 +27,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
-        private double reducedNoteCount;
-        private double? reducedDuration;
+        private double? firstObjectStartTime;
 
         private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
         protected override double ProcessInternal(DifficultyHitObject current)
         {
             const double skill_multiplier = 2.5;
-            const double reduced_difficulty_duration = 60 * 1000;
+            const double reduced_difficulty_duration = 40 * 1000;
 
             double decay = strainDecay(current.DeltaTime);
 
-            currentStrain *= decay;
-            currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
-
             // This currently operates under the assumption that `ObjectDifficultyOf` is called once per object, and in order.
-            // Under that assumption, we can trust that `current.StartTime` refers to the start time of the first object in the case that `reducedDuration` is yet to be set.
-            reducedDuration ??= current.StartTime + reduced_difficulty_duration;
+            // Under that assumption, we can trust that `current.StartTime` refers to the start time of the first object in the case that `firstObjectStartTime` is yet to be set.
+            firstObjectStartTime ??= current.StartTime;
 
-            // This relies on the same assumption, as calling in order means that we can safely increase the note count until we reach the first object after the reduced duration.
-            if (current.StartTime <= reducedDuration)
-                reducedNoteCount++;
+            const double reduced_difficulty_base_line = 0.2; // Assume that even with full memorisation, skill is still required to read and play the first objects.
+
+            double currentObjectStrain = calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
+
+            if (current.StartTime <= firstObjectStartTime + reduced_difficulty_duration)
+            {
+                double scale = Math.Log10(double.Lerp(1, 10, Math.Clamp((current.StartTime - firstObjectStartTime.Value) / reduced_difficulty_duration, 0, 1)));
+                currentObjectStrain *= double.Lerp(reduced_difficulty_base_line, 1.0, scale);
+            }
+
+            currentStrain *= decay;
+            currentStrain += currentObjectStrain;
 
             return currentStrain;
         }
@@ -84,26 +87,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0;
 
-            var difficulties = GetTransformedDifficulties(ObjectDifficulties);
-
-            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(difficulties);
+            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(ObjectDifficulties);
 
             return difficulty;
-        }
-
-        protected List<double> GetTransformedDifficulties(List<double> difficulties)
-        {
-            difficulties = difficulties.Where(v => v > 0).ToList();
-
-            const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
-
-            for (int i = 0; i < Math.Min(difficulties.Count, reducedNoteCount); i++)
-            {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp(i / reducedNoteCount, 0, 1)));
-                difficulties[i] *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
-            }
-
-            return difficulties;
         }
 
         public double CountTopWeightedObjectDifficulties(double difficultyValue)
