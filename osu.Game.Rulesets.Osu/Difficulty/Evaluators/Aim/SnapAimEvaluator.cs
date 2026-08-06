@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (current.BaseObject is Spinner || current.Index <= 1 || osuLastObj.BaseObject is Spinner)
                 return 0;
 
-            const double wide_angle_multiplier = 11.0;
+            const double wide_angle_multiplier = 10.0;
             const double acute_angle_multiplier = 2.41;
             const double slider_multiplier = 1.5;
             const double velocity_change_multiplier = 1.0;
