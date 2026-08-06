@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // Under that assumption, we can trust that `current.StartTime` refers to the start time of the first object in the case that `firstObjectStartTime` is yet to be set.
             firstObjectStartTime ??= current.StartTime;
 
-            const double reduced_difficulty_base_line = 0.2;
+            const double reduced_difficulty_base_line = 0.2; // Assume that even with full memorisation, skill is still required to read and play the first objects.
 
             double currentObjectStrain = calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
 
