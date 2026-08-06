@@ -30,6 +30,11 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
+        /// <summary>
+        /// Conversion factor from converting legacy positioning values (based in x480 dimensions) to x768.
+        /// </summary>
+        public const float POSITION_SCALE_FACTOR = 1.6f;
+
         protected virtual bool AllowManiaConfigLookups => true;
 
         /// <summary>
