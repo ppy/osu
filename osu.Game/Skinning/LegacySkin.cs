@@ -453,8 +453,7 @@ namespace osu.Game.Skinning
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
-                                    hitError.Origin = Anchor.CentreLeft;
-                                    hitError.Rotation = -90;
+                                    hitError.Origin = Anchor.BottomCentre;
                                 }
 
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
@@ -466,7 +465,7 @@ namespace osu.Game.Skinning
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
                                     new LegacySongProgress(),
-                                    new BarHitErrorMeter(),
+                                    new LegacyBarHitErrorMeter(),
 
                                     // to match stable, health bars are in front of everything else
                                     // for the sake of hacky full screen area health bars
