@@ -247,6 +247,29 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Rotation = 270,
                 Margin = new MarginPadding { Left = 50 }
             });
+
+            Add(new LegacyBarHitErrorMeter
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.BottomCentre,
+                Rotation = 90,
+                X = -100,
+            });
+
+            Add(new LegacyBarHitErrorMeter
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.BottomCentre,
+                Rotation = 90,
+                X = 100,
+            });
+
+            Add(new LegacyBarHitErrorMeter
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                Y = -100
+            });
         }
 
         private void newJudgement(double offset = 0, HitResult result = HitResult.Perfect)
