@@ -15,6 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
+    /// <seealso href="https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameModes/Play/Components/ScoreMeterError.cs"/>
     public partial class LegacyBarHitErrorMeter : HitErrorMeter
     {
         private const float bar_height = 3;
