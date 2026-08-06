@@ -48,6 +48,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </remarks>
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => timeline.ReceivePositionalInputAt(screenSpacePos);
 
+        private readonly Bindable<TernaryState> noteLock = new Bindable<TernaryState>();
+
+        protected override bool AllowSelectionMovement => noteLock.Value == TernaryState.False;
+
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
         {
@@ -72,6 +76,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            noteLock.BindTo(Composer.BlueprintContainer.NoteLock);
 
             placement = Beatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
