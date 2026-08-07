@@ -9,13 +9,13 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
-    public partial class ReportCommentPopover : ReportPopover<CommentReportReason>
+    public partial class ReportCommentDialog : ReportDialog<CommentReportReason>
     {
         private readonly Comment comment;
 
         protected override bool IsCommentRequired(CommentReportReason reason) => reason == CommentReportReason.Other;
 
-        public ReportCommentPopover(Comment comment)
+        public ReportCommentDialog(Comment comment)
             : base(ReportStrings.CommentTitle(comment.User?.Username ?? comment.LegacyName ?? @"Someone"), false)
         {
             this.comment = comment;

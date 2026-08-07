@@ -7,6 +7,15 @@ namespace osu.Game.Overlays.Dialog
 {
     public partial class PopupDialogButton : DialogButton
     {
+        /// <summary>
+        /// Whether the dialog should be closed before the action related to this button is invoked.
+        /// </summary>
+        /// <remarks>
+        /// This is important as the code which is performed may check for a dialog being present (ie. `OsuGame.PerformFromScreen`)
+        /// and we don't want it to see the already dismissed dialog.
+        /// </remarks>
+        public virtual bool HideDialogBeforeInvoke => true;
+
         public PopupDialogButton(HoverSampleSet sampleSet = HoverSampleSet.Button)
             : base(sampleSet)
         {

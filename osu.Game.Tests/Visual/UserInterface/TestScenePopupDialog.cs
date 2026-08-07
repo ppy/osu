@@ -1,9 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 using osuTK;
 using osuTK.Input;
@@ -47,7 +51,17 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("hold button", () => InputManager.PressButton(MouseButton.Left));
             AddUntilStep("action invoked", () => dialog.DangerousButtonInvoked);
+            AddAssert("dialog is hidden", () => dialog.State.Value, () => Is.EqualTo(Visibility.Hidden));
             AddStep("release button", () => InputManager.ReleaseButton(MouseButton.Left));
+        }
+
+        [Test]
+        public void TestHideDialogBeforeInvoke()
+        {
+            AddStep("move mouse to button", () => InputManager.MoveMouseTo(dialog.ChildrenOfType<NonHideButton>().First()));
+            AddStep("click button", () => InputManager.Click(MouseButton.Left));
+            AddAssert("action invoked", () => dialog.NonHideActionInvoked, () => Is.True);
+            AddAssert("dialog is still visible", () => dialog.State.Value, () => Is.EqualTo(Visibility.Visible));
         }
 
         private partial class TestPopupDialog : PopupDialog
@@ -55,6 +69,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public PopupDialogDangerousButton DangerousButton { get; }
 
             public bool DangerousButtonInvoked;
+            public bool NonHideActionInvoked;
 
             public TestPopupDialog()
             {
@@ -78,7 +93,27 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Text = @"Careful with this one..",
                         Action = () => DangerousButtonInvoked = true,
                     },
+                    new NonHideButton
+                    {
+                        Action = () => NonHideActionInvoked = true,
+                    },
                 };
+            }
+        }
+
+        private partial class NonHideButton : PopupDialogButton
+        {
+            public override bool HideDialogBeforeInvoke => false;
+
+            public NonHideButton()
+            {
+                Text = @"This button will not hide the dialog!";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                ButtonColour = colours.Yellow;
             }
         }
     }
