@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -75,6 +76,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                 var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
                                 var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
                                 Vector2 pos = new Vector2();
 
@@ -104,6 +106,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     leaderboard.Position = pos;
                                 }
 
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.BottomCentre;
+                                    hitError.Origin = Anchor.BottomCentre;
+                                }
+
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
                                     d.UsesFixedAnchor = true;
                             })
@@ -114,6 +122,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                                     new LegacyKeyCounterDisplay(),
                                     new SpectatorList(),
                                     new DrawableGameplayLeaderboard(),
+                                    new LegacyBarHitErrorMeter(),
                                 }
                             };
                     }
