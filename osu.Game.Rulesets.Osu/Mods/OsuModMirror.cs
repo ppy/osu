@@ -20,6 +20,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Flipped axes")]
         public Bindable<MirrorType> Reflection { get; } = new Bindable<MirrorType>();
 
+        [SettingSource("Reflect stack direction")]
+        public BindableBool MirrorStacks { get; } = new BindableBool();
+
+        public bool MirrorStackingDirection => MirrorStacks.Value;
+        public override bool Ranked => MirrorStackingDirection;
+
+        public OsuModMirror()
+        {
+            MirrorStacks.Value = MirrorStacks.Default = false;
+        }
+
         public void ApplyToHitObject(HitObject hitObject)
         {
             var osuObject = (OsuHitObject)hitObject;
@@ -27,16 +38,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (Reflection.Value)
             {
                 case MirrorType.Horizontal:
-                    OsuHitObjectGenerationUtils.ReflectHorizontallyAlongPlayfield(osuObject);
+                    OsuHitObjectGenerationUtils.ReflectHorizontallyAlongPlayfield(osuObject, MirrorStackingDirection);
                     break;
 
                 case MirrorType.Vertical:
-                    OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
+                    OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject, MirrorStackingDirection);
                     break;
 
                 case MirrorType.Both:
-                    OsuHitObjectGenerationUtils.ReflectHorizontallyAlongPlayfield(osuObject);
-                    OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject);
+                    OsuHitObjectGenerationUtils.ReflectHorizontallyAlongPlayfield(osuObject, MirrorStackingDirection);
+                    OsuHitObjectGenerationUtils.ReflectVerticallyAlongPlayfield(osuObject, MirrorStackingDirection);
                     break;
             }
         }
