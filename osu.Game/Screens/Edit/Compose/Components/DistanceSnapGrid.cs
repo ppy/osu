@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (Precision.DefinitelyBigger(beatIndex, fractionalBeatIndex, 0.01))
                 beatIndex = (int)Math.Floor(fractionalBeatIndex);
 
-            var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
+            var colour = BindableBeatDivisor.GetDefaultColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
             int repeatIndex = placementIndex / beatDivisor.Value;
             return colour.Opacity(0.5f / (repeatIndex + 1));

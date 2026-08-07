@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public partial class TestSceneStageForeground : ManiaSkinnableTestScene
+    public partial class TestSceneStageForeground : ManiaSkinnableTestSceneScrolling
     {
         [BackgroundDependencyLoader]
         private void load()

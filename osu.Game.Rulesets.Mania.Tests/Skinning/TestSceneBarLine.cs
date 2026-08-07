@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public partial class TestSceneBarLine : ManiaSkinnableTestScene
+    public partial class TestSceneBarLine : ManiaSkinnableTestSceneScrolling
     {
         [Test]
         public void TestMinor()

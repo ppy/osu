@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Mania.UI;
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
     /// <summary>
-    /// A container to be used in a <see cref="ManiaSkinnableTestScene"/> to provide a resolvable <see cref="Column"/> dependency.
+    /// A container to be used in a <see cref="ManiaSkinnableTestSceneScrolling"/> to provide a resolvable <see cref="Column"/> dependency.
     /// </summary>
     public partial class ColumnTestContainer : Container
     {

@@ -112,6 +112,9 @@ namespace osu.Game.Skinning
                     case SkinCustomColourLookup customColour:
                         return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString() ?? string.Empty));
 
+                    case SkinTimingColourLookup timingColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(Configuration.GetTimingColourFor(timingColour.SnapDivisor)));
+
                     case LegacyManiaSkinConfigurationLookup maniaLookup:
                         if (!AllowManiaConfigLookups)
                             break;
