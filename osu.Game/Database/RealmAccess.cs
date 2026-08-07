@@ -101,8 +101,9 @@ namespace osu.Game.Database
         /// 49   2025-06-10    Reset the LegacyOnlineID to -1 for all scores that have it set to 0 (which is semantically the same) for consistency of handling with OnlineID.
         /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
         /// 51   2025-07-22    Add ScoreInfo.Pauses.
+        /// 52   2026-07-28    Add RealmOnlineAsset.
         /// </summary>
-        private const int schema_version = 51;
+        private const int schema_version = 52;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -412,6 +413,12 @@ namespace osu.Game.Database
 
                     foreach (var s in pendingDeletePresets)
                         realm.Remove(s);
+
+                    var onlineAssetAccessCutoff = DateTimeOffset.Now.AddMonths(-1);
+                    var pendingDeleteOnlineAssets = realm.All<RealmOnlineAsset>().Where(a => a.LastAccessed < onlineAssetAccessCutoff);
+
+                    foreach (var a in pendingDeleteOnlineAssets)
+                        realm.Remove(a);
 
                     transaction.Commit();
                 }
@@ -774,6 +781,8 @@ namespace osu.Game.Database
                     realmRetrievalLock.Wait();
                     currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
+
+                    ObjectDisposedException.ThrowIf(isDisposed, this);
                 }
                 else
                 {
