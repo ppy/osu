@@ -12,7 +12,7 @@ using DragArea = osu.Game.Screens.Edit.Compose.Components.Timeline.TimelineHitOb
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public partial class TestSceneHoldNoteTailDrag : EditorTestScene
+    public partial class TestSceneTimelineHoldNote : EditorTestScene
     {
         protected override Ruleset CreateEditorRuleset() => new ManiaRuleset();
 

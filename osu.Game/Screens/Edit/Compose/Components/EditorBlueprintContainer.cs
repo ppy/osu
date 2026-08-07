@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; }
 
+        [Cached]
         protected readonly HitObjectComposer Composer;
 
         private HitObjectUsageEventBuffer usageEventBuffer;
