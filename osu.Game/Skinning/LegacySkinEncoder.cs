@@ -110,10 +110,10 @@ namespace osu.Game.Skinning
                 writeValue(textWriter, @"JudgementLine", maniaConfig.ShowJudgementLine ? @"1" : @"0");
                 writeValue(textWriter, @"BarlineHeight", maniaConfig.BarLineHeight.ToString(CultureInfo.InvariantCulture), defaultValue: @"1.2");
 
-                float hitPosition = 480 - (maniaConfig.HitPosition / LegacySkin.POSITION_SCALE_FACTOR);
+                float hitPosition = 480 - (maniaConfig.HitPosition / LegacySkin.STABLE_MAGIC_SCALE_FACTOR);
                 writeValue(textWriter, @"HitPosition", hitPosition.ToString(CultureInfo.InvariantCulture), defaultValue: @"402");
 
-                float lightPosition = 480 - (maniaConfig.LightPosition / LegacySkin.POSITION_SCALE_FACTOR);
+                float lightPosition = 480 - (maniaConfig.LightPosition / LegacySkin.STABLE_MAGIC_SCALE_FACTOR);
                 writeValue(textWriter, @"LightPosition", lightPosition.ToString(CultureInfo.InvariantCulture), defaultValue: @"413");
 
                 writeValue(textWriter, @"ComboPosition", undoPositionScaleFactor(maniaConfig.ComboPosition).ToString(CultureInfo.InvariantCulture), defaultValue: @"111");
@@ -189,7 +189,7 @@ namespace osu.Game.Skinning
                 : FormattableString.Invariant($"{(int)(colour.Value.R * 255)},{(int)(colour.Value.G * 255)},{(int)(colour.Value.B * 255)}");
         }
 
-        private float undoPositionScaleFactor(float f) => f / LegacySkin.POSITION_SCALE_FACTOR;
+        private float undoPositionScaleFactor(float f) => f / LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
 
         private string enumerableToString<T>(IEnumerable<T?> ts)
             where T : IFormattable
