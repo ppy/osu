@@ -17,7 +17,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public int Rating { get; set; }
 
         [JsonProperty("rank")]
-        public int? Rank { get; set; }
+        public int Rank { get; set; }
+
+        [JsonProperty("rank_percent")]
+        public float RankPercent { get; set; }
 
         [JsonProperty("plays")]
         public int Plays { get; set; }
