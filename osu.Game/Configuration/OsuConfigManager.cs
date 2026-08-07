@@ -44,6 +44,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
             SetDefault(OsuSetting.BeatmapLeaderboardSortMode, LeaderboardSortMode.Score);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
+            SetDefault(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, false);
 
             SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
             SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
@@ -377,6 +378,7 @@ namespace osu.Game.Configuration
         BeatmapDetailTab,
         BeatmapLeaderboardSortMode,
         BeatmapDetailModsFilter,
+        AutoSwitchToLocalLeaderboardWhenUnavailable,
         Username,
         ReleaseStream,
         SavePassword,
