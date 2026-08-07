@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -47,11 +48,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             foreach (var attribute in base.GetAttributesForDisplay())
                 yield return attribute;
 
-            yield return new PerformanceDisplayAttribute(nameof(Aim), "Aim", Aim);
-            yield return new PerformanceDisplayAttribute(nameof(Speed), "Speed", Speed);
-            yield return new PerformanceDisplayAttribute(nameof(Accuracy), "Accuracy", Accuracy);
-            yield return new PerformanceDisplayAttribute(nameof(Flashlight), "Flashlight Bonus", Flashlight);
-            yield return new PerformanceDisplayAttribute(nameof(Reading), "Reading", Reading);
+            yield return new PerformanceDisplayAttribute(nameof(Aim), PerformanceBreakdownStrings.AimAttribute, Aim);
+            yield return new PerformanceDisplayAttribute(nameof(Speed), PerformanceBreakdownStrings.SpeedAttribute, Speed);
+            yield return new PerformanceDisplayAttribute(nameof(Accuracy), PerformanceBreakdownStrings.AccuracyAttribute, Accuracy);
+            yield return new PerformanceDisplayAttribute(nameof(Flashlight), PerformanceBreakdownStrings.FlashlightBonusAttribute, Flashlight);
+            yield return new PerformanceDisplayAttribute(nameof(Reading), PerformanceBreakdownStrings.ReadingAttribute, Reading);
         }
     }
 }

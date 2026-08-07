@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -14,6 +15,7 @@ using osu.Game.Database;
 using osu.Game.Scoring;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osuTK;
@@ -86,24 +88,24 @@ namespace osu.Game.Screens.Play
                 switch (state.NewValue)
                 {
                     case DownloadState.LocallyAvailable:
-                        button.TooltipText = @"watch replay";
+                        button.TooltipText = SongSelectStrings.WatchReplay.ToLower();
                         button.Enabled.Value = true;
                         break;
 
                     case DownloadState.Importing:
-                        button.TooltipText = @"importing score";
+                        button.TooltipText = ResultsScreenStrings.ImportingScore;
                         button.Enabled.Value = false;
                         break;
 
                     default:
                         if (importFailedScore != null)
                         {
-                            button.TooltipText = @"save score";
+                            button.TooltipText = ResultsScreenStrings.SaveScore;
                             button.Enabled.Value = true;
                         }
                         else
                         {
-                            button.TooltipText = @"replay unavailable";
+                            button.TooltipText = ResultsScreenStrings.ReplayUnavailable;
                             button.Enabled.Value = false;
                         }
 

@@ -8,7 +8,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -30,7 +32,7 @@ namespace osu.Game.Rulesets.Scoring
         /// This miss window should determine how early a hit can be before it is considered for judgement (as opposed to being ignored as
         /// "too far in the future"). It should also define when a forced miss should be triggered (as a result of no user input in time).
         /// </remarks>
-        [Description(@"Miss")]
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowScoreboardHeadersMiss))]
         [EnumMember(Value = "miss")]
         [Order(5)]
         Miss,

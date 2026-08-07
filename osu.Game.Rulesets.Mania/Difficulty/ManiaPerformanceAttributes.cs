@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             foreach (var attribute in base.GetAttributesForDisplay())
                 yield return attribute;
 
-            yield return new PerformanceDisplayAttribute(nameof(Difficulty), "Difficulty", Difficulty);
+            yield return new PerformanceDisplayAttribute(nameof(Difficulty), PerformanceBreakdownStrings.DifficultyAttribute, Difficulty);
         }
     }
 }
