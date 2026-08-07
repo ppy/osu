@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Configuration
 
             SetDefault(TaikoRulesetSetting.TouchControlScheme, TaikoTouchControlScheme.KDDK);
             SetDefault(TaikoRulesetSetting.RateAdjustedHitAnimation, true);
+            SetDefault(TaikoRulesetSetting.HitAnimations, true);
         }
     }
 
@@ -26,5 +27,6 @@ namespace osu.Game.Rulesets.Taiko.Configuration
     {
         TouchControlScheme,
         RateAdjustedHitAnimation,
+        HitAnimations,
     }
 }

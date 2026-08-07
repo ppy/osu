@@ -36,7 +36,7 @@ namespace osu.Game.Overlays
                                           // Without this, a dialog pushed during disabled overlay activation mode would be presented,
                                           // but immediately dismissed without ever being seen by the user (see
                                           // https://github.com/ppy/osu/blob/ce5e54c9d27b17d460d99e774de502f9480fb710/osu.Game/Graphics/Containers/OsuFocusedOverlayContainer.cs#L131-L136).
-                                          && OverlayActivationMode.Value == OverlayActivation.All;
+                                          && OverlayActivationMode.Value != OverlayActivation.Disabled;
 
         [CanBeNull]
         private IDisposable duckOperation;

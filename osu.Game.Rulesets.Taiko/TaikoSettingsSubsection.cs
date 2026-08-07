@@ -26,6 +26,9 @@ namespace osu.Game.Rulesets.Taiko
         {
             var config = (TaikoRulesetConfigManager)Config;
 
+            FormCheckBox rateAdjustedAnimations;
+            FormCheckBox hitAnimations;
+
             Children = new Drawable[]
             {
                 new SettingsItemV2(new FormEnumDropdown<TaikoTouchControlScheme>
@@ -33,7 +36,13 @@ namespace osu.Game.Rulesets.Taiko
                     Caption = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
                 }),
-                new SettingsItemV2(new FormCheckBox
+                new SettingsItemV2(hitAnimations = new FormCheckBox
+                {
+                    Caption = RulesetSettingsStrings.HitAnimations,
+                    HintText = RulesetSettingsStrings.HitAnimationsTaikoTooltip,
+                    Current = config.GetBindable<bool>(TaikoRulesetSetting.HitAnimations)
+                }),
+                new SettingsItemV2(rateAdjustedAnimations = new FormCheckBox
                 {
                     Caption = RulesetSettingsStrings.RateAdjustedHitAnimation,
                     HintText = RulesetSettingsStrings.RateAdjustedHitAnimationTooltip,
@@ -43,6 +52,11 @@ namespace osu.Game.Rulesets.Taiko
                     ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
                 }
             };
+
+            hitAnimations.Current.BindValueChanged(val =>
+            {
+                rateAdjustedAnimations.Current.Disabled = !val.NewValue;
+            }, true);
         }
     }
 }

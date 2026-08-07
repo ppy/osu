@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             float hitPosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.HitPosition)?.Value ?? 0;
             float scorePosition = skin.GetManiaSkinConfig<float>(LegacyManiaSkinConfigurationLookups.ScorePosition)?.Value ?? 0;
 
-            float hitPositionFromTop = 480f * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR - hitPosition;
+            float hitPositionFromTop = 480f * LegacySkin.POSITION_SCALE_FACTOR - hitPosition;
 
             if (scorePosition > hitPositionFromTop / 2f)
             {

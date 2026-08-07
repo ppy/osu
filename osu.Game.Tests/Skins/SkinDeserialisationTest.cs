@@ -83,6 +83,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-classic-20250827.osk",
             // Covers "Argon" judgement counter
             "Archives/modified-argon-20250308.osk",
+            // Covers legacy bar hit error meter
+            "Archives/modified-classic-20260806.osk",
         };
 
         /// <summary>

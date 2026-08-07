@@ -140,6 +140,8 @@ namespace osu.Game.Tests.Visual.Playlists
                 room = new Room
                 {
                     RoomID = 1,
+                    Name = "Test Playlist",
+                    Description = "This is a playlist with a short description, woo!",
                     MaxAttempts = 10,
                     Playlist =
                     [

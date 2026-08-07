@@ -99,6 +99,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestScrollToSectionChildren()
+        {
+            AddRepeatStep("add many sections", () => append(1f), 3);
+            AddStep("scroll to first section", () => container.ScrollTo(container.Children.First()));
+            AddStep("scroll to final section's text", () => container.ScrollTo(container.Children.Last().ChildrenOfType<OsuSpriteText>().Single()));
+            AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children.Last());
+        }
+
+        [Test]
         public void TestSelection()
         {
             AddStep("clear", () => container.Clear());

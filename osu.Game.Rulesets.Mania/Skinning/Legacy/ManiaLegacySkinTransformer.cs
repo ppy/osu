@@ -128,8 +128,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
-                                    hitError.Origin = Anchor.CentreLeft;
-                                    hitError.Rotation = -90;
+                                    hitError.Origin = Anchor.BottomCentre;
                                 }
 
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
@@ -139,7 +138,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                                 new LegacyManiaComboCounter(),
                                 new SpectatorList(),
                                 new DrawableGameplayLeaderboard(),
-                                new BarHitErrorMeter(),
+                                new LegacyBarHitErrorMeter(),
                             };
                     }
 

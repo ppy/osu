@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Edit.Setup
 
         public Action? MetadataChanged { get; set; }
 
+        public Action? BackgroundChanged { get; set; }
+
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {

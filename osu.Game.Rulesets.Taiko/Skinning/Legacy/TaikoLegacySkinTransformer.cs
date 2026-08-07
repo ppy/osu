@@ -85,8 +85,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                 if (hitError != null)
                                 {
                                     hitError.Anchor = Anchor.BottomCentre;
-                                    hitError.Origin = Anchor.CentreLeft;
-                                    hitError.Rotation = -90;
+                                    hitError.Origin = Anchor.BottomCentre;
                                 }
 
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
@@ -96,7 +95,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                 new LegacyDefaultComboCounter(),
                                 new SpectatorList(),
                                 new DrawableGameplayLeaderboard(),
-                                new BarHitErrorMeter(),
+                                new LegacyBarHitErrorMeter(),
                             };
                     }
 
