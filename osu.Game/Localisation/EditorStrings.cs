@@ -309,6 +309,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SampleSet => new TranslatableString(getKey(@"sample_set"), @"Sample set");
 
+        /// <summary>
+        /// "Sync to all difficulties"
+        /// </summary>
+        public static LocalisableString SyncToAllDifficulties => new TranslatableString(getKey(@"sync_to_all_difficulties"), @"Sync to all difficulties");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

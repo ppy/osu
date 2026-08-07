@@ -94,6 +94,26 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SnapAllNotesConfirmationBody => new TranslatableString(getKey(@"snap_all_notes_confirmation_body"), @"Every hit object in this difficulty will move to the nearest tick for your current snap divisor. Slider and hold durations may change. You can undo this from the editor history.");
 
+        /// <summary>
+        /// "Sync to all difficulties?"
+        /// </summary>
+        public static LocalisableString SyncTimingConfirmationHeader => new TranslatableString(getKey(@"sync_timing_confirmation_header"), @"Sync to all difficulties?");
+
+        /// <summary>
+        /// "This overwrites the selected options on all other difficulties. This cannot be undone."
+        /// </summary>
+        public static LocalisableString SyncTimingConfirmationBody => new TranslatableString(getKey(@"sync_timing_confirmation_body"), @"This overwrites the selected options on all other difficulties. This cannot be undone.");
+
+        /// <summary>
+        /// "Bookmarks"
+        /// </summary>
+        public static LocalisableString SyncTimingOptionBookmarks => new TranslatableString(getKey(@"sync_timing_option_bookmarks"), @"Bookmarks");
+
+        /// <summary>
+        /// "Preview point"
+        /// </summary>
+        public static LocalisableString SyncTimingOptionPreviewPoint => new TranslatableString(getKey(@"sync_timing_option_preview_point"), @"Preview point");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
