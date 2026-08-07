@@ -6,11 +6,11 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -53,8 +53,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private readonly Container judgementAboveHitObjectLayer;
 
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
+        private readonly Bindable<bool> showSliderTickMissMarkers = new Bindable<bool>(true);
 
         public OsuPlayfield()
         {
@@ -139,6 +138,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private void load(OsuRulesetConfigManager? config, IBeatmap? beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
+            config?.BindWith(OsuRulesetSetting.ShowSliderTickMissMarkers, showSliderTickMissMarkers);
 
             var osuBeatmap = (OsuBeatmap?)beatmap;
 
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 return;
 
             // LargeTickMiss = slider ticks / ends / repeats; IgnoreMiss = slider tails.
-            if (!config.Get<bool>(OsuSetting.ShowSliderEndMiss)
+            if (!showSliderTickMissMarkers.Value
                 && result.Type is HitResult.LargeTickMiss or HitResult.IgnoreMiss)
             {
                 return;

@@ -148,7 +148,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.HitLighting, true);
             SetDefault(OsuSetting.StarFountains, true);
-            SetDefault(OsuSetting.ShowSliderEndMiss, true);
 
             SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -420,7 +419,6 @@ namespace osu.Game.Configuration
         UIHoldActivationDelay,
         HitLighting,
         StarFountains,
-        ShowSliderEndMiss,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,

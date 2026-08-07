@@ -5,14 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
@@ -32,16 +33,21 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private static readonly Vector2 slider_start_position = new Vector2(256 - slider_path_length / 2, 192);
 
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
+        private OsuRulesetConfigManager config = null!;
 
         private ScoreAccessibleReplayPlayer currentPlayer = null!;
         private readonly List<JudgementResult> judgementResults = new List<JudgementResult>();
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            config = (OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(new OsuRuleset()).AsNonNull();
+        }
+
         [Test]
         public void TestMissMarkersHidden()
         {
-            AddStep("disable slider end miss", () => config.SetValue(OsuSetting.ShowSliderEndMiss, false));
+            AddStep("disable slider tick miss markers", () => config.SetValue(OsuRulesetSetting.ShowSliderTickMissMarkers, false));
 
             performMiss();
 
@@ -53,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestMissMarkersShown()
         {
-            AddStep("enable slider end miss", () => config.SetValue(OsuSetting.ShowSliderEndMiss, true));
+            AddStep("enable slider tick miss markers", () => config.SetValue(OsuRulesetSetting.ShowSliderTickMissMarkers, true));
 
             performMiss();
 
