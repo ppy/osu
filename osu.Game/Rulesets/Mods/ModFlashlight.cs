@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mods
         public abstract float DefaultFlashlightSize { get; }
     }
 
-    public abstract partial class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
+    public abstract partial class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor, IAdjustableWhenReplay
         where T : HitObject
     {
         public const double FLASHLIGHT_FADE_DURATION = 800;
@@ -100,9 +100,16 @@ namespace osu.Game.Rulesets.Mods
                 // NegativeInfinity is not used to allow one more thing drawn on top (used in replay analysis overlay in osu!).
                 Depth = float.MinValue,
             });
+
+            IsDisabled.BindValueChanged(_ =>
+            {
+                flashlight.FadeTo(IsDisabled.Value ? 0.3f : 1.0f, 50);
+            }, true);
         }
 
         protected abstract Flashlight CreateFlashlight();
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         public abstract partial class Flashlight : Drawable
         {
