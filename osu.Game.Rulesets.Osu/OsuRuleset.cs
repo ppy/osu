@@ -66,14 +66,24 @@ namespace osu.Game.Rulesets.Osu
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.Z, OsuAction.LeftButton),
-            new KeyBinding(InputKey.X, OsuAction.RightButton),
-            new KeyBinding(InputKey.C, OsuAction.Smoke),
-            new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
-            new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.Z, OsuAction.LeftButton),
+                        new KeyBinding(InputKey.X, OsuAction.RightButton),
+                        new KeyBinding(InputKey.C, OsuAction.Smoke),
+                        new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
+                        new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
+                    };
+
+                case EDITOR_VARIANT:
+                    return [];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {

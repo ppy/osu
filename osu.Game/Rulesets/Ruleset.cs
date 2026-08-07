@@ -306,9 +306,20 @@ namespace osu.Game.Rulesets
         public virtual string PlayingVerb => "Playing";
 
         /// <summary>
-        /// A list of available variant ids.
+        /// A list of available gameplay variant IDs.
         /// </summary>
-        public virtual IEnumerable<int> AvailableVariants => new[] { 0 };
+        public virtual IEnumerable<int> GameplayVariants => new[] { 0 };
+
+        /// <summary>
+        /// A list of all available variants.
+        /// Includes special variants like <see cref="EDITOR_VARIANT"/>.
+        /// </summary>
+        public IEnumerable<int> AllVariants => GameplayVariants.Append(EDITOR_VARIANT);
+
+        /// <summary>
+        /// A special variant used for supporting editor-specific customisable key bindings.
+        /// </summary>
+        public const int EDITOR_VARIANT = int.MaxValue;
 
         /// <summary>
         /// Get a list of default keys for the specified variant.
@@ -328,7 +339,17 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
-        public virtual LocalisableString GetVariantName(int variant) => string.Empty;
+        public virtual LocalisableString GetVariantName(int variant)
+        {
+            switch (variant)
+            {
+                default:
+                    return string.Empty;
+
+                case EDITOR_VARIANT:
+                    return EditorStrings.BeatmapEditor;
+            }
+        }
 
         /// <summary>
         /// Returns the ID of the variant that is applicable for the given <paramref name="beatmapInfo"/>, given the current active <paramref name="mods"/>.

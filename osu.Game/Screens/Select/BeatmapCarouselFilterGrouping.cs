@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Select
                 {
                     var rulesetInstance = criteria.Ruleset?.CreateInstance();
 
-                    if (rulesetInstance == null || rulesetInstance.AvailableVariants.Count() <= 1)
+                    if (rulesetInstance == null || rulesetInstance.GameplayVariants.Count() <= 1)
                         goto case GroupMode.None;
 
                     return getGroupsBy(b => defineGroupByVariant(rulesetInstance, b, criteria.Mods), items);

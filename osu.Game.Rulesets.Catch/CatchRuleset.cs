@@ -59,15 +59,25 @@ namespace osu.Game.Rulesets.Catch
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.Z, CatchAction.MoveLeft),
-            new KeyBinding(InputKey.Left, CatchAction.MoveLeft),
-            new KeyBinding(InputKey.X, CatchAction.MoveRight),
-            new KeyBinding(InputKey.Right, CatchAction.MoveRight),
-            new KeyBinding(InputKey.Shift, CatchAction.Dash),
-            new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.Z, CatchAction.MoveLeft),
+                        new KeyBinding(InputKey.Left, CatchAction.MoveLeft),
+                        new KeyBinding(InputKey.X, CatchAction.MoveRight),
+                        new KeyBinding(InputKey.Right, CatchAction.MoveRight),
+                        new KeyBinding(InputKey.Shift, CatchAction.Dash),
+                        new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
+                    };
+
+                case EDITOR_VARIANT:
+                    return [];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {

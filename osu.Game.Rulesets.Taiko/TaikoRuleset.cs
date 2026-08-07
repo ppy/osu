@@ -76,17 +76,27 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.D, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.J, TaikoAction.RightCentre),
-            new KeyBinding(InputKey.None, TaikoAction.RightCentre),
-            new KeyBinding(InputKey.K, TaikoAction.RightRim),
-            new KeyBinding(InputKey.None, TaikoAction.RightRim),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+                        new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
+                        new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
+                        new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
+                        new KeyBinding(InputKey.J, TaikoAction.RightCentre),
+                        new KeyBinding(InputKey.None, TaikoAction.RightCentre),
+                        new KeyBinding(InputKey.K, TaikoAction.RightRim),
+                        new KeyBinding(InputKey.None, TaikoAction.RightRim),
+                    };
+
+                case EDITOR_VARIANT:
+                    return [];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
