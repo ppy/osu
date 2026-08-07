@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             set
             {
                 if (value != null)
-                    value.ScaleAdjust *= LegacySkin.POSITION_SCALE_FACTOR;
+                    value.ScaleAdjust *= LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                 base.Texture = value;
             }
         }

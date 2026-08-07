@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     // https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameModes/Play/Rulesets/Taiko/RulesetTaiko.cs#L480-L481
                     // the final factor is attempting to compensate for the aspect ratio clamping logic in `TaikoPlayfieldAdjustmentContainer`
                     // such that it does not change the visible range of objects.
-                    FlashlightPosition = new Vector2(208 * LegacySkin.POSITION_SCALE_FACTOR * drawableRuleset.PlayfieldAdjustmentContainer.Scale.X);
+                    FlashlightPosition = new Vector2(208 * LegacySkin.STABLE_MAGIC_SCALE_FACTOR * drawableRuleset.PlayfieldAdjustmentContainer.Scale.X);
 
                     ClearTransforms(targetMember: nameof(FlashlightSize));
                     FlashlightSize = new Vector2(0, GetSize());

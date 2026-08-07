@@ -14,9 +14,9 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Size of a legacy column in the default skin, used for determining relative scale factors.
         /// </summary>
-        public const float DEFAULT_COLUMN_SIZE = 30 * LegacySkin.POSITION_SCALE_FACTOR;
+        public const float DEFAULT_COLUMN_SIZE = 30 * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
 
-        public const float DEFAULT_HIT_POSITION = (480 - 402) * LegacySkin.POSITION_SCALE_FACTOR;
+        public const float DEFAULT_HIT_POSITION = (480 - 402) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
 
         public readonly int Keys;
 
@@ -33,9 +33,9 @@ namespace osu.Game.Skinning
         public readonly float[] HoldNoteLightWidth;
 
         public float HitPosition = DEFAULT_HIT_POSITION;
-        public float LightPosition = (480 - 413) * LegacySkin.POSITION_SCALE_FACTOR;
-        public float ComboPosition = 111 * LegacySkin.POSITION_SCALE_FACTOR;
-        public float ScorePosition = 300 * LegacySkin.POSITION_SCALE_FACTOR;
+        public float LightPosition = (480 - 413) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
+        public float ComboPosition = 111 * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
+        public float ScorePosition = 300 * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
         public float BarLineHeight = 1.2f;
         public bool ShowJudgementLine = true;
         public bool KeysUnderNotes;

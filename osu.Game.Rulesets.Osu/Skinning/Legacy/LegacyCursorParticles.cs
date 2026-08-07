@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             var starBreakAdditive = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.StarBreakAdditive)?.Value ?? new Color4(255, 182, 193, 255);
 
             if (texture != null)
-                texture.ScaleAdjust *= LegacySkin.POSITION_SCALE_FACTOR;
+                texture.ScaleAdjust *= LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
 
             InternalChildren = new[]
             {

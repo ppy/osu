@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                     // set the anchor to top right so that it won't squash to the return button to the top
                                     keyCounter.Anchor = Anchor.CentreRight;
                                     keyCounter.Origin = Anchor.TopRight;
-                                    keyCounter.Position = new Vector2(0, -40) * LegacySkin.POSITION_SCALE_FACTOR;
+                                    keyCounter.Position = new Vector2(0, -40) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                                 }
 
                                 if (spectatorList != null)

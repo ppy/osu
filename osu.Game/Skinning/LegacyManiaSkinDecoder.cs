@@ -91,19 +91,19 @@ namespace osu.Game.Skinning
                         break;
 
                     case "HitPosition":
-                        currentConfig.HitPosition = (480 - Math.Clamp(float.Parse(pair.Value, CultureInfo.InvariantCulture), 240, 480)) * LegacySkin.POSITION_SCALE_FACTOR;
+                        currentConfig.HitPosition = (480 - Math.Clamp(float.Parse(pair.Value, CultureInfo.InvariantCulture), 240, 480)) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                         break;
 
                     case "LightPosition":
-                        currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacySkin.POSITION_SCALE_FACTOR;
+                        currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                         break;
 
                     case "ComboPosition":
-                        currentConfig.ComboPosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacySkin.POSITION_SCALE_FACTOR;
+                        currentConfig.ComboPosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                         break;
 
                     case "ScorePosition":
-                        currentConfig.ScorePosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacySkin.POSITION_SCALE_FACTOR;
+                        currentConfig.ScorePosition = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                         break;
 
                     case "JudgementLine":
@@ -128,7 +128,7 @@ namespace osu.Game.Skinning
                         break;
 
                     case "WidthForNoteHeightScale":
-                        currentConfig.WidthForNoteHeightScale = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacySkin.POSITION_SCALE_FACTOR;
+                        currentConfig.WidthForNoteHeightScale = float.Parse(pair.Value, CultureInfo.InvariantCulture) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                         break;
 
                     case "LightFramePerSecond":
@@ -209,7 +209,7 @@ namespace osu.Game.Skinning
                     parsedValue = 0;
 
                 if (applyScaleFactor)
-                    parsedValue *= LegacySkin.POSITION_SCALE_FACTOR;
+                    parsedValue *= LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
 
                 output[i] = parsedValue;
             }

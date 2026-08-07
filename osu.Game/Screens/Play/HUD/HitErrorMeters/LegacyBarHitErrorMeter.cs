@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             hitWindows = HitWindows.GetAllAvailableWindows().Where(w => w.result.IsHit()).ToArray();
 
             AutoSizeAxes = Axes.X;
-            Height = (bar_height * 4) * LegacySkin.POSITION_SCALE_FACTOR;
+            Height = (bar_height * 4) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
             Origin = Anchor.Centre;
             InternalChildren = new Drawable[]
             {
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 colourBarContainer = new Container
                 {
                     AutoSizeAxes = Axes.X,
-                    Height = bar_height * LegacySkin.POSITION_SCALE_FACTOR,
+                    Height = bar_height * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(1.5f, bar_height * 4) * LegacySkin.POSITION_SCALE_FACTOR,
+                    Size = new Vector2(1.5f, bar_height * 4) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                 },
                 judgementLinePool = new DrawablePool<JudgementLine>(50),
                 judgementContainer = new Container
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
                 colourBarContainer.Add(new Box
                 {
-                    Size = new Vector2((float)hitWindow.length, bar_height) * LegacySkin.POSITION_SCALE_FACTOR,
+                    Size = new Vector2((float)hitWindow.length, bar_height) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = GetColourForHitResult(hitWindow.result),
