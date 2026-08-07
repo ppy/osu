@@ -23,6 +23,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -48,11 +50,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private OsuSpriteText beatmapState = null!;
         private OsuSpriteText damageMultiplierText = null!;
         private OsuSpriteText lastStandText = null!;
+        private ModDisplay modDisplay = null!;
 
         private BeatmapAvailability availability = BeatmapAvailability.Unknown();
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
+
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; } = null!;
 
         [Resolved]
         private RankedPlayCornerPiece? cornerPiece { get; set; }
@@ -83,30 +89,47 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 ? Anchor.CentreLeft
                 : Anchor.CentreRight;
 
+            var modsAnchor = (contentAnchor & Anchor.x0) != 0
+                ? Anchor.TopCentre
+                : Anchor.BottomCentre;
+
             InternalChildren =
             [
-                new CircularContainer
+                new Container
                 {
-                    Name = "Avatar",
                     Size = new Vector2(72),
-                    Masking = true,
                     Anchor = contentAnchor,
                     Origin = contentAnchor,
                     Children =
                     [
-                        new Box
+                        new CircularContainer
                         {
+                            Name = "Avatar",
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colourScheme.Surface,
-                            Alpha = 0.5f,
+                            Masking = true,
+                            Children =
+                            [
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourScheme.Surface,
+                                    Alpha = 0.5f,
+                                },
+                                grayScaleContainer = new BufferedContainer(cachedFrameBuffer: false, pixelSnapping: true)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Child = new UpdateableAvatar(user)
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    }
+                                }
+                            ]
                         },
-                        grayScaleContainer = new BufferedContainer(cachedFrameBuffer: false, pixelSnapping: true)
+                        modDisplay = new ModDisplay(false)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = new UpdateableAvatar(user)
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
+                            Anchor = modsAnchor,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(0.5f)
                         }
                     ]
                 },
@@ -198,13 +221,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             });
 
             client.RoomUpdated += onRoomUpdated;
+            client.UserModsChanged += onUserModsChanged;
+
             onRoomUpdated();
+
+            foreach (var roomUser in client.Room?.Users ?? [])
+                onUserModsChanged(roomUser);
         }
 
         private void onRoomUpdated()
         {
             updateBeatmapState();
             updateDamageMultiplier();
+        }
+
+        private void onUserModsChanged(MultiplayerRoomUser roomUser)
+        {
+            if (roomUser.UserID != user.Id)
+                return;
+
+            Ruleset ruleset = rulesetStore.GetRuleset(client.Room!.CurrentPlaylistItem.RulesetID)!.CreateInstance();
+            modDisplay.Current.Value = roomUser.Mods.Select(m => m.ToMod(ruleset)).ToArray();
         }
 
         private void updateBeatmapState()
