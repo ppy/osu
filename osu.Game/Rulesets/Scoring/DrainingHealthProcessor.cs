@@ -134,11 +134,16 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.ApplyResultInternal(result);
 
-            if (IsSimulating && !result.Type.IsBonus())
+            if (IsSimulating)
             {
-                healthIncreases.Add(new HealthIncrease(
-                    result.HitObject.GetEndTime() + result.TimeOffset,
-                    GetHealthIncreaseFor(result)));
+                if (result.Type.IsBonus())
+                {
+                    // Bonus objects are treated as if they don't award any health - they are optional.
+                    // However, they still need to be tracked in order for drain to start at the correct point in time after a break.
+                    healthIncreases.Add(new HealthIncrease(result.HitObject.GetEndTime() + result.TimeOffset, 0));
+                }
+                else
+                    healthIncreases.Add(new HealthIncrease(result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
             }
         }
 
@@ -162,7 +167,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual double ComputeDrainRate()
         {
-            if (healthIncreases.Count <= 1)
+            // Drain requires there to be at least two objects in general.
+            if (healthIncreases.Count < 2)
                 return 0;
 
             int adjustment = 1;
@@ -202,14 +208,15 @@ namespace osu.Game.Rulesets.Scoring
 
                 // Stop if the resulting health is within a reasonable offset from the target
                 if (Math.Abs(lowestHealth - targetMinimumHealth) <= minimum_health_error)
-                    break;
+                    return result;
 
                 // This effectively works like a binary search - each iteration the search space moves closer to the target, but may exceed it.
                 adjustment *= 2;
                 result += 1.0 / adjustment * Math.Sign(lowestHealth - targetMinimumHealth);
             }
 
-            return result;
+            // The target health couldn't be reached.
+            return 0;
         }
 
         private record struct HealthIncrease(double Time, double Amount);
