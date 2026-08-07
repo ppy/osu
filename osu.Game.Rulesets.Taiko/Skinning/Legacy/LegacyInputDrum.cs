@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             const float taiko_bar_y = 0;
 
             // stable things
-            const float ratio = 1.6f;
+            const float ratio = LegacySkin.POSITION_SCALE_FACTOR;
 
             // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
             const float negative_scale_adjust = TaikoPlayfield.INPUT_DRUM_WIDTH / ratio;

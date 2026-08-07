@@ -184,7 +184,7 @@ namespace osu.Game.Skinning
             public LegacyOldStyleFill(ISkin skin)
                 : base(skin)
             {
-                Position = new Vector2(3, 10) * 1.6f;
+                Position = new Vector2(3, 10) * LegacySkin.POSITION_SCALE_FACTOR;
             }
         }
 
@@ -193,7 +193,7 @@ namespace osu.Game.Skinning
             public LegacyNewStyleFill(ISkin skin)
                 : base(skin)
             {
-                Position = new Vector2(7.5f, 7.8f) * 1.6f;
+                Position = new Vector2(7.5f, 7.8f) * LegacySkin.POSITION_SCALE_FACTOR;
             }
 
             protected override void Update()

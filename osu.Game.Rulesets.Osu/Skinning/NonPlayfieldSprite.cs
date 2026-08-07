@@ -4,6 +4,7 @@
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -19,8 +20,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             set
             {
                 if (value != null)
-                    // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
-                    value.ScaleAdjust *= 1.6f;
+                    value.ScaleAdjust *= LegacySkin.POSITION_SCALE_FACTOR;
                 base.Texture = value;
             }
         }
