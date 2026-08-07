@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Taiko.Edit
 {
     [Cached]
-    public partial class TaikoHitObjectComposer : ScrollingHitObjectComposer<TaikoHitObject>
+    public partial class TaikoHitObjectComposer : ScrollingHitObjectComposer<TaikoHitObject, TaikoAction>
     {
         protected override bool ApplyHorizontalCentering => false;
 

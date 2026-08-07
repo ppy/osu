@@ -24,7 +24,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Mania.Edit
 {
     [Cached]
-    public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject>
+    public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject, ManiaAction>
     {
         private DrawableManiaEditorRuleset drawableRuleset = null!;
 

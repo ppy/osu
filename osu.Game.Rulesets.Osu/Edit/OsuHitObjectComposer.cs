@@ -37,7 +37,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.Osu.Edit
 {
     [Cached]
-    public partial class OsuHitObjectComposer : HitObjectComposer<OsuHitObject>
+    public partial class OsuHitObjectComposer : HitObjectComposer<OsuHitObject, OsuAction>
     {
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)

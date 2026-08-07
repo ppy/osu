@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,8 +21,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract partial class ScrollingHitObjectComposer<TObject> : HitObjectComposer<TObject>
+    public abstract partial class ScrollingHitObjectComposer<TObject, TAction> : HitObjectComposer<TObject, TAction>
         where TObject : HitObject
+        where TAction : struct, Enum
     {
         [Resolved]
         private Editor? editor { get; set; }

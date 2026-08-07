@@ -27,7 +27,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Edit
 {
     [Cached]
-    public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject>, IKeyBindingHandler<GlobalAction>
+    public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject, CatchAction>, IKeyBindingHandler<GlobalAction>
     {
         public const float DISTANCE_SNAP_RADIUS = 50;
 
