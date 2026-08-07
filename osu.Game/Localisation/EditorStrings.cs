@@ -309,6 +309,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SampleSet => new TranslatableString(getKey(@"sample_set"), @"Sample set");
 
+        /// <summary>
+        /// "Select"
+        /// </summary>
+        public static LocalisableString SelectTool => new TranslatableString(getKey(@"select_tool"), @"Select");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

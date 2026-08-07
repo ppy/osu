@@ -21,6 +21,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
@@ -175,7 +176,7 @@ namespace osu.Game.Rulesets.Edit
                             {
                                 Children = new Drawable[]
                                 {
-                                    new EditorToolboxGroup("toolbox (1-9)")
+                                    new EditorToolboxGroup("tools")
                                     {
                                         Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                                     },
@@ -268,8 +269,20 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            foreach (var compositionTool in CompositionTools.Prepend(new SelectTool()))
-                toolboxCollection.AddButton(new HitObjectCompositionToolButton(compositionTool, toolSelected));
+            toolboxCollection.AddButton(new HitObjectCompositionToolButton<GlobalAction>(new SelectTool(), toolSelected)
+            {
+                Hotkey = new Hotkey(GlobalAction.EditorSelectTool)
+            });
+
+            foreach (var compositionTool in CompositionTools)
+            {
+                toolboxCollection.AddButton(new HitObjectCompositionToolButton<TAction>(compositionTool, toolSelected)
+                {
+                    Hotkey = compositionTool.Action != null
+                        ? new Hotkey(Ruleset.ShortName, Rulesets.Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(compositionTool.Action.Value, typeof(int)))
+                        : null,
+                });
+            }
 
             togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
@@ -367,7 +380,7 @@ namespace osu.Game.Rulesets.Edit
         /// <remarks>
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
-        protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<CompositionTool<TAction>> CompositionTools { get; }
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
@@ -402,18 +415,6 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.SuperPressed)
                 return false;
 
-            if (checkToolboxMappingFromKey(e.Key, out int leftIndex))
-            {
-                var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
-
-                if (item != null)
-                {
-                    if (!item.Selected.Disabled)
-                        item.Select();
-                    return true;
-                }
-            }
-
             if (checkToggleMappingFromKey(e.Key, out int rightIndex))
             {
                 if (e.ShiftPressed || e.AltPressed)
@@ -440,18 +441,6 @@ namespace osu.Game.Rulesets.Edit
             }
 
             return base.OnKeyDown(e);
-        }
-
-        private bool checkToolboxMappingFromKey(Key key, out int index)
-        {
-            if (key < Key.Number1 || key > Key.Number9)
-            {
-                index = -1;
-                return false;
-            }
-
-            index = key - Key.Number1;
-            return true;
         }
 
         private bool checkToggleMappingFromKey(Key key, out int index)

@@ -75,7 +75,12 @@ namespace osu.Game.Rulesets.Catch
                     };
 
                 case EDITOR_VARIANT:
-                    return [];
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, CatchAction.EditorFruitTool),
+                        new KeyBinding(InputKey.Number3, CatchAction.EditorJuiceStreamTool),
+                        new KeyBinding(InputKey.Number4, CatchAction.EditorBananaShowerTool),
+                    ];
             }
         }
 

@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
             return base.FindSnappedPositionAndTime(screenSpacePosition);
         }
 
-        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
+        protected override IReadOnlyList<CompositionTool<TaikoAction>> CompositionTools => new CompositionTool<TaikoAction>[]
         {
             new HitCompositionTool(),
             new DrumRollCompositionTool(),

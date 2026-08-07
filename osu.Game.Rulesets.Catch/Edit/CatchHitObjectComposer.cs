@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new CatchBeatSnapGrid();
 
-        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
+        protected override IReadOnlyList<CompositionTool<CatchAction>> CompositionTools => new CompositionTool<CatchAction>[]
         {
             new FruitCompositionTool(),
             new JuiceStreamCompositionTool(),

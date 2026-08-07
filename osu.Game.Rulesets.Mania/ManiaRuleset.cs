@@ -346,7 +346,13 @@ namespace osu.Game.Rulesets.Mania
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
             if (variant == EDITOR_VARIANT)
-                return [];
+            {
+                return
+                [
+                    new KeyBinding(InputKey.Number2, ManiaAction.EditorNoteTool),
+                    new KeyBinding(InputKey.Number3, ManiaAction.EditorHoldNoteTool),
+                ];
+            }
 
             switch (getPlayfieldType(variant))
             {

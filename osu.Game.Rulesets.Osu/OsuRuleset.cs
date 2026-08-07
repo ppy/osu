@@ -81,7 +81,13 @@ namespace osu.Game.Rulesets.Osu
                     };
 
                 case EDITOR_VARIANT:
-                    return [];
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, OsuAction.EditorHitCircleTool),
+                        new KeyBinding(InputKey.Number3, OsuAction.EditorSliderTool),
+                        new KeyBinding(InputKey.Number4, OsuAction.EditorSpinnerTool),
+                        new KeyBinding(InputKey.Number5, OsuAction.EditorGridFromPointsTool),
+                    ];
             }
         }
 

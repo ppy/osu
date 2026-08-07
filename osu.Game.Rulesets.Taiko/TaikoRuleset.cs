@@ -94,7 +94,12 @@ namespace osu.Game.Rulesets.Taiko
                     };
 
                 case EDITOR_VARIANT:
-                    return [];
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, TaikoAction.EditorHitTool),
+                        new KeyBinding(InputKey.Number3, TaikoAction.EditorDrumRollTool),
+                        new KeyBinding(InputKey.Number4, TaikoAction.EditorSwellTool),
+                    ];
             }
         }
 

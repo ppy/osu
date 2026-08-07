@@ -4,18 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Taiko.Edit.Blueprints;
-using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class HitCompositionTool : CompositionTool
+    public class HitCompositionTool : CompositionTool<TaikoAction>
     {
         public HitCompositionTool()
-            : base(nameof(Hit))
+            : base(TaikoEditorStrings.HitTool)
         {
+            Action = TaikoAction.EditorHitTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorHit };

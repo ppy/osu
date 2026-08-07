@@ -4,18 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Catch;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class FruitCompositionTool : CompositionTool
+    public class FruitCompositionTool : CompositionTool<CatchAction>
     {
         public FruitCompositionTool()
-            : base(nameof(Fruit))
+            : base(CatchEditorStrings.FruitTool)
         {
+            Action = CatchAction.EditorFruitTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorFruit };
