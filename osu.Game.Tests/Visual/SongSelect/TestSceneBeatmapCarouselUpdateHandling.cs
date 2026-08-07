@@ -430,6 +430,56 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Order didn't change", () => Carousel.PostFilterBeatmaps.Select(b => b.ID), () => Is.EqualTo(originalOrder));
         }
 
+        /// <summary>
+        /// Replicates the #34826 scenario: the matched beatmap is present in the replace snapshot, but has been
+        /// deleted from realm by the time the replace is processed, see https://github.com/ppy/osu/issues/34826.
+        /// </summary>
+        [Test]
+        public void TestBeatmapSetReplacedWithDeletedCurrentBeatmap()
+        {
+            int targetSetIndex = 0;
+
+            AddStep("select first difficulty", () =>
+            {
+                Carousel.CurrentBeatmap = baseTestBeatmap.Beatmaps[0];
+                BeatmapRequestedSelections.Clear();
+            });
+
+            AddStep("delete current beatmap from realm and replace set", () =>
+            {
+                targetSetIndex = BeatmapSets.IndexOf(baseTestBeatmap);
+                var detachedSet = BeatmapSets[targetSetIndex];
+                var selectedBeatmap = detachedSet.Beatmaps[0];
+
+                Realm.Write(r =>
+                {
+                    var toDelete = r.Find<BeatmapInfo>(selectedBeatmap.ID);
+                    if (toDelete != null)
+                        r.Remove(toDelete);
+                });
+
+                // Trigger the Replace action with a beatmap that is not in realm.
+                var staleSet = new BeatmapSetInfo
+                {
+                    ID = detachedSet.ID,
+                    OnlineID = detachedSet.OnlineID,
+                    DateAdded = detachedSet.DateAdded,
+                    DateSubmitted = detachedSet.DateSubmitted,
+                    Status = detachedSet.Status,
+                    Hash = detachedSet.Hash,
+                    Protected = detachedSet.Protected,
+                };
+
+                var staleBeatmap = createBeatmap(staleSet, selectedBeatmap);
+                staleSet.Beatmaps.Add(staleBeatmap);
+                BeatmapSets.ReplaceRange(targetSetIndex, 1, [staleSet]);
+            });
+
+            WaitForFiltering();
+
+            AddAssert("deleted match never requested for selection", () => BeatmapRequestedSelections, () => Is.Empty);
+        }
+
         private void assertDidFilter(int count = 1) => AddAssert("did filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count + count));
 
         private void assertDidNotFilter() => AddAssert("did not filter", () => Carousel.FilterCount, () => Is.EqualTo(initial_filter_count));
