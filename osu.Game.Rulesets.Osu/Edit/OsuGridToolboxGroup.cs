@@ -167,22 +167,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                         gridTypeButtons = new EditorRadioButtonCollection
                         {
                             RelativeSizeAxes = Axes.X,
-                            Items = new[]
-                            {
-                                new RadioButton("Square",
-                                    () => GridType.Value = PositionSnapGridType.Square,
-                                    () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
-                                new RadioButton("Triangle",
-                                    () => GridType.Value = PositionSnapGridType.Triangle,
-                                    () => new OutlineTriangle(true, 20)),
-                                new RadioButton("Circle",
-                                    () => GridType.Value = PositionSnapGridType.Circle,
-                                    () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }),
-                            }
                         },
                     }
                 },
             };
+
+            gridTypeButtons.AddButton(new EditorRadioButton("Square",
+                () => GridType.Value = PositionSnapGridType.Square,
+                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }));
+            gridTypeButtons.AddButton(new EditorRadioButton("Triangle",
+                () => GridType.Value = PositionSnapGridType.Triangle,
+                () => new OutlineTriangle(true, 20)));
+            gridTypeButtons.AddButton(new EditorRadioButton("Circle",
+                () => GridType.Value = PositionSnapGridType.Circle,
+                () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }));
 
             GridLineSpacing.Value = editorBeatmap.GridSize;
         }
@@ -239,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
 
-                gridTypeButtons.Items[(int)v.NewValue].Select();
+                gridTypeButtons.Items.ElementAt((int)v.NewValue).Select();
 
                 switch (v.NewValue)
                 {
