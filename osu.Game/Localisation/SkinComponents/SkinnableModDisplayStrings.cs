@@ -7,7 +7,7 @@ namespace osu.Game.Localisation.SkinComponents
 {
     public static class SkinnableModDisplayStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.SkinnableModDisplay";
+        private const string prefix = @"osu.Game.Resources.Localisation.SkinComponents.SkinnableModDisplay";
 
         /// <summary>
         /// "Show extended information"

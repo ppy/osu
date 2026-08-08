@@ -35,6 +35,21 @@ namespace osu.Game.Localisation
         public static LocalisableString Gameplay => new TranslatableString(getKey(@"gameplay"), @"Gameplay");
 
         /// <summary>
+        /// "HUD"
+        /// </summary>
+        public static LocalisableString MainHUDComponents => new TranslatableString(getKey(@"main_hud_components"), @"HUD");
+
+        /// <summary>
+        /// "Playfield"
+        /// </summary>
+        public static LocalisableString Playfield => new TranslatableString(getKey(@"playfield"), @"Playfield");
+
+        /// <summary>
+        /// "{0} ("{1}" only)"
+        /// </summary>
+        public static LocalisableString WorkingLayerOfRuleset(LocalisableString layerName, string rulesetName) => new TranslatableString(getKey(@"working_layer_of_ruleset"), @"{0} (""{1}"" only)", layerName, rulesetName);
+
+        /// <summary>
         /// "Settings ({0})"
         /// </summary>
         public static LocalisableString Settings(string arg0) => new TranslatableString(getKey(@"settings"), @"Settings ({0})", arg0);

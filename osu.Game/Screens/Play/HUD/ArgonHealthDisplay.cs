@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Bar height")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.BarHeight))]
         public BindableFloat BarHeight { get; } = new BindableFloat(20)
         {
             MinValue = 0,
