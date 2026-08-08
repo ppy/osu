@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -18,10 +19,12 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
+using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Seasonal;
+using Realms;
 
 namespace osu.Game.Overlays
 {
@@ -57,6 +60,24 @@ namespace osu.Game.Overlays
         /// Includes direction information for display purposes.
         /// </summary>
         public event Action<WorkingBeatmap, TrackChangeDirection>? TrackChanged;
+
+        public Live<BeatmapCollection>? PlaylistCollection
+        {
+            get => collection;
+            set
+            {
+                collection = value;
+                fieldCollectionBeatmapMD5Hashes = null;
+            }
+        }
+
+        private Live<BeatmapCollection>? collection;
+        private ImmutableHashSet<string>? fieldCollectionBeatmapMD5Hashes;
+
+        private ImmutableHashSet<string>? collectionBeatmapMD5Hashes =>
+            fieldCollectionBeatmapMD5Hashes ??= PlaylistCollection?.PerformRead(c => c.BeatmapMD5Hashes.ToImmutableHashSet());
+
+        private IDisposable? realmSubscription;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
@@ -100,6 +121,8 @@ namespace osu.Game.Overlays
                     changeBeatmap(b.NewValue);
             }, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
         }
 
         /// <summary>
@@ -461,7 +484,8 @@ namespace osu.Game.Overlays
                  .AsEnumerable()
                  .Select(s => new RealmLive<BeatmapSetInfo>(s, realm))
                  .Where(i => (allowProtectedTracks || !i.Value.Protected)
-                             && (SeasonalUIConfig.ENABLED || i.Value.Hash != IntroChristmas.CHRISTMAS_BEATMAP_SET_HASH));
+                             && (SeasonalUIConfig.ENABLED || i.Value.Hash != IntroChristmas.CHRISTMAS_BEATMAP_SET_HASH)
+                             && i.Value.Beatmaps.Any(b => collectionBeatmapMD5Hashes?.Contains(b.MD5Hash) ?? true));
 
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
@@ -588,6 +612,20 @@ namespace osu.Game.Overlays
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(modTrackAdjustments);
             }
+        }
+
+        private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
+        {
+            // Only place where it may be changed without any external updating is in settings overlay button
+            // 'Clear all collection' that sends update with empty list. So just null it because there are no collections anymore.
+            if (!collections.Any())
+                PlaylistCollection = null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            realmSubscription?.Dispose();
         }
     }
 
