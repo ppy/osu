@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             // No Scope
             // Moving Fast
             Single<CatchModSynesthesia>(hasMultiplier: 0.8);
+            // Moving Always
 
             #endregion
 
