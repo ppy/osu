@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             Single<CatchModDifficultyAdjust>(hasMultiplier: 0.5);
             Single<CatchModClassic>(hasMultiplier: _ => classicMultiplier(context.Score));
             // Mirror
+            // Wrap
 
             #endregion
 
