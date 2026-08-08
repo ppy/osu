@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Mods
             player.ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
             player.DimmableStoryboard.IgnoreUserSettings.Value = true;
 
-            player.BreakOverlay.Hide();
+            player.BreakOverlayContainer.Hide();
             (player as ReplayPlayer)?.ReplayOverlay.Hide();
         }
 
