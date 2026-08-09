@@ -76,6 +76,7 @@ namespace osu.Game.Database
                     finally
                     {
                         loaded.Set();
+                        frozenSets.Realm.Dispose();
                     }
                 }, TaskCreationOptions.LongRunning).FireAndForget();
 
