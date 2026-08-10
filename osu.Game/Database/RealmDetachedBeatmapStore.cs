@@ -62,16 +62,16 @@ namespace osu.Game.Database
                 {
                     try
                     {
-                        realm.Run(_ =>
-                        {
-                            var detached = frozenSets.Detach();
+                        // operations purposefully not wrapped in `Realm.Run()`.
+                        // `frozenSets` is, as the name suggests, frozen, and thus documented as safe to access from any thread for reading.
+                        // using `Realm.Run()` would only be misdirection here as it would take out a *second, non-frozen* realm instance.
+                        var detached = frozenSets.Detach();
 
-                            lock (detachedBeatmapSets)
-                            {
-                                detachedBeatmapSets.Clear();
-                                detachedBeatmapSets.AddRange(detached);
-                            }
-                        });
+                        lock (detachedBeatmapSets)
+                        {
+                            detachedBeatmapSets.Clear();
+                            detachedBeatmapSets.AddRange(detached);
+                        }
                     }
                     finally
                     {
