@@ -22,7 +22,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
@@ -34,9 +33,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public abstract partial class ComposeBlueprintContainer : EditorBlueprintContainer
     {
+        private DependencyContainer dependencies = null!;
+
         private readonly Container<PlacementBlueprint> placementBlueprintContainer;
 
-        protected new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
+        public new EditorSelectionHandler SelectionHandler => (EditorSelectionHandler)base.SelectionHandler;
 
         public PlacementBlueprint CurrentPlacement { get; private set; }
 
@@ -64,6 +65,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            return dependencies = new DependencyContainer(parent);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -74,6 +80,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Child = placementBlueprintContainer
             });
+
+            dependencies.CacheAs(SelectionHandler);
         }
 
         protected override void LoadComplete()
@@ -85,19 +93,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // updates to selected are handled for us by SelectionHandler.
             NewCombo.BindTo(SelectionHandler.SelectionNewComboState);
 
-            // we are responsible for current placement blueprint updated based on state changes.
-            NewCombo.ValueChanged += _ => updatePlacementNewCombo();
-
-            // we own SelectionHandler so don't need to worry about making bindable copies (for simplicity)
-            foreach (var kvp in SelectionHandler.SelectionSampleStates)
-                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
-
-            foreach (var kvp in SelectionHandler.SelectionBankStates)
-                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
-
-            foreach (var kvp in SelectionHandler.SelectionAdditionBankStates)
-                kvp.Value.BindValueChanged(_ => updatePlacementSamples());
-
             SelectionHandler.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
         }
 
@@ -107,68 +102,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             var blueprint = (HitObjectSelectionBlueprint)GetBlueprintFor(hitObject);
             blueprint.DrawableObject = drawableObject;
-        }
-
-        private void updatePlacementNewCombo()
-        {
-            if (CurrentHitObjectPlacement?.HitObject is IHasComboInformation c)
-                c.NewCombo = NewCombo.Value == TernaryState.True;
-        }
-
-        private void updatePlacementSamples()
-        {
-            if (CurrentHitObjectPlacement == null) return;
-
-            foreach (var kvp in SelectionHandler.SelectionSampleStates)
-                sampleChanged(kvp.Key, kvp.Value.Value);
-
-            foreach (var kvp in SelectionHandler.SelectionBankStates)
-                bankChanged(kvp.Key, kvp.Value.Value);
-
-            foreach (var kvp in SelectionHandler.SelectionAdditionBankStates)
-                additionBankChanged(kvp.Key, kvp.Value.Value);
-        }
-
-        private void sampleChanged(string sampleName, TernaryState state)
-        {
-            if (CurrentHitObjectPlacement == null) return;
-
-            var samples = CurrentHitObjectPlacement.HitObject.Samples;
-
-            var existingSample = samples.FirstOrDefault(s => s.Name == sampleName);
-
-            switch (state)
-            {
-                case TernaryState.False:
-                    if (existingSample != null)
-                        samples.Remove(existingSample);
-                    break;
-
-                case TernaryState.True:
-                    if (existingSample == null)
-                        samples.Add(CurrentHitObjectPlacement.HitObject.CreateHitSampleInfo(sampleName));
-                    break;
-            }
-        }
-
-        private void bankChanged(string bankName, TernaryState state)
-        {
-            if (CurrentHitObjectPlacement == null) return;
-
-            if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
-                CurrentHitObjectPlacement.AutomaticBankAssignment = state == TernaryState.True;
-            else if (state == TernaryState.True)
-                CurrentHitObjectPlacement.HitObject.Samples = CurrentHitObjectPlacement.HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
-        }
-
-        private void additionBankChanged(string bankName, TernaryState state)
-        {
-            if (CurrentHitObjectPlacement == null) return;
-
-            if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
-                CurrentHitObjectPlacement.AutomaticAdditionBankAssignment = state == TernaryState.True;
-            else if (state == TernaryState.True)
-                CurrentHitObjectPlacement.HitObject.Samples = CurrentHitObjectPlacement.HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bankName) : s).ToList();
         }
 
         public readonly Bindable<TernaryState> NewCombo = new Bindable<TernaryState> { Description = "New Combo" };
@@ -403,10 +336,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
                 updatePlacementTimeAndPosition();
-
-                updatePlacementSamples();
-
-                updatePlacementNewCombo();
             }
         }
 

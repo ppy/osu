@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -25,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class PolygonGenerationPopover : OsuPopover
     {
+        private DependencyContainer dependencies = null!;
+
         private FormSliderBar<double> distanceSnapInput { get; set; } = null!;
         private FormSliderBar<int> offsetAngleInput { get; set; } = null!;
         private FormSliderBar<int> repeatCountInput { get; set; } = null!;
@@ -50,14 +51,16 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Resolved]
         private HitObjectComposer composer { get; set; } = null!;
 
-        private Bindable<TernaryState> newComboState = null!;
+        private PlacementStateManager? placementStateManager;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            return dependencies = new DependencyContainer(parent);
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
-            newComboState = selectionHandler.SelectionNewComboState.GetBoundCopy();
-
             AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
 
             Child = new FillFlowContainer
@@ -120,6 +123,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                     }
                 }
             };
+
+            dependencies.CacheAs(composer.BlueprintContainer.SelectionHandler);
         }
 
         protected override void LoadComplete()
@@ -133,7 +138,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             offsetAngleInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             repeatCountInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             pointInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
-            newComboState.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             tryCreatePolygon();
         }
 
@@ -162,7 +166,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 float angle = float.DegreesToRadians(offsetAngleInput.Current.Value) + (i + 1) * (2 * float.Pi / pointInput.Current.Value);
                 var position = OsuPlayfield.BASE_SIZE / 2 + new Vector2(polygonRadius * float.Cos(angle), polygonRadius * float.Sin(angle));
-                bool newCombo = i == 0 && newComboState.Value == TernaryState.True;
 
                 HitCircle circle;
 
@@ -172,9 +175,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                     circle.Position = position;
                     circle.StartTime = startTime;
-                    circle.NewCombo = newCombo;
-
-                    editorBeatmap.Update(circle);
                 }
                 else
                 {
@@ -182,12 +182,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         Position = position,
                         StartTime = startTime,
-                        NewCombo = newCombo,
                     };
 
                     newlyAdded.Add(circle);
 
-                    // TODO: probably ensure samples also follow current ternary status (not trivial)
                     circle.Samples.Add(circle.CreateHitSampleInfo());
                 }
 
@@ -202,14 +200,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 startTime = beatSnapProvider.SnapTime(startTime + timeSpacing);
             }
 
-            var previousNewComboState = newComboState.Value;
-
             insertedCircles.AddRange(newlyAdded);
             editorBeatmap.AddRange(newlyAdded);
 
-            // When adding new hitObjects, newCombo state will get reset to false when no objects are selected.
-            // Since this is the case when this popover is showing, we need to restore the previous newCombo state
-            newComboState.Value = previousNewComboState;
+            placementStateManager?.RemoveAndDisposeImmediately();
+            Content.Add(placementStateManager = new PlacementStateManager(insertedCircles.Cast<HitObject>().ToArray())
+            {
+                PerformBeatmapUpdates = true,
+            });
 
             commitButton.Enabled.Value = true;
         }
