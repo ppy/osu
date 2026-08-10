@@ -12,6 +12,7 @@ using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Input;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -76,8 +77,9 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource source)
+        private void load(ISkinSource source, RealmKeyBindingStore keyBindingStore)
         {
+            Config.LookupKeyBindings = keyBindingStore.GetBindingsStringFor;
             currentSkin = source;
             currentSkin.SourceChanged += onSkinChange;
             skinChanged();

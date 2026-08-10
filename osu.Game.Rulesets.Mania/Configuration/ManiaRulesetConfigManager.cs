@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Configuration.Tracking;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.UI;
@@ -47,10 +50,15 @@ namespace osu.Game.Rulesets.Mania.Configuration
                 speed => new SettingDescription(
                     rawValue: speed,
                     name: RulesetSettingsStrings.ScrollSpeed,
-                    value: RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(speed), speed)
+                    value: RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(speed), speed),
+                    shortcut: new TranslatableString(@"_", @"{0} / {1}",
+                        LookupKeyBindings(GlobalAction.IncreaseScrollSpeed),
+                        LookupKeyBindings(GlobalAction.DecreaseScrollSpeed))
                 )
             )
         };
+
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => string.Empty;
     }
 
     public enum ManiaRulesetSetting
