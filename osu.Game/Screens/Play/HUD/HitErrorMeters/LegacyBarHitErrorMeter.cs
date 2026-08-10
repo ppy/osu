@@ -37,7 +37,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             AutoSizeAxes = Axes.X;
             Height = (bar_height * 4) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
-            Origin = Anchor.Centre;
             InternalChildren = new Drawable[]
             {
                 new Box
