@@ -1212,13 +1212,17 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasAutoAdditionBankFlag(0, true);
         }
 
-        private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
+        private void clickSamplePiece(int objectIndex)
         {
-            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+            AddStep("switch tool to select", () => InputManager.Key(Key.Number1));
+            AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
+            {
+                var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
 
-            InputManager.MoveMouseTo(samplePiece);
-            InputManager.Click(MouseButton.Left);
-        });
+                InputManager.MoveMouseTo(samplePiece);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
 
         private void clickNodeSamplePiece(int objectIndex, int nodeIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node sample piece", () =>
         {
