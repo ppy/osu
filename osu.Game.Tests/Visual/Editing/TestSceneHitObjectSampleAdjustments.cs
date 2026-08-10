@@ -1212,6 +1212,89 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasAutoAdditionBankFlag(0, true);
         }
 
+        [Test]
+        public void TestPolygonGenerationInheritsSettings()
+        {
+            AddStep("seek to 1000", () => EditorClock.Seek(1000));
+            AddStep("open polygon tool", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.D);
+                InputManager.ReleaseKey(Key.LControl);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasAutoAdditionBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set addition bank to drum", () =>
+            {
+                InputManager.PressKey(Key.LAlt);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LAlt);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleNormalBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasSampleAdditionBank(i, HitSampleInfo.BANK_DRUM);
+                hitObjectHasAutoAdditionBankFlag(i, false);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set normal bank to normal", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleNormalBank(i, HitSampleInfo.BANK_NORMAL);
+                hitObjectHasAutoNormalBankFlag(i, false);
+                hitObjectHasSampleAdditionBank(i, HitSampleInfo.BANK_DRUM);
+                hitObjectHasAutoAdditionBankFlag(i, false);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set addition bank to auto", () =>
+            {
+                InputManager.PressKey(Key.LAlt);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.LAlt);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_NORMAL);
+                hitObjectHasAutoNormalBankFlag(i, false);
+                hitObjectHasAutoAdditionBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+        }
+
         private void clickSamplePiece(int objectIndex)
         {
             AddStep("switch tool to select", () => InputManager.Key(Key.Number1));
