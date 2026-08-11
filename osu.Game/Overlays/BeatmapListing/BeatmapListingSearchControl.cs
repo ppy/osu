@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public partial class BeatmapListingSearchControl : CompositeDrawable
     {
         /// <summary>
-        /// Any time the text box receives key events (even while masked).
+        /// Invoked any time text is added to or removed from the search box.
         /// </summary>
         public Action? TypingStarted;
 
@@ -175,7 +175,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private partial class BeatmapSearchTextBox : BasicSearchTextBox
         {
             /// <summary>
-            /// Any time the text box receives key events (even while masked).
+            /// Invoked any time text is added to or removed from the text box.
             /// </summary>
             public Action? TextChanged;
 

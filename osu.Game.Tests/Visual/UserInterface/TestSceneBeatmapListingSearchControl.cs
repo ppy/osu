@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable disable
@@ -8,6 +8,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Testing.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
@@ -26,6 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private BeatmapListingSearchControl control;
+        private ManualTextInputSource textInput;
 
         private OsuConfigManager localConfig;
 
@@ -38,6 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            ManualTextInputContainer textInputContainer;
             OsuSpriteText query;
             OsuSpriteText general;
             OsuSpriteText ruleset;
@@ -51,10 +55,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             Children = new Drawable[]
             {
-                control = new BeatmapListingSearchControl
+                textInputContainer = new ManualTextInputContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Child = control = new BeatmapListingSearchControl
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 },
                 new FillFlowContainer
                 {
@@ -76,6 +83,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     }
                 }
             };
+
+            textInput = textInputContainer.TextInput;
 
             control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
             control.General.BindCollectionChanged((_, _) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().ToSnakeCase())) : "")}", true);
@@ -108,6 +117,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestTypingStartedFiredOnTextAdded()
+        {
+            bool typingStarted = false;
+
+            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
+            AddStep("focus search box", () => control.TakeFocus());
+            AddStep("type a character", () => textInput.Text("a"));
+            AddAssert("typing started was called", () => typingStarted);
+        }
+
+        [Test]
         public void TestTypingStartedFiredOnBackspace()
         {
             bool typingStarted = false;
@@ -123,16 +143,29 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestTypingStartedFiredOnEscapeClear()
+        {
+            bool typingStarted = false;
+
+            AddStep("set callback and populate search box", () =>
+            {
+                control.TypingStarted = () => typingStarted = true;
+                control.Query.Value = "test";
+            });
+            AddStep("focus search box", () => control.TakeFocus());
+            AddStep("press escape", () => InputManager.Key(Key.Escape));
+            AddAssert("typing started was called", () => typingStarted);
+            AddAssert("search box is empty", () => string.IsNullOrEmpty(control.Query.Value));
+        }
+
+        [Test]
         public void TestTypingStartedNotFiredOnCopy()
         {
             bool typingStarted = false;
 
-            AddStep("set callback and type text", () =>
-            {
-                control.TypingStarted = () => typingStarted = true;
-            });
+            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
             AddStep("focus search box", () => control.TakeFocus());
-            AddStep("type a character", () => InputManager.Key(Key.A));
+            AddStep("type a character", () => textInput.Text("a"));
             AddStep("reset flag", () => typingStarted = false);
             AddStep("copy text", () =>
             {
@@ -163,6 +196,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             localConfig?.Dispose();
             base.Dispose(isDisposing);
+        }
+
+        private partial class ManualTextInputContainer : Container
+        {
+            [Cached(typeof(TextInputSource))]
+            public readonly ManualTextInputSource TextInput = new ManualTextInputSource();
+
+            public ManualTextInputContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
         }
 
         private static readonly APIBeatmapSet beatmap_set = new APIBeatmapSet
