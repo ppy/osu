@@ -135,6 +135,26 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestBackspaceWhileScrolledScrollsBackToTop()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show many results", () => fetchFor(getManyBeatmaps(100).ToArray()));
+
+            AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
+
+            AddStep("type in search box", () => overlay.ChildrenOfType<SearchTextBox>().First().Text = "test");
+
+            AddStep("scroll to bottom", () => overlay.ChildrenOfType<OverlayScrollContainer>().First().ScrollToEnd());
+
+            AddUntilStep("scrolled to bottom", () => overlay.ChildrenOfType<OverlayScrollContainer>().First().IsScrolledToEnd());
+
+            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
+
+            AddUntilStep("is scrolled to top", () => overlay.ChildrenOfType<OverlayScrollContainer>().First().Current == 0);
+        }
+
+        [Test]
         public void TestCorrectOldContentExpiration()
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);

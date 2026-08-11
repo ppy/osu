@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -189,6 +190,15 @@ namespace osu.Game.Overlays.BeatmapListing
             protected override bool OnKeyDown(KeyDownEvent e)
             {
                 if (!base.OnKeyDown(e))
+                    return false;
+
+                TextChanged?.Invoke();
+                return true;
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            {
+                if (!base.OnPressed(e))
                     return false;
 
                 TextChanged?.Invoke();
