@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -187,22 +186,16 @@ namespace osu.Game.Overlays.BeatmapListing
                 PlaceholderText = BeatmapsStrings.ListingSearchPrompt;
             }
 
-            protected override bool OnKeyDown(KeyDownEvent e)
+            protected override void OnUserTextAdded(string added)
             {
-                if (!base.OnKeyDown(e))
-                    return false;
-
+                base.OnUserTextAdded(added);
                 TextChanged?.Invoke();
-                return true;
             }
 
-            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            protected override void OnUserTextRemoved(string removed)
             {
-                if (!base.OnPressed(e))
-                    return false;
-
+                base.OnUserTextRemoved(removed);
                 TextChanged?.Invoke();
-                return true;
             }
 
             public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)

@@ -16,10 +16,11 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public partial class TestSceneBeatmapListingSearchControl : OsuTestScene
+    public partial class TestSceneBeatmapListingSearchControl : OsuManualInputManagerTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -104,6 +105,56 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("configure explicit content to disallowed", () => localConfig.SetValue(OsuSetting.ShowOnlineExplicitContent, false));
             AddAssert("explicit control set to hide", () => control.ExplicitContent.Value == SearchExplicit.Hide);
+        }
+
+        [Test]
+        public void TestTypingStartedFiredOnBackspace()
+        {
+            bool typingStarted = false;
+
+            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
+            AddStep("focus search box", () => control.TakeFocus());
+            AddStep("type a character", () => InputManager.Key(Key.A));
+            AddStep("reset flag", () => typingStarted = false);
+            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
+            AddAssert("typing started was called", () => typingStarted);
+        }
+
+        [Test]
+        public void TestTypingStartedNotFiredOnCopy()
+        {
+            bool typingStarted = false;
+
+            AddStep("set callback and type text", () =>
+            {
+                control.TypingStarted = () => typingStarted = true;
+            });
+            AddStep("focus search box", () => control.TakeFocus());
+            AddStep("type a character", () => InputManager.Key(Key.A));
+            AddStep("reset flag", () => typingStarted = false);
+            AddStep("copy text", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.C);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddAssert("typing started was not called", () => !typingStarted);
+        }
+
+        [Test]
+        public void TestTypingStartedNotFiredOnSelectAll()
+        {
+            bool typingStarted = false;
+
+            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
+            AddStep("focus search box", () => control.TakeFocus());
+            AddStep("select all", () =>
+            {
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.A);
+                InputManager.ReleaseKey(Key.LControl);
+            });
+            AddAssert("typing started was not called", () => !typingStarted);
         }
 
         protected override void Dispose(bool isDisposing)
