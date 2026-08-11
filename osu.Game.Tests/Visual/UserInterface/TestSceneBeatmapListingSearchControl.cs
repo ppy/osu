@@ -112,10 +112,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             bool typingStarted = false;
 
-            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
+            AddStep("set callback and populate search box", () =>
+            {
+                control.TypingStarted = () => typingStarted = true;
+                control.Query.Value = "test";
+            });
             AddStep("focus search box", () => control.TakeFocus());
-            AddStep("type a character", () => InputManager.Key(Key.A));
-            AddStep("reset flag", () => typingStarted = false);
             AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
             AddAssert("typing started was called", () => typingStarted);
         }
