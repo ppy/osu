@@ -9,11 +9,11 @@ using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Rulesets.Taiko.Skinning.Default
+namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class TaikoTrianglesSkinTransformer : SkinTransformer
+    public class CatchTrianglesSkinTransformer : SkinTransformer
     {
-        public TaikoTrianglesSkinTransformer(ISkin skin)
+        public CatchTrianglesSkinTransformer(ISkin skin)
             : base(skin)
         {
         }
@@ -33,40 +33,45 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                         case GlobalSkinnableContainers.MainHUDComponents:
                             return new DefaultSkinComponentsContainer(container =>
                             {
+                                const float screen_edge_padding = 10;
+                                // Hard to find this at runtime, so taken from the most expanded state during replay.
+                                const float song_progress_offset_height = 73;
+
                                 var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
                                 var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
 
                                 if (leaderboard != null)
-                                {
-                                    leaderboard.Position = new Vector2(40, -100);
-                                    leaderboard.Height = 180;
-                                    leaderboard.Anchor = Anchor.BottomLeft;
-                                    leaderboard.Origin = Anchor.BottomLeft;
-                                }
+                                    leaderboard.Position = new Vector2(40, 60);
 
                                 if (spectatorList != null)
                                 {
                                     spectatorList.HeaderFont.Value = Typeface.Venera;
                                     spectatorList.HeaderColour.Value = new OsuColour().BlueLighter;
                                     spectatorList.Anchor = Anchor.BottomLeft;
-                                    spectatorList.Origin = Anchor.TopLeft;
-                                    spectatorList.Position = new Vector2(320, -280);
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = new Vector2(10, -(song_progress_offset_height + screen_edge_padding));
                                 }
 
-                                if (hitError != null)
+                                if (hitError is ColourHitErrorMeter colourHitError)
                                 {
-                                    hitError.Anchor = Anchor.CentreLeft;
-                                    hitError.Origin = Anchor.CentreLeft;
+                                    colourHitError.Anchor = Anchor.CentreLeft;
+                                    colourHitError.Origin = Anchor.CentreLeft;
+                                    colourHitError.JudgementCount.Value = 28;
+                                    colourHitError.JudgementSpacing.Value = 1.25f;
+                                    colourHitError.JudgementShape.Value = ColourHitErrorMeter.ShapeStyle.Square;
                                 }
 
-                                if (hitError2 != null)
+                                if (hitError2 is ColourHitErrorMeter colourHitError2)
                                 {
-                                    hitError2.Anchor = Anchor.CentreRight;
-                                    hitError2.Scale = new Vector2(-1, 1);
+                                    colourHitError2.Anchor = Anchor.CentreRight;
+                                    colourHitError2.Scale = new Vector2(-1, 1);
                                     // origin flipped to match scale above.
-                                    hitError2.Origin = Anchor.CentreLeft;
+                                    colourHitError2.Origin = Anchor.CentreLeft;
+                                    colourHitError2.JudgementCount.Value = 28;
+                                    colourHitError2.JudgementSpacing.Value = 1.25f;
+                                    colourHitError2.JudgementShape.Value = ColourHitErrorMeter.ShapeStyle.Square;
                                 }
 
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
@@ -77,13 +82,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                                 Children = new Drawable[]
                                 {
                                     new DrawableGameplayLeaderboard(),
-                                    new SpectatorList
-                                    {
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                    },
-                                    new BarHitErrorMeter(),
-                                    new BarHitErrorMeter(),
+                                    new SpectatorList(),
+                                    new ColourHitErrorMeter(),
+                                    new ColourHitErrorMeter(),
                                 },
                             };
                     }

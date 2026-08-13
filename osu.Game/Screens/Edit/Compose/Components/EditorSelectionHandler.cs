@@ -61,6 +61,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Selection State
 
+        public event Action? SelectionStateChanged;
+
         /// <summary>
         /// The state of "new combo" for all selected hitobjects.
         /// </summary>
@@ -150,6 +152,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                             break;
                     }
+
+                    SelectionStateChanged?.Invoke();
                 };
 
                 SelectionBankStates[bankName] = bindable;
@@ -213,6 +217,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                             break;
                     }
+
+                    SelectionStateChanged?.Invoke();
                 };
 
                 SelectionAdditionBankStates[bankName] = bindable;
@@ -239,6 +245,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             AddHitSample(sampleName);
                             break;
                     }
+
+                    SelectionStateChanged?.Invoke();
                 };
 
                 SelectionSampleStates[sampleName] = bindable;
@@ -257,6 +265,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         SetNewCombo(true);
                         break;
                 }
+
+                SelectionStateChanged?.Invoke();
             };
         }
 

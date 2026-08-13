@@ -1380,7 +1380,7 @@ namespace osu.Game
             if (combined < 20260728)
             {
 #pragma warning disable CS0612 // Type or member is obsolete (MenuParallax exists solely to make this migration work, it should not be used anywhere else)
-                LocalConfig.SetValue(OsuSetting.MenuParallaxScale, LocalConfig.Get<bool>(OsuSetting.MenuParallax) ? 1 : 0);
+                LocalConfig.SetValue<float>(OsuSetting.MenuParallaxScale, LocalConfig.Get<bool>(OsuSetting.MenuParallax) ? 1 : 0);
 #pragma warning restore CS0612 // Type or member is obsolete
             }
         }

@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Catch.Skinning.Argon;
+using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
@@ -225,6 +226,9 @@ namespace osu.Game.Rulesets.Catch
 
                 case ArgonSkin:
                     return new CatchArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new CatchTrianglesSkinTransformer(skin);
             }
 
             return null;
