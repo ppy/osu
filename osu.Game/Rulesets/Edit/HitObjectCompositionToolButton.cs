@@ -7,12 +7,12 @@ using osu.Game.Screens.Edit.Components.RadioButtons;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class HitObjectCompositionToolButton : RadioButton
+    public partial class HitObjectCompositionToolButton : EditorRadioButton
     {
         public CompositionTool Tool { get; }
 
-        public HitObjectCompositionToolButton(CompositionTool tool, Action? action)
-            : base(tool.Name, action, tool.CreateIcon)
+        public HitObjectCompositionToolButton(CompositionTool tool, Action<CompositionTool>? action)
+            : base(tool.Name, () => action?.Invoke(tool), tool.CreateIcon)
         {
             Tool = tool;
 
