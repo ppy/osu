@@ -431,8 +431,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         /// <summary>
-        /// Replicates the #34826 scenario: the matched beatmap is present in the replace snapshot, but has been
-        /// deleted from realm by the time the replace is processed, see https://github.com/ppy/osu/issues/34826.
+        /// Case where a matched beatmap is present in the Replace operation results, but has been
+        /// deleted from realm by the time the Replace is processed.
+        /// See https://github.com/ppy/osu/issues/34826.
         /// </summary>
         [Test]
         public void TestBeatmapSetReplacedWithDeletedCurrentBeatmap()
