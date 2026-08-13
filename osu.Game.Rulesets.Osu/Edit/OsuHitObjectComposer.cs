@@ -44,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
+        public override Bindable<TernaryState> SelectionNewComboState { get; } = new Bindable<TernaryState>();
+
         protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
@@ -388,8 +390,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (!osuSelectionHandler.SelectedItems.Any())
                 {
-                    osuSelectionHandler.SelectionNewComboState.Value =
-                        osuSelectionHandler.SelectionNewComboState.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
+                    SelectionNewComboState!.Value = SelectionNewComboState.Value == TernaryState.False ? TernaryState.True : TernaryState.False;
                     return true;
                 }
             }

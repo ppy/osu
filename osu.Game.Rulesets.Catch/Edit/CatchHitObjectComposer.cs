@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Catch.Edit
     {
         public const float DISTANCE_SNAP_RADIUS = 50;
 
+        public override Bindable<TernaryState>? SelectionNewComboState { get; } = new Bindable<TernaryState>();
+
         private CatchDistanceSnapGrid distanceSnapGrid = null!;
 
         private readonly BindableDouble timeRangeMultiplier = new BindableDouble(1)

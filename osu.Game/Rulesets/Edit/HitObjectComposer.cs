@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -135,6 +136,8 @@ namespace osu.Game.Rulesets.Edit
 
             string shiftDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Shift));
             string altDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Alt));
+
+            createSelectionStateBindables();
 
             InternalChildren = new[]
             {
@@ -269,6 +272,9 @@ namespace osu.Game.Rulesets.Edit
             SetSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
+
+            // bring in updates from selection changes
+            EditorBeatmap.HitObjectUpdated += hitObjectUpdated;
         }
 
         /// <summary>
@@ -503,7 +509,17 @@ namespace osu.Game.Rulesets.Edit
             {
                 // ensure in selection mode if a selection is made.
                 SetSelectTool();
+                Scheduler.AddOnce(UpdateTernaryStates);
             }
+            else
+                // Reset the ternary states when the selection is cleared.
+                Scheduler.AddOnce(resetTernaryStates);
+        }
+
+        private void hitObjectUpdated(HitObject _)
+        {
+            // bring in updates from selection changes
+            Scheduler.AddOnce(UpdateTernaryStates);
         }
 
         public void SetSelectTool() => toolboxCollection.Items.First().Select();
@@ -565,6 +581,17 @@ namespace osu.Game.Rulesets.Edit
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (EditorBeatmap.IsNotNull())
+            {
+                EditorBeatmap.HitObjectUpdated -= hitObjectUpdated;
+                EditorBeatmap.SelectedHitObjects.CollectionChanged -= selectionChanged;
+            }
+
+            base.Dispose(isDisposing);
+        }
     }
 
     /// <summary>

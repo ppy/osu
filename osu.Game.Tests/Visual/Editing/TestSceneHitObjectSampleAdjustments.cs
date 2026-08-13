@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
@@ -131,7 +130,7 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
 
-            setAdditionBankViaPopover(EditorSelectionHandler.HIT_BANK_AUTO);
+            setAdditionBankViaPopover(HitObjectComposer.HIT_BANK_AUTO);
             hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
         }
@@ -691,7 +690,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             clickSamplePiece(0);
             samplePopoverIsOpen();
-            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
         }
 
         [Test]
@@ -739,7 +738,7 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(0);
             samplePopoverIsOpen();
             samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
-            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
             dismissPopover();
 
             AddStep("Move to 5000", () => EditorClock.Seek(5000));
@@ -756,7 +755,7 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(1);
             samplePopoverIsOpen();
             samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
-            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
         }
 
         [Test]
