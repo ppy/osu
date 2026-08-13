@@ -437,7 +437,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestBeatmapSetReplacedWithDeletedCurrentBeatmap()
         {
-            int targetSetIndex = 0;
+            int targetSetIndex;
 
             AddStep("select first difficulty", () =>
             {

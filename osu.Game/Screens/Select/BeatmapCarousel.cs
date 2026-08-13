@@ -265,9 +265,11 @@ namespace osu.Game.Screens.Select
                             // we need to ensure the global beatmap is also updated alongside changes.
                             if (CurrentBeatmap != null && beatmap.Equals(CurrentBeatmap))
                             {
+                                var id = matchingNewBeatmap.ID;
+
                                 // The matching beatmap may have been deleted or invalidated in some way since this event was fired.
                                 // Let's make sure we have the most up-to-date realm state of the current beatmap.
-                                var refreshedNewBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(matchingNewBeatmap.ID)?.Detach());
+                                var refreshedNewBeatmap = realm.Run(r => r.FindWithRefresh<BeatmapInfo>(id)?.Detach());
 
                                 if (refreshedNewBeatmap != null)
                                 {
