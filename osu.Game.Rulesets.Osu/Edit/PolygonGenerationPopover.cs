@@ -124,6 +124,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             };
 
+            // TODO: This is a pretty ugly dependency chain.
+            // We should look to rearrange things to avoid this altogether.
             dependencies.CacheAs(composer.BlueprintContainer.SelectionHandler);
         }
 
