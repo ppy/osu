@@ -40,6 +40,11 @@ namespace osu.Game.Skinning
 
         public bool Protected { get; set; }
 
+        /// <summary>
+        /// Whether the user has pinned this skin to the top of their skin list.
+        /// </summary>
+        public bool Pinned { get; set; }
+
         public virtual Skin CreateInstance(IStorageResourceProvider resources)
         {
             var type = string.IsNullOrEmpty(InstantiationInfo)
