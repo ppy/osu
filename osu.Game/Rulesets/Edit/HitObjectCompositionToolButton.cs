@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Edit
 
         public bool OnPressed(KeyBindingPressEvent<TAction> e)
         {
-            if (Nullable.Equals(e.Action, Tool.Action))
+            if (Nullable.Equals(e.Action, Tool.Action) && Enabled.Value)
             {
                 Select();
                 return true;

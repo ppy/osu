@@ -9,6 +9,7 @@ using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestTouchInputPlaceHitCircleDirectly()
         {
-            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == "Hit circle")));
+            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == OsuEditorStrings.HitCircleTool)));
 
             AddStep("tap to place circle", () => tap(this.ChildrenOfType<Playfield>().Single()));
             AddAssert("circle placed correctly", () =>
@@ -52,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestTouchInputPlaceCircleAfterTouchingComposeArea()
         {
-            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == "Hit circle")));
+            AddStep("tap circle", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == OsuEditorStrings.HitCircleTool)));
 
             AddStep("tap playfield", () => tap(this.ChildrenOfType<Playfield>().Single()));
             AddAssert("circle placed", () => EditorBeatmap.HitObjects.Single(h => h.StartTime == EditorClock.CurrentTimeAccurate) is HitCircle);
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestTouchInputPlaceSliderDirectly()
         {
-            AddStep("tap slider", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == "Slider")));
+            AddStep("tap slider", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == OsuEditorStrings.SliderTool)));
 
             AddStep("hold to draw slider", () => InputManager.BeginTouch(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(50, 20)))));
             AddStep("drag to draw", () => InputManager.MoveTouchTo(new Touch(TouchSource.Touch1, this.ChildrenOfType<Playfield>().Single().ToScreenSpace(new Vector2(200, 50)))));
@@ -105,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestTouchInputPlaceSliderAfterTouchingComposeArea()
         {
-            AddStep("tap slider", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == "Slider")));
+            AddStep("tap slider", () => tap(this.ChildrenOfType<EditorRadioButton>().Single(b => b.Text == OsuEditorStrings.SliderTool)));
 
             AddStep("tap playfield", () => tap(this.ChildrenOfType<Playfield>().Single()));
             AddStep("tap and hold another spot", () => hold(this.ChildrenOfType<Playfield>().Single(), new Vector2(50, 0)));
