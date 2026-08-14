@@ -37,11 +37,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
 
         /// <summary>
-        /// The action to run when the report is submitted.
-        /// </summary>
-        public Action? Submitted { get; set; }
-
-        /// <summary>
         /// The action to run when the report is submitted successfully.
         /// </summary>
         public Action? Success { get; set; }
@@ -109,10 +104,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Action = () =>
                     {
                         errorNote.Current.Value = null;
-
                         loadingLayer.Show();
-
-                        Submitted?.Invoke();
                         performRequest();
                     }
                 },

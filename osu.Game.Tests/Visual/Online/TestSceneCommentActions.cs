@@ -277,9 +277,6 @@ namespace osu.Game.Tests.Visual.Online
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
-            AddWaitStep("Wait", 3);
-            AddAssert("Overlay closed", () => !this.ChildrenOfType<ReportCommentDialog>().Any());
-            AddAssert("Loading spinner shown", () => targetComment.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
             AddAssert("Request is correct", () => request != null && request.CommentID == 2 && request.Comment == report_text && request.Reason == CommentReportReason.Other);

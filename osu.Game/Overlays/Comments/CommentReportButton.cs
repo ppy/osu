@@ -10,10 +10,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -22,7 +20,6 @@ namespace osu.Game.Overlays.Comments
         private readonly Comment comment;
 
         private LinkFlowContainer link = null!;
-        private LoadingSpinner loading = null!;
 
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
@@ -46,25 +43,14 @@ namespace osu.Game.Overlays.Comments
                 {
                     AutoSizeAxes = Axes.Both,
                 },
-                loading = new LoadingSpinner
-                {
-                    Size = new Vector2(12f),
-                }
             };
 
             link.AddLink(ReportStrings.CommentButton.ToLower(), () =>
             {
                 dialogOverlay?.Push(new ReportCommentDialog(comment)
                 {
-                    Submitted = () =>
-                    {
-                        link.Hide();
-                        loading.Show();
-                    },
                     Success = () => Schedule(() =>
                     {
-                        loading.Hide();
-
                         link.Clear(true);
                         link.AddText(UsersStrings.ReportThanks, s => s.Colour = colourProvider?.Content2 ?? Colour4.White);
                         link.Show();
