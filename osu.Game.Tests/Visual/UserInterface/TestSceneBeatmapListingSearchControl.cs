@@ -123,14 +123,44 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var cases = new (string Name, Action Perform)[]
             {
-                ("type a character",            () => textInput.Text("a")),
-                ("backspace (DeleteBackwardChar)",  () => InputManager.Key(Key.BackSpace)),
-                ("Ctrl+Backspace (DeleteBackwardWord)", () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.BackSpace); InputManager.ReleaseKey(Key.LControl); }),
-                ("Shift+Left (SelectBackwardChar)", () => { InputManager.PressKey(Key.LShift); InputManager.Key(Key.Left); InputManager.ReleaseKey(Key.LShift); }),
-                ("Ctrl+C (Copy)",                  () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.C); InputManager.ReleaseKey(Key.LControl); }),
-                ("Ctrl+X (Cut)",                   () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.X); InputManager.ReleaseKey(Key.LControl); }),
-                ("Ctrl+V (Paste)",                 () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.V); InputManager.ReleaseKey(Key.LControl); }),
-                ("Ctrl+A (SelectAll)",             () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.A); InputManager.ReleaseKey(Key.LControl); }),
+                ("type a character", () => textInput.Text("a")),
+                ("backspace (DeleteBackwardChar)", () => InputManager.Key(Key.BackSpace)),
+                ("Ctrl+Backspace (DeleteBackwardWord)", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.BackSpace);
+                    InputManager.ReleaseKey(Key.LControl);
+                }),
+                ("Shift+Left (SelectBackwardChar)", () =>
+                {
+                    InputManager.PressKey(Key.LShift);
+                    InputManager.Key(Key.Left);
+                    InputManager.ReleaseKey(Key.LShift);
+                }),
+                ("Ctrl+C (Copy)", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.C);
+                    InputManager.ReleaseKey(Key.LControl);
+                }),
+                ("Ctrl+X (Cut)", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.X);
+                    InputManager.ReleaseKey(Key.LControl);
+                }),
+                ("Ctrl+V (Paste)", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.V);
+                    InputManager.ReleaseKey(Key.LControl);
+                }),
+                ("Ctrl+A (SelectAll)", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.A);
+                    InputManager.ReleaseKey(Key.LControl);
+                }),
                 ("escape with text (GlobalAction.Back)", () => InputManager.Key(Key.Escape)),
             };
 
@@ -155,11 +185,21 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var cases = new (string Name, Action Perform)[]
             {
-                ("F5 (no PlatformAction)",          () => InputManager.Key(Key.F5)),
-                ("F12 (no PlatformAction)",         () => InputManager.Key(Key.F12)),
-                ("Delete (blocked by SearchTextBox)",   () => InputManager.Key(Key.Delete)),
-                ("Ctrl+S (PlatformAction.Save)",    () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.S); InputManager.ReleaseKey(Key.LControl); }),
-                ("Ctrl+= (PlatformAction.ZoomIn)",  () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.Plus); InputManager.ReleaseKey(Key.LControl); }),
+                ("F5 (no PlatformAction)", () => InputManager.Key(Key.F5)),
+                ("F12 (no PlatformAction)", () => InputManager.Key(Key.F12)),
+                ("Delete (blocked by SearchTextBox)", () => InputManager.Key(Key.Delete)),
+                ("Ctrl+S (PlatformAction.Save)", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.S);
+                    InputManager.ReleaseKey(Key.LControl);
+                }),
+                ("Ctrl+= (PlatformAction.ZoomIn)", () =>
+                {
+                    InputManager.PressKey(Key.LControl);
+                    InputManager.Key(Key.Plus);
+                    InputManager.ReleaseKey(Key.LControl);
+                }),
             };
 
             bool typingStarted = false;
