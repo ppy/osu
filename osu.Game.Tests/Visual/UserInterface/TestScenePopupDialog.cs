@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestHideDialogBeforeInvoke()
+        public void TestButtonWhichDoesNotHideDialog()
         {
             AddStep("move mouse to button", () => InputManager.MoveMouseTo(dialog.ChildrenOfType<NonHideButton>().First()));
             AddStep("click button", () => InputManager.Click(MouseButton.Left));
