@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <param name="headerString">The text to display in the header of the dialog.</param>
         /// <param name="showConfirmation">
         /// Whether the dialog should show a generic "Thank you for your report" confirmation message.
-        /// Set this to `true` if you're displaying a custom message outside of this dialog.
+        /// Set this to <c>false</c> if you're displaying a custom message outside of this dialog.
         /// </param>
         protected ReportDialog(LocalisableString headerString, bool showConfirmation = true)
         {
