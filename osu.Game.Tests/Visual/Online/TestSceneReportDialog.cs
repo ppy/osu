@@ -61,14 +61,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("input reason", () => this.ChildrenOfType<OsuTextBox>().First().Text = "reason");
             AddStep("send report", () => dialogOverlay.CurrentDialog!.PerformAction<TestReportDialog.SubmitButton>());
 
-            AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
-            AddUntilStep("wait for request triggered", () => pendingRequest != null);
-            AddStep("complete request", () => pendingRequest!.TriggerSuccess());
-            AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.False);
-
-            AddAssert("ensure form is not present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.False);
-            AddAssert("ensure header text is updated", () => dialogOverlay.CurrentDialog!.HeaderText, () => Is.EqualTo(UsersStrings.ReportThanks));
-            AddUntilStep("wait for dialog to hide", () => this.ChildrenOfType<TestReportDialog>().Any(), () => Is.False);
+            confirmSuccess();
         }
 
         [Test]
@@ -85,6 +78,27 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("ensure form is present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.True);
             AddAssert("ensure error is present", () => this.ChildrenOfType<SettingsNote>().First().Current.Value?.Text.ToString(), () => Is.EqualTo("test error"));
             AddAssert("ensure header text is not updated", () => dialogOverlay.CurrentDialog!.HeaderText.ToString(), () => Is.EqualTo("Report test?"));
+
+            // now test a success after the failure
+            AddStep("send report", () => dialogOverlay.CurrentDialog!.PerformAction<TestReportDialog.SubmitButton>());
+
+            AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
+            AddUntilStep("wait for request triggered", () => pendingRequest != null);
+            AddStep("complete request", () => pendingRequest!.TriggerSuccess());
+
+            confirmSuccess();
+        }
+
+        private void confirmSuccess()
+        {
+            AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
+            AddUntilStep("wait for request triggered", () => pendingRequest != null);
+            AddStep("complete request", () => pendingRequest!.TriggerSuccess());
+            AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.False);
+
+            AddAssert("ensure form is not present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.False);
+            AddAssert("ensure header text is updated", () => dialogOverlay.CurrentDialog!.HeaderText, () => Is.EqualTo(UsersStrings.ReportThanks));
+            AddUntilStep("wait for dialog to hide", () => this.ChildrenOfType<TestReportDialog>().Any(), () => Is.False);
         }
 
         public partial class TestReportDialog : ReportDialog<ChatReportReason>
