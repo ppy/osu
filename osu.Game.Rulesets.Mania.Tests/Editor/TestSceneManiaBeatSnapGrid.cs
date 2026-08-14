@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public override ComposeBlueprintContainer BlueprintContainer => throw new NotImplementedException();
         public override IEnumerable<DrawableHitObject> HitObjects => Enumerable.Empty<DrawableHitObject>();
         public override bool CursorInPlacementArea => false;
-        public override Bindable<TernaryState>? SelectionNewComboState => throw new NotImplementedException();
+        public override Bindable<TernaryState> SelectionNewComboState => throw new NotImplementedException();
         public override IReadOnlyDictionary<string, Bindable<TernaryState>> SelectionSampleStates => throw new NotImplementedException();
         public override IReadOnlyDictionary<string, Bindable<TernaryState>> SelectionBankStates => throw new NotImplementedException();
         public override IReadOnlyDictionary<string, Bindable<TernaryState>> SelectionAdditionBankStates => throw new NotImplementedException();
