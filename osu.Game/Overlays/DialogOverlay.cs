@@ -27,6 +27,7 @@ namespace osu.Game.Overlays
         protected override string PopInSampleName => "UI/dialog-pop-in";
         protected override string PopOutSampleName => "UI/dialog-pop-out";
 
+        // Dialog overlay creates its own dim layer as it may be displayed over the top of other global overlays.
         protected override bool DimMainContent => false;
 
         [Resolved]
