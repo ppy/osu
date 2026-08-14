@@ -597,7 +597,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Current = bindable,
                         Description = string.Empty,
-                        CreateIcon = () => ComposeBlueprintContainer.GetIconForSample(sampleName),
+                        CreateIcon = () => HitObjectComposer.GetIconForSample(sampleName),
                         RelativeSizeAxes = Axes.None,
                         Size = new Vector2(40, 40),
                     };

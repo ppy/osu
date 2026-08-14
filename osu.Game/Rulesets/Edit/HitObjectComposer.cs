@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Edit
 
         private EditorRadioButtonCollection toolboxCollection = null!;
         private FillFlowContainer togglesCollection = null!;
-        private FillFlowContainer sampleBankTogglesCollection = null!;
+        private FillFlowContainer<SampleBankTernaryButton> sampleBankTogglesCollection = null!;
 
         private IBindable<bool> hasTiming = null!;
         private Bindable<bool> autoSeekOnPlacement = null!;
@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Edit
                                                         },
                                                     }
                                                 },
-                                                sampleBankTogglesCollection = new FillFlowContainer
+                                                sampleBankTogglesCollection = new FillFlowContainer<SampleBankTernaryButton>
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
@@ -286,7 +286,7 @@ namespace osu.Game.Rulesets.Edit
 
             togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
-            sampleBankTogglesCollection.AddRange(BlueprintContainer.SampleBankTernaryStates);
+            sampleBankTogglesCollection.AddRange(createSampleBankTernaryButtons());
 
             SetSelectTool();
 
@@ -384,11 +384,6 @@ namespace osu.Game.Rulesets.Edit
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
         protected abstract IReadOnlyList<CompositionTool<TAction>> CompositionTools { get; }
-
-        /// <summary>
-        /// Create all ternary states required to be displayed to the user.
-        /// </summary>
-        protected virtual IEnumerable<Drawable> CreateTernaryButtons() => BlueprintContainer.MainTernaryStates;
 
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.

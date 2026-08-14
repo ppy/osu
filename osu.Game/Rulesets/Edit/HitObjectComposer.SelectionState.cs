@@ -6,12 +6,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -284,6 +290,108 @@ namespace osu.Game.Rulesets.Edit
 
         #endregion
 
+        #region Ternary button creation
+
+        /// <summary>
+        /// Create all ternary states required to be displayed to the user.
+        /// </summary>
+        protected virtual IEnumerable<Drawable> CreateTernaryButtons()
+        {
+            if (SelectionNewComboState != null && CompositionTools.Count > 0)
+            {
+                yield return new NewComboTernaryButton
+                {
+                    Current = SelectionNewComboState,
+                    CreateIcon = () => new Container
+                    {
+                        Children = new[]
+                        {
+                            CompositionTools[0].CreateIcon()?.With(d =>
+                            {
+                                d.Anchor = Anchor.BottomLeft;
+                                d.Origin = Anchor.BottomLeft;
+                                d.Size = new Vector2(15);
+                            }) ?? Empty(),
+                            new SpriteIcon
+                            {
+                                Icon = OsuIcon.EditorNewComboSparkles,
+                                Size = new Vector2(20),
+                            }
+                        },
+                    },
+                };
+            }
+
+            foreach (var kvp in SelectionSampleStates)
+            {
+                yield return new DrawableTernaryButton
+                {
+                    Current = kvp.Value,
+                    Description = kvp.Key.Replace(@"hit", string.Empty).Titleize(),
+                    CreateIcon = () => GetIconForSample(kvp.Key),
+                };
+            }
+        }
+
+        private IEnumerable<SampleBankTernaryButton> createSampleBankTernaryButtons()
+        {
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HIT_BANK_AUTO))
+            {
+                yield return new SampleBankTernaryButton(bankName)
+                {
+                    NormalState = { Current = SelectionBankStates[bankName], },
+                    AdditionsState = { Current = SelectionAdditionBankStates[bankName], },
+                    CreateIcon = () => getIconForBank(bankName),
+                    CreateCompactIcon = () => getCompactIconForBank(bankName),
+                };
+            }
+
+            AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
+        }
+
+        private Drawable getIconForBank(string sampleName)
+        {
+            return new SpriteIcon
+            {
+                Size = new Vector2(20, 20),
+                Icon = sampleName switch
+                {
+                    HIT_BANK_AUTO => OsuIcon.EditorBankAuto,
+                    HitSampleInfo.BANK_NORMAL => OsuIcon.EditorBankNormal,
+                    HitSampleInfo.BANK_SOFT => OsuIcon.EditorBankSoft,
+                    HitSampleInfo.BANK_DRUM => OsuIcon.EditorBankDrum,
+                    _ => throw new ArgumentOutOfRangeException(nameof(sampleName), sampleName, null)
+                },
+            };
+        }
+
+        private Drawable getCompactIconForBank(string sampleName)
+        {
+            return new SpriteIcon
+            {
+                Size = new Vector2(10, 20),
+                Icon = sampleName switch
+                {
+                    HIT_BANK_AUTO => OsuIcon.EditorBankAutoCompact,
+                    HitSampleInfo.BANK_NORMAL => OsuIcon.EditorBankNormalCompact,
+                    HitSampleInfo.BANK_SOFT => OsuIcon.EditorBankSoftCompact,
+                    HitSampleInfo.BANK_DRUM => OsuIcon.EditorBankDrumCompact,
+                    _ => throw new ArgumentOutOfRangeException(nameof(sampleName), sampleName, null)
+                },
+            };
+        }
+
+        private void updateAutoBankTernaryButtonTooltip()
+        {
+            bool enabled = AutoSelectionBankEnabled.Value;
+
+            var autoBankButton = sampleBankTogglesCollection.Single(t => t.BankName == HIT_BANK_AUTO);
+            autoBankButton.NormalButton.Enabled.Value = enabled;
+            autoBankButton.NormalButton.TooltipText = !enabled ? "Auto normal bank can only be used during hit object placement" : string.Empty;
+        }
+
+        #endregion
+
         #region Ternary state changes
 
         /// <summary>
@@ -518,5 +626,22 @@ namespace osu.Game.Rulesets.Edit
         public abstract Bindable<bool> AutoSelectionBankEnabled { get; }
 
         #endregion
+
+        public static Drawable GetIconForSample(string sampleName)
+        {
+            switch (sampleName)
+            {
+                case HitSampleInfo.HIT_CLAP:
+                    return new SpriteIcon { Icon = OsuIcon.EditorClap };
+
+                case HitSampleInfo.HIT_WHISTLE:
+                    return new SpriteIcon { Icon = OsuIcon.EditorWhistle };
+
+                case HitSampleInfo.HIT_FINISH:
+                    return new SpriteIcon { Icon = OsuIcon.EditorFinish };
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(sampleName), sampleName, null);
+        }
     }
 }
