@@ -71,11 +71,6 @@ namespace osu.Game.Overlays.Comments
 
                         this.FadeOut(2000, Easing.InQuint).Expire();
                     }),
-                    Failure = () => Schedule(() =>
-                    {
-                        loading.Hide();
-                        link.Show();
-                    })
                 });
             });
         }

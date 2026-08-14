@@ -46,11 +46,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public Action? Success { get; set; }
 
-        /// <summary>
-        /// The action to run when the report failed to submit.
-        /// </summary>
-        public Action? Failure { get; set; }
-
         private readonly ReverseChildIDFillFlowContainer<Drawable> form;
         private readonly FormEnumDropdown<TReportReason> reasonDropdown;
         private readonly FormTextBox commentsTextBox;
@@ -122,9 +117,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                         Submitted?.Invoke();
                         performRequest();
-
-                        if (!showConfirmation)
-                            Hide();
                     }
                 },
                 new PopupDialogCancelButton { Text = WebCommonStrings.ButtonsCancel },
@@ -155,15 +147,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             if (showConfirmation)
             {
-                Schedule(() =>
-                {
-                    form.Hide();
-                    Buttons = [];
-                    HeaderText = UsersStrings.ReportThanks;
+                form.Hide();
+                Buttons = [];
+                HeaderText = UsersStrings.ReportThanks;
 
-                    loadingLayer.Hide();
-                    Scheduler.AddDelayed(Hide, 2000);
-                });
+                loadingLayer.Hide();
+                Scheduler.AddDelayed(Hide, 2000);
+            }
+            else
+            {
+                Hide();
             }
 
             Success?.Invoke();
@@ -171,13 +164,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void handleFailure(Exception e)
         {
-            if (showConfirmation)
-            {
-                Schedule(() => errorNote.Current.Value = new SettingsNote.Data(e.Message, SettingsNote.Type.Critical));
-                loadingLayer.Hide();
-            }
-
-            Failure?.Invoke();
+            Schedule(() => errorNote.Current.Value = new SettingsNote.Data(e.Message, SettingsNote.Type.Critical));
+            loadingLayer.Hide();
         }
 
         private void updateStatus()
