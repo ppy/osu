@@ -95,6 +95,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                     new NonHideButton
                     {
+                        HideDialogOnAction = false,
                         Action = () => NonHideActionInvoked = true,
                     },
                 };
@@ -103,8 +104,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class NonHideButton : PopupDialogButton
         {
-            public override bool HideDialogBeforeInvoke => false;
-
             public NonHideButton()
             {
                 Text = @"This button will not hide the dialog!";

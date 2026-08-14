@@ -112,12 +112,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                         loadingLayer.Show();
 
-                        // we don't want size easing to mess up any transforms that are happening
-                        // when the dialog is appearing, hence easing is only enabled after
-                        // the report is submitted
-                        Content.AutoSizeEasing = Easing.OutQuint;
-                        Content.AutoSizeDuration = 500F;
-
                         Submitted?.Invoke();
                         performRequest();
                     }
@@ -151,11 +145,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void handleSuccess()
         {
-            performingRequest = false;
             loadingLayer.Hide();
 
             if (showConfirmation)
             {
+                Content.AutoSizeEasing = Easing.OutQuint;
+                Content.AutoSizeDuration = 500F;
+
                 form.Hide();
                 Buttons = [];
                 HeaderText = UsersStrings.ReportThanks;
@@ -173,10 +169,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void handleFailure(Exception e)
         {
             performingRequest = false;
+            loadingLayer.Hide();
             updateSubmitButtonState();
 
             Schedule(() => errorNote.Current.Value = new SettingsNote.Data(e.Message, SettingsNote.Type.Critical));
-            loadingLayer.Hide();
         }
 
         private void updateSubmitButtonState()
@@ -200,12 +196,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public partial class SubmitButton : PopupDialogButton
         {
-            public override bool HideDialogBeforeInvoke => false;
-
             public SubmitButton()
                 : base(HoverSampleSet.DialogOk)
             {
                 Text = UsersStrings.ReportActionsSend;
+                HideDialogOnAction = false;
             }
 
             [BackgroundDependencyLoader]
