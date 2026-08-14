@@ -21,6 +21,6 @@ namespace osu.Game.Overlays.Comments
             this.comment = comment;
         }
 
-        protected override APIRequest GetRequest(CommentReportReason reason, string comments) => new CommentReportRequest(comment.Id, reason, comments);
+        protected override APIRequest CreateRequest(CommentReportReason reason, string comments) => new CommentReportRequest(comment.Id, reason, comments);
     }
 }

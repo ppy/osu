@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Chat
             this.message = message;
         }
 
-        protected override APIRequest GetRequest(ChatReportReason reason, string comments) => new ChatReportRequest(message.Id, reason, comments);
+        protected override APIRequest CreateRequest(ChatReportReason reason, string comments) => new ChatReportRequest(message.Id, reason, comments);
 
         protected override bool IsCommentRequired(ChatReportReason reason) => reason == ChatReportReason.Other;
     }

@@ -135,7 +135,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void performRequest()
         {
-            var request = GetRequest(reasonDropdown.Current.Value, commentsTextBox.Current.Value);
+            var request = CreateRequest(reasonDropdown.Current.Value, commentsTextBox.Current.Value);
 
             request.Success += handleSuccess;
             request.Failure += handleFailure;
@@ -179,7 +179,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <param name="reason">The reason for this report.</param>
         /// <param name="comments">An optional comment explaining the report.</param>
         /// <returns></returns>
-        protected abstract APIRequest GetRequest(TReportReason reason, string comments);
+        protected abstract APIRequest CreateRequest(TReportReason reason, string comments);
 
         /// <summary>
         /// Determines whether an additional comment is required for submitting the report with the supplied <paramref name="reason"/>.

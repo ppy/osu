@@ -19,6 +19,6 @@ namespace osu.Game.Overlays.Profile
             this.user = user;
         }
 
-        protected override APIRequest GetRequest(UserReportReason reason, string comments) => new UserReportRequest(user.Id, reason, comments);
+        protected override APIRequest CreateRequest(UserReportReason reason, string comments) => new UserReportRequest(user.Id, reason, comments);
     }
 }

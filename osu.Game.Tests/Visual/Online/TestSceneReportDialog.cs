@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
             {
             }
 
-            protected override APIRequest GetRequest(ChatReportReason reason, string comment) => new ChatReportRequest(1, reason, comment);
+            protected override APIRequest CreateRequest(ChatReportReason reason, string comment) => new ChatReportRequest(1, reason, comment);
         }
     }
 }
