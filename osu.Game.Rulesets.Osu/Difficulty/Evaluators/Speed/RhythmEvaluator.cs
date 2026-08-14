@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                 rhythmStart++;
 
             var loopPrevObj = (OsuDifficultyHitObject)currObj.Previous(rhythmStart);
-            var loopPrev1Obj = (OsuDifficultyHitObject)currObj.Previous(rhythmStart + 1);
+            var loopPrevObj1 = (OsuDifficultyHitObject)currObj.Previous(rhythmStart + 1);
 
             // we go from the furthest object back to the current one
             for (int i = rhythmStart; i > 0; i--)
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                             effectiveDifficulty *= 0.5;
 
                         // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
-                        if (Math.Max(loopPrev1Obj.DeltaTime, delta_min_value) > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
+                        if (Math.Max(loopPrevObj1.DeltaTime, delta_min_value) > prevDelta + deltaDifferenceEpsilon && prevDelta > currDelta + deltaDifferenceEpsilon)
                             effectiveDifficulty *= 0.125;
 
                         // repeated island size (ex: triplet -> triplet)
@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     island = new Island((int)currDelta);
                 }
 
-                loopPrev1Obj = loopPrevObj;
+                loopPrevObj1 = loopPrevObj;
                 loopPrevObj = loopObj;
             }
 

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             // WARNING: Increasing this multiplier beyond 1.02 reduces difficulty as distance increases. Refer to the desmos link above the wiggle bonus calculation
             const double wiggle_multiplier = 1.02;
 
-            var prev2Obj = (OsuDifficultyHitObject)currObj.Previous(2);
+            var prevObj2 = (OsuDifficultyHitObject)currObj.Previous(2);
 
             const int radius = OsuDifficultyHitObject.NORMALISED_RADIUS;
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
@@ -98,12 +98,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 wideAngleBonus *= Math.Min(wideAngleCurrVelocity, wideAnglePrevVelocity);
 
-                if (prev2Obj != null)
+                if (prevObj2 != null)
                 {
                     // If objects just go back and forth through a middle point - don't give as much wide bonus
                     // Use Previous(2) and Previous(0) because angles calculation is done prevprev-prev-curr, so any object's angle's center point is always the previous object
                     var prevBaseObject = (OsuHitObject)prevObj.BaseObject;
-                    var prev2BaseObject = (OsuHitObject)prev2Obj.BaseObject;
+                    var prev2BaseObject = (OsuHitObject)prevObj2.BaseObject;
 
                     float distance = (prev2BaseObject.StackedPosition - prevBaseObject.StackedPosition).Length;
 
