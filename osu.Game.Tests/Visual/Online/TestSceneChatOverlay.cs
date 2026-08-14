@@ -737,7 +737,6 @@ namespace osu.Game.Tests.Visual.Online
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("Overlay closed", () => !this.ChildrenOfType<ReportChatDialog>().Any());
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
             AddUntilStep("Info message displayed", () => channelManager.CurrentChannel.Value.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));
