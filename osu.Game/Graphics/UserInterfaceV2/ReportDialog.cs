@@ -55,6 +55,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly bool showConfirmation;
 
+        private bool performingRequest;
+
         /// <summary>
         /// Creates a new <see cref="ReportDialog{TReportReason}"/>.
         /// </summary>
@@ -106,8 +108,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     Action = () =>
                     {
-                        if (showConfirmation)
-                            loadingLayer.Show();
+                        errorNote.Current.Value = null;
+
+                        loadingLayer.Show();
 
                         // we don't want size easing to mess up any transforms that are happening
                         // when the dialog is appearing, hence easing is only enabled after
@@ -123,18 +126,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            commentsTextBox.Current.BindValueChanged(_ => updateStatus());
+            base.LoadComplete();
 
-            reasonDropdown.Current.BindValueChanged(_ => updateStatus());
+            commentsTextBox.Current.BindValueChanged(_ => updateSubmitButtonState());
+            reasonDropdown.Current.BindValueChanged(_ => updateSubmitButtonState());
 
-            updateStatus();
+            updateSubmitButtonState();
         }
 
         private void performRequest()
         {
+            performingRequest = true;
+            updateSubmitButtonState();
+
             var request = CreateRequest(reasonDropdown.Current.Value, commentsTextBox.Current.Value);
 
             request.Success += handleSuccess;
@@ -145,13 +151,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void handleSuccess()
         {
+            performingRequest = false;
+            loadingLayer.Hide();
+
             if (showConfirmation)
             {
                 form.Hide();
                 Buttons = [];
                 HeaderText = UsersStrings.ReportThanks;
 
-                loadingLayer.Hide();
                 Scheduler.AddDelayed(Hide, 2000);
             }
             else
@@ -164,13 +172,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void handleFailure(Exception e)
         {
+            performingRequest = false;
+            updateSubmitButtonState();
+
             Schedule(() => errorNote.Current.Value = new SettingsNote.Data(e.Message, SettingsNote.Type.Critical));
             loadingLayer.Hide();
         }
 
-        private void updateStatus()
+        private void updateSubmitButtonState()
         {
-            submitButton.Enabled.Value = !string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) || !IsCommentRequired(reasonDropdown.Current.Value);
+            bool missingRequredComment = string.IsNullOrWhiteSpace(commentsTextBox.Current.Value) && IsCommentRequired(reasonDropdown.Current.Value);
+            submitButton.Enabled.Value = !missingRequredComment && !performingRequest;
         }
 
         /// <summary>
