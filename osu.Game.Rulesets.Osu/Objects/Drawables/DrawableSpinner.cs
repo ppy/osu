@@ -231,7 +231,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// The completion progress of this spinner from 0..1 (clamped).
         /// </summary>
-        public float Progress
+        public float Progress => Math.Clamp(progressUnclamped, 0, 1);
+
+        private float progressUnclamped
         {
             get
             {
@@ -240,11 +242,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(progressUnclamped, 0, 1);
+                return Result.TotalRotation / 360 / HitObject.SpinsRequired;
             }
         }
-
-        private float progressUnclamped => Result.TotalRotation / 360 / HitObject.SpinsRequired;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuSpinnerJudgementResult(HitObject, judgement);
 
