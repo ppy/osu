@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -41,7 +42,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            ManualTextInputContainer textInputContainer;
             OsuSpriteText query;
             OsuSpriteText general;
             OsuSpriteText ruleset;
@@ -53,15 +53,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuSpriteText played;
             OsuSpriteText explicitMap;
 
+            ManualTextInputContainer textInputContainer;
+
             Children = new Drawable[]
             {
                 textInputContainer = new ManualTextInputContainer
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Child = control = new BeatmapListingSearchControl
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -84,8 +87,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             };
 
-            textInput = textInputContainer.TextInput;
-
             control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
             control.General.BindCollectionChanged((_, _) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().ToSnakeCase())) : "")}", true);
             control.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
@@ -96,6 +97,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             control.Ranks.BindCollectionChanged((_, _) => ranks.Text = $"Ranks: {(control.Ranks.Any() ? string.Join('.', control.Ranks.Select(i => i.ToString())) : "")}", true);
             control.Played.BindValueChanged(p => played.Text = $"Played: {p.NewValue}", true);
             control.ExplicitContent.BindValueChanged(e => explicitMap.Text = $"Explicit Maps: {e.NewValue}", true);
+            textInput = textInputContainer.TextInput;
         });
 
         [Test]
@@ -117,96 +119,77 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestTypingStartedFiredOnTextAdded()
+        public void TestTypingStartedFiredOnTextMutatingInteractions()
         {
+            var cases = new (string Name, Action Perform)[]
+            {
+                ("type a character",            () => textInput.Text("a")),
+                ("backspace (DeleteBackwardChar)",  () => InputManager.Key(Key.BackSpace)),
+                ("Ctrl+Backspace (DeleteBackwardWord)", () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.BackSpace); InputManager.ReleaseKey(Key.LControl); }),
+                ("Shift+Left (SelectBackwardChar)", () => { InputManager.PressKey(Key.LShift); InputManager.Key(Key.Left); InputManager.ReleaseKey(Key.LShift); }),
+                ("Ctrl+C (Copy)",                  () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.C); InputManager.ReleaseKey(Key.LControl); }),
+                ("Ctrl+X (Cut)",                   () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.X); InputManager.ReleaseKey(Key.LControl); }),
+                ("Ctrl+V (Paste)",                 () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.V); InputManager.ReleaseKey(Key.LControl); }),
+                ("Ctrl+A (SelectAll)",             () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.A); InputManager.ReleaseKey(Key.LControl); }),
+                ("escape with text (GlobalAction.Back)", () => InputManager.Key(Key.Escape)),
+            };
+
             bool typingStarted = false;
 
-            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
-            AddStep("focus search box", () => control.TakeFocus());
-            AddStep("type a character", () => textInput.Text("a"));
-            AddAssert("typing started was called", () => typingStarted);
+            foreach (var (name, perform) in cases)
+            {
+                AddStep($"setup for: {name}", () =>
+                {
+                    typingStarted = false;
+                    control.Query.Value = "test";
+                    control.TypingStarted = () => typingStarted = true;
+                    control.TakeFocus();
+                });
+                AddStep(name, perform);
+                AddAssert("typing started was called", () => typingStarted);
+            }
         }
 
         [Test]
-        public void TestTypingStartedFiredOnBackspace()
+        public void TestTypingStartedNotFiredOnNonMutatingInteractions()
         {
+            var cases = new (string Name, Action Perform)[]
+            {
+                ("F5 (no PlatformAction)",          () => InputManager.Key(Key.F5)),
+                ("F12 (no PlatformAction)",         () => InputManager.Key(Key.F12)),
+                ("Delete (blocked by SearchTextBox)",   () => InputManager.Key(Key.Delete)),
+                ("Ctrl+S (PlatformAction.Save)",    () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.S); InputManager.ReleaseKey(Key.LControl); }),
+                ("Ctrl+= (PlatformAction.ZoomIn)",  () => { InputManager.PressKey(Key.LControl); InputManager.Key(Key.Plus); InputManager.ReleaseKey(Key.LControl); }),
+            };
+
             bool typingStarted = false;
 
-            AddStep("set callback and populate search box", () =>
+            foreach (var (name, perform) in cases)
             {
-                control.TypingStarted = () => typingStarted = true;
-                control.Query.Value = "test";
-            });
-            AddStep("focus search box", () => control.TakeFocus());
-            AddStep("press backspace", () => InputManager.Key(Key.BackSpace));
-            AddAssert("typing started was called", () => typingStarted);
+                AddStep($"setup for: {name}", () =>
+                {
+                    typingStarted = false;
+                    control.TypingStarted = () => typingStarted = true;
+                    control.TakeFocus();
+                });
+                AddStep(name, perform);
+                AddAssert("typing started was not called", () => !typingStarted);
+            }
         }
 
         [Test]
-        public void TestTypingStartedFiredOnEscapeClear()
+        public void TestEscapeClearsSearchBox()
         {
-            bool typingStarted = false;
-
-            AddStep("set callback and populate search box", () =>
-            {
-                control.TypingStarted = () => typingStarted = true;
-                control.Query.Value = "test";
-            });
+            AddStep("populate search box", () => control.Query.Value = "test");
             AddStep("focus search box", () => control.TakeFocus());
             AddStep("press escape", () => InputManager.Key(Key.Escape));
-            AddAssert("typing started was called", () => typingStarted);
             AddAssert("search box is empty", () => string.IsNullOrEmpty(control.Query.Value));
-        }
-
-        [Test]
-        public void TestTypingStartedNotFiredOnCopy()
-        {
-            bool typingStarted = false;
-
-            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
-            AddStep("focus search box", () => control.TakeFocus());
-            AddStep("type a character", () => textInput.Text("a"));
-            AddStep("reset flag", () => typingStarted = false);
-            AddStep("copy text", () =>
-            {
-                InputManager.PressKey(Key.LControl);
-                InputManager.Key(Key.C);
-                InputManager.ReleaseKey(Key.LControl);
-            });
-            AddAssert("typing started was not called", () => !typingStarted);
-        }
-
-        [Test]
-        public void TestTypingStartedNotFiredOnSelectAll()
-        {
-            bool typingStarted = false;
-
-            AddStep("set callback", () => control.TypingStarted = () => typingStarted = true);
-            AddStep("focus search box", () => control.TakeFocus());
-            AddStep("select all", () =>
-            {
-                InputManager.PressKey(Key.LControl);
-                InputManager.Key(Key.A);
-                InputManager.ReleaseKey(Key.LControl);
-            });
-            AddAssert("typing started was not called", () => !typingStarted);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             localConfig?.Dispose();
             base.Dispose(isDisposing);
-        }
-
-        private partial class ManualTextInputContainer : Container
-        {
-            [Cached(typeof(TextInputSource))]
-            public readonly ManualTextInputSource TextInput = new ManualTextInputSource();
-
-            public ManualTextInputContainer()
-            {
-                RelativeSizeAxes = Axes.Both;
-            }
         }
 
         private static readonly APIBeatmapSet beatmap_set = new APIBeatmapSet
@@ -224,5 +207,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Cover = string.Empty
             }
         };
+
+        private partial class ManualTextInputContainer : Container
+        {
+            [Cached(typeof(TextInputSource))]
+            public readonly ManualTextInputSource TextInput = new ManualTextInputSource();
+        }
     }
 }

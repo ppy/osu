@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public partial class BeatmapListingSearchControl : CompositeDrawable
     {
         /// <summary>
-        /// Invoked any time text is added to or removed from the search box.
+        /// Invoked when the user interacts with the search box in a way that aims to mutate its state.
         /// </summary>
         public Action? TypingStarted;
 
@@ -175,7 +176,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private partial class BeatmapSearchTextBox : BasicSearchTextBox
         {
             /// <summary>
-            /// Invoked any time text is added to or removed from the text box.
+            /// Invoked when the user interacts with this text box in a way that aims to mutate its state.
             /// </summary>
             public Action? TextChanged;
 
@@ -192,10 +193,13 @@ namespace osu.Game.Overlays.BeatmapListing
                 TextChanged?.Invoke();
             }
 
-            protected override void OnUserTextRemoved(string removed)
+            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
             {
-                base.OnUserTextRemoved(removed);
+                if (!base.OnPressed(e))
+                    return false;
+
                 TextChanged?.Invoke();
+                return true;
             }
 
             public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
