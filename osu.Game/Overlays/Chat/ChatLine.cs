@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Chat
         protected virtual float UsernameWidth => 150;
 
         [Resolved]
-        private ChannelManager? chatManager { get; set; }
+        private ChannelManager? channelManager { get; set; }
 
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
@@ -219,7 +220,28 @@ namespace osu.Game.Overlays.Chat
             updateMessageContent();
             FinishTransforms(true);
 
-            drawableUsername.ReportRequested = () => dialogOverlay?.Push(new ReportChatDialog(message));
+            drawableUsername.ReportRequested = () => dialogOverlay?.Push(new ReportChatDialog(message)
+            {
+                Success = () =>
+                {
+                    Debug.Assert(channelManager != null);
+
+                    switch (channelManager.CurrentChannel.Value.Type)
+                    {
+                        case ChannelType.PM:
+                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage("""
+                                                                                            Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
+                                                                                            You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
+                                                                                            You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
+                                                                                            """));
+                            break;
+
+                        default:
+                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(@"Chat moderators have been alerted. Thanks for your help."));
+                            break;
+                    }
+                }
+            });
         }
 
         /// <summary>
@@ -279,7 +301,7 @@ namespace osu.Game.Overlays.Chat
             drawableUsername.Text = $@"{message.Sender.Username}";
 
             // remove non-existent channels from the link list
-            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && channelManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
 
             isMention = MessageNotifier.MatchUsername(message.DisplayContent, api.LocalUser.Value.Username).Success;
 

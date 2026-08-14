@@ -52,37 +52,32 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            link.AddLink(ReportStrings.CommentButton.ToLower(), () => dialogOverlay?.Push(createDialog()));
-        }
-
-        private ReportCommentDialog createDialog()
-        {
-            var dialog = new ReportCommentDialog(comment);
-
-            dialog.Submitted += () =>
+            link.AddLink(ReportStrings.CommentButton.ToLower(), () =>
             {
-                link.Hide();
-                loading.Show();
-            };
+                dialogOverlay?.Push(new ReportCommentDialog(comment)
+                {
+                    Submitted = () =>
+                    {
+                        link.Hide();
+                        loading.Show();
+                    },
+                    Success = () => Schedule(() =>
+                    {
+                        loading.Hide();
 
-            dialog.Success += () => Schedule(() =>
-            {
-                loading.Hide();
+                        link.Clear(true);
+                        link.AddText(UsersStrings.ReportThanks, s => s.Colour = colourProvider?.Content2 ?? Colour4.White);
+                        link.Show();
 
-                link.Clear(true);
-                link.AddText(UsersStrings.ReportThanks, s => s.Colour = colourProvider?.Content2 ?? Colour4.White);
-                link.Show();
-
-                this.FadeOut(2000, Easing.InQuint).Expire();
+                        this.FadeOut(2000, Easing.InQuint).Expire();
+                    }),
+                    Failure = () => Schedule(() =>
+                    {
+                        loading.Hide();
+                        link.Show();
+                    })
+                });
             });
-
-            dialog.Failure += () => Schedule(() =>
-            {
-                loading.Hide();
-                link.Show();
-            });
-
-            return dialog;
         }
 
         public float LineBaseHeight => link.ChildrenOfType<IHasLineBaseHeight>().FirstOrDefault()?.LineBaseHeight ?? DrawHeight;

@@ -39,17 +39,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// <summary>
         /// The action to run when the report is submitted.
         /// </summary>
-        public event Action? Submitted;
+        public Action? Submitted { get; set; }
 
         /// <summary>
         /// The action to run when the report is submitted successfully.
         /// </summary>
-        public event Action? Success;
+        public Action? Success { get; set; }
 
         /// <summary>
         /// The action to run when the report failed to submit.
         /// </summary>
-        public event Action? Failure;
+        public Action? Failure { get; set; }
 
         private readonly ReverseChildIDFillFlowContainer<Drawable> form;
         private readonly FormEnumDropdown<TReportReason> reasonDropdown;
