@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override LocalisableString Description => "The fruit has gone bad... dodge it!";
         public override double ScoreMultiplier => 1;
         public override string Acronym => "RF";
-        public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay) };
+        public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay), typeof(CatchModCinema) };
         public override ModType Type => ModType.Conversion;
 
         [SettingSource("Mute hit sounds", "Hit sounds become muted.")]
