@@ -44,8 +44,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
 
-        private const float spinning_sample_initial_frequency = 1.0f;
-        private const float spinning_sample_modulated_base_frequency = 0.5f;
+        // see https://github.com/peppy/osu-stable-reference/blob/0b8b19af621dbb282773c22b36cc0453942b98d8/osu!/Audio/AudioEngine.cs#L924
+        private const float spinning_sample_modulated_base_frequency = 20_000f / 44_100;
+        private const float spinning_sample_modulaton_ratio = 40_000f / 44_100;
+        private const float spinning_sample_modulated_max_frequency = 100_000f / 44_100;
 
         private PausableSkinnableSound maxBonusSample;
 
@@ -112,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Volume = { Value = 0 },
                     MinimumSampleVolume = MINIMUM_SAMPLE_VOLUME,
                     Looping = true,
-                    Frequency = { Value = spinning_sample_initial_frequency }
+                    Frequency = { Value = spinning_sample_modulated_base_frequency }
                 },
                 maxBonusSample = new PausableSkinnableSound
                 {
@@ -144,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.LoadSamples();
 
             spinningSample.Samples = HitObject.CreateSpinningSamples().Cast<ISampleInfo>().ToArray();
-            spinningSample.Frequency.Value = spinning_sample_initial_frequency;
+            spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency;
 
             maxBonusSample.Samples = new ISampleInfo[] { new SpinnerBonusMaxSampleInfo(HitObject.CreateHitSampleInfo()) };
         }
@@ -238,9 +240,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     // these become implicitly hit.
                     return 1;
 
-                return Math.Clamp(Result.TotalRotation / 360 / HitObject.SpinsRequired, 0, 1);
+                return Math.Clamp(progressUnclamped, 0, 1);
             }
         }
+
+        private float progressUnclamped => Result.TotalRotation / 360 / HitObject.SpinsRequired;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuSpinnerJudgementResult(HitObject, judgement);
 
@@ -279,8 +283,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HandleUserInput)
                 RotationTracker.Tracking = RotationTracker.IsSpinnableTime && !Result.HasResult && correctButtonPressed();
 
-            if (spinningSample != null && spinnerFrequencyModulate)
-                spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
+            if (spinningSample != null)
+            {
+                spinningSample.Frequency.Value = spinnerFrequencyModulate
+                    ? Math.Min(spinning_sample_modulated_max_frequency, spinning_sample_modulated_base_frequency + progressUnclamped * spinning_sample_modulaton_ratio)
+                    : 1;
+            }
 
             // Ticks can theoretically be judged at any point in the spinner's duration.
             // A tick must be alive to correctly play back samples,
