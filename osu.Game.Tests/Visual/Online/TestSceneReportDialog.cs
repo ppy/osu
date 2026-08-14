@@ -24,6 +24,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
+        private ChatReportRequest? pendingRequest;
+
         [SetUpSteps]
         public void SetUp()
         {
@@ -31,15 +33,10 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Child = dialogOverlay = new DialogOverlay();
             });
-        }
-
-        [Test]
-        public void TestSuccess()
-        {
-            ChatReportRequest pendingRequest = null!;
 
             AddStep("setup request handling", () =>
             {
+                pendingRequest = null;
                 dummyAPI.HandleRequest += request =>
                 {
                     if (request is ChatReportRequest chatReportRequest)
@@ -52,7 +49,11 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
             AddStep("push dialog", () => dialogOverlay.Push(new TestReportDialog("test")));
+        }
 
+        [Test]
+        public void TestSuccess()
+        {
             AddStep("try to report", () => dialogOverlay.CurrentDialog!.PerformAction<TestReportDialog.SubmitButton>());
             AddWaitStep("wait", 3);
             AddAssert("nothing happened", () => dialogOverlay.CurrentDialog!.ChildrenOfType<LoadingLayer>().First().IsReadOnly, () => Is.False);
@@ -61,8 +62,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("send report", () => dialogOverlay.CurrentDialog!.PerformAction<TestReportDialog.SubmitButton>());
 
             AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
-            AddWaitStep("wait some", 3);
-            AddStep("complete request", () => pendingRequest.TriggerSuccess());
+            AddUntilStep("wait for request triggered", () => pendingRequest != null);
+            AddStep("complete request", () => pendingRequest!.TriggerSuccess());
             AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.False);
 
             AddAssert("ensure form is not present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.False);
@@ -73,29 +74,12 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestFailure()
         {
-            ChatReportRequest pendingRequest = null!;
-
-            AddStep("setup request handling", () =>
-            {
-                dummyAPI.HandleRequest += request =>
-                {
-                    if (request is ChatReportRequest chatReportRequest)
-                    {
-                        pendingRequest = chatReportRequest;
-                        return true;
-                    }
-
-                    return false;
-                };
-            });
-            AddStep("push dialog", () => dialogOverlay.Push(new TestReportDialog("test")));
-
             AddStep("input reason", () => this.ChildrenOfType<OsuTextBox>().First().Text = "reason");
             AddStep("send report", () => dialogOverlay.CurrentDialog!.PerformAction<TestReportDialog.SubmitButton>());
 
             AddUntilStep("wait for loading layer to show", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.True);
-            AddWaitStep("wait some", 3);
-            AddStep("fail request", () => pendingRequest.TriggerFailure(new APIException("test error", new HttpRequestException("test error"))));
+            AddUntilStep("wait for request triggered", () => pendingRequest != null);
+            AddStep("fail request", () => pendingRequest!.TriggerFailure(new APIException("test error", new HttpRequestException("test error"))));
             AddUntilStep("wait for loading layer to hide", () => this.ChildrenOfType<LoadingLayer>().First().IsPresent, () => Is.False);
 
             AddAssert("ensure form is present", () => this.ChildrenOfType<ReverseChildIDFillFlowContainer<Drawable>>().First().IsPresent, () => Is.True);

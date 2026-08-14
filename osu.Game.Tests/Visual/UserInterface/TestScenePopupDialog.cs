@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Child = dialog = new TestPopupDialog
                 {
-                    State = { Value = Framework.Graphics.Containers.Visibility.Visible },
+                    State = { Value = Visibility.Visible },
                 };
             });
         }
