@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
-        public double CalculateDoubleTapFeasibility(OsuDifficultyHitObject? nextObj)
+        public double CalculateDoubleTapFeasibility(OsuDifficultyHitObject? osuPrevObj, OsuDifficultyHitObject? osuNextObj)
         {
             if (osuPrevObj == null || osuNextObj == null)
                 return 0;
@@ -192,15 +192,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double speedRatio = Math.Max(getSpeedRatio(osuPrevObj), getSpeedRatio(osuNextObj));
 
             // Can't doubletap if circles don't intersect
-            double distanceFactor = Math.Pow(DifficultyCalculationUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
+            double distanceFactor = DiffUtils.Pow(DiffUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
             // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
             double windowRatio = Math.Min(DeltaTime / (HitWindowGreat * 2), 1);
 
             // Nerf even more if you can straight up doubletap
-            windowRatio *= Math.Min(Math.Pow(DeltaTime / HitWindowGreat, 2), 1);
+            windowRatio *= Math.Min(DiffUtils.Pow(DeltaTime / HitWindowGreat, 2), 1);
 
-            return 1 - Math.Pow(speedRatio, distanceFactor * (1 - windowRatio));
+            return 1 - DiffUtils.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
