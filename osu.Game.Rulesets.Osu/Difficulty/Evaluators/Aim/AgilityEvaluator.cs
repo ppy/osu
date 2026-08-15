@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
 
-            double travelDistance = osuPrevObj?.LazyTravelDistance ?? 0;
+            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
             double distance = travelDistance + osuCurrObj.LazyJumpDistance;
 
             double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;

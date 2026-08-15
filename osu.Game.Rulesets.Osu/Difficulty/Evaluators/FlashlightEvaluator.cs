@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (osuCurrent.BaseObject is Slider osuSlider)
             {
                 // Invert the scaling factor to determine the true travel distance independent of circle size.
-                double pixelTravelDistance = osuCurrent.LazyTravelDistance / scalingFactor;
+                double pixelTravelDistance = osuCurrent.BaseTravelDistance / scalingFactor;
 
                 // Reward sliders based on velocity.
                 sliderBonus = DiffUtils.Pow(Math.Max(0.0, pixelTravelDistance / osuCurrent.TravelTime - min_velocity), 0.5);
