@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                             islands.Add(island);
 
                         // scale down the difficulty if the object is double-tappable
-                        effectiveDifficulty *= 1 - prevObj.CalculateDoubleTapFeasibility(currObj) * 0.75;
+                        effectiveDifficulty *= 1 - prevObj.CalculateDoubleTapFeasibility(prevPrevObj, currObj) * 0.75;
 
                         if (island.DeltaCount > 1)
                         {

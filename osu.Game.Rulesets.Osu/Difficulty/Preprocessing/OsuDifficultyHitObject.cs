@@ -177,22 +177,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Returns how possible is it to doubletap this object together with the next one and get perfect judgement in range from 0 to 1
         /// </summary>
-        public double CalculateDoubleTapFeasibility(OsuDifficultyHitObject? nextObj)
+        public double CalculateDoubleTapFeasibility(OsuDifficultyHitObject? osuPrevObj, OsuDifficultyHitObject? osuNextObj)
         {
-            if (nextObj == null) return 0;
+            if (osuPrevObj == null || osuNextObj == null)
+                return 0;
 
-            double currDeltaTime = Math.Max(1, DeltaTime);
-            double nextDeltaTime = Math.Max(1, nextObj.DeltaTime);
+            double getSpeedRatio(OsuDifficultyHitObject other)
+            {
+                double deltaDifference = Math.Abs(DeltaTime - other.DeltaTime);
+                return DeltaTime / Math.Max(Math.Max(DeltaTime, deltaDifference), 1);
+            }
 
-            double deltaDifference = Math.Abs(nextDeltaTime - currDeltaTime);
-
-            double speedRatio = currDeltaTime / Math.Max(currDeltaTime, deltaDifference);
-            double windowRatio = DiffUtils.Pow(Math.Min(1, currDeltaTime / HitWindowGreat), 5);
+            // Get max between next and prev ratio to avoid nerfing triples
+            double speedRatio = Math.Max(getSpeedRatio(osuPrevObj), getSpeedRatio(osuNextObj));
 
             // Can't doubletap if circles don't intersect
             double distanceFactor = DiffUtils.Pow(DiffUtils.ReverseLerp(LazyJumpDistance, NORMALISED_DIAMETER, NORMALISED_RADIUS), 2);
 
-            return 1.0 - DiffUtils.Pow(speedRatio, distanceFactor * (1 - windowRatio));
+            // Use HitWindowGreat * 2, because even if you can't get 300 with doubletapping - you still can gallop
+            double windowRatio = Math.Min(DeltaTime / (HitWindowGreat * 2), 1);
+
+            // Nerf even more if you can straight up doubletap
+            windowRatio *= Math.Min(DiffUtils.Pow(DeltaTime / HitWindowGreat, 2), 1);
+
+            return 1 - DiffUtils.Pow(speedRatio, distanceFactor * (1 - windowRatio));
         }
 
         private void setDistances(double clockRate)
