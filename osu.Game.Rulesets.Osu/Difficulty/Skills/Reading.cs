@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             hasHiddenMod = mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value);
         }
 
+        protected override double HarmonicScale => 5;
+
         private double currentStrain;
 
         private double reducedNoteCount;
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double ProcessInternal(DifficultyHitObject current)
         {
-            const double skill_multiplier = 2.5;
+            const double skill_multiplier = 2.17;
             const double reduced_difficulty_duration = 60 * 1000;
 
             double decay = strainDecay(current.DeltaTime);
