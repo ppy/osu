@@ -504,6 +504,7 @@ namespace osu.Game.Screens.Play
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,
                         BreakTracker = breakTracker,
+                        Mods = GameplayState.Mods,
                     },
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),

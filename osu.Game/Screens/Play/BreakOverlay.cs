@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -39,6 +38,15 @@ namespace osu.Game.Screens.Play
 
         public required BreakTracker BreakTracker { get; init; }
 
+        /// <summary>
+        /// The mods in effect for this gameplay session.
+        /// </summary>
+        /// <remarks>
+        /// Must be the mod instances gameplay is running with rather than the selected ones, as mods which vary their
+        /// rate only track that rate on the former.
+        /// </remarks>
+        public required IReadOnlyList<Mod> Mods { get; init; }
+
         private readonly Container remainingTimeAdjustmentBox;
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
@@ -56,9 +64,6 @@ namespace osu.Game.Screens.Play
         /// down to zero while the overlay is still fading out.
         /// </remarks>
         private double? breakEndTime;
-
-        [Resolved]
-        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         public BreakOverlay(ScoreProcessor scoreProcessor)
         {
@@ -151,9 +156,9 @@ namespace osu.Game.Screens.Play
         /// active mods.
         /// </summary>
         /// <remarks>
-        /// Mods which vary their rate over the course of a beatmap are sampled at the current point in time rather than
-        /// projected forward. For wind up / wind down the rate drifts slowly enough over a single break for this to be
-        /// imperceptible, while adaptive speed is driven by the player's input and cannot be predicted at all.
+        /// Wind up / wind down are sampled at the current point in time rather than projected forward over the break.
+        /// Their rate drifts slowly enough across a single break for the difference to be well under the one second
+        /// granularity the countdown is displayed at.
         /// </remarks>
         private double gameplayRate
         {
@@ -161,13 +166,14 @@ namespace osu.Game.Screens.Play
             {
                 double rate = 1;
 
-                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
+                foreach (var mod in Mods.OfType<IApplicableToRate>())
                 {
-                    // adaptive speed's `ApplyToRate()` can only report the rate gameplay started at,
-                    // so read the rate it is actually running at instead.
-                    rate = mod is ModAdaptiveSpeed adaptiveSpeed
-                        ? rate * adaptiveSpeed.SpeedChange.Value
-                        : mod.ApplyToRate(Time.Current, rate);
+                    // adaptive speed's rate is driven by how the player is performing and can change at any point,
+                    // so there is nothing meaningful to count down towards. its breaks are left in beatmap time.
+                    if (mod is ModAdaptiveSpeed)
+                        continue;
+
+                    rate = mod.ApplyToRate(Time.Current, rate);
                 }
 
                 return rate;

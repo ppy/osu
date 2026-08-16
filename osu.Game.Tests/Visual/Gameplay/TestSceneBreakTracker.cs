@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public partial class TestSceneBreakTracker : OsuTestScene
     {
-        private readonly BreakOverlay breakOverlay;
+        private BreakOverlay breakOverlay;
 
         private readonly TestBreakTracker breakTracker;
 
@@ -48,11 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     RelativeSizeAxes = Axes.Both,
                 },
                 breakTracker = new TestBreakTracker(),
-                breakOverlay = new BreakOverlay(new ScoreProcessor(new OsuRuleset()))
-                {
-                    ProcessCustomClock = false,
-                    BreakTracker = breakTracker,
-                },
+                breakOverlay = createBreakOverlay(),
                 new LetterboxOverlay
                 {
                     ProcessCustomClock = false,
@@ -172,28 +168,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         /// <remarks>
-        /// Adaptive speed's rate is driven by how the player is performing, so it can only be assumed to hold for the
-        /// remainder of the break. The countdown should follow it as it changes.
+        /// Adaptive speed's rate is driven by how the player is performing and can change at any point, so its breaks
+        /// are deliberately left counting down in beatmap time.
         /// </remarks>
         [Test]
-        public void TestRemainingTimeAdjustedForAdaptiveSpeed()
+        public void TestRemainingTimeUnaffectedByAdaptiveSpeed()
         {
             var testBreak = new BreakPeriod(1000, 11000);
-            var adaptiveSpeed = new ModAdaptiveSpeed();
 
             setClock(true);
-            AddStep("apply adaptive speed at 2x", () =>
-            {
-                adaptiveSpeed.SpeedChange.Value = 2;
-                SelectedMods.Value = new Mod[] { adaptiveSpeed };
-            });
+            setMods("adaptive speed at 2x", () => new Mod[] { new ModAdaptiveSpeed { InitialRate = { Value = 2 } } });
             loadBreaksStep("10s break", new[] { testBreak });
 
             seekAndAssertBreak("seek to break start", testBreak.StartTime, true);
-            assertRemainingTime("countdown uses current rate", "5");
-
-            AddStep("slow down to 0.5x", () => adaptiveSpeed.SpeedChange.Value = 0.5);
-            assertRemainingTime("countdown follows the rate change", "20");
+            assertRemainingTime("countdown is left in beatmap time", "10");
         }
 
         private string remainingTimeText => breakOverlay.ChildrenOfType<RemainingTimeCounter>().Single()
@@ -202,22 +190,42 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void assertRemainingTime(string description, string expected)
             => AddUntilStep(description, () => remainingTimeText, () => Is.EqualTo(expected));
 
+        private BreakOverlay createBreakOverlay(params Mod[] mods) => new BreakOverlay(new ScoreProcessor(new OsuRuleset()))
+        {
+            ProcessCustomClock = false,
+            BreakTracker = breakTracker,
+            Mods = mods,
+        };
+
+        /// <remarks>
+        /// The overlay reads its mods once on construction, mirroring how <see cref="Player"/> hands it the mods
+        /// gameplay is running with, so it has to be recreated to change them.
+        /// </remarks>
+        private void setMods(string description, Func<Mod[]> createMods)
+        {
+            AddStep($"set mods to {description}", () =>
+            {
+                Remove(breakOverlay, true);
+                Add(breakOverlay = createBreakOverlay(createMods()));
+            });
+        }
+
         private void setRateAdjustMod(double rate)
         {
-            AddStep($"set rate to {rate}x", () =>
+            setMods($"{rate}x rate adjust", () =>
             {
                 if (rate == 1)
-                    SelectedMods.Value = Array.Empty<Mod>();
-                else if (rate > 1)
-                    SelectedMods.Value = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = rate } } };
-                else
-                    SelectedMods.Value = new Mod[] { new OsuModHalfTime { SpeedChange = { Value = rate } } };
+                    return Array.Empty<Mod>();
+
+                return rate > 1
+                    ? new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = rate } } }
+                    : new Mod[] { new OsuModHalfTime { SpeedChange = { Value = rate } } };
             });
         }
 
         private void setTimeRampMod(double initialRate, double finalRate)
         {
-            AddStep($"set rate to ramp from {initialRate}x to {finalRate}x", () =>
+            setMods($"ramp from {initialRate}x to {finalRate}x", () =>
             {
                 ModTimeRamp mod = finalRate > initialRate
                     ? new ModWindUp { FinalRate = { Value = finalRate }, InitialRate = { Value = initialRate } }
@@ -234,7 +242,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                 });
 
-                SelectedMods.Value = new Mod[] { mod };
+                return new Mod[] { mod };
             });
         }
 
