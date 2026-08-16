@@ -11,11 +11,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.Break;
@@ -145,11 +147,60 @@ namespace osu.Game.Tests.Visual.Gameplay
             loadBreaksStep("10s break", new[] { testBreak });
 
             seekAndAssertBreak("seek to break start", testBreak.StartTime, true);
-            AddUntilStep("countdown shows remaining real time", () => remainingTimeText, () => Is.EqualTo(expectedInitialCountdown));
+            assertRemainingTime("countdown shows remaining real time", expectedInitialCountdown);
+        }
+
+        /// <remarks>
+        /// Wind up and wind down change their rate as the beatmap progresses, so the countdown has to follow whichever
+        /// rate is in effect at the point in time it is being displayed at.
+        /// </remarks>
+        [TestCase(1, 2, "10", "4")]
+        [TestCase(1, 0.5, "11", "7")]
+        public void TestRemainingTimeAdjustedForTimeRampMods(double initialRate, double finalRate, string countdownAtStart, string countdownAtMiddle)
+        {
+            var testBreak = new BreakPeriod(1000, 11000);
+
+            setClock(true);
+            setTimeRampMod(initialRate, finalRate);
+            loadBreaksStep("10s break", new[] { testBreak });
+
+            seekAndAssertBreak("seek to break start", testBreak.StartTime, true);
+            assertRemainingTime("countdown uses rate at break start", countdownAtStart);
+
+            seekAndAssertBreak("seek to break middle", 6000, true);
+            assertRemainingTime("countdown uses ramped rate at break middle", countdownAtMiddle);
+        }
+
+        /// <remarks>
+        /// Adaptive speed's rate is driven by how the player is performing, so it can only be assumed to hold for the
+        /// remainder of the break. The countdown should follow it as it changes.
+        /// </remarks>
+        [Test]
+        public void TestRemainingTimeAdjustedForAdaptiveSpeed()
+        {
+            var testBreak = new BreakPeriod(1000, 11000);
+            var adaptiveSpeed = new ModAdaptiveSpeed();
+
+            setClock(true);
+            AddStep("apply adaptive speed at 2x", () =>
+            {
+                adaptiveSpeed.SpeedChange.Value = 2;
+                SelectedMods.Value = new Mod[] { adaptiveSpeed };
+            });
+            loadBreaksStep("10s break", new[] { testBreak });
+
+            seekAndAssertBreak("seek to break start", testBreak.StartTime, true);
+            assertRemainingTime("countdown uses current rate", "5");
+
+            AddStep("slow down to 0.5x", () => adaptiveSpeed.SpeedChange.Value = 0.5);
+            assertRemainingTime("countdown follows the rate change", "20");
         }
 
         private string remainingTimeText => breakOverlay.ChildrenOfType<RemainingTimeCounter>().Single()
                                                         .ChildrenOfType<OsuSpriteText>().Single().Text.ToString();
+
+        private void assertRemainingTime(string description, string expected)
+            => AddUntilStep(description, () => remainingTimeText, () => Is.EqualTo(expected));
 
         private void setRateAdjustMod(double rate)
         {
@@ -161,6 +212,29 @@ namespace osu.Game.Tests.Visual.Gameplay
                     SelectedMods.Value = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = rate } } };
                 else
                     SelectedMods.Value = new Mod[] { new OsuModHalfTime { SpeedChange = { Value = rate } } };
+            });
+        }
+
+        private void setTimeRampMod(double initialRate, double finalRate)
+        {
+            AddStep($"set rate to ramp from {initialRate}x to {finalRate}x", () =>
+            {
+                ModTimeRamp mod = finalRate > initialRate
+                    ? new ModWindUp { FinalRate = { Value = finalRate }, InitialRate = { Value = initialRate } }
+                    : new ModWindDown { FinalRate = { Value = finalRate }, InitialRate = { Value = initialRate } };
+
+                // the ramp is defined relative to the first and last hitobjects, so it needs a beatmap to apply to
+                // before it can report a rate. this one reaches its final rate at 15,000ms.
+                mod.ApplyToBeatmap(new Beatmap
+                {
+                    HitObjects =
+                    {
+                        new HitCircle { StartTime = 0 },
+                        new HitCircle { StartTime = 20000 },
+                    }
+                });
+
+                SelectedMods.Value = new Mod[] { mod };
             });
         }
 

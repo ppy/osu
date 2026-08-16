@@ -3,15 +3,38 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.Break
 {
-    public partial class RemainingTimeCounter : Counter
+    public partial class RemainingTimeCounter : CompositeDrawable
     {
         private readonly OsuSpriteText counter;
+
+        private double remainingTime;
+        private int displayedSeconds = -1;
+
+        /// <summary>
+        /// The amount of time left to display, in milliseconds.
+        /// </summary>
+        public double RemainingTime
+        {
+            get => remainingTime;
+            set
+            {
+                remainingTime = value;
+
+                int seconds = (int)Math.Ceiling(value / 1000);
+
+                if (seconds == displayedSeconds)
+                    return;
+
+                displayedSeconds = seconds;
+                counter.Text = seconds.ToString();
+            }
+        }
 
         public RemainingTimeCounter()
         {
@@ -23,7 +46,5 @@ namespace osu.Game.Screens.Play.Break
                 Font = OsuFont.Numeric.With(size: 33),
             };
         }
-
-        protected override void OnCountChanged(double count) => counter.Text = ((int)Math.Ceiling(count / 1000)).ToString();
     }
 }
