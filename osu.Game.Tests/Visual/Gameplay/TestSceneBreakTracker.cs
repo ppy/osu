@@ -3,16 +3,22 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.Break;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -121,6 +127,41 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             seekAndAssertBreak("seek to break intro time", -100, true);
             seekAndAssertBreak("seek to break intro time", 0, false);
+        }
+
+        /// <remarks>
+        /// The countdown is displayed in real time, so a 10 second break should read as 5 seconds under 2x rate.
+        /// </remarks>
+        [TestCase(1, "10")]
+        [TestCase(2, "5")]
+        [TestCase(1.5, "7")]
+        [TestCase(0.5, "20")]
+        public void TestRemainingTimeAdjustedForRateChangingMods(double rate, string expectedInitialCountdown)
+        {
+            var testBreak = new BreakPeriod(1000, 11000);
+
+            setClock(true);
+            setRateAdjustMod(rate);
+            loadBreaksStep("10s break", new[] { testBreak });
+
+            seekAndAssertBreak("seek to break start", testBreak.StartTime, true);
+            AddUntilStep("countdown shows remaining real time", () => remainingTimeText, () => Is.EqualTo(expectedInitialCountdown));
+        }
+
+        private string remainingTimeText => breakOverlay.ChildrenOfType<RemainingTimeCounter>().Single()
+                                                        .ChildrenOfType<OsuSpriteText>().Single().Text.ToString();
+
+        private void setRateAdjustMod(double rate)
+        {
+            AddStep($"set rate to {rate}x", () =>
+            {
+                if (rate == 1)
+                    SelectedMods.Value = Array.Empty<Mod>();
+                else if (rate > 1)
+                    SelectedMods.Value = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = rate } } };
+                else
+                    SelectedMods.Value = new Mod[] { new OsuModHalfTime { SpeedChange = { Value = rate } } };
+            });
         }
 
         private void addShowBreakStep(double seconds)

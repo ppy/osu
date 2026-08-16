@@ -2,6 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.Break;
@@ -43,6 +47,9 @@ namespace osu.Game.Screens.Play
         private readonly BreakInfo info;
 
         private readonly IBindable<Period?> currentPeriod = new Bindable<Period?>();
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
 
         public BreakOverlay(ScoreProcessor scoreProcessor)
         {
@@ -130,6 +137,16 @@ namespace osu.Game.Screens.Play
         private float remainingTimeForCurrentPeriod =>
             currentPeriod.Value == null ? 0 : (float)Math.Max(0, (currentPeriod.Value.Value.End - Time.Current - BREAK_FADE_DURATION) / currentPeriod.Value.Value.Duration);
 
+        /// <summary>
+        /// How fast beatmap time progresses relative to real time, as dictated by the active mods.
+        /// </summary>
+        /// <remarks>
+        /// Only mods applying a constant rate change (ie. double time / nightcore / half time / daycore) are considered.
+        /// Mods which vary the rate over the course of a beatmap (ie. wind up / wind down / adaptive speed) are not
+        /// handled yet, and will fall back to a rate of 1.
+        /// </remarks>
+        private double gameplayRate => mods.Value.OfType<ModRateAdjust>().Aggregate(1.0, (rate, mod) => mod.ApplyToRate(0, rate));
+
         protected override void Update()
         {
             base.Update();
@@ -157,7 +174,11 @@ namespace osu.Game.Screens.Play
                     .Delay(b.Duration)
                     .ResizeWidthTo(0);
 
-                remainingTimeCounter.CountTo(b.Duration + BREAK_FADE_DURATION).CountTo(0, b.Duration + BREAK_FADE_DURATION);
+                double countdownDuration = b.Duration + BREAK_FADE_DURATION;
+
+                // the countdown is displayed in real time rather than beatmap time, so that it lines up with how long
+                // the break will actually last for the user when rate-changing mods are active.
+                remainingTimeCounter.CountTo(countdownDuration / gameplayRate).CountTo(0, countdownDuration);
 
                 remainingTimeCounter.MoveToX(-50)
                                     .MoveToX(0, BREAK_FADE_DURATION, Easing.OutQuint);
