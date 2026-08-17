@@ -122,32 +122,38 @@ namespace osu.Game.Online.Chat
                     NewChatMessageData? messageData = JsonConvert.DeserializeObject<NewChatMessageData>(message.Data.ToString());
                     Debug.Assert(messageData != null);
 
+                    // If all channels are in a good state, let's batch the message delivery.
+                    if (messageData.Messages.TrueForAll(msg => channelsMap.TryGetValue(msg.ChannelId, out Channel? channel) && channel.Joined.Value))
+                    {
+                        NewMessages?.Invoke(messageData.Messages);
+                        return;
+                    }
+
+                    // Otherwise, for simplicity, we handle messages one at a time and prepare channels to show them.
                     foreach (var msg in messageData.Messages)
-                        postToChannel(msg);
+                    {
+                        if (channelsMap.TryGetValue(msg.ChannelId, out Channel? channel))
+                        {
+                            joinChannel(channel);
+                            NewMessages?.Invoke(new List<Message> { msg });
+                        }
+                        else
+                        {
+                            var req = new GetChannelRequest(msg.ChannelId);
+
+                            req.Success += response =>
+                            {
+                                joinChannel(channelsMap[msg.ChannelId] = response.Channel);
+                                NewMessages?.Invoke(new List<Message> { msg });
+                            };
+                            req.Failure += ex => Logger.Error(ex, "Failed to join channel");
+
+                            api.Queue(req);
+                        }
+                    }
 
                     break;
             }
-        }
-
-        private void postToChannel(Message message)
-        {
-            if (channelsMap.TryGetValue(message.ChannelId, out Channel? channel))
-            {
-                joinChannel(channel);
-                NewMessages?.Invoke(new List<Message> { message });
-                return;
-            }
-
-            var req = new GetChannelRequest(message.ChannelId);
-
-            req.Success += response =>
-            {
-                joinChannel(channelsMap[message.ChannelId] = response.Channel);
-                NewMessages?.Invoke(new List<Message> { message });
-            };
-            req.Failure += ex => Logger.Error(ex, "Failed to join channel");
-
-            api.Queue(req);
         }
 
         private void joinChannel(Channel ch)
