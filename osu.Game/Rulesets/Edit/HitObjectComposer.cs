@@ -279,7 +279,7 @@ namespace osu.Game.Rulesets.Edit
                 toolboxCollection.AddButton(new HitObjectCompositionToolButton<TAction>(compositionTool, toolSelected)
                 {
                     Hotkey = compositionTool.Action != null
-                        ? new Hotkey(Ruleset.ShortName, Rulesets.Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(compositionTool.Action.Value, typeof(int)))
+                        ? new Hotkey(Ruleset.ShortName, Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(compositionTool.Action.Value, typeof(int)))
                         : null,
                 });
             }
