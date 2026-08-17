@@ -84,22 +84,24 @@ namespace osu.Game.Overlays.SkinEditor
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            int delta = e.ShiftPressed ? 10 : 1;
+
             switch (e.Key)
             {
                 case Key.Left:
-                    moveSelection(new Vector2(-1, 0));
+                    moveSelection(new Vector2(-delta, 0));
                     return true;
 
                 case Key.Right:
-                    moveSelection(new Vector2(1, 0));
+                    moveSelection(new Vector2(delta, 0));
                     return true;
 
                 case Key.Up:
-                    moveSelection(new Vector2(0, -1));
+                    moveSelection(new Vector2(0, -delta));
                     return true;
 
                 case Key.Down:
-                    moveSelection(new Vector2(0, 1));
+                    moveSelection(new Vector2(0, delta));
                     return true;
             }
 
