@@ -49,11 +49,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         });
 
         [Test]
-        public void TestExtraPressDoesNotChainMissNextObject() => CreateModTest(new ModTestData
+        public void TestExtraPressChainMissesNextObject() => CreateModTest(new ModTestData
         {
             Mod = new OsuModPreciseTapping(),
-            PassCondition = () => Player.ScoreProcessor.Statistics.GetValueOrDefault(HitResult.Miss) == 1
-                                  && Player.ScoreProcessor.Statistics.GetValueOrDefault(HitResult.Great) == 1,
+            PassCondition = () => Player.ScoreProcessor.Statistics.GetValueOrDefault(HitResult.Miss) == 2,
             Autoplay = false,
             CreateBeatmap = () => new Beatmap
             {

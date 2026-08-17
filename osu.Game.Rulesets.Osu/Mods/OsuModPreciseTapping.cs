@@ -20,7 +20,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public partial class OsuModPreciseTapping : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IUpdatableByPlayfield
+    public partial class OsuModPreciseTapping : Mod, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => @"Precise Tapping";
         public override string Acronym => @"PT";
@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private PeriodTracker nonGameplayPeriods = null!;
 
         private IFrameStableClock gameplayClock = null!;
-
-        private bool penaltyActive = true;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -58,12 +56,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             nonGameplayPeriods = new PeriodTracker(periods);
 
             gameplayClock = drawableRuleset.FrameStableClock;
-        }
-
-        public void Update(Playfield playfield)
-        {
-            if (gameplayClock.IsRewinding || nonGameplayPeriods.IsInAny(gameplayClock.CurrentTime))
-                penaltyActive = true;
         }
 
         private DrawableHitCircle? getNextTappable()
@@ -111,13 +103,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 tappable.HitArea.OnPressed(e);
 
-                if (tappable.Result?.IsHit == true)
-                    mod.penaltyActive = true;
-                else if (tappable.Result?.HasResult != true && mod.penaltyActive)
-                {
+                if (tappable.Result?.HasResult != true)
                     tappable.MissForcefully();
-                    mod.penaltyActive = false;
-                }
 
                 return true;
             }
