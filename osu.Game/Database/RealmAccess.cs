@@ -110,6 +110,13 @@ namespace osu.Game.Database
         /// </summary>
         private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
 
+        /// <summary>
+        /// This <see cref="CancellationTokenSource"/> is cancelled on disposal
+        /// so that all callers of <see cref="getRealmInstance"/> who are blocked on <see cref="realmRetrievalLock"/>
+        /// can hard-fail the retrieval rather than spin on the semaphore forever.
+        /// </summary>
+        private readonly CancellationTokenSource realmRetrievalCancellation = new CancellationTokenSource();
+
         private readonly CountdownEvent pendingAsyncOperations = new CountdownEvent(0);
 
         /// <summary>
@@ -778,7 +785,7 @@ namespace osu.Game.Database
                 // Ensure that the thread that currently has the `realmRetrievalLock` can retrieve nested contexts and not deadlock on itself.
                 if (!currentThreadHasRealmRetrievalLock.Value)
                 {
-                    realmRetrievalLock.Wait();
+                    realmRetrievalLock.Wait(realmRetrievalCancellation.Token);
                     currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
                 }
@@ -1515,6 +1522,8 @@ namespace osu.Game.Database
                 // intentionally block realm retrieval indefinitely. this ensures that nothing can start consuming a new instance after disposal.
                 realmRetrievalLock.Wait();
                 realmRetrievalLock.Dispose();
+                // also unblock all readers who may be spinning on realm retrieval.
+                realmRetrievalCancellation.Cancel();
 
                 isDisposed = true;
             }
