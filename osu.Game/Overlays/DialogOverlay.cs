@@ -129,6 +129,8 @@ namespace osu.Game.Overlays
 
         protected override bool BlockNonPositionalInput => true;
 
+        // Matches `OsuFocusedOverlayContainer` implementation but redirects checks to the meaningful part of the dialog display.
+        // Required because of the custom dim layer logic used in this class.
         private bool closeOnMouseUp;
 
         protected override bool OnMouseDown(MouseDownEvent e)
