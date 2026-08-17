@@ -127,7 +127,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             performingRequest = true;
             updateSubmitButtonState();
 
-            var request = CreateRequest(reasonDropdown.Current.Value, commentsTextBox.Current.Value);
+            var request = CreateRequest(
+                reasonDropdown.Current.Value,
+                string.IsNullOrEmpty(commentsTextBox.Current.Value) ? string.Empty : commentsTextBox.Current.Value
+            );
 
             request.Success += handleSuccess;
             request.Failure += handleFailure;
