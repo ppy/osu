@@ -22,18 +22,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
     public partial class HamburgerMenu : IconButton, IHasPopover
     {
+        public Action? ReportRequested { get; init; }
+
         public HamburgerMenu()
         {
             Icon = FontAwesome.Solid.Bars;
             Action = this.ShowPopover;
         }
 
-        public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover();
+        public Framework.Graphics.UserInterface.Popover GetPopover() => new Popover { ReportRequested = ReportRequested };
 
         private partial class Popover : OsuPopover
         {
             [Resolved]
             private RankedPlayScreen? rankedPlayScreen { get; set; }
+
+            public Action? ReportRequested { get; init; }
 
             private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
             private FillFlowContainer buttonFlow = null!;
@@ -51,6 +55,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 };
 
                 addButton(rankedPlayScreen?.ActiveSubScreen is not EndedScreen ? "Give up" : CommonStrings.Exit, FontAwesome.Solid.SignOutAlt, () => rankedPlayScreen?.Exit());
+
+                if (ReportRequested != null)
+                    addButton("Report opponent", FontAwesome.Solid.ExclamationTriangle, () => ReportRequested.Invoke());
             }
 
             protected override void LoadComplete()
