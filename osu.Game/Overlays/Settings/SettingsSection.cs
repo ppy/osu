@@ -32,6 +32,8 @@ namespace osu.Game.Overlays.Settings
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
 
+        public bool UseSmallerSidebarButton { get; init; }
+
         public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 
         public const int ITEM_SPACING = 14;

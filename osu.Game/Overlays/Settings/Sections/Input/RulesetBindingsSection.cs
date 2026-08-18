@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public RulesetBindingsSection(RulesetInfo ruleset)
         {
+            UseSmallerSidebarButton = true;
             this.ruleset = ruleset;
         }
 

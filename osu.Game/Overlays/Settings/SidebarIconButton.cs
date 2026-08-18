@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
@@ -20,26 +19,13 @@ namespace osu.Game.Overlays.Settings
         private const float selection_indicator_height_active = 18;
         private const float selection_indicator_height_inactive = 4;
 
-        private readonly ConstrainedIconContainer iconContainer;
-        private readonly SpriteText headerText;
-        private readonly CircularContainer selectionIndicator;
-        private readonly Container textIconContent;
+        private CircularContainer selectionIndicator;
+        private Container textIconContent;
 
         // always consider as part of flow, even when not visible (for the sake of the initial animation).
         public override bool IsPresent => true;
 
-        private SettingsSection section;
-
-        public SettingsSection Section
-        {
-            get => section;
-            set
-            {
-                section = value;
-                headerText.Text = value.Header;
-                iconContainer.Icon = value.CreateIcon();
-            }
-        }
+        public required SettingsSection Section { get; init; }
 
         private bool selected;
 
@@ -58,9 +44,17 @@ namespace osu.Game.Overlays.Settings
         public SidebarIconButton()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 46;
+        }
 
-            Padding = new MarginPadding { Horizontal = 5, Vertical = 2.5f };
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            const float icon_size = 20;
+
+            float scale = Section.UseSmallerSidebarButton ? 0.8f : 1;
+
+            Height = 46 * scale;
+            Padding = new MarginPadding { Horizontal = 5 + (Section.UseSmallerSidebarButton ? icon_size : 0), Vertical = 2.5f * scale };
 
             AddRange(new Drawable[]
             {
@@ -70,16 +64,20 @@ namespace osu.Game.Overlays.Settings
                     Colour = OsuColour.Gray(0.6f),
                     Children = new Drawable[]
                     {
-                        iconContainer = new ConstrainedIconContainer
+                        new ConstrainedIconContainer
                         {
                             Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Size = new Vector2(20),
+                            Origin = Anchor.Centre,
+                            X = icon_size,
+                            Size = new Vector2(icon_size * scale),
+                            Icon = Section.CreateIcon(),
                             Margin = new MarginPadding { Left = 25 }
                         },
-                        headerText = new OsuSpriteText
+                        new OsuSpriteText
                         {
-                            Position = new Vector2(60, 0),
+                            Text = Section.Header,
+                            Font = OsuFont.Default.With(size: OsuFont.DEFAULT_FONT_SIZE * scale),
+                            Position = new Vector2(50, 0),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
@@ -87,6 +85,8 @@ namespace osu.Game.Overlays.Settings
                 },
                 selectionIndicator = new CircularContainer
                 {
+                    Colour = ColourProvider.Highlight1,
+
                     Alpha = 0,
                     Width = 4,
                     Height = selection_indicator_height_inactive,
@@ -105,12 +105,6 @@ namespace osu.Game.Overlays.Settings
                     }
                 },
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            selectionIndicator.Colour = ColourProvider.Highlight1;
         }
 
         protected override void UpdateState()
