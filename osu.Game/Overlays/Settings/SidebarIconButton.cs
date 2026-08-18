@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X;
             Height = 46;
 
-            Padding = new MarginPadding(5);
+            Padding = new MarginPadding { Horizontal = 5, Vertical = 2.5f };
 
             AddRange(new Drawable[]
             {
