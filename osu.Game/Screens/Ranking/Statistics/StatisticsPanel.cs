@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 {
     public partial class StatisticsPanel : VisibilityContainer
     {
-        public const float SIDE_PADDING = 30;
+        public const float SIDE_PADDING = 20;
 
         public readonly Bindable<ScoreInfo?> Score = new Bindable<ScoreInfo?>();
 
@@ -142,24 +142,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                 else
                 {
                     FillFlowContainer flow;
-                    container = new OsuScrollContainer(Direction.Vertical)
+                    container = flow = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Masking = false,
-                        ScrollbarOverlapsContent = false,
-                        Alpha = 0,
-                        Children = new[]
-                        {
-                            flow = new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(30, 10),
-                                Direction = FillDirection.Full,
-                            }
-                        }
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
                     };
 
                     bool anyRequiredHitEvents = false;

@@ -294,9 +294,9 @@ namespace osu.Game.Rulesets.Taiko
                         new HitEventTimingDistributionGraph(timedHitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 220
+                            Height = 150
                         },
-                        new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                        new SimpleStatisticTable(1, new SimpleStatisticItem[]
                         {
                             new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)

@@ -365,20 +365,20 @@ namespace osu.Game.Rulesets.Osu
                         new HitEventTimingDistributionGraph(timedHitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 220
+                            Height = 150
                         },
-                        new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                        new SimpleStatisticTable(1, new SimpleStatisticItem[]
                         {
                             new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
                         })
                     }
-                }, true),
+                }, requiresHitEvents: true, fullWidth: false),
                 new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
+                    Height = 150 + 20 + StatisticItem.FONT_SIZE * 2,
+                }, requiresHitEvents: true, fullWidth: false),
             };
         }
 
@@ -440,7 +440,8 @@ namespace osu.Game.Rulesets.Osu
                 Description = OsuRulesetStrings.CircleSizeDescription,
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.HitCircleRadius, (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.#"))
+                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.HitCircleRadius,
+                        (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.#"))
                 ]
             };
 
@@ -474,8 +475,12 @@ namespace osu.Game.Rulesets.Osu
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).Concat([
-                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToClearSpinners, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
-                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToGetFullSpinnerBonus, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToClearSpinners,
+                                                      LocalisableString.Interpolate(
+                                                          $@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToGetFullSpinnerBonus,
+                                                      LocalisableString.Interpolate(
+                                                          $@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
                                               ]).ToArray()
             };
 

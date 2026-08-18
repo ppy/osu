@@ -26,13 +26,15 @@ namespace osu.Game.Screens.Ranking.Statistics
             AutoSizeAxes = Axes.Y;
 
             Padding = new MarginPadding(5);
+            Width = item.FullWidth ? 1 : 0.5f;
 
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Masking = true,
-                CornerRadius = 10,
+                CornerRadius = 20,
+                CornerExponent = 2.5f,
                 Children = new Drawable[]
                 {
                     new Box
@@ -47,17 +49,15 @@ namespace osu.Game.Screens.Ranking.Statistics
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding(5),
+                        Padding = new MarginPadding(2),
                         Children = new[]
                         {
-                            LocalisableString.IsNullOrEmpty(item.Name)
-                                ? Empty()
-                                : new StatisticItemHeader { Text = item.Name },
+                            LocalisableString.IsNullOrEmpty(item.Name) ? Empty() : new StatisticItemHeader { Text = item.Name },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding(20) { Top = 45 },
+                                Padding = new MarginPadding(10) { Top = 45 },
                                 Child = item.CreateContent()
                             }
                         }
