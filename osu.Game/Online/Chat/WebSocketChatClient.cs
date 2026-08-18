@@ -162,7 +162,11 @@ namespace osu.Game.Online.Chat
             ChannelJoined?.Invoke(ch);
         }
 
-        private void partChannel(Channel channel) => ChannelParted?.Invoke(channel);
+        private void partChannel(Channel channel)
+        {
+            ChannelParted?.Invoke(channel);
+            channel.Joined.Value = false;
+        }
 
         private void handleMessages(List<Message>? messages)
         {
