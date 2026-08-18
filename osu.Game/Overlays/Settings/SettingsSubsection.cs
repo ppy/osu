@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Settings
             {
                 Text = Header,
                 Font = OsuFont.GetFont(size: header_font_size),
-                Margin = new MarginPadding { Vertical = VERTICAL_PADDING },
+                Margin = new MarginPadding { Vertical = VERTICAL_PADDING, Horizontal = 5 },
                 Padding = SettingsPanel.CONTENT_PADDING,
             };
         }

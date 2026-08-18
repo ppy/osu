@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings
         public const int ITEM_SPACING = 14;
         public const int ITEM_SPACING_V2 = 4;
 
-        private const int header_size = 24;
+        private const int header_size = 30;
         private const int border_size = 2;
 
         private bool matchingFilter = true;
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Settings
             {
                 Margin = new MarginPadding
                 {
-                    Top = 36
+                    Top = header_size + 6,
                 },
                 Spacing = new Vector2(0, ITEM_SPACING_V2),
                 Direction = FillDirection.Vertical,
