@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <param name="name">The name of the item. Can be <see langword="null"/> to hide the item header.</param>
         /// <param name="createContent">A function returning the <see cref="Drawable"/> content to be displayed.</param>
         /// <param name="requiresHitEvents">Whether this item requires hit events. If true, <see cref="CreateContent"/> will not be called if no hit events are available.</param>
+        /// <param name="fullWidth">Whether the statistic should take full width, instead of half.</param>
         public StatisticItem(LocalisableString name, Func<Drawable> createContent, bool requiresHitEvents = false, bool fullWidth = true)
         {
             Name = name;
