@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -139,7 +137,7 @@ namespace osu.Game.Tests.Visual.Editing
         [FlakyTest]
         public void TestLengthAndStarRatingUpdated()
         {
-            WorkingBeatmap working = null;
+            WorkingBeatmap working = null!;
             double lastStarRating = 0;
             double lastLength = 0;
 
@@ -223,7 +221,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("beatmap version is populated", () => EditorBeatmap.BeatmapVersion > 0);
         }
 
-        private DialogOverlay dialogOverlay => Game.ChildrenOfType<DialogOverlay>().FirstOrDefault();
+        private DialogOverlay? dialogOverlay => Game.ChildrenOfType<DialogOverlay>().FirstOrDefault();
 
         [Test]
         public void TestReplacingEntireSetInsideEditorDoesNotCrashOnExitToSongSelect()
@@ -241,18 +239,18 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddUntilStep("wait for dialog", () => dialogOverlay?.CurrentDialog is CreateNewDifficultyDialog);
-            AddStep("confirm creation with no objects", () => dialogOverlay.CurrentDialog!.PerformOkAction());
+            AddStep("confirm creation with no objects", () => dialogOverlay!.CurrentDialog!.PerformOkAction());
 
             AddUntilStep("wait for created", () =>
             {
                 string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != currentDifficulty;
             });
-            AddUntilStep("wait for editor load", () => Editor.ReadyForUse && dialogOverlay.IsLoaded);
+            AddUntilStep("wait for editor load", () => Editor.ReadyForUse && dialogOverlay!.IsLoaded);
 
             ReloadEditorToSameBeatmap();
 
-            Task<Live<BeatmapSetInfo>> importAsUpdateTask = null!;
+            Task<Live<BeatmapSetInfo>?> importAsUpdateTask = null!;
             AddStep("import as update edited beatmap inside editor", () =>
             {
                 using var stream = TestResources.GetTestBeatmapStream();
