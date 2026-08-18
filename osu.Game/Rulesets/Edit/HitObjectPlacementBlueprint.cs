@@ -25,16 +25,6 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class HitObjectPlacementBlueprint : PlacementBlueprint
     {
         /// <summary>
-        /// Whether the sample bank should be taken from the previous hit object.
-        /// </summary>
-        public bool AutomaticBankAssignment { get; set; }
-
-        /// <summary>
-        /// Whether the sample addition bank should be taken from the previous hit objects.
-        /// </summary>
-        public bool AutomaticAdditionBankAssignment { get; set; }
-
-        /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
         public readonly HitObject HitObject;

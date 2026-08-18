@@ -3,32 +3,29 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
-using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
-    public partial class CommentReportButton : CompositeDrawable, IHasPopover, IHasLineBaseHeight
+    public partial class CommentReportButton : CompositeDrawable, IHasLineBaseHeight
     {
         private readonly Comment comment;
 
         private LinkFlowContainer link = null!;
-        private LoadingSpinner loading = null!;
 
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         public CommentReportButton(Comment comment)
         {
@@ -46,43 +43,22 @@ namespace osu.Game.Overlays.Comments
                 {
                     AutoSizeAxes = Axes.Both,
                 },
-                loading = new LoadingSpinner
+            };
+
+            link.AddLink(ReportStrings.CommentButton.ToLower(), () =>
+            {
+                dialogOverlay?.Push(new ReportCommentDialog(comment)
                 {
-                    Size = new Vector2(12f),
-                }
-            };
+                    Success = () => Schedule(() =>
+                    {
+                        link.Clear(true);
+                        link.AddText(UsersStrings.ReportThanks, s => s.Colour = colourProvider?.Content2 ?? Colour4.White);
+                        link.Show();
 
-            link.AddLink(ReportStrings.CommentButton.ToLower(), this.ShowPopover);
-        }
-
-        public Popover GetPopover()
-        {
-            var popover = new ReportCommentPopover(comment);
-
-            popover.Submitted += () =>
-            {
-                link.Hide();
-                loading.Show();
-            };
-
-            popover.Success += () => Schedule(() =>
-            {
-                loading.Hide();
-
-                link.Clear(true);
-                link.AddText(UsersStrings.ReportThanks, s => s.Colour = colourProvider?.Content2 ?? Colour4.White);
-                link.Show();
-
-                this.FadeOut(2000, Easing.InQuint).Expire();
+                        this.FadeOut(2000, Easing.InQuint).Expire();
+                    }),
+                });
             });
-
-            popover.Failure += () => Schedule(() =>
-            {
-                loading.Hide();
-                link.Show();
-            });
-
-            return popover;
         }
 
         public float LineBaseHeight => link.ChildrenOfType<IHasLineBaseHeight>().FirstOrDefault()?.LineBaseHeight ?? DrawHeight;

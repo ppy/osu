@@ -7,6 +7,11 @@ namespace osu.Game.Overlays.Dialog
 {
     public partial class PopupDialogButton : DialogButton
     {
+        /// <summary>
+        /// Whether the dialog should be closed when any action is invoked. <c>True</c> by default.
+        /// </summary>
+        public bool HideDialogOnAction { get; init; } = true;
+
         public PopupDialogButton(HoverSampleSet sampleSet = HoverSampleSet.Button)
             : base(sampleSet)
         {
