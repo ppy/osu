@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         [Resolved]
-        private EditorSelectionHandler? selectionHandler { get; set; }
+        private HitObjectComposer? composer { get; set; }
 
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
@@ -34,8 +35,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (selectionHandler != null)
-                selectionHandler.SelectionStateChanged += updatePlacementFromSelectionStateChange;
+            if (composer != null)
+                composer.SelectionStateChanged += updatePlacementFromSelectionStateChange;
 
             updatePlacementFromSelectionStateChange();
             CopyStateFromPreviousObject();
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementNewCombo()
         {
-            if (selectionHandler == null)
+            if (composer == null)
                 return;
 
             IHasComboInformation? comboStarter = null;
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 if (comboStarter == null)
                 {
-                    withCombo.NewCombo = selectionHandler.SelectionNewComboState.Value == TernaryState.True;
+                    withCombo.NewCombo = composer.SelectionNewComboState?.Value == TernaryState.True;
                     comboStarter = withCombo;
                 }
                 else
@@ -76,18 +77,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementSamples()
         {
-            if (selectionHandler == null)
+            if (composer == null)
                 return;
 
             foreach (var hitObject in hitObjects)
             {
-                foreach (var kvp in selectionHandler.SelectionSampleStates)
+                foreach (var kvp in composer.SelectionSampleStates)
                     sampleChanged(hitObject, kvp.Key, kvp.Value.Value);
 
-                foreach (var kvp in selectionHandler.SelectionBankStates)
+                foreach (var kvp in composer.SelectionBankStates)
                     bankChanged(hitObject, kvp.Key, kvp.Value.Value);
 
-                foreach (var kvp in selectionHandler.SelectionAdditionBankStates)
+                foreach (var kvp in composer.SelectionAdditionBankStates)
                     additionBankChanged(hitObject, kvp.Key, kvp.Value.Value);
             }
         }
@@ -117,7 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void bankChanged(HitObject hitObject, string bankName, TernaryState state)
         {
-            if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
+            if (bankName == HitObjectComposer.HIT_BANK_AUTO)
             {
                 automaticBankAssignment = state == TernaryState.True;
                 if (automaticBankAssignment)
@@ -134,7 +135,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void additionBankChanged(HitObject hitObject, string bankName, TernaryState state)
         {
-            if (bankName == EditorSelectionHandler.HIT_BANK_AUTO)
+            if (bankName == HitObjectComposer.HIT_BANK_AUTO)
             {
                 automaticAdditionBankAssignment = state == TernaryState.True;
                 if (automaticAdditionBankAssignment)
@@ -210,8 +211,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void Dispose(bool isDisposing)
         {
-            if (selectionHandler != null)
-                selectionHandler.SelectionStateChanged -= updatePlacementFromSelectionStateChange;
+            if (composer != null)
+                composer.SelectionStateChanged -= updatePlacementFromSelectionStateChange;
 
             base.Dispose(isDisposing);
         }

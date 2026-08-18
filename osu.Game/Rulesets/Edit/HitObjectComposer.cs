@@ -1,15 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -52,51 +51,50 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected virtual bool ApplyHorizontalCentering => true;
 
-        protected IRulesetConfigManager Config { get; private set; }
+        protected IRulesetConfigManager? Config { get; private set; }
 
         // Provides `Playfield`
-        private DependencyContainer dependencies;
+        private DependencyContainer dependencies = null!;
 
         [Resolved]
-        protected EditorClock EditorClock { get; private set; }
+        protected EditorClock EditorClock { get; private set; } = null!;
 
         [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; }
+        protected EditorBeatmap EditorBeatmap { get; private set; } = null!;
 
         [Resolved]
-        protected IBeatSnapProvider BeatSnapProvider { get; private set; }
+        protected IBeatSnapProvider BeatSnapProvider { get; private set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public override ComposeBlueprintContainer BlueprintContainer => blueprintContainer;
-        private ComposeBlueprintContainer blueprintContainer;
+        private ComposeBlueprintContainer blueprintContainer = null!;
 
-        protected ExpandingToolboxContainer LeftToolbox { get; private set; }
+        protected ExpandingToolboxContainer LeftToolbox { get; private set; } = null!;
 
-        protected ExpandingToolboxContainer RightToolbox { get; private set; }
+        protected ExpandingToolboxContainer RightToolbox { get; private set; } = null!;
 
-        private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
+        private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper = null!;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
-        protected InputManager InputManager { get; private set; }
+        protected InputManager InputManager { get; private set; } = null!;
 
-        private Box leftToolboxBackground;
-        private Box rightToolboxBackground;
+        private Box leftToolboxBackground = null!;
+        private Box rightToolboxBackground = null!;
 
-        private EditorRadioButtonCollection toolboxCollection;
-        private FillFlowContainer togglesCollection;
-        private FillFlowContainer sampleBankTogglesCollection;
+        private EditorRadioButtonCollection toolboxCollection = null!;
+        private FillFlowContainer togglesCollection = null!;
+        private FillFlowContainer sampleBankTogglesCollection = null!;
 
-        private IBindable<bool> hasTiming;
-        private Bindable<bool> autoSeekOnPlacement;
+        private IBindable<bool> hasTiming = null!;
+        private Bindable<bool> autoSeekOnPlacement = null!;
         private readonly Bindable<bool> composerFocusMode = new Bindable<bool>();
 
-        [CanBeNull]
-        private EditorRadioButton lastTool;
+        private EditorRadioButton? lastTool;
 
-        protected DrawableRuleset<TObject> DrawableRuleset { get; private set; }
+        protected DrawableRuleset<TObject> DrawableRuleset { get; private set; } = null!;
 
         protected HitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -107,7 +105,7 @@ namespace osu.Game.Rulesets.Edit
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, [CanBeNull] Editor editor, ReadableKeyCombinationProvider keyCombinationProvider)
+        private void load(OsuConfigManager config, Editor? editor, ReadableKeyCombinationProvider keyCombinationProvider)
         {
             autoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
 
@@ -118,7 +116,7 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                DrawableRuleset = CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() });
+                DrawableRuleset = CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, Ruleset.GetAutoplayMod()?.Yield().ToArray() ?? []);
                 drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(DrawableRuleset)
                 {
                     Clock = EditorClock,
@@ -138,6 +136,8 @@ namespace osu.Game.Rulesets.Edit
 
             string shiftDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Shift));
             string altDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Alt));
+
+            createSelectionStateBindables();
 
             InternalChildren = new[]
             {
@@ -272,6 +272,9 @@ namespace osu.Game.Rulesets.Edit
             SetSelectTool();
 
             EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
+
+            // bring in updates from selection changes
+            EditorBeatmap.HitObjectUpdated += hitObjectUpdated;
         }
 
         /// <summary>
@@ -281,13 +284,13 @@ namespace osu.Game.Rulesets.Edit
         /// Generally implementations should not be adding to this directly.
         /// Use <see cref="LayerBelowRuleset"/> or <see cref="BlueprintContainer"/> instead.
         /// </remarks>
-        protected Container PlayfieldContentContainer { get; private set; }
+        protected Container PlayfieldContentContainer { get; private set; } = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            InputManager = GetContainingInputManager();
+            InputManager = GetContainingInputManager()!;
 
             hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
             hasTiming.BindValueChanged(timing =>
@@ -500,13 +503,23 @@ namespace osu.Game.Rulesets.Edit
             return index >= 0;
         }
 
-        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
+        private void selectionChanged(object? sender, NotifyCollectionChangedEventArgs changedArgs)
         {
             if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
                 SetSelectTool();
+                Scheduler.AddOnce(UpdateTernaryStates);
             }
+            else
+                // Reset the ternary states when the selection is cleared.
+                Scheduler.AddOnce(resetTernaryStates);
+        }
+
+        private void hitObjectUpdated(HitObject _)
+        {
+            // bring in updates from selection changes
+            Scheduler.AddOnce(UpdateTernaryStates);
         }
 
         public void SetSelectTool() => toolboxCollection.Items.First().Select();
@@ -568,6 +581,17 @@ namespace osu.Game.Rulesets.Edit
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
 
         #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (EditorBeatmap.IsNotNull())
+            {
+                EditorBeatmap.HitObjectUpdated -= hitObjectUpdated;
+                EditorBeatmap.SelectedHitObjects.CollectionChanged -= selectionChanged;
+            }
+
+            base.Dispose(isDisposing);
+        }
     }
 
     /// <summary>

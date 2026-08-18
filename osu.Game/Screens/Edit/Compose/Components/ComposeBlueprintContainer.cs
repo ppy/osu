@@ -91,9 +91,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Beatmap.HitObjectAdded += hitObjectAdded;
 
             // updates to selected are handled for us by SelectionHandler.
-            NewCombo.BindTo(SelectionHandler.SelectionNewComboState);
+            if (Composer.SelectionNewComboState != null)
+                NewCombo.BindTo(Composer.SelectionNewComboState);
 
-            SelectionHandler.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
+            Composer.AutoSelectionBankEnabled.BindValueChanged(_ => updateAutoBankTernaryButtonTooltip(), true);
         }
 
         protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
@@ -158,7 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (newComboButton != null)
                 yield return newComboButton;
 
-            foreach (var kvp in SelectionHandler.SelectionSampleStates)
+            foreach (var kvp in Composer.SelectionSampleStates)
             {
                 yield return new DrawableTernaryButton
                 {
@@ -171,12 +172,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private IEnumerable<SampleBankTernaryButton> createSampleBankTernaryButtons()
         {
-            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(EditorSelectionHandler.HIT_BANK_AUTO))
+            foreach (string bankName in HitSampleInfo.ALL_BANKS.Prepend(HitObjectComposer.HIT_BANK_AUTO))
             {
                 yield return new SampleBankTernaryButton(bankName)
                 {
-                    NormalState = { Current = SelectionHandler.SelectionBankStates[bankName], },
-                    AdditionsState = { Current = SelectionHandler.SelectionAdditionBankStates[bankName], },
+                    NormalState = { Current = Composer.SelectionBankStates[bankName], },
+                    AdditionsState = { Current = Composer.SelectionAdditionBankStates[bankName], },
                     CreateIcon = () => getIconForBank(bankName),
                     CreateCompactIcon = () => getCompactIconForBank(bankName),
                 };
@@ -190,7 +191,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Size = new Vector2(20, 20),
                 Icon = sampleName switch
                 {
-                    EditorSelectionHandler.HIT_BANK_AUTO => OsuIcon.EditorBankAuto,
+                    HitObjectComposer.HIT_BANK_AUTO => OsuIcon.EditorBankAuto,
                     HitSampleInfo.BANK_NORMAL => OsuIcon.EditorBankNormal,
                     HitSampleInfo.BANK_SOFT => OsuIcon.EditorBankSoft,
                     HitSampleInfo.BANK_DRUM => OsuIcon.EditorBankDrum,
@@ -206,7 +207,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Size = new Vector2(10, 20),
                 Icon = sampleName switch
                 {
-                    EditorSelectionHandler.HIT_BANK_AUTO => OsuIcon.EditorBankAutoCompact,
+                    HitObjectComposer.HIT_BANK_AUTO => OsuIcon.EditorBankAutoCompact,
                     HitSampleInfo.BANK_NORMAL => OsuIcon.EditorBankNormalCompact,
                     HitSampleInfo.BANK_SOFT => OsuIcon.EditorBankSoftCompact,
                     HitSampleInfo.BANK_DRUM => OsuIcon.EditorBankDrumCompact,
@@ -234,9 +235,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateAutoBankTernaryButtonTooltip()
         {
-            bool enabled = SelectionHandler.AutoSelectionBankEnabled.Value;
+            bool enabled = Composer.AutoSelectionBankEnabled.Value;
 
-            var autoBankButton = SampleBankTernaryStates.Single(t => t.BankName == EditorSelectionHandler.HIT_BANK_AUTO);
+            var autoBankButton = SampleBankTernaryStates.Single(t => t.BankName == HitObjectComposer.HIT_BANK_AUTO);
             autoBankButton.NormalButton.Enabled.Value = enabled;
             autoBankButton.NormalButton.TooltipText = !enabled ? "Auto normal bank can only be used during hit object placement" : string.Empty;
         }
