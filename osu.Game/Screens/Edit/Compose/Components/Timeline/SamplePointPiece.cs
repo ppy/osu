@@ -479,7 +479,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="HitObjectComposer{T}.SetSampleBank"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.SetSampleBank"/>.
             /// </remarks>
             private void setBank(string newBank)
             {
@@ -495,7 +495,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="HitObjectComposer{T}.SetSampleAdditionBank"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.SetSampleAdditionBank"/>.
             /// </remarks>
             private void setAdditionBank(string newBank)
             {
@@ -605,7 +605,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="HitObjectComposer{T}.AddHitSample"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.AddHitSample"/>.
             /// </remarks>
             private void addHitSample(string sampleName)
             {
