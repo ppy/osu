@@ -55,9 +55,9 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorSection => new TranslatableString(getKey(@"editor_section"), @"Editor");
 
         /// <summary>
-        /// "Editor: Test play"
+        /// "Test play"
         /// </summary>
-        public static LocalisableString EditorTestPlaySection => new TranslatableString(getKey(@"editor_test_play_section"), @"Editor: Test play");
+        public static LocalisableString EditorTestPlaySection => new TranslatableString(getKey(@"editor_test_play_section"), @"Test play");
 
         /// <summary>
         /// "Reset all bindings in section"
