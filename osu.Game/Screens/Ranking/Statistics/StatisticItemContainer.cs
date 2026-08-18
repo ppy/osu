@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding(10) { Top = 45 },
+                                Padding = new MarginPadding(15) { Top = 40 },
                                 Child = item.CreateContent()
                             }
                         }

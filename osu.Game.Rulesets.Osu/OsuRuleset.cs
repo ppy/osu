@@ -359,7 +359,7 @@ namespace osu.Game.Rulesets.Osu
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(20),
+                    Spacing = new Vector2(15),
                     Children = new Drawable[]
                     {
                         new HitEventTimingDistributionGraph(timedHitEvents)
@@ -377,7 +377,7 @@ namespace osu.Game.Rulesets.Osu
                 new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 150 + 20 + StatisticItem.FONT_SIZE * 2,
+                    Height = 150 + 15 + StatisticItem.FONT_SIZE * 2,
                 }, requiresHitEvents: true, fullWidth: false),
             };
         }

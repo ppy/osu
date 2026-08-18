@@ -430,7 +430,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(20),
+                Spacing = new Vector2(15),
                 Children = new Drawable[]
                 {
                     new HitEventTimingDistributionGraph(score.HitEvents)
