@@ -26,6 +26,7 @@ namespace osu.Game.Models
         /// Assets that have not been accessed for over a month are purged
         /// (<see cref="RealmAccess.cleanupPendingDeletions"/>).
         /// </remarks>
+        [Indexed]
         public DateTimeOffset LastAccessed { get; set; } = DateTimeOffset.Now;
 
         [UsedImplicitly]
