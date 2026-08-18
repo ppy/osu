@@ -344,7 +344,7 @@ namespace osu.Game.Rulesets
             switch (variant)
             {
                 default:
-                    return string.Empty;
+                    return GameplaySettingsStrings.GameplaySectionHeader;
 
                 case EDITOR_VARIANT:
                     return EditorStrings.BeatmapEditor;
