@@ -419,7 +419,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestUnscopeRevertsToOriginalSelection(bool grouped)
+        public void TestUnscopeRevertsToFinalSelection(bool grouped)
         {
             ImportBeatmapForRuleset(0);
             ImportBeatmapForRuleset(0);
@@ -445,7 +445,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             WaitForFiltering();
 
             checkMatchedBeatmaps(6);
-            AddAssert("normal difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Normal")));
+            AddAssert("insane difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
 
             AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
         }
@@ -480,7 +480,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
             WaitForFiltering();
 
-            AddAssert("hard difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+            AddAssert("insane difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
 
             AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
         }
@@ -543,7 +543,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("show converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
             WaitForFiltering();
 
-            AddAssert("hard difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Hard")));
+            AddAssert("insane difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Insane")));
 
             AddStep("revert convert setting", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, showConverts));
             AddStep("reset star difficulty filter", () => Config.SetValue(OsuSetting.DisplayStarsMaximum, 10.1));
