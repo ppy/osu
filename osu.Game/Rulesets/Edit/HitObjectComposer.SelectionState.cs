@@ -15,7 +15,9 @@ using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public partial class HitObjectComposer<TObject>
+    public abstract partial class HitObjectComposer<TObject, TAction>
+        where TObject : HitObject
+        where TAction : struct, Enum
     {
         #region Selection State
 
@@ -135,7 +137,8 @@ namespace osu.Game.Rulesets.Edit
                                 }
                                 else
                                 {
-                                    if (EditorBeatmap.SelectedHitObjects.SelectMany(enumerateAllSamples).All(h => h.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName && !s.EditorAutoBank)))
+                                    if (EditorBeatmap.SelectedHitObjects.SelectMany(enumerateAllSamples)
+                                                     .All(h => h.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(s => s.Bank == bankName && !s.EditorAutoBank)))
                                         bindable.Value = TernaryState.True;
                                 }
                             }
@@ -261,7 +264,8 @@ namespace osu.Game.Rulesets.Edit
                     foreach ((string bankName, var bindable) in selectionAdditionBankStates)
                     {
                         bindable.Value = samplesInSelection.SelectMany(s => s).Where(o => o.Name != HitSampleInfo.HIT_NORMAL)
-                                                           .GetTernaryState(h => (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
+                                                           .GetTernaryState(h =>
+                                                               (bankName != HIT_BANK_AUTO && h.Bank == bankName && !h.EditorAutoBank) || (bankName == HIT_BANK_AUTO && h.EditorAutoBank));
                     }
                 }
             }

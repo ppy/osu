@@ -20,6 +20,8 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
@@ -43,8 +45,10 @@ namespace osu.Game.Rulesets.Edit
     /// Responsible for providing snapping and generally gluing components together.
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
-    public abstract partial class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
+    /// <typeparam name="TAction">The enumeration type used for ruleset-specific editor key bindings.</typeparam>
+    public abstract partial class HitObjectComposer<TObject, TAction> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
+        where TAction : struct, Enum
     {
         /// <summary>
         /// Whether the playfield should be centered horizontally. Should be disabled for playfields which span the full horizontal width.
@@ -139,131 +143,146 @@ namespace osu.Game.Rulesets.Edit
 
             createSelectionStateBindables();
 
-            InternalChildren = new[]
+            InternalChild = new DatabasedKeyBindingContainer<TAction>(Ruleset.RulesetInfo, Ruleset.EDITOR_VARIANT, matchingMode: KeyCombinationMatchingMode.Modifiers)
             {
-                PlayfieldContentContainer = new Container
+                Children = new[]
                 {
-                    Name = "Playfield content",
-                    RelativeSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    PlayfieldContentContainer = new Container
                     {
-                        // layers below playfield
-                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(LayerBelowRuleset),
-                        drawableRulesetWrapper,
-                        // layers above playfield
-                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(blueprintContainer = CreateBlueprintContainer())
-                    }
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
+                        Name = "Playfield content",
+                        RelativeSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            // layers below playfield
+                            drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(LayerBelowRuleset),
+                            drawableRulesetWrapper,
+                            // layers above playfield
+                            drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
+                                                  .WithChild(blueprintContainer = CreateBlueprintContainer())
+                        }
+                    },
+                    new Container
                     {
-                        leftToolboxBackground = new Box
+                        RelativeSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X,
+                        Children = new Drawable[]
                         {
-                            Colour = colourProvider.Background5,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 200)
-                        {
-                            Children = new Drawable[]
+                            leftToolboxBackground = new Box
                             {
-                                new EditorToolboxGroup("toolbox (1-9)")
+                                Colour = colourProvider.Background5,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            LeftToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_LEFT, 200)
+                            {
+                                Children = new Drawable[]
                                 {
-                                    Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
-                                },
-                                new EditorToolboxGroup("toggles (Q~P)")
-                                {
-                                    Child = togglesCollection = new FillFlowContainer
+                                    new EditorToolboxGroup("tools")
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 5),
+                                        Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                                     },
-                                },
-                                new EditorToolboxGroup($"bank ({shiftDisplay}/{altDisplay}-Q~R)")
-                                {
-                                    Child = new FillFlowContainer
+                                    new EditorToolboxGroup("toggles (Q~P)")
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 5),
-                                        Children = new Drawable[]
+                                        Child = togglesCollection = new FillFlowContainer
                                         {
-                                            new Container
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 5),
+                                        },
+                                    },
+                                    new EditorToolboxGroup($"bank ({shiftDisplay}/{altDisplay}-Q~R)")
+                                    {
+                                        Child = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 5),
+                                            Children = new Drawable[]
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Children = new Drawable[]
+                                                new Container
                                                 {
-                                                    new ExpandableSpriteText
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Children = new Drawable[]
                                                     {
-                                                        Text = "Normal",
-                                                        AlwaysPresent = true,
-                                                        AllowMultiline = false,
-                                                        RelativePositionAxes = Axes.X,
-                                                        X = 0.25f,
-                                                        Origin = Anchor.TopCentre,
-                                                        Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
-                                                    },
-                                                    new ExpandableSpriteText
-                                                    {
-                                                        Text = "Addition",
-                                                        AlwaysPresent = true,
-                                                        AllowMultiline = false,
-                                                        RelativePositionAxes = Axes.X,
-                                                        X = 0.75f,
-                                                        Origin = Anchor.TopCentre,
-                                                        Anchor = Anchor.TopLeft,
-                                                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
-                                                    },
-                                                }
-                                            },
-                                            sampleBankTogglesCollection = new FillFlowContainer
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Direction = FillDirection.Vertical,
-                                                Spacing = new Vector2(0, 5),
-                                            },
+                                                        new ExpandableSpriteText
+                                                        {
+                                                            Text = "Normal",
+                                                            AlwaysPresent = true,
+                                                            AllowMultiline = false,
+                                                            RelativePositionAxes = Axes.X,
+                                                            X = 0.25f,
+                                                            Origin = Anchor.TopCentre,
+                                                            Anchor = Anchor.TopLeft,
+                                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                        },
+                                                        new ExpandableSpriteText
+                                                        {
+                                                            Text = "Addition",
+                                                            AlwaysPresent = true,
+                                                            AllowMultiline = false,
+                                                            RelativePositionAxes = Axes.X,
+                                                            X = 0.75f,
+                                                            Origin = Anchor.TopCentre,
+                                                            Anchor = Anchor.TopLeft,
+                                                            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 17),
+                                                        },
+                                                    }
+                                                },
+                                                sampleBankTogglesCollection = new FillFlowContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Direction = FillDirection.Vertical,
+                                                    Spacing = new Vector2(0, 5),
+                                                },
+                                            }
                                         }
-                                    }
-                                },
-                            }
-                        },
-                    }
-                },
-                new Container
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Children = new Drawable[]
-                    {
-                        rightToolboxBackground = new Box
-                        {
-                            Colour = colourProvider.Background5,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
-                        {
-                            Child = new EditorToolboxGroup("inspector")
-                            {
-                                Child = CreateHitObjectInspector()
+                                    },
+                                }
                             },
                         }
-                    }
-                },
+                    },
+                    new Container
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        RelativeSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X,
+                        Children = new Drawable[]
+                        {
+                            rightToolboxBackground = new Box
+                            {
+                                Colour = colourProvider.Background5,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                            {
+                                Child = new EditorToolboxGroup("inspector")
+                                {
+                                    Child = CreateHitObjectInspector()
+                                },
+                            }
+                        }
+                    },
+                }
             };
 
-            foreach (var compositionTool in CompositionTools.Prepend(new SelectTool()))
-                toolboxCollection.AddButton(new HitObjectCompositionToolButton(compositionTool, toolSelected));
+            toolboxCollection.AddButton(new HitObjectCompositionToolButton<GlobalAction>(new SelectTool(), toolSelected)
+            {
+                Hotkey = new Hotkey(GlobalAction.EditorSelectTool)
+            });
+
+            foreach (var compositionTool in CompositionTools)
+            {
+                toolboxCollection.AddButton(new HitObjectCompositionToolButton<TAction>(compositionTool, toolSelected)
+                {
+                    Hotkey = compositionTool.Action != null
+                        ? new Hotkey(Ruleset.ShortName, Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(compositionTool.Action.Value, typeof(int)))
+                        : null,
+                });
+            }
 
             togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
@@ -364,7 +383,7 @@ namespace osu.Game.Rulesets.Edit
         /// <remarks>
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
-        protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<CompositionTool<TAction>> CompositionTools { get; }
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.
@@ -399,18 +418,6 @@ namespace osu.Game.Rulesets.Edit
             if (e.ControlPressed || e.SuperPressed)
                 return false;
 
-            if (checkToolboxMappingFromKey(e.Key, out int leftIndex))
-            {
-                var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
-
-                if (item != null)
-                {
-                    if (!item.Selected.Disabled)
-                        item.Select();
-                    return true;
-                }
-            }
-
             if (checkToggleMappingFromKey(e.Key, out int rightIndex))
             {
                 if (e.ShiftPressed || e.AltPressed)
@@ -437,18 +444,6 @@ namespace osu.Game.Rulesets.Edit
             }
 
             return base.OnKeyDown(e);
-        }
-
-        private bool checkToolboxMappingFromKey(Key key, out int index)
-        {
-            if (key < Key.Number1 || key > Key.Number9)
-            {
-                index = -1;
-                return false;
-            }
-
-            index = key - Key.Number1;
-            return true;
         }
 
         private bool checkToggleMappingFromKey(Key key, out int index)
@@ -596,7 +591,7 @@ namespace osu.Game.Rulesets.Edit
 
     /// <summary>
     /// A non-generic definition of a HitObject composer class.
-    /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
+    /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{TObject,TAction}" />.
     /// </summary>
     [Cached]
     public abstract partial class HitObjectComposer : CompositeDrawable

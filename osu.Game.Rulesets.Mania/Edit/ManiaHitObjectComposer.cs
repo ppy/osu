@@ -25,7 +25,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Mania.Edit
 {
     [Cached]
-    public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject>
+    public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject, ManiaAction>
     {
         public override Bindable<TernaryState>? SelectionNewComboState => null;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new ManiaBeatSnapGrid();
 
-        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
+        protected override IReadOnlyList<CompositionTool<ManiaAction>> CompositionTools => new CompositionTool<ManiaAction>[]
         {
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()

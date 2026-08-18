@@ -18,6 +18,7 @@ namespace osu.Game.Graphics.UserInterface
         public KeyCombination[]? KeyCombinations { get; init; }
         public GlobalAction? GlobalAction { get; init; }
         public PlatformAction? PlatformAction { get; init; }
+        public (string ruleset, int variant, int action)? RulesetAction { get; init; }
 
         public Hotkey(params KeyCombination[] keyCombinations)
         {
@@ -34,6 +35,11 @@ namespace osu.Game.Graphics.UserInterface
             PlatformAction = platformAction;
         }
 
+        public Hotkey(string ruleset, int variant, int action)
+        {
+            RulesetAction = (ruleset, variant, action);
+        }
+
         public IEnumerable<string> ResolveKeyCombination(ReadableKeyCombinationProvider keyCombinationProvider, RealmKeyBindingStore keyBindingStore, GameHost gameHost)
         {
             var result = new List<string>();
@@ -46,6 +52,12 @@ namespace osu.Game.Graphics.UserInterface
             if (GlobalAction != null)
             {
                 result.AddRange(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.Value));
+            }
+
+            if (RulesetAction != null)
+            {
+                var (ruleset, variant, action) = RulesetAction.Value;
+                result.AddRange(keyBindingStore.GetReadableKeyCombinationsFor(ruleset, variant, action));
             }
 
             if (PlatformAction != null)
@@ -69,6 +81,7 @@ namespace osu.Game.Graphics.UserInterface
             bool result = (KeyCombinations == null && other.KeyCombinations == null) || KeyCombinations!.SequenceEqual(other.KeyCombinations!);
             result &= GlobalAction == other.GlobalAction;
             result &= PlatformAction == other.PlatformAction;
+            result &= RulesetAction == other.RulesetAction;
             return result;
         }
 

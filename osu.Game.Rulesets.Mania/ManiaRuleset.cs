@@ -332,7 +332,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override LocalisableString VariantDescription => ManiaRulesetStrings.VariantDescription;
 
-        public override IEnumerable<int> AvailableVariants
+        public override IEnumerable<int> GameplayVariants
         {
             get
             {
@@ -345,6 +345,15 @@ namespace osu.Game.Rulesets.Mania
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
+            if (variant == EDITOR_VARIANT)
+            {
+                return
+                [
+                    new KeyBinding(InputKey.Number2, ManiaAction.EditorNoteTool),
+                    new KeyBinding(InputKey.Number3, ManiaAction.EditorHoldNoteTool),
+                ];
+            }
+
             switch (getPlayfieldType(variant))
             {
                 case PlayfieldType.Single:
@@ -359,6 +368,9 @@ namespace osu.Game.Rulesets.Mania
 
         public override LocalisableString GetVariantName(int variant)
         {
+            if (variant == EDITOR_VARIANT)
+                return base.GetVariantName(variant);
+
             switch (getPlayfieldType(variant))
             {
                 default:
