@@ -355,21 +355,30 @@ namespace osu.Game.Rulesets.Osu
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                new StatisticItem("Timing Distribution", () => new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 250
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(20),
+                    Children = new Drawable[]
+                    {
+                        new HitEventTimingDistributionGraph(timedHitEvents)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 220
+                        },
+                        new SimpleStatisticTable(2, new SimpleStatisticItem[]
+                        {
+                            new AverageHitError(timedHitEvents),
+                            new UnstableRate(timedHitEvents)
+                        })
+                    }
                 }, true),
                 new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250
                 }, true),
-                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
-                {
-                    new AverageHitError(timedHitEvents),
-                    new UnstableRate(timedHitEvents)
-                }), true)
             };
         }
 
