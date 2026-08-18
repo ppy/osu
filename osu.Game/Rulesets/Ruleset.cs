@@ -346,17 +346,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="variant">The variant.</param>
         /// <returns>A descriptive name of the variant.</returns>
-        public virtual LocalisableString GetVariantName(int variant)
-        {
-            switch (variant)
-            {
-                default:
-                    return GameplaySettingsStrings.GameplaySectionHeader;
-
-                case EDITOR_VARIANT:
-                    return EditorStrings.BeatmapEditor;
-            }
-        }
+        public virtual LocalisableString GetVariantName(int variant) => string.Empty;
 
         /// <summary>
         /// Returns the ID of the variant that is applicable for the given <paramref name="beatmapInfo"/>, given the current active <paramref name="mods"/>.

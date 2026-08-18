@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -28,7 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             });
 
-            AddSection(new GlobalKeyBindingsSection(OsuIcon.GameplayC, InputSettingsStrings.InGameSection)
+            AddSection(new GlobalKeyBindingsSection(OsuIcon.GameplayC, GameplaySettingsStrings.GameplaySectionHeader)
             {
                 Children = new[]
                 {
@@ -48,13 +50,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             });
 
+            List<KeyBindingsSubsection> rulesetEditorVariants = new List<KeyBindingsSubsection>();
+
+            foreach (var ruleset in rulesets.AvailableRulesets)
+                rulesetEditorVariants.Add(new RulesetEditorBindingsSubsection(ruleset));
+
             AddSection(new GlobalKeyBindingsSection(OsuIcon.EditorSelect, InputSettingsStrings.EditorSection)
             {
-                Children = new[]
+                ChildrenEnumerable = new KeyBindingsSubsection[]
                 {
                     new GlobalKeyBindingsSubsection(CommonStrings.General, GlobalActionCategory.Editor),
                     new GlobalKeyBindingsSubsection(InputSettingsStrings.EditorTestPlaySection, GlobalActionCategory.EditorTestPlay),
-                }
+                }.Concat(rulesetEditorVariants),
             });
         }
     }
