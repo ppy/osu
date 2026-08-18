@@ -269,7 +269,7 @@ namespace osu.Game.Overlays.Chat
         private void styleMessageContent(SpriteText text)
         {
             text.Shadow = false;
-            text.Font = text.Font.With(size: font_size, italics: Message.IsAction, weight: isMention ? FontWeight.SemiBold : FontWeight.Medium);
+            text.Font = OsuFont.Inter.With(size: font_size, italics: Message.IsAction, weight: isMention ? FontWeight.SemiBold : FontWeight.Regular);
 
             Color4 messageColour = colourProvider?.Content1 ?? Colour4.White;
 
