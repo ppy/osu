@@ -37,6 +37,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 }
             });
 
+            foreach (var ruleset in rulesets.AvailableRulesets)
+                AddSection(new RulesetBindingsSection(ruleset));
+
             AddSection(new GlobalKeyBindingsSection(OsuIcon.Beatmap, InputSettingsStrings.SongSelectSection)
             {
                 Children = new[]
@@ -53,9 +56,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     new GlobalKeyBindingsSubsection(InputSettingsStrings.EditorTestPlaySection, GlobalActionCategory.EditorTestPlay),
                 }
             });
-
-            foreach (var ruleset in rulesets.AvailableRulesets)
-                AddSection(new RulesetBindingsSection(ruleset));
         }
     }
 }
