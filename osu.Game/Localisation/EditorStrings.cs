@@ -52,8 +52,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Move already placed objects when changing timing"
         /// </summary>
-        public static LocalisableString AdjustExistingObjectsOnTimingChanges =>
-            new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
+        public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
 
         /// <summary>
         /// "For editing (.olz)"
@@ -273,8 +272,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
         /// </summary>
-        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"),
-            @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
 
         /// <summary>
         /// "New combo"
@@ -317,9 +315,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectTool => new TranslatableString(getKey(@"select_tool"), @"Select");
 
         /// <summary>
-        /// "Sync to all difficulties"
+        /// "Synchronise..."
         /// </summary>
-        public static LocalisableString SyncToAllDifficulties => new TranslatableString(getKey(@"sync_to_all_difficulties"), @"Sync to all difficulties");
+        public static LocalisableString Synchronise => new TranslatableString(getKey(@"synchronise"), @"Synchronise...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

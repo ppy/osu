@@ -95,14 +95,14 @@ namespace osu.Game.Localisation
         public static LocalisableString SnapAllNotesConfirmationBody => new TranslatableString(getKey(@"snap_all_notes_confirmation_body"), @"Every hit object in this difficulty will move to the nearest tick for your current snap divisor. Slider and hold durations may change. You can undo this from the editor history.");
 
         /// <summary>
-        /// "Sync to all difficulties?"
+        /// "Synchronise timing attributes?"
         /// </summary>
-        public static LocalisableString SyncTimingConfirmationHeader => new TranslatableString(getKey(@"sync_timing_confirmation_header"), @"Sync to all difficulties?");
+        public static LocalisableString SyncTimingConfirmationHeader => new TranslatableString(getKey(@"sync_timing_confirmation_header"), @"Synchronise timing attributes?");
 
         /// <summary>
-        /// "This overwrites the selected options on all other difficulties. This cannot be undone."
+        /// "Select the timing attributes to synchronise from this difficulty to all other difficulties. This cannot be undone."
         /// </summary>
-        public static LocalisableString SyncTimingConfirmationBody => new TranslatableString(getKey(@"sync_timing_confirmation_body"), @"This overwrites the selected options on all other difficulties. This cannot be undone.");
+        public static LocalisableString SyncTimingConfirmationBody => new TranslatableString(getKey(@"sync_timing_confirmation_body"), @"Select the timing attributes to synchronise from this difficulty to all other difficulties. This cannot be undone.");
 
         /// <summary>
         /// "Bookmarks"
