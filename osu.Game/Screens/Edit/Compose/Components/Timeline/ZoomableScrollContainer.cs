@@ -12,11 +12,12 @@ using osu.Framework.Layout;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Volume;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public partial class ZoomableScrollContainer : OsuScrollContainer
+    public partial class ZoomableScrollContainer : OsuScrollContainer, IBlockGlobalAltScrollVolume
     {
         /// <summary>
         /// The time to zoom into/out of a point.
