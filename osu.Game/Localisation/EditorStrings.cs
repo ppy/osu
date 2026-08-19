@@ -317,6 +317,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectTool => new TranslatableString(getKey(@"select_tool"), @"Select");
 
         /// <summary>
+        /// "Synchronise..."
+        /// </summary>
+        public static LocalisableString Synchronise => new TranslatableString(getKey(@"synchronise"), @"Synchronise...");
+
+        /// <summary>
         /// "Toggle new combo"
         /// </summary>
         public static LocalisableString ToggleNewCombo => new TranslatableString(getKey(@"toggle_new_combo"), @"Toggle new combo");
