@@ -60,14 +60,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 if (beatmapInfo != null)
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
             });
-        }
 
-        [SetUp]
-        public void SetUp() => Schedule(() => skins.CurrentSkinInfo.SetDefault());
-
-        [Test]
-        public void TestScaling()
-        {
             // scheduling is needed as scaling the content immediately causes the entire scene to shake badly, for some odd reason.
             AddSliderStep("scale", 0.5f, 1.6f, 1f, v => Schedule(() =>
             {
@@ -76,8 +69,8 @@ namespace osu.Game.Tests.Visual.Ranking
             }));
         }
 
-        [Test]
-        public void TestLegacySkin()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
             AddToggleStep("toggle legacy classic skin", v =>
             {
