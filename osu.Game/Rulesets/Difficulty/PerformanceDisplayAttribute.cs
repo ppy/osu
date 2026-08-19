@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Localisation;
+
 namespace osu.Game.Rulesets.Difficulty
 {
     /// <summary>
@@ -16,14 +18,14 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// A custom display name for the attribute.
         /// </summary>
-        public string DisplayName { get; }
+        public LocalisableString DisplayName { get; }
 
         /// <summary>
         /// The associated attribute value.
         /// </summary>
         public double Value { get; }
 
-        public PerformanceDisplayAttribute(string propertyName, string displayName, double value)
+        public PerformanceDisplayAttribute(string propertyName, LocalisableString displayName, double value)
         {
             PropertyName = propertyName;
             DisplayName = displayName;

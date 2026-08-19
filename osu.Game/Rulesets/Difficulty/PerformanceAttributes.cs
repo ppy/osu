@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns></returns>
         public virtual IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
-            yield return new PerformanceDisplayAttribute(nameof(Total), "Achieved PP", Total);
+            yield return new PerformanceDisplayAttribute(nameof(Total), PerformanceBreakdownStrings.AchievedPP, Total);
         }
     }
 }

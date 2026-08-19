@@ -10,6 +10,11 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.RankingStatisticsStrings";
 
         /// <summary>
+        /// "Statistics"
+        /// </summary>
+        public static LocalisableString StatisticsHeader => new TranslatableString(getKey(@"statistics_header"), @"Statistics");
+
+        /// <summary>
         /// "Average Hit Error"
         /// </summary>
         public static LocalisableString AverageHitErrorTitle => new TranslatableString(getKey(@"average_hit_error_title"), @"Average Hit Error");
