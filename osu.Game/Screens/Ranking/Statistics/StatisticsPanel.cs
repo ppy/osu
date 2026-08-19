@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -262,31 +263,42 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    yield return new StatisticItem("Beatmap tags", () => new FillFlowContainer<CompositeDrawable>
+                    yield return new StatisticItem("Beatmap tags", () => new Container
                     {
-                        Children = new CompositeDrawable[]
+                        Children = new Drawable[]
                         {
-                            new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                TextAnchor = Anchor.Centre,
-                                Text = preventTaggingReason,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
                             new UserTagControl(newScore.BeatmapInfo)
                             {
                                 Writable = false,
                                 RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            new Container
+                            {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                            }
+                                AutoSizeAxes = Axes.Both,
+                                Masking = true,
+                                EdgeEffect = new EdgeEffectParameters
+                                {
+                                    Radius = 60,
+                                    Roundness = 8,
+                                    Colour = OsuColour.Gray(0.18f),
+                                    Type = EdgeEffectType.Shadow,
+                                },
+                                Children = new Drawable[]
+                                {
+                                    new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Text = preventTaggingReason,
+                                    },
+                                }
+                            },
                         },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(4),
                     });
                 }
             }
