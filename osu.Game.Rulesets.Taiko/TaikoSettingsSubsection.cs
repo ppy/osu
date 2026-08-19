@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
@@ -14,8 +13,6 @@ namespace osu.Game.Rulesets.Taiko
 {
     public partial class TaikoSettingsSubsection : RulesetSettingsSubsection
     {
-        protected override LocalisableString Header => "osu!taiko";
-
         public TaikoSettingsSubsection(TaikoRuleset ruleset)
             : base(ruleset)
         {
