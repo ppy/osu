@@ -70,8 +70,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 2,
                     Right = SIDE_PADDING,
-                    Top = ScorePanel.EXPANDED_TOP_LAYER_HEIGHT,
-                    Bottom = 15 // Approximate padding to the bottom of the score panel.
                 },
                 Children = new Drawable[]
                 {
