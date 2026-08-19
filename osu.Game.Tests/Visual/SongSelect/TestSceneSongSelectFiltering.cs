@@ -10,12 +10,15 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osuTK.Input;
@@ -570,6 +573,37 @@ namespace osu.Game.Tests.Visual.SongSelect
             WaitForFiltering();
 
             AddAssert("normal difficulty is selected", () => Beatmap.Value.BeatmapInfo, () => Is.EqualTo(findBeatmap("Normal")));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestUnscopeByPresentingBeatmap(bool grouped)
+        {
+            bool showConverts = Config.Get<bool>(OsuSetting.ShowConvertedBeatmaps);
+
+            AddStep("hide converts", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
+
+            ImportBeatmapForRuleset(_ => { }, 2, 0, 0);
+            ImportBeatmapForRuleset(_ => { }, 4, 0, 0, 0, 0);
+            ImportBeatmapForRuleset(_ => { }, 3, 1, 1, 1);
+
+            LoadSongSelect();
+            ChangeRuleset(1);
+            SortBy(grouped ? SortMode.Title : SortMode.Difficulty);
+            checkMatchedBeatmaps(3);
+
+            scopeBeatmap(grouped);
+            checkMatchedBeatmaps(3);
+
+            AddStep("present osu! beatmap", () =>
+            {
+                var beatmap = Realm.Run(r => r.All<BeatmapSetInfo>().AsEnumerable().First(s => s.Beatmaps.Count == 2).Beatmaps.First().Detach());
+                var working = Beatmaps.GetWorkingBeatmap(beatmap);
+                ((IHandlePresentBeatmap)SongSelect).PresentBeatmap(working, new OsuRuleset().RulesetInfo);
+            });
+            AddUntilStep("selection changed", () => Beatmap.Value.BeatmapSetInfo.Beatmaps, () => Has.Count.EqualTo(2));
+
+            AddStep("revert convert setting", () => Config.SetValue(OsuSetting.ShowConvertedBeatmaps, showConverts));
         }
 
         private void scopeBeatmap(bool grouped)
