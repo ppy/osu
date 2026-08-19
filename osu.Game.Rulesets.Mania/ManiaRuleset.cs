@@ -421,7 +421,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
-            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
