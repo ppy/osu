@@ -452,7 +452,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
                                             new EditorMenuItem(EditorStrings.SnapAllNotesToCurrentSnapDivisor, MenuItemType.Destructive, confirmSnapAllHitObjectsToCurrentDivisor),
-                                            new EditorMenuItem(EditorStrings.Synchronise, MenuItemType.Destructive, confirmSyncTimingToAllDifficulties)
+                                            new EditorMenuItem(EditorStrings.Synchronise, MenuItemType.Destructive, confirmSyncTimingAttributes)
                                             {
                                                 Action = { Disabled = loadableBeatmap.BeatmapSetInfo.Beatmaps.Count < 2 }
                                             },
@@ -1041,50 +1041,46 @@ namespace osu.Game.Screens.Edit
             editorBeatmap.PreviewTime.Value = (int)clock.CurrentTime;
         }
 
-        private void confirmSyncTimingToAllDifficulties()
+        private void confirmSyncTimingAttributes()
         {
-            dialogOverlay.Push(new SyncTimingConfirmationDialog(syncTimingToAllOtherDifficulties));
-        }
-
-        private void syncTimingToAllOtherDifficulties(bool syncBookmarks, bool syncPreviewPoint)
-        {
-            if (Beatmap.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
-                return;
-
-            if (!syncBookmarks && !syncPreviewPoint)
-                return;
-
-            var set = Beatmap.Value.BeatmapSetInfo;
-            var current = editorBeatmap.BeatmapInfo;
-            int[] sourceBookmarks = editorBeatmap.Bookmarks.ToArray();
-            int sourcePreviewTime = editorBeatmap.BeatmapInfo.Metadata.PreviewTime;
-
-            foreach (var beatmapInfo in set.Beatmaps)
+            dialogOverlay.Push(new SyncTimingConfirmationDialog((syncBookmarks, syncPreviewPoint) =>
             {
-                if (beatmapInfo.Equals(current))
-                    continue;
-
-                try
-                {
-                    var targetWorking = beatmapManager.GetWorkingBeatmap(beatmapInfo);
-                    var playable = targetWorking.GetPlayableBeatmap(beatmapInfo.Ruleset);
-
-                    if (syncBookmarks)
-                        playable.Bookmarks = sourceBookmarks.ToArray();
-
-                    if (syncPreviewPoint)
-                        beatmapInfo.Metadata.PreviewTime = sourcePreviewTime;
-
-                    beatmapManager.Save(beatmapInfo, playable, targetWorking.GetSkin(), targetWorking.Storyboard);
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Failed to sync bookmarks/preview to {beatmapInfo.GetDisplayTitle()}");
+                if (Beatmap.Value.BeatmapSetInfo.Beatmaps.Count <= 1)
                     return;
-                }
-            }
 
-            SaveAndReload(withDialog: false);
+                if (!syncBookmarks && !syncPreviewPoint)
+                    return;
+
+                int[] sourceBookmarks = editorBeatmap.Bookmarks.ToArray();
+                int sourcePreviewTime = editorBeatmap.BeatmapInfo.Metadata.PreviewTime;
+
+                foreach (var beatmapInfo in Beatmap.Value.BeatmapSetInfo.Beatmaps)
+                {
+                    if (beatmapInfo.Equals(editorBeatmap.BeatmapInfo))
+                        continue;
+
+                    try
+                    {
+                        var targetWorking = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+                        var playable = targetWorking.GetPlayableBeatmap(beatmapInfo.Ruleset);
+
+                        if (syncBookmarks)
+                            playable.Bookmarks = sourceBookmarks;
+
+                        if (syncPreviewPoint)
+                            beatmapInfo.Metadata.PreviewTime = sourcePreviewTime;
+
+                        beatmapManager.Save(beatmapInfo, playable, targetWorking.GetSkin(), targetWorking.Storyboard);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Failed to sync bookmarks/preview to {beatmapInfo.GetDisplayTitle()}");
+                        return;
+                    }
+                }
+
+                SaveAndReload(withDialog: false);
+            }));
         }
 
         private void confirmSnapAllHitObjectsToCurrentDivisor()
