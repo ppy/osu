@@ -2,18 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -26,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public partial class ChatLine : CompositeDrawable, IHasPopover
+    public partial class ChatLine : CompositeDrawable
     {
         private Message message = null!;
 
@@ -55,10 +53,13 @@ namespace osu.Game.Overlays.Chat
         protected virtual float UsernameWidth => 150;
 
         [Resolved]
-        private ChannelManager? chatManager { get; set; }
+        private ChannelManager? channelManager { get; set; }
 
         [Resolved]
         private OverlayColourProvider? colourProvider { get; set; }
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         private OsuSpriteText drawableTimestamp = null!;
 
@@ -219,19 +220,29 @@ namespace osu.Game.Overlays.Chat
             updateMessageContent();
             FinishTransforms(true);
 
-            if (this.FindClosestParent<PopoverContainer>() != null)
+            drawableUsername.ReportRequested = () => dialogOverlay?.Push(new ReportChatDialog(message)
             {
-                // This guards against cases like in-game chat where there's no available popover container.
-                // There may be a future where a global one becomes available, at which point this code may be unnecessary.
-                //
-                // See:
-                // https://github.com/ppy/osu/pull/23698
-                // https://github.com/ppy/osu/pull/14554
-                drawableUsername.ReportRequested = this.ShowPopover;
-            }
-        }
+                Success = () =>
+                {
+                    Debug.Assert(channelManager != null);
 
-        public Popover GetPopover() => new ReportChatPopover(message);
+                    switch (channelManager.CurrentChannel.Value.Type)
+                    {
+                        case ChannelType.PM:
+                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage("""
+                                                                                            Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
+                                                                                            You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
+                                                                                            You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
+                                                                                            """));
+                            break;
+
+                        default:
+                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(@"Chat moderators have been alerted. Thanks for your help."));
+                            break;
+                    }
+                }
+            });
+        }
 
         /// <summary>
         /// Performs a highlight animation on this <see cref="ChatLine"/>.
@@ -258,7 +269,7 @@ namespace osu.Game.Overlays.Chat
         private void styleMessageContent(SpriteText text)
         {
             text.Shadow = false;
-            text.Font = text.Font.With(size: font_size, italics: Message.IsAction, weight: isMention ? FontWeight.SemiBold : FontWeight.Medium);
+            text.Font = OsuFont.Inter.With(size: font_size, italics: Message.IsAction, weight: isMention ? FontWeight.SemiBold : FontWeight.Regular);
 
             Color4 messageColour = colourProvider?.Content1 ?? Colour4.White;
 
@@ -290,7 +301,7 @@ namespace osu.Game.Overlays.Chat
             drawableUsername.Text = $@"{message.Sender.Username}";
 
             // remove non-existent channels from the link list
-            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && channelManager?.AvailableChannels.Any(c => c.Name == link.Argument.ToString()) != true);
 
             isMention = MessageNotifier.MatchUsername(message.DisplayContent, api.LocalUser.Value.Username).Success;
 

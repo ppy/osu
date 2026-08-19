@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -46,7 +47,7 @@ namespace osu.Game.Screens.Select
         private DifficultyRangeSlider difficultyRangeSlider = null!;
         private ShearedDropdown<SortMode> sortDropdown = null!;
         private ShearedDropdown<GroupModeDropdownItem> groupDropdown = null!;
-        private CollectionDropdown collectionDropdown = null!;
+        private readonly Bindable<string> configCollectionFilter = new Bindable<string>();
 
         /// <summary>
         /// An optional method which can force certain criteria adjustments.
@@ -196,7 +197,7 @@ namespace osu.Game.Screens.Select
                                                 RelativeSizeAxes = Axes.X,
                                             },
                                             Empty(),
-                                            collectionDropdown = new CollectionDropdown
+                                            new CollectionDropdown
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                             },
@@ -225,6 +226,7 @@ namespace osu.Game.Screens.Select
             difficultyRangeSlider.UpperBound = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmapsButton.Active);
             config.BindWith(OsuSetting.SongSelectSortingMode, sortDropdown.Current);
+            config.BindWith(OsuSetting.SongSelectCollectionFilter, configCollectionFilter);
 
             ruleset.BindValueChanged(_ => updateCriteria());
             mods.BindValueChanged(m =>
@@ -261,15 +263,7 @@ namespace osu.Game.Screens.Select
             showConvertedBeatmapsButton.Active.BindValueChanged(_ => updateCriteria());
             sortDropdown.Current.BindValueChanged(_ => updateCriteria());
             groupDropdown.Current.BindValueChanged(_ => updateCriteria());
-            collectionDropdown.Current.BindValueChanged(v =>
-            {
-                // The hope would be that this never arrives here, but due to bindings receiving changes before
-                // local ValueChanged events, that's not the case (see https://github.com/ppy/osu-framework/pull/1545).
-                if (v.NewValue is ManageCollectionsFilterMenuItem || v.OldValue is ManageCollectionsFilterMenuItem)
-                    return;
-
-                updateCriteria();
-            });
+            configCollectionFilter.BindValueChanged(_ => updateCriteria());
             collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (_, changeSet) =>
             {
                 if (changeSet != null && groupDropdown.Current.Value.Value == GroupMode.Collections)
@@ -297,6 +291,11 @@ namespace osu.Game.Screens.Select
             string query = searchTextBox.Current.Value;
             bool isValidUser = localUser.Value.Id > 1;
 
+            IEnumerable<string>? collectionBeatmapMD5Hashes = null;
+
+            if (Guid.TryParse(configCollectionFilter.Value, out var collectionId))
+                collectionBeatmapMD5Hashes = realm.Run(r => r.Find<BeatmapCollection>(collectionId)?.BeatmapMD5Hashes.ToImmutableHashSet());
+
             var criteria = new FilterCriteria
             {
                 SelectedBeatmapSet = ScopedBeatmapSet.Value,
@@ -305,7 +304,7 @@ namespace osu.Game.Screens.Select
                 AllowConvertedBeatmaps = showConvertedBeatmapsButton.Active.Value,
                 Ruleset = ruleset.Value,
                 Mods = mods.Value,
-                Collection = collectionDropdown.Current.Value?.Collection,
+                CollectionBeatmapMD5Hashes = collectionBeatmapMD5Hashes,
                 LocalUserId = isValidUser ? localUser.Value.Id : null,
                 LocalUserUsername = isValidUser ? localUser.Value.Username : null,
             };
@@ -461,7 +460,7 @@ namespace osu.Game.Screens.Select
                             break;
 
                         case GroupMode.Variant:
-                            if (rulesetInstance.AvailableVariants.Count() <= 1)
+                            if (rulesetInstance.GameplayVariants.Count() <= 1)
                                 break;
 
                             items.Add(new GroupModeDropdownItem(GroupMode.Variant, rulesetInstance.VariantDescription));

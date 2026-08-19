@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             var r = ruleset.CreateInstance();
 
-            foreach (int variant in r.AvailableVariants)
+            foreach (int variant in r.AllVariants)
                 Add(new VariantBindingsSubsection(ruleset, variant));
         }
     }

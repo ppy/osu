@@ -16,6 +16,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Osu;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -65,14 +66,30 @@ namespace osu.Game.Rulesets.Osu
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.Z, OsuAction.LeftButton),
-            new KeyBinding(InputKey.X, OsuAction.RightButton),
-            new KeyBinding(InputKey.C, OsuAction.Smoke),
-            new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
-            new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.Z, OsuAction.LeftButton),
+                        new KeyBinding(InputKey.X, OsuAction.RightButton),
+                        new KeyBinding(InputKey.C, OsuAction.Smoke),
+                        new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
+                        new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
+                    };
+
+                case EDITOR_VARIANT:
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, OsuAction.EditorHitCircleTool),
+                        new KeyBinding(InputKey.Number3, OsuAction.EditorSliderTool),
+                        new KeyBinding(InputKey.Number4, OsuAction.EditorSpinnerTool),
+                        new KeyBinding(InputKey.Number5, OsuAction.EditorGridFromPointsTool),
+                    ];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
@@ -411,20 +428,20 @@ namespace osu.Game.Rulesets.Osu
             // for circle size, we can use `effectiveDifficulty` directly
             yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
             {
-                Description = "Affects the size of hit circles and sliders.",
+                Description = OsuRulesetStrings.CircleSizeDescription,
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("Hit circle radius", (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.#"))
+                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.HitCircleRadius, (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.#"))
                 ]
             };
 
             // for approach rate, we can use `effectiveDifficulty` directly, and it is even convenient to do so (it correctly handles rate-changing mods like DT/HT)
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
             {
-                Description = "Affects how early objects appear on screen relative to their hit time.",
+                Description = OsuRulesetStrings.ApproachRateDescription,
                 AdditionalMetrics =
                 [
-                    new RulesetBeatmapAttribute.AdditionalMetric("Approach time",
+                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.ApproachTime,
                         LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, OsuHitObject.PREEMPT_RANGE):#,0.##} ms"))
                 ]
             };
@@ -440,23 +457,23 @@ namespace osu.Game.Rulesets.Osu
             double rate = ModUtils.CalculateRateWithMods(mods);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = "Affects timing requirements for hit circles and spin speed requirements for spinners.",
+                Description = OsuRulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).Concat([
-                                                  new RulesetBeatmapAttribute.AdditionalMetric("RPM required to clear spinners", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
-                                                  new RulesetBeatmapAttribute.AdditionalMetric("RPM required to get full spinner bonus", LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToClearSpinners, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToGetFullSpinnerBonus, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
                                               ]).ToArray()
             };
 
             // HP drain is thankfully simple enough.
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
             {
-                Description = "Affects the harshness of health drain and the health penalties for missing."
+                Description = SongSelectStrings.HPDrainDescription
             };
         }
 

@@ -219,6 +219,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Height = 16;
                 TextContainer.Height = 1;
                 BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
+                CornerRadius = 0;
             }
 
             protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);

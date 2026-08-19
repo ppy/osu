@@ -52,7 +52,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Move already placed objects when changing timing"
         /// </summary>
-        public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
+        public static LocalisableString AdjustExistingObjectsOnTimingChanges =>
+            new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
 
         /// <summary>
         /// "For editing (.olz)"
@@ -140,9 +141,9 @@ namespace osu.Game.Localisation
         public static LocalisableString RotationSnapped(float newRotation) => new TranslatableString(getKey(@"rotation_snapped"), @"{0:0}° (snapped)", newRotation);
 
         /// <summary>
-        /// "Limit distance snap placement to current time"
+        /// "Limit placement to current time"
         /// </summary>
-        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
+        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limit_placement_to_current_time"), @"Limit placement to current time");
 
         /// <summary>
         /// "Contract sidebars when not hovered"
@@ -272,7 +273,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
         /// </summary>
-        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"),
+            @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
 
         /// <summary>
         /// "New combo"
@@ -308,6 +310,11 @@ namespace osu.Game.Localisation
         /// "Sample set"
         /// </summary>
         public static LocalisableString SampleSet => new TranslatableString(getKey(@"sample_set"), @"Sample set");
+
+        /// <summary>
+        /// "Select"
+        /// </summary>
+        public static LocalisableString SelectTool => new TranslatableString(getKey(@"select_tool"), @"Select");
 
         /// <summary>
         /// "Sync to all difficulties"

@@ -22,11 +22,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -169,7 +171,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (firstAddition == null)
                 return null;
 
-            return firstAddition.EditorAutoBank ? EditorSelectionHandler.HIT_BANK_AUTO : firstAddition.Bank;
+            return firstAddition.EditorAutoBank ? HitObjectComposer.HIT_BANK_AUTO : firstAddition.Bank;
         }
 
         public static int GetVolumeValue(ICollection<HitSampleInfo> samples)
@@ -477,7 +479,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="EditorSelectionHandler.SetSampleBank"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.SetSampleBank"/>.
             /// </remarks>
             private void setBank(string newBank)
             {
@@ -493,7 +495,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="EditorSelectionHandler.SetSampleAdditionBank"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.SetSampleAdditionBank"/>.
             /// </remarks>
             private void setAdditionBank(string newBank)
             {
@@ -507,7 +509,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             continue;
 
                         // Addition samples with bank set to auto should inherit the bank of the normal sample
-                        if (newBank == EditorSelectionHandler.HIT_BANK_AUTO)
+                        if (newBank == HitObjectComposer.HIT_BANK_AUTO)
                         {
                             relevantSamples[i] = relevantSamples[i].With(newBank: normalBank, newEditorAutoBank: true);
                         }
@@ -576,14 +578,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     selectionSampleStates[sampleName] = bindable;
                 }
 
-                banks.AddRange(HitSampleInfo.ALL_BANKS.Prepend(EditorSelectionHandler.HIT_BANK_AUTO));
+                banks.AddRange(HitSampleInfo.ALL_BANKS.Prepend(HitObjectComposer.HIT_BANK_AUTO));
             }
 
             private void updateTernaryStates()
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(GetRelevantSamples(relevantObjects), h => h.samples.Any(s => s.Name == sampleName));
+                    bindable.Value = GetRelevantSamples(relevantObjects).GetTernaryState(h => h.samples.Any(s => s.Name == sampleName));
                 }
             }
 
@@ -603,7 +605,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="EditorSelectionHandler.AddHitSample"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.AddHitSample"/>.
             /// </remarks>
             private void addHitSample(string sampleName)
             {
@@ -653,7 +655,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     if (string.IsNullOrEmpty(newBank))
                         return true;
 
-                    if (e.ShiftPressed && newBank != EditorSelectionHandler.HIT_BANK_AUTO)
+                    if (e.ShiftPressed && newBank != HitObjectComposer.HIT_BANK_AUTO)
                     {
                         setBank(newBank);
                         updatePrimaryBankState();
@@ -734,24 +736,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 LabelFormat = isMultipleValues
                     ? static _ => "(multiple)"
                     : v => LocalisableString.Interpolate($"{v / 100.0:P0}");
+                TextBox.PlaceholderText = isMultipleValues ? "(multiple)" : string.Empty;
             }
 
             public VolumeControl()
             {
-                updateLabelFormat();
-
-                // The `IsMultipleValues` / `updateLabelFormat()` hack above to jam an indicator of multiple active values does not work for tooltip
+                // The `IsMultipleValues` / `updateLabelFormat()` hack to jam an indicator of multiple active values does not work for tooltip
                 // because the tooltip machinery framework-side is too smart for it (the tooltip text is only regenerated on direct changes to `Current`).
                 // Just disable it to hide the skeleton. It's of little use anyhow.
                 TooltipFormat = _ => default;
                 TransferValueOnCommit = true;
             }
 
-            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new TextBox();
-
-            private partial class TextBox : FormNumberBox.InnerNumberBox
+            protected override void LoadComplete()
             {
-                public TextBox()
+                base.LoadComplete();
+                updateLabelFormat();
+                TextBox.Focused.BindValueChanged(focused =>
+                {
+                    if (focused.NewValue && IsMultipleValues)
+                        TextBox.Text = string.Empty;
+                });
+            }
+
+            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new VolumeTextBox();
+
+            private partial class VolumeTextBox : FormNumberBox.InnerNumberBox
+            {
+                public VolumeTextBox()
                     : base(true)
                 {
                 }

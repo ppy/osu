@@ -1,0 +1,87 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Linq;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.Models;
+using osu.Game.Online;
+using Realms;
+
+namespace osu.Game.Graphics
+{
+    /// <summary>
+    /// <para>
+    /// Store for retrieval and caching of assets (background, avatars, covers) retrieved from the web to disk.
+    /// </para>
+    /// <para>
+    /// This store assumes relies on the uniqueness of the URL of retrieved assets to determine identity.
+    /// Therefore, this store <b>MUST</b> only be used with URLs that are content-addressed in some way
+    /// (by containing a content-based hash in the filename, or a cache-busting query string based on time of last update).
+    /// </para>
+    /// <para>
+    /// This store <b>MUST NOT</b> be used with URLs containing naive cache-busting strings (e.g. <c>test.jpg?TIMESTAMP</c>)
+    /// as it both makes the caching ineffective <b>AND</b> trashes the cache with entries that will never be used again.
+    /// </para>
+    /// </summary>
+    public class OnlineAssetCachingStore
+    {
+        private readonly RealmAccess realmAccess;
+        private readonly OnlineStore onlineStore;
+        private readonly RealmFileStore fileStore;
+        private readonly LargeTextureStore largeTextureStore;
+
+        public OnlineAssetCachingStore(GameHost host, RealmAccess realmAccess)
+        {
+            this.realmAccess = realmAccess;
+            onlineStore = new TrustedDomainOnlineStore();
+            fileStore = new RealmFileStore(realmAccess, host.Storage);
+            largeTextureStore = new LargeTextureStore(host.Renderer, host.CreateTextureLoaderStore(new StorageBackedResourceStore(fileStore.Storage)));
+        }
+
+        public Texture? Get(string url)
+        {
+            var existingAsset = realmAccess.Write(r =>
+            {
+                var a = r.All<RealmOnlineAsset>().Filter($@"{nameof(RealmOnlineAsset.File)}.{nameof(RealmNamedFileUsage.Filename)} == $0", url).FirstOrDefault();
+                if (a != null)
+                    a.LastAccessed = DateTimeOffset.Now;
+                return a?.Detach();
+            });
+
+            if (existingAsset == null)
+            {
+                var onlineStream = onlineStore.GetStream(url);
+
+                if (onlineStream == null)
+                    return null;
+
+                existingAsset = realmAccess.Write(r =>
+                {
+                    var file = fileStore.Add(onlineStream, r);
+                    var newAsset = new RealmOnlineAsset(file, url);
+                    r.Add(newAsset);
+                    return newAsset.Detach();
+                });
+            }
+            else
+            {
+                Logger.Log($"Online asset {url} retrieved from {nameof(OnlineAssetCachingStore)}.", LoggingTarget.Network);
+            }
+
+            string path = existingAsset.File.File.GetStoragePath();
+            return largeTextureStore.Get(path);
+        }
+
+        public void Dispose()
+        {
+            onlineStore.Dispose();
+            largeTextureStore.Dispose();
+        }
+    }
+}

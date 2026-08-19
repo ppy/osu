@@ -44,8 +44,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
         {
             if (isPlacingEnd)
             {
+                // even if the mouse button isn't the correct button to terminate placement,
+                // clicks must not be allowed to fall through to underlying drawables.
+                // if they were allowed to fall through, they may trigger selection of some other object.
+                // selection of some other object will cause the tool to revert to "select",
+                // which will cause this placement to automatically commit,
+                // which *may* also cause the removal of the object whose selection was attempted
+                // (happens when the start time of this spinner is the same as the start time of clicked object),
+                // and that last possibility *will* result in a hard crash.
                 if (e.Button != MouseButton.Right)
-                    return false;
+                    return true;
 
                 updateEndTimeFromCurrent();
                 EndPlacement(true);

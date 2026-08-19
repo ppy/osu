@@ -28,5 +28,14 @@ namespace osu.Game.Rulesets.Catch
 
         [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.Dash))]
         Dash,
+
+        [LocalisableDescription(typeof(CatchEditorStrings), nameof(CatchEditorStrings.FruitTool))]
+        EditorFruitTool = 10000,
+
+        [LocalisableDescription(typeof(CatchEditorStrings), nameof(CatchEditorStrings.JuiceStreamTool))]
+        EditorJuiceStreamTool,
+
+        [LocalisableDescription(typeof(CatchEditorStrings), nameof(CatchEditorStrings.BananaShowerTool))]
+        EditorBananaShowerTool,
     }
 }
