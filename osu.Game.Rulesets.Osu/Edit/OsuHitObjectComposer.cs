@@ -63,11 +63,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
-                   .Append(new DrawableTernaryButton
+                   .Append(new DrawableTernaryButton<OsuAction>
                    {
                        Current = rectangularGridSnapToggle,
                        Description = "Grid Snap",
                        CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorGridSnap },
+                       Action = OsuAction.EditorToggleGridSnap,
+                       Hotkey = HotkeyForAction(OsuAction.EditorToggleGridSnap)
                    })
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 

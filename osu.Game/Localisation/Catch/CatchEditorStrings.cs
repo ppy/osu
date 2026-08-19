@@ -24,6 +24,11 @@ namespace osu.Game.Localisation.Catch
         /// </summary>
         public static LocalisableString BananaShowerTool => new TranslatableString(getKey(@"banana_shower_tool"), @"Banana shower");
 
+        /// <summary>
+        /// "Toggle distance snap grid"
+        /// </summary>
+        public static LocalisableString ToggleDistanceSnap => new TranslatableString(getKey(@"toggle_distance_snap"), @"Toggle distance snap grid");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

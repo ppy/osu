@@ -37,5 +37,8 @@ namespace osu.Game.Rulesets.Catch
 
         [LocalisableDescription(typeof(CatchEditorStrings), nameof(CatchEditorStrings.BananaShowerTool))]
         EditorBananaShowerTool,
+
+        [LocalisableDescription(typeof(CatchEditorStrings), nameof(CatchEditorStrings.ToggleDistanceSnap))]
+        EditorToggleDistanceSnap,
     }
 }

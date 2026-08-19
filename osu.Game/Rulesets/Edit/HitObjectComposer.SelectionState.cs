@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
@@ -324,11 +325,13 @@ namespace osu.Game.Rulesets.Edit
 
             foreach (var kvp in SelectionSampleStates)
             {
-                yield return new DrawableTernaryButton
+                yield return new DrawableTernaryButton<GlobalAction>
                 {
                     Current = kvp.Value,
                     Description = kvp.Key.Replace(@"hit", string.Empty).Titleize(),
                     CreateIcon = () => GetIconForSample(kvp.Key),
+                    Action = GetActionForSample(kvp.Key),
+                    Hotkey = new Hotkey(GetActionForSample(kvp.Key)),
                 };
             }
         }
@@ -341,6 +344,8 @@ namespace osu.Game.Rulesets.Edit
                 {
                     NormalState = { Current = SelectionBankStates[bankName], },
                     AdditionsState = { Current = SelectionAdditionBankStates[bankName], },
+                    NormalHotkey = getHotkeyForBank(bankName, false),
+                    AdditionsHotkey = getHotkeyForBank(bankName, true),
                     CreateIcon = () => getIconForBank(bankName),
                     CreateCompactIcon = () => getCompactIconForBank(bankName),
                 };
@@ -380,6 +385,21 @@ namespace osu.Game.Rulesets.Edit
                 },
             };
         }
+
+        private GlobalAction getHotkeyForBank(string sampleName, bool addition) => (sampleName, addition) switch
+        {
+            (HIT_BANK_AUTO, false) => GlobalAction.EditorToggleNormalAutoBank,
+            (HitSampleInfo.BANK_NORMAL, false) => GlobalAction.EditorToggleNormalNormalBank,
+            (HitSampleInfo.BANK_SOFT, false) => GlobalAction.EditorToggleNormalSoftBank,
+            (HitSampleInfo.BANK_DRUM, false) => GlobalAction.EditorToggleNormalDrumBank,
+
+            (HIT_BANK_AUTO, true) => GlobalAction.EditorToggleAdditionAutoBank,
+            (HitSampleInfo.BANK_NORMAL, true) => GlobalAction.EditorToggleAdditionNormalBank,
+            (HitSampleInfo.BANK_SOFT, true) => GlobalAction.EditorToggleAdditionSoftBank,
+            (HitSampleInfo.BANK_DRUM, true) => GlobalAction.EditorToggleAdditionDrumBank,
+
+            _ => throw new ArgumentOutOfRangeException(nameof(sampleName), sampleName, null)
+        };
 
         private void updateAutoBankTernaryButtonTooltip()
         {
@@ -626,6 +646,14 @@ namespace osu.Game.Rulesets.Edit
         public abstract Bindable<bool> AutoSelectionBankEnabled { get; }
 
         #endregion
+
+        public static GlobalAction GetActionForSample(string sampleName) => sampleName switch
+        {
+            HitSampleInfo.HIT_CLAP => GlobalAction.EditorToggleClapSound,
+            HitSampleInfo.HIT_WHISTLE => GlobalAction.EditorToggleWhistleSound,
+            HitSampleInfo.HIT_FINISH => GlobalAction.EditorToggleFinishSound,
+            _ => throw new ArgumentOutOfRangeException(nameof(sampleName), sampleName, null),
+        };
 
         public static Drawable GetIconForSample(string sampleName)
         {

@@ -131,6 +131,18 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
             new KeyBinding(new[] { InputKey.Number1 }, GlobalAction.EditorSelectTool),
+            new KeyBinding(new[] { InputKey.Q }, GlobalAction.EditorToggleNewCombo),
+            new KeyBinding(new[] { InputKey.W }, GlobalAction.EditorToggleWhistleSound),
+            new KeyBinding(new[] { InputKey.E }, GlobalAction.EditorToggleFinishSound),
+            new KeyBinding(new[] { InputKey.R }, GlobalAction.EditorToggleClapSound),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.Q }, GlobalAction.EditorToggleNormalAutoBank),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.W }, GlobalAction.EditorToggleNormalNormalBank),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.E }, GlobalAction.EditorToggleNormalSoftBank),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.R }, GlobalAction.EditorToggleNormalDrumBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Q }, GlobalAction.EditorToggleAdditionAutoBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.W }, GlobalAction.EditorToggleAdditionNormalBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.E }, GlobalAction.EditorToggleAdditionSoftBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.R }, GlobalAction.EditorToggleAdditionDrumBank),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.EditorCloneSelection),
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
@@ -544,6 +556,42 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SelectTool))]
         EditorSelectTool,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNewCombo))]
+        EditorToggleNewCombo,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleWhistleSound))]
+        EditorToggleWhistleSound,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleFinishSound))]
+        EditorToggleFinishSound,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleClapSound))]
+        EditorToggleClapSound,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalAutoBank))]
+        EditorToggleNormalAutoBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalNormalBank))]
+        EditorToggleNormalNormalBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalSoftBank))]
+        EditorToggleNormalSoftBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalDrumBank))]
+        EditorToggleNormalDrumBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionAutoBank))]
+        EditorToggleAdditionAutoBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionNormalBank))]
+        EditorToggleAdditionNormalBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionSoftBank))]
+        EditorToggleAdditionSoftBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionDrumBank))]
+        EditorToggleAdditionDrumBank,
     }
 
     public enum GlobalActionCategory

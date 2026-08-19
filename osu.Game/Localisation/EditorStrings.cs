@@ -52,7 +52,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Move already placed objects when changing timing"
         /// </summary>
-        public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
+        public static LocalisableString AdjustExistingObjectsOnTimingChanges =>
+            new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
 
         /// <summary>
         /// "For editing (.olz)"
@@ -272,7 +273,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
         /// </summary>
-        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"),
+            @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
 
         /// <summary>
         /// "New combo"
@@ -313,6 +315,66 @@ namespace osu.Game.Localisation
         /// "Select"
         /// </summary>
         public static LocalisableString SelectTool => new TranslatableString(getKey(@"select_tool"), @"Select");
+
+        /// <summary>
+        /// "Toggle new combo"
+        /// </summary>
+        public static LocalisableString ToggleNewCombo => new TranslatableString(getKey(@"toggle_new_combo"), @"Toggle new combo");
+
+        /// <summary>
+        /// "Toggle whistle sound"
+        /// </summary>
+        public static LocalisableString ToggleWhistleSound => new TranslatableString(getKey(@"toggle_whistle_sound"), @"Toggle whistle sound");
+
+        /// <summary>
+        /// "Toggle finish sound"
+        /// </summary>
+        public static LocalisableString ToggleFinishSound => new TranslatableString(getKey(@"toggle_finish_sound"), @"Toggle finish sound");
+
+        /// <summary>
+        /// "Toggle clap sound"
+        /// </summary>
+        public static LocalisableString ToggleClapSound => new TranslatableString(getKey(@"toggle_clap_sound"), @"Toggle clap sound");
+
+        /// <summary>
+        /// "Set normal sample bank to auto"
+        /// </summary>
+        public static LocalisableString ToggleNormalAutoBank => new TranslatableString(getKey(@"toggle_normal_auto_bank"), @"Set normal sample bank to auto");
+
+        /// <summary>
+        /// "Set normal sample bank to normal"
+        /// </summary>
+        public static LocalisableString ToggleNormalNormalBank => new TranslatableString(getKey(@"toggle_normal_normal_bank"), @"Set normal sample bank to normal");
+
+        /// <summary>
+        /// "Set normal sample bank to soft"
+        /// </summary>
+        public static LocalisableString ToggleNormalSoftBank => new TranslatableString(getKey(@"toggle_normal_soft_bank"), @"Set normal sample bank to soft");
+
+        /// <summary>
+        /// "Set normal sample bank to drum"
+        /// </summary>
+        public static LocalisableString ToggleNormalDrumBank => new TranslatableString(getKey(@"toggle_normal_drum_bank"), @"Set normal sample bank to drum");
+
+        /// <summary>
+        /// "Set addition sample bank to auto"
+        /// </summary>
+        public static LocalisableString ToggleAdditionAutoBank => new TranslatableString(getKey(@"toggle_addition_auto_bank"), @"Set addition sample bank to auto");
+
+        /// <summary>
+        /// "Set addition sample bank to normal"
+        /// </summary>
+        public static LocalisableString ToggleAdditionNormalBank => new TranslatableString(getKey(@"toggle_addition_normal_bank"), @"Set addition sample bank to normal");
+
+        /// <summary>
+        /// "Set addition sample bank to soft"
+        /// </summary>
+        public static LocalisableString ToggleAdditionSoftBank => new TranslatableString(getKey(@"toggle_addition_soft_bank"), @"Set addition sample bank to soft");
+
+        /// <summary>
+        /// "Set addition sample bank to drum"
+        /// </summary>
+        public static LocalisableString ToggleAdditionDrumBank => new TranslatableString(getKey(@"toggle_addition_drum_bank"), @"Set addition sample bank to drum");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

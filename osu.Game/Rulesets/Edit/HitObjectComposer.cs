@@ -14,9 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -36,7 +34,6 @@ using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -138,9 +135,6 @@ namespace osu.Game.Rulesets.Edit
 
             dependencies.CacheAs(Playfield);
 
-            string shiftDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Shift));
-            string altDisplay = keyCombinationProvider.GetReadableString(new KeyCombination(InputKey.Alt));
-
             createSelectionStateBindables();
 
             InternalChild = new DatabasedKeyBindingContainer<TAction>(Ruleset.RulesetInfo, Ruleset.EDITOR_VARIANT, matchingMode: KeyCombinationMatchingMode.Modifiers)
@@ -180,7 +174,7 @@ namespace osu.Game.Rulesets.Edit
                                     {
                                         Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                                     },
-                                    new EditorToolboxGroup("toggles (Q~P)")
+                                    new EditorToolboxGroup("toggles")
                                     {
                                         Child = togglesCollection = new FillFlowContainer
                                         {
@@ -190,7 +184,7 @@ namespace osu.Game.Rulesets.Edit
                                             Spacing = new Vector2(0, 5),
                                         },
                                     },
-                                    new EditorToolboxGroup($"bank ({shiftDisplay}/{altDisplay}-Q~R)")
+                                    new EditorToolboxGroup("bank")
                                     {
                                         Child = new FillFlowContainer
                                         {
@@ -279,7 +273,7 @@ namespace osu.Game.Rulesets.Edit
                 toolboxCollection.AddButton(new HitObjectCompositionToolButton<TAction>(compositionTool, toolSelected)
                 {
                     Hotkey = compositionTool.Action != null
-                        ? new Hotkey(Ruleset.ShortName, Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(compositionTool.Action.Value, typeof(int)))
+                        ? HotkeyForAction(compositionTool.Action.Value)
                         : null,
                 });
             }
@@ -408,91 +402,6 @@ namespace osu.Game.Rulesets.Edit
 
         #region Tool selection logic
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.ControlPressed || e.SuperPressed)
-                return false;
-
-            if (checkToggleMappingFromKey(e.Key, out int rightIndex))
-            {
-                if (e.ShiftPressed || e.AltPressed)
-                {
-                    if (sampleBankTogglesCollection.ElementAtOrDefault(rightIndex) is SampleBankTernaryButton sampleBankTernaryButton)
-                    {
-                        if (e.ShiftPressed)
-                            sampleBankTernaryButton.NormalButton.Toggle();
-
-                        if (e.AltPressed)
-                            sampleBankTernaryButton.AdditionsButton.Toggle();
-
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (togglesCollection.ChildrenOfType<DrawableTernaryButton>().ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
-                    {
-                        button.Toggle();
-                        return true;
-                    }
-                }
-            }
-
-            return base.OnKeyDown(e);
-        }
-
-        private bool checkToggleMappingFromKey(Key key, out int index)
-        {
-            switch (key)
-            {
-                case Key.Q:
-                    index = 0;
-                    break;
-
-                case Key.W:
-                    index = 1;
-                    break;
-
-                case Key.E:
-                    index = 2;
-                    break;
-
-                case Key.R:
-                    index = 3;
-                    break;
-
-                case Key.T:
-                    index = 4;
-                    break;
-
-                case Key.Y:
-                    index = 5;
-                    break;
-
-                case Key.U:
-                    index = 6;
-                    break;
-
-                case Key.I:
-                    index = 7;
-                    break;
-
-                case Key.O:
-                    index = 8;
-                    break;
-
-                case Key.P:
-                    index = 9;
-                    break;
-
-                default:
-                    index = -1;
-                    break;
-            }
-
-            return index >= 0;
-        }
-
         private void selectionChanged(object? sender, NotifyCollectionChangedEventArgs changedArgs)
         {
             if (EditorBeatmap.SelectedHitObjects.Any())
@@ -581,6 +490,11 @@ namespace osu.Game.Rulesets.Edit
             }
 
             base.Dispose(isDisposing);
+        }
+
+        public Hotkey HotkeyForAction(TAction action)
+        {
+            return new Hotkey(Ruleset.ShortName, Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(action, typeof(int)));
         }
     }
 

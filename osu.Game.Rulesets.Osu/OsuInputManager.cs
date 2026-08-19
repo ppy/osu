@@ -126,5 +126,11 @@ namespace osu.Game.Rulesets.Osu
 
         [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.GridFromPointsTool))]
         EditorGridFromPointsTool,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.ToggleGridSnap))]
+        EditorToggleGridSnap,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.ToggleDistanceSnap))]
+        EditorToggleDistanceSnap,
     }
 }
