@@ -93,7 +93,6 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             }
         }
 
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
