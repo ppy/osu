@@ -157,13 +157,13 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
 
             if (e.Action == NormalHotkey)
             {
-                NormalButton.Toggle();
+                NormalButton.TriggerClick();
                 return true;
             }
 
             if (e.Action == AdditionsHotkey)
             {
-                AdditionsButton.Toggle();
+                AdditionsButton.TriggerClick();
                 return true;
             }
 

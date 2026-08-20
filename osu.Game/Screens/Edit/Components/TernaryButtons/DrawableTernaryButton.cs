@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             if (e.Repeat || !Nullable.Equals(Action, e.Action))
                 return false;
 
-            Toggle();
+            TriggerClick();
             return true;
         }
 
