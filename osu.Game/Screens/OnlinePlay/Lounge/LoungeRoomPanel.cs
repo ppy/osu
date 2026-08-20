@@ -74,8 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
-            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-select");
+            sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetResourceName()}-select");
+            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetResourceName()}-select");
 
             AddRangeInternal(new Drawable[]
             {
