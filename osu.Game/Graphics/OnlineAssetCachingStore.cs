@@ -46,27 +46,27 @@ namespace osu.Game.Graphics
 
         public Texture? Get(string url)
         {
-            var existingAsset = realmAccess.Write(r =>
+            string? path = realmAccess.Write(r =>
             {
                 var a = r.All<RealmOnlineAsset>().Filter($@"{nameof(RealmOnlineAsset.File)}.{nameof(RealmNamedFileUsage.Filename)} == $0", url).FirstOrDefault();
                 if (a != null)
                     a.LastAccessed = DateTimeOffset.Now;
-                return a?.Detach();
+                return a?.File.File.GetStoragePath();
             });
 
-            if (existingAsset == null)
+            if (path == null)
             {
                 var onlineStream = onlineStore.GetStream(url);
 
                 if (onlineStream == null)
                     return null;
 
-                existingAsset = realmAccess.Write(r =>
+                path = realmAccess.Write(r =>
                 {
                     var file = fileStore.Add(onlineStream, r);
                     var newAsset = new RealmOnlineAsset(file, url);
                     r.Add(newAsset);
-                    return newAsset.Detach();
+                    return newAsset.File.File.GetStoragePath();
                 });
             }
             else
@@ -74,7 +74,6 @@ namespace osu.Game.Graphics
                 Logger.Log($"Online asset {url} retrieved from {nameof(OnlineAssetCachingStore)}.", LoggingTarget.Network);
             }
 
-            string path = existingAsset.File.File.GetStoragePath();
             return largeTextureStore.Get(path);
         }
 
