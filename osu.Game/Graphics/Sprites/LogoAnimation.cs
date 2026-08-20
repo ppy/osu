@@ -7,13 +7,13 @@ using System;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Rendering.Vertices;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Graphics.ES30;
 
 namespace osu.Game.Graphics.Sprites
@@ -126,7 +126,7 @@ namespace osu.Game.Graphics.Sprites
                 public Vector2 Position;
 
                 [VertexMember(4, VertexAttribPointerType.Float)]
-                public Color4 Colour;
+                public PremultipliedColour Colour;
 
                 [VertexMember(2, VertexAttribPointerType.Float)]
                 public Vector2 TexturePosition;
