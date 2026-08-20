@@ -64,9 +64,8 @@ namespace osu.Game.Graphics
                 path = realmAccess.Write(r =>
                 {
                     var file = fileStore.Add(onlineStream, r);
-                    var newAsset = new RealmOnlineAsset(file, url);
-                    r.Add(newAsset);
-                    return newAsset.File.File.GetStoragePath();
+                    r.Add(new RealmOnlineAsset(file, url));
+                    return file.GetStoragePath();
                 });
             }
             else
