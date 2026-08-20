@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// Rotation of the grid lines in degrees.
         /// </summary>
-        public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
+        public BindableFloat GridLinesRotation { get; } = new BindableFloat
         {
             MinValue = -180f,
             MaxValue = 180f,
