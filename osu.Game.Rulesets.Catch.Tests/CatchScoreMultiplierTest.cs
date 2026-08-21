@@ -136,6 +136,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             [new Mod[] { new CatchModNoScope() }, 1],
             [new Mod[] { new CatchModMovingFast() }, 1],
             [new Mod[] { new CatchModSynesthesia() }, 0.8],
+            [new Mod[] { new CatchModFirstPerson() }, 1],
 
             #endregion
 
