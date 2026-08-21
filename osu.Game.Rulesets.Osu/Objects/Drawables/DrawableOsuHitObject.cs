@@ -114,7 +114,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void applyDim(Drawable piece)
         {
-            piece.FadeColour(new Color4(195, 195, 195, 255));
+            const double max_dim_density = 3.0; // density where the dimming effect is maximal
+            const double min_dim_density = 8.0; // density where the dimming effect disappears
+            byte dimIntensity = 255;
+
+            if (null != HitObject)
+            {
+                if (min_dim_density < HitObject.NoteDensity)
+                    return;
+
+                double undimStrength = Math.Max(HitObject.NoteDensity - max_dim_density, 0.0) / (min_dim_density - max_dim_density);
+                dimIntensity = (byte)Math.Truncate(undimStrength * 255 + (1 - undimStrength) * 195);
+            }
+
+            piece.FadeColour(new Color4(dimIntensity, dimIntensity, dimIntensity, 255));
             using (piece.BeginDelayedSequence(InitialLifetimeOffset - OsuHitWindows.MISS_WINDOW))
                 piece.FadeColour(Color4.White, 100);
         }
