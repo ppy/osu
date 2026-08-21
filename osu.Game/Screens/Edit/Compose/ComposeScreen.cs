@@ -160,12 +160,14 @@ namespace osu.Game.Screens.Edit.Compose
             foreach (var h in objects)
                 h.StartTime += timeOffset;
 
+            var validHitObjects = objects.Where(o => o.StartTime <= clock.TrackLength).ToArray();
+
             EditorBeatmap.BeginChange();
 
             EditorBeatmap.SelectedHitObjects.Clear();
 
-            EditorBeatmap.AddRange(objects);
-            EditorBeatmap.SelectedHitObjects.AddRange(objects);
+            EditorBeatmap.AddRange(validHitObjects);
+            EditorBeatmap.SelectedHitObjects.AddRange(validHitObjects);
 
             EditorBeatmap.EndChange();
         }
