@@ -80,6 +80,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             Single<OsuModSynesthesia>(hasMultiplier: 0.8);
             // Depth
             // Bloom
+            // Pitch Adjust
 
             #endregion
         }
