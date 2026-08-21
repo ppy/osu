@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Mods
                 // Block bananas from getting coloured.
                 if (d.HitObject is not Banana)
                 {
-                    timingBasedColour = BindableBeatDivisor.GetColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(d.HitObject.StartTime), colours);
+                    timingBasedColour = BindableBeatDivisor.GetDefaultColourFor(currentBeatmap.ControlPointInfo.GetClosestBeatDivisor(d.HitObject.StartTime), colours);
                 }
 
                 // Colour droplets into a solid colour, as droplets aren't generated snapped to timeline ticks.

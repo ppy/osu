@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public partial class TestScenePlayfield : ManiaSkinnableTestScene
+    public partial class TestScenePlayfield : ManiaSkinnableTestSceneScrolling
     {
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new ManiaRuleset());

@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public partial class TestSceneColumnHitObjectArea : ManiaSkinnableTestScene
+    public partial class TestSceneColumnHitObjectArea : ManiaSkinnableTestSceneScrolling
     {
         [BackgroundDependencyLoader]
         private void load()

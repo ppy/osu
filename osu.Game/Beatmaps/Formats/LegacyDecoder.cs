@@ -22,6 +22,8 @@ namespace osu.Game.Beatmaps.Formats
 
         public const int MAX_COMBO_COLOUR_COUNT = 8;
 
+        public const int MAX_SNAP_COLOUR_COUNT = 16;
+
         /// <summary>
         /// The .osu format (beatmap) version.
         ///
@@ -139,6 +141,19 @@ namespace osu.Game.Beatmaps.Formats
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
                 tHasComboColours.CustomComboColours.Add(colour);
+            }
+            else if (pair.Key.StartsWith(@"Snap", StringComparison.Ordinal))
+            {
+                if (!(output is IHasTimingColours tHasTimingColours)) return;
+
+                if (pair.Key == "SnapDefault")
+                {
+                    tHasTimingColours.CustomTimingColours[0] = colour;
+                }
+                else if (int.TryParse(pair.Key[4..], out int snapIndex) && snapIndex >= 1 && snapIndex <= MAX_SNAP_COLOUR_COUNT)
+                {
+                    tHasTimingColours.CustomTimingColours[snapIndex] = colour;
+                }
             }
             else
             {

@@ -308,6 +308,10 @@ namespace osu.Game.Skinning
                 case SkinComboColourLookup comboColour:
                     LogLookupDebug(this, lookup, LookupDebugType.Hit);
                     return SkinUtils.As<TValue>(new Bindable<Color4>(getComboColour(Configuration, comboColour.ColourIndex)));
+
+                case SkinTimingColourLookup timingColour:
+                    LogLookupDebug(this, lookup, LookupDebugType.Hit);
+                    return SkinUtils.As<TValue>(new Bindable<Color4>(Configuration.GetTimingColourFor(timingColour.SnapDivisor)));
             }
 
             LogLookupDebug(this, lookup, LookupDebugType.Miss);
