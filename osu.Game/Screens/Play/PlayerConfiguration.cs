@@ -44,5 +44,10 @@ namespace osu.Game.Screens.Play
         /// Whether to show the red failing overlay.
         /// </summary>
         public bool ShowFailingOverlay { get; set; } = true;
+
+        /// <summary>
+        /// Whether to use the total score without mods for display purposes.
+        /// </summary>
+        public bool UseTotalScoreWithoutMods { get; set; }
     }
 }

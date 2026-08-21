@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Play.Leaderboards
         public bool HasTeams => TeamScores.Count > 0;
 
         private readonly MultiplayerRoomUser[] users;
+        private readonly bool useTotalScoreWithoutMods;
 
         private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
         private readonly IBindableList<int> playingUserIds = new BindableList<int>();
@@ -56,9 +57,10 @@ namespace osu.Game.Screens.Play.Leaderboards
 
         private readonly Cached sorting = new Cached();
 
-        public MultiplayerLeaderboardProvider(MultiplayerRoomUser[] users)
+        public MultiplayerLeaderboardProvider(MultiplayerRoomUser[] users, bool useTotalScoreWithoutMods)
         {
             this.users = users;
+            this.useTotalScoreWithoutMods = useTotalScoreWithoutMods;
         }
 
         [BackgroundDependencyLoader]
@@ -69,6 +71,7 @@ namespace osu.Game.Screens.Play.Leaderboards
             foreach (var user in users)
             {
                 var scoreProcessor = new SpectatorScoreProcessor(user.UserID);
+                scoreProcessor.UseTotalScoreWithoutMods = useTotalScoreWithoutMods;
                 scoreProcessor.Mode.BindTo(scoringMode);
                 scoreProcessor.TotalScore.BindValueChanged(_ => Scheduler.AddOnce(updateTotals));
                 AddInternal(scoreProcessor);
@@ -185,7 +188,8 @@ namespace osu.Game.Screens.Play.Leaderboards
                 return;
 
             var orderedByScore = scores
-                                 .OrderByDescending(i => i.TotalScore.Value)
+                                 // Some implementations override GetDisplayScore (see: SpectatorScoreProcessor.UseTotalScoreWithoutMods).
+                                 .OrderByDescending(i => i.GetDisplayScore(ScoringMode.Standardised))
                                  .ThenBy(i => i.TotalScoreTiebreaker)
                                  .ToList();
 

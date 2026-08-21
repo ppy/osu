@@ -930,10 +930,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public override async Task MatchmakingJoinQueue(int poolId)
+        public override async Task<MatchmakingJoinQueueResponse> MatchmakingJoinQueueWithParams(MatchmakingJoinQueueRequest request)
         {
             await ((IMatchmakingClient)this).MatchmakingQueueJoined().ConfigureAwait(false);
             await ((IMatchmakingClient)this).MatchmakingQueueStatusChanged(new MatchmakingQueueStatus.Searching()).ConfigureAwait(false);
+
+            return new MatchmakingJoinQueueResponse();
         }
 
         public override async Task MatchmakingLeaveQueue()

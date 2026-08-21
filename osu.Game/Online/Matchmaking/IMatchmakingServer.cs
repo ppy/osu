@@ -28,7 +28,7 @@ namespace osu.Game.Online.Matchmaking
         /// <summary>
         /// Joins the matchmaking queue, allowing the local user to get matched up with others.
         /// </summary>
-        Task MatchmakingJoinQueue(int poolId);
+        Task<MatchmakingJoinQueueResponse> MatchmakingJoinQueueWithParams(MatchmakingJoinQueueRequest request);
 
         /// <summary>
         /// Leaves the matchmaking queue.
