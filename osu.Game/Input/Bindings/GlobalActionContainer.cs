@@ -159,10 +159,25 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.None, GlobalAction.EditorToggleMoveControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
+
+            new KeyBinding(new[] { InputKey.Left }, GlobalAction.EditorSeekBackwards),
+            new KeyBinding(new[] { InputKey.Right }, GlobalAction.EditorSeekForwards),
+
+            // These two keys are reversed from stable because it feels more natural (and matches mouse wheel scroll directionality).
+            new KeyBinding(new[] { InputKey.Up }, GlobalAction.EditorSeekToPreviousTimingPoint),
+            new KeyBinding(new[] { InputKey.Down }, GlobalAction.EditorSeekToNextTimingPoint),
+
             new KeyBinding(new[] { InputKey.Control, InputKey.Left }, GlobalAction.EditorSeekToPreviousHitObject),
             new KeyBinding(new[] { InputKey.Control, InputKey.Right }, GlobalAction.EditorSeekToNextHitObject),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Left }, GlobalAction.EditorSeekToPreviousSamplePoint),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
+
+            new KeyBinding(new[] { InputKey.Z }, GlobalAction.EditorSeekToStart),
+            new KeyBinding(new[] { InputKey.X }, GlobalAction.EditorPlayFromStart),
+            new KeyBinding(new[] { InputKey.Space }, GlobalAction.EditorTogglePause),
+            new KeyBinding(new[] { InputKey.C }, GlobalAction.EditorTogglePause),
+            new KeyBinding(new[] { InputKey.V }, GlobalAction.EditorSeekToEnd),
+
             new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.EditorAddBookmark),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.EditorRemoveClosestBookmark),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousBookmark),
@@ -592,6 +607,30 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionDrumBank))]
         EditorToggleAdditionDrumBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekBackwards))]
+        EditorSeekBackwards,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekForwards))]
+        EditorSeekForwards,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToPreviousTimingPoint))]
+        EditorSeekToPreviousTimingPoint,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToNextTimingPoint))]
+        EditorSeekToNextTimingPoint,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToStart))]
+        EditorSeekToStart,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.PlayFromStart))]
+        EditorPlayFromStart,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.TogglePause))]
+        EditorTogglePause,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToEnd))]
+        EditorSeekToEnd,
     }
 
     public enum GlobalActionCategory
