@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         public RulesetBindingsSection(RulesetInfo ruleset)
         {
+            UseSmallerSidebarButton = true;
             this.ruleset = ruleset;
         }
 
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             var r = ruleset.CreateInstance();
 
-            foreach (int variant in r.AllVariants)
+            foreach (int variant in r.GameplayVariants)
                 Add(new VariantBindingsSubsection(ruleset, variant));
         }
     }

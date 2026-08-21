@@ -45,9 +45,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
-        /// "Snap all notes to current snap divisor"
+        /// "Snap all notes to current snap divisor..."
         /// </summary>
-        public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor");
+        public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor...");
 
         /// <summary>
         /// "Move already placed objects when changing timing"
@@ -81,19 +81,19 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeDifficulty => new TranslatableString(getKey(@"change_difficulty"), @"Change difficulty");
 
         /// <summary>
-        /// "Delete difficulty"
+        /// "Delete difficulty..."
         /// </summary>
-        public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
+        public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty...");
 
         /// <summary>
-        /// "Edit externally"
+        /// "Edit externally..."
         /// </summary>
-        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally");
+        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally...");
 
         /// <summary>
-        /// "Submit beatmap"
+        /// "Submit beatmap..."
         /// </summary>
-        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap");
+        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap...");
 
         /// <summary>
         /// "setup"
@@ -211,9 +211,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekToNextBookmark => new TranslatableString(getKey(@"seek_to_next_bookmark"), @"Seek to next bookmark");
 
         /// <summary>
-        /// "Reset bookmarks"
+        /// "Reset bookmarks..."
         /// </summary>
-        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
+        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks..."), @"Reset bookmarks...");
 
         /// <summary>
         /// "Open beatmap info page"
@@ -322,6 +322,46 @@ namespace osu.Game.Localisation
         public static LocalisableString Synchronise => new TranslatableString(getKey(@"synchronise"), @"Synchronise...");
 
         /// <summary>
+        /// "Seek backwards"
+        /// </summary>
+        public static LocalisableString SeekBackwards => new TranslatableString(getKey(@"seek_backwards"), @"Seek backwards");
+
+        /// <summary>
+        /// "Seek forwards"
+        /// </summary>
+        public static LocalisableString SeekForwards => new TranslatableString(getKey(@"seek_forwards"), @"Seek forwards");
+
+        /// <summary>
+        /// "Seek to previous timing point"
+        /// </summary>
+        public static LocalisableString SeekToPreviousTimingPoint => new TranslatableString(getKey(@"seek_to_previous_timing_point"), @"Seek to previous timing point");
+
+        /// <summary>
+        /// "Seek to next timing point"
+        /// </summary>
+        public static LocalisableString SeekToNextTimingPoint => new TranslatableString(getKey(@"seek_to_next_timing_point"), @"Seek to next timing point");
+
+        /// <summary>
+        /// "Seek to first object / track start"
+        /// </summary>
+        public static LocalisableString SeekToStart => new TranslatableString(getKey(@"seek_to_start"), @"Seek to first object / track start");
+
+        /// <summary>
+        /// "Play from track start"
+        /// </summary>
+        public static LocalisableString PlayFromStart => new TranslatableString(getKey(@"play_from_start"), @"Play from track start");
+
+        /// <summary>
+        /// "Toggle pause"
+        /// </summary>
+        public static LocalisableString TogglePause => new TranslatableString(getKey(@"toggle_pause"), @"Toggle pause");
+
+        /// <summary>
+        /// "Seek to last object / track end"
+        /// </summary>
+        public static LocalisableString SeekToEnd => new TranslatableString(getKey(@"seek_to_end"), @"Seek to last object / track end");
+
+        /// <summary>
         /// "Toggle new combo"
         /// </summary>
         public static LocalisableString ToggleNewCombo => new TranslatableString(getKey(@"toggle_new_combo"), @"Toggle new combo");
@@ -385,46 +425,6 @@ namespace osu.Game.Localisation
         /// "Toggle distance snap grid"
         /// </summary>
         public static LocalisableString ToggleDistanceSnap => new TranslatableString(getKey(@"toggle_distance_snap"), @"Toggle distance snap grid");
-
-        /// <summary>
-        /// "Seek backwards"
-        /// </summary>
-        public static LocalisableString SeekBackwards => new TranslatableString(getKey(@"seek_backwards"), @"Seek backwards");
-
-        /// <summary>
-        /// "Seek forwards"
-        /// </summary>
-        public static LocalisableString SeekForwards => new TranslatableString(getKey(@"seek_forwards"), @"Seek forwards");
-
-        /// <summary>
-        /// "Seek to previous timing point"
-        /// </summary>
-        public static LocalisableString SeekToPreviousTimingPoint => new TranslatableString(getKey(@"seek_to_previous_timing_point"), @"Seek to previous timing point");
-
-        /// <summary>
-        /// "Seek to next timing point"
-        /// </summary>
-        public static LocalisableString SeekToNextTimingPoint => new TranslatableString(getKey(@"seek_to_next_timing_point"), @"Seek to next timing point");
-
-        /// <summary>
-        /// "Seek to first object / track start"
-        /// </summary>
-        public static LocalisableString SeekToStart => new TranslatableString(getKey(@"seek_to_start"), @"Seek to first object / track start");
-
-        /// <summary>
-        /// "Play from track start"
-        /// </summary>
-        public static LocalisableString PlayFromStart => new TranslatableString(getKey(@"play_from_start"), @"Play from track start");
-
-        /// <summary>
-        /// "Toggle pause"
-        /// </summary>
-        public static LocalisableString TogglePause => new TranslatableString(getKey(@"toggle_pause"), @"Toggle pause");
-
-        /// <summary>
-        /// "Seek to last object / track end"
-        /// </summary>
-        public static LocalisableString SeekToEnd => new TranslatableString(getKey(@"seek_to_end"), @"Seek to last object / track end");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
