@@ -102,7 +102,11 @@ namespace osu.Game.Screens.Select
 
             Filters = new ICarouselFilter[]
             {
-                new BeatmapCarouselFilterMatching(() => Criteria!),
+                new BeatmapCarouselFilterMatching
+                {
+                    GetCriteria = () => Criteria!,
+                    GetLocalUserTopRanks = GetBeatmapInfoGuidToTopRankMapping,
+                },
                 new BeatmapCarouselFilterSorting(() => Criteria!),
                 grouping = new BeatmapCarouselFilterGrouping
                 {
