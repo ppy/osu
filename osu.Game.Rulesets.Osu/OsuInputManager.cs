@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Lists;
 using osu.Framework.Localisation;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -130,7 +131,7 @@ namespace osu.Game.Rulesets.Osu
         [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.ToggleGridSnap))]
         EditorToggleGridSnap,
 
-        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.ToggleDistanceSnap))]
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleDistanceSnap))]
         EditorToggleDistanceSnap,
     }
 }

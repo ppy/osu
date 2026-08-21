@@ -381,6 +381,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString ToggleAdditionDrumBank => new TranslatableString(getKey(@"toggle_addition_drum_bank"), @"Set addition sample bank to drum");
 
+        /// <summary>
+        /// "Toggle distance snap grid"
+        /// </summary>
+        public static LocalisableString ToggleDistanceSnap => new TranslatableString(getKey(@"toggle_distance_snap"), @"Toggle distance snap grid");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

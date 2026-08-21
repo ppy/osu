@@ -34,11 +34,6 @@ namespace osu.Game.Localisation.Osu
         /// </summary>
         public static LocalisableString ToggleGridSnap => new TranslatableString(getKey(@"toggle_grid_snap"), @"Toggle position snap grid");
 
-        /// <summary>
-        /// "Toggle distance snap grid"
-        /// </summary>
-        public static LocalisableString ToggleDistanceSnap => new TranslatableString(getKey(@"toggle_distance_snap"), @"Toggle distance snap grid");
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
