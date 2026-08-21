@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Edit
         {
             if (Nullable.Equals(e.Action, Tool.Action) && Enabled.Value)
             {
-                Select();
+                TriggerClick();
                 return true;
             }
 

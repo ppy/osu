@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Localisation.Catch;
 using osu.Game.Rulesets.UI;
 
@@ -37,5 +38,8 @@ namespace osu.Game.Rulesets.Catch
 
         [LocalisableDescription(typeof(CatchEditorStrings), nameof(CatchEditorStrings.BananaShowerTool))]
         EditorBananaShowerTool,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleDistanceSnap))]
+        EditorToggleDistanceSnap,
     }
 }

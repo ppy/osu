@@ -433,10 +433,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select drum bank", () =>
             {
                 InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LShift);
+
                 InputManager.PressKey(Key.LAlt);
                 InputManager.Key(Key.R);
                 InputManager.ReleaseKey(Key.LAlt);
-                InputManager.ReleaseKey(Key.LShift);
             });
             AddStep("enable clap addition", () => InputManager.Key(Key.R));
 

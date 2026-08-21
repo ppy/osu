@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -48,6 +50,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
         private Color4 selectedIconColour;
 
         public Drawable Icon { get; private set; } = null!;
+        protected HotkeyDisplay HotkeyDisplay { get; private set; } = null!;
+        public Hotkey? Hotkey { get; init; }
 
         public DrawableTernaryButton(HoverSampleSet? hoverSampleSet = HoverSampleSet.Button)
             : base(hoverSampleSet)
@@ -72,6 +76,21 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 b.Size = new Vector2(20);
                 b.X = 10;
             }));
+
+            if (Hotkey != null)
+            {
+                SpriteText.Origin = Anchor.BottomLeft;
+                SpriteText.Y = -1;
+
+                Add(HotkeyDisplay = new HotkeyDisplay
+                {
+                    Hotkey = Hotkey.Value,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.TopLeft,
+                    X = 40,
+                    Y = 1,
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -137,5 +156,29 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             Anchor = Anchor.CentreLeft,
             X = 40f
         };
+    }
+
+    public partial class DrawableTernaryButton<TAction> : DrawableTernaryButton, IKeyBindingHandler<TAction>
+        where TAction : struct, Enum
+    {
+        public new TAction? Action { get; init; }
+
+        public DrawableTernaryButton(HoverSampleSet? hoverSampleSet = HoverSampleSet.Button)
+            : base(hoverSampleSet)
+        {
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<TAction> e)
+        {
+            if (e.Repeat || !Nullable.Equals(Action, e.Action))
+                return false;
+
+            TriggerClick();
+            return true;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<TAction> e)
+        {
+        }
     }
 }
