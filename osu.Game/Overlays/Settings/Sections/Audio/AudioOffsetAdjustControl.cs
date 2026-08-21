@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public partial class AudioOffsetAdjustControl : CompositeDrawable
+    public partial class AudioOffsetAdjustControl : SettingsFilterableGroup
     {
         public Bindable<double> Current
         {
