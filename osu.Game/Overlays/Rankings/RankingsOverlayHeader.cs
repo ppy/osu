@@ -55,6 +55,7 @@ namespace osu.Game.Overlays.Rankings
                     case RankingsScope.Score:
                     case RankingsScope.Country:
                     case RankingsScope.Playlists:
+                    case RankingsScope.Matchmaking:
                         return true;
 
                     default:
