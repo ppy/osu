@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select
             else
                 yield return new OsuMenuItem(SongSelectStrings.RemoveFromPlayed, MenuItemType.Standard, () => beatmaps.MarkNotPlayed(beatmap)) { Icon = FontAwesome.Solid.TimesCircle };
 
-            yield return new OsuMenuItem(SongSelectStrings.ClearAllLocalScores, MenuItemType.Standard, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap)))
+            yield return new OsuMenuItem(SongSelectStrings.ClearAllLocalScores, MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap)))
             {
                 Icon = FontAwesome.Solid.Eraser
             };
