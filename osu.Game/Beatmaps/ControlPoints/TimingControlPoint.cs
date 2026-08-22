@@ -58,13 +58,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         }
 
         public const double DEFAULT_BEAT_LENGTH = 1000;
+        public const double MIN_BEAT_LENGTH = 0.00001;
 
         /// <summary>
         /// The beat length at this control point.
         /// </summary>
         public readonly BindableDouble BeatLengthBindable = new BindableDouble(DEFAULT_BEAT_LENGTH)
         {
-            MinValue = 6,
+            MinValue = MIN_BEAT_LENGTH,
             MaxValue = 60000
         };
 

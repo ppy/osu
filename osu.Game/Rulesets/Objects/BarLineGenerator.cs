@@ -45,10 +45,13 @@ namespace osu.Game.Rulesets.Objects
                 // Of note, this will still differ from stable if the first timing control point is t<0 and is not near the first hitobject.
                 double generationStartTime = Math.Min(0, firstHitTime);
 
-                // Stop on the next timing point, or if there is no next timing point stop slightly past the last object
-                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastHitTime + currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
+                // Limit beat length to limit barline count generation
+                double beatLength = Math.Max(currentTimingPoint.BeatLength, 6);
 
-                double barLength = currentTimingPoint.BeatLength * currentTimingPoint.TimeSignature.Numerator;
+                // Stop on the next timing point, or if there is no next timing point stop slightly past the last object
+                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastHitTime + beatLength * currentTimingPoint.TimeSignature.Numerator;
+
+                double barLength = beatLength * currentTimingPoint.TimeSignature.Numerator;
 
                 double startTime;
 
