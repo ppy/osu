@@ -24,7 +24,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             Debug.Assert(DrawableObject != null);
 
-            double remainingTime = Math.Max(0, DrawableObject.HitStateUpdateTime - Time.Current);
+            // If the follow circle is instantiated during a rewind, the transforms are all repopulated from the judgment state,
+            // before the slider is visible on the playfield. Therefore, we can't use `Time.Current` here as it would point to
+            // a time past the end time of the slider, and not the actual time the slider head was pressed.
+            //
+            // To avoid extra complexity, `TimeAbsolute` is used here even during regular non-rewind playback.
+            double remainingTime = Math.Max(0, DrawableObject.HitStateUpdateTime - DrawableObject.HeadCircle.Result.TimeAbsolute);
 
             // Note that the scale adjust here is 2 instead of DrawableSliderBall.FOLLOW_AREA to match legacy behaviour.
             // This means the actual tracking area for gameplay purposes is larger than the sprite (but skins may be accounting for this).
