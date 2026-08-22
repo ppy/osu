@@ -88,12 +88,28 @@ namespace osu.Game.Screens.Select
 
         private const float personal_best_height = 112;
 
-        // Blocking mouse down is required to avoid song select's background reveal logic happening while hovering scores.
-        // Our horizontal alignment doesn't really align with the rest of the sheared components (protrudes a touch to the right) which makes
-        // it complicated to handle this at a higher level.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => scoresScroll.ReceivePositionalInputAt(screenSpacePos);
+        private const float scores_scroll_left_padding = 80f;
 
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        private const float scores_scroll_top_padding = 5f;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // No scores, allow background preview
+            if (!scoresContainer.Any())
+                return base.OnMouseDown(e);
+
+            // Block mousedown from the top left of the leaderboard list to the bottom right of the last score
+            var mousePosition = scoresScroll.ToLocalSpace(GetContainingInputManager()!.CurrentState.Mouse.Position);
+            float scrollOffset = (float)scoresScroll.Current;
+            var lastScore = scoresContainer.Last();
+            var bottomRight = new Vector2(lastScore.X + lastScore.DrawWidth + scores_scroll_left_padding,
+                lastScore.Y + lastScore.DrawHeight + scores_scroll_top_padding - scrollOffset);
+
+            if (mousePosition.X <= bottomRight.X && mousePosition.Y <= bottomRight.Y)
+                return true;
+
+            return base.OnMouseDown(e);
+        }
 
         private Sample? swishSample;
 
@@ -120,9 +136,9 @@ namespace osu.Game.Screens.Select
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding
                             {
-                                Top = 5,
+                                Top = scores_scroll_top_padding,
                                 // Left padding offsets the shear to create a visually appealing list display.
-                                Left = 80f,
+                                Left = scores_scroll_left_padding,
                                 // Bottom padding ensures the last entry's full width is displayed
                                 // (ie it is fully on screen after shear is considered).
                                 Bottom = BeatmapLeaderboardScore.HEIGHT * 3
