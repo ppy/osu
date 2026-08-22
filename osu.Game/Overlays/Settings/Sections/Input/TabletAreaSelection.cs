@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         public bool IsWithinBounds { get; private set; }
 
+        public readonly BindableBool LockToUsableArea = new BindableBool(true);
+
         private readonly ITabletHandler handler;
 
         private Container tabletContainer;
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = colourProvider.Background4,
                                 },
-                                usableAreaContainer = new UsableAreaContainer(handler)
+                                usableAreaContainer = new UsableAreaContainer(handler, LockToUsableArea)
                                 {
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
@@ -246,10 +248,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
     public partial class UsableAreaContainer : Container
     {
+        private readonly ITabletHandler tabletHandler;
         private readonly Bindable<Vector2> areaOffset;
+        private readonly BindableBool lockToUsableArea;
 
-        public UsableAreaContainer(ITabletHandler tabletHandler)
+        public UsableAreaContainer(ITabletHandler tabletHandler, BindableBool lockToUsableArea)
         {
+            this.tabletHandler = tabletHandler;
+            this.lockToUsableArea = lockToUsableArea;
             areaOffset = tabletHandler.AreaOffset.GetBoundCopy();
         }
 
@@ -258,7 +264,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void OnDrag(DragEvent e)
         {
             var newPos = Position + e.Delta;
-            this.MoveTo(Vector2.Clamp(newPos, Vector2.Zero, Parent!.Size));
+            newPos = lockToUsableArea.Value ? tabletHandler.ClampOffset(newPos) : Vector2.Clamp(newPos, Vector2.Zero, Parent!.Size);
+            this.MoveTo(newPos);
         }
 
         protected override void OnDragEnd(DragEndEvent e)
