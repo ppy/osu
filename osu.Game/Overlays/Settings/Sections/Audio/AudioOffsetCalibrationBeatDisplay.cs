@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         private AudioManager audio { get; set; } = null!;
 
         public AudioOffsetCalibrationBeatDisplay(IAdjustableClock track, IBindable<double> offset, double beatLength = AudioOffsetCalibrationTrackStore.BEAT_LENGTH,
-                                                Ruleset? ruleset = null)
+                                                 Ruleset? ruleset = null)
         {
             this.offset = offset.GetBoundCopy();
             this.beatLength = beatLength;
