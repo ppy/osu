@@ -51,6 +51,8 @@ namespace osu.Game.Rulesets.Taiko
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
 
+        public override AudioOffsetCalibrationVisualisation CreateAudioOffsetCalibrationVisualisation() => new TaikoAudioOffsetCalibrationVisualisation(RulesetInfo);
+
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
 
         public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new TaikoHealthProcessor();

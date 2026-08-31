@@ -251,6 +251,11 @@ namespace osu.Game.Rulesets
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null);
 
         /// <summary>
+        /// Creates a gameplay cue with the ruleset's input bindings for audio offset calibration, if supported.
+        /// </summary>
+        public virtual AudioOffsetCalibrationVisualisation? CreateAudioOffsetCalibrationVisualisation() => null;
+
+        /// <summary>
         /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The score processor.</returns>

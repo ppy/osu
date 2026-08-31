@@ -109,6 +109,46 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString LegacyAudioTooltip => new TranslatableString(getKey(@"legacy_audio_tooltip"), @"Use this if you are experiencing audio issues. Note that audio latency will be higher when this is toggled on.");
 
+        /// <summary>
+        /// "Match the note's disappearance to the click. Hover over the preview to tap with your gameplay buttons."
+        /// </summary>
+        public static LocalisableString CalibrationInstructions => new TranslatableString(getKey(@"calibration_instructions"), @"Match the note's disappearance to the click. Hover over the preview to tap with your gameplay buttons.");
+
+        /// <summary>
+        /// "Gameplay preview"
+        /// </summary>
+        public static LocalisableString CalibrationGameplay => new TranslatableString(getKey(@"calibration_gameplay"), @"Gameplay preview");
+
+        /// <summary>
+        /// "Tempo"
+        /// </summary>
+        public static LocalisableString CalibrationTempo => new TranslatableString(getKey(@"calibration_tempo"), @"Tempo");
+
+        /// <summary>
+        /// "Use estimate"
+        /// </summary>
+        public static LocalisableString CalibrationUseEstimate => new TranslatableString(getKey(@"calibration_use_estimate"), @"Use estimate");
+
+        /// <summary>
+        /// "Early"
+        /// </summary>
+        public static LocalisableString CalibrationEarly => new TranslatableString(getKey(@"calibration_early"), @"Early");
+
+        /// <summary>
+        /// "Late"
+        /// </summary>
+        public static LocalisableString CalibrationLate => new TranslatableString(getKey(@"calibration_late"), @"Late");
+
+        /// <summary>
+        /// "Taps: {0}/{1}"
+        /// </summary>
+        public static LocalisableString CalibrationTapProgress(int count, int required) => new TranslatableString(getKey(@"calibration_tap_progress"), @"Taps: {0}/{1}", count, required);
+
+        /// <summary>
+        /// "Tap estimate: {0:N0} ms. Includes input delay."
+        /// </summary>
+        public static LocalisableString CalibrationTapEstimate(double offset) => new TranslatableString(getKey(@"calibration_tap_estimate"), @"Tap estimate: {0:N0} ms. Includes input delay.", offset);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

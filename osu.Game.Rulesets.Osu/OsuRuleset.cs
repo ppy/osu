@@ -54,6 +54,8 @@ namespace osu.Game.Rulesets.Osu
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod>? mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
+        public override AudioOffsetCalibrationVisualisation CreateAudioOffsetCalibrationVisualisation() => new OsuAudioOffsetCalibrationVisualisation(RulesetInfo);
+
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
         public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new OsuHealthProcessor(drainStartTime);

@@ -16,10 +16,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override LocalisableString Header => AudioSettingsStrings.OffsetHeader;
 
-        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "universal", "uo", "timing", "delay", "latency", "wizard" });
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "universal", "uo", "timing", "delay", "latency", "wizard", "calibrate", "metronome" });
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, IDialogOverlay dialogOverlay)
         {
             Children = new Drawable[]
             {
@@ -27,6 +27,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                     Margin = new MarginPadding { Bottom = 5 },
+                },
+                new SettingsButtonV2
+                {
+                    Text = AudioSettingsStrings.OffsetWizard,
+                    Action = () => dialogOverlay.Push(new AudioOffsetCalibrationDialog(config.GetBindable<double>(OsuSetting.AudioOffset))),
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
