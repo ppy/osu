@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double speedEstimatedSliderBreaks;
 
         public static double DifficultyToPerformance(double difficulty) => 4.0 * DiffUtils.Pow(difficulty, 3);
+        public static double PerformanceToDifficulty(double performance) => DiffUtils.Pow(performance / 4.0, 1.0 / 3.0);
 
         public OsuPerformanceCalculator()
             : base(new OsuRuleset())
@@ -238,7 +239,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
-            double speedValue = DifficultyToPerformance(attributes.SpeedDifficulty);
+            double speedDifficulty = attributes.SpeedDifficulty;
+            double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
+            speedDifficulty *= speedHighDeviationMultiplier;
+
+            double speedValue = DifficultyToPerformance(speedDifficulty);
 
             if (effectiveMissCount > 0)
             {
@@ -253,12 +258,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.12;
             }
 
-            double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
-            speedValue *= speedHighDeviationMultiplier;
-
             // An effective hit window is created based on the speed SR. The higher the speed difficulty, the shorter the hit window.
             // For example, a speed SR of 4.0 leads to an effective hit window of 20ms, which is OD 10.
-            double effectiveHitWindow = 20 * DiffUtils.Pow(4 / attributes.SpeedDifficulty, 0.35);
+            double effectiveHitWindow = 20 * DiffUtils.Pow(4 / speedDifficulty, 0.35);
 
             // Find the proportion of 300s on speed notes assuming the hit window was the effective hit window.
             double effectiveAccuracy = DiffUtils.Erf(effectiveHitWindow / (double)speedDeviation);
@@ -505,7 +507,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double lerp = 1 - DiffUtils.ReverseLerp(speedDeviation.Value, 22.0, 27.0);
             adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
 
-            return adjustedSpeedValue / speedValue;
+            // We're calculating eveything in pp to avoid changing values
+            double adjustedSpeedDifficulty = PerformanceToDifficulty(adjustedSpeedValue);
+
+            return adjustedSpeedDifficulty / attributes.SpeedDifficulty;
         }
 
         /// <summary>
