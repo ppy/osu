@@ -238,9 +238,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
-            double speedDifficulty = attributes.SpeedDifficulty;
-            double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
-            speedDifficulty *= speedHighDeviationMultiplier;
+            double speedDifficulty = attributes.SpeedDifficulty * calculateSpeedHighDeviationNerf(attributes);
 
             double speedValue = DifficultyToPerformance(speedDifficulty);
 
