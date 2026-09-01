@@ -491,24 +491,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (speedDeviation == null)
                 return 0;
 
-            double speedValue = DifficultyToPerformance(attributes.SpeedDifficulty);
-
             // Decides a point where the PP value achieved compared to the speed deviation is assumed to be tapped improperly. Any PP above this point is considered "excess" speed difficulty.
             // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
-            double excessSpeedDifficultyCutoff = 100 + 220 * DiffUtils.Pow(22 / speedDeviation.Value, 6.5);
+            double excessSpeedDifficultyCutoff = 2.9 + 1.45 * DiffUtils.Pow(22 / speedDeviation.Value, 5);
 
-            if (speedValue <= excessSpeedDifficultyCutoff)
+            if (attributes.SpeedDifficulty <= excessSpeedDifficultyCutoff)
                 return 1.0;
 
-            const double scale = 50;
-            double adjustedSpeedValue = scale * (Math.Log((speedValue - excessSpeedDifficultyCutoff) / scale + 1) + excessSpeedDifficultyCutoff / scale);
+            const double scale = 0.45;
+            double adjustedSpeedDifficulty = scale * (Math.Log((attributes.SpeedDifficulty - excessSpeedDifficultyCutoff) / scale + 1) + excessSpeedDifficultyCutoff / scale);
 
             // 220 UR and less are considered tapped correctly to ensure that normal scores will be punished as little as possible
             double lerp = 1 - DiffUtils.ReverseLerp(speedDeviation.Value, 22.0, 27.0);
-            adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
-
-            // We're calculating eveything in pp to avoid changing values
-            double adjustedSpeedDifficulty = PerformanceToDifficulty(adjustedSpeedValue);
+            adjustedSpeedDifficulty = double.Lerp(adjustedSpeedDifficulty, attributes.SpeedDifficulty, lerp);
 
             return adjustedSpeedDifficulty / attributes.SpeedDifficulty;
         }
