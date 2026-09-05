@@ -38,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private Sprite spin = null!;
         private Sprite clear = null!;
 
+        internal Sprite SpinSprite => spin;
+        internal Sprite ClearSprite => clear;
+
         private LegacySpriteText bonusCounter = null!;
 
         private Sprite spmBackground = null!;
@@ -151,27 +154,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void onCompletedChanged(ValueChangedEvent<bool> completed)
         {
             if (completed.NewValue)
-            {
-                double startTime = Math.Min(Time.Current, DrawableSpinner.HitStateUpdateTime - 400);
-
-                using (BeginAbsoluteSequence(startTime))
-                {
-                    clear.FadeInFromZero(400, Easing.Out);
-
-                    clear.ScaleTo(SPRITE_SCALE * 2)
-                         .Then().ScaleTo(SPRITE_SCALE * 0.8f, 240, Easing.Out)
-                         .Then().ScaleTo(SPRITE_SCALE, 160);
-                }
-
-                const double fade_out_duration = 50;
-                using (BeginAbsoluteSequence(DrawableSpinner.HitStateUpdateTime - fade_out_duration))
-                    clear.FadeOut(fade_out_duration);
-            }
+                applyClearTransforms(Time.Current);
             else
             {
                 clear.ClearTransforms();
                 clear.Alpha = 0;
             }
+        }
+
+        /// <summary>
+        /// Applies the transforms for the "clear" sprite, displayed once the spinner has been completed.
+        /// </summary>
+        /// <param name="completionTime">The time at which the spinner was completed.</param>
+        private void applyClearTransforms(double completionTime)
+        {
+            clear.ClearTransforms();
+            clear.Alpha = 0;
+
+            double startTime = Math.Min(completionTime, DrawableSpinner.HitStateUpdateTime - 400);
+
+            using (BeginAbsoluteSequence(startTime))
+            {
+                clear.FadeInFromZero(400, Easing.Out);
+
+                clear.ScaleTo(SPRITE_SCALE * 2)
+                     .Then().ScaleTo(SPRITE_SCALE * 0.8f, 240, Easing.Out)
+                     .Then().ScaleTo(SPRITE_SCALE, 160);
+            }
+
+            const double fade_out_duration = 50;
+            using (BeginAbsoluteSequence(DrawableSpinner.HitStateUpdateTime - fade_out_duration))
+                clear.FadeOut(fade_out_duration);
         }
 
         protected override void Update()
@@ -201,6 +214,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime - spinFadeOutLength))
                         spin.FadeOutFromOne(spinFadeOutLength);
+
+                    // the "spin" and "clear" sprites are otherwise transformed in response to tick judgements and
+                    // spinner completion, neither of which are replayed on rewind. as all transforms are cleared
+                    // on every state update (see DrawableHitObject.UpdateState()), they are re-applied here so that
+                    // rewinding into an already-spun spinner displays the same state as when it was first played.
+                    if (d.Result.TimeStarted is double spinStartTime)
+                    {
+                        using (BeginAbsoluteSequence(spinStartTime))
+                            spin.FadeOut(300);
+                    }
+
+                    if (d.Result.TimeCompleted is double completionTime)
+                        applyClearTransforms(completionTime);
+
                     break;
 
                 case DrawableSpinnerTick d:
