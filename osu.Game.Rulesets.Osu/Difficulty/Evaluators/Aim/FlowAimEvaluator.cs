@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 return 0;
 
             const double velocity_change_multiplier = 0.52;
+            const double rhythm_change_cap = 0.1;
 
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Rhythm changes are harder to flow
-            flowDifficulty *= 1 + Math.Min(0.25,
+            flowDifficulty *= 1 + Math.Min(rhythm_change_cap,
                 DiffUtils.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
