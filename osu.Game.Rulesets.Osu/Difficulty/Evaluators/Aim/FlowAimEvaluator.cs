@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (current.BaseObject is Spinner || current.Index <= 1 || osuLastObj.BaseObject is Spinner)
                 return 0;
 
-            const double velocity_change_multiplier = 0.52;
+            const double velocity_change_multiplier = 0.45;
 
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
@@ -92,11 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 // Scale with ratio of difference compared to 0.5 * max dist.
                 double distRatio = DiffUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity), 0, 1);
 
-                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime),
-                    Math.Abs(prevVelocity - currVelocity));
-
-                flowDifficulty += overlapVelocityBuff *
+                flowDifficulty += Math.Abs(prevVelocity - currVelocity) *
                                   distRatio *
                                   overlappedNotesWeight *
                                   velocity_change_multiplier;
