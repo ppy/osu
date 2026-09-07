@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override string Name => "Rotten Fruits";
         public override LocalisableString Description => "The fruit has gone bad... dodge it!";
-        public override double ScoreMultiplier => 1;
+        public override double ScoreMultiplier => 0.1;
         public override string Acronym => "RF";
         public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay), typeof(CatchModCinema) };
         public override ModType Type => ModType.Conversion;
