@@ -18,6 +18,21 @@ namespace osu.Game.IO
             if (!RuntimeInfo.IsDesktop)
                 return false;
 
+            if (OperatingSystem.IsWindows())
+            {
+                // Attention: Windows supports mounting volume into folders. Don't detect volume from the volume letter of path.
+                if (!GetVolumeInformationForDirectory(testSourcePath, out uint sourceVolume, out uint flags))
+                    return false;
+
+                if (!GetVolumeInformationForDirectory(testDestinationPath, out uint destinationVolume, out _))
+                    return false;
+
+                if (sourceVolume != destinationVolume)
+                    return false;
+
+                return (flags & FILE_SUPPORTS_HARD_LINKS) != 0;
+            }
+
             const string test_filename = "_hard_link_test";
 
             testDestinationPath = Path.Combine(testDestinationPath, test_filename);
@@ -86,13 +101,12 @@ namespace osu.Game.IO
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    SafeFileHandle handle = CreateFile(filePath, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, FileAttributes.Archive, IntPtr.Zero);
+                    using (SafeFileHandle handle = File.OpenHandle(filePath))
+                    {
+                        if (GetFileInformationByHandle(handle, out var fileInfo))
+                            result = (int)fileInfo.NumberOfLinks;
+                    }
 
-                    ByHandleFileInformation fileInfo;
-
-                    if (GetFileInformationByHandle(handle, out fileInfo))
-                        result = (int)fileInfo.NumberOfLinks;
-                    CloseHandle(handle);
                     break;
 
                 case RuntimeInfo.Platform.Linux:
@@ -111,22 +125,50 @@ namespace osu.Game.IO
         [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        // https://learn.microsoft.com/windows/win32/fileio/obtaining-a-handle-to-a-directory
+        // The flag is required when opening directory as a handle. It's not accepted by File.OpenHandle.
+        public const uint FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern SafeFileHandle CreateFile(
             string lpFileName,
-            [MarshalAs(UnmanagedType.U4)] FileAccess dwDesiredAccess,
-            [MarshalAs(UnmanagedType.U4)] FileShare dwShareMode,
+            FileAccess dwDesiredAccess,
+            FileShare dwShareMode,
             IntPtr lpSecurityAttributes,
-            [MarshalAs(UnmanagedType.U4)] FileMode dwCreationDisposition,
-            [MarshalAs(UnmanagedType.U4)] FileAttributes dwFlagsAndAttributes,
+            FileMode dwCreationDisposition,
+            FileAttributes dwFlagsAndAttributes,
             IntPtr hTemplateFile);
+
+        public const uint FILE_SUPPORTS_HARD_LINKS = 0x00400000;
+        public const uint FILE_SUPPORTS_BLOCK_REFCOUNTING = 0x08000000;
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern bool GetVolumeInformationByHandle(
+            SafeFileHandle hFile,
+            IntPtr lpVolumeNameBuffer,
+            uint nVolumeNameSize,
+            out uint lpVolumeSerialNumber,
+            out uint lpMaximumComponentLength,
+            out uint lpFileSystemFlags,
+            IntPtr lpFileSystemNameBuffer,
+            uint nFileSystemNameSize);
+
+        public static bool GetVolumeInformationForDirectory(string directoryPath, out uint volumeSerialNumber, out uint fileSystemFlags)
+        {
+            using var handle = CreateFile(directoryPath, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, (FileAttributes)FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero);
+
+            if (handle.IsInvalid)
+            {
+                volumeSerialNumber = 0;
+                fileSystemFlags = 0;
+                return false;
+            }
+
+            return GetVolumeInformationByHandle(handle, IntPtr.Zero, 0, out volumeSerialNumber, out _, out fileSystemFlags, IntPtr.Zero, 0);
+        }
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool GetFileInformationByHandle(SafeFileHandle handle, out ByHandleFileInformation lpFileInformation);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool CloseHandle(SafeHandle hObject);
 
         [StructLayout(LayoutKind.Sequential)]
         private struct ByHandleFileInformation

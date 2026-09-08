@@ -41,7 +41,8 @@ namespace osu.Game.Database
         /// <param name="realm">The realm instance to add to. Should already be in a transaction.</param>
         /// <param name="addToRealm">Whether the <see cref="RealmFile"/> should immediately be added to the underlying realm. If <c>false</c> is provided here, the instance must be manually added.</param>
         /// <param name="preferHardLinks">Whether this import should use hard links rather than file copy operations if available.</param>
-        public RealmFile Add(Stream data, Realm realm, bool addToRealm = true, bool preferHardLinks = false)
+        /// <param name="preferCopyOnWrite">Whether this import should use copy on write cloning operations if available.</param>
+        public RealmFile Add(Stream data, Realm realm, bool addToRealm = true, bool preferHardLinks = false, bool preferCopyOnWrite = false)
         {
             string hash = data.ComputeSHA2Hash();
 
@@ -50,7 +51,7 @@ namespace osu.Game.Database
             var file = existing ?? new RealmFile { Hash = hash };
 
             if (!checkFileExistsAndMatchesHash(file))
-                copyToStore(file, data, preferHardLinks);
+                copyToStore(file, data, preferHardLinks, preferCopyOnWrite);
 
             if (addToRealm && !file.IsManaged)
                 realm.Add(file);
@@ -58,12 +59,16 @@ namespace osu.Game.Database
             return file;
         }
 
-        private void copyToStore(RealmFile file, Stream data, bool preferHardLinks)
+        private void copyToStore(RealmFile file, Stream data, bool preferHardLinks, bool preferCopyOnWrite)
         {
-            if (data is FileStream fs && preferHardLinks)
+            if (data is FileStream fs)
             {
+                // Prefer CoW over hard link because it provides better isolation.
+                if (preferCopyOnWrite && CopyOnWriteHelper.TryCloneFile(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name))
+                    return;
+
                 // attempt to do a fast hard link rather than copy.
-                if (HardLinkHelper.TryCreateHardLink(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name))
+                if (preferHardLinks && HardLinkHelper.TryCreateHardLink(Storage.GetFullPath(file.GetStoragePath(), true), fs.Name))
                     return;
             }
 
