@@ -3,6 +3,9 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
+using osu.Framework;
+using SDL;
 
 // ReSharper disable IdentifierTypo
 
@@ -10,6 +13,14 @@ namespace osu.Desktop.Windows
 {
     internal class WindowsKey
     {
+        /// <summary>
+        /// Whether raw keyboard is enabled by default in SDL3. This is specified in <see href="https://wiki.libsdl.org/SDL3/SDL_HINT_WINDOWS_RAW_KEYBOARD"/>.
+        /// </summary>
+        private const bool sdl_default_raw_keyboard = false;
+
+        private static readonly Lazy<bool> block_using_sdl3_hint =
+            new Lazy<bool>(() => FrameworkEnvironment.UseSDL3 && SDL3.SDL_GetHintBoolean(SDL3.SDL_HINT_WINDOWS_RAW_KEYBOARD, sdl_default_raw_keyboard), LazyThreadSafetyMode.None);
+
         private delegate int LowLevelKeyboardProcDelegate(int nCode, int wParam, ref KdDllHookStruct lParam);
 
         private static bool isBlocked;
@@ -49,6 +60,12 @@ namespace osu.Desktop.Windows
 
         internal static void Disable()
         {
+            if (block_using_sdl3_hint.Value)
+            {
+                SDL3.SDL_SetHint(SDL3.SDL_HINT_WINDOWS_RAW_KEYBOARD_EXCLUDE_HOTKEYS, "1");
+                return;
+            }
+
             if (keyHook != IntPtr.Zero || isBlocked)
                 return;
 
@@ -59,6 +76,12 @@ namespace osu.Desktop.Windows
 
         internal static void Enable()
         {
+            if (block_using_sdl3_hint.Value)
+            {
+                SDL3.SDL_SetHint(SDL3.SDL_HINT_WINDOWS_RAW_KEYBOARD_EXCLUDE_HOTKEYS, "0");
+                return;
+            }
+
             if (keyHook == IntPtr.Zero || !isBlocked)
                 return;
 
