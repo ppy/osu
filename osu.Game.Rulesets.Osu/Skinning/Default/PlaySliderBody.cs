@@ -25,6 +25,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private readonly Bindable<bool> configSnakingOut = new Bindable<bool>();
 
+        protected Color4? SliderTrackOverride;
+
+        protected Color4? SliderBorder;
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableObject)
         {
@@ -35,6 +39,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             pathVersion = drawableSlider.PathVersion.GetBoundCopy();
             pathVersion.BindValueChanged(_ => Scheduler.AddOnce(Refresh));
+
+            SliderTrackOverride = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value;
+
+            SliderBorder = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value;
 
             AccentColourBindable = drawableObject.AccentColour.GetBoundCopy();
             AccentColourBindable.BindValueChanged(accent => AccentColour = GetBodyAccentColour(skin, accent.NewValue), true);
@@ -47,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             BorderColour = GetBorderColour(skin);
         }
 
-        protected virtual Color4 GetBorderColour(ISkinSource skin) => Color4.White;
+        protected virtual Color4 GetBorderColour(ISkinSource skin) => SliderBorder ?? Color4.White;
 
-        protected virtual Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour) => hitObjectAccentColour;
+        protected virtual Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour) => SliderTrackOverride ?? hitObjectAccentColour;
     }
 }
