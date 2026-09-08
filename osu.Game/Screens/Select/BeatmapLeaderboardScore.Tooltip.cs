@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
-                    CornerRadius = corner_radius;
+                    CornerRadius = CORNER_RADIUS;
                     Masking = true;
 
                     EdgeEffect = new EdgeEffectParameters
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    CornerRadius = corner_radius,
+                                    CornerRadius = CORNER_RADIUS,
                                     Masking = true,
                                     Margin = new MarginPadding { Top = 4f },
                                     Children = new Drawable[]
@@ -357,7 +357,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
-                    CornerRadius = corner_radius;
+                    CornerRadius = CORNER_RADIUS;
                     Masking = true;
 
                     EdgeEffect = new EdgeEffectParameters
@@ -417,7 +417,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.X;
                     AutoSizeAxes = Axes.Y;
-                    CornerRadius = corner_radius;
+                    CornerRadius = CORNER_RADIUS;
                     Masking = true;
 
                     EdgeEffect = new EdgeEffectParameters
