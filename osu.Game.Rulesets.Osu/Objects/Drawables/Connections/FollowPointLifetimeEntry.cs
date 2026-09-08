@@ -3,14 +3,16 @@
 
 using System;
 using System.Diagnostics;
+
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Objects;
+
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
-    public class FollowPointLifetimeEntry : LifetimeEntry
+    public class FollowPointLifetimeEntry : LifetimeEntryBase<FollowPointLifetimeEntry>
     {
         public event Action? Invalidated;
         public readonly OsuHitObject Start;
