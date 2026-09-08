@@ -17,7 +17,7 @@ using osu.Framework.Layout;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.OpenGL.Vertices;
+using osu.Game.Graphics.Rendering.Vertices;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
