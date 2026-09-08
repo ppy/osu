@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
@@ -22,6 +23,8 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osuTK;
@@ -35,17 +38,17 @@ namespace osu.Game.Screens.Utility
         private FrameSync previousFrameSyncMode;
         private double previousActiveHz;
 
-        private readonly OsuTextFlowContainer statusText;
+        private OsuTextFlowContainer statusText = null!;
 
         public override bool HideOverlaysOnEnter => true;
 
         public override float BackgroundParallaxAmount => 0;
 
-        private readonly LinkFlowContainer explanatoryText;
+        private LinkFlowContainer explanatoryText = null!;
 
-        private readonly Container<LatencyArea> mainArea;
+        private Container<LatencyArea> mainArea = null!;
 
-        private readonly Container resultsArea;
+        private Container resultsArea = null!;
 
         public readonly BindableDouble SampleBPM = new BindableDouble(120) { MinValue = 60, MaxValue = 300, Precision = 1 };
         public readonly BindableDouble SampleApproachRate = new BindableDouble(9) { MinValue = 5, MaxValue = 12, Precision = 0.1 };
@@ -64,6 +67,11 @@ namespace osu.Game.Screens.Utility
 
         [Resolved]
         private FrameworkConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private LocalisationManager localisation { get; set; } = null!;
+
+        private IBindable<string> latencyCertifierMethodologyText = new Bindable<string>();
 
         public readonly Bindable<LatencyVisualMode> VisualMode = new Bindable<LatencyVisualMode>();
 
@@ -86,7 +94,7 @@ namespace osu.Game.Screens.Utility
         private double lastPoll;
         private int pollingMax;
 
-        private readonly FillFlowContainer settings;
+        private FillFlowContainer settings = null!;
 
         [Resolved]
         private GameHost host { get; set; } = null!;
@@ -94,7 +102,8 @@ namespace osu.Game.Screens.Utility
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
-        public LatencyCertifierScreen()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
@@ -152,7 +161,7 @@ namespace osu.Game.Screens.Utility
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.None,
                             Width = 400,
-                            LabelText = "bpm",
+                            LabelText = "BPM",
                             Current = SampleBPM
                         },
                         new SettingsSlider<float>
@@ -161,7 +170,7 @@ namespace osu.Game.Screens.Utility
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.None,
                             Width = 400,
-                            LabelText = "visual spacing",
+                            LabelText = LatencyCertifierStrings.VisualSpacing,
                             Current = SampleVisualSpacing
                         },
                         new SettingsSlider<double>
@@ -170,7 +179,7 @@ namespace osu.Game.Screens.Utility
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.None,
                             Width = 400,
-                            LabelText = "approach rate",
+                            LabelText = LatencyCertifierStrings.ApproachRate,
                             Current = SampleApproachRate
                         },
                     },
@@ -190,11 +199,8 @@ namespace osu.Game.Screens.Utility
                 },
             };
 
-            explanatoryText.AddParagraph(@"Welcome to the latency certifier!");
-            explanatoryText.AddParagraph(@"Do whatever you need to try and perceive the difference in latency, then choose your best side. Read more about the methodology ");
-            explanatoryText.AddLink("here", "https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology");
-            explanatoryText.AddParagraph(@"Use the arrow keys or Z/X/F/J to control the display.");
-            explanatoryText.AddParagraph(@"Tab key to change focus. Space to change display mode");
+            const string url = @"https://github.com/ppy/osu/wiki/Latency-and-unlimited-frame-rates#methodology";
+            latencyCertifierMethodologyText = localisation.GetLocalisedBindableString(LatencyCertifierStrings.LatencyCertifierMethodology(url));
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -229,6 +235,18 @@ namespace osu.Game.Screens.Utility
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            latencyCertifierMethodologyText.BindValueChanged(_ =>
+            {
+                explanatoryText.Clear();
+
+                explanatoryText.AddParagraph(LatencyCertifierStrings.WelcomeToLatencyCertifier);
+                explanatoryText.NewParagraph();
+                var formattedSource = MessageFormatter.FormatText(latencyCertifierMethodologyText.Value);
+                explanatoryText.AddLinks(formattedSource.Text, formattedSource.Links);
+                explanatoryText.AddParagraph(LatencyCertifierStrings.DisplayControls);
+            }, true);
+
             loadNextRound();
         }
 
@@ -259,16 +277,29 @@ namespace osu.Game.Screens.Utility
 
             var displayMode = host.Window?.CurrentDisplayMode.Value;
 
-            string exclusive = (host.Renderer as IWindowsRenderer)?.FullscreenCapability.ToString() ?? "unknown";
+            LocalisableString exclusive = (host.Renderer as IWindowsRenderer)?.FullscreenCapability.ToString()
+                                          ?? LatencyCertifierStrings.ExclusiveFullscreenCapabilityUnknown;
 
             statusText.Clear();
 
             float successRate = (float)correctAtCurrentDifficulty / attemptsAtCurrentDifficulty;
             bool isPass = successRate == 1;
 
-            statusText.AddParagraph($"You scored {correctAtCurrentDifficulty} out of {attemptsAtCurrentDifficulty} ({successRate:0%})!", cp => cp.Colour = isPass ? colours.Green : colours.Red);
-            statusText.AddParagraph($"Level {DifficultyLevel} ({mapDifficultyToTargetFrameRate(DifficultyLevel):N0} Hz)",
-                cp => cp.Font = OsuFont.Default.With(size: 24));
+            statusText.AddParagraph(
+                LatencyCertifierStrings.ScoreInfo(
+                    correctAtCurrentDifficulty,
+                    attemptsAtCurrentDifficulty,
+                    successRate
+                ),
+                cp => cp.Colour = isPass ? colours.Green : colours.Red
+            );
+            statusText.AddParagraph(
+                LatencyCertifierStrings.LevelInfo(
+                    DifficultyLevel,
+                    mapDifficultyToTargetFrameRate(DifficultyLevel)
+                ),
+                cp => cp.Font = OsuFont.Default.With(size: 24)
+            );
 
             statusText.AddParagraph(string.Empty);
             statusText.AddParagraph(string.Empty);
@@ -277,18 +308,24 @@ namespace osu.Game.Screens.Utility
 
             if (!isPass && DifficultyLevel > 1)
             {
-                statusText.AddParagraph("To complete certification, the difficulty level will now decrease until you can get 20 rounds correct in a row!",
-                    cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold));
+                statusText.AddParagraph(
+                    LatencyCertifierStrings.CertificationRequirements(rounds_to_complete_certified),
+                    cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold)
+                );
                 statusText.AddParagraph(string.Empty);
             }
 
-            statusText.AddParagraph($"Polling: {pollingMax} Hz Monitor: {displayMode?.RefreshRate ?? 0:N0} Hz Exclusive: {exclusive}",
-                cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
-
-            statusText.AddParagraph($"Input: {host.InputThread.Clock.FramesPerSecond} Hz "
-                                    + $"Update: {host.UpdateThread.Clock.FramesPerSecond} Hz "
-                                    + $"Draw: {host.DrawThread.Clock.FramesPerSecond} Hz"
-                , cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
+            statusText.AddParagraph(
+                LatencyCertifierStrings.RefreshRatesInfo(
+                    pollingMax,
+                    (int)(displayMode?.RefreshRate ?? 0),
+                    exclusive,
+                    (int)host.InputThread.Clock.FramesPerSecond,
+                    (int)host.UpdateThread.Clock.FramesPerSecond,
+                    (int)host.DrawThread.Clock.FramesPerSecond
+                ),
+                cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold)
+            );
 
             if (isCertifying && isPass)
             {
@@ -296,12 +333,12 @@ namespace osu.Game.Screens.Utility
                 return;
             }
 
-            string cannotIncreaseReason = string.Empty;
+            LocalisableString? cannotIncreaseReason = null;
 
             if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > target_host_update_frames)
-                cannotIncreaseReason = "You've reached the maximum level.";
+                cannotIncreaseReason = LatencyCertifierStrings.MaximumLevelReached;
             else if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > Clock.FramesPerSecond)
-                cannotIncreaseReason = "Game is not running fast enough to test this level";
+                cannotIncreaseReason = LatencyCertifierStrings.LowPerformanceRestriction;
 
             FillFlowContainer buttonFlow;
 
@@ -317,16 +354,17 @@ namespace osu.Game.Screens.Utility
 
             if (isPass)
             {
-                buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
-                {
-                    Text = "Continue to next level",
-                    BackgroundColour = colours.Green,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Action = () => changeDifficulty(DifficultyLevel + 1),
-                    Enabled = { Value = string.IsNullOrEmpty(cannotIncreaseReason) },
-                    TooltipText = cannotIncreaseReason
-                });
+                var button = new ButtonWithKeyBind(Key.Enter);
+                button.Text = LatencyCertifierStrings.ContinueToNextLevel;
+                button.BackgroundColour = colours.Green;
+                button.Anchor = Anchor.Centre;
+                button.Origin = Anchor.Centre;
+                button.Action = () => changeDifficulty(DifficultyLevel + 1);
+                button.Enabled.Value = !cannotIncreaseReason.HasValue;
+                if (cannotIncreaseReason.HasValue)
+                    button.TooltipText = cannotIncreaseReason.Value;
+
+                buttonFlow.Add(button);
             }
             else
             {
@@ -334,8 +372,8 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = "Retry",
-                        TooltipText = "Are you even trying..?",
+                        Text = LatencyCertifierStrings.Retry,
+                        TooltipText = LatencyCertifierStrings.AreYouEvenTrying,
                         BackgroundColour = colours.Pink2,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -350,7 +388,7 @@ namespace osu.Game.Screens.Utility
                 {
                     buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
                     {
-                        Text = "Begin certification at last level",
+                        Text = LatencyCertifierStrings.BeginCertificationAtLastLevel,
                         BackgroundColour = colours.Yellow,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -360,8 +398,8 @@ namespace osu.Game.Screens.Utility
                             changeDifficulty(DifficultyLevel - 1);
                         },
                         TooltipText = isPass
-                            ? $"Chain {rounds_to_complete_certified} rounds to confirm your perception!"
-                            : "You've reached your limits. Go to the previous level to complete certification!",
+                            ? LatencyCertifierStrings.ChainRoundsToConfirmYourPerception(rounds_to_complete_certified)
+                            : LatencyCertifierStrings.GoToPreviousLevelToCompleteCertification,
                     });
                 }
             }
@@ -383,7 +421,7 @@ namespace osu.Game.Screens.Utility
                 {
                     Alpha = 0,
                     Font = OsuFont.TorusAlternate.With(size: 80, weight: FontWeight.Bold),
-                    Text = "Certified!",
+                    Text = LatencyCertifierStrings.Certified,
                     Blending = BlendingParameters.Additive,
                 }).WithEffect(new GlowEffect
                 {
@@ -396,7 +434,7 @@ namespace osu.Game.Screens.Utility
                 }),
                 new OsuSpriteText
                 {
-                    Text = $"You should use a frame limiter with update rate of {mapDifficultyToTargetFrameRate(DifficultyLevel + 1)} Hz (or fps) for best results!",
+                    Text = LatencyCertifierStrings.CertificationResults(mapDifficultyToTargetFrameRate(DifficultyLevel + 1)),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
@@ -437,7 +475,7 @@ namespace osu.Game.Screens.Utility
             settings.Show();
 
             attemptsAtCurrentDifficulty++;
-            statusText.Text = $"Level {DifficultyLevel}\nRound {attemptsAtCurrentDifficulty} of {totalRoundForNextResultsScreen}";
+            statusText.Text = LatencyCertifierStrings.LevelAndRoundInfo(DifficultyLevel, attemptsAtCurrentDifficulty, totalRoundForNextResultsScreen);
 
             mainArea.Clear();
 
