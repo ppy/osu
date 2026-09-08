@@ -49,9 +49,8 @@ namespace osu.Game.Localisation
         [Description(@"Suomi")]
         fi,
 
-        // TODO: Doesn't work as appropriate satellite assemblies aren't copied from resources (see: https://github.com/ppy/osu/discussions/18851#discussioncomment-3042170)
-        // [Description(@"Filipino")]
-        // fil,
+        [Description(@"Filipino")]
+        fil,
 
         [Description(@"français")]
         fr,
@@ -132,11 +131,6 @@ namespace osu.Game.Localisation
 
         [Description(@"ไทย")]
         th,
-
-        // Tagalog has no associated localisations yet, and is not supported on Xamarin platforms or Windows versions <10.
-        // Can be revisited if localisations ever arrive.
-        //[Description(@"Tagalog")]
-        //tl,
 
         [Description(@"Türkçe")]
         tr,
