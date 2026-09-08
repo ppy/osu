@@ -8,12 +8,14 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Play;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -126,6 +128,18 @@ namespace osu.Game.Screens.Backgrounds
 
         public partial class DimmableBackground : UserDimContainer
         {
+            public DimmableBackground()
+            {
+                // Black backdrop such that UserDimContainer can use FadeTo instead of FadeColour which in turn avoids broken behavior in foreground dimmable content
+                // as well as with non-opaque background images.
+                AddInternal(new Box
+                {
+                    Colour = Color4.Black,
+                    Depth = float.MaxValue,
+                    RelativeSizeAxes = Axes.Both,
+                });
+            }
+
             /// <summary>
             /// The amount of blur to be applied to the background in addition to user-specified blur.
             /// </summary>

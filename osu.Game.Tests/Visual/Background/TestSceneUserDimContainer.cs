@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -106,7 +105,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestUserDimContainer : UserDimContainer
         {
-            public bool DimEqual(float expectedDimLevel) => Content.Colour == OsuColour.Gray(1f - expectedDimLevel);
+            public bool DimEqual(float expectedDimLevel) => Content.Alpha == 1f - expectedDimLevel;
 
             public new Bindable<double> UserDimLevel => base.UserDimLevel;
         }

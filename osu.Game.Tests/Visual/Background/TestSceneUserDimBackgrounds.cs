@@ -21,7 +21,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -236,11 +235,11 @@ namespace osu.Game.Tests.Visual.Background
                 player.DimmableStoryboard.IgnoreUserSettings.Value = true;
             });
             AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
-            AddUntilStep("Background is dimmed", () => songSelect.IsBackgroundVisible() && songSelect.IsBackgroundBlack());
+            AddUntilStep("Background is dimmed", () => songSelect.IsBackgroundBlack());
 
             AddStep("Disable background replacement", () => player.StoryboardReplacesBackground.Value = false);
             AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
-            AddUntilStep("Background is visible", () => songSelect.IsBackgroundVisible() && !songSelect.IsBackgroundBlack());
+            AddUntilStep("Background is visible", () => songSelect.IsBackgroundVisible());
         }
 
         /// <summary>
@@ -368,17 +367,17 @@ namespace osu.Game.Tests.Visual.Background
                 config.BindWith(OsuSetting.BlurLevel, BlurLevel);
             }
 
-            public bool IsBackgroundBlack() => background.CurrentColour == OsuColour.Gray(0);
+            public bool IsBackgroundBlack() => background.CurrentAlpha == 0;
 
-            public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
+            public bool IsBackgroundDimmed() => background.CurrentAlpha == 1f - background.CurrentDim;
 
-            public bool IsBackgroundUndimmed() => background.CurrentColour == new Color4(0.9f, 0.9f, 0.9f, 1f);
+            public bool IsBackgroundUndimmed() => background.CurrentAlpha == 0.9f;
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
             public bool IsUserBlurDisabled() => background.CurrentBlur == new Vector2(0);
 
-            public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
+            public bool IsBackgroundVisible() => background.CurrentAlpha > 0;
 
             public bool IsBackgroundBlur() => Precision.AlmostBigger(background.CurrentBlur.X, 0, 0.1f);
 
@@ -476,6 +475,8 @@ namespace osu.Game.Tests.Visual.Background
             public float CurrentDim => dimmable.DimLevel;
 
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
+
+            public bool ContentDisplayed => dimmable.ContentDisplayed;
 
             private TestDimmableBackground dimmable;
 
