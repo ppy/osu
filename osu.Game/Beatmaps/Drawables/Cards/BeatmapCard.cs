@@ -16,6 +16,7 @@ using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Localisation;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -81,9 +82,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 throw new InvalidOperationException($"An action should be assigned to this {nameof(BeatmapCard)}. To use the default, assign {nameof(DefaultAction)}.");
         }
 
+        private bool shiftActivated => containingInputManager?.CurrentState.Keyboard.ShiftPressed == true;
+
+        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => base.ReceivePositionalInputAtSubTree(screenSpacePos) && !shiftActivated;
+
         protected void DefaultAction()
         {
-            if (containingInputManager?.CurrentState.Keyboard.ShiftPressed == true)
+            if (shiftActivated)
             {
                 switch (DownloadTracker.State.Value)
                 {
