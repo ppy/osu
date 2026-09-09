@@ -73,7 +73,7 @@ namespace osu.Game.Beatmaps.Formats
                 catch (Exception e)
                 {
                     const int line_length_limit = 50;
-                    Logger.Log($"Failed to process line {lineNumber} \"{line[..line_length_limit]}{(line.Length > line_length_limit ? "…" : "")}\" into \"{output}\": {e.Message}");
+                    Logger.Log($"Failed to process line {lineNumber} \"{(line.Length <= line_length_limit ? line : string.Concat(line.AsSpan(0, line_length_limit), "…"))}\" into \"{output}\": {e.Message}");
                 }
             }
         }
