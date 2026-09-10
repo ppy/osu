@@ -40,6 +40,11 @@ namespace osu.Game.Localisation
         public static LocalisableString NotifyOnFriendPresenceChangeTooltip => new TranslatableString(getKey(@"notify_on_friend_presence_change_tooltip"), @"Notifications will be shown when friends go online/offline.");
 
         /// <summary>
+        /// "Show a notification when you receive a multiplayer invite"
+        /// </summary>
+        public static LocalisableString NotifyOnMultiplayerInvite => new TranslatableString(getKey(@"notify_on_multiplayer_invite"), @"Show a notification when you receive a multiplayer invite");
+
+        /// <summary>
         /// "Integrations"
         /// </summary>
         public static LocalisableString IntegrationsHeader => new TranslatableString(getKey(@"integrations_header"), @"Integrations");

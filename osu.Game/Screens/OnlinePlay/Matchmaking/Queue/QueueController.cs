@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
@@ -57,6 +58,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private int? lastDuelUser;
         private MatchmakingPool? lastDuelPool;
+        private Bindable<bool> notifyOnMultiplayerInvite;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            notifyOnMultiplayerInvite = config.GetBindable<bool>(OsuSetting.NotifyOnMultiplayerInvite);
+        }
 
         protected override void LoadComplete()
         {
@@ -193,15 +201,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private void onMatchmakingDuelIssued(MatchmakingDuelIssuedParams duel)
         {
-            Task.Run(async () =>
+            if (!notifyOnMultiplayerInvite.Value)
+                return;
             {
-                APIUser? user = await users.GetUserAsync(duel.UserId).ConfigureAwait(false);
+                Task.Run(async () =>
+                {
+                    APIUser? user = await users.GetUserAsync(duel.UserId).ConfigureAwait(false);
 
-                if (user == null)
-                    return;
+                    if (user == null)
+                        return;
 
-                Scheduler.Add(() => notifications?.Post(new DuelNotification(this, user, duel)));
-            }).FireAndForget();
+                    Scheduler.Add(() => notifications?.Post(new DuelNotification(this, user, duel)));
+                }).FireAndForget();
+            }
         }
 
         private void postNotification()

@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -148,6 +149,7 @@ namespace osu.Game.Online.Multiplayer
         /// This is NOT thread safe and usage should be scheduled.
         /// </summary>
         public abstract IBindable<bool> IsConnected { get; }
+        private Bindable<bool> notifyOnMultiplayerInvite;
 
         /// <summary>
         /// The joined <see cref="MultiplayerRoom"/>.
@@ -212,8 +214,9 @@ namespace osu.Game.Online.Multiplayer
         private readonly Dictionary<RankedPlayCardItem, RankedPlayCardWithPlaylistItem> cardsWithPlaylistItems = [];
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            notifyOnMultiplayerInvite = config.GetBindable<bool>(OsuSetting.NotifyOnMultiplayerInvite);
             IsConnected.BindValueChanged(connected => Scheduler.Add(() =>
             {
                 if (!connected.NewValue)
@@ -609,14 +612,18 @@ namespace osu.Game.Online.Multiplayer
 
             if (apiUser == null || apiRoom == null) return;
 
-            PostNotification?.Invoke(new MultiplayerInvitationNotification(apiUser, apiRoom)
+            if (!notifyOnMultiplayerInvite.Value)
+                return;
             {
-                Activated = () =>
+                PostNotification?.Invoke(new MultiplayerInvitationNotification(apiUser, apiRoom)
                 {
-                    PresentMatch?.Invoke(apiRoom, password);
-                    return true;
-                }
-            });
+                    Activated = () =>
+                    {
+                        PresentMatch?.Invoke(apiRoom, password);
+                        return true;
+                    }
+                });
+            }
 
             Task<Room?> getRoomAsync(long id)
             {

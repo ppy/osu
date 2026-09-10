@@ -99,6 +99,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.NotifyOnUsernameMentioned, true);
             SetDefault(OsuSetting.NotifyOnPrivateMessage, true);
             SetDefault(OsuSetting.NotifyOnFriendPresenceChange, true);
+            SetDefault(OsuSetting.NotifyOnMultiplayerInvite, true);
 
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -418,6 +419,7 @@ namespace osu.Game.Configuration
         NotifyOnUsernameMentioned,
         NotifyOnPrivateMessage,
         NotifyOnFriendPresenceChange,
+        NotifyOnMultiplayerInvite,
         UIHoldActivationDelay,
         HitLighting,
         StarFountains,
