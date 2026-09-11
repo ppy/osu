@@ -116,6 +116,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             [new Mod[] { new CatchModDifficultyAdjust() }, 0.5],
             [new Mod[] { new CatchModClassic() }, 1],
             [new Mod[] { new CatchModMirror() }, 1],
+            [new Mod[] { new CatchModWrap() }, 1],
 
             #endregion
 
