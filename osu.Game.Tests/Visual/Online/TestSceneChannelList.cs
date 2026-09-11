@@ -100,8 +100,8 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        [Test]
+        public void TestBasic()
         {
             AddStep("Add Public Channels", () =>
             {
@@ -122,11 +122,7 @@ namespace osu.Game.Tests.Visual.Online
                 for (int i = 0; i < 2; i++)
                     channelList.AddChannel(createRandomAnnounceChannel());
             });
-        }
 
-        [Test]
-        public void TestVisual()
-        {
             AddStep("Unread Selected", () =>
             {
                 if (validItem)
@@ -155,6 +151,18 @@ namespace osu.Game.Tests.Visual.Online
             {
                 if (validItem)
                     channelList.GetItem(selected.Value).Mentions.Value = 0;
+            });
+        }
+
+        [Test]
+        public void TestManyChannels()
+        {
+            AddStep("Add Public Channels", () =>
+            {
+                for (int i = 0; i < 500; i++)
+                    channelList.AddChannel(createRandomPublicChannel());
+                for (int i = 0; i < 500; i++)
+                    channelList.AddChannel(createRandomPrivateChannel());
             });
         }
 
