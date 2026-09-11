@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,9 +25,9 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
 
-        private OsuSpriteText selectedText;
-        private OsuSpriteText leaveText;
-        private ChannelList channelList;
+        private OsuSpriteText selectedText = null!;
+        private OsuSpriteText leaveText = null!;
+        private ChannelList channelList = null!;
 
         [SetUp]
         public void SetUp()
