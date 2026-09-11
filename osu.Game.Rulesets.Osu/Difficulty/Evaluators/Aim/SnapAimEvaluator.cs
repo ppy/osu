@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double calculateAcuteAngleBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj,
                                                        double currDistance, double currVelocity, double prevVelocity)
         {
-            const double acute_angle_multiplier = 2.41;
+            const double acute_angle_multiplier = 2.5;
 
             if (osuCurrObj.Angle == null || osuLastObj.Angle == null)
                 return 0;
