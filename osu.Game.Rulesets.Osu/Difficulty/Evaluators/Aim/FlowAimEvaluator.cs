@@ -67,6 +67,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             if (osuCurrObj.Angle != null && osuNextObj?.Angle != null)
             {
+                double currAcuteness = AngleUtils.CalculateAcuteness(osuCurrObj.Angle.Value);
+                double nextAcuteness = AngleUtils.CalculateAcuteness(osuNextObj.Angle.Value);
+
+                double acuteness, overlapWeight;
+
                 // We want to evaluate flow turns at the center point of the actual turn, but curr.Angle is a prev2-prev-curr angle.
                 // The issue with changing that to prev-curr-next is that we might evaluate the second note of a flow pattern as snap if prev is acute.
                 // With min(curr,next) the evaluation (assuming acute affects snap/flow probability enough) behaves roughly like this:
@@ -89,14 +94,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 //    flow (prev-curr-next evaluates as wide)
                 //
                 // In both examples the first object in a flow pattern is evaluated as acute (likely snap) and the rest are wide (likely flow).
-                double currAcuteness = AngleUtils.CalculateAcuteness(osuCurrObj.Angle.Value);
-                double nextAcuteness = AngleUtils.CalculateAcuteness(osuNextObj.Angle.Value);
-
-                double acuteness = Math.Min(currAcuteness, nextAcuteness);
-
-                double overlapWeight = currAcuteness > nextAcuteness
-                    ? calculateOverlapWeight(osuCurrObj, osuLastObj, osuLastLastObj)
-                    : calculateOverlapWeight(osuNextObj, osuCurrObj, osuLastObj);
+                if (currAcuteness < nextAcuteness)
+                {
+                    acuteness = currAcuteness;
+                    overlapWeight = calculateOverlapWeight(osuCurrObj, osuLastObj, osuLastLastObj);
+                }
+                else
+                {
+                    acuteness = nextAcuteness;
+                    overlapWeight = calculateOverlapWeight(osuNextObj, osuCurrObj, osuLastObj);
+                }
 
                 flowDifficulty += currVelocity *
                                   acuteness *
