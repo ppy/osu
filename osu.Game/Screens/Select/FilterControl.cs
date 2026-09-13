@@ -358,7 +358,9 @@ namespace osu.Game.Screens.Select
             if (existingQuery.Contains(query))
                 return;
 
-            searchTextBox.Current.Value = string.Join(' ', existingQuery.Trim(), query);
+            searchTextBox.Current.Value = string.IsNullOrWhiteSpace(existingQuery)
+                ? query
+                : string.Join(' ', existingQuery.Trim(), query);
         }
 
         protected override void PopIn()
