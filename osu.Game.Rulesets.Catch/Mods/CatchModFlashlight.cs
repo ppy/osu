@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public partial class CatchModFlashlight : ModFlashlight<CatchHitObject>
     {
+        public override Type[] IncompatibleMods => new[] { typeof(CatchModFadeIn) };
+
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)
         {
             MinValue = 0.5f,
