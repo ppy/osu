@@ -18,7 +18,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Resources.Localisation.Web;
@@ -118,7 +117,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         private void onNewMessagesArrived(IEnumerable<Message> bundle)
         {
             foreach (var message in bundle)
-                chatHistory.PostMessage(message.Sender, message.Content);
+                chatHistory.PostMessage(message);
         }
 
         private void onFocusGained()
@@ -282,11 +281,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             /// <summary>
             /// Posts a message.
             /// </summary>
-            /// <param name="user">The user that posted the message.</param>
-            /// <param name="content">The message content.</param>
-            public void PostMessage(APIUser user, string content)
+            public void PostMessage(Message message)
             {
-                var newMessage = new MessageBubble(user, content)
+                var newMessage = new MessageBubble(message)
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -340,17 +337,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             private partial class MessageBubble : CompositeDrawable
             {
-                private readonly APIUser user;
-                private readonly string message;
+                private readonly Message message;
 
                 /// <summary>
                 /// The time at which this message was posted.
                 /// </summary>
                 public required double PostTime { get; init; }
 
-                public MessageBubble(APIUser user, string message)
+                public MessageBubble(Message message)
                 {
-                    this.user = user;
                     this.message = message;
                     AutoSizeAxes = Axes.Both;
 
@@ -376,7 +371,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = api.LocalUser.Value.Id == user.Id
+                                    Colour = api.LocalUser.Value.Id == message.Sender.Id
                                         ? RankedPlayColourScheme.BLUE.PrimaryDarkest
                                         : RankedPlayColourScheme.RED.PrimaryDarkest,
                                 },
@@ -392,7 +387,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                             Origin = Anchor.CentreLeft,
                                             Size = new Vector2(16),
                                             Masking = true,
-                                            Child = new UpdateableAvatar(user)
+                                            Child = new UpdateableAvatar(message.Sender)
                                             {
                                                 DelayedLoad = false,
                                                 RelativeSizeAxes = Axes.Both
@@ -405,7 +400,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             AutoSizeAxes = Axes.Both,
-                                            Text = message,
+                                            Text = message.Content,
                                         }
                                     }
                                 }
