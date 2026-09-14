@@ -71,7 +71,7 @@ namespace osu.Game.Database
 
         private readonly Queue<(TLookup id, TaskCompletionSource<TValue?>)> pendingTasks = new Queue<(TLookup, TaskCompletionSource<TValue?>)>();
         private Task? pendingRequestTask;
-        private readonly object taskAssignmentLock = new object();
+        private readonly Lock taskAssignmentLock = new Lock();
 
         private Task<TValue?> queryValue(TLookup id)
         {
