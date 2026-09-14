@@ -297,7 +297,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var instance = instances.Single(i => i.UserId == userId);
 
             // PassGameplay can be called before the spectator player has consumed all replay frames, let the spectator
-            // clock keep draining remaining replay frames isntead of stopping it.
+            // clock keep draining remaining replay frames instead of stopping it.
             syncManager.RemoveManagedClock(instance.SpectatorPlayerClock, drain: true);
         });
 
