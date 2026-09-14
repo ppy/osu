@@ -32,6 +32,14 @@ namespace osu.Game.Skinning
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), SettingControlType = typeof(SpriteSelectorControl))]
         public Bindable<string> SpriteName { get; } = new Bindable<string>(string.Empty);
 
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Transparency))]
+        public BindableNumber<float> Transparency { get; } = new BindableNumber<float>(1)
+        {
+            MinValue = 0.01f,
+            MaxValue = 1,
+            Precision = 0.01f,
+        };
+
         [Resolved]
         private ISkinSource source { get; set; } = null!;
 
@@ -53,6 +61,7 @@ namespace osu.Game.Skinning
                 if (IsLoaded)
                     SkinChanged(CurrentSkin);
             });
+            Transparency.BindValueChanged(alpha => Alpha = alpha.NewValue, true);
         }
 
         protected override Drawable CreateDefault(ISkinComponentLookup lookup)
