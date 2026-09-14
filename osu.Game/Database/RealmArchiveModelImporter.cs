@@ -520,8 +520,20 @@ namespace osu.Game.Database
             if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
+            // filename lookups on models are case insensitive (see `BeatmapSetInfoExtensions.GetFile()`), but an
+            // archive can contain both "audio.mp3" and "Audio.MP3". importing such a pair would result in a model which
+            // throws on any file lookup or be unclear which file should be chosen should that be guarded
+            var seenFilenames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             foreach (string file in reader.Filenames)
-                yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
+            {
+                string shortened = file.Substring(prefix.Length).ToStandardisedPath();
+
+                if (!seenFilenames.Add(shortened))
+                    throw new InvalidOperationException($@"Multiple files with the name ""{shortened}"" (ignoring case) are present. Only one of them can be kept.");
+
+                yield return (file, shortened);
+            }
         }
 
         /// <summary>
