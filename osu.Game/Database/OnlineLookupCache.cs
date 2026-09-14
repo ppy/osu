@@ -170,7 +170,7 @@ namespace osu.Game.Database
             var nextTask = Task.Run(performLookup);
             nextTask.ContinueWith(t =>
             {
-                Logger.Error(t.Exception.AsSingular(), $"{nameof(OnlineLookupCache<TLookup, TValue, TRequest>)} lookup request failed!");
+                Logger.Error(t.Exception.AsSingular(), $"{nameof(OnlineLookupCache<,,>)} lookup request failed!");
             }, TaskContinuationOptions.OnlyOnFaulted);
             pendingRequestTask = nextTask;
         }
