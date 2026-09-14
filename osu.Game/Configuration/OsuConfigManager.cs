@@ -147,6 +147,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
+            SetDefault(OsuSetting.LegacyBreakOverlay, false);
             SetDefault(OsuSetting.HitLighting, true);
             SetDefault(OsuSetting.StarFountains, true);
 
@@ -419,6 +420,7 @@ namespace osu.Game.Configuration
         NotifyOnPrivateMessage,
         NotifyOnFriendPresenceChange,
         UIHoldActivationDelay,
+        LegacyBreakOverlay,
         HitLighting,
         StarFountains,
         MenuBackgroundSource,
