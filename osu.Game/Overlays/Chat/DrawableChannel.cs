@@ -32,8 +32,7 @@ namespace osu.Game.Overlays.Chat
                 if (scrollbarVisible == value) return;
 
                 scrollbarVisible = value;
-                if (scroll != null)
-                    scroll.ScrollbarVisible = value;
+                scroll?.ScrollbarVisible = value;
             }
         }
 

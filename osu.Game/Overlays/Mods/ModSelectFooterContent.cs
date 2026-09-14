@@ -100,8 +100,7 @@ namespace osu.Game.Overlays.Mods
 
             Beatmap.BindValueChanged(b =>
             {
-                if (beatmapAttributesDisplay != null)
-                    beatmapAttributesDisplay.BeatmapInfo.Value = b.NewValue?.BeatmapInfo;
+                beatmapAttributesDisplay?.BeatmapInfo.Value = b.NewValue?.BeatmapInfo;
 
                 updateInformation();
             }, true);
@@ -135,8 +134,7 @@ namespace osu.Game.Overlays.Mods
                 rankingInformationDisplay.Ranked.Value = ActiveMods.Value.All(m => m.Ranked);
             }
 
-            if (beatmapAttributesDisplay != null)
-                beatmapAttributesDisplay.Mods.Value = ActiveMods.Value;
+            beatmapAttributesDisplay?.Mods.Value = ActiveMods.Value;
         }
 
         protected override void Update()

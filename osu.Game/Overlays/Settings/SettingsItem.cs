@@ -246,8 +246,7 @@ namespace osu.Game.Overlays.Settings
 
         private void updateDisabled()
         {
-            if (labelText != null)
-                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
+            labelText?.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
     }
 }
