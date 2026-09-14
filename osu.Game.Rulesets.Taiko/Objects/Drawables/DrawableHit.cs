@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Configuration;
@@ -79,6 +80,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             updateActionsFromType();
             base.RecreatePieces();
             Size = new Vector2(HitObject.IsStrong ? TaikoStrongableHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
+
+            if (MainPiece.Drawable is not IHasAccentColour drawableHasColor) return;
+
+            AccentColour.Value = drawableHasColor.AccentColour;
+
+            AccentColour.BindValueChanged(c =>
+            {
+                drawableHasColor.AccentColour = c.NewValue;
+            });
         }
 
         protected override void OnFree()
