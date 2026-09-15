@@ -55,6 +55,7 @@ jobs:
           # this is WTF tier but if you don't specify *both* of these the defaults assume `build: true`
           build: false
           no-build: true
+          tool-version: '2026.2.1'
           solution: ./osu.Desktop.slnf
           caches-home: inspectcode
           verbosity: WARN

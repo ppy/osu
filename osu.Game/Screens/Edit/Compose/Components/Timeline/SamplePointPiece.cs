@@ -445,12 +445,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         ternary.Current.Value = activeSets.Contains(ternary.SampleSet.SampleSetIndex) ? onState : TernaryState.False;
                 }
 
-                if (sampleSetDropdown != null)
-                {
-                    sampleSetDropdown.Current.Value = activeSets.Count == 1
-                        ? sampleSetDropdown.Items.Single(i => i.SampleSetIndex == activeSets.Single())
-                        : new EditorBeatmapSkin.SampleSet(-1, "(multiple)");
-                }
+                sampleSetDropdown?.Current.Value = activeSets.Count == 1
+                    ? sampleSetDropdown.Items.Single(i => i.SampleSetIndex == activeSets.Single())
+                    : new EditorBeatmapSkin.SampleSet(-1, "(multiple)");
             }
 
             private void playDemoSample() => Scheduler.AddOnce(() =>

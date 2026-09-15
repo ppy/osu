@@ -57,10 +57,11 @@ namespace osu.Game.Storyboards.Commands
 
             public override TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
             {
-                if (loopingGroup.TotalIterations == 0)
+                double loopingGroupDuration = loopingGroup.Duration;
+
+                if (loopingGroupDuration == 0 || loopingGroup.TotalIterations == 0)
                     return command.ApplyTransforms(d);
 
-                double loopingGroupDuration = loopingGroup.Duration;
                 return command.ApplyTransforms(d).Loop(loopingGroupDuration - Duration, loopingGroup.TotalIterations);
             }
         }
