@@ -71,9 +71,9 @@ namespace osu.Game.Localisation.SkinComponents
             new TranslatableString(getKey(@"if_enabled_the_leaderboard_will"), @"If enabled, the leaderboard will become more compact during active gameplay.");
 
         /// <summary>
-        /// "Transparency"
+        /// "Opacity"
         /// </summary>
-        public static LocalisableString Transparency => new TranslatableString(getKey(@"transparency"), @"Transparency");
+        public static LocalisableString Opacity => new TranslatableString(getKey(@"opacity"), @"Opacity");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
