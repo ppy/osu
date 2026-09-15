@@ -355,8 +355,7 @@ namespace osu.Game.Overlays.Chat
 
         private void updateBackground()
         {
-            if (background != null)
-                background.Alpha = alternatingBackground ? 0.2f : 0;
+            background?.Alpha = alternatingBackground ? 0.2f : 0;
         }
     }
 }

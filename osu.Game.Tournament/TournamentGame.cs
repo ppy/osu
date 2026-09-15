@@ -60,8 +60,7 @@ namespace osu.Game.Tournament
             // can potentially be removed when https://github.com/ppy/osu-framework/issues/4309 is resolved.
             var mouseHandler = host.AvailableInputHandlers.OfType<MouseHandler>().FirstOrDefault();
 
-            if (mouseHandler != null)
-                mouseHandler.UseRelativeMode.Value = false;
+            mouseHandler?.UseRelativeMode.Value = false;
 
             loadingSpinner.Show();
 
