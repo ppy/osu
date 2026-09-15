@@ -18,7 +18,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
     [TestFixture]
-    public partial class TestSceneHitExplosion : ManiaSkinnableTestScene
+    public partial class TestSceneHitExplosion : ManiaSkinnableTestSceneScrolling
     {
         private readonly List<DrawablePool<PoolableHitExplosion>> hitExplosionPools = new List<DrawablePool<PoolableHitExplosion>>();
 

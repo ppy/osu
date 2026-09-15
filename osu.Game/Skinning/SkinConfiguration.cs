@@ -1,8 +1,11 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Graphics;
+using osu.Game.Screens.Edit;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -10,11 +13,22 @@ namespace osu.Game.Skinning
     /// <summary>
     /// An empty skin configuration.
     /// </summary>
-    public class SkinConfiguration : IHasComboColours, IHasCustomColours
+    public class SkinConfiguration : IHasComboColours, IHasCustomColours, IHasTimingColours
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
         public const decimal LATEST_VERSION = 2.7m;
+
+        private readonly OsuColour colours;
+
+        public SkinConfiguration()
+            : this(null)
+        { }
+
+        public SkinConfiguration(OsuColour? colours)
+        {
+            this.colours = colours ?? new OsuColour();
+        }
 
         /// <summary>
         /// Whether to allow <see cref="DefaultComboColours"/> as a fallback list for when no combo colours are provided.
@@ -70,5 +84,16 @@ namespace osu.Game.Skinning
         public Dictionary<string, Color4> CustomColours { get; } = new Dictionary<string, Color4>();
 
         public readonly Dictionary<string, string> ConfigDictionary = new Dictionary<string, string>();
+
+        public List<Color4?> CustomTimingColours { get; set; } = [.. new Color4?[64]];
+
+        public Color4 GetTimingColourFor(int beatDivisor)
+        {
+            return CustomTimingColours.ElementAtOrDefault(beatDivisor)
+                   // if not specified, use the user-specified default snap colour
+                   ?? CustomTimingColours[0]
+                   // if not specified, use the normal snap colour
+                   ?? BindableBeatDivisor.GetDefaultColourFor(beatDivisor, colours);
+        }
     }
 }
