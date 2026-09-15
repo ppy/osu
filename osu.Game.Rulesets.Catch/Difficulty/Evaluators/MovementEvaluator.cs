@@ -87,7 +87,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             if (current.Index >= 2 && Math.Abs(catchCurrent.ExactDistanceMoved) <= CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2
                                    && Precision.AlmostEquals(catchCurrent.ExactDistanceMoved, -catchLast.ExactDistanceMoved)
                                    && Precision.AlmostEquals(catchLast.ExactDistanceMoved, -catchLastLast.ExactDistanceMoved)
-                                   && Precision.AlmostEquals(catchCurrent.StrainTime, catchLast.StrainTime) && Precision.AlmostEquals(catchLast.StrainTime, catchLastLast.StrainTime))
+                                   && Precision.AlmostEquals(catchCurrent.StrainTime, catchLast.StrainTime)
+                                   && Precision.AlmostEquals(catchLast.StrainTime, catchLastLast.StrainTime))
                 distanceAddition = 0;
 
             return distanceAddition / weightedStrainTime;
