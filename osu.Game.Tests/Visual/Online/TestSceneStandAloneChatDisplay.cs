@@ -419,7 +419,6 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestReportConfirmationArrivesInCorrectChannel()
         {
-            ChatReportRequest pendingRequest = null!;
             Channel testChannel2 = null!;
 
             AddStep("join second channel", () => chatWithTextBox2.Channel.Value = testChannel2 = new Channel());
