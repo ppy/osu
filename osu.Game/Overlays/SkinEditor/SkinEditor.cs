@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -404,7 +405,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     Children = new Drawable[]
                     {
-                        new SettingsDropdown<GlobalSkinnableContainerLookup?>
+                        new GlobalSkinnableContainerLookupDropdown
                         {
                             Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
@@ -782,6 +783,32 @@ namespace osu.Game.Overlays.SkinEditor
                 HeaderText = CommonStrings.RevertToDefault;
                 BodyText = SkinEditorStrings.RevertToDefaultDescription;
                 DangerousAction = revert;
+            }
+        }
+
+        public partial class GlobalSkinnableContainerLookupDropdown : SettingsDropdown<GlobalSkinnableContainerLookup?>
+        {
+            protected override OsuDropdown<GlobalSkinnableContainerLookup?> CreateDropdown() => new DropdownControl();
+
+            protected new partial class DropdownControl : OsuDropdown<GlobalSkinnableContainerLookup?>
+            {
+                public DropdownControl()
+                {
+                    RelativeSizeAxes = Axes.X;
+                }
+
+                protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
+
+                protected override LocalisableString GenerateItemText(GlobalSkinnableContainerLookup? item)
+                {
+                    if (item == null)
+                        return base.GenerateItemText(item);
+
+                    if (item.Ruleset == null)
+                        return item.Lookup.GetLocalisableDescription();
+
+                    return SkinEditorStrings.WorkingLayerOfRuleset(item.Lookup.GetLocalisableDescription(), item.Ruleset.Name);
+                }
             }
         }
 
