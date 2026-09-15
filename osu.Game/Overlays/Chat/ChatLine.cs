@@ -53,6 +53,9 @@ namespace osu.Game.Overlays.Chat
         protected virtual float UsernameWidth => 150;
 
         [Resolved]
+        private Bindable<Channel?>? currentChannel { get; set; }
+
+        [Resolved]
         private ChannelManager? channelManager { get; set; }
 
         [Resolved]
@@ -224,20 +227,20 @@ namespace osu.Game.Overlays.Chat
             {
                 Success = () =>
                 {
-                    Debug.Assert(channelManager != null);
+                    Debug.Assert(currentChannel?.Value != null);
 
-                    switch (channelManager.CurrentChannel.Value.Type)
+                    switch (currentChannel.Value.Type)
                     {
                         case ChannelType.PM:
-                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage("""
-                                                                                            Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
-                                                                                            You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
-                                                                                            You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
-                                                                                            """));
+                            currentChannel.Value.AddNewMessages(new InfoMessage("""
+                                                                                Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
+                                                                                You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
+                                                                                You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
+                                                                                """));
                             break;
 
                         default:
-                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(@"Chat moderators have been alerted. Thanks for your help."));
+                            currentChannel.Value.AddNewMessages(new InfoMessage(@"Chat moderators have been alerted. Thanks for your help."));
                             break;
                     }
                 }
