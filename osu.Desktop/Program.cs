@@ -38,6 +38,11 @@ namespace osu.Desktop
             // last time has been fixed, let's not tempt fate.
             setupVelopack(args);
 
+#if DEBUG || TACHYON
+            if (Environment.GetEnvironmentVariable("OSU_SDL3") == null)
+                Environment.SetEnvironmentVariable("OSU_SDL3", "1");
+#endif
+
             if (OperatingSystem.IsWindows())
             {
                 var windowsVersion = Environment.OSVersion.Version;
