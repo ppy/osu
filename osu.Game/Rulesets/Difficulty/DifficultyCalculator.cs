@@ -9,10 +9,7 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Lists;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -32,8 +29,6 @@ namespace osu.Game.Rulesets.Difficulty
         /// The working beatmap for which difficulty will be calculated.
         /// </summary>
         protected readonly IWorkingBeatmap WorkingBeatmap;
-
-        private Mod[] playableMods;
 
         private readonly IRulesetInfo ruleset;
 
@@ -70,24 +65,15 @@ namespace osu.Game.Rulesets.Difficulty
                 cancellationToken = timedCancellationSource.Token;
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            var playableMods = mods.Select(m => m.DeepClone()).ToArray();
+
             // ReSharper disable once PossiblyMistakenUseOfCancellationToken
-            preProcess(mods, cancellationToken);
+            preProcess(playableMods, cancellationToken);
 
-            var skills = CreateSkills(Beatmap, playableMods);
+            var skillAttributes = ProcessSkills(Beatmap, playableMods, cancellationToken);
 
-            if (!Beatmap.HitObjects.Any())
-                return CreateDifficultyAttributes(Beatmap, playableMods, skills);
-
-            foreach (var hitObject in getDifficultyHitObjects())
-            {
-                foreach (var skill in skills)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    skill.Process(hitObject);
-                }
-            }
-
-            return CreateDifficultyAttributes(Beatmap, playableMods, skills);
+            return CreateDifficultyAttributes(Beatmap, playableMods, skillAttributes);
         }
 
         /// <summary>
@@ -112,39 +98,94 @@ namespace osu.Game.Rulesets.Difficulty
                 cancellationToken = timedCancellationSource.Token;
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            var playableMods = mods.Select(m => m.DeepClone()).ToArray();
+
             // ReSharper disable once PossiblyMistakenUseOfCancellationToken
-            preProcess(mods, cancellationToken);
+            preProcess(playableMods, cancellationToken);
 
             var attribs = new List<TimedDifficultyAttributes>();
 
             if (!Beatmap.HitObjects.Any())
                 return attribs;
 
-            var skills = CreateSkills(Beatmap, playableMods);
-            var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
-            var difficultyObjects = getDifficultyHitObjects().ToArray();
+            var timedSkillAttributes = ProcessSkillsTimed(Beatmap, playableMods, cancellationToken);
 
-            int currentIndex = 0;
-
-            foreach (var obj in Beatmap.HitObjects)
+            foreach (var skillAttributes in timedSkillAttributes)
             {
-                progressiveBeatmap.HitObjects.Add(obj);
-
-                while (currentIndex < difficultyObjects.Length && difficultyObjects[currentIndex].BaseObject.GetEndTime() <= obj.GetEndTime())
-                {
-                    foreach (var skill in skills)
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        skill.Process(difficultyObjects[currentIndex]);
-                    }
-
-                    currentIndex++;
-                }
-
-                attribs.Add(new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills)));
+                attribs.Add(new TimedDifficultyAttributes(skillAttributes.Key, CreateDifficultyAttributes(Beatmap, playableMods, skillAttributes.Value)));
             }
 
             return attribs;
+        }
+
+        /// <summary>
+        /// Calculates per-skill difficulty of the beatmap using a specific mod combination.
+        /// </summary>
+        /// <param name="beatmap">Beatmap to calculate difficulty for.</param>
+        /// <param name="playableMods">The mods that have been applied to the beatmap.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>List of <see cref="ISkillAttributes"/>.</returns>
+        public virtual List<ISkillAttributes> ProcessSkills(IBeatmap beatmap, Mod[] playableMods, CancellationToken cancellationToken = default)
+        {
+            var difficultyHitObjects = getDifficultyHitObjects(playableMods);
+
+            var skills = CreateSkills(beatmap, playableMods, difficultyHitObjects.ToArray());
+            var skillAttributes = new List<ISkillAttributes>();
+
+            foreach (var skill in skills)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                skillAttributes.Add(skill.Process());
+            }
+
+            return skillAttributes;
+        }
+
+        /// <summary>
+        /// Calculates per-skill difficulty of the beatmap using a specific mod combination and returns <see cref="ISkillAttributes"/> at every relevant time value.
+        /// </summary>
+        /// <param name="beatmap">Beatmap to calculate difficulty for.</param>
+        /// <param name="playableMods">The mods that have been applied to the beatmap.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Lists of per-skill <see cref="ISkillAttributes"/> at different time points.</returns>
+        public virtual Dictionary<double, IReadOnlyList<ISkillAttributes>> ProcessSkillsTimed(IBeatmap beatmap, Mod[] playableMods, CancellationToken cancellationToken = default)
+        {
+            var difficultyHitObjects = getDifficultyHitObjects(playableMods);
+
+            var skills = CreateSkills(beatmap, playableMods, difficultyHitObjects.ToArray());
+            var timedSkillAttributes = new List<TimedSkillAttributes[]>();
+
+            foreach (var skill in skills)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                timedSkillAttributes.Add(skill.ProcessTimed().ToArray());
+            }
+
+            // Skills have authority over what times they want to calculate skill attributes at
+            // so we want to try to calculate difficulty attributes for every timing point available
+            var times = timedSkillAttributes.SelectMany(x => x.Select(y => y.Time)).Distinct().ToList();
+
+            var timedAttributes = new Dictionary<double, IReadOnlyList<ISkillAttributes>>();
+
+            foreach (double time in times)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var attributes = new List<ISkillAttributes>();
+
+                foreach (var attribute in timedSkillAttributes)
+                {
+                    // Different skills might calculate skill attributes at different times
+                    // take the latest skill attributes for every skill to make sure we always pass all  skill attributes to CalculateDifficultyAttributes
+                    var closestAttributes = attribute.LastOrDefault(x => x.Time <= time);
+                    if (closestAttributes != null)
+                        attributes.Add(closestAttributes.Attributes);
+                }
+
+                timedAttributes.Add(time, attributes);
+            }
+
+            return timedAttributes;
         }
 
         /// <summary>
@@ -173,16 +214,15 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Retrieves the <see cref="DifficultyHitObject"/>s to calculate against.
         /// </summary>
-        private IEnumerable<DifficultyHitObject> getDifficultyHitObjects() => SortObjects(CreateDifficultyHitObjects(Beatmap, playableMods));
+        private IEnumerable<DifficultyHitObject> getDifficultyHitObjects(Mod[] playableMods) => SortObjects(CreateDifficultyHitObjects(Beatmap, playableMods));
 
         /// <summary>
         /// Performs required tasks before every calculation.
         /// </summary>
-        /// <param name="mods">The original list of <see cref="Mod"/>s.</param>
+        /// <param name="playableMods"></param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        private void preProcess([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken)
+        private void preProcess([NotNull] Mod[] playableMods, CancellationToken cancellationToken)
         {
-            playableMods = mods.Select(m => m.DeepClone()).ToArray();
             Beatmap = WorkingBeatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
         }
 
@@ -274,7 +314,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// This may differ from <see cref="Beatmap"/> in the case of timed calculation.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
-        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills);
+        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, IReadOnlyList<ISkillAttributes> skills);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
@@ -285,149 +325,13 @@ namespace osu.Game.Rulesets.Difficulty
         protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods);
 
         /// <summary>
-        /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
+        /// Creates the <see cref="ISkill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.
         /// This may differ from <see cref="Beatmap"/> in the case of timed calculation.</param>
         /// <param name="mods">Mods to calculate difficulty with.</param>
-        /// <returns>The <see cref="Skill"/>s.</returns>
-        protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods);
-
-        /// <summary>
-        /// Used to calculate timed difficulty attributes, where only a subset of hitobjects should be visible at any point in time.
-        /// </summary>
-        private class ProgressiveCalculationBeatmap : IBeatmap
-        {
-            private readonly IBeatmap baseBeatmap;
-
-            public ProgressiveCalculationBeatmap(IBeatmap baseBeatmap)
-            {
-                this.baseBeatmap = baseBeatmap;
-            }
-
-            public readonly List<HitObject> HitObjects = new List<HitObject>();
-
-            IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
-
-            #region Delegated IBeatmap implementation
-
-            public BeatmapInfo BeatmapInfo
-            {
-                get => baseBeatmap.BeatmapInfo;
-                set => baseBeatmap.BeatmapInfo = value;
-            }
-
-            public ControlPointInfo ControlPointInfo
-            {
-                get => baseBeatmap.ControlPointInfo;
-                set => baseBeatmap.ControlPointInfo = value;
-            }
-
-            public BeatmapMetadata Metadata => baseBeatmap.Metadata;
-
-            public BeatmapDifficulty Difficulty
-            {
-                get => baseBeatmap.Difficulty;
-                set => baseBeatmap.Difficulty = value;
-            }
-
-            public SortedList<BreakPeriod> Breaks
-            {
-                get => baseBeatmap.Breaks;
-                set => baseBeatmap.Breaks = value;
-            }
-
-            public double TotalBreakTime => baseBeatmap.TotalBreakTime;
-            public IEnumerable<BeatmapStatistic> GetStatistics() => baseBeatmap.GetStatistics();
-            public double GetMostCommonBeatLength() => baseBeatmap.GetMostCommonBeatLength();
-            public int BeatmapVersion => baseBeatmap.BeatmapVersion;
-            public IBeatmap Clone() => new ProgressiveCalculationBeatmap(baseBeatmap.Clone());
-
-            public double AudioLeadIn
-            {
-                get => baseBeatmap.AudioLeadIn;
-                set => baseBeatmap.AudioLeadIn = value;
-            }
-
-            public float StackLeniency
-            {
-                get => baseBeatmap.StackLeniency;
-                set => baseBeatmap.StackLeniency = value;
-            }
-
-            public bool SpecialStyle
-            {
-                get => baseBeatmap.SpecialStyle;
-                set => baseBeatmap.SpecialStyle = value;
-            }
-
-            public bool LetterboxInBreaks
-            {
-                get => baseBeatmap.LetterboxInBreaks;
-                set => baseBeatmap.LetterboxInBreaks = value;
-            }
-
-            public bool WidescreenStoryboard
-            {
-                get => baseBeatmap.WidescreenStoryboard;
-                set => baseBeatmap.WidescreenStoryboard = value;
-            }
-
-            public bool EpilepsyWarning
-            {
-                get => baseBeatmap.EpilepsyWarning;
-                set => baseBeatmap.EpilepsyWarning = value;
-            }
-
-            public bool SamplesMatchPlaybackRate
-            {
-                get => baseBeatmap.SamplesMatchPlaybackRate;
-                set => baseBeatmap.SamplesMatchPlaybackRate = value;
-            }
-
-            public double DistanceSpacing
-            {
-                get => baseBeatmap.DistanceSpacing;
-                set => baseBeatmap.DistanceSpacing = value;
-            }
-
-            public int GridSize
-            {
-                get => baseBeatmap.GridSize;
-                set => baseBeatmap.GridSize = value;
-            }
-
-            public double TimelineZoom
-            {
-                get => baseBeatmap.TimelineZoom;
-                set => baseBeatmap.TimelineZoom = value;
-            }
-
-            public CountdownType Countdown
-            {
-                get => baseBeatmap.Countdown;
-                set => baseBeatmap.Countdown = value;
-            }
-
-            public int CountdownOffset
-            {
-                get => baseBeatmap.CountdownOffset;
-                set => baseBeatmap.CountdownOffset = value;
-            }
-
-            public int[] Bookmarks
-            {
-                get => baseBeatmap.Bookmarks;
-                set => baseBeatmap.Bookmarks = value;
-            }
-
-            public double[] SliderVelocityPresets
-            {
-                get => baseBeatmap.SliderVelocityPresets;
-                set => baseBeatmap.SliderVelocityPresets = value;
-            }
-
-            #endregion
-        }
+        /// <param name="difficultyHitObjects"></param>
+        /// <returns>The <see cref="ISkill"/>s.</returns>
+        protected abstract ISkill[] CreateSkills(IBeatmap beatmap, Mod[] mods, DifficultyHitObject[] difficultyHitObjects);
     }
 }
