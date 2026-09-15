@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecay(double ms) => DiffUtils.Pow(0.2, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
-            currentStrain * strainDecay(time - current.Previous(0).StartTime);
+            currentStrain * strainDecay(time - current.Previous().StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -56,9 +56,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            const double skill_multiplier_snap = 70.9;
-            const double skill_multiplier_agility = 2.35;
-            const double skill_multiplier_flow = 242.0;
+            const double skill_multiplier_snap = 71.0;
+            const double skill_multiplier_agility = 1.62;
+            const double skill_multiplier_flow = 247.0;
 
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;

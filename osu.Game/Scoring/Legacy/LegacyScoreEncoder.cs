@@ -63,9 +63,10 @@ namespace osu.Game.Scoring.Legacy
         /// <item><description>30000016: Fix taiko standardised score estimation algorithm not including swell tick score gain into bonus portion. Reconvert all scores.</description></item>
         /// <item><description>30000017: Mod score multiplier rebalance. Recalculates the <see cref="ScoreInfo.TotalScore"/> of all scores with <see cref="ScoreInfo.TotalScoreWithoutMods"/> present.</description></item>
         /// <item><description>30000018: Further improvements to taiko standardised score estimation algorithm. Reconvert all scores.</description></item>
+        /// <item><description>30000019: Fix back-to-front combo and accuracy proportions in mania standardised score estimation algorithm. Reconvert all scores.</description></item>
         /// </list>
         /// </remarks>
-        public const int LATEST_VERSION = 30000018;
+        public const int LATEST_VERSION = 30000019;
 
         /// <summary>
         /// The first stable-compatible YYYYMMDD format version given to lazer usage of replays.

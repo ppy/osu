@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double comboBasedEstimatedMissCount = calculateComboBasedEstimatedMissCount(osuAttributes);
             double? scoreBasedEstimatedMissCount = null;
 
-            if (usingClassicSliderAccuracy && !usingScoreV2 && score.LegacyTotalScore != null)
+            if (usingClassicSliderAccuracy && !usingScoreV2 && score.LegacyTotalScore > 0)
             {
                 var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, osuAttributes);
                 scoreBasedEstimatedMissCount = legacyScoreMissCalculator.Calculate();
@@ -238,7 +238,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
-            double speedValue = DifficultyToPerformance(attributes.SpeedDifficulty);
+            double speedDifficulty = attributes.SpeedDifficulty * calculateSpeedHighDeviationNerf(attributes);
+
+            double speedValue = DifficultyToPerformance(speedDifficulty);
 
             if (effectiveMissCount > 0)
             {
@@ -253,12 +255,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= 1.12;
             }
 
-            double speedHighDeviationMultiplier = calculateSpeedHighDeviationNerf(attributes);
-            speedValue *= speedHighDeviationMultiplier;
-
             // An effective hit window is created based on the speed SR. The higher the speed difficulty, the shorter the hit window.
             // For example, a speed SR of 4.0 leads to an effective hit window of 20ms, which is OD 10.
-            double effectiveHitWindow = 20 * DiffUtils.Pow(4 / attributes.SpeedDifficulty, 0.35);
+            double effectiveHitWindow = 20 * DiffUtils.Pow(4 / speedDifficulty, 0.35);
 
             // Find the proportion of 300s on speed notes assuming the hit window was the effective hit window.
             double effectiveAccuracy = DiffUtils.Erf(effectiveHitWindow / (double)speedDeviation);
@@ -489,23 +488,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (speedDeviation == null)
                 return 0;
 
-            double speedValue = DifficultyToPerformance(attributes.SpeedDifficulty);
+            // Decides a point where the difficulty played compared to the speed deviation is assumed to be tapped improperly.
+            // Any difficulty above this point is considered "excess" speed difficulty.
+            // This is used to cause difficulty above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
+            double excessSpeedDifficultyCutoff = 2.9 + 1.45 * DiffUtils.Pow(22 / speedDeviation.Value, 5);
 
-            // Decides a point where the PP value achieved compared to the speed deviation is assumed to be tapped improperly. Any PP above this point is considered "excess" speed difficulty.
-            // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.
-            double excessSpeedDifficultyCutoff = 100 + 220 * DiffUtils.Pow(22 / speedDeviation.Value, 6.5);
-
-            if (speedValue <= excessSpeedDifficultyCutoff)
+            if (attributes.SpeedDifficulty <= excessSpeedDifficultyCutoff)
                 return 1.0;
 
-            const double scale = 50;
-            double adjustedSpeedValue = scale * (Math.Log((speedValue - excessSpeedDifficultyCutoff) / scale + 1) + excessSpeedDifficultyCutoff / scale);
+            const double scale = 0.45;
+            double adjustedSpeedDifficulty = scale * (Math.Log((attributes.SpeedDifficulty - excessSpeedDifficultyCutoff) / scale + 1) + excessSpeedDifficultyCutoff / scale);
 
             // 220 UR and less are considered tapped correctly to ensure that normal scores will be punished as little as possible
             double lerp = 1 - DiffUtils.ReverseLerp(speedDeviation.Value, 22.0, 27.0);
-            adjustedSpeedValue = double.Lerp(adjustedSpeedValue, speedValue, lerp);
+            adjustedSpeedDifficulty = double.Lerp(adjustedSpeedDifficulty, attributes.SpeedDifficulty, lerp);
 
-            return adjustedSpeedValue / speedValue;
+            return adjustedSpeedDifficulty / attributes.SpeedDifficulty;
         }
 
         /// <summary>

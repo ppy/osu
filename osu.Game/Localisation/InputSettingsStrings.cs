@@ -35,11 +35,6 @@ namespace osu.Game.Localisation
         public static LocalisableString SongSelectSection => new TranslatableString(getKey(@"song_select_section"), @"Song Select");
 
         /// <summary>
-        /// "In Game"
-        /// </summary>
-        public static LocalisableString InGameSection => new TranslatableString(getKey(@"in_game_section"), @"In Game");
-
-        /// <summary>
         /// "Replay"
         /// </summary>
         public static LocalisableString ReplaySection => new TranslatableString(getKey(@"replay_section"), @"Replay");
@@ -55,9 +50,9 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorSection => new TranslatableString(getKey(@"editor_section"), @"Editor");
 
         /// <summary>
-        /// "Editor: Test play"
+        /// "Test play"
         /// </summary>
-        public static LocalisableString EditorTestPlaySection => new TranslatableString(getKey(@"editor_test_play_section"), @"Editor: Test play");
+        public static LocalisableString EditorTestPlaySection => new TranslatableString(getKey(@"editor_test_play_section"), @"Test play");
 
         /// <summary>
         /// "Reset all bindings in section"

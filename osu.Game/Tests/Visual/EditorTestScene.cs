@@ -119,8 +119,6 @@ namespace osu.Game.Tests.Visual
 
             public new void SwitchToDifficulty(BeatmapInfo beatmapInfo) => base.SwitchToDifficulty(beatmapInfo);
 
-            public new void CreateNewDifficulty(RulesetInfo rulesetInfo) => base.CreateNewDifficulty(rulesetInfo);
-
             public new bool HasUnsavedChanges => base.HasUnsavedChanges;
 
             public override bool OnExiting(ScreenExitEvent e)

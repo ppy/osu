@@ -21,12 +21,15 @@ using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -169,7 +172,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (firstAddition == null)
                 return null;
 
-            return firstAddition.EditorAutoBank ? EditorSelectionHandler.HIT_BANK_AUTO : firstAddition.Bank;
+            return firstAddition.EditorAutoBank ? HitObjectComposer.HIT_BANK_AUTO : firstAddition.Bank;
         }
 
         public static int GetVolumeValue(ICollection<HitSampleInfo> samples)
@@ -306,7 +309,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         return;
 
                     setBank(val.NewValue);
-                    updatePrimaryBankState();
                     playDemoSample();
                 });
 
@@ -317,7 +319,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         return;
 
                     setAdditionBank(val.NewValue);
-                    updateAdditionBankState();
                     playDemoSample();
                 });
 
@@ -477,7 +478,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="EditorSelectionHandler.SetSampleBank"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.SetSampleBank"/>.
             /// </remarks>
             private void setBank(string newBank)
             {
@@ -490,10 +491,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         relevantSamples[i] = relevantSamples[i].With(newBank: newBank);
                     }
                 });
+
+                updatePrimaryBankState();
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="EditorSelectionHandler.SetSampleAdditionBank"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.SetSampleAdditionBank"/>.
             /// </remarks>
             private void setAdditionBank(string newBank)
             {
@@ -507,7 +510,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             continue;
 
                         // Addition samples with bank set to auto should inherit the bank of the normal sample
-                        if (newBank == EditorSelectionHandler.HIT_BANK_AUTO)
+                        if (newBank == HitObjectComposer.HIT_BANK_AUTO)
                         {
                             relevantSamples[i] = relevantSamples[i].With(newBank: normalBank, newEditorAutoBank: true);
                         }
@@ -515,6 +518,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             relevantSamples[i] = relevantSamples[i].With(newBank: newBank, newEditorAutoBank: false);
                     }
                 });
+
+                updateAdditionBankState();
             }
 
             private void setSampleSet(EditorBeatmapSkin.SampleSet newSampleSet)
@@ -576,14 +581,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     selectionSampleStates[sampleName] = bindable;
                 }
 
-                banks.AddRange(HitSampleInfo.ALL_BANKS.Prepend(EditorSelectionHandler.HIT_BANK_AUTO));
+                banks.AddRange(HitSampleInfo.ALL_BANKS.Prepend(HitObjectComposer.HIT_BANK_AUTO));
             }
 
             private void updateTernaryStates()
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    bindable.Value = SelectionHandler<HitObject>.GetStateFromSelection(GetRelevantSamples(relevantObjects), h => h.samples.Any(s => s.Name == sampleName));
+                    bindable.Value = GetRelevantSamples(relevantObjects).GetTernaryState(h => h.samples.Any(s => s.Name == sampleName));
                 }
             }
 
@@ -591,19 +596,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 foreach ((string sampleName, var bindable) in selectionSampleStates)
                 {
-                    yield return new DrawableTernaryButton(null)
+                    yield return new DrawableTernaryButton<GlobalAction>(null)
                     {
                         Current = bindable,
                         Description = string.Empty,
-                        CreateIcon = () => ComposeBlueprintContainer.GetIconForSample(sampleName),
+                        CreateIcon = () => HitObjectComposer.GetIconForSample(sampleName),
                         RelativeSizeAxes = Axes.None,
                         Size = new Vector2(40, 40),
+                        Action = HitObjectComposer.GetActionForSample(sampleName),
+                        Hotkey = new Hotkey(HitObjectComposer.GetActionForSample(sampleName)),
                     };
                 }
             }
 
             /// <remarks>
-            /// Should be kept in sync with <see cref="EditorSelectionHandler.AddHitSample"/>.
+            /// Should be kept in sync with <see cref="HitObjectComposer{T,T}.AddHitSample"/>.
             /// </remarks>
             private void addHitSample(string sampleName)
             {
@@ -641,68 +648,43 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 updateAdditionBankState();
             }
 
-            protected override bool OnKeyDown(KeyDownEvent e)
+            public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                if (e.ControlPressed || e.SuperPressed || !checkRightToggleFromKey(e.Key, out int rightIndex))
-                    return base.OnKeyDown(e);
+                if (e.Repeat)
+                    return base.OnPressed(e);
 
-                if (e.ShiftPressed || e.AltPressed)
+                switch (e.Action)
                 {
-                    string? newBank = banks.ElementAtOrDefault(rightIndex);
-
-                    if (string.IsNullOrEmpty(newBank))
-                        return true;
-
-                    if (e.ShiftPressed && newBank != EditorSelectionHandler.HIT_BANK_AUTO)
-                    {
-                        setBank(newBank);
-                        updatePrimaryBankState();
-                    }
-
-                    if (e.AltPressed)
-                    {
-                        setAdditionBank(newBank);
-                        updateAdditionBankState();
-                    }
-                }
-                else
-                {
-                    var item = togglesCollection.ElementAtOrDefault(rightIndex - 1);
-
-                    if (item is not DrawableTernaryButton button) return base.OnKeyDown(e);
-
-                    button.Toggle();
-                }
-
-                return true;
-            }
-
-            private bool checkRightToggleFromKey(Key key, out int index)
-            {
-                switch (key)
-                {
-                    case Key.Q:
-                        index = 0;
+                    case GlobalAction.EditorToggleNormalNormalBank:
+                        setBank(HitSampleInfo.BANK_NORMAL);
                         break;
 
-                    case Key.W:
-                        index = 1;
+                    case GlobalAction.EditorToggleNormalSoftBank:
+                        setBank(HitSampleInfo.BANK_SOFT);
                         break;
 
-                    case Key.E:
-                        index = 2;
+                    case GlobalAction.EditorToggleNormalDrumBank:
+                        setBank(HitSampleInfo.BANK_DRUM);
                         break;
 
-                    case Key.R:
-                        index = 3;
+                    case GlobalAction.EditorToggleAdditionAutoBank:
+                        setAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
                         break;
 
-                    default:
-                        index = -1;
+                    case GlobalAction.EditorToggleAdditionNormalBank:
+                        setAdditionBank(HitSampleInfo.BANK_NORMAL);
+                        break;
+
+                    case GlobalAction.EditorToggleAdditionSoftBank:
+                        setAdditionBank(HitSampleInfo.BANK_SOFT);
+                        break;
+
+                    case GlobalAction.EditorToggleAdditionDrumBank:
+                        setAdditionBank(HitSampleInfo.BANK_DRUM);
                         break;
                 }
 
-                return index >= 0;
+                return base.OnPressed(e);
             }
 
             #endregion
@@ -734,24 +716,34 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 LabelFormat = isMultipleValues
                     ? static _ => "(multiple)"
                     : v => LocalisableString.Interpolate($"{v / 100.0:P0}");
+                TextBox.PlaceholderText = isMultipleValues ? "(multiple)" : string.Empty;
             }
 
             public VolumeControl()
             {
-                updateLabelFormat();
-
-                // The `IsMultipleValues` / `updateLabelFormat()` hack above to jam an indicator of multiple active values does not work for tooltip
+                // The `IsMultipleValues` / `updateLabelFormat()` hack to jam an indicator of multiple active values does not work for tooltip
                 // because the tooltip machinery framework-side is too smart for it (the tooltip text is only regenerated on direct changes to `Current`).
                 // Just disable it to hide the skeleton. It's of little use anyhow.
                 TooltipFormat = _ => default;
                 TransferValueOnCommit = true;
             }
 
-            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new TextBox();
-
-            private partial class TextBox : FormNumberBox.InnerNumberBox
+            protected override void LoadComplete()
             {
-                public TextBox()
+                base.LoadComplete();
+                updateLabelFormat();
+                TextBox.Focused.BindValueChanged(focused =>
+                {
+                    if (focused.NewValue && IsMultipleValues)
+                        TextBox.Text = string.Empty;
+                });
+            }
+
+            internal override FormNumberBox.InnerNumberBox CreateTextBox() => new VolumeTextBox();
+
+            private partial class VolumeTextBox : FormNumberBox.InnerNumberBox
+            {
+                public VolumeTextBox()
                     : base(true)
                 {
                 }

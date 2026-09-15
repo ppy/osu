@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double calculateAcuteAngleBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj,
                                                        double currDistance, double currVelocity, double prevVelocity)
         {
-            const double acute_angle_multiplier = 2.41;
+            const double acute_angle_multiplier = 2.35;
 
             if (osuCurrObj.Angle == null || osuLastObj.Angle == null)
                 return 0;
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double velocityChangeBonus = overlapVelocityBuff * distRatio;
 
             // Penalize for rhythm changes.
-            velocityChangeBonus *= DiffUtils.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), 2);
+            velocityChangeBonus *= DiffUtils.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), 3);
 
             return velocityChangeBonus * velocity_change_multiplier;
         }

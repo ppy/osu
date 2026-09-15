@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 bodyPiece = new EditBodyPiece { Origin = Anchor.TopCentre },
                 headPiece = new Circle

@@ -30,6 +30,11 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
+        /// <summary>
+        /// Conversion factor from converting legacy positioning values (based in x480 dimensions) to x768.
+        /// </summary>
+        public const float STABLE_MAGIC_SCALE_FACTOR = 1.6f;
+
         protected virtual bool AllowManiaConfigLookups => true;
 
         /// <summary>
@@ -387,6 +392,7 @@ namespace osu.Game.Skinning
                                     var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
                                     var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
                                     var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
                                     Vector2 pos = new Vector2();
 
@@ -413,6 +419,12 @@ namespace osu.Game.Skinning
                                         leaderboard.X = 10;
                                     }
 
+                                    if (hitError != null)
+                                    {
+                                        hitError.Anchor = Anchor.BottomCentre;
+                                        hitError.Origin = Anchor.BottomCentre;
+                                    }
+
                                     foreach (var d in container.OfType<ISerialisableDrawable>())
                                         d.UsesFixedAnchor = true;
                                 })
@@ -420,6 +432,7 @@ namespace osu.Game.Skinning
                                     new LegacyDefaultComboCounter(),
                                     new SpectatorList(),
                                     new DrawableGameplayLeaderboard(),
+                                    new LegacyBarHitErrorMeter(),
                                 };
                             }
 
@@ -443,15 +456,6 @@ namespace osu.Game.Skinning
                                     songProgress.Y = container.ToLocalSpace(accuracy.ScreenSpaceDrawQuad.TopLeft).Y + (accuracy.ScreenSpaceDeltaToParentSpace(accuracy.ScreenSpaceDrawQuad.Size).Y / 2);
                                 }
 
-                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-
-                                if (hitError != null)
-                                {
-                                    hitError.Anchor = Anchor.BottomCentre;
-                                    hitError.Origin = Anchor.CentreLeft;
-                                    hitError.Rotation = -90;
-                                }
-
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
                                     d.UsesFixedAnchor = true;
                             })
@@ -461,7 +465,6 @@ namespace osu.Game.Skinning
                                     new LegacyScoreCounter(),
                                     new LegacyAccuracyCounter(),
                                     new LegacySongProgress(),
-                                    new BarHitErrorMeter(),
 
                                     // to match stable, health bars are in front of everything else
                                     // for the sake of hacky full screen area health bars
