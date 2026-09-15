@@ -35,6 +35,10 @@ namespace osu.Game.Overlays.Wiki
 
             Children = new Drawable[]
             {
+                new WikiSearch
+                {
+                    Depth = -1, // This depth is to ensure the suggestion result is always in front of other element.
+                },
                 createBlurb(html),
                 new GridContainer
                 {

@@ -7,14 +7,17 @@ using System.Net;
 using NUnit.Framework;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public partial class TestSceneWikiOverlay : OsuTestScene
+    public partial class TestSceneWikiOverlay : OsuManualInputManagerTestScene
     {
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
@@ -87,8 +90,36 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Error message not displayed", () => wiki.ChildrenOfType<SpriteText>().All(text => text.Text != "\"This_page_will_error_out\"."));
         }
 
+        [Test]
+        public void TestSuggestion()
+        {
+            setUpWikiResponse(responseMainPage);
+            AddStep("Show main page", () => wiki.ShowPage());
+
+            setUpWikiSuggestionResponse();
+
+            SearchTextBox? searchBox = null;
+
+            AddUntilStep("Wait for search box", () => (searchBox = wiki.ChildrenOfType<SearchTextBox>().FirstOrDefault()) != null);
+            AddStep("Focus search box", () => searchBox?.TakeFocus());
+            AddStep("Type in search box", () => searchBox!.Text = "wi");
+            AddUntilStep("Suggestions shown", () => wiki.ChildrenOfType<OsuClickableContainer>().Any(d => d.GetType().Name == "ResultItem"));
+
+            AddRepeatStep("Press up", () => InputManager.Key(Key.Up), 2);
+            AddAssert("Search box text is changed", () => searchBox?.Text == "osu! wiki maintainers");
+
+            AddRepeatStep("Press down", () => InputManager.Key(Key.Down), 3);
+            AddAssert("Search box text is changed again", () => searchBox?.Text == "osu! wiki");
+
+            AddStep("Press up again", () => InputManager.Key(Key.Up));
+            AddAssert("Search box text is restored", () => searchBox?.Text == "wi");
+
+            AddStep("Unfocus search box", () => searchBox?.KillFocus());
+            AddUntilStep("Suggestions cleared", () => wiki.ChildrenOfType<OsuClickableContainer>().All(d => d.GetType().Name != "ResultItem"));
+        }
+
         private void setUpWikiResponse(APIWikiPage r, string? redirectionPath = null)
-            => AddStep("set up response", () =>
+            => AddStep("set up wiki page response", () =>
             {
                 dummyAPI.HandleRequest = request =>
                 {
@@ -103,6 +134,19 @@ namespace osu.Game.Tests.Visual.Online
                     else
                         getWikiRequest.TriggerFailure(new WebException());
 
+                    return true;
+                };
+            });
+
+        private void setUpWikiSuggestionResponse()
+            => AddStep("set up wiki suggestion response", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    if (!(request is GetWikiSuggestionRequest getWikiSuggestionRequest))
+                        return false;
+
+                    getWikiSuggestionRequest.TriggerSuccess(responseWikiSuggestion);
                     return true;
                 };
             });
@@ -141,6 +185,80 @@ namespace osu.Game.Tests.Visual.Online
             Subtitle = null,
             Markdown =
                 "---\ntags:\n  - wiki standards\n---\n\n# Article styling criteria\n\n*For news posts, see: [News Styling Criteria](/wiki/News_styling_criteria)*\n\nThe article styling criteria (ASC) serve as the osu! wiki's enforced styling standards to keep consistency in clarity, formatting, and layout in all articles, and to help them strive for proper grammar, correct spelling, and correct information.\n\nThese articles are primarily tools to aid in reviewing and represent the consensus of osu! wiki contributors formed over the years. Since the wiki is a collaborative effort through the review process, it is not necessary to read or memorise all of the ASC at once. If you are looking to contribute, read the [contribution guide](/wiki/osu!_wiki/Contribution_guide).\n\nTo suggest changes regarding the article styling criteria, [open an issue on GitHub](https://github.com/ppy/osu-wiki/issues/new).\n\n## Standards\n\n*Notice: The articles below use [RFC 2119](https://tools.ietf.org/html/rfc2119) to describe requirement levels.*\n\nThe article styling criteria are split up into two articles:\n\n- [Formatting](Formatting): includes Markdown and other formatting rules\n- [Writing](Writing): includes writing practices and other grammar rules\n"
+        };
+
+        private APIWikiSuggestion[] responseWikiSuggestion => new[]
+        {
+            new APIWikiSuggestion
+            {
+                Highlight = "osu! *wi*ki",
+                Locale = "en",
+                Path = "osu!_wiki",
+                Title = "osu! wiki"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "*Wi*imote",
+                Locale = "en",
+                Path = "Gameplay/Input_device/Wiimote",
+                Title = "Wiimote"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "*Wi*nd Up (mod)",
+                Locale = "en",
+                Path = "Gameplay/Game_modifier/Wind_Up",
+                Title = "Wind Up (mod)"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "Hit *wi*ndow",
+                Locale = "en",
+                Path = "Gameplay/Hit_window",
+                Title = "Hit window"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "*Wi*ggle (mod)",
+                Locale = "en",
+                Path = "Gameplay/Game_modifier/Wiggle",
+                Title = "Wiggle (mod)"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "*Wi*nd Down (mod)",
+                Locale = "en",
+                Path = "Gameplay/Game_modifier/Wind_Down",
+                Title = "Wind Down (mod)"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "Offset *Wi*zard",
+                Locale = "en",
+                Path = "Client/Options/Offset_Wizard",
+                Title = "Offset Wizard"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "Song setup *wi*ndow",
+                Locale = "en",
+                Path = "Client/Beatmap_editor/Song_setup",
+                Title = "Song setup window"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "osu! *wi*ki maintainers",
+                Locale = "en",
+                Path = "People/osu!_wiki_maintainers",
+                Title = "osu! wiki maintainers"
+            },
+            new APIWikiSuggestion
+            {
+                Highlight = "nik's *Wi*nter Tour 2019",
+                Locale = "en",
+                Path = "Tournaments/NT/NWT_2019",
+                Title = "nik's Winter Tour 2019"
+            }
         };
     }
 }
