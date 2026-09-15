@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
@@ -23,8 +24,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
 
         public readonly double ColumnStrainTime;
 
-        public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, List<DifficultyHitObject>[] perColumnObjects, int index)
-            : base(hitObject, lastObject, clockRate, objects, index)
+        public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, List<DifficultyHitObject>[] perColumnObjects, int index, Mod[] mods)
+            : base(hitObject, lastObject, clockRate, objects, index, mods)
         {
             int totalColumns = perColumnObjects.Length;
             this.perColumnObjects = perColumnObjects;
