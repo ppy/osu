@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Select
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex % Math.Pow(2, FlashOffset) != 0)
+                if (beatIndex % getBeatsPerFlash(timingPoint.TimeSignature.Numerator) != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
@@ -203,6 +203,42 @@ namespace osu.Game.Screens.Select
                     .FadeTo(0.8f, 40, Easing.Out)
                     .Then()
                     .FadeTo(0.4f, length, Easing.Out);
+            }
+
+            private int getBeatsPerFlash(int beatsPerBar)
+            {
+                int beatsPerFlash = 1;
+
+                for (int depth = 1; depth <= FlashOffset; depth++)
+                {
+                    int target = 1 << depth;
+
+                    // power-of-two interval when it divides the bar or spans whole bars
+                    if (target > beatsPerFlash && (beatsPerBar % target == 0 || target % beatsPerBar == 0))
+                    {
+                        beatsPerFlash = target;
+                        continue;
+                    }
+
+                    // closest bar-aligned interval, increasing with panel depth
+                    int closest = beatsPerBar * (beatsPerFlash / beatsPerBar + 1);
+
+                    for (int interval = beatsPerFlash + 1; interval < beatsPerBar; interval++)
+                    {
+                        if (beatsPerBar % interval != 0)
+                            continue;
+
+                        if (Math.Abs(interval - target) < Math.Abs(closest - target))
+                            closest = interval;
+
+                        if (interval >= target)
+                            break;
+                    }
+
+                    beatsPerFlash = closest;
+                }
+
+                return beatsPerFlash;
             }
         }
 
