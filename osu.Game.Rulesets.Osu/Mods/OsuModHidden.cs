@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Osu.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHidden : ModHidden, IHidesApproachCircles
+    public class OsuModHidden : ModHidden, IHidesApproachCircles, IAdjustableWhenReplay
     {
         [SettingSource("Only fade approach circles", "The main object body will not fade when enabled.")]
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public const double FADE_IN_DURATION_MULTIPLIER = 0.4;
         public const double FADE_OUT_DURATION_MULTIPLIER = 0.3;
+
+        public BindableBool IsDisabled { get; } = new BindableBool();
 
         protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
@@ -62,6 +64,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void applyHiddenState(DrawableHitObject drawableObject, bool increaseVisibility)
         {
+            if (IsDisabled.Value)
+                return;
+
             if (!(drawableObject is DrawableOsuHitObject drawableOsuObject))
                 return;
 
