@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -190,14 +191,7 @@ namespace osu.Game.Screens.Select
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                int divisor = 1 << FlashOffset;
-                int beatsPerBar = timingPoint.TimeSignature.Numerator;
-
-                // Handle time signatures that don't fit the power-of-two rate, ie. 3/4
-                if (beatsPerBar % divisor != 0 && divisor % beatsPerBar != 0)
-                    divisor = beatsPerBar % (divisor >> 1) != 0 ? beatsPerBar << (FlashOffset - 1) : beatsPerBar;
-
-                if (beatIndex % divisor != 0)
+                if (beatIndex % getBeatsPerFlash(timingPoint.TimeSignature.Numerator) != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
@@ -209,6 +203,42 @@ namespace osu.Game.Screens.Select
                     .FadeTo(0.8f, 40, Easing.Out)
                     .Then()
                     .FadeTo(0.4f, length, Easing.Out);
+            }
+
+            private int getBeatsPerFlash(int beatsPerBar)
+            {
+                int beatsPerFlash = 1;
+
+                for (int depth = 1; depth <= FlashOffset; depth++)
+                {
+                    int target = 1 << depth;
+
+                    // power-of-two interval when it divides the bar or spans whole bars
+                    if (target > beatsPerFlash && (beatsPerBar % target == 0 || target % beatsPerBar == 0))
+                    {
+                        beatsPerFlash = target;
+                        continue;
+                    }
+
+                    // closest bar-aligned interval, increasing with panel depth
+                    int closest = beatsPerBar * (beatsPerFlash / beatsPerBar + 1);
+
+                    for (int interval = beatsPerFlash + 1; interval < beatsPerBar; interval++)
+                    {
+                        if (beatsPerBar % interval != 0)
+                            continue;
+
+                        if (Math.Abs(interval - target) < Math.Abs(closest - target))
+                            closest = interval;
+
+                        if (interval >= target)
+                            break;
+                    }
+
+                    beatsPerFlash = closest;
+                }
+
+                return beatsPerFlash;
             }
         }
 
