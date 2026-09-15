@@ -143,6 +143,20 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         }
 
         /// <summary>
+        /// Smoothly transitions from 0 to 1, and then slowly slowing down afterwards
+        /// </summary>
+        /// <param name="x">Value to calculate the function for</param>
+        /// <param name="start">Value at which function returns 0</param>
+        /// <param name="end">Value at which function returns 1</param>
+        /// <param name="power">The steepness of the function</param>
+        /// <param name="limit">Value the function is approaching after the end. Should be greater than 1</param>
+        public static double SmoothTransition(double x, double start, double end, double power = 2.5, double limit = 2)
+        {
+            x = Math.Pow(Math.Max(0.0, (x - start) / (end - start)), power);
+            return limit * x / (x + limit - 1);
+        }
+
+        /// <summary>
         /// Error function (https://en.wikipedia.org/wiki/Error_function)
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
