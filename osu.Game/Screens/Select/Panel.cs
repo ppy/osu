@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -191,7 +190,14 @@ namespace osu.Game.Screens.Select
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex % Math.Pow(2, FlashOffset) != 0)
+                int divisor = 1 << FlashOffset;
+                int beatsPerBar = timingPoint.TimeSignature.Numerator;
+
+                // Handle time signatures that don't fit the power-of-two rate, ie. 3/4
+                if (beatsPerBar % divisor != 0 && divisor % beatsPerBar != 0)
+                    divisor = beatsPerBar % (divisor >> 1) != 0 ? beatsPerBar << (FlashOffset - 1) : beatsPerBar;
+
+                if (beatIndex % divisor != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
