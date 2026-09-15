@@ -21,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
 using osuTK;
 using Realms;
 
@@ -44,6 +45,9 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private MusicController musicController { get; set; } = null!;
 
         private IDisposable? realmSubscription;
 
@@ -70,7 +74,8 @@ namespace osu.Game.Screens.Select
 
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>().OrderBy(c => c.Name), collectionsChanged);
 
-            Current.BindValueChanged(selectionChanged);
+            // Run once to update collection in music controller after re-entering select screen.
+            Current.BindValueChanged(selectionChanged, true);
         }
 
         private void collectionsChanged(IRealmCollection<BeatmapCollection> collections, ChangeSet? changes)
@@ -148,6 +153,9 @@ namespace osu.Game.Screens.Select
                     configCollectionFilter.Value = string.Empty;
                     break;
             }
+
+            if (filter.NewValue is not ManageCollectionsFilterMenuItem)
+                musicController.PlaylistCollection = filter.NewValue.Collection;
         }
 
         protected override void Dispose(bool isDisposing)
