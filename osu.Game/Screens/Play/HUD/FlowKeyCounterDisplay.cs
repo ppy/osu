@@ -30,9 +30,16 @@ namespace osu.Game.Screens.Play.HUD
 
         public FlowKeyCounterDisplay()
         {
+            AutoSizeAxes = Axes.X;
+            Content.AutoSizeAxes = Axes.X;
+            Content.RelativeSizeAxes = Axes.Y;
+
+            Height = 200;
+
             Child = KeyFlow = new FillFlowContainer<KeyCounter>
             {
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
                 Direction = FillDirection.Horizontal,
                 Spacing = new Vector2(2),
             };

@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public BindableColour4 AccentColour { get; } = new BindableColour4(Colour4.White);
 
-        private const float fade_height = 0.5f;
+        private const float fade_height = 100f;
 
         private readonly DrawablePool<FlowBar> barPool = new DrawablePool<FlowBar>(5);
 
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load()
         {
-            Height = 200f;
+            RelativeSizeAxes = Axes.Y;
             Width = 50f;
 
             Children = new Drawable[]
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play.HUD
                         },
                         new Box
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
                             Height = fade_height,
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,

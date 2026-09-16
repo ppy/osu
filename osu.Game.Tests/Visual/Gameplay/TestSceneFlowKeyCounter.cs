@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -18,10 +19,17 @@ namespace osu.Game.Tests.Visual.Gameplay
             Children = new Drawable[]
             {
                 trigger,
-                counter = new FlowKeyCounter(trigger)
+                new Container
                 {
+                    Height = 200,
+                    AutoSizeAxes = Axes.X,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Child = counter = new FlowKeyCounter(trigger)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
                 }
             };
 
