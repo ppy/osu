@@ -2,6 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Skinning
@@ -26,6 +29,13 @@ namespace osu.Game.Skinning
         {
             Lookup = lookup;
             Ruleset = ruleset;
+        }
+
+        public LocalisableString GetLocalisableDescription()
+        {
+            if (Ruleset == null) return Lookup.GetLocalisableDescription();
+
+            return SkinEditorStrings.WorkingLayerOfRuleset(Lookup.GetLocalisableDescription(), Ruleset.Name);
         }
 
         public bool Equals(GlobalSkinnableContainerLookup? other)
