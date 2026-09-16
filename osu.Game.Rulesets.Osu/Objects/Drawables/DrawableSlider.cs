@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // HeadCircle should not be added to this list, as it handles dimming itself
             TailCircle,
             repeatContainer,
-            // Body, (for fun :D)
+            Body,
         };
 
         /// <summary>
@@ -125,7 +125,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         circlePieceContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 1,
                             Children = new Drawable[]
                             {
                                 headCopy = createCirclePieceCopy(),
@@ -163,15 +162,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (Hidden != null)
             {
                 numberlessCirclesCopy = Hidden.LegacySliderFade;
-                circlePieceContainer.Alpha = numberlessCirclesCopy.Value ? 1 : 0;
+                circlePieceContainer.Alpha = numberlessCirclesCopy.Value ? 0 : 1;
                 numberlessCirclesCopy.BindValueChanged(onNumberlessCirclesCopyChanged, true);
+                return;
+            }
+            else
+            {
+                circlePieceContainer.Alpha = 0;
+                return;
             }
 
         }
 
         private void onNumberlessCirclesCopyChanged(ValueChangedEvent<bool> visible)
         {
-            circlePieceContainer.FadeTo(visible.NewValue ? 1 : 0, HitObject.TimeFadeIn);
+            circlePieceContainer.FadeTo(visible.NewValue ? 0 : 1, HitObject.TimeFadeIn);
         }
         private static SkinnableDrawable createCirclePieceCopy() => new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderHeadNumberlessHitCircle), _ => new NumberlessMainCirclePiece(true))
         {
@@ -404,7 +409,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateInitialTransforms();
 
             Body.FadeInFromZero(HitObject.TimeFadeIn);
-            circlePieceContainer.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateStartTimeStateTransforms()
@@ -460,6 +464,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Body.Alpha = Alpha;
                 Alpha = 1;
             }
+            headCopy.Alpha = Alpha;
+            tailCopy.Alpha = Alpha;
 
             LifetimeEnd = HitStateUpdateTime + 700;
         }
