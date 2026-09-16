@@ -10,30 +10,40 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
+using ClientChatStrings = osu.Game.Localisation.ChatStrings;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
-    public partial class RankedPlayChatDisplay : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public partial class RankedPlayChatDisplay : VisibilityContainer, IKeyBindingHandler<GlobalAction>, IFocusManager
     {
         [Resolved]
         private ChannelManager? channelManager { get; set; }
 
         [Resolved]
         private RealmKeyBindingStore keyBindingStore { get; set; } = null!;
+
+        private IFocusManager parentFocusManager = null!;
 
         private readonly MultiplayerRoom room;
 
@@ -42,11 +52,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private Channel? channel;
 
-        private const float width = 320;
+        private const float chatbox_width = 320;
 
         public RankedPlayChatDisplay(MultiplayerRoom room)
         {
-            Size = new Vector2(width, 160);
+            RelativeSizeAxes = Axes.Y;
+            Width = chatbox_width * 1.5f;
             this.room = room;
         }
 
@@ -59,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    RelativeSizeAxes = Axes.X,
+                    Width = chatbox_width,
                     Height = 30,
                     CornerRadius = 10,
                     ReleaseFocusOnCommit = true,
@@ -74,6 +85,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
             base.LoadComplete();
 
+            parentFocusManager = GetContainingFocusManager()!;
+
             resetPlaceholderText();
             textbox.OnCommit += onCommit;
 
@@ -83,17 +96,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             textbox.Current.BindTo(channel.TextBoxMessage);
 
-            AddInternal(new Container
+            AddInternal(new ChatContextMenuContainer
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Bottom = 35 },
                 Child = chatHistory = new BubbleChatHistory(channel)
                 {
-                    RelativeSizeAxes = Axes.X,
-                }
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.X
+                },
             });
         }
 
@@ -159,6 +173,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         {
         }
 
+        public void TriggerFocusContention(Drawable? triggerSource)
+        {
+            if (triggerSource == null || triggerSource.IsRootedAt(chatHistory))
+                parentFocusManager.TriggerFocusContention(triggerSource);
+        }
+
+        public bool ChangeFocus(Drawable? potentialFocusTarget)
+        {
+            if (potentialFocusTarget == null || potentialFocusTarget.IsRootedAt(chatHistory))
+                return parentFocusManager.ChangeFocus(potentialFocusTarget);
+
+            return false;
+        }
+
         protected override void PopIn()
         {
             FinishTransforms();
@@ -194,6 +222,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 BackgroundFocused = Colour4.FromHex("222228");
                 BackgroundUnfocused = BackgroundFocused.Opacity(0.7f);
                 Placeholder.Colour = Color4.White;
+            }
+        }
+
+        private partial class ChatContextMenuContainer : OsuContextMenuContainer
+        {
+            public ChatContextMenuContainer()
+            {
+                Content.Anchor = Anchor.BottomRight;
+                Content.Origin = Anchor.BottomRight;
             }
         }
 
@@ -338,7 +375,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 channel.NewMessagesArrived -= onNewMessagesArrived;
             }
 
-            private partial class MessageBubble : CompositeDrawable
+            private partial class MessageBubble : CompositeDrawable, IHasContextMenu
             {
                 private readonly Message message;
 
@@ -359,6 +396,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 [Resolved]
                 private IAPIProvider api { get; set; } = null!;
 
+                [Resolved]
+                private Channel channel { get; set; } = null!;
+
+                [Resolved]
+                private IDialogOverlay? dialogOverlay { get; set; }
+
+                private const int padding = 8;
+                private const int avatar_offset = 20;
+
                 [BackgroundDependencyLoader]
                 private void load()
                 {
@@ -374,14 +420,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = api.LocalUser.Value.Id == message.Sender.Id
-                                        ? RankedPlayColourScheme.BLUE.PrimaryDarkest
-                                        : RankedPlayColourScheme.RED.PrimaryDarkest,
+                                    Colour = getColour(),
                                 },
                                 new Container
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding(8),
+                                    Padding = new MarginPadding(padding),
                                     Children = new Drawable[]
                                     {
                                         new CircularContainer
@@ -398,8 +442,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                                         },
                                         new OsuTextFlowContainer
                                         {
-                                            X = 20,
-                                            MaximumSize = new Vector2(width * 1.5f, 0),
+                                            X = avatar_offset,
+                                            MaximumSize = new Vector2(chatbox_width * 1.5f - avatar_offset - padding * 2, 0),
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             AutoSizeAxes = Axes.Both,
@@ -421,6 +465,37 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 public override void Hide()
                 {
                     this.FadeOut(200, Easing.OutQuint);
+                }
+
+                private Colour4 getColour()
+                {
+                    if (message is InfoMessage)
+                        return Color4Extensions.FromHex("#240d36");
+
+                    if (message.Sender.Id == api.LocalUser.Value.Id)
+                        return RankedPlayColourScheme.BLUE.PrimaryDarkest;
+
+                    return RankedPlayColourScheme.RED.PrimaryDarkest;
+                }
+
+                public MenuItem[]? ContextMenuItems
+                {
+                    get
+                    {
+                        if (message.Sender.Equals(APIUser.SYSTEM_USER))
+                            return null;
+
+                        if (message.Sender.Equals(api.LocalUser.Value))
+                            return null;
+
+                        return
+                        [
+                            new OsuMenuItem(UsersStrings.ReportButtonText, MenuItemType.Destructive, () => dialogOverlay?.Push(new ReportChatDialog(message)
+                            {
+                                Success = () => channel.AddNewMessages(new InfoMessage(ClientChatStrings.ReportConfirmation)),
+                            }))
+                        ];
+                    }
                 }
             }
         }
