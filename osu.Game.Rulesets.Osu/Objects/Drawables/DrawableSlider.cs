@@ -334,18 +334,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = SliderBody?.Size ?? Vector2.Zero;
             OriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
 
-            /*
-                        if (!relativeAnchorPositionLayout.IsValid)
-                        {
-                            Vector2 pos = Vector2.Divide(OriginPosition, DrawSize);
-                            foreach (var obj in NestedHitObjects)
-                                obj.RelativeAnchorPosition = pos;
-                            Ball.RelativeAnchorPosition = pos;
-
-                            relativeAnchorPositionLayout.Validate();
-                        }
-            */
-
             if (!relativeAnchorPositionLayout.IsValid && DrawSize != Vector2.Zero)
             {
                 Vector2 pos = Vector2.Divide(OriginPosition, DrawSize);
@@ -482,8 +470,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Body.Alpha = Alpha;
                 Alpha = 1;
             }
-            headCopy.Alpha = Alpha;
-            tailCopy.Alpha = Alpha;
 
             LifetimeEnd = HitStateUpdateTime + 700;
         }
