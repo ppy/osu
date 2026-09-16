@@ -204,20 +204,20 @@ namespace osu.Game.Screens.Select
                     .FadeTo(0.4f, length, Easing.Out);
             }
 
-            private int getBeatsPerFlash(int beatsPerBar)
+            private long getBeatsPerFlash(int beatsPerBar)
             {
-                int beatsPerFlash = 1;
+                long beatsPerFlash = 1;
 
                 for (int i = 0; i < DepthLevel; i++)
                 {
-                    int target = beatsPerFlash * 2;
+                    long target = beatsPerFlash * 2;
 
-                    int next = target;
+                    long next = target;
 
                     // only consider multiples of current beatsPerFlash, else this panel would sometimes flash without previous levels
                     //
                     // if already > beatsPerBar we are already at a multiple of beatsPerBar -> doubling was enough
-                    for (int candidate = target; candidate <= beatsPerBar; candidate += beatsPerFlash)
+                    for (long candidate = target; candidate <= beatsPerBar; candidate += beatsPerFlash)
                     {
                         // need to divide the bar evenly to not drift across bars
                         if (beatsPerBar % candidate != 0)
