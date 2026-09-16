@@ -211,32 +211,24 @@ namespace osu.Game.Screens.Select
 
                 for (int i = 0; i < DepthLevel; i++)
                 {
-                    // ideally flash half as fast as the previous level
                     int target = beatsPerFlash * 2;
 
-                    // a multiple of beatsPerBar always works in terms of bar alignment
-                    int closest = beatsPerFlash < beatsPerBar ? beatsPerBar : target;
+                    int next = target;
 
-                    // but we might be able to find a shorter working interval
-                    for (int candidate = beatsPerFlash + 1; candidate < beatsPerBar; candidate++)
+                    // only consider multiples of current beatsPerFlash, else this panel would sometimes flash without previous levels
+                    //
+                    // if already > beatsPerBar we are already at a multiple of beatsPerBar -> doubling was enough
+                    for (int candidate = target; candidate <= beatsPerBar; candidate += beatsPerFlash)
                     {
-                        // must divide the bar evenly, or the flash drifts against the music
+                        // need to divide the bar evenly to not drift across bars
                         if (beatsPerBar % candidate != 0)
                             continue;
 
-                        // must land on a flash from the depth before
-                        if (candidate % beatsPerFlash != 0)
-                            continue;
-
-                        if (Math.Abs(candidate - target) < Math.Abs(closest - target))
-                            closest = candidate;
-
-                        // can't find anything closer now
-                        if (candidate >= target)
-                            break;
+                        next = candidate;
+                        break;
                     }
 
-                    beatsPerFlash = closest;
+                    beatsPerFlash = next;
                 }
 
                 return beatsPerFlash;
