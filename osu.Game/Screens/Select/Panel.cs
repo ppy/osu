@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Select
 
         public partial class PulsatingBox : BeatSyncedContainer
         {
-            public int DepthLevel;
+            public int DepthLayer;
 
             private readonly Box box;
 
@@ -204,33 +204,33 @@ namespace osu.Game.Screens.Select
                     .FadeTo(0.4f, length, Easing.Out);
             }
 
-            private long getBeatsPerFlash(int beatsPerBar)
+            private int getBeatsPerFlash(int beatsPerBar)
             {
                 long beatsPerFlash = 1;
+                int remainingBar = beatsPerBar;
 
-                for (int i = 0; i < DepthLevel; i++)
+                for (int i = 0; i < DepthLayer; i++)
                 {
-                    long target = beatsPerFlash * 2;
+                    int factor = smallestFactorOrTwo(remainingBar);
 
-                    long next = target;
+                    beatsPerFlash *= factor;
 
-                    // only consider multiples of current beatsPerFlash, else this panel would sometimes flash without previous levels
-                    //
-                    // if already > beatsPerBar we are already at a multiple of beatsPerBar -> doubling was enough
-                    for (long candidate = target; candidate <= beatsPerBar; candidate += beatsPerFlash)
-                    {
-                        // need to divide the bar evenly to not drift across bars
-                        if (beatsPerBar % candidate != 0)
-                            continue;
-
-                        next = candidate;
-                        break;
-                    }
-
-                    beatsPerFlash = next;
+                    if (remainingBar % factor == 0)
+                        remainingBar /= factor;
                 }
 
-                return beatsPerFlash;
+                return beatsPerFlash > int.MaxValue ? int.MaxValue : (int)beatsPerFlash;
+            }
+
+            private static int smallestFactorOrTwo(int value)
+            {
+                for (int i = 2; i <= value / i; i++)
+                {
+                    if (value % i == 0)
+                        return i;
+                }
+
+                return value > 1 ? value : 2;
             }
         }
 
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Select
 
             // Slightly offset the flash animation based on the panel depth.
             // This assumes a minimum depth of -2 (groups).
-            selectionLayer.DepthLevel = -Item!.DepthLayer;
+            selectionLayer.DepthLayer = -Item!.DepthLayer;
 
             updateAccentColour();
 
