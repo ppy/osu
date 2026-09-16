@@ -67,18 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     Focus = onFocusGained,
                     FocusLost = onFocusLost
                 },
-                new Container
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Bottom = 35 },
-                    Child = chatHistory = new BubbleChatHistory
-                    {
-                        RelativeSizeAxes = Axes.X
-                    }
-                }
             };
         }
 
@@ -91,12 +79,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
             channel = channelManager?.JoinChannel(new Channel { Id = room.ChannelID, Type = ChannelType.Multiplayer, Name = $"#lazermp_{room.RoomID}" });
 
-            if (channel != null)
-            {
-                channel.NewMessagesArrived += onNewMessagesArrived;
+            if (channel == null) return;
 
-                textbox.Current.BindTo(channel.TextBoxMessage);
-            }
+            textbox.Current.BindTo(channel.TextBoxMessage);
+
+            AddInternal(new Container
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding { Bottom = 35 },
+                Child = chatHistory = new BubbleChatHistory(channel)
+                {
+                    RelativeSizeAxes = Axes.X,
+                }
+            });
         }
 
         private void onCommit(TextBox sender, bool newText)
@@ -112,12 +110,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 channelManager?.PostMessage(text, target: channel);
 
             textbox.Text = string.Empty;
-        }
-
-        private void onNewMessagesArrived(IEnumerable<Message> bundle)
-        {
-            foreach (var message in bundle)
-                chatHistory.PostMessage(message);
         }
 
         private void onFocusGained()
@@ -190,10 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             base.Dispose(isDisposing);
 
             if (channel != null)
-            {
-                channel.NewMessagesArrived -= onNewMessagesArrived;
                 textbox.Current.UnbindFrom(channel.TextBoxMessage);
-            }
         }
 
         private partial class ChatTextBox : StandAloneChatDisplay.ChatTextBox
@@ -225,6 +214,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             /// </summary>
             private const float time_before_disappear = 5000;
 
+            [Cached]
+            private readonly Channel channel;
+
             private readonly Container<MessageBubble> messageContainer;
 
             private bool expanded;
@@ -232,9 +224,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             private Sample messageReceivedSample = null!;
             private double? lastSamplePlayback;
 
-            public BubbleChatHistory()
+            public BubbleChatHistory(Channel channel)
             {
                 AutoSizeAxes = Axes.Y;
+
+                this.channel = channel;
 
                 InternalChild = messageContainer = new Container<MessageBubble>
                 {
@@ -247,6 +241,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             private void load(AudioManager audio)
             {
                 messageReceivedSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/message");
+
+                channel.NewMessagesArrived += onNewMessagesArrived;
             }
 
             /// <summary>
@@ -278,51 +274,51 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                     child.Show();
             }
 
-            /// <summary>
-            /// Posts a message.
-            /// </summary>
-            public void PostMessage(Message message)
+            private void onNewMessagesArrived(IEnumerable<Message> bundle)
             {
-                var newMessage = new MessageBubble(message)
+                foreach (var message in bundle)
                 {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    PostTime = Time.Current
-                };
-
-                messageContainer.Add(newMessage);
-
-                float offset = 0;
-
-                ScheduleAfterChildren(() =>
-                {
-                    // Layout bubbles, pushing all others upwards to make room for the new one.
-                    foreach (var child in messageContainer.Reverse())
+                    var newMessage = new MessageBubble(message)
                     {
-                        child.MoveToY(-offset, 400, Easing.OutPow10);
-                        offset += child.DrawHeight + message_spacing;
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        PostTime = Time.Current
+                    };
+
+                    messageContainer.Add(newMessage);
+
+                    float offset = 0;
+
+                    ScheduleAfterChildren(() =>
+                    {
+                        // Layout bubbles, pushing all others upwards to make room for the new one.
+                        foreach (var child in messageContainer.Reverse())
+                        {
+                            child.MoveToY(-offset, 400, Easing.OutPow10);
+                            offset += child.DrawHeight + message_spacing;
+                        }
+                    });
+
+                    // Hide any overflowing message.
+                    // Only need to handle the most-recently-overflowing one, because others would be handled in prior calls to this method.
+                    if (messageContainer.Count > max_length)
+                    {
+                        var lastBubble = messageContainer[messageContainer.Count - max_length - 1];
+
+                        lastBubble.Hide();
+                        lastBubble.Expire();
                     }
-                });
 
-                // Hide any overflowing message.
-                // Only need to handle the most-recently-overflowing one, because others would be handled in prior calls to this method.
-                if (messageContainer.Count > max_length)
-                {
-                    var lastBubble = messageContainer[messageContainer.Count - max_length - 1];
+                    newMessage.Show();
 
-                    lastBubble.Hide();
-                    lastBubble.Expire();
-                }
+                    playSample();
 
-                newMessage.Show();
-
-                playSample();
-
-                // If not in the expanded state, hide the new message after a short while.
-                if (!expanded)
-                {
-                    using (BeginDelayedSequence(time_before_disappear))
-                        newMessage.Hide();
+                    // If not in the expanded state, hide the new message after a short while.
+                    if (!expanded)
+                    {
+                        using (BeginDelayedSequence(time_before_disappear))
+                            newMessage.Hide();
+                    }
                 }
             }
 
@@ -333,6 +329,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
                 messageReceivedSample.Play();
                 lastSamplePlayback = Time.Current;
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                channel.NewMessagesArrived -= onNewMessagesArrived;
             }
 
             private partial class MessageBubble : CompositeDrawable

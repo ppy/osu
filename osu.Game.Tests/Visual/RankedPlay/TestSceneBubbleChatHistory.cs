@@ -12,11 +12,12 @@ namespace osu.Game.Tests.Visual.RankedPlay
     public partial class TestSceneBubbleChatHistory : OsuTestScene
     {
         private RankedPlayChatDisplay.BubbleChatHistory history = null!;
+        private Channel testChannel = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = history = new RankedPlayChatDisplay.BubbleChatHistory
+            Child = history = new RankedPlayChatDisplay.BubbleChatHistory(testChannel = new Channel())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.BottomCentre,
@@ -28,7 +29,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         public void TestPostMessages()
         {
             int messageId = 1;
-            AddRepeatStep("post message", () => history.PostMessage(new Message
+            AddRepeatStep("post message", () => testChannel.AddNewMessages(new Message
             {
                 Sender = new APIUser { Id = 2 },
                 Content = $"message {messageId++}",
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    history.PostMessage(new Message
+                    testChannel.AddNewMessages(new Message
                     {
                         Sender = new APIUser { Id = 2 },
                         Content = $"message {i}",
