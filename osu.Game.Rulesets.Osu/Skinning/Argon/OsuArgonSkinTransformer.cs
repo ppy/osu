@@ -52,10 +52,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                             return new ArgonMainCirclePiece(false);
 
                         case OsuSkinComponents.SliderHeadNumberlessHitCircle:
-                            return new ArgonNumberlessMainCirclePiece(true);
+                            return new ArgonNumberlessMainCirclePiece(false);
 
                         case OsuSkinComponents.SliderTailNumberlessHitCircle:
-                            return new ArgonNumberlessMainCirclePiece(true);
+                            return new ArgonNumberlessMainCirclePiece(false);
 
                         case OsuSkinComponents.SliderBody:
                             return new ArgonSliderBody

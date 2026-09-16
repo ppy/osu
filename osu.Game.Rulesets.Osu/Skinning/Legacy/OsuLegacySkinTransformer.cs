@@ -197,8 +197,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                             return null;
 
+                        case OsuSkinComponents.SliderHeadNumberlessHitCircle:
+                            if (hasHitCircle.Value)
+                                return new LegacyNumberlessMainCirclePiece();
+
+                            return null;
+
                         case OsuSkinComponents.SliderTailNumberlessHitCircle:
-                            return new LegacyNumberlessMainCirclePiece();
+                            if (hasHitCircle.Value)
+                                return new LegacyNumberlessMainCirclePiece();
+
+                            return null;
 
                         case OsuSkinComponents.SliderHeadHitCircle:
                             if (hasHitCircle.Value)

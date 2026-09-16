@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
@@ -10,19 +10,15 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Configuration;
-using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableSliderTail : DrawableOsuHitObject
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
-
-        public OsuModHidden? Hidden;
 
         public Slider? Slider => DrawableSlider?.HitObject;
 
@@ -68,12 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new Drawable[]
                     {
                         // no default for this; only visible in legacy skins.
-                        // CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderTailNumberlessHitCircle), _ => new NumberlessMainCirclePiece())
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
                     }
                 },
             });
@@ -106,8 +97,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Debug.Assert(HitObject.HitWindows != null);
 
-            // const float fade_out_time = 240;
-
             switch (state)
             {
                 case ArmedState.Idle:
@@ -120,9 +109,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 case ArmedState.Hit:
                     if (!hitAnimations.Value)
-                        /* if (Hidden != null && Hidden.LegacySliderFade != null && Hidden.LegacySliderFade.Value)
-                            this.FadeOut(fade_out_time).Expire();
-                        else */
                         this.FadeOut(60, Easing.Out);
                     else
                     {

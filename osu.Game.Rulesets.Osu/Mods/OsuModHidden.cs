@@ -82,6 +82,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             applyHiddenState(hitObject, false);
         }
 
+
         private void applyHiddenState(DrawableHitObject drawableObject, bool increaseVisibility)
         {
             if (!(drawableObject is DrawableOsuHitObject drawableOsuObject))
@@ -112,31 +113,33 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawableObject)
             {
                 case DrawableSliderHead: //temporary tweak until it will be correctly tweaked into objects code
-                    if (LegacySliderFade.Value)
-                        return; /*
-                    else using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        drawableObject.FadeOut(fadeDuration); */
+                    /* if (LegacySliderFade.Value)
+                        return;
+                    else */
+                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
+                        drawableObject.FadeOut(fadeDuration);
                     break;
 
                 case DrawableSliderTail:
-                    if (LegacySliderFade.Value)
+                    /* if (LegacySliderFade.Value)
                         return;
-                    else using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
+                    else */
+                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         drawableObject.FadeOut(fadeDuration);
                     break;
 
                 case DrawableSliderRepeat sliderRepeat:
-                    if (LegacySliderFade.Value)
+                    /* if (LegacySliderFade.Value)
                         return;
-                    else
-                    {
-                        using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                            // only apply to circle piece – reverse arrow is not affected by hidden.
-                            sliderRepeat.CirclePiece.FadeOut(fadeDuration);
+                    else */
+                    // {
+                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
+                        // only apply to circle piece – reverse arrow is not affected by hidden.
+                        sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
-                        using (drawableObject.BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
-                            sliderRepeat.FadeOut();
-                    }
+                    using (drawableObject.BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+                        sliderRepeat.FadeOut();
+                    // }
                     break;
 
                 case DrawableHitCircle circle:

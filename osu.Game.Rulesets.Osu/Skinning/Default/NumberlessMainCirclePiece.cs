@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
+// using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         private readonly ExplodePiece explode;
         private readonly GlowPiece glow;
 
-        public NumberlessMainCirclePiece()
+        public NumberlessMainCirclePiece(bool v)
         {
             Size = OsuHitObject.OBJECT_DIMENSIONS;
 
@@ -44,13 +44,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
+        /*
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
-            accentColour.BindTo(drawableObject.AccentColour);
-        }
+                    accentColour.BindTo(drawableObject.AccentColour);
+                }
+        */
 
         protected override void LoadComplete()
         {

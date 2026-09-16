@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -34,10 +35,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
 
+        [Resolved(canBeNull: true)]
+        protected OsuModHidden Hidden { get; private set; }
+
         [Cached]
         public DrawableSliderBall Ball { get; private set; }
 
         public SkinnableDrawable Body { get; private set; }
+
+        private const double numberlesscircle_fade_duration = 100;
 
         private ShakeContainer shakeContainer;
 
@@ -62,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public IBindable<int> PathVersion => pathVersion;
         private readonly Bindable<int> pathVersion = new Bindable<int>();
+        private IBindable<bool> numberlessCirclesCopy;
 
         public readonly SliderInputManager SliderInputManager;
 
@@ -69,6 +76,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container<DrawableSliderTail> tailContainer;
         private Container<DrawableSliderTick> tickContainer;
         private Container<DrawableSliderRepeat> repeatContainer;
+        private Container circlePieceContainer;
+        private SkinnableDrawable headCopy;
+        private SkinnableDrawable tailCopy;
         private PausableSkinnableSound slidingSample;
 
         private readonly LayoutValue relativeAnchorPositionLayout;
@@ -113,6 +123,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                         // actual tail container is placed here to ensure that tail hitobjects are processed after ticks/repeats.
                         // this is required for the correct operation of Score V2.
+                        circlePieceContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 1,
+                            Children = new Drawable[]
+                            {
+                                headCopy = createCirclePieceCopy(),
+                                tailCopy = createCirclePieceCopy(),
+                            }
+                        },
                         tailContainer,
                     }
                 },
@@ -129,14 +149,37 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            ScaleBindable.BindValueChanged(scale => Ball.Scale = new Vector2(scale.NewValue));
+            // ScaleBindable.BindValueChanged(scale => Ball.Scale = new Vector2(scale.NewValue));
+            ScaleBindable.BindValueChanged(scale =>
+            {
+                Ball.Scale = new Vector2(scale.NewValue);
+                headCopy.Scale = tailCopy.Scale = new Vector2(scale.NewValue);
+            }, true);
 
             AccentColour.BindValueChanged(colour =>
             {
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
+
+            if (Hidden != null)
+            {
+                numberlessCirclesCopy = Hidden.LegacySliderFade;
+                circlePieceContainer.Alpha = numberlessCirclesCopy.Value ? 1 : 0;
+                numberlessCirclesCopy.BindValueChanged(onNumberlessCirclesCopyChanged, true);
+            }
+
         }
+
+        private void onNumberlessCirclesCopyChanged(ValueChangedEvent<bool> visible)
+        {
+            circlePieceContainer.FadeTo(visible.NewValue ? 1 : 0, numberlesscircle_fade_duration);
+        }
+        private static SkinnableDrawable createCirclePieceCopy() => new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderHeadNumberlessHitCircle), _ => new NumberlessMainCirclePiece(true))
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+        };
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuSliderJudgementResult(HitObject, judgement);
 
@@ -153,6 +196,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void OnFree()
         {
+            if (numberlessCirclesCopy != null)
+            {
+                numberlessCirclesCopy.BindValueChanged(onNumberlessCirclesCopyChanged, true);
+                numberlessCirclesCopy = null;
+            }
+
             base.OnFree();
 
             PathVersion.UnbindFrom(HitObject.Path.Version);
@@ -273,15 +322,34 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = SliderBody?.Size ?? Vector2.Zero;
             OriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
 
-            if (!relativeAnchorPositionLayout.IsValid)
+            /*
+                        if (!relativeAnchorPositionLayout.IsValid)
+                        {
+                            Vector2 pos = Vector2.Divide(OriginPosition, DrawSize);
+                            foreach (var obj in NestedHitObjects)
+                                obj.RelativeAnchorPosition = pos;
+                            Ball.RelativeAnchorPosition = pos;
+
+                            relativeAnchorPositionLayout.Validate();
+                        }
+            */
+
+            if (!relativeAnchorPositionLayout.IsValid && DrawSize != Vector2.Zero)
             {
                 Vector2 pos = Vector2.Divide(OriginPosition, DrawSize);
                 foreach (var obj in NestedHitObjects)
                     obj.RelativeAnchorPosition = pos;
                 Ball.RelativeAnchorPosition = pos;
-
+                headCopy.RelativeAnchorPosition = pos;
+                tailCopy.RelativeAnchorPosition = pos;
                 relativeAnchorPositionLayout.Validate();
             }
+            if (HeadCircle != null)
+                headCopy.Position = HeadCircle.Position;
+
+            if (TailCircle != null)
+                tailCopy.Position = TailCircle.Position;
+
         }
 
         public override void OnKilled()

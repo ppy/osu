@@ -5,29 +5,18 @@
 
 using System.Diagnostics;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
-using osu.Game.Rulesets.Osu.Mods;
+
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableSliderHead : DrawableHitCircle
     {
         public new SliderHeadCircle HitObject => (SliderHeadCircle)base.HitObject;
-
-        public OsuModHidden? Hidden { get; set; }
-
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         private readonly IBindable<int> pathVersion = new Bindable<int>();
-
-        protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
-
-        public SkinnableDrawable? CirclePiece { get; private set; }
-
-        private Container scaleContainer = null!;
 
         public DrawableSliderHead()
         {
