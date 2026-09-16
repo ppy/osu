@@ -33,6 +33,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Drawable scaleContainer;
 
+        public double ArrowHitAnimationTime => DrawableSlider?.LegacySliderFade.Value == true
+            ? Math.Max(HitStateUpdateTime, DrawableSlider.HitObject.EndTime)
+            : HitStateUpdateTime;
+
         public DrawableSliderRepeat()
             : base(null)
         {
@@ -96,6 +100,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateHitStateTransforms(state);
 
             double animDuration = Math.Min(300, HitObject.SpanDuration);
+            double fadeOutDelay = ArrowHitAnimationTime - HitStateUpdateTime;
 
             switch (state)
             {
@@ -104,11 +109,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Miss:
-                    this.FadeOut(animDuration);
+                    this.Delay(fadeOutDelay).FadeOut(animDuration);
                     break;
 
                 case ArmedState.Hit:
-                    this.FadeOut(animDuration, Easing.Out);
+                    this.Delay(fadeOutDelay).FadeOut(animDuration, Easing.Out);
                     break;
             }
         }

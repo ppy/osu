@@ -84,10 +84,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.Update();
 
-            if (Time.Current >= drawableRepeat.HitStateUpdateTime && drawableRepeat.State.Value == ArmedState.Hit)
+            if (Time.Current >= drawableRepeat.ArrowHitAnimationTime && drawableRepeat.State.Value == ArmedState.Hit)
             {
                 double animDuration = Math.Min(300, drawableRepeat.HitObject.SpanDuration);
-                arrow.Scale = new Vector2(Interpolation.ValueAt(Time.Current, 1, 1.4f, drawableRepeat.HitStateUpdateTime, drawableRepeat.HitStateUpdateTime + animDuration, Easing.Out));
+                arrow.Scale = new Vector2(Interpolation.ValueAt(Time.Current, 1, 1.4f, drawableRepeat.ArrowHitAnimationTime, drawableRepeat.ArrowHitAnimationTime + animDuration, Easing.Out));
             }
             else
             {

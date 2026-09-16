@@ -57,6 +57,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
                         case OsuSkinComponents.SliderTailNumberlessHitCircle:
                             return new ArgonNumberlessMainCirclePiece(false);
 
+                        case OsuSkinComponents.ReverseArrow:
+                            return new ArgonReverseArrow();
+
                         case OsuSkinComponents.SliderBody:
                             return new ArgonSliderBody
                             {
@@ -74,9 +77,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
                         case OsuSkinComponents.SpinnerBody:
                             return new ArgonSpinner();
-
-                        case OsuSkinComponents.ReverseArrow:
-                            return new ArgonReverseArrow();
 
                         case OsuSkinComponents.FollowPoint:
                             return new ArgonFollowPoint();

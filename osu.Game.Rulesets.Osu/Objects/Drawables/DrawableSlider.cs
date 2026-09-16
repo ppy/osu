@@ -15,8 +15,10 @@ using osu.Framework.Layout;
 using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Skinning.Default;
@@ -33,6 +35,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public new OsuSliderJudgementResult Result => (OsuSliderJudgementResult)base.Result;
 
         [Resolved(canBeNull: true)]
+        private IReadOnlyList<Mod> mods { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private OsuRulesetConfigManager osuConfig { get; set; }
+
+        private readonly Bindable<bool> hitAnimations = new Bindable<bool>(true);
+
         protected OsuModHidden Hidden { get; private set; }
 
         public DrawableSliderHead HeadCircle => headContainer.Child;
@@ -51,6 +60,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             TailCircle,
             repeatContainer,
             Body,
+            circlePieceContainer,
         };
 
         /// <summary>
@@ -66,7 +76,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public IBindable<int> PathVersion => pathVersion;
         private readonly Bindable<int> pathVersion = new Bindable<int>();
-        private IBindable<bool> numberlessCirclesCopy;
+
+        private readonly BindableBool legacySliderFade = new BindableBool();
+
+        public IBindable<bool> LegacySliderFade => legacySliderFade;
 
         public readonly SliderInputManager SliderInputManager;
 
@@ -77,7 +90,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container circlePieceContainer;
         private SkinnableDrawable headCopy;
         private SkinnableDrawable tailCopy;
-
         private PausableSkinnableSound slidingSample;
 
         private readonly LayoutValue relativeAnchorPositionLayout;
@@ -116,21 +128,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new[]
                     {
                         Body = new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderBody), _ => new DefaultSliderBody(), confineMode: ConfineMode.NoScaling),
+                        circlePieceContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                tailCopy = createCirclePieceCopy(),
+                                headCopy = createCirclePieceCopy(),
+                            }
+                        },
                         // proxied here so that the tail is drawn under repeats/ticks - legacy skins rely on this
                         tailContainer.CreateProxy(),
                         tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                         repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                         // actual tail container is placed here to ensure that tail hitobjects are processed after ticks/repeats.
                         // this is required for the correct operation of Score V2.
-                        circlePieceContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                headCopy = createCirclePieceCopy(),
-                                tailCopy = createCirclePieceCopy(),
-                            }
-                        },
                         tailContainer,
                     }
                 },
@@ -159,25 +171,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
 
+            osuConfig?.BindWith(OsuRulesetSetting.HitAnimations, hitAnimations);
+
+            Hidden = mods?.OfType<OsuModHidden>().FirstOrDefault();
+
             if (Hidden != null)
-            {
-                numberlessCirclesCopy = Hidden.LegacySliderFade;
-                circlePieceContainer.Alpha = numberlessCirclesCopy.Value ? 0 : 1;
-                numberlessCirclesCopy.BindValueChanged(onNumberlessCirclesCopyChanged, true);
-                return;
-            }
-            else
-            {
-                circlePieceContainer.Alpha = 0;
-                return;
-            }
+                legacySliderFade.BindTo(Hidden.LegacySliderFade);
 
+            circlePieceContainer.Alpha = 0;
+            legacySliderFade.BindValueChanged(_ => updateCirclePieceCopiesVisibility());
         }
 
-        private void onNumberlessCirclesCopyChanged(ValueChangedEvent<bool> visible)
+        private bool circlePieceCopiesVisible => legacySliderFade.Value;
+
+        private void updateCirclePieceCopiesVisibility()
         {
-            circlePieceContainer.FadeTo(visible.NewValue ? 0 : 1, HitObject.TimeFadeIn);
+            if (HitObject == null)
+                return;
+
+            circlePieceContainer.ClearTransforms();
+            circlePieceContainer.Alpha = circlePieceCopiesVisible && Time.Current < HitStateUpdateTime ? 1 : 0;
         }
+
         private static SkinnableDrawable createCirclePieceCopy() => new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderHeadNumberlessHitCircle), _ => new NumberlessMainCirclePiece(true))
         {
             Anchor = Anchor.Centre,
@@ -199,18 +214,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void OnFree()
         {
-            if (numberlessCirclesCopy != null)
-            {
-                numberlessCirclesCopy.UnbindEvents();
-                numberlessCirclesCopy = null;
-            }
-
             base.OnFree();
 
             PathVersion.UnbindFrom(HitObject.Path.Version);
 
             slidingSample?.ClearSamples();
-
         }
 
         protected override void LoadSamples()
@@ -348,11 +356,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 tailCopy.RelativeAnchorPosition = pos;
                 relativeAnchorPositionLayout.Validate();
             }
+
             if (HeadCircle != null)
                 headCopy.Position = HeadCircle.Position;
 
-            if (TailCircle != null)
-                tailCopy.Position = TailCircle.Position;
+            tailCopy.Position = HitObject.Path.PositionAt(SliderBody?.SnakedEnd ?? 1);
         }
 
         public override void OnKilled()
@@ -409,6 +417,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateInitialTransforms();
 
             Body.FadeInFromZero(HitObject.TimeFadeIn);
+
+            if (circlePieceCopiesVisible)
+                circlePieceContainer.FadeInFromZero(HitObject.TimeFadeIn);
+            else
+                circlePieceContainer.FadeOut();
         }
 
         protected override void UpdateStartTimeStateTransforms()
@@ -424,6 +437,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateHitStateTransforms(state);
 
             const float fade_out_time = 240;
+
+            if (!hitAnimations.Value)
+                circlePieceContainer.FadeOut(60, Easing.Out);
+            else if (state != ArmedState.Hit)
+                circlePieceContainer.FadeOut(100);
 
             switch (state)
             {

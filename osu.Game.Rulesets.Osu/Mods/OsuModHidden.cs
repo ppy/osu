@@ -118,6 +118,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case DrawableSliderRepeat sliderRepeat:
+                    if (LegacySliderFade.Value)
+                        break;
+
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
