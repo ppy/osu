@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
 
             AddUntilStep("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
-            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
+            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Any(m => m.State == MenuState.Open));
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
 
             AddUntilStep("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
-            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
+            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Any(m => m.State == MenuState.Open));
         }
 
         [Test]

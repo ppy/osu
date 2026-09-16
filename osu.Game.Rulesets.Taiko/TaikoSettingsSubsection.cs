@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
@@ -14,8 +13,6 @@ namespace osu.Game.Rulesets.Taiko
 {
     public partial class TaikoSettingsSubsection : RulesetSettingsSubsection
     {
-        protected override LocalisableString Header => "osu!taiko";
-
         public TaikoSettingsSubsection(TaikoRuleset ruleset)
             : base(ruleset)
         {
@@ -26,6 +23,9 @@ namespace osu.Game.Rulesets.Taiko
         {
             var config = (TaikoRulesetConfigManager)Config;
 
+            FormCheckBox rateAdjustedAnimations;
+            FormCheckBox hitAnimations;
+
             Children = new Drawable[]
             {
                 new SettingsItemV2(new FormEnumDropdown<TaikoTouchControlScheme>
@@ -33,7 +33,13 @@ namespace osu.Game.Rulesets.Taiko
                     Caption = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
                 }),
-                new SettingsItemV2(new FormCheckBox
+                new SettingsItemV2(hitAnimations = new FormCheckBox
+                {
+                    Caption = RulesetSettingsStrings.HitAnimations,
+                    HintText = RulesetSettingsStrings.HitAnimationsTaikoTooltip,
+                    Current = config.GetBindable<bool>(TaikoRulesetSetting.HitAnimations)
+                }),
+                new SettingsItemV2(rateAdjustedAnimations = new FormCheckBox
                 {
                     Caption = RulesetSettingsStrings.RateAdjustedHitAnimation,
                     HintText = RulesetSettingsStrings.RateAdjustedHitAnimationTooltip,
@@ -43,6 +49,11 @@ namespace osu.Game.Rulesets.Taiko
                     ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
                 }
             };
+
+            hitAnimations.Current.BindValueChanged(val =>
+            {
+                rateAdjustedAnimations.Current.Disabled = !val.NewValue;
+            }, true);
         }
     }
 }

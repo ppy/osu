@@ -199,7 +199,7 @@ namespace osu.Game.Users
 
                     if (canDuelUser())
                     {
-                        items.Add(new OsuMenuItem("Duel", MenuItemType.Standard, () =>
+                        items.Add(new OsuMenuItem(ContextMenuStrings.DuelPlayer, MenuItemType.Standard, () =>
                         {
                             if (canDuelUser())
                                 queueController?.IssueDuel(queueController.SelectedPool.Value!, User.Id);

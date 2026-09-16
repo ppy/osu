@@ -24,6 +24,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -207,7 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Font = OsuFont.Style.Caption1,
-                                        Text = "(empty slot)"
+                                        Text = MultiplayerMatchStrings.EmptySlot,
                                     },
                                     Action = moveToSlot,
                                 }
@@ -337,7 +338,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 {
                     return new MenuItem[]
                     {
-                        new OsuMenuItem("Move to slot", MenuItemType.Highlighted, moveToSlot)
+                        new OsuMenuItem(MultiplayerMatchStrings.MoveToSlot, MenuItemType.Highlighted, moveToSlot)
                     };
                 }
 
@@ -354,7 +355,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Give host", MenuItemType.Standard, () =>
+                    new OsuMenuItem(MultiplayerMatchStrings.GiveHost, MenuItemType.Standard, () =>
                     {
                         // Ensure the local user is still host / a referee.
                         if (!client.IsHost && !client.IsReferee)
@@ -362,7 +363,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                         client.TransferHost(targetUser).FireAndForget();
                     }),
-                    new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
+                    new OsuMenuItem(MultiplayerMatchStrings.Kick, MenuItemType.Destructive, () =>
                     {
                         // Ensure the local user is still host.
                         if (!client.IsHost && !client.IsReferee)
@@ -387,7 +388,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             public KickButton()
             {
                 Icon = FontAwesome.Solid.UserTimes;
-                TooltipText = "Kick";
+                TooltipText = MultiplayerMatchStrings.Kick;
             }
 
             [BackgroundDependencyLoader]

@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mania.Difficulty.Evaluators;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
@@ -52,6 +53,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             + applyDecay(overallStrain, offset - current.Previous(0).StartTime, overall_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
-            => value * Math.Pow(decayBase, deltaTime / 1000);
+            => value * DiffUtils.Pow(decayBase, deltaTime / 1000);
     }
 }

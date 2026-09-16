@@ -8,6 +8,8 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using osu.Game.Utils;
 
+// ReSharper disable AccessToModifiedClosure
+
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]

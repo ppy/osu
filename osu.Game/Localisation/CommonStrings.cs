@@ -190,6 +190,11 @@ namespace osu.Game.Localisation
         public static LocalisableString General => new TranslatableString(getKey(@"general"), @"General");
 
         /// <summary>
+        /// "Open"
+        /// </summary>
+        public static LocalisableString OpenLink => new TranslatableString(getKey(@"open_link"), @"Open");
+
+        /// <summary>
         /// "Copy link"
         /// </summary>
         public static LocalisableString CopyLink => new TranslatableString(getKey(@"copy_link"), @"Copy link");
@@ -213,6 +218,21 @@ namespace osu.Game.Localisation
         /// "Delete..."
         /// </summary>
         public static LocalisableString DeleteWithConfirmation => new TranslatableString(getKey(@"delete_with_confrmation"), @"Delete...");
+
+        /// <summary>
+        /// "Go to beatmap"
+        /// </summary>
+        public static LocalisableString GoToBeatmap => new TranslatableString(getKey(@"go_to_beatmap"), @"Go to beatmap");
+
+        /// <summary>
+        /// "View in browser"
+        /// </summary>
+        public static LocalisableString ViewInBrowser => new TranslatableString(getKey(@"view_in_browser"), @"View in browser");
+
+        /// <summary>
+        /// "Create copy"
+        /// </summary>
+        public static LocalisableString CreateCopy => new TranslatableString(getKey(@"create_copy"), @"Create copy");
 
         /// <summary>
         /// "{0} item|{0} items"
