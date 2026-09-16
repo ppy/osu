@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -190,26 +191,7 @@ namespace osu.Game.Screens.Select
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                int divisor = 1 << DepthLevel;
-                int beatsPerBar = timingPoint.TimeSignature.Numerator;
-
-                // doesn't evenly fit the divisor into the bar, i.e. 3/4 on the set and group (depth 1 and 2)
-                if (beatsPerBar % divisor != 0 && divisor % beatsPerBar != 0)
-                {
-                    // If previous depth level divisor is a multiple of beatsPerPar already
-                    if (beatsPerBar % (divisor >> 1) != 0)
-                    {
-                        // double it once more to flash less often, instead of taking the same value
-                        divisor = beatsPerBar << (DepthLevel - 1);
-                    }
-                    else
-                    {
-                        // flash once per bar
-                        divisor = beatsPerBar;
-                    }
-                }
-
-                if (beatIndex % divisor != 0)
+                if (beatIndex % getBeatsPerFlash(timingPoint.TimeSignature.Numerator) != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
@@ -222,7 +204,45 @@ namespace osu.Game.Screens.Select
                     .Then()
                     .FadeTo(0.4f, length, Easing.Out);
             }
+
+            private int getBeatsPerFlash(int beatsPerBar)
+            {
+                int beatsPerFlash = 1;
+
+                for (int i = 0; i < DepthLevel; i++)
+                {
+                    // ideally flash half as fast as the previous level
+                    int target = beatsPerFlash * 2;
+
+                    // a multiple of beatsPerBar always works in terms of bar alignment
+                    int closest = beatsPerFlash < beatsPerBar ? beatsPerBar : target;
+
+                    // but we might be able to find a shorter working interval
+                    for (int candidate = beatsPerFlash + 1; candidate < beatsPerBar; candidate++)
+                    {
+                        // must divide the bar evenly, or the flash drifts against the music
+                        if (beatsPerBar % candidate != 0)
+                            continue;
+
+                        // must land on a flash from the depth before
+                        if (candidate % beatsPerFlash != 0)
+                            continue;
+
+                        if (Math.Abs(candidate - target) < Math.Abs(closest - target))
+                            closest = candidate;
+
+                        // can't find anything closer now
+                        if (candidate >= target)
+                            break;
+                    }
+
+                    beatsPerFlash = closest;
+                }
+
+                return beatsPerFlash;
+            }
         }
+
 
         protected override void LoadComplete()
         {
