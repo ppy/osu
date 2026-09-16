@@ -64,6 +64,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"simple #2", sendAmazingNotification);
             AddStep(@"progress #1", sendUploadProgress);
             AddStep(@"progress #2", sendDownloadProgress);
+            AddStep("outage", () => notificationOverlay.Post(new OutageNotification("Things are on fire. Investigating...")));
+            AddStep("failed submission", () => notificationOverlay.Post(new ScoreSubmissionFailureNotification("Score will not be submitted", "This beatmap does not match the online version. Please update or redownload it.")));
 
             checkProgressingCount(2);
 
@@ -592,8 +594,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
 
-                if (p != null)
-                    p.State = ProgressNotificationState.Active;
+                p?.State = ProgressNotificationState.Active;
             }
 
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))

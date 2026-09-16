@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestVelocityToolbox()
         {
-            OsuSliderVelocityToolboxGroup.ExpandableSliderVelocityControl velocitySlider = null!;
+            OsuSliderVelocityToolboxGroup.ExpandableSliderVelocityAdjustmentControl toolboxVelocityControl = null!;
             ExpandableButton useLastSliderButton = null!;
 
             AddStep("enter editor", () => Game.ScreenStack.Push(new EditorLoader()));
@@ -144,57 +144,51 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("retrieve controls", () =>
             {
                 var toolbox = this.ChildrenOfType<OsuSliderVelocityToolboxGroup>().Single();
-                velocitySlider = toolbox.ChildrenOfType<OsuSliderVelocityToolboxGroup.ExpandableSliderVelocityControl>().Single();
+                toolboxVelocityControl = toolbox.ChildrenOfType<OsuSliderVelocityToolboxGroup.ExpandableSliderVelocityAdjustmentControl>().Single();
                 useLastSliderButton = toolbox.ChildrenOfType<ExpandableButton>().Single();
             });
 
-            AddAssert("velocity slider at 1x", () => velocitySlider.Current.Value, () => Is.EqualTo(1));
-            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
-            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
+            AddAssert("velocity control at 1x", () => toolboxVelocityControl.Current.Value, () => Is.EqualTo(1));
+            expandRightToolbox();
             AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
 
             AddStep("seek to 5000", () => editorClock.Seek(5000));
-            AddStep("set 2x velocity", () => velocitySlider.Current.Value = 2);
+            AddStep("set 2x velocity", () => toolboxVelocityControl.Current.Value = 2);
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
-            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
-            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
+            expandRightToolbox();
             AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 6000", () => editorClock.Seek(6000));
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(2));
-            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
-            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
+            expandRightToolbox();
             AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 9000", () => editorClock.Seek(9000));
-            AddStep("set 3x velocity", () => velocitySlider.Current.Value = 3);
+            AddStep("set 3x velocity", () => toolboxVelocityControl.Current.Value = 3);
             placeSlider();
             AddAssert("placed slider has 3x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(3));
-            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
-            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
+            expandRightToolbox();
             AddAssert("use last slider button enabled", () => useLastSliderButton.Enabled.Value, () => Is.True);
 
             AddStep("seek to 10000", () => editorClock.Seek(10000));
-            AddStep("set 1x velocity", () => velocitySlider.Current.Value = 1);
+            AddStep("set 1x velocity", () => toolboxVelocityControl.Current.Value = 1);
             AddStep("use last slider velocity instead", () => useLastSliderButton.TriggerClick());
             placeSlider();
             AddAssert("placed slider has 3x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().Last().SliderVelocityMultiplier, () => Is.EqualTo(3));
-            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
-            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
+            expandRightToolbox();
             AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
 
             AddStep("seek back to 7000", () => editorClock.Seek(7000));
             placeSlider();
             AddAssert("placed slider has 2x velocity", () => editorBeatmap.HitObjects.OfType<Slider>().ElementAt(2).SliderVelocityMultiplier, () => Is.EqualTo(2));
-            AddStep("expand right toolbox", () => InputManager.MoveMouseTo(this.ChildrenOfType<ExpandingToolboxContainer>().Last()));
-            AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
+            expandRightToolbox();
             AddAssert("use last slider button disabled", () => useLastSliderButton.Enabled.Value, () => Is.False);
 
             AddStep("select fourth slider", () => editorBeatmap.SelectedHitObjects.Add(editorBeatmap.HitObjects[3]));
-            AddAssert("velocity slider at 3x", () => velocitySlider.Current.Value, () => Is.EqualTo(3));
-            AddStep("set 1.5x velocity", () => velocitySlider.Current.Value = 1.5);
+            AddAssert("velocity control at 3x", () => toolboxVelocityControl.Current.Value, () => Is.EqualTo(3));
+            AddStep("set 1.5x velocity", () => toolboxVelocityControl.Current.Value = 1.5);
             AddAssert("fourth slider has 1.5x velocity", () => ((Slider)editorBeatmap.HitObjects[3]).SliderVelocityMultiplier, () => Is.EqualTo(1.5));
 
             AddStep("select first and last slider", () =>
@@ -203,13 +197,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 editorBeatmap.SelectedHitObjects.Add(editorBeatmap.HitObjects[0]);
                 editorBeatmap.SelectedHitObjects.Add(editorBeatmap.HitObjects[^1]);
             });
-            AddAssert("velocity slider at 1x", () => velocitySlider.Current.Value, () => Is.EqualTo(1));
-            AddStep("set 5x velocity", () => velocitySlider.Current.Value = 5);
+            AddAssert("velocity control is indeterminate", () => toolboxVelocityControl.IsMultipleValues, () => Is.True);
+            AddStep("set 5x velocity", () => toolboxVelocityControl.Current.Value = 5);
             AddAssert("first slider has 5x velocity", () => ((Slider)editorBeatmap.HitObjects[0]).SliderVelocityMultiplier, () => Is.EqualTo(5));
             AddAssert("last slider has 5x velocity", () => ((Slider)editorBeatmap.HitObjects[^1]).SliderVelocityMultiplier, () => Is.EqualTo(5));
 
             AddStep("clear selection", () => editorBeatmap.SelectedHitObjects.Clear());
-            AddAssert("velocity slider at 2x", () => velocitySlider.Current.Value, () => Is.EqualTo(2));
+            AddAssert("velocity control at 2x", () => toolboxVelocityControl.Current.Value, () => Is.EqualTo(2));
 
             void placeSlider()
             {
@@ -218,6 +212,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 AddStep("start placement", () => InputManager.Click(MouseButton.Left));
                 AddStep("move mouse to bottom right", () => InputManager.MoveMouseTo(editor.ChildrenOfType<Playfield>().First().ScreenSpaceDrawQuad.BottomRight - new Vector2(50)));
                 AddStep("end placement", () => InputManager.Click(MouseButton.Right));
+            }
+
+            void expandRightToolbox()
+            {
+                AddStep("expand right toolbox", () =>
+                {
+                    var expandingToolboxContainer = this.ChildrenOfType<ExpandingToolboxContainer>().Last();
+                    InputManager.MoveMouseTo(expandingToolboxContainer.ScreenSpaceDrawQuad.TopRight + new Vector2(-1, 1));
+                });
+                AddUntilStep("wait for expand", () => useLastSliderButton.Expanded.Value, () => Is.True);
             }
         }
     }

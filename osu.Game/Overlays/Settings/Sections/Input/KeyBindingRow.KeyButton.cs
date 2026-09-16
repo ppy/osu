@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -156,7 +157,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 // For gameplay bindings, users care about being able to use both left / right shift as different bindings.
                 // For global bindings, it's better to combine both of these into a virtual key which covers both side modifiers.
-                var combination = KeyBinding.Value.RulesetName == null
+                var combination = (KeyBinding.Value.RulesetName == null || KeyBinding.Value.Variant == Ruleset.EDITOR_VARIANT)
                     ? keys.Select(k => k.GetVirtualKey() ?? k).ToArray()
                     : keys;
 

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        public override int Version => 20251020;
+        public override int Version => 20260706;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -66,11 +66,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int totalHits = beatmap.HitObjects.Count;
 
+            double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
+            double aimNoSlidersRating = calculateAimDifficultyRating(aimNoSlidersDifficultyValue);
+
             double sliderFactor = aimDifficultyValue > 0
-                ? calculateAimDifficultyRating(aimNoSlidersDifficultyValue) / calculateAimDifficultyRating(aimDifficultyValue)
+                ? aimNoSlidersRating / aimRating
                 : 1;
 
-            double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
             double speedRating = calculateDifficultyRating(speedDifficultyValue);
             double readingRating = calculateDifficultyRating(readingDifficultyValue);
 

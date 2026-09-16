@@ -322,13 +322,14 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
             scrollToAndStartBinding("Left (rim)");
-            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("attempt to bind F to two keys", () => InputManager.Key(Key.F));
 
             KeyBindingConflictPopover popover = null;
             AddUntilStep("wait for popover", () => popover = panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("click first button", () => popover.ChildrenOfType<RoundedButton>().First().TriggerClick());
-            checkBinding("Left (centre)", "M1");
-            checkBinding("Left (rim)", "M2");
+            checkBinding("Left (centre)", "F");
+            checkBinding("Left (rim)", "D");
         }
 
         [Test]
@@ -341,13 +342,14 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
             scrollToAndStartBinding("Left (rim)");
-            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("attempt to bind F to two keys", () => InputManager.Key(Key.F));
 
             KeyBindingConflictPopover popover = null;
             AddUntilStep("wait for popover", () => popover = panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("click second button", () => popover.ChildrenOfType<RoundedButton>().ElementAt(1).TriggerClick());
             checkBinding("Left (centre)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
-            checkBinding("Left (rim)", "M1");
+            checkBinding("Left (rim)", "F");
         }
 
         [Test]
@@ -362,12 +364,13 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
             scrollToAndStartBinding("Left (rim)");
-            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("attempt to bind F to two keys", () => InputManager.Key(Key.F));
 
             AddUntilStep("wait for popover", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("press Esc", () => InputManager.Key(Key.Escape));
-            checkBinding("Left (centre)", "M1");
-            checkBinding("Left (rim)", "M2");
+            checkBinding("Left (centre)", "F");
+            checkBinding("Left (rim)", "D");
         }
 
         [Test]
@@ -382,12 +385,12 @@ namespace osu.Game.Tests.Visual.Settings
             });
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(panel.ScreenSpaceDrawQuad.Centre));
             scrollToAndStartBinding("Left (rim)");
-            AddStep("attempt to bind M1 to two keys", () => InputManager.Click(MouseButton.Left));
+            AddStep("attempt to bind F to two keys", () => InputManager.Key(Key.F));
 
             AddUntilStep("wait for popover", () => panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("press Enter", () => InputManager.Key(Key.Enter));
             checkBinding("Left (centre)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
-            checkBinding("Left (rim)", "M1");
+            checkBinding("Left (rim)", "F");
         }
 
         [Test]
@@ -406,7 +409,7 @@ namespace osu.Game.Tests.Visual.Settings
                 row.ChildrenOfType<DangerousRoundedButton>().Single().TriggerClick();
             });
             scrollToAndStartBinding("Left (rim)");
-            AddStep("bind M1", () => InputManager.Click(MouseButton.Left));
+            AddStep("bind F", () => InputManager.Key(Key.F));
 
             AddStep("reset Left (centre) to default", () =>
             {
@@ -417,7 +420,7 @@ namespace osu.Game.Tests.Visual.Settings
             KeyBindingConflictPopover popover = null;
             AddUntilStep("wait for popover", () => popover = panel.ChildrenOfType<KeyBindingConflictPopover>().SingleOrDefault(), () => Is.Not.Null);
             AddStep("click second button", () => popover.ChildrenOfType<RoundedButton>().ElementAt(1).TriggerClick());
-            checkBinding("Left (centre)", "M1");
+            checkBinding("Left (centre)", "F");
             checkBinding("Left (rim)", InputSettingsStrings.ActionHasNoKeyBinding.ToString());
         }
 
@@ -433,7 +436,7 @@ namespace osu.Game.Tests.Visual.Settings
             scrollToAndStartBinding("Left (centre)");
             clearBinding();
             scrollToAndStartBinding("Left (rim)");
-            AddStep("bind M1", () => InputManager.Click(MouseButton.Left));
+            AddStep("bind F", () => InputManager.Key(Key.F));
 
             AddStep("reset taiko section to default", () =>
             {

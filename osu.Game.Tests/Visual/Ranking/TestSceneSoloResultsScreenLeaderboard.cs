@@ -25,7 +25,7 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
-    public partial class TestSceneSoloResultsScreen : ScreenTestScene
+    public partial class TestSceneSoloResultsScreenLeaderboard : ScreenTestScene
     {
         private ScoreManager scoreManager = null!;
         private RulesetStore rulesetStore = null!;

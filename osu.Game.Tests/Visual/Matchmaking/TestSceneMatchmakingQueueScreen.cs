@@ -83,6 +83,18 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddWaitStep("wait a little bit", 10);
         }
 
+        [Test]
+        public void TestRoomScreenPushNullHandling()
+        {
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
+
+            AddWaitStep("wait for room leave", 5);
+
+            AddStep("change state to in room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom));
+
+            AddWaitStep("wait a little bit", 10);
+        }
+
         private static double generateCount(double x, double mean, double stdDev, double amplitude)
         {
             return amplitude * Math.Exp(-Math.Pow(x - mean, 2) / (2 * Math.Pow(stdDev, 2))) + Random.Shared.Next(300);

@@ -96,6 +96,7 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <remarks>
         /// Not populated if <see cref="IsLegacyScore"/> is <c>false</c>.
+        /// Always 0 on scores set in lazer.
         /// </remarks>
         public long? LegacyTotalScore { get; set; }
 

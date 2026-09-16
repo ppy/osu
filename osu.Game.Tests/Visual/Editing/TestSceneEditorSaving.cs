@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,10 +12,16 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -131,7 +137,7 @@ namespace osu.Game.Tests.Visual.Editing
         [FlakyTest]
         public void TestLengthAndStarRatingUpdated()
         {
-            WorkingBeatmap working = null;
+            WorkingBeatmap working = null!;
             double lastStarRating = 0;
             double lastLength = 0;
 
@@ -213,6 +219,47 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestBeatmapVersionPopulatedCorrectly()
         {
             AddAssert("beatmap version is populated", () => EditorBeatmap.BeatmapVersion > 0);
+        }
+
+        private DialogOverlay? dialogOverlay => Game.ChildrenOfType<DialogOverlay>().FirstOrDefault();
+
+        [Test]
+        public void TestReplacingEntireSetInsideEditorDoesNotCrashOnExitToSongSelect()
+        {
+            SaveEditor();
+            // required to provoke crash
+            AddStep("set sort mode to difficulty", () => Game.LocalConfig.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
+
+            string? currentDifficulty = null;
+
+            AddStep("create second difficulty", () =>
+            {
+                currentDifficulty = EditorBeatmap.BeatmapInfo.DifficultyName;
+                Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo);
+            });
+
+            AddUntilStep("wait for dialog", () => dialogOverlay?.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => dialogOverlay!.CurrentDialog!.PerformOkAction());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != currentDifficulty;
+            });
+            AddUntilStep("wait for editor load", () => Editor.ReadyForUse && dialogOverlay!.IsLoaded);
+
+            ReloadEditorToSameBeatmap();
+
+            Task<Live<BeatmapSetInfo>?> importAsUpdateTask = null!;
+            AddStep("import as update edited beatmap inside editor", () =>
+            {
+                using var stream = TestResources.GetTestBeatmapStream();
+                var memoryStream = new MemoryStream();
+                stream.CopyTo(memoryStream);
+                importAsUpdateTask = Game.BeatmapManager.ImportAsUpdate(new ProgressNotification(), new ImportTask(memoryStream, "test.osz"), Editor.Beatmap.Value.BeatmapSetInfo);
+            });
+            AddUntilStep("wait for import", () => importAsUpdateTask.Status, () => Is.EqualTo(TaskStatus.RanToCompletion));
+            AddStep("exit to song select", () => Editor.Exit());
         }
     }
 }
