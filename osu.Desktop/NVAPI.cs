@@ -367,6 +367,10 @@ namespace osu.Desktop
 
         static NVAPI()
         {
+            // The native entry points below are only supported in x86 and x64 processes.
+            if (RuntimeInformation.ProcessArchitecture is not (Architecture.X86 or Architecture.X64))
+                return;
+
             // TODO: check whether gpu vendor contains NVIDIA before attempting load?
 
             try

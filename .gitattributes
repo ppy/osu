@@ -23,3 +23,6 @@ App.config text eol=crlf
 .gitattributes text eol=lf
 *.md text eol=lf
 .travis.yml text eol=lf
+
+# Keep vendored upstream notices byte-for-byte identical to their recorded hashes.
+assets/native/win-arm64/*.txt -text -diff

@@ -1,0 +1,42 @@
+name: Windows ARM64
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Publish and load native dependencies
+    runs-on: windows-11-arm
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Publish
+        shell: pwsh
+        run: ./scripts/Publish-WindowsArm64.ps1
+
+      - name: Load native dependencies in an ARM64 process
+        shell: pwsh
+        run: ./scripts/Test-WindowsArm64Publish.ps1 -LoadNativeLibraries
+
+      - name: Decode MP3 and Vorbis samples
+        shell: pwsh
+        run: ./scripts/Test-WindowsArm64Audio.ps1
+
+      - name: Upload portable development build
+        uses: actions/upload-artifact@v7
+        with:
+          name: osu-windows-arm64-debug
+          path: artifacts/win-arm64/

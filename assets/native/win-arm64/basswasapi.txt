@@ -1,0 +1,171 @@
+BASSWASAPI 2.4
+Copyright (c) 2009-2023 Un4seen Developments Ltd. All rights reserved.
+
+Files that you should have found in the BASSWASAPI package
+==========================================================
+BASSWASAPI.TXT  This file
+BASSWASAPI.DLL  BASSWASAPI module
+BASSWASAPI.CHM  BASSWASAPI documentation
+X64\
+  BASSWASAPI.DLL  64-bit BASSWASAPI module
+C\              C/C++ API and examples...
+  BASSWASAPI.H    BASSWASAPI C/C++ header file
+  BASSWASAPI.LIB  BASSWASAPI import library
+  BASSWASAPI.SLN  Visual Studio solution for examples
+  MAKEFILE        Makefile for examples
+  MAKEFILE.IN     Makefile helper macros
+  X64\
+    BASSWASAPI.LIB  64-bit BASSWASAPI import library
+  CONTEST\        WASAPI version of the BASS console example
+    ...
+  LIST\           Lists WASAPI devices
+    ...
+  LIVEFX\         WASAPI version of the BASS full-duplex example
+    ...
+  LIVESPEC\       WASAPI version of the BASS live spectrum example
+    ...
+  RECTEST\        WASAPI version of the BASS recording example
+    ...
+  SPEAKERS\       WASAPI version of the BASS multi-speaker example
+    ...
+  SYNTH\          WASAPI version of the BASS synth example
+    ...
+  BIN\            Precompiled examples
+    CONTEST.EXE
+    LIST.EXE
+    LIVESPEC.EXE
+    RECTEST.EXE
+    SPEAKERS.EXE
+    SYNTH.EXE
+DELPHI\         Delphi API
+  BASSWASAPI.PAS  BASSWASAPI Delphi unit
+  RECTEST\        WASAPI version of the BASS recording example
+    ...
+VB\             Visual Basic API
+  BASSWASAPI.BAS  BASSWASAPI Visual Basic module
+  RECTEST\        WASAPI version of the BASS recording example
+    ...
+
+NOTE: To run the example EXEs, first you will have to copy BASSWASAPI.DLL and
+      BASS.DLL and BASSMIX.DLL into the same directory as them.
+
+NOTE: To build the examples, you will need to copy the BASS and BASSmix APIs
+      into the same directory as the BASSWASAPI API.
+
+
+What's the point?
+=================
+BASSWASAPI is an extension to the BASS audio library, providing the ability
+to use WASAPI output and input on Windows Vista and beyond. Both exclusive
+and shared WASAPI modes are supported, as are both WASAPI's regular and
+event-driven buffering systems.
+
+
+Requirements
+============
+Windows Vista or above is required; BASSWASAPI will load on older Windows,
+but it will not function. BASS (version 2.4.11 or above) is also required,
+and the BASSmix add-on is recommended for mixing purposes.
+
+
+Using BASSWASAPI
+================
+The usage information in the BASS.TXT file (from the BASS package) is also
+applicable to BASSWASAPI and other add-ons.
+
+TIP: The BASSWASAPI.CHM file should be put in the same directory as the
+     BASS.CHM file, so that the BASSWASAPI documentation can be accessed
+     from within the BASS documentation.
+
+
+Latest Version
+==============
+The latest version of BASSWASAPI can always be found at the BASS website:
+
+	www.un4seen.com
+
+
+Licence
+=======
+BASSWASAPI is free to use with BASS.
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, BASSWASAPI IS PROVIDED
+"AS IS", WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND/OR FITNESS FOR A PARTICULAR PURPOSE. THE AUTHORS SHALL NOT BE HELD
+LIABLE FOR ANY DAMAGE THAT MAY RESULT FROM THE USE OF BASSWASAPI. YOU USE
+BASSWASAPI ENTIRELY AT YOUR OWN RISK.
+
+Usage of BASSWASAPI indicates that you agree to the above conditions.
+
+All trademarks and other registered names contained in the BASSWASAPI
+package are the property of their respective owners.
+
+
+History
+=======
+These are the major (and not so major) changes in each release, along with the
+functions/options that are introduced/affected by them. There are other little
+tweaks and fixes made along the way too.
+
+2.4.4 - 19/5/2023
+-----------------
+* Shared mode resampling support
+    BASS_WASAPI_Init
+    CONTEST example updated
+* Faster device info retrieval
+    BASS_WASAPI_GetDeviceInfo
+
+2.4.3 - 27/3/2020
+-----------------
+* BASS channel support
+	WASAPIPROC_BASS (BASS_WASAPI_Init option)
+* Asynchronous output buffering
+	BASS_WASAPI_ASYNC (BASS_WASAPI_Init option)
+* Constant defined for push output option
+	WASAPIPROC_PUSH (BASS_WASAPI_Init option)
+* Raw mode support
+	BASS_WASAPI_RAW (BASS_WASAPI_Init flag)
+* Category support
+	BASS_WASAPI_CATEGORY_xxx (BASS_WASAPI_Init flags)
+* Any BASS device (not only "No Sound") can be used for buffering
+	BASS_WASAPI_BUFFER (BASS_WASAPI_Init flag)
+
+2.4.2 - 15/11/2017
+------------------
+* Support for lower latency shared mode on Windows 10
+	BASS_WASAPI_Init
+* A buffer length can be requested with event-driven shared mode
+	BASS_WASAPI_Init
+* Buffer size specification in samples
+	BASS_WASAPI_SAMPLES (BASS_WASAPI_Init flag)
+* Dither in conversion from floating-point to device format
+	BASS_WASAPI_DITHER (BASS_WASAPI_Init flag)
+* More precise latency measurement
+	BASS_WASAPI_GetData
+	BASS_WASAPI_GetLevel/Ex
+* Notification of unexpected stoppages
+	BASS_WASAPI_NOTIFY_FAIL (WASAPINOTIFYPROC notification)
+* Negative return values from output callback functions are treated as 0
+	WASAPIPROC
+* Fix for a handle leak in BASS_WASAPI_Free
+* LIVEFX example added, LIST and SYNTH examples updated
+
+2.4.1 - 10/2/2015
+-----------------
+* Extended level retrieval support
+	BASS_WASAPI_GetLevelEx
+* Device number for default loopback device
+	BASS_WASAPI_Init
+	BASS_WASAPI_CheckFormat
+
+2.4 - 13/9/2013
+---------------
+* First "final" release
+
+
+Bug reports, Suggestions, Comments, Enquiries, etc
+==================================================
+If you have any of the aforementioned please visit the BASS forum at the
+website.
+

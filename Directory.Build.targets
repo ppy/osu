@@ -1,0 +1,47 @@
+﻿<Project>
+  <!-- Keep the temporary NativeLibs supplements scoped to Windows ARM64
+       executables, including RID-less desktop builds on native ARM64 SDKs. -->
+  <PropertyGroup Condition="('$(OutputType)' == 'Exe' Or '$(OutputType)' == 'WinExe') And
+                            ('$(RuntimeIdentifier)' == 'win-arm64' Or
+                             ('$(RuntimeIdentifier)' == '' And '$(NETCoreSdkRuntimeIdentifier)' == 'win-arm64' And '$(TargetPlatformIdentifier)' == '' And
+                              ('$(PlatformTarget)' == '' Or '$(PlatformTarget)' == 'AnyCPU' Or '$(PlatformTarget)' == 'ARM64')))">
+    <_UseWindowsArm64NativeOverrides>true</_UseWindowsArm64NativeOverrides>
+    <_WindowsArm64NativeDirectory>$(MSBuildThisFileDirectory)assets/native/win-arm64/</_WindowsArm64NativeDirectory>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(_UseWindowsArm64NativeOverrides)' == 'true'">
+    <Content Include="$(MSBuildThisFileDirectory)assets/native/win-arm64/basswasapi.dll"
+             Link="basswasapi.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Pack="false" />
+    <Content Include="$(MSBuildThisFileDirectory)assets/native/win-arm64/*.txt;$(MSBuildThisFileDirectory)assets/native/win-arm64/README.md"
+             Link="licenses/bass/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Pack="false" />
+  </ItemGroup>
+
+  <!-- Replace the package asset itself instead of adding a second file with the
+       same destination. Transforms preserve its destination and package metadata,
+       including the runtime subdirectory used by RID-less builds. -->
+  <Target Name="ReplaceWindowsArm64BassBuildAsset" AfterTargets="ResolvePackageAssets"
+          Condition="'$(_UseWindowsArm64NativeOverrides)' == 'true'">
+    <ItemGroup>
+      <_WindowsArm64BassNativeAsset Include="@(NativeCopyLocalItems)"
+                                 Condition="'%(NativeCopyLocalItems.NuGetPackageId)' == 'ppy.osu.Framework.NativeLibs' And '%(NativeCopyLocalItems.PathInPackage)' == 'runtimes/win-arm64/native/bass.dll'" />
+      <_WindowsArm64BassRuntimeAsset Include="@(RuntimeTargetsCopyLocalItems)"
+                                  Condition="'%(RuntimeTargetsCopyLocalItems.NuGetPackageId)' == 'ppy.osu.Framework.NativeLibs' And '%(RuntimeTargetsCopyLocalItems.PathInPackage)' == 'runtimes/win-arm64/native/bass.dll'" />
+      <NativeCopyLocalItems Remove="@(_WindowsArm64BassNativeAsset)" />
+      <NativeCopyLocalItems Include="@(_WindowsArm64BassNativeAsset->'$(_WindowsArm64NativeDirectory)bass.dll')" />
+      <RuntimeTargetsCopyLocalItems Remove="@(_WindowsArm64BassRuntimeAsset)" />
+      <RuntimeTargetsCopyLocalItems Include="@(_WindowsArm64BassRuntimeAsset->'$(_WindowsArm64NativeDirectory)bass.dll')" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Publish normally reuses the build assets above. PreserveStoreLayout and
+       runtime-store publishing can resolve them from project.assets.json again. -->
+  <Target Name="ReplaceWindowsArm64BassPublishAsset" AfterTargets="_ResolveCopyLocalAssetsForPublish"
+          Condition="'$(_UseWindowsArm64NativeOverrides)' == 'true'">
+    <ItemGroup>
+      <_WindowsArm64BassPublishAsset Include="@(_ResolvedCopyLocalPublishAssets)"
+                                  Condition="'%(_ResolvedCopyLocalPublishAssets.NuGetPackageId)' == 'ppy.osu.Framework.NativeLibs' And $([System.String]::Copy('%(_ResolvedCopyLocalPublishAssets.Identity)').Replace('\', '/').EndsWith('/runtimes/win-arm64/native/bass.dll'))" />
+      <_ResolvedCopyLocalPublishAssets Remove="@(_WindowsArm64BassPublishAsset)" />
+      <_ResolvedCopyLocalPublishAssets Include="@(_WindowsArm64BassPublishAsset->'$(_WindowsArm64NativeDirectory)bass.dll')" />
+    </ItemGroup>
+  </Target>
+</Project>

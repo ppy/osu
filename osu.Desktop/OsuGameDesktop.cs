@@ -125,6 +125,10 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
+            // External and portable builds may not have Velopack's Update.exe.
+            if (IsPackageManaged)
+                return false;
+
             RestartOnExitAction = () => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId);
             return true;
         }
