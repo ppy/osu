@@ -200,12 +200,12 @@ namespace osu.Game.Screens.Select
                     if (beatsPerBar % (divisor >> 1) != 0)
                     {
                         // double it once more to flash less often, instead of taking the same value
-                        divisor =  beatsPerBar << (DepthLevel - 1);
+                        divisor = beatsPerBar << (DepthLevel - 1);
                     }
                     else
                     {
                         // flash once per bar
-                        divisor =  beatsPerBar;
+                        divisor = beatsPerBar;
                     }
                 }
 
