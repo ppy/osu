@@ -112,34 +112,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             switch (drawableObject)
             {
-                case DrawableSliderHead: //temporary tweak until it will be correctly tweaked into objects code
-                    /* if (LegacySliderFade.Value)
-                        return;
-                    else */
-                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        drawableObject.FadeOut(fadeDuration);
-                    break;
-
                 case DrawableSliderTail:
-                    /* if (LegacySliderFade.Value)
-                        return;
-                    else */
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         drawableObject.FadeOut(fadeDuration);
                     break;
 
                 case DrawableSliderRepeat sliderRepeat:
-                    /* if (LegacySliderFade.Value)
-                        return;
-                    else */
-                    // {
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
                         sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
                     using (drawableObject.BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
                         sliderRepeat.FadeOut();
-                    // }
                     break;
 
                 case DrawableHitCircle circle:

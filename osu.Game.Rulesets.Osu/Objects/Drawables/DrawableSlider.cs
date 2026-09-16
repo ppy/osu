@@ -32,18 +32,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public new OsuSliderJudgementResult Result => (OsuSliderJudgementResult)base.Result;
 
-        public DrawableSliderHead HeadCircle => headContainer.Child;
-        public DrawableSliderTail TailCircle => tailContainer.Child;
-
         [Resolved(canBeNull: true)]
         protected OsuModHidden Hidden { get; private set; }
+
+        public DrawableSliderHead HeadCircle => headContainer.Child;
+        public DrawableSliderTail TailCircle => tailContainer.Child;
 
         [Cached]
         public DrawableSliderBall Ball { get; private set; }
 
         public SkinnableDrawable Body { get; private set; }
-
-        private const double numberlesscircle_fade_duration = 100;
 
         private ShakeContainer shakeContainer;
 
@@ -52,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // HeadCircle should not be added to this list, as it handles dimming itself
             TailCircle,
             repeatContainer,
-            Body,
+            // Body, (for fun :D)
         };
 
         /// <summary>
@@ -79,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Container circlePieceContainer;
         private SkinnableDrawable headCopy;
         private SkinnableDrawable tailCopy;
+
         private PausableSkinnableSound slidingSample;
 
         private readonly LayoutValue relativeAnchorPositionLayout;
@@ -149,7 +148,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            // ScaleBindable.BindValueChanged(scale => Ball.Scale = new Vector2(scale.NewValue));
             ScaleBindable.BindValueChanged(scale =>
             {
                 Ball.Scale = new Vector2(scale.NewValue);
@@ -173,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void onNumberlessCirclesCopyChanged(ValueChangedEvent<bool> visible)
         {
-            circlePieceContainer.FadeTo(visible.NewValue ? 1 : 0, numberlesscircle_fade_duration);
+            circlePieceContainer.FadeTo(visible.NewValue ? 1 : 0, HitObject.TimeFadeIn);
         }
         private static SkinnableDrawable createCirclePieceCopy() => new SkinnableDrawable(new OsuSkinComponentLookup(OsuSkinComponents.SliderHeadNumberlessHitCircle), _ => new NumberlessMainCirclePiece(true))
         {
@@ -198,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (numberlessCirclesCopy != null)
             {
-                numberlessCirclesCopy.BindValueChanged(onNumberlessCirclesCopyChanged, true);
+                numberlessCirclesCopy.UnbindEvents();
                 numberlessCirclesCopy = null;
             }
 
@@ -207,6 +205,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PathVersion.UnbindFrom(HitObject.Path.Version);
 
             slidingSample?.ClearSamples();
+
         }
 
         protected override void LoadSamples()
@@ -349,7 +348,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (TailCircle != null)
                 tailCopy.Position = TailCircle.Position;
-
         }
 
         public override void OnKilled()
@@ -406,6 +404,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateInitialTransforms();
 
             Body.FadeInFromZero(HitObject.TimeFadeIn);
+            circlePieceContainer.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateStartTimeStateTransforms()
