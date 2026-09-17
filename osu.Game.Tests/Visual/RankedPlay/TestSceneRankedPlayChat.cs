@@ -6,13 +6,20 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Testing;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Chat;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osu.Game.Tests.Visual.Multiplayer;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.RankedPlay
 {
@@ -20,7 +27,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
     {
         private ChannelManager channelManager = null!;
         private Channel testChannel = null!;
+        private int channelIdSequence;
         private int messageIdSequence;
+
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -37,7 +47,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
         public void SetUp() => Schedule(() =>
         {
             messageIdSequence = 0;
-            testChannel = channelManager.JoinChannel(new Channel { Id = 1, Type = ChannelType.Multiplayer });
+            testChannel = channelManager.JoinChannel(new Channel { Id = ++channelIdSequence, Type = ChannelType.Multiplayer });
         });
 
         public override void SetUpSteps()
@@ -47,7 +57,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("join room", () =>
             {
                 var room = CreateDefaultRoom(MatchType.RankedPlay);
-                room.ChannelId = 1;
+                room.ChannelId = channelIdSequence;
                 JoinRoom(room);
             });
 
@@ -100,6 +110,52 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     }
                 }
             }).WaitSafely());
+        }
+
+        [Test]
+        public void TestReport()
+        {
+            ReportChatDialog dialog = null!;
+
+            AddStep("setup request handling", () =>
+            {
+                dummyAPI.HandleRequest += request =>
+                {
+                    if (request is ChatReportRequest chatReportRequest)
+                    {
+                        chatReportRequest.TriggerSuccess();
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+
+            AddStep("set pick state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = API.LocalUser.Value.OnlineID).WaitSafely());
+            postOpponentMessage("wangs");
+
+            AddStep("show chat history", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("right click message", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<OsuSpriteText>().First(t => t.Text == "wangs"));
+                InputManager.Click(MouseButton.Right);
+            });
+            AddStep("Select report option", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<Menu.DrawableMenuItem>().First(m => m.Item.Text.ToString() == "Report"));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("report dialog is present", () => (dialog = this.ChildrenOfType<ReportChatDialog>().Single()).IsPresent, () => Is.True);
+
+            AddStep("input reason", () => dialog.ChildrenOfType<OsuTextBox>().First().Text = "reason");
+            AddStep("send report", () => DialogOverlay.CurrentDialog!.PerformAction<ReportChatDialog.SubmitButton>());
+
+            AddUntilStep("Info message displayed", () => testChannel.Messages.Last(), Is.InstanceOf<InfoMessage>);
         }
 
         private void postLocalUserMessage(string content)
