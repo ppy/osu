@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -32,8 +34,13 @@ namespace osu.Game.Collections
         private BasicSearchTextBox searchTextBox = null!;
         private DrawableCollectionList list = null!;
 
+        public Func<IEnumerable<BeatmapInfo>>? FilteredBeatmapsProvider { get; set; }
+
         [Resolved]
         private MusicController? musicController { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         public ManageCollectionsDialog()
         {
@@ -217,6 +224,14 @@ namespace osu.Game.Collections
                     TextBox.Text = string.Empty;
                 };
             }
+        }
+
+        internal void RequestBatchAddToCollection(Live<BeatmapCollection> collection)
+        {
+            BatchAddToCollectionHandler.RequestSaveToCollection(
+                collection,
+                FilteredBeatmapsProvider,
+                dialog => Schedule(() => dialogOverlay?.Push(dialog)));
         }
     }
 }
