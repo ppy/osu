@@ -27,17 +27,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             double totalRatioCount = 0.0;
 
             List<double> recentRatios = new List<double>();
+
             TaikoDifficultyHitObject current = hitObject;
-            var previousHitObject = (TaikoDifficultyHitObject)current.Previous(1);
+            var previous = (TaikoDifficultyHitObject?)current.Previous();
 
             for (int i = 0; i < maxObjectsToCheck; i++)
             {
-                // Break if there is no valid previous object
-                if (current.Index <= 1)
+                if (previous == null)
                     break;
 
                 double currentRatio = current.RhythmData.Ratio;
-                double previousRatio = previousHitObject.RhythmData.Ratio;
+                double previousRatio = previous.RhythmData.Ratio;
 
                 recentRatios.Add(currentRatio);
 
@@ -49,7 +49,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
                     break;
                 }
 
-                current = previousHitObject;
+                current = previous;
+                previous = (TaikoDifficultyHitObject?)current.Previous();
             }
 
             // Ensure no division by zero
