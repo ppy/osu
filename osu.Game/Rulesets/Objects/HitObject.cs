@@ -161,6 +161,12 @@ namespace osu.Game.Rulesets.Objects
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
+        public virtual void UpdateNoteDensity(HitObject? lastObj)
+        {
+            foreach (var nestedObj in nestedHitObjects)
+                nestedObj.UpdateNoteDensity(lastObj);
+        }
+
         protected virtual void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
         }

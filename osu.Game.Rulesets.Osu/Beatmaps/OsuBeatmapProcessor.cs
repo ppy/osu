@@ -47,6 +47,18 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             base.PostProcess();
 
             ApplyStacking(Beatmap);
+            ComputeNoteDensity(Beatmap);
+        }
+
+        internal static void ComputeNoteDensity(IBeatmap beatmap)
+        {
+            HitObject? lastObj = null;
+
+            foreach (var obj in beatmap.HitObjects)
+            {
+                obj.UpdateNoteDensity(lastObj);
+                lastObj = obj;
+            }
         }
 
         internal static void ApplyStacking(IBeatmap beatmap)
