@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public partial class BeatmapListingSearchControl : CompositeDrawable
     {
         /// <summary>
-        /// Any time the text box receives key events (even while masked).
+        /// Invoked when the user interacts with the search box in a way that aims to mutate its state.
         /// </summary>
         public Action? TypingStarted;
 
@@ -175,7 +176,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private partial class BeatmapSearchTextBox : BasicSearchTextBox
         {
             /// <summary>
-            /// Any time the text box receives key events (even while masked).
+            /// Invoked when the user interacts with this text box in a way that aims to mutate its state.
             /// </summary>
             public Action? TextChanged;
 
@@ -186,9 +187,15 @@ namespace osu.Game.Overlays.BeatmapListing
                 PlaceholderText = BeatmapsStrings.ListingSearchPrompt;
             }
 
-            protected override bool OnKeyDown(KeyDownEvent e)
+            protected override void OnUserTextAdded(string added)
             {
-                if (!base.OnKeyDown(e))
+                base.OnUserTextAdded(added);
+                TextChanged?.Invoke();
+            }
+
+            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
+            {
+                if (!base.OnPressed(e))
                     return false;
 
                 TextChanged?.Invoke();
