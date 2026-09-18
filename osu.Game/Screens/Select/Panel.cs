@@ -206,12 +206,12 @@ namespace osu.Game.Screens.Select
 
             /// <summary>
             /// Returns the interval between flashes for this panel as a number of beats.
-            //
-            // Interval has the following properties:
-            //   1) stay bar aligned
-            //   2) higher DepthLayers flash less often than lower DepthLayers
-            //   3) higher DepthLayers only flash when lower DepthLayers flash as well
-            //   4) next smallest possible value to fulfill 1,2 and 3
+            ///
+            /// Interval has the following properties:
+            ///   1) stay bar aligned
+            ///   2) higher DepthLayers flash less often than lower DepthLayers
+            ///   3) higher DepthLayers only flash when lower DepthLayers flash as well
+            ///   4) next smallest possible value to fulfill 1,2 and 3
             /// </summary>
             private long getFlashInterval(int beatsPerBar)
             {
