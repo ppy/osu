@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -51,6 +52,8 @@ namespace osu.Game.Rulesets.Osu.UI
         public override Quad SkinnableComponentScreenSpaceDrawQuad => playfieldBorder.ScreenSpaceDrawQuad;
 
         private readonly Container judgementAboveHitObjectLayer;
+
+        private readonly Bindable<bool> showSliderTickMissMarkers = new Bindable<bool>(true);
 
         public OsuPlayfield()
         {
@@ -135,6 +138,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private void load(OsuRulesetConfigManager? config, IBeatmap? beatmap)
         {
             config?.BindWith(OsuRulesetSetting.PlayfieldBorderStyle, playfieldBorder.PlayfieldBorderStyle);
+            config?.BindWith(OsuRulesetSetting.ShowSliderTickMissMarkers, showSliderTickMissMarkers);
 
             var osuBeatmap = (OsuBeatmap?)beatmap;
 
@@ -193,6 +197,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
+
+            // LargeTickMiss = slider ticks / ends / repeats; IgnoreMiss = slider tails.
+            if (!showSliderTickMissMarkers.Value
+                && result.Type is HitResult.LargeTickMiss or HitResult.IgnoreMiss)
+            {
+                return;
+            }
 
             var explosion = judgementPooler.Get(result.Type, doj => doj.Apply(result, judgedObject));
 
