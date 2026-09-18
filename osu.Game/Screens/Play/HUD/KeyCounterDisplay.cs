@@ -43,13 +43,12 @@ namespace osu.Game.Screens.Play.HUD
         protected KeyCounterDisplay()
         {
             AddInternal(Content);
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, DrawableRuleset? drawableRuleset)
         {
-            AutoSizeAxes = Axes.Both;
-
             config.BindWith(OsuSetting.KeyOverlay, ConfigVisibility);
 
             if (drawableRuleset != null)
