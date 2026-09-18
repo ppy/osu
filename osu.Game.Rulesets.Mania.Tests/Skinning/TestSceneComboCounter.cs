@@ -16,7 +16,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Tests.Skinning
 {
-    public partial class TestSceneComboCounter : ManiaSkinnableTestScene
+    public partial class TestSceneComboCounter : ManiaSkinnableTestSceneScrolling
     {
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor(new ManiaRuleset());
