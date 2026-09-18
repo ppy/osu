@@ -159,7 +159,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 case GlobalAction.ToggleChatFocus:
                     if (!textbox.HasFocus)
                     {
-                        Schedule(() => textbox.TakeFocus());
+                        Schedule(() => parentFocusManager.ChangeFocus(textbox));
                         return true;
                     }
 
