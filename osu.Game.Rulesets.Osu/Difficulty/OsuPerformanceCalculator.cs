@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
@@ -239,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
-            double speedValue = HarmonicSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            double speedValue = DifficultyToPerformance(attributes.SpeedDifficulty);
 
             if (effectiveMissCount > 0)
             {
@@ -332,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeReadingValue(OsuDifficultyAttributes attributes)
         {
-            double readingValue = HarmonicSkill.DifficultyToPerformance(attributes.ReadingDifficulty);
+            double readingValue = DifficultyToPerformance(attributes.ReadingDifficulty);
 
             if (effectiveMissCount > 0)
                 readingValue *= calculateMissPenalty(effectiveMissCount + aimEstimatedSliderBreaks, attributes.ReadingDifficultNoteCount);
@@ -490,7 +489,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (speedDeviation == null)
                 return 0;
 
-            double speedValue = HarmonicSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
+            double speedValue = DifficultyToPerformance(attributes.SpeedDifficulty);
 
             // Decides a point where the PP value achieved compared to the speed deviation is assumed to be tapped improperly. Any PP above this point is considered "excess" speed difficulty.
             // This is used to cause PP above the cutoff to scale logarithmically towards the original speed value thus nerfing the value.

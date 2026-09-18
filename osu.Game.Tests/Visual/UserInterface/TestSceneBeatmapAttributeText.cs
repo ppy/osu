@@ -208,14 +208,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, IReadOnlyList<ISkillAttributes> skills)
                 => new DifficultyAttributes(mods, mods.OfType<TestMod>().SingleOrDefault()?.Difficulty.Value ?? 0);
 
             protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
                 => Array.Empty<DifficultyHitObject>();
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
-                => Array.Empty<Skill>();
+            protected override ISkill[] CreateSkills(IBeatmap beatmap, Mod[] mods, DifficultyHitObject[] difficultyHitObjects)
+                => Array.Empty<ISkill>();
         }
 
         private class TestPerformanceCalculator : PerformanceCalculator

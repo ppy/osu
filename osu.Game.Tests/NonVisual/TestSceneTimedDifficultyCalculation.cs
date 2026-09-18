@@ -173,7 +173,7 @@ namespace osu.Game.Tests.NonVisual
             {
             }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, IReadOnlyList<ISkillAttributes> skills)
                 => new TestDifficultyAttributes { Objects = beatmap.HitObjects.ToArray() };
 
             protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
@@ -194,21 +194,37 @@ namespace osu.Game.Tests.NonVisual
                 return objects;
             }
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[] { new PassThroughSkill(mods) };
+            protected override ISkill[] CreateSkills(IBeatmap beatmap, Mod[] mods, DifficultyHitObject[] difficultyHitObjects) => new ISkill[] { new PassThroughSkill(mods, difficultyHitObjects) };
 
-            private class PassThroughSkill : Skill
+            private class PassThroughSkill : ISkill
             {
-                public PassThroughSkill(Mod[] mods)
-                    : base(mods)
+                public class EmptySkillAttributes : ISkillAttributes
                 {
+                    public double Difficulty { get; init; } = 0;
+                    public List<double> ObjectDifficulties { get; init; } = [];
                 }
 
-                protected override double ProcessInternal(DifficultyHitObject current)
+                public PassThroughSkill(IReadOnlyList<Mod> mods, IReadOnlyList<DifficultyHitObject> difficultyHitObjects)
                 {
-                    return 0;
+                    Mods = mods;
+                    DifficultyHitObjects = difficultyHitObjects;
                 }
 
-                public override double DifficultyValue() => 1;
+                public IReadOnlyList<Mod> Mods { get; init; }
+                public IReadOnlyList<DifficultyHitObject> DifficultyHitObjects { get; init; }
+
+                public ISkillAttributes Process()
+                {
+                    return new EmptySkillAttributes();
+                }
+
+                public IEnumerable<TimedSkillAttributes> ProcessTimed()
+                {
+                    foreach (var difficultyHitObject in DifficultyHitObjects)
+                    {
+                        yield return new TimedSkillAttributes(new EmptySkillAttributes(), difficultyHitObject.EndTime);
+                    }
+                }
             }
         }
 
