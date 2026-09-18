@@ -404,7 +404,7 @@ namespace osu.Game.Overlays.SkinEditor
                 {
                     Children = new Drawable[]
                     {
-                        new SettingsDropdown<GlobalSkinnableContainerLookup?>
+                        new WorkingLayerDropdown
                         {
                             Items = availableTargets.Select(t => t.Lookup).Distinct(),
                             Current = selectedTarget,
@@ -782,6 +782,29 @@ namespace osu.Game.Overlays.SkinEditor
                 HeaderText = CommonStrings.RevertToDefault;
                 BodyText = SkinEditorStrings.RevertToDefaultDescription;
                 DangerousAction = revert;
+            }
+        }
+
+        public partial class WorkingLayerDropdown : SettingsDropdown<GlobalSkinnableContainerLookup?>
+        {
+            protected override OsuDropdown<GlobalSkinnableContainerLookup?> CreateDropdown() => new DropdownControl();
+
+            protected new partial class DropdownControl : OsuDropdown<GlobalSkinnableContainerLookup?>
+            {
+                public DropdownControl()
+                {
+                    RelativeSizeAxes = Axes.X;
+                }
+
+                protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
+
+                protected override LocalisableString GenerateItemText(GlobalSkinnableContainerLookup? item)
+                {
+                    if (item == null)
+                        return base.GenerateItemText(item);
+
+                    return item.GetLocalisableDescription();
+                }
             }
         }
 
