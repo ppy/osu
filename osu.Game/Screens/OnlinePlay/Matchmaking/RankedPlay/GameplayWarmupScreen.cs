@@ -164,7 +164,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             globalBeatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             globalRuleset.Value = ruleset;
-            globalMods.Value = item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+            globalMods.Value = Client.LocalUser!.Mods.Concat(item.RequiredMods).Select(m => m.ToMod(rulesetInstance)).ToArray();
 
             // Play the new track from its preview point.
             globalBeatmap.Value.PrepareTrackForPreview(false);

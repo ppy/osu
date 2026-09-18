@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         protected override MultiplayerLeaderboardProvider CreateLeaderboardProvider() =>
-            new MultiplayerLeaderboardProvider(MultiplayerUsers.ToArray())
+            new MultiplayerLeaderboardProvider(MultiplayerUsers.ToArray(), false)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
