@@ -79,6 +79,10 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 
             AddUntilStep("chat is focused", () => this.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().Single().HasFocus, () => Is.True);
+
+            AddStep("press escape", () => InputManager.Key(Key.Escape));
+
+            AddUntilStep("chat not focused", () => this.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().SingleOrDefault()?.HasFocus, () => Is.False);
         }
 
         [Test]
