@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Select
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex % getBeatsPerFlash(timingPoint.TimeSignature.Numerator) != 0)
+                if (beatIndex % getFlashInterval(timingPoint.TimeSignature.Numerator) != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
@@ -204,25 +204,39 @@ namespace osu.Game.Screens.Select
                     .FadeTo(0.4f, length, Easing.Out);
             }
 
-            private int getBeatsPerFlash(int beatsPerBar)
+            /// <summary>
+            /// Returns the interval between flashes for this panel as a number of beats.
+            //
+            // Interval has the following properties:
+            //   1) stay bar aligned
+            //   2) higher DepthLayers flash less often than lower DepthLayers
+            //   3) higher DepthLayers only flash when lower DepthLayers flash as well
+            //   4) next smallest possible value to fulfill 1,2 and 3
+            /// </summary>
+            private long getFlashInterval(int beatsPerBar)
             {
                 long beatsPerFlash = 1;
                 int remainingBar = beatsPerBar;
 
                 for (int i = 0; i < DepthLayer; i++)
                 {
-                    int factor = smallestFactorOrTwo(remainingBar);
+                    int factor = smallestPrimeFactor(remainingBar);
+
+                    // when running out of prime factors, use 2 for higher multiple of beatsPerBar
+                    if (factor <= 1)
+                        factor = 2;
 
                     beatsPerFlash *= factor;
 
+                    // divide out factor just used, so next iteration takes the next smallest prime factor
                     if (remainingBar % factor == 0)
                         remainingBar /= factor;
                 }
 
-                return beatsPerFlash > int.MaxValue ? int.MaxValue : (int)beatsPerFlash;
+                return beatsPerFlash;
             }
 
-            private static int smallestFactorOrTwo(int value)
+            private static int smallestPrimeFactor(int value)
             {
                 for (int i = 2; i <= value / i; i++)
                 {
@@ -230,7 +244,7 @@ namespace osu.Game.Screens.Select
                         return i;
                 }
 
-                return value > 1 ? value : 2;
+                return value;
             }
         }
 
