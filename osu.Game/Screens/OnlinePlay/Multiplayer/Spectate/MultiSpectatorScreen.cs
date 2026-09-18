@@ -295,7 +295,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void PassGameplay(int userId) => Schedule(() =>
         {
             var instance = instances.Single(i => i.UserId == userId);
-            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock);
+
+            // PassGameplay can be called before the spectator player has consumed all replay frames, let the spectator
+            // clock keep draining remaining replay frames instead of stopping it.
+            syncManager.RemoveManagedClock(instance.SpectatorPlayerClock, drain: true);
         });
 
         protected override void QuitGameplay(int userId) => Schedule(() =>
