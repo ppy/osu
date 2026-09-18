@@ -10,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -69,12 +70,25 @@ namespace osu.Game.Tests.Visual.RankedPlay
         }
 
         [Test]
+        public void TestFocusChat()
+        {
+            AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
+
+            AddUntilStep("chat not focused", () => this.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().SingleOrDefault()?.HasFocus, () => Is.False);
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("chat is focused", () => this.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().Single().HasFocus, () => Is.True);
+        }
+
+        [Test]
         public void TestDiscardCardStage()
         {
             AddStep("set discard phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardDiscard).WaitSafely());
 
             postLocalUserMessage("this is a message from the local user");
-            postOpponentMessage("this is a message from the opponent. your opponent has a lot to say about you. nice stuff, of course. they see your potential in this game and want to shower you with compliments.");
+            postOpponentMessage(
+                "this is a message from the opponent. your opponent has a lot to say about you. nice stuff, of course. they see your potential in this game and want to shower you with compliments.");
         }
 
         [Test]
@@ -153,7 +167,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddAssert("report dialog is present", () => (dialog = this.ChildrenOfType<ReportChatDialog>().Single()).IsPresent, () => Is.True);
 
             AddStep("input reason", () => dialog.ChildrenOfType<OsuTextBox>().First().Text = "reason");
-            AddStep("send report", () => DialogOverlay.CurrentDialog!.PerformAction<ReportChatDialog.SubmitButton>());
+            AddStep("send report", () => DialogOverlay.CurrentDialog!.PerformAction<ReportDialog<ChatReportReason>.SubmitButton>());
 
             AddUntilStep("Info message displayed", () => testChannel.Messages.Last(), Is.InstanceOf<InfoMessage>);
         }
