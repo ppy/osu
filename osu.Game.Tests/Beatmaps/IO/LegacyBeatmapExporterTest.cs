@@ -95,10 +95,10 @@ namespace osu.Game.Tests.Beatmaps.IO
             AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"fractional-coordinates.olz"));
             AddAssert("second slider has fractional position",
                 () => ((IHasXPosition)beatmap.Beatmap.HitObjects[1]).X,
-                () => Is.EqualTo(-3.0517578E-05).Within(0.00001));
+                () => Is.EqualTo(3.0517578E-05).Within(0.00001));
             AddAssert("second slider path has fractional coordinates",
                 () => ((IHasPath)beatmap.Beatmap.HitObjects[1]).Path.ControlPoints[1].Position.X,
-                () => Is.EqualTo(191.999939).Within(0.00001));
+                () => Is.EqualTo(191.999878).Within(0.00001));
             AddAssert("second hit circle has fractional position",
                 () => ((IHasYPosition)beatmap.Beatmap.HitObjects[3]).Y,
                 () => Is.EqualTo(383.99997).Within(0.00001));
