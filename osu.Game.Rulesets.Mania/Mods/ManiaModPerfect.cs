@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModPerfect : ModPerfect
     {
-        [SettingSource("Require perfect hits")]
+        [SettingSource("Require perfect hits", "Also fail when getting a GREAT hit.")]
         public BindableBool RequirePerfectHits { get; } = new BindableBool();
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
