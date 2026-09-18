@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -170,7 +169,7 @@ namespace osu.Game.Screens.Select
 
         public partial class PulsatingBox : BeatSyncedContainer
         {
-            public int FlashOffset;
+            public int DepthLayer;
 
             private readonly Box box;
 
@@ -191,7 +190,7 @@ namespace osu.Game.Screens.Select
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex % Math.Pow(2, FlashOffset) != 0)
+                if (beatIndex % getFlashInterval(timingPoint.TimeSignature.Numerator) != 0)
                     return;
 
                 double length = timingPoint.BeatLength;
@@ -204,7 +203,51 @@ namespace osu.Game.Screens.Select
                     .Then()
                     .FadeTo(0.4f, length, Easing.Out);
             }
+
+            /// <summary>
+            /// Returns the interval between flashes for this panel as a number of beats.
+            ///
+            /// Interval has the following properties:
+            ///   1) stay bar aligned
+            ///   2) higher DepthLayers flash less often than lower DepthLayers
+            ///   3) higher DepthLayers only flash when lower DepthLayers flash as well
+            ///   4) next smallest possible value to fulfill 1,2 and 3
+            /// </summary>
+            private long getFlashInterval(int beatsPerBar)
+            {
+                long beatsPerFlash = 1;
+                int remainingBar = beatsPerBar;
+
+                for (int i = 0; i < DepthLayer; i++)
+                {
+                    int factor = smallestPrimeFactor(remainingBar);
+
+                    // when running out of prime factors, use 2 for higher multiple of beatsPerBar
+                    if (factor <= 1)
+                        factor = 2;
+
+                    beatsPerFlash *= factor;
+
+                    // divide out factor just used, so next iteration takes the next smallest prime factor
+                    if (remainingBar % factor == 0)
+                        remainingBar /= factor;
+                }
+
+                return beatsPerFlash;
+            }
+
+            private static int smallestPrimeFactor(int value)
+            {
+                for (int i = 2; i <= value / i; i++)
+                {
+                    if (value % i == 0)
+                        return i;
+                }
+
+                return value;
+            }
         }
+
 
         protected override void LoadComplete()
         {
@@ -243,7 +286,7 @@ namespace osu.Game.Screens.Select
 
             // Slightly offset the flash animation based on the panel depth.
             // This assumes a minimum depth of -2 (groups).
-            selectionLayer.FlashOffset = -Item!.DepthLayer;
+            selectionLayer.DepthLayer = -Item!.DepthLayer;
 
             updateAccentColour();
 
