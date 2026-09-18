@@ -125,6 +125,9 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
+            if (IsPackageManaged)
+                return false;
+
             RestartOnExitAction = () => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId);
             return true;
         }
