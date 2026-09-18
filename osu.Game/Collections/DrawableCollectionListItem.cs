@@ -125,9 +125,11 @@ namespace osu.Game.Collections
             }
         }
 
-        private partial class ItemTextBox : OsuTextBox
+        private partial class ItemTextBox : FocusedTextBox
         {
             protected override float LeftRightPadding => item_height / 2;
+
+            protected override bool KillFocusOnBackKey => true;
 
             private const float count_text_size = 12;
 
