@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private float hyperDashTargetPosition;
         private Bindable<bool> hitLighting = null!;
 
-        private readonly HitExplosionContainer hitExplosionContainer;
+        internal readonly HitExplosionContainer HitExplosionContainer;
 
         private readonly DrawablePool<CaughtFruit> caughtFruitPool;
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Y = -5
                 },
                 body = new SkinnableCatcher(),
-                hitExplosionContainer = new HitExplosionContainer
+                HitExplosionContainer = new HitExplosionContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -400,7 +400,7 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void addLighting(JudgementResult judgementResult, Color4 colour, float x) =>
-            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, judgementResult, colour, x));
+            HitExplosionContainer.Add(new HitExplosionEntry(Time.Current, judgementResult, colour, x));
 
         private CaughtObject? getCaughtObject(PalpableCatchHitObject source)
         {
