@@ -31,7 +31,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Footer;
@@ -209,7 +208,6 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                new GlobalScrollAdjustsVolume(),
                 (content = new LogoTrackingContainer
                 {
                     Anchor = Anchor.Centre,

@@ -132,7 +132,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 matchInfo = new RankedPlayMatchInfo(),
                 backgroundMusic = new BackgroundMusicManager(),
                 new RankedPlayBeatmapAvailabilityTracker(),
-                new GlobalScrollAdjustsVolume(),
                 content = new InverseScalingDrawSizePreservingFillContainer
                 {
                     Anchor = Anchor.Centre,
