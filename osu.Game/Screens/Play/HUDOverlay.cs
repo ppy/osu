@@ -380,7 +380,7 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.BottomRight,
         };
 
-        protected ModDisplay CreateModsContainer() => new ModDisplay
+        protected ModDisplay CreateModsContainer() => new HudModDisplay(replayLoaded)
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
