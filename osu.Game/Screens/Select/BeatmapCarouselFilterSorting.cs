@@ -115,12 +115,15 @@ namespace osu.Game.Screens.Select
                     throw new ArgumentOutOfRangeException();
             }
 
-            // If the initial sort could not differentiate, attempt to use DateAdded to order sets in a stable fashion.
+            // If the initial sort could not differentiate, attempt to use Title then DateAdded to order sets in a stable fashion.
+            if (comparison == 0)
+                comparison = OrdinalSortByCaseStringComparer.DEFAULT.Compare(a.BeatmapSet!.Metadata.Title, b.BeatmapSet!.Metadata.Title);
+
             // The directionality of this matches the current SortMode.DateAdded, but we may want to reconsider if that becomes a user decision (ie. asc / desc).
             if (comparison == 0)
                 comparison = b.BeatmapSet!.DateAdded.CompareTo(a.BeatmapSet!.DateAdded);
 
-            // If DateAdded fails to break the tie, fallback to our internal GUID for stability.
+            // If both failed to break the tie, fallback to our internal GUID for stability.
             // This basically means it's a stable random sort.
             if (comparison == 0)
                 comparison = b.BeatmapSet!.ID.CompareTo(a.BeatmapSet!.ID);

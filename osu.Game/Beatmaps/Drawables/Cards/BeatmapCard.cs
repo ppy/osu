@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 {
     public abstract partial class BeatmapCard : OsuClickableContainer, IHasContextMenu
     {
-        public const float TRANSITION_DURATION = 340;
+        public const float TRANSITION_DURATION = 360;
         public const float CORNER_RADIUS = 8;
 
         public const float WIDTH = 345;

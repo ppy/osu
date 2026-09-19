@@ -91,7 +91,6 @@ namespace osu.Game.Tests.Mods
         {
             public override string Name => "Non-matching setting type mod";
             public override LocalisableString Description => "Description";
-            public override double ScoreMultiplier => 1;
             public override ModType Type => ModType.Conversion;
 
             [SettingSource("Test setting")]

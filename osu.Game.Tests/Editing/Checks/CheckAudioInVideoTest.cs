@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var storyboard = new Storyboard();
             var layer = storyboard.GetLayer("Video");
-            layer.Add(new StoryboardVideo("abc123.mp4", 0));
+            layer.Add(new StoryboardVideo(StoryboardElementSource.Beatmap, "abc123.mp4", 0));
 
             var mockWorkingBeatmap = new Mock<TestWorkingBeatmap>(beatmap, null!, null!);
             mockWorkingBeatmap.Setup(w => w.GetStream(It.IsAny<string>())).Returns(resourceStream);

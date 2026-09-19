@@ -32,6 +32,9 @@ namespace osu.Game.Online.Multiplayer
         [Key(6)]
         public bool AutoSkip { get; set; }
 
+        [Key(7)]
+        public byte? MaxParticipants { get; set; }
+
         [IgnoreMember]
         public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
 
@@ -47,6 +50,7 @@ namespace osu.Game.Online.Multiplayer
             QueueMode = room.QueueMode;
             AutoStartDuration = room.AutoStartDuration;
             AutoSkip = room.AutoSkip;
+            MaxParticipants = room.MaxParticipants;
         }
 
         public bool Equals(MultiplayerRoomSettings? other)
@@ -60,7 +64,8 @@ namespace osu.Game.Online.Multiplayer
                    && MatchType == other.MatchType
                    && QueueMode == other.QueueMode
                    && AutoStartDuration == other.AutoStartDuration
-                   && AutoSkip == other.AutoSkip;
+                   && AutoSkip == other.AutoSkip
+                   && MaxParticipants == other.MaxParticipants;
         }
 
         public override string ToString() => $"Name:{Name}"
@@ -69,6 +74,7 @@ namespace osu.Game.Online.Multiplayer
                                              + $" Item:{PlaylistItemId}"
                                              + $" Queue:{QueueMode}"
                                              + $" Start:{AutoStartDuration}"
-                                             + $" AutoSkip:{AutoSkip}";
+                                             + $" AutoSkip:{AutoSkip}"
+                                             + $" MaxParticipants:{MaxParticipants?.ToString() ?? "no limit"}";
     }
 }

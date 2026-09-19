@@ -26,6 +26,31 @@ namespace osu.Game.Online.Matchmaking
         [Key(4)]
         public MatchmakingPoolType Type { get; set; } = MatchmakingPoolType.QuickPlay;
 
+        [IgnoreMember]
+        public string DisplayName
+        {
+            get
+            {
+                switch (RulesetId)
+                {
+                    case 0:
+                        return $"osu! ({Name})";
+
+                    case 1:
+                        return $"osu!taiko ({Name})";
+
+                    case 2:
+                        return $"osu!catch ({Name})";
+
+                    case 3:
+                        return $"osu!mania {Variant}K ({Name})";
+
+                    default:
+                        return Name;
+                }
+            }
+        }
+
         public bool Equals(MatchmakingPool? other)
             => other != null
                && Id == other.Id

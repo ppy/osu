@@ -10,14 +10,13 @@ namespace osu.Game.Online.Multiplayer
     {
         /// <summary>
         /// <para>
-        /// If <see langword="true"/>, <see cref="MultiplayerRoomUserRole.Player"/>s will not be able to change teams by themselves in the room,
+        /// If <see langword="true"/>, <see cref="MultiplayerRoomUserRole.Player"/>s will not be able to change teams and slots by themselves in the room,
         /// only <see cref="MultiplayerRoomUserRole.Referee"/>s will be able to change teams for the <see cref="MultiplayerRoomUserRole.Player"/>s.
         /// </para>
         /// <para>
-        /// If <see langword="false"/>, any user can change their team in the room.
+        /// If <see langword="false"/>, any user can change their team and slot in the room.
         /// </para>
         /// </summary>
-        // TODO: mention slots as well when slots are reimplemented
         [Key(0)]
         public bool Locked { get; set; }
     }

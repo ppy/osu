@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Select
         {
             public Bindable<BeatmapInfo?> Beatmap { get; } = new Bindable<BeatmapInfo?>();
             public Bindable<StarDifficulty> StarDifficulty { get; } = new Bindable<StarDifficulty>();
+            public BindableBool Selected { get; } = new BindableBool();
 
             protected override Colour4 DimColour => Colour4.White;
 
@@ -140,6 +141,8 @@ namespace osu.Game.Screens.Select
                 StarDifficulty.BindValueChanged(_ => updateBeatmap());
                 showConvertedBeatmaps.BindValueChanged(_ => updateBeatmap());
                 scopedBeatmapSet.BindValueChanged(_ => updateBeatmap(), true);
+                Selected.BindValueChanged(_ => updateEnabled());
+                scopedBeatmapSet.BindDisabledChanged(_ => updateEnabled(), true);
                 Enabled.BindValueChanged(_ => updateAppearance(), true);
                 FinishTransforms(true);
             }
@@ -252,6 +255,11 @@ namespace osu.Game.Screens.Select
             {
                 updateAppearance();
                 base.OnHoverLost(e);
+            }
+
+            private void updateEnabled()
+            {
+                Enabled.Value = Selected.Value && !scopedBeatmapSet.Disabled;
             }
 
             private void updateAppearance()

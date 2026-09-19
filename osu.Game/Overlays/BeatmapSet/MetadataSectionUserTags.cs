@@ -2,17 +2,32 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public partial class MetadataSectionUserTags : MetadataSection<string[]?>
+    public partial class MetadataSectionUserTags : MetadataSection<string[]>
     {
         private readonly Action<string>? searchAction;
 
+        public override string[] Metadata
+        {
+            set
+            {
+                if (value.Length == 0)
+                {
+                    this.FadeOut(TRANSITION_DURATION);
+                    return;
+                }
+
+                base.Metadata = value;
+            }
+        }
+
         public MetadataSectionUserTags(Action<string>? searchAction = null)
-            : base(MetadataType.UserTags, null)
+            : base(MetadataType.UserTags)
         {
             this.searchAction = searchAction;
         }

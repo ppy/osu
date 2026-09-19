@@ -48,6 +48,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             Composer = playable.BeatmapInfo.Ruleset.CreateInstance().CreateHitObjectComposer();
             Debug.Assert(Composer != null);
+            Dependencies.CacheAs(Composer);
 
             Composer.Alpha = 0;
 

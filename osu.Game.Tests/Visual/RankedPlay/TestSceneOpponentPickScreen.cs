@@ -6,6 +6,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 
 namespace osu.Game.Tests.Visual.RankedPlay
@@ -26,7 +27,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
             AddUntilStep("screen loaded", () => screen.IsLoaded);
 
-            var requestHandler = new BeatmapRequestHandler();
+            BeatmapRequestHandler requestHandler = null!;
+            AddStep("setup ruleset", () => requestHandler = new BeatmapRequestHandler(new OsuRuleset().RulesetInfo));
 
             AddStep("setup request handler", () => ((DummyAPIAccess)API).HandleRequest = requestHandler.HandleRequest);
 

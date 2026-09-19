@@ -67,6 +67,16 @@ namespace osu.Game.Database
                 Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
             };
 
+            using var storyboardStream = base.GetFileContents(model, file);
+
+            if (storyboardStream == null)
+                return null;
+
+            using var storyboardStreamReader = new LineBufferedReader(storyboardStream);
+            var beatmapStoryboard = new LegacyStoryboardDecoder().Decode(storyboardStreamReader);
+            beatmapStoryboard.Beatmap = beatmapContent;
+            beatmapStoryboard.BeatmapInfo = beatmapInfo;
+
             MutateBeatmap(model, playableBeatmap);
 
             // Encode to legacy format
@@ -78,7 +88,7 @@ namespace osu.Game.Database
                 // If we don't do that, uploads to BSS may show changes where there are none.
                 sw.NewLine = "\r\n";
 
-                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
+                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin, beatmapStoryboard).Encode(sw);
             }
 
             stream.Seek(0, SeekOrigin.Begin);

@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -31,6 +33,26 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Text = GeneralSettingsStrings.ChangeFolderLocation,
                 Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
+            });
+
+            // This is a temporary stand-in until we have a setup for `SettingsItemV2` which can handle buttons.
+            Add(new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Padding = SettingsPanel.CONTENT_PADDING,
+                Children = new Drawable[]
+                {
+                    new SettingsNote
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Margin = new MarginPadding { Top = -SettingsSection.ITEM_SPACING_V2 },
+                        Current =
+                        {
+                            Value = new SettingsNote.Data(GeneralSettingsStrings.ChangeFolderLocationTooltip, SettingsNote.Type.Informational)
+                        }
+                    }
+                }
             });
         }
     }

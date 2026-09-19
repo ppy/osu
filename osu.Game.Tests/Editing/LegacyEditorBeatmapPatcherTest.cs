@@ -362,7 +362,7 @@ namespace osu.Game.Tests.Editing
             using (var encoded = new MemoryStream())
             {
                 using (var sw = new StreamWriter(encoded))
-                    new LegacyBeatmapEncoder(beatmap, null).Encode(sw);
+                    new LegacyBeatmapEncoder(beatmap, null, null).Encode(sw);
 
                 return encoded.ToArray();
             }

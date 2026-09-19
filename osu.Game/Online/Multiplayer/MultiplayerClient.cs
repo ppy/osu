@@ -11,9 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
-using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -117,11 +115,6 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public event Action? ResultsReady;
 
-        /// <summary>
-        /// Invoked just prior to disconnection requested by the server via <see cref="IStatefulUserHubClient.DisconnectRequested"/>.
-        /// </summary>
-        public event Action? Disconnecting;
-
         public event Action<MultiplayerCountdown>? CountdownStarted;
 
         public event Action<MultiplayerCountdown>? CountdownStopped;
@@ -133,6 +126,7 @@ namespace osu.Game.Online.Multiplayer
         public event Action? MatchmakingQueueJoined;
         public event Action? MatchmakingQueueLeft;
         public event Action<MatchmakingRoomInvitationParams>? MatchmakingRoomInvited;
+        public event Action<MatchmakingDuelIssuedParams>? MatchmakingDuelIssued;
         public event Action<long, string>? MatchmakingRoomReady;
         public event Action<MatchmakingLobbyStatus>? MatchmakingLobbyStatusChanged;
         public event Action<MatchmakingQueueStatus>? MatchmakingQueueStatusChanged;
@@ -409,8 +403,9 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="queueMode">The new queue mode, if any.</param>
         /// <param name="autoStartDuration">The new auto-start countdown duration, if any.</param>
         /// <param name="autoSkip">The new auto-skip setting.</param>
+        /// <param name="maxParticipants">The new participant count limit, if any.</param>
         public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default,
-                                   Optional<TimeSpan> autoStartDuration = default, Optional<bool> autoSkip = default)
+                                   Optional<TimeSpan> autoStartDuration = default, Optional<bool> autoSkip = default, Optional<byte?> maxParticipants = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -422,7 +417,8 @@ namespace osu.Game.Online.Multiplayer
                 MatchType = matchType.GetOr(Room.Settings.MatchType),
                 QueueMode = queueMode.GetOr(Room.Settings.QueueMode),
                 AutoStartDuration = autoStartDuration.GetOr(Room.Settings.AutoStartDuration),
-                AutoSkip = autoSkip.GetOr(Room.Settings.AutoSkip)
+                AutoSkip = autoSkip.GetOr(Room.Settings.AutoSkip),
+                MaxParticipants = maxParticipants.GetOr(Room.Settings.MaxParticipants),
             });
         }
 
@@ -488,8 +484,6 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task ChangeState(MultiplayerUserState newState);
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
-
-        public abstract Task DisconnectInternal();
 
         public abstract Task ChangeUserStyle(int? beatmapId, int? rulesetId);
 
@@ -1017,6 +1011,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.AutoStartDuration = Room.Settings.AutoStartDuration;
             APIRoom.CurrentPlaylistItem = APIRoom.Playlist.Single(item => item.ID == settings.PlaylistItemId);
             APIRoom.AutoSkip = Room.Settings.AutoSkip;
+            APIRoom.MaxParticipants = Room.Settings.MaxParticipants;
 
             SettingsChanged?.Invoke(settings);
             RoomUpdated?.Invoke();
@@ -1081,15 +1076,7 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
-        Task IStatefulUserHubClient.DisconnectRequested()
-        {
-            Schedule(() =>
-            {
-                Disconnecting?.Invoke();
-                DisconnectInternal();
-            });
-            return Task.CompletedTask;
-        }
+        #region Matchmaking / Ranked Play
 
         Task IMatchmakingClient.MatchmakingQueueJoined()
         {
@@ -1112,6 +1099,12 @@ namespace osu.Game.Online.Multiplayer
         Task IMatchmakingClient.MatchmakingRoomInvitedWithParams(MatchmakingRoomInvitationParams invitation)
         {
             Scheduler.Add(() => MatchmakingRoomInvited?.Invoke(invitation));
+            return Task.CompletedTask;
+        }
+
+        Task IMatchmakingClient.MatchmakingDuelIssued(MatchmakingDuelIssuedParams issue)
+        {
+            Scheduler.Add(() => MatchmakingDuelIssued?.Invoke(issue));
             return Task.CompletedTask;
         }
 
@@ -1223,20 +1216,45 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task MatchmakingAcceptInvitation();
 
+        public abstract Task<MatchmakingIssueDuelResponse> MatchmakingIssueDuel(MatchmakingIssueDuelRequest request);
+
+        public abstract Task<MatchmakingAcceptDuelResponse> MatchmakingAcceptDuel(MatchmakingAcceptDuelRequest request);
+
         public abstract Task MatchmakingDeclineInvitation();
 
         public abstract Task MatchmakingToggleSelection(long playlistItemId);
 
         public abstract Task MatchmakingSkipToNextStage();
 
-        private partial class MultiplayerInvitationNotification : UserAvatarNotification
-        {
-            protected override IconUsage CloseButtonIcon => FontAwesome.Solid.Times;
+        #endregion
 
-            public MultiplayerInvitationNotification(APIUser user, Room room)
-                : base(user, NotificationsStrings.InvitedYouToTheMultiplayer(user.Username, room.Name))
+        #region Disconnection handling
+
+        /// <summary>
+        /// Invoked just prior to disconnection.
+        /// </summary>
+        public event Action? Disconnecting;
+
+        protected abstract Task DisconnectInternal();
+
+        public abstract Task Reconnect();
+
+        Task IStatefulUserHubClient.DisconnectRequested()
+        {
+            Schedule(() =>
             {
-            }
+                Disconnecting?.Invoke();
+                DisconnectInternal().FireAndForget();
+            });
+            return Task.CompletedTask;
         }
+
+        Task IStatefulUserHubClient.ServerShuttingDown()
+        {
+            this.ReconnectWhenReady(IsConnected, () => room == null, Reconnect);
+            return Task.CompletedTask;
+        }
+
+        #endregion
     }
 }

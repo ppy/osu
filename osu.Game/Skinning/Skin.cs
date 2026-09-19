@@ -112,6 +112,7 @@ namespace osu.Game.Skinning
                     // generally won't be hit as we always write a `skin.ini` on import, but best be safe than sorry.
                     // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
                     LegacyVersion = SkinConfiguration.LATEST_VERSION,
+                    IsLatestVersion = true,
                 };
             }
 

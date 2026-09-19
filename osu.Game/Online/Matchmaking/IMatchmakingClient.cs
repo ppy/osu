@@ -39,6 +39,12 @@ namespace osu.Game.Online.Matchmaking
         Task MatchmakingRoomInvitedWithParams(MatchmakingRoomInvitationParams invitation);
 
         /// <summary>
+        /// Signals that the user has been issued a duel by another user.
+        /// </summary>
+        /// <param name="issue">Contains the parameters for the duel.</param>
+        Task MatchmakingDuelIssued(MatchmakingDuelIssuedParams issue);
+
+        /// <summary>
         /// Signals that the matchmaking room is ready to be opened.
         /// </summary>
         Task MatchmakingRoomReady(long roomId, string password);

@@ -11,6 +11,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuHitObjectInspector : HitObjectInspector
     {
+        private readonly OsuDistanceSnapProvider snapProvider;
+
+        public OsuHitObjectInspector(OsuDistanceSnapProvider snapProvider)
+        {
+            this.snapProvider = snapProvider;
+        }
+
         protected override void AddInspectorValues(HitObject[] objects)
         {
             base.AddInspectorValues(objects);
@@ -27,14 +34,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (precedingObject != null && precedingObject is not Spinner)
                 {
-                    AddHeader("To previous");
-                    AddValue($"{(firstInSelection.StackedPosition - precedingObject.StackedEndPosition).Length:#,0.##}px");
+                    AddHeader("From previous");
+                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(precedingObject, firstInSelection):N2}x ({(firstInSelection.StackedPosition - precedingObject.StackedEndPosition).Length:#,0.##}px)");
                 }
 
                 if (nextObject != null && nextObject is not Spinner)
                 {
                     AddHeader("To next");
-                    AddValue($"{(nextObject.StackedPosition - lastInSelection.StackedEndPosition).Length:#,0.##}px");
+                    AddValue($"{snapProvider.ReadCurrentDistanceSnap(lastInSelection, nextObject):N2}x ({(nextObject.StackedPosition - lastInSelection.StackedEndPosition).Length:#,0.##}px)");
                 }
             }
         }

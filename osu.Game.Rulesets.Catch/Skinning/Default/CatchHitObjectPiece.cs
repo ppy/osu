@@ -40,15 +40,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
             HyperDash.BindValueChanged(hyper =>
             {
-                if (HyperBorderPiece != null)
-                    HyperBorderPiece.Alpha = hyper.NewValue ? 1 : 0;
+                HyperBorderPiece?.Alpha = hyper.NewValue ? 1 : 0;
             }, true);
         }
 
         protected override void Update()
         {
-            if (BorderPiece != null)
-                BorderPiece.Alpha = (float)Math.Clamp((ObjectState.HitObject.StartTime - Time.Current) / 500, 0, 1);
+            BorderPiece?.Alpha = (float)Math.Clamp((ObjectState.HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
     }
 }

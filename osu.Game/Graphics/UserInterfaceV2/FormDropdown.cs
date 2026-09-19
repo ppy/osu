@@ -110,7 +110,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     captionText = value;
 
                     if (caption.IsNotNull())
+                    {
                         caption.Caption = value;
+                        updateState();
+                    }
                 }
             }
 
@@ -151,9 +154,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load()
             {
-                Masking = true;
-                CornerRadius = 5;
-
                 // We use our own background for more control.
                 Background.Alpha = 0;
 
@@ -233,6 +233,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void updateState()
             {
                 caption.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+                caption.Alpha = Caption == default ? 0 : 1;
+
                 label.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 DisabledColour = Colour4.White;

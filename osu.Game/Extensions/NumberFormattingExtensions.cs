@@ -24,7 +24,7 @@ namespace osu.Game.Extensions
         {
             double floatValue = double.CreateTruncating(value);
 
-            decimal decimalPrecision = normalise(decimal.CreateTruncating(value), maxDecimalDigits);
+            decimal decimalPrecision = Normalise(decimal.CreateTruncating(value), maxDecimalDigits);
 
             // Find the number of significant digits (we could have less than maxDecimalDigits after normalize())
             int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
@@ -37,7 +37,7 @@ namespace osu.Game.Extensions
                 return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.CurrentCulture);
             }
 
-            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
+            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? CultureInfo.CurrentCulture.NumberFormat.NegativeSign : string.Empty;
 
             return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}", CultureInfo.CurrentCulture)}";
         }
@@ -48,7 +48,7 @@ namespace osu.Game.Extensions
         /// <param name="d">The decimal to normalize.</param>
         /// <param name="sd">The maximum number of decimal digits to keep. The final result may have fewer decimal digits than this value.</param>
         /// <returns>The normalised decimal.</returns>
-        private static decimal normalise(decimal d, int sd)
+        public static decimal Normalise(decimal d, int sd)
             => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
     }
 }

@@ -95,6 +95,33 @@ namespace osu.Game.Rulesets.Taiko.Tests.Judgements
         }
 
         [Test]
+        public void TestHitNoneStrongDrumRollWithTicksPastEnd()
+        {
+            PerformTest(new List<ReplayFrame>
+            {
+                new TaikoReplayFrame(0),
+            }, CreateBeatmap(new DrumRoll
+            {
+                StartTime = 1000,
+                // duration intentionally chosen.
+                // default tick spacing is 250ms, so take half of that and add 1
+                // to ensure a tick is spawned past the end time of the drum roll
+                Duration = 1126,
+                IsStrong = true
+            }));
+
+            AssertJudgementCount(14);
+
+            for (int i = 0; i < 6; ++i)
+            {
+                AssertResult<DrumRollTick>(i, HitResult.IgnoreMiss);
+                AssertResult<DrumRollTick.StrongNestedHit>(i, HitResult.IgnoreMiss);
+            }
+
+            AssertResult<DrumRoll>(0, HitResult.IgnoreHit);
+        }
+
+        [Test]
         public void TestHitAllStrongDrumRollWithOneKey()
         {
             PerformTest(new List<ReplayFrame>

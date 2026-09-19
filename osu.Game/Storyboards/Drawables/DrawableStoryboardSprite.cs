@@ -107,7 +107,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storyboard storyboard)
+        private void load(Storyboard storyboard, StoryboardTriggerController triggerController)
         {
             if (storyboard.UseSkinSprites)
             {
@@ -117,7 +117,7 @@ namespace osu.Game.Storyboards.Drawables
             else
                 Texture = textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
-            Sprite.ApplyTransforms(this);
+            Sprite.ApplyTransforms(this, triggerController);
         }
 
         private void skinSourceChanged()

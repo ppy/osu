@@ -45,11 +45,6 @@ namespace osu.Game.Localisation
         public static LocalisableString Calculating => new TranslatableString(getKey(@"calculating"), @"calculating...");
 
         /// <summary>
-        /// "{0} item(s)"
-        /// </summary>
-        public static LocalisableString Items(int arg0) => new TranslatableString(getKey(@"items"), @"{0} item(s)", arg0);
-
-        /// <summary>
         /// "Data migration will use &quot;hard links&quot;. No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation."
         /// </summary>
         public static LocalisableString DataMigrationNoExtraSpace => new TranslatableString(getKey(@"data_migration_no_extra_space"), @"Data migration will use ""hard links"". No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation.");

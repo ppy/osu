@@ -74,6 +74,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 })
                 {
                     Keywords = new[] { "speed", "velocity" },
+                    Note = { Value = FrameworkEnvironment.UseSDL3 ? new SettingsNote.Data(MouseSettingsStrings.CursorSensitivityForTabletsElsewhere, SettingsNote.Type.Informational) : null }
                 },
                 new SettingsItemV2(confineMouseModeSetting = new FormEnumDropdown<OsuConfineMouseMode>
                 {

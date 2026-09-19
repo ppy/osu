@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -27,16 +28,22 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             var renderer = config.GetBindable<RendererType>(FrameworkSetting.Renderer);
             automaticRendererInUse = renderer.Value == RendererType.Automatic;
 
+            IEnumerable<RendererType> availableRenderers = host.GetPreferredRenderersForCurrentPlatform().Order();
+
+            // Vulkan renderers are pretty broken to the point it may result in a startup crash at worst.
+            // If a user isn't already using it let's hide it until we can fix.
+            if (renderer.Value != RendererType.Deferred_Vulkan)
+                availableRenderers = availableRenderers.Where(t => t != RendererType.Deferred_Vulkan);
+            if (renderer.Value != RendererType.Vulkan)
+                availableRenderers = availableRenderers.Where(t => t != RendererType.Vulkan);
+
             Children = new Drawable[]
             {
                 new SettingsItemV2(new RendererDropdown
                 {
                     Caption = GraphicsSettingsStrings.Renderer,
                     Current = renderer,
-                    Items = host.GetPreferredRenderersForCurrentPlatform().Order()
-#pragma warning disable CS0612 // Type or member is obsolete
-                                .Where(t => t != RendererType.Vulkan && t != RendererType.OpenGLLegacy),
-#pragma warning restore CS0612 // Type or member is obsolete
+                    Items = availableRenderers,
                 })
                 {
                     Keywords = new[] { @"compatibility", @"directx" },
