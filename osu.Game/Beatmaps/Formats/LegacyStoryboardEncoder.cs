@@ -231,7 +231,7 @@ namespace osu.Game.Beatmaps.Formats
                 case StoryboardRotationCommand rotation:
                     typeAcronym = @"R";
                     details = rotation.StartValue == rotation.EndValue
-                        ? rotation.StartValue.ToString(CultureInfo.InvariantCulture)
+                        ? float.DegreesToRadians(rotation.StartValue).ToString(CultureInfo.InvariantCulture)
                         : string.Format(CultureInfo.InvariantCulture,
                             @"{0},{1}",
                             float.DegreesToRadians(rotation.StartValue),

@@ -175,6 +175,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             sprite.Commands.AddVectorScale(Easing.InCirc, 1400, 1500, new Vector2(4), new Vector2(3, 1));
             sprite.Commands.AddX(Easing.InOutQuad, 1600, 1700, 300, 500);
             sprite.Commands.AddY(Easing.OutBounce, 1800, 1800, 300, 100);
+            sprite.Commands.AddRotation(Easing.InSine, 1900, 1900, 90, 90);
             initial.Storyboard.GetLayer("Background").Add(sprite);
 
             var encoded = encode(initial);
@@ -219,12 +220,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(flipVCommand.StartValue, Is.EqualTo(true));
                 Assert.That(flipVCommand.EndValue, Is.EqualTo(false));
 
-                var rotationCommand = decodedSprite.Commands.Rotation.Single();
+                var rotationCommand = decodedSprite.Commands.Rotation.First();
                 Assert.That(rotationCommand.Easing, Is.EqualTo(Easing.OutSine));
                 Assert.That(rotationCommand.StartTime, Is.EqualTo(1000));
                 Assert.That(rotationCommand.EndTime, Is.EqualTo(1100));
                 Assert.That(rotationCommand.StartValue, Is.EqualTo(0));
                 Assert.That(rotationCommand.EndValue, Is.EqualTo(720));
+
+                var staticRotationCommand = decodedSprite.Commands.Rotation.Last();
+                Assert.That(staticRotationCommand.Easing, Is.EqualTo(Easing.InSine));
+                Assert.That(staticRotationCommand.StartTime, Is.EqualTo(1900));
+                Assert.That(staticRotationCommand.EndTime, Is.EqualTo(1900));
+                Assert.That(staticRotationCommand.StartValue, Is.EqualTo(90));
+                Assert.That(staticRotationCommand.EndValue, Is.EqualTo(90));
 
                 var scaleCommand = decodedSprite.Commands.Scale.Single();
                 Assert.That(scaleCommand.Easing, Is.EqualTo(Easing.OutQuint));
