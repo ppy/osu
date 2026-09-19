@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     /// <summary>
     /// A <see cref="SliderBody"/> with the ability to set the drawn vertices manually.
     /// </summary>
-    public partial class ManualSliderBody : SliderBody
+    public partial class ManualSliderBody : DefaultSliderBody
     {
         public ManualSliderBody()
         {
