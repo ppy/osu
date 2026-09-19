@@ -240,8 +240,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
-            // cross-reference: https://github.com/ppy/osu-web/blob/a6afee076f4f68bb56dea0cb8f18db63651763a7/resources/js/scores/pp-value.tsx#L19-L39
-            if (!Score.Ranked || !Score.Preserve || (Score.PP == null && Score.Processed))
+            // cross-reference: https://github.com/ppy/osu-web/blob/21c00439025139747a88b08f5dce56692a459d72/resources/js/scores/pp-value.tsx#L20-L43
+            if (!Score.Ranked || (Score.PP == null && Score.Processed))
             {
                 return new SpriteTextWithTooltip
                 {
@@ -263,12 +263,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 };
             }
 
-            var ppTooltipText = LocalisableString.Interpolate($@"{Score.PP:N1}pp");
+            var ppTooltipText = Score.Preserve ? Score.PP.ToLocalisableString(@"N3") : ScoresStrings.StatusNonBest;
 
             return new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
+                Alpha = Score.Preserve ? 1 : 0.7f,
                 Children = new[]
                 {
                     new SpriteTextWithTooltip

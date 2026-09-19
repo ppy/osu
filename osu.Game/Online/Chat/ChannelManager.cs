@@ -291,6 +291,16 @@ namespace osu.Game.Online.Chat
                     AddInternal(new NowPlayingCommand(target));
                     break;
 
+                case @"watch":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /watch [user]"));
+                        break;
+                    }
+
+                    AddInternal(new WatchCommand(target, content));
+                    break;
+
                 case @"me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
@@ -411,7 +421,19 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case @"help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np, /savelog, /roll [2-100] (multiplayer only)"));
+                    target.AddNewMessages(new InfoMessage(
+                        """
+                        Supported commands:
+                        /help            - Displays all available commands.
+                        /me [action]     - Perform a third-person action.
+                        /join [channel]  - Joins the specified channel.
+                        /chat [user]     - Opens a new chat tab with the specified user.
+                        /watch [user]    - Spectates the specified user.
+                        /np              - Print to chat the current song you are listening to or playing.
+                        /savelog         - Saves the current chat tab to a text file.
+                        /roll [2-100]    - Rolls a random number (multiplayer only).
+                        """
+                    ));
                     break;
 
                 default:

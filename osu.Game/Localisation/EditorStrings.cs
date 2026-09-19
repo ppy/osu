@@ -45,9 +45,15 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
+        /// "Snap all notes to current snap divisor..."
+        /// </summary>
+        public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor...");
+
+        /// <summary>
         /// "Move already placed objects when changing timing"
         /// </summary>
-        public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
+        public static LocalisableString AdjustExistingObjectsOnTimingChanges =>
+            new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");
 
         /// <summary>
         /// "For editing (.olz)"
@@ -75,19 +81,19 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeDifficulty => new TranslatableString(getKey(@"change_difficulty"), @"Change difficulty");
 
         /// <summary>
-        /// "Delete difficulty"
+        /// "Delete difficulty..."
         /// </summary>
-        public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
+        public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty...");
 
         /// <summary>
-        /// "Edit externally"
+        /// "Edit externally..."
         /// </summary>
-        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally");
+        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally...");
 
         /// <summary>
-        /// "Submit beatmap"
+        /// "Submit beatmap..."
         /// </summary>
-        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap");
+        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap...");
 
         /// <summary>
         /// "setup"
@@ -135,9 +141,9 @@ namespace osu.Game.Localisation
         public static LocalisableString RotationSnapped(float newRotation) => new TranslatableString(getKey(@"rotation_snapped"), @"{0:0}° (snapped)", newRotation);
 
         /// <summary>
-        /// "Limit distance snap placement to current time"
+        /// "Limit placement to current time"
         /// </summary>
-        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limited_distance_snap_grid"), @"Limit distance snap placement to current time");
+        public static LocalisableString LimitedDistanceSnap => new TranslatableString(getKey(@"limit_placement_to_current_time"), @"Limit placement to current time");
 
         /// <summary>
         /// "Contract sidebars when not hovered"
@@ -205,9 +211,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekToNextBookmark => new TranslatableString(getKey(@"seek_to_next_bookmark"), @"Seek to next bookmark");
 
         /// <summary>
-        /// "Reset bookmarks"
+        /// "Reset bookmarks..."
         /// </summary>
-        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks"), @"Reset bookmarks");
+        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks..."), @"Reset bookmarks...");
 
         /// <summary>
         /// "Open beatmap info page"
@@ -267,7 +273,158 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions."
         /// </summary>
-        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"), @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+        public static LocalisableString ExternalEditMountedExplanation => new TranslatableString(getKey(@"external_edit_mounted_explanation"),
+            @"Any changes made to the exported folder will be imported to the game, including file additions, modifications and deletions.");
+
+        /// <summary>
+        /// "New combo"
+        /// </summary>
+        public static LocalisableString NewCombo => new TranslatableString(getKey(@"new_combo"), @"New combo");
+
+        /// <summary>
+        /// "Bank"
+        /// </summary>
+        public static LocalisableString Bank => new TranslatableString(getKey(@"bank"), @"Bank");
+
+        /// <summary>
+        /// "Normal bank"
+        /// </summary>
+        public static LocalisableString NormalBank => new TranslatableString(getKey(@"normal_bank"), @"Normal bank");
+
+        /// <summary>
+        /// "Addition bank"
+        /// </summary>
+        public static LocalisableString AdditionBank => new TranslatableString(getKey(@"addition_bank"), @"Addition bank");
+
+        /// <summary>
+        /// "Volume"
+        /// </summary>
+        public static LocalisableString SampleVolume => new TranslatableString(getKey(@"sample_volume"), @"Volume");
+
+        /// <summary>
+        /// "Sample"
+        /// </summary>
+        public static LocalisableString Sample => new TranslatableString(getKey(@"sample"), @"Sample");
+
+        /// <summary>
+        /// "Sample set"
+        /// </summary>
+        public static LocalisableString SampleSet => new TranslatableString(getKey(@"sample_set"), @"Sample set");
+
+        /// <summary>
+        /// "Select"
+        /// </summary>
+        public static LocalisableString SelectTool => new TranslatableString(getKey(@"select_tool"), @"Select");
+
+        /// <summary>
+        /// "Synchronise..."
+        /// </summary>
+        public static LocalisableString Synchronise => new TranslatableString(getKey(@"synchronise"), @"Synchronise...");
+
+        /// <summary>
+        /// "Seek backwards"
+        /// </summary>
+        public static LocalisableString SeekBackwards => new TranslatableString(getKey(@"seek_backwards"), @"Seek backwards");
+
+        /// <summary>
+        /// "Seek forwards"
+        /// </summary>
+        public static LocalisableString SeekForwards => new TranslatableString(getKey(@"seek_forwards"), @"Seek forwards");
+
+        /// <summary>
+        /// "Seek to previous timing point"
+        /// </summary>
+        public static LocalisableString SeekToPreviousTimingPoint => new TranslatableString(getKey(@"seek_to_previous_timing_point"), @"Seek to previous timing point");
+
+        /// <summary>
+        /// "Seek to next timing point"
+        /// </summary>
+        public static LocalisableString SeekToNextTimingPoint => new TranslatableString(getKey(@"seek_to_next_timing_point"), @"Seek to next timing point");
+
+        /// <summary>
+        /// "Seek to first object / track start"
+        /// </summary>
+        public static LocalisableString SeekToStart => new TranslatableString(getKey(@"seek_to_start"), @"Seek to first object / track start");
+
+        /// <summary>
+        /// "Play from track start"
+        /// </summary>
+        public static LocalisableString PlayFromStart => new TranslatableString(getKey(@"play_from_start"), @"Play from track start");
+
+        /// <summary>
+        /// "Toggle pause"
+        /// </summary>
+        public static LocalisableString TogglePause => new TranslatableString(getKey(@"toggle_pause"), @"Toggle pause");
+
+        /// <summary>
+        /// "Seek to last object / track end"
+        /// </summary>
+        public static LocalisableString SeekToEnd => new TranslatableString(getKey(@"seek_to_end"), @"Seek to last object / track end");
+
+        /// <summary>
+        /// "Toggle new combo"
+        /// </summary>
+        public static LocalisableString ToggleNewCombo => new TranslatableString(getKey(@"toggle_new_combo"), @"Toggle new combo");
+
+        /// <summary>
+        /// "Toggle whistle sound"
+        /// </summary>
+        public static LocalisableString ToggleWhistleSound => new TranslatableString(getKey(@"toggle_whistle_sound"), @"Toggle whistle sound");
+
+        /// <summary>
+        /// "Toggle finish sound"
+        /// </summary>
+        public static LocalisableString ToggleFinishSound => new TranslatableString(getKey(@"toggle_finish_sound"), @"Toggle finish sound");
+
+        /// <summary>
+        /// "Toggle clap sound"
+        /// </summary>
+        public static LocalisableString ToggleClapSound => new TranslatableString(getKey(@"toggle_clap_sound"), @"Toggle clap sound");
+
+        /// <summary>
+        /// "Set normal sample bank to auto"
+        /// </summary>
+        public static LocalisableString ToggleNormalAutoBank => new TranslatableString(getKey(@"toggle_normal_auto_bank"), @"Set normal sample bank to auto");
+
+        /// <summary>
+        /// "Set normal sample bank to normal"
+        /// </summary>
+        public static LocalisableString ToggleNormalNormalBank => new TranslatableString(getKey(@"toggle_normal_normal_bank"), @"Set normal sample bank to normal");
+
+        /// <summary>
+        /// "Set normal sample bank to soft"
+        /// </summary>
+        public static LocalisableString ToggleNormalSoftBank => new TranslatableString(getKey(@"toggle_normal_soft_bank"), @"Set normal sample bank to soft");
+
+        /// <summary>
+        /// "Set normal sample bank to drum"
+        /// </summary>
+        public static LocalisableString ToggleNormalDrumBank => new TranslatableString(getKey(@"toggle_normal_drum_bank"), @"Set normal sample bank to drum");
+
+        /// <summary>
+        /// "Set addition sample bank to auto"
+        /// </summary>
+        public static LocalisableString ToggleAdditionAutoBank => new TranslatableString(getKey(@"toggle_addition_auto_bank"), @"Set addition sample bank to auto");
+
+        /// <summary>
+        /// "Set addition sample bank to normal"
+        /// </summary>
+        public static LocalisableString ToggleAdditionNormalBank => new TranslatableString(getKey(@"toggle_addition_normal_bank"), @"Set addition sample bank to normal");
+
+        /// <summary>
+        /// "Set addition sample bank to soft"
+        /// </summary>
+        public static LocalisableString ToggleAdditionSoftBank => new TranslatableString(getKey(@"toggle_addition_soft_bank"), @"Set addition sample bank to soft");
+
+        /// <summary>
+        /// "Set addition sample bank to drum"
+        /// </summary>
+        public static LocalisableString ToggleAdditionDrumBank => new TranslatableString(getKey(@"toggle_addition_drum_bank"), @"Set addition sample bank to drum");
+
+        /// <summary>
+        /// "Toggle distance snap grid"
+        /// </summary>
+        public static LocalisableString ToggleDistanceSnap => new TranslatableString(getKey(@"toggle_distance_snap"), @"Toggle distance snap grid");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

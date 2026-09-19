@@ -60,6 +60,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("New max negative", () => newJudgement(-drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
             AddRepeatStep("New max positive", () => newJudgement(drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
+            AddToggleStep("switch colour hit error meter style", b =>
+            {
+                foreach (var meter in Children.OfType<ColourHitErrorMeter>())
+                {
+                    meter.JudgementShape.Value = b ? ColourHitErrorMeter.ShapeStyle.Square : ColourHitErrorMeter.ShapeStyle.Circle;
+                    meter.JudgementSpacing.Value = b ? 1.25f : 2;
+                }
+            });
 
             ScheduledDelegate del = null;
             AddStep("Judgement barrage", () =>
@@ -246,6 +254,29 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Origin = Anchor.CentreLeft,
                 Rotation = 270,
                 Margin = new MarginPadding { Left = 50 }
+            });
+
+            Add(new LegacyBarHitErrorMeter
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.BottomCentre,
+                Rotation = 90,
+                X = -100,
+            });
+
+            Add(new LegacyBarHitErrorMeter
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.BottomCentre,
+                Rotation = 90,
+                X = 100,
+            });
+
+            Add(new LegacyBarHitErrorMeter
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                Y = -100
             });
         }
 

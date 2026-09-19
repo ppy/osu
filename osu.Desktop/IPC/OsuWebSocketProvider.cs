@@ -27,7 +27,12 @@ namespace osu.Desktop.IPC
         [BackgroundDependencyLoader]
         private void load(SessionStatics sessionStatics)
         {
-            server = new WebSocketServer(49727);
+            int port = 49727;
+
+            if (int.TryParse(Environment.GetEnvironmentVariable("OSU_WEBSOCKET_SERVER_PORT"), out int portOverride))
+                port = portOverride;
+
+            server = new WebSocketServer(port);
             server.StartAsync().FireAndForget(onError: ex => Logger.Error(ex, "Failed to start websocket"));
 
             sessionStatics.BindWith(Static.LastLocalUserScore, lastLocalScore);

@@ -3,6 +3,7 @@
 
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
@@ -19,6 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public TestMultiplayerClient MultiplayerClient => OnlinePlayDependencies.MultiplayerClient;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies.SpectatorClient;
+        public QueueController QueueController => OnlinePlayDependencies.QueueController;
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 

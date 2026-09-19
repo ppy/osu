@@ -21,9 +21,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -85,7 +87,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly Bindable<MatchmakingPool[]?> availablePools = new Bindable<MatchmakingPool[]?>();
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
-
         private readonly MatchmakingPoolType poolType;
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
@@ -621,12 +622,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Spacing = new Vector2(15),
                         Children = new Drawable[]
                         {
-                            new OsuSpriteText
+                            new FillFlowContainer
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Text = "Waiting for a game...",
-                                Font = OsuFont.GetFont(size: 32, weight: FontWeight.Light, typeface: Typeface.TorusAlternate),
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 4),
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Text = "Searching for a match...",
+                                        Font = OsuFont.Style.Title,
+                                    },
+                                    new QueueTimerText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Font = OsuFont.Style.Body,
+                                    }
+                                }
                             },
                             new LoadingSpinner
                             {
@@ -709,14 +727,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     {
                         pushScreenDelegate = Schedule(() =>
                         {
+                            if (client.Room == null)
+                            {
+                                Logger.Log("Room became null, returning to idle");
+                                SetState(MatchmakingScreenState.Idle);
+                                return;
+                            }
+
                             switch (poolType)
                             {
                                 case MatchmakingPoolType.QuickPlay:
-                                    this.Push(new ScreenMatchmaking(client.Room!));
+                                    this.Push(new ScreenMatchmaking(client.Room));
                                     break;
 
                                 case MatchmakingPoolType.RankedPlay:
-                                    this.Push(new RankedPlayScreen(client.Room!));
+                                    this.Push(new RankedPlayScreen(client.Room));
                                     break;
                             }
                         });
@@ -858,6 +883,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     IdleColour = colours.YellowDarker;
                     HoverColour = Color4.Black;
                 }
+            }
+        }
+
+        private partial class QueueTimerText : OsuSpriteText
+        {
+            [Resolved]
+            private QueueController queue { get; set; } = null!;
+
+            public QueueTimerText()
+            {
+                AlwaysPresent = true;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                Text = queue.QueueTimer.Elapsed.ToFormattedDuration();
             }
         }
     }

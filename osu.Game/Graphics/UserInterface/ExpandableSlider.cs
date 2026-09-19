@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
         where TSlider : FormSliderBar<T>, new()
     {
         private readonly OsuSpriteText contractedLabel;
-        private readonly TSlider slider;
+        protected readonly TSlider Slider;
 
         /// <summary>
         /// The label text to display when this slider is in a contracted state.
@@ -39,14 +39,14 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public LocalisableString ExpandedLabelText
         {
-            get => slider.Caption;
-            set => slider.Caption = value;
+            get => Slider.Caption;
+            set => Slider.Caption = value;
         }
 
         public Bindable<T> Current
         {
-            get => slider.Current;
-            set => slider.Current = value;
+            get => Slider.Current;
+            set => Slider.Current = value;
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float KeyboardStep
         {
-            get => slider.KeyboardStep;
-            set => slider.KeyboardStep = value;
+            get => Slider.KeyboardStep;
+            set => Slider.KeyboardStep = value;
         }
 
         public BindableBool Expanded { get; } = new BindableBool();
@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.UserInterface
                 Children = new Drawable[]
                 {
                     contractedLabel = new OsuSpriteText(),
-                    slider = new TSlider
+                    Slider = new TSlider
                     {
                         RelativeSizeAxes = Axes.X,
                     },
@@ -99,13 +99,13 @@ namespace osu.Game.Graphics.UserInterface
             {
                 contractedLabel.FadeTo(v.NewValue ? 0 : 1);
 
-                slider.FadeTo(v.NewValue ? Current.Disabled ? 0.3f : 1f : 0f, 500, Easing.OutQuint);
-                slider.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+                Slider.FadeTo(v.NewValue ? Current.Disabled ? 0.3f : 1f : 0f, 500, Easing.OutQuint);
+                Slider.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
             }, true);
 
             Current.BindDisabledChanged(disabled =>
             {
-                slider.Alpha = Expanded.Value ? disabled ? 0.3f : 1 : 0f;
+                Slider.Alpha = Expanded.Value ? disabled ? 0.3f : 1 : 0f;
             });
         }
     }

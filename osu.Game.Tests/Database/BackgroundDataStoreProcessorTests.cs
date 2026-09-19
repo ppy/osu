@@ -247,6 +247,8 @@ namespace osu.Game.Tests.Database
         {
             protected override int TimeToSleepDuringGameplay => 10;
 
+            protected override bool SkipProcessing => false;
+
             public bool Completed => ProcessingTask.IsCompleted;
         }
     }

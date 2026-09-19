@@ -75,9 +75,19 @@ namespace osu.Game.Localisation
         public static LocalisableString Accuracy => new TranslatableString(getKey(@"accuracy"), @"Accuracy");
 
         /// <summary>
+        /// "{0} hit window"
+        /// </summary>
+        public static LocalisableString HitResultWindow(string hitResult) => new TranslatableString(getKey(@"hit_result_window"), @"{0} hit window", hitResult);
+
+        /// <summary>
         /// "HP Drain"
         /// </summary>
         public static LocalisableString HPDrain => new TranslatableString(getKey(@"hp_drain"), @"HP Drain");
+
+        /// <summary>
+        /// "Affects the harshness of health drain and the health penalties for missing."
+        /// </summary>
+        public static LocalisableString HPDrainDescription => new TranslatableString(getKey(@"hp_drain_description"), @"Affects the harshness of health drain and the health penalties for missing.");
 
         /// <summary>
         /// "Scroll Speed"
@@ -140,9 +150,9 @@ namespace osu.Game.Localisation
         public static LocalisableString RemoveFromPlayed => new TranslatableString(getKey(@"remove_from_played"), @"Remove from played");
 
         /// <summary>
-        /// "Clear all local scores"
+        /// "Clear all local scores..."
         /// </summary>
-        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
+        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores...");
 
         /// <summary>
         /// "Restore all hidden"
@@ -268,6 +278,11 @@ namespace osu.Game.Localisation
         /// "mostly {0}"
         /// </summary>
         public static LocalisableString MostlyBPM(int mostCommonBPM) => new TranslatableString(getKey(@"mostly_bpm"), @"mostly {0}", mostCommonBPM);
+
+        /// <summary>
+        /// "{0:#,0} match|{0:#,0} matches"
+        /// </summary>
+        public static LocalisableString MatchesCount(int quantity) => new PluralisableString(new TranslatableString(getKey(@"matches_count"), @"{0:#,0} match|{0:#,0} matches", quantity), quantity, '|');
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -4,11 +4,13 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -64,6 +66,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestHitLighting()
         {
             AddToggleStep("toggle hit lighting", v => config.SetValue(OsuSetting.HitLighting, v));
+            AddToggleStep("toggle hit animation", v => ((OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull()).SetValue(OsuRulesetSetting.HitAnimations, v));
             AddStep("Hit Big Single", () => SetContents(_ => testSingle(2, true)));
         }
 

@@ -255,31 +255,28 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Set reason to other", () =>
             {
-                var reason = this.ChildrenOfType<OsuEnumDropdown<CommentReportReason>>().Single();
+                var reason = this.ChildrenOfType<FormEnumDropdown<CommentReportReason>>().Single();
                 reason.Current.Value = CommentReportReason.Other;
             });
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportCommentDialog.SubmitButton>().First();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
             AddWaitStep("Wait", 3);
-            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentPopover>().Any());
+            AddAssert("Nothing happened", () => this.ChildrenOfType<ReportCommentDialog>().Any());
             AddStep("Add comment", () =>
             {
-                var field = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<OsuTextBox>().First();
+                var field = this.ChildrenOfType<ReportCommentDialog>().Single().ChildrenOfType<OsuTextBox>().First();
                 field.Current.Value = report_text;
             });
             AddStep("Try to report", () =>
             {
-                var btn = this.ChildrenOfType<ReportCommentPopover>().Single().ChildrenOfType<RoundedButton>().Single();
+                var btn = this.ChildrenOfType<ReportCommentDialog.SubmitButton>().First();
                 InputManager.MoveMouseTo(btn);
                 InputManager.Click(MouseButton.Left);
             });
-            AddWaitStep("Wait", 3);
-            AddAssert("Overlay closed", () => !this.ChildrenOfType<ReportCommentPopover>().Any());
-            AddAssert("Loading spinner shown", () => targetComment.ChildrenOfType<LoadingSpinner>().Any(d => d.IsPresent));
             AddStep("Complete request", () => requestLock.Set());
             AddUntilStep("Request sent", () => request != null);
             AddAssert("Request is correct", () => request != null && request.CommentID == 2 && request.Comment == report_text && request.Reason == CommentReportReason.Other);

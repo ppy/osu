@@ -37,30 +37,33 @@ namespace osu.Game.Screens.Ranking.Statistics
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new Container
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding
+                new Container
                 {
-                    Horizontal = 10,
-                    Top = 5,
-                    Bottom = 20,
-                },
-                Children = new Drawable[]
-                {
-                    spriteText = new OsuSpriteText
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding
                     {
-                        Text = text,
-                        Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                        Horizontal = 12,
+                        Top = 8,
+                        Bottom = 20,
                     },
-                    new Box
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding { Top = 4 },
-                        RelativeSizeAxes = Axes.X,
-                        Height = 2,
-                        Colour = Color4Extensions.FromHex("#66FFCC")
+                        spriteText = new OsuSpriteText
+                        {
+                            Text = text,
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                        },
+                        new Box
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.TopCentre,
+                            Margin = new MarginPadding { Top = 4 },
+                            RelativeSizeAxes = Axes.X,
+                            Height = 2,
+                            Colour = Color4Extensions.FromHex("#66FFCC")
+                        }
                     }
                 }
             };

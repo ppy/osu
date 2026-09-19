@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -144,6 +145,77 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasVelocity(1, 3);
         }
 
+        [Test]
+        public void TestPresetInteractions()
+        {
+            clickDifficultyPiece(0);
+            AddAssert("three presets displayed",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1d, 1.5d]));
+            AddAssert("one preset selected",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Count(b => b.Current.Value == TernaryState.True),
+                () => Is.EqualTo(1));
+            AddAssert("selected preset is 1.0x",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Single(b => b.Current.Value == TernaryState.True).Velocity,
+                () => Is.EqualTo(1));
+
+            AddStep("press first preset", () =>
+            {
+                InputManager.MoveMouseTo(getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            hitObjectHasVelocity(0, 0.75);
+
+            dismissPopover();
+
+            AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+            clickDifficultyPiece(0);
+            AddAssert("three presets displayed",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1d, 1.5d]));
+            AddAssert("no preset fully selected",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Count(b => b.Current.Value == TernaryState.True),
+                () => Is.EqualTo(0));
+            AddAssert("one preset indeterminate",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Count(b => b.Current.Value == TernaryState.Indeterminate),
+                () => Is.EqualTo(1));
+
+            AddStep("remove second preset", () =>
+            {
+                InputManager.MoveMouseTo(getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().ElementAt(1));
+                InputManager.Click(MouseButton.Middle);
+            });
+            AddAssert("two presets displayed",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1.5d]));
+            hitObjectHasVelocity(0, 0.75);
+            hitObjectHasVelocity(1, 2);
+
+            AddStep("press last preset", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Last());
+                InputManager.Click(MouseButton.Left);
+            });
+            hitObjectHasVelocity(0, 1.5);
+            hitObjectHasVelocity(1, 1.5);
+
+            setVelocityViaPopover(2);
+            hitObjectHasVelocity(0, 2);
+            hitObjectHasVelocity(1, 2);
+
+            AddStep("add preset", () =>
+            {
+                var popover = getPopover().ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
+                InputManager.MoveMouseTo(popover.ChildrenOfType<RoundedButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("three presets displayed",
+                () => getPopover().ChildrenOfType<SliderVelocityAdjustmentControl.SliderVelocityPresetTernaryButton>().Select(b => b.Velocity),
+                () => Is.EquivalentTo([0.75d, 1.5d, 2d]));
+
+            DifficultyPointPiece.DifficultyEditPopover getPopover() => this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Single();
+        }
+
         private void clickDifficultyPiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} difficulty piece", () =>
         {
             var difficultyPiece = this.ChildrenOfType<DifficultyPointPiece>().Single(piece => piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
@@ -155,7 +227,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void velocityPopoverHasFocus() => AddUntilStep("velocity popover textbox focused", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var slider = popover?.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
             var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
 
             return textbox?.HasFocus == true;
@@ -164,17 +236,17 @@ namespace osu.Game.Tests.Visual.Editing
         private void velocityPopoverHasSingleValue(double velocity) => AddUntilStep($"velocity popover has {velocity}", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var control = popover?.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
 
-            return slider?.Current.Value == velocity;
+            return control?.Current.Value == velocity && !control.IsMultipleValues;
         });
 
         private void velocityPopoverHasIndeterminateValue() => AddUntilStep("velocity popover has indeterminate value", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var control = popover?.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
 
-            return slider != null && slider.Current.Value == null;
+            return control != null && control.IsMultipleValues;
         });
 
         private void dismissPopover()
@@ -187,7 +259,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void setVelocityViaPopover(double velocity) => AddStep($"set {velocity} via popover", () =>
         {
             var popover = this.ChildrenOfType<DifficultyPointPiece.DifficultyEditPopover>().Single();
-            var slider = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<double>>().Single();
+            var slider = popover.ChildrenOfType<SliderVelocityAdjustmentControl>().Single();
             slider.Current.Value = velocity;
         });
 
