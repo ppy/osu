@@ -70,14 +70,14 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         }
 
         /// <summary>
-        /// Calculates a Gaussian-based bell curve function (https://en.wikipedia.org/wiki/Gaussian_function)
+        /// Calculates a Gaussian-based bell curve function (https://en.wikipedia.org/wiki/Gaussian_function). Note that this is *not* the normal distribution, which normalizes the height to 1/(width * sqrt(2pi))
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
         /// <param name="mean">The mean (center) of the bell curve</param>
         /// <param name="width">The width (spread) of the curve</param>
-        /// <param name="multiplier">Multiplier to adjust the curve's height</param>
+        /// <param name="height">Multiplier to adjust the curve's height</param>
         /// <returns>The output of the bell curve function of <paramref name="x"/></returns>
-        public static double BellCurve(double x, double mean, double width, double multiplier = 1.0) => multiplier * Math.Exp(Math.E * -(Pow(x - mean, 2) / Pow(width, 2)));
+        public static double GaussianCurve(double x, double mean, double width, double height = 1.0) => height * Math.Exp(-0.5 * (Pow(x - mean, 2) / Pow(width, 2)));
 
         /// <summary>
         /// Calculates a Smoothstep bell curve that returns 1 for x = mean, and smoothly reducing it's value to 0 over width
