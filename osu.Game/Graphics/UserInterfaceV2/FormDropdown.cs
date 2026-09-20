@@ -66,6 +66,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             get
             {
                 yield return Caption;
+                yield return HintText;
 
                 foreach (var item in MenuItems)
                     yield return item.Text.Value;

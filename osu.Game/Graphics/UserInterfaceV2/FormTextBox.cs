@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -254,7 +253,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool IsDisabled => current.Disabled;
 
-        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
 
         public float MainDrawHeight => DrawHeight;
     }

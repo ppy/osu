@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -136,7 +135,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 background.VisualStyle = VisualStyle.Normal;
         }
 
-        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
 
         public event Action? ValueChanged;
 
