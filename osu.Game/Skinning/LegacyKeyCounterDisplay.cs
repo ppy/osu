@@ -40,7 +40,7 @@ namespace osu.Game.Skinning
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Y = 7,
+                    Y = 7f,
                     Spacing = new Vector2(1.2f),
                     Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
