@@ -87,6 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 case nameof(Room.Status):
                 case nameof(Room.Host):
                 case nameof(Room.StartDate):
+                case nameof(Room.EndDate):
                     updateState();
                     break;
             }
