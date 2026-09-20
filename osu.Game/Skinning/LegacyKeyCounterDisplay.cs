@@ -33,14 +33,14 @@ namespace osu.Game.Skinning
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopLeft,
                     Scale = new Vector2(1.05f, 1),
-                    X = 0.5f,
+                    X = 1,
                     Rotation = 90,
                 },
                 KeyFlow = new FillFlowContainer<KeyCounter>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Y = 7f,
+                    Y = 7.35f,
                     Spacing = new Vector2(1.2f),
                     Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
