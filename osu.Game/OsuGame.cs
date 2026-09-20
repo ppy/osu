@@ -1196,8 +1196,6 @@ namespace osu.Game
                 },
             }, topMostOverlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
-
             onScreenDisplay = new OnScreenDisplay();
 
             onScreenDisplay.BeginTracking(this, frameworkConfig);
@@ -1254,6 +1252,8 @@ namespace osu.Game
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
             loadComponentSingleFile<BeatmapStore>(detachedBeatmapStore = new RealmDetachedBeatmapStore(), Add, true);
             loadComponentSingleFile(new QueueController(), Add, true);
+
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
