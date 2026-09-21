@@ -3,13 +3,11 @@
 
 using Newtonsoft.Json;
 
-#nullable disable
-
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIScreenshot
     {
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public string Url { get; set; } = string.Empty;
     }
 }
