@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Utils
@@ -15,7 +16,7 @@ namespace osu.Game.Tests.Utils
         {
             string nextBestName = NamingUtils.GetNextBestName(Enumerable.Empty<string>(), "New Difficulty");
 
-            Assert.AreEqual("New Difficulty", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty", nextBestName);
         }
 
         [Test]
@@ -30,7 +31,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty");
 
-            Assert.AreEqual("New Difficulty", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty", nextBestName);
         }
 
         [Test]
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty");
 
-            Assert.AreEqual("New Difficulty", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty", nextBestName);
         }
 
         [Test]
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty");
 
-            Assert.AreEqual("New Difficulty (1)", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty (1)", nextBestName);
         }
 
         [Test]
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty");
 
-            Assert.AreEqual("New Difficulty (1)", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty (1)", nextBestName);
         }
 
         [Test]
@@ -84,7 +85,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty (copy)");
 
-            Assert.AreEqual("New Difficulty (copy) (1)", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty (copy) (1)", nextBestName);
         }
 
         [Test]
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty");
 
-            Assert.AreEqual("New Difficulty (4)", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty (4)", nextBestName);
         }
 
         [Test]
@@ -110,7 +111,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty");
 
-            Assert.AreEqual("New Difficulty (31)", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty (31)", nextBestName);
         }
 
         [Test]
@@ -126,7 +127,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestName = NamingUtils.GetNextBestName(existingNames, "New Difficulty");
 
-            Assert.AreEqual("New Difficulty (2)", nextBestName);
+            ClassicAssert.AreEqual("New Difficulty (2)", nextBestName);
         }
 
         [Test]
@@ -134,7 +135,7 @@ namespace osu.Game.Tests.Utils
         {
             string nextBestFilename = NamingUtils.GetNextBestFilename(Enumerable.Empty<string>(), "test_file.osr");
 
-            Assert.AreEqual("test_file.osr", nextBestFilename);
+            ClassicAssert.AreEqual("test_file.osr", nextBestFilename);
         }
 
         [Test]
@@ -149,7 +150,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "test_file.osr");
 
-            Assert.AreEqual("test_file.osr", nextBestFilename);
+            ClassicAssert.AreEqual("test_file.osr", nextBestFilename);
         }
 
         [Test]
@@ -164,7 +165,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.osr");
 
-            Assert.AreEqual("replay_file.osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file.osr", nextBestFilename);
         }
 
         [Test]
@@ -177,7 +178,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.osr");
 
-            Assert.AreEqual("replay_file (1).osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (1).osr", nextBestFilename);
         }
 
         [Test]
@@ -191,7 +192,7 @@ namespace osu.Game.Tests.Utils
             };
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.osr");
-            Assert.AreEqual("replay_file (3).osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (3).osr", nextBestFilename);
         }
 
         [Test]
@@ -204,10 +205,10 @@ namespace osu.Game.Tests.Utils
             };
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.osr");
-            Assert.AreEqual("replay_file (1).osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (1).osr", nextBestFilename);
 
             nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file (copy).osr");
-            Assert.AreEqual("replay_file (copy) (1).osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (copy) (1).osr", nextBestFilename);
         }
 
         [Test]
@@ -223,7 +224,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.osr");
 
-            Assert.AreEqual("replay_file (4).osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (4).osr", nextBestFilename);
         }
 
         [Test]
@@ -240,7 +241,7 @@ namespace osu.Game.Tests.Utils
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.osr");
 
-            Assert.AreEqual("replay_file (3).osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (3).osr", nextBestFilename);
         }
 
         [Test]
@@ -254,10 +255,10 @@ namespace osu.Game.Tests.Utils
             };
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "surely");
-            Assert.AreEqual("surely", nextBestFilename);
+            ClassicAssert.AreEqual("surely", nextBestFilename);
 
             nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "those");
-            Assert.AreEqual("those (1)", nextBestFilename);
+            ClassicAssert.AreEqual("those (1)", nextBestFilename);
         }
 
         [Test]
@@ -271,10 +272,10 @@ namespace osu.Game.Tests.Utils
             };
 
             string nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.osr");
-            Assert.AreEqual("replay_file (2).osr", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (2).osr", nextBestFilename);
 
             nextBestFilename = NamingUtils.GetNextBestFilename(existingFiles, "replay_file.txt");
-            Assert.AreEqual("replay_file (1).txt", nextBestFilename);
+            ClassicAssert.AreEqual("replay_file (1).txt", nextBestFilename);
         }
     }
 }

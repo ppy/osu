@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
@@ -37,7 +38,7 @@ namespace osu.Game.Tests.NonVisual
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
-            Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, nested.HitWindows);
+            ClassicAssert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, nested.HitWindows);
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace osu.Game.Tests.NonVisual
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
-            Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, testObject.HitWindows);
+            ClassicAssert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, testObject.HitWindows);
         }
 
         [Test]
@@ -61,7 +62,7 @@ namespace osu.Game.Tests.NonVisual
             var secondObject = new TestHitObject(new DefaultHitWindows());
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject, secondObject };
 
-            Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, secondObject.HitWindows);
+            ClassicAssert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, secondObject.HitWindows);
         }
 
         [Test]
@@ -73,7 +74,7 @@ namespace osu.Game.Tests.NonVisual
 
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject };
 
-            Assert.IsNull(testDrawableRuleset.FirstAvailableHitWindows);
+            ClassicAssert.Null(testDrawableRuleset.FirstAvailableHitWindows);
         }
 
         [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]

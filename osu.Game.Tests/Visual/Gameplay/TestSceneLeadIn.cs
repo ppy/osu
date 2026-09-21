@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var storyboard = new Storyboard();
 
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
 
             sprite.Commands.AddAlpha(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             var storyboard = new Storyboard();
 
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
             sprite.Commands.AddScale(Easing.None, loop_start_time, -18000, 0, 1);

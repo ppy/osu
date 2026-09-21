@@ -55,9 +55,9 @@ namespace osu.Game.Extensions
                         {
                             tcs.TrySetResult(true);
                         }
-                    }, cancellationToken: default);
+                    }, cancellationToken: CancellationToken.None);
                 }
-            }, cancellationToken: default);
+            }, cancellationToken: CancellationToken.None);
 
             // importantly, we are not returning the continuation itself but rather a task which represents its status in sequential execution order.
             // this will not be cancelled or completed until the previous task has also.

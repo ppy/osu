@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Edit
         }
 
         /// <summary>
-        /// Seek smoothly to the provided destination.
+        /// Seek smoothly to the provided destination, if within a certain proximity to the current viewport.
         /// Use <see cref="Seek"/> to perform an immediate seek.
         /// </summary>
         /// <param name="seekDestination"></param>
@@ -217,12 +217,17 @@ namespace osu.Game.Screens.Edit
         {
             seekingOrStopped.Value = true;
 
-            if (IsRunning)
-                Seek(seekDestination);
-            else
+            // The whole point of seeking smoothly is to maintain continuity for the user.
+            // Above a certain proximity, there's little reason to do this as the jump is already huge.
+            const double smooth_seek_max_proximity = 5000;
+
+            if (IsRunning || Math.Abs(seekDestination - currentTime) > smooth_seek_max_proximity)
             {
-                transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
+                Seek(seekDestination);
+                return;
             }
+
+            transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
         }
 
         public void BindAdjustments() => track.Value?.BindAdjustments(AudioAdjustments);

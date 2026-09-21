@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         public IHitObjectContainer? HitObjectContainer { get; set; }
 
-        public ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult _)
+        public ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult result)
         {
             if (HitObjectContainer == null)
                 throw new InvalidOperationException($"{nameof(HitObjectContainer)} should be set before {nameof(CheckHittable)} is called.");
@@ -36,15 +36,22 @@ namespace osu.Game.Rulesets.Osu.UI
                     blockingObject = obj;
             }
 
-            // If there is no previous hitobject, allow the hit.
-            if (blockingObject == null)
-                return ClickAction.Hit;
+            if (blockingObject != null)
+            {
+                // A hit is disallowed if:
+                // 1. The last blocking hitobject has not yet been judged.
+                // 2. The current time is before the last hitobject's start time.
+                //
+                // Hits at exactly the same time as the blocking hitobject are allowed for maps that contain simultaneous hitobjects (e.g. /b/372245).
+                if (!blockingObject.Judged && time < blockingObject.HitObject.StartTime)
+                    return ClickAction.Shake;
+            }
 
-            // A hit is allowed if:
-            // 1. The last blocking hitobject has been judged.
-            // 2. The current time is after the last hitobject's start time.
-            // Hits at exactly the same time as the blocking hitobject are allowed for maps that contain simultaneous hitobjects (e.g. /b/372245).
-            return (blockingObject.Judged || time >= blockingObject.HitObject.StartTime) ? ClickAction.Hit : ClickAction.Shake;
+            // Generally when the user has hit way too early.
+            if (result == HitResult.None)
+                return ClickAction.Shake;
+
+            return ClickAction.Hit;
         }
 
         public void HandleHit(DrawableHitObject hitObject)

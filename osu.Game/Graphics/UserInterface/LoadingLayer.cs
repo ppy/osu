@@ -6,7 +6,9 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -17,20 +19,28 @@ namespace osu.Game.Graphics.UserInterface
     /// Also optionally dims target elements.
     /// Useful for disabling all elements in a form and showing we are waiting on a response, for instance.
     /// </summary>
-    public partial class LoadingLayer : LoadingSpinner
+    public partial class LoadingLayer : LoadingSpinner, IKeyBindingHandler<GlobalAction>
     {
-        private readonly bool blockInput;
+        /// <summary>
+        /// Whether to block positional input of components behind the loading layer.
+        /// Defaults to <c>true</c>.
+        /// </summary>
+        public bool BlockPositionalInput { get; init; } = true;
+
+        /// <summary>
+        /// Whether to block all keyboard input. Includes global actions.
+        /// Defaults to <c>false</c>.
+        /// </summary>
+        public bool BlockNonPositionalInput { get; init; }
 
         /// <summary>
         /// Construct a new loading spinner.
         /// </summary>
         /// <param name="dimBackground">Whether the full background area should be dimmed while loading.</param>
         /// <param name="withBox">Whether the spinner should have a surrounding black box for visibility.</param>
-        /// <param name="blockInput">Whether to block input of components behind the loading layer.</param>
-        public LoadingLayer(bool dimBackground = false, bool withBox = true, bool blockInput = true)
+        public LoadingLayer(bool dimBackground = false, bool withBox = true)
             : base(withBox)
         {
-            this.blockInput = blockInput;
             RelativeSizeAxes = Axes.Both;
             Size = new Vector2(1);
 
@@ -48,11 +58,11 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public override bool HandleNonPositionalInput => false;
+        public override bool HandleNonPositionalInput => BlockNonPositionalInput;
 
         protected override bool Handle(UIEvent e)
         {
-            if (!blockInput)
+            if (!BlockPositionalInput)
                 return false;
 
             switch (e)
@@ -75,6 +85,12 @@ namespace osu.Game.Graphics.UserInterface
             base.Update();
 
             MainContents.Size = new Vector2(Math.Clamp(Math.Min(DrawWidth, DrawHeight) * 0.25f, 20, 80));
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e) => BlockNonPositionalInput;
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 }

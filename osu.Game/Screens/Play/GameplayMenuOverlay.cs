@@ -5,25 +5,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osuTK;
-using osuTK.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
+using osu.Game.Skinning;
 using osu.Game.Utils;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,7 +34,7 @@ namespace osu.Game.Screens.Play
     {
         protected const int TRANSITION_DURATION = 200;
 
-        private const int button_height = 70;
+        private const int button_height = 80;
         private const float background_alpha = 0.75f;
 
         protected override bool BlockScrollInput => false;
@@ -62,6 +65,8 @@ namespace osu.Game.Screens.Play
 
         public abstract LocalisableString Header { get; }
 
+        public Container FooterContent { get; private set; } = null!;
+
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons = null!;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
@@ -76,58 +81,79 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, GameHost? host)
         {
             Children = new Drawable[]
             {
+                pauseLoop = new SkinnableSound(new SampleInfo("Gameplay/pause-loop"))
+                {
+                    Looping = true,
+                    Volume = { Value = 0 }
+                },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                     Alpha = background_alpha,
                 },
-                new FillFlowContainer
+                new GridContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 50),
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Children = new Drawable[]
+                    RelativeSizeAxes = Axes.Both,
+                    RowDimensions = new[]
                     {
-                        new OsuSpriteText
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            Text = Header,
-                            Font = OsuFont.GetFont(size: 48),
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Colour = colours.Yellow,
-                        },
-                        InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
-                        {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Masking = true,
-                            EdgeEffect = new EdgeEffectParameters
+                            new OsuSpriteText
                             {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.6f),
-                                Radius = 50
+                                Text = Header,
+                                Font = OsuFont.GetFont(typeface: Typeface.TorusAlternate, size: 48, weight: FontWeight.SemiBold),
+                                Spacing = new Vector2(5),
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Colour = colours.Yellow,
                             },
                         },
-                        playInfoText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: 18))
+                        new Drawable[]
                         {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            TextAnchor = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
+                            InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                Padding = new MarginPadding { Horizontal = 50 },
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(2),
+                                Masking = true,
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            playInfoText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: 18))
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                TextAnchor = Anchor.Centre,
+                                AutoSizeAxes = Axes.Both,
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            FooterContent = new Container
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            },
                         }
                     }
-                },
+                }
             };
 
             if (OnResume != null)
@@ -142,6 +168,9 @@ namespace osu.Game.Screens.Play
             State.ValueChanged += _ => InternalButtons.Deselect();
 
             updateInfoText();
+
+            if (host != null)
+                windowActive.BindTo(host.IsActive);
         }
 
         private int retries;
@@ -164,9 +193,15 @@ namespace osu.Game.Screens.Play
         {
             this.FadeIn(TRANSITION_DURATION, Easing.In);
             updateInfoText();
+
+            startPauseLoop();
         }
 
-        protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
+        protected override void PopOut()
+        {
+            this.FadeOut(TRANSITION_DURATION, Easing.In);
+            stopPauseLoop();
+        }
 
         protected void AddButton(LocalisableString text, Color4 colour, Action? action)
         {
@@ -283,5 +318,44 @@ namespace osu.Game.Screens.Play
 
             return base.Handle(e);
         }
+
+        #region Pause loop sound handling
+
+        public override bool IsPresent => base.IsPresent || pauseLoop.IsPlaying;
+
+        private SkinnableSound pauseLoop = null!;
+
+        private readonly IBindable<bool> windowActive = new Bindable<bool>(true);
+
+        private float targetVolume => windowActive.Value && State.Value == Visibility.Visible ? 1.0f : 0;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Schedule required because host.IsActive doesn't seem to always run on the update thread.
+            windowActive.BindValueChanged(_ => Schedule(() => pauseLoop.VolumeTo(targetVolume, 1000, Easing.Out)));
+        }
+
+        public void StopAllSamples()
+        {
+            if (!IsLoaded)
+                return;
+
+            pauseLoop.Stop();
+        }
+
+        private void startPauseLoop()
+        {
+            pauseLoop.VolumeTo(targetVolume, TRANSITION_DURATION, Easing.InQuint);
+            pauseLoop.Play();
+        }
+
+        private void stopPauseLoop()
+        {
+            pauseLoop.VolumeTo(targetVolume, TRANSITION_DURATION, Easing.OutQuad).Finally(_ => pauseLoop.Stop());
+        }
+
+        #endregion
     }
 }

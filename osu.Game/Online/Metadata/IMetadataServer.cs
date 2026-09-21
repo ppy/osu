@@ -53,5 +53,10 @@ namespace osu.Game.Online.Metadata
         /// Signals to the server that the current user would like to stop receiving updates about the state of the multiplayer room with the given <paramref name="id"/>.
         /// </summary>
         Task EndWatchingMultiplayerRoom(long id);
+
+        /// <summary>
+        /// Refresh this user's friend listing.
+        /// </summary>
+        Task RefreshFriends();
     }
 }

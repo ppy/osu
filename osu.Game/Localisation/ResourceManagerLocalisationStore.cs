@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,6 +15,7 @@ namespace osu.Game.Localisation
 {
     public class ResourceManagerLocalisationStore : ILocalisationStore
     {
+        private readonly Dictionary<string, string?> lookupCache = new Dictionary<string, string?>();
         private readonly Dictionary<string, ResourceManager> resourceManagers = new Dictionary<string, ResourceManager>();
 
         public ResourceManagerLocalisationStore(string cultureCode)
@@ -28,7 +27,28 @@ namespace osu.Game.Localisation
         {
         }
 
-        public string Get(string lookup)
+        public string? Get(string lookup)
+        {
+            lock (lookupCache)
+            {
+                if (lookupCache.TryGetValue(lookup, out string? cached))
+                    return cached;
+            }
+
+            string? result = getInternal(lookup);
+
+            lock (lookupCache)
+            {
+                // It's important to cache both lookup successes and failures here.
+                // The strings cannot really change under the game, so there's no risk of having a lookup fail now but succeed at some point later,
+                // and lookup failures are *more* costly than successes as they incur a scan of *all* strings in resources.
+                lookupCache[lookup] = result;
+            }
+
+            return result;
+        }
+
+        private string? getInternal(string lookup)
         {
             string[] split = lookup.Split(':');
 
@@ -83,7 +103,7 @@ namespace osu.Game.Localisation
             }
         }
 
-        public Task<string> GetAsync(string lookup, CancellationToken cancellationToken = default)
+        public Task<string?> GetAsync(string lookup, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(Get(lookup));
         }

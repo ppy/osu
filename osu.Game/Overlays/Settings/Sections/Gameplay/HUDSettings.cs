@@ -3,8 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
@@ -18,44 +20,50 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsEnumDropdown<HUDVisibilityMode>
+                new SettingsItemV2(new FormEnumDropdown<HUDVisibilityMode>
                 {
-                    LabelText = GameplaySettingsStrings.HUDVisibilityMode,
+                    Caption = GameplaySettingsStrings.HUDVisibilityMode,
                     Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.ShowReplaySettingsOverlay,
+                    Caption = GameplaySettingsStrings.ShowReplaySettingsOverlay,
                     Current = config.GetBindable<bool>(OsuSetting.ReplaySettingsOverlay),
+                })
+                {
                     Keywords = new[] { "hide" },
                 },
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.AlwaysShowKeyOverlay,
+                    Caption = GameplaySettingsStrings.AlwaysShowKeyOverlay,
                     Current = config.GetBindable<bool>(OsuSetting.KeyOverlay),
+                })
+                {
                     Keywords = new[] { "counter" },
                 },
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
+                    Caption = GameplaySettingsStrings.AlwaysShowGameplayLeaderboard,
                     Current = config.GetBindable<bool>(OsuSetting.GameplayLeaderboard),
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.AlwaysRequireHoldForMenu,
+                    Caption = GameplaySettingsStrings.AlwaysRequireHoldForMenu,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysRequireHoldingForPause),
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.AlwaysShowHoldForMenuButton,
+                    Caption = GameplaySettingsStrings.AlwaysShowHoldForMenuButton,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysShowHoldForMenuButton),
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    ClassicDefault = false,
-                    LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
+                    Caption = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
-                    Keywords = new[] { "hp", "bar" }
+                })
+                {
+                    Keywords = new[] { "hp", "bar" },
+                    ApplyClassicDefault = c => ((IHasCurrentValue<bool>)c).Current.Value = false,
                 },
             };
         }

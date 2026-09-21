@@ -9,12 +9,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -193,15 +191,7 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        public IEnumerable<DrawableTernaryButton> CreateTernaryButtons() => new[]
-        {
-            new DrawableTernaryButton
-            {
-                Current = DistanceSnapToggle,
-                Description = "Distance Snap",
-                CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap },
-            }
-        };
+        public abstract IEnumerable<DrawableTernaryButton> CreateTernaryButtons();
 
         public void HandleToggleViaKey(KeyboardEvent key)
         {
@@ -308,7 +298,7 @@ namespace osu.Game.Rulesets.Edit
             private readonly ValueChangedEvent<double> change;
 
             public DistanceSpacingToast(LocalisableString value, ValueChangedEvent<double> change)
-                : base(getAction(change).GetLocalisableDescription(), value, string.Empty)
+                : base(getAction(change).GetLocalisableDescription(), value)
             {
                 this.change = change;
             }
@@ -316,7 +306,7 @@ namespace osu.Game.Rulesets.Edit
             [BackgroundDependencyLoader]
             private void load(RealmKeyBindingStore keyBindingStore)
             {
-                ShortcutText.Text = keyBindingStore.GetBindingsStringFor(getAction(change)).ToUpper();
+                ExtraText = keyBindingStore.GetBindingsStringFor(getAction(change));
             }
 
             private static GlobalAction getAction(ValueChangedEvent<double> change) => change.NewValue - change.OldValue > 0

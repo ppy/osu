@@ -1,0 +1,53 @@
+osu file format v14
+
+[General]
+Mode: 3
+
+[Metadata]
+Title:keycount test
+TitleUnicode:keycount test
+Artist:mania
+ArtistUnicode:mania
+Creator:spaceman_atlas
+Version:17K
+
+[Difficulty]
+HPDrainRate:5
+CircleSize:17
+OverallDifficulty:5
+ApproachRate:5
+SliderMultiplier:1.4
+SliderTickRate:1
+
+[Events]
+//Background and Video events
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+
+[TimingPoints]
+0,500,4,2,0,100,1,0
+
+
+[HitObjects]
+15,192,0,1,0,0:0:0:0:
+45,192,125,1,0,0:0:0:0:
+75,192,250,1,0,0:0:0:0:
+105,192,375,1,0,0:0:0:0:
+135,192,500,1,0,0:0:0:0:
+165,192,625,1,0,0:0:0:0:
+195,192,750,1,0,0:0:0:0:
+225,192,875,1,0,0:0:0:0:
+256,192,1000,1,0,0:0:0:0:
+286,192,1125,1,0,0:0:0:0:
+316,192,1250,1,0,0:0:0:0:
+346,192,1375,1,0,0:0:0:0:
+376,192,1500,1,0,0:0:0:0:
+406,192,1625,1,0,0:0:0:0:
+436,192,1750,1,0,0:0:0:0:
+466,192,1875,1,0,0:0:0:0:
+496,192,2000,1,0,0:0:0:0:

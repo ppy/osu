@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.BeatmapSelect
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 200 },
+                    Padding = new MarginPadding { Horizontal = 250 },
                     Children = new Drawable[]
                     {
                         beatmapSelectGrid = new BeatmapSelectGrid

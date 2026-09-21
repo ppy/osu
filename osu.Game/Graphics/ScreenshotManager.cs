@@ -186,7 +186,7 @@ namespace osu.Game.Graphics
 
                     notificationOverlay.Post(new SimpleNotification
                     {
-                        Text = $"Screenshot {filename} saved!",
+                        Text = NotificationsStrings.ScreenshotSaved(filename),
                         Activated = () =>
                         {
                             storage.PresentFileExternally(filename);
@@ -257,7 +257,7 @@ namespace osu.Game.Graphics
             api.Queue(uploadRequest);
         });
 
-        private static readonly object filename_reservation_lock = new object();
+        private static readonly Lock filename_reservation_lock = new Lock();
 
         private (string? filename, Stream? stream) getWritableStream(ScreenshotFormat format)
         {

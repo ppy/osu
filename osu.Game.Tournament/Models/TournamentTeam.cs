@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -49,11 +50,9 @@ namespace osu.Game.Tournament.Models
 
         public Bindable<string> Seed = new Bindable<string>(string.Empty);
 
-        public Bindable<int> LastYearPlacing = new BindableInt
-        {
-            MinValue = 0,
-            MaxValue = 256
-        };
+        [JsonProperty]
+        [JsonConverter(typeof(LastYearPlacingConverter))]
+        public Bindable<string> LastYearPlacing = new Bindable<string>(@"N/A");
 
         [JsonProperty]
         public BindableList<TournamentUser> Players { get; } = new BindableList<TournamentUser>();
@@ -76,5 +75,37 @@ namespace osu.Game.Tournament.Models
         }
 
         public override string ToString() => FullName.Value ?? Acronym.Value;
+
+        public class LastYearPlacingConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType) => objectType == typeof(Bindable<string>);
+
+            public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+                => serializer.Serialize(writer, ((Bindable<string>)value!).Value);
+
+            public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+            {
+                var lastYearPlacing = existingValue as Bindable<string>;
+                Debug.Assert(lastYearPlacing != null);
+
+                switch (reader.TokenType)
+                {
+                    case JsonToken.String:
+                        lastYearPlacing.Value = (string?)reader.Value ?? lastYearPlacing.Default;
+                        break;
+
+                    case JsonToken.Integer:
+                        long value = (long)reader.Value!;
+                        lastYearPlacing.Value = value > 0 ? $@"#{value}" : lastYearPlacing.Default;
+                        break;
+
+                    default:
+                        reader.Read();
+                        break;
+                }
+
+                return lastYearPlacing;
+            }
+        }
     }
 }

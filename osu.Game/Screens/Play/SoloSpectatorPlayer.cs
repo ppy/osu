@@ -6,7 +6,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Game.Online.Spectator;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play

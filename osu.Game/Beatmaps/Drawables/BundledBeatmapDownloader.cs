@@ -467,7 +467,6 @@ namespace osu.Game.Beatmaps.Drawables
             @"2055329 miraie & blackwinterwells - facade.osz",
             @"2069877 Sephid - Thunderstrike 1988.osz",
             @"2119716 Aethoro - Snowy.osz",
-            @"2120379 Synthion - VIVIDVELOCITY.osz",
             @"2124805 Frums (unknown ""lambda"") - 19ZZ.osz",
             @"2127811 Wiklund - Joy of Living (Cut Ver.).osz",
         };

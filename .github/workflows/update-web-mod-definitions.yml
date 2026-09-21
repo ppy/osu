@@ -38,15 +38,19 @@ jobs:
       run: ./UseLocalOsu.sh
       working-directory: ./osu-tools
 
+    - name: Build tools
+      run: dotnet build PerformanceCalculator --nologo --verbosity quiet
+      working-directory: ./osu-tools
+
     - name: Regenerate mod definitions
-      run: dotnet run --project PerformanceCalculator -- mods > ../osu-web/database/mods.json
+      run: dotnet run --project PerformanceCalculator --no-build -- mods > ../osu-web/database/mods.json
       working-directory: ./osu-tools
 
     - name: Create pull request with changes
       uses: peter-evans/create-pull-request@v6
       with:
         title: Update mod definitions
-        body: "This PR has been auto-generated to update the mod definitions to match ppy/osu@${{ github.ref_name }}."
+        body: "This PR has been auto-generated to update the mod definitions to match ppy/osu@${{ github.ref_name }}. cc @peppy"
         branch: update-mod-definitions
         commit-message: Update mod definitions
         path: osu-web

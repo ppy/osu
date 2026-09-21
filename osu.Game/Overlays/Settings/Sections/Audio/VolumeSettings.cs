@@ -6,7 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -20,46 +20,38 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new VolumeAdjustSlider
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = AudioSettingsStrings.MasterVolume,
+                    Caption = AudioSettingsStrings.MasterVolume,
                     Current = audio.Volume,
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
-                },
-                new SettingsSlider<double>
+                    DisplayAsPercentage = true,
+                    PlaySamplesOnAdjust = false,
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = AudioSettingsStrings.MasterVolumeInactive,
+                    Caption = AudioSettingsStrings.MasterVolumeInactive,
                     Current = config.GetBindable<double>(OsuSetting.VolumeInactive),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
-                },
-                new VolumeAdjustSlider
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = AudioSettingsStrings.EffectVolume,
+                    Caption = AudioSettingsStrings.EffectVolume,
                     Current = audio.VolumeSample,
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
-                },
-
-                new VolumeAdjustSlider
+                    DisplayAsPercentage = true,
+                    PlaySamplesOnAdjust = false,
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = AudioSettingsStrings.MusicVolume,
+                    Caption = AudioSettingsStrings.MusicVolume,
                     Current = audio.VolumeTrack,
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
-                },
+                    DisplayAsPercentage = true,
+                    PlaySamplesOnAdjust = false,
+                }),
             };
-        }
-
-        private partial class VolumeAdjustSlider : SettingsSlider<double>
-        {
-            protected override Drawable CreateControl()
-            {
-                var sliderBar = (RoundedSliderBar<double>)base.CreateControl();
-                sliderBar.PlaySamplesOnAdjust = false;
-                return sliderBar;
-            }
         }
     }
 }

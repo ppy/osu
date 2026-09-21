@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -45,10 +46,46 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddStep("add panel", () =>
             {
+                var beatmap = CreateAPIBeatmap();
+
+                beatmap.TopTags =
+                [
+                    new APIBeatmapTag { TagId = 4, VoteCount = 1 },
+                    new APIBeatmapTag { TagId = 2, VoteCount = 1 },
+                    new APIBeatmapTag { TagId = 23, VoteCount = 5 },
+                ];
+
+                beatmap.BeatmapSet!.HasExplicitContent = true;
+                beatmap.BeatmapSet!.HasVideo = true;
+                beatmap.BeatmapSet!.HasStoryboard = true;
+                beatmap.BeatmapSet.FeaturedInSpotlight = true;
+                beatmap.BeatmapSet.TrackId = 1;
+                beatmap.BeatmapSet!.RelatedTags =
+                [
+                    new APITag
+                    {
+                        Id = 2,
+                        Name = "song representation/simple",
+                        Description = "Accessible and straightforward map design."
+                    },
+                    new APITag
+                    {
+                        Id = 4,
+                        Name = "style/clean",
+                        Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects."
+                    },
+                    new APITag
+                    {
+                        Id = 23,
+                        Name = "aim/aim control",
+                        Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern."
+                    }
+                ];
+
                 Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = panel = new MatchmakingSelectPanelBeatmap(new MatchmakingPlaylistItem(new MultiplayerPlaylistItem(), CreateAPIBeatmap(), []))
+                    Child = panel = new MatchmakingSelectPanelBeatmap(new MatchmakingPlaylistItem(new MultiplayerPlaylistItem(), beatmap, []))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -95,6 +132,12 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     }
                 };
             });
+
+            AddStep("add peppy", () => panel!.AddUser(new APIUser
+            {
+                Id = 2,
+                Username = "peppy",
+            }));
 
             AddToggleStep("allow selection", value => panel!.AllowSelection = value);
 

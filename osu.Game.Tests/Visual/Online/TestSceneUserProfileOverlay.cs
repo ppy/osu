@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -24,6 +26,9 @@ namespace osu.Game.Tests.Visual.Online
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private UserProfileOverlay profile = null!;
+
+        [Resolved]
+        private FrameworkConfigManager configManager { get; set; } = null!;
 
         [SetUpSteps]
         public void SetUp()
@@ -232,6 +237,37 @@ namespace osu.Game.Tests.Visual.Online
             }));
         }
 
+        [Test]
+        public void TestOtherLanguages()
+        {
+            AddStep("set up request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    if (req is GetUserRequest getUserRequest)
+                    {
+                        getUserRequest.TriggerSuccess(TEST_USER);
+                        return true;
+                    }
+
+                    if (req is GetUserBeatmapsRequest getUserBeatmapsRequest)
+                    {
+                        getUserBeatmapsRequest.TriggerSuccess(new List<APIBeatmapSet>
+                        {
+                            CreateAPIBeatmapSet(),
+                            CreateAPIBeatmapSet()
+                        });
+                        return true;
+                    }
+
+                    return false;
+                };
+            });
+            AddStep("show user", () => profile.ShowUser(new APIUser { Id = 1 }));
+            AddStep("set language", () => configManager.SetValue(FrameworkSetting.Locale, "ko"));
+            AddStep("restore language", () => configManager.SetValue(FrameworkSetting.Locale, string.Empty));
+        }
+
         public static readonly APIUser TEST_USER = new APIUser
         {
             Username = @"Somebody",
@@ -240,6 +276,7 @@ namespace osu.Game.Tests.Visual.Online
             CoverUrl = TestResources.COVER_IMAGE_1,
             JoinDate = DateTimeOffset.Now.AddDays(-1),
             LastVisit = DateTimeOffset.Now,
+            PreviousUsernames = ["ForgetMe", "MySpaceLover", "i once was a man named enis", "mr anderson"],
             Groups = new[]
             {
                 new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" },
@@ -330,7 +367,24 @@ namespace osu.Game.Tests.Visual.Online
                 WeeklyStreakBest = 51,
                 Top10PercentPlacements = 345,
                 Top50PercentPlacements = 427,
+                PlayCount = 213,
             },
+            MatchmakingStatistics =
+            [
+                new APIUserMatchmakingStatistics
+                {
+                    Pool = new APIMatchmakingPool
+                    {
+                        Active = true,
+                        Name = "osu!",
+                    },
+                    Rating = 1234,
+                    Rank = 333,
+                    FirstPlacements = 1234,
+                    Plays = 4444,
+                    TotalPoints = 5555,
+                }
+            ],
             Title = "osu!volunteer",
             Colour = "ff0000",
             Achievements = Array.Empty<APIUserAchievement>(),

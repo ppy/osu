@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Edit
@@ -11,7 +12,7 @@ namespace osu.Game.Screens.Edit
     {
         public SaveRequiredPopupDialog(Action saveAndAction)
         {
-            HeaderText = "The beatmap will be saved to continue with this operation.";
+            HeaderText = EditorDialogsStrings.SaveRequiredDialogHeader;
 
             Icon = FontAwesome.Regular.Save;
 
@@ -19,12 +20,12 @@ namespace osu.Game.Screens.Edit
             {
                 new PopupDialogOkButton
                 {
-                    Text = "Sounds good, let's go!",
+                    Text = EditorDialogsStrings.SoundsGood,
                     Action = saveAndAction
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = "Oops, continue editing",
+                    Text = EditorDialogsStrings.ContinueEditing,
                 },
             };
         }

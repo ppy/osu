@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             var ruleset = scores.First().Ruleset.CreateInstance();
 
-            foreach (var resultGroup in ruleset.GetHitResults().GroupBy(r => r.displayName))
+            foreach (var resultGroup in ruleset.GetHitResultsForDisplay().GroupBy(r => r.displayName))
             {
                 if (!resultGroup.Any(r => allScoreStatistics.Contains(r.result)))
                     continue;

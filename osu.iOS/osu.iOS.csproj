@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
-    <TargetFramework>net8.0-ios</TargetFramework>
+    <TargetFramework>net10.0-ios</TargetFramework>
     <SupportedOSPlatformVersion>13.4</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
     <Version>0.1.0</Version>
@@ -21,6 +21,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Essentials" Version="8.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Assets.car" />
+    <BundleResource Include="AppIcon60x60@2x.png" />
+    <BundleResource Include="AppIcon76x76@2x~ipad.png" />
   </ItemGroup>
   <!-- https://github.com/dotnet/macios/blob/eabcdee2ac43a0cc8324396a1bf75f8797d71810/msbuild/Xamarin.Shared/Xamarin.Shared.targets#L1328 -->
   <Target Name="AddOsuVersionToBundle" AfterTargets="_CreateAppBundle">

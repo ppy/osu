@@ -22,10 +22,11 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 using osu.Game.Tests.Visual.Spectator;
@@ -101,6 +102,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     (typeof(IGameplayClock), gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false)),
                     (typeof(SpectatorClient), spectatorClient),
                     (typeof(IGameplayLeaderboardProvider), new TestGameplayLeaderboardProvider()),
+                    (typeof(DrawableRuleset), ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(ruleset.RulesetInfo).GetPlayableBeatmap(ruleset.RulesetInfo)))
                 ];
 
                 if (drawableRuleset is IDrawableScrollingRuleset scrolling)
@@ -119,7 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             Children = new Drawable[]
                             {
                                 drawableRuleset,
-                                new HUDOverlay(drawableRuleset, [])
+                                new HUDOverlay(drawableRuleset, [], new PlayerConfiguration())
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }

@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using Markdig.Extensions.Yaml;
+using Markdig.Helpers;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,9 +29,16 @@ namespace osu.Game.Overlays.Wiki.Markdown
             Direction = FillDirection.Vertical;
             Spacing = new Vector2(10);
 
-            foreach (object line in yamlFrontMatterBlock.Lines)
+            foreach (StringLine line in yamlFrontMatterBlock.Lines)
             {
-                switch (line.ToString())
+                // Commonly, comments are added to the end of lines.
+                // There are cases of '#' used inside frontmatter, ie for url content, so matching with the prefix space is important.
+                string cleaned = line.ToString().Split(" #").First().Trim();
+
+                // Exact text matching should hopefully be enough as a certain degree of linting is applied at
+                // the wiki side. Note that this will ensure cases of the whole line being commented out are not actioned
+                // on, covering cases not caught by the above check.
+                switch (cleaned)
                 {
                     case @"outdated: true":
                         isOutdated = true;

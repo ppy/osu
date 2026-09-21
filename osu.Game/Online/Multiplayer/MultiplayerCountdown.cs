@@ -5,6 +5,7 @@ using System;
 using MessagePack;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Online.RankedPlay;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -16,6 +17,7 @@ namespace osu.Game.Online.Multiplayer
     [Union(1, typeof(ForceGameplayStartCountdown))]
     [Union(2, typeof(ServerShuttingDownCountdown))]
     [Union(3, typeof(MatchmakingStageCountdown))]
+    [Union(4, typeof(RankedPlayStageCountdown))]
     public abstract class MultiplayerCountdown
     {
         /// <summary>

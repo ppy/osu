@@ -330,7 +330,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
                 if (offsetChanged)
                 {
-                    offsetText.AddText($"Beatmap offset was adjusted to {Current.Value.ToStandardFormattedString(1)} ms.", t => t.Font = OsuFont.Style.Caption1);
+                    offsetText.AddText(BeatmapOffsetControlStrings.BeatmapOffsetWasAdjustedTo(Current.Value.ToStandardFormattedString(1)), t => t.Font = OsuFont.Style.Caption1);
                     offsetText.NewParagraph();
                 }
             }

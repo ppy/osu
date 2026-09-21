@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 currentStoryboard = new Storyboard();
 
                 for (int i = 0; i < 10; i++)
-                    currentStoryboard.GetLayer("Foreground").Add(new StoryboardSprite($"test{i}", Anchor.Centre, Vector2.Zero));
+                    currentStoryboard.GetLayer("Foreground").Add(new StoryboardSprite(StoryboardElementSource.Beatmap, $"test{i}", Anchor.Centre, Vector2.Zero));
             });
 
             CreateTest();
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 currentStoryboard = new Storyboard();
 
                 for (int i = 0; i < 10; i++)
-                    currentStoryboard.GetLayer("Overlay").Add(new StoryboardSprite($"test{i}", Anchor.Centre, Vector2.Zero));
+                    currentStoryboard.GetLayer("Overlay").Add(new StoryboardSprite(StoryboardElementSource.Beatmap, $"test{i}", Anchor.Centre, Vector2.Zero));
             });
 
             CreateTest();

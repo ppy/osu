@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
@@ -106,8 +107,12 @@ namespace osu.Game.Screens.Edit
 
         private void seekBookmark(int direction)
         {
+            // In the case of a backwards seek while playing, it can be hard to jump before a bookmark.
+            // Adding some lenience here makes it more user-friendly.
+            double seekLenience = clock.IsRunning ? 1000 * ((IAdjustableClock)clock).Rate : 0;
+
             int? targetBookmark = direction < 1
-                ? bookmarks.Cast<int?>().LastOrDefault(b => b < clock.CurrentTimeAccurate)
+                ? bookmarks.Cast<int?>().LastOrDefault(b => b < clock.CurrentTimeAccurate - seekLenience)
                 : bookmarks.Cast<int?>().FirstOrDefault(b => b > clock.CurrentTimeAccurate);
 
             if (targetBookmark != null)

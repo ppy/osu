@@ -74,7 +74,7 @@ namespace osu.Game.Input.Bindings
         {
             var defaults = DefaultKeyBindings.ToList();
 
-            List<RealmKeyBinding> newBindings = realmKeyBindings.Detach()
+            List<RealmKeyBinding> newBindings = realmKeyBindings.AsEnumerable().Detach()
                                                                 // this ordering is important to ensure that we read entries from the database in the order
                                                                 // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
                                                                 // have been eaten by the music controller due to query order.

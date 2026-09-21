@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -10,7 +12,9 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Models;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
@@ -23,6 +27,36 @@ namespace osu.Game.Tests.Beatmaps.IO
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
+
+        [TestCase(96, 32)]
+        [TestCase(32, 32)]
+        [TestCase(24, 32)]
+        [TestCase(23, 16)]
+        [TestCase(15, 16)]
+        [TestCase(12, 16)]
+        [TestCase(11, 8)]
+        [TestCase(6, 8)]
+        [TestCase(2, 4)]
+        public void TestGridSizeClampedToStableValues(int set, int expected)
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"decimal-timing-beatmap.olz"));
+            AddStep("adjust grid", () => beatmap.Beatmap.GridSize = set);
+            AddStep("save", () => beatmaps.Save((beatmap.BeatmapInfo as BeatmapInfo)!, beatmap.Beatmap));
+
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
+            AddAssert("grid clamped", () => beatmap.Beatmap.GridSize, () => Is.EqualTo(expected));
+        }
 
         [Test]
         public void TestObjectsSnappedAfterTruncatingExport()
@@ -91,6 +125,29 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public void TestBackgroundSpecificationPreserved()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            // Ensure importer encoding is correct
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"241526 Soleily - Renatus.osz"));
+            AddAssert("beatmap background is correct", () => beatmap.BeatmapInfo.Metadata.BackgroundFile, () => Is.EqualTo("machinetop_background.jpg"));
+
+            // Ensure exporter legacy conversion is correct
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddStep("import beatmap again", () => beatmap = importBeatmapFromStream(outStream));
+            AddAssert("beatmap background is still correct", () => beatmap.BeatmapInfo.Metadata.BackgroundFile, () => Is.EqualTo("machinetop_background.jpg"));
+        }
+
+        [Test]
         public void TestExportStability()
         {
             IWorkingBeatmap beatmap = null!;
@@ -129,6 +186,85 @@ namespace osu.Game.Tests.Beatmaps.IO
                 byte[] fileContent = archiveReader.GetStream(filename).ReadAllBytesToArray();
                 return Encoding.UTF8.GetString(fileContent);
             }
+        }
+
+        [Test]
+        public void TestExportUsesCarriageReturnLineFeed()
+        {
+            IWorkingBeatmap beatmap = null!;
+            MemoryStream outStream = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"legacy-export-stability-test.olz"));
+            AddStep("export", () =>
+            {
+                outStream = new MemoryStream();
+
+                new LegacyBeatmapExporter(LocalStorage)
+                    .ExportToStream((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!, outStream, null);
+            });
+
+            AddAssert(".osu file uses CRLF line endings",
+                () => hasBareLineFeed(outStream.GetBuffer()),
+                () => Is.False);
+
+            bool hasBareLineFeed(byte[] archiveBytes)
+            {
+                using var memoryStream = new MemoryStream(archiveBytes);
+                using var archiveReader = new ZipArchiveReader(memoryStream);
+
+                foreach (string filename in archiveReader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.Ordinal)))
+                {
+                    byte[] content = archiveReader.GetStream(filename).ReadAllBytesToArray();
+
+                    for (int i = 0; i < content.Length; i++)
+                    {
+                        if (content[i] != '\n')
+                            continue;
+
+                        if (i == 0 || content[i - 1] != '\r')
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        [Test]
+        public void TestExportFailsOnDuplicateEntry()
+        {
+            IWorkingBeatmap beatmap = null!;
+            BeatmapSetInfo beatmapSetInfo = null!;
+            Exception exception = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"241526 Soleily - Renatus.osz"));
+            AddStep("add bogus duplicated file", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var refetchedSet = r.Find<BeatmapSetInfo>(((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!).ID);
+                    var fileToDuplicate = refetchedSet!.Files.First();
+                    var duplicate = new RealmNamedFileUsage(fileToDuplicate.File, fileToDuplicate.Filename);
+                    refetchedSet.Files.Add(duplicate);
+                    beatmapSetInfo = refetchedSet.Detach();
+                    beatmapSetInfo.Files.AddRange(refetchedSet.Files.Detach());
+                });
+            });
+            AddStep("attempt export", () =>
+            {
+                var outStream = new MemoryStream();
+
+                try
+                {
+                    new LegacyBeatmapExporter(LocalStorage)
+                        .ExportToStream(beatmapSetInfo, outStream, null);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+            });
+            AddUntilStep("exception thrown", () => exception, () => Is.Not.Null);
         }
 
         private IWorkingBeatmap importBeatmapFromStream(Stream stream)

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,7 +40,7 @@ namespace osu.Game.Database
         {
             var zipWriterOptions = new ZipWriterOptions(CompressionType.Deflate)
             {
-                ArchiveEncoding = UseFixedEncoding ? ZipArchiveReader.DEFAULT_ENCODING : new ArchiveEncoding(Encoding.UTF8, Encoding.UTF8)
+                ArchiveEncoding = UseFixedEncoding ? ZipArchiveReader.DEFAULT_ENCODING : new ArchiveEncoding { Default = Encoding.UTF8, Password = Encoding.UTF8 }
             };
 
             using (var writer = new ZipWriter(outputStream, zipWriterOptions))
@@ -46,10 +48,14 @@ namespace osu.Game.Database
                 int i = 0;
                 int fileCount = model.Files.Count();
                 bool anyFileMissing = false;
+                HashSet<string> filesWritten = [];
 
                 foreach (var file in model.Files)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+
+                    if (filesWritten.Contains(file.Filename))
+                        throw new InvalidOperationException($"Error when exporting {model.GetDisplayString()}: Multiple files specify filename of {file.Filename}");
 
                     using (var stream = GetFileContents(model, file))
                     {
@@ -61,14 +67,12 @@ namespace osu.Game.Database
                         }
 
                         writer.Write(file.Filename, stream);
+                        filesWritten.Add(file.Filename);
                     }
 
                     i++;
 
-                    if (notification != null)
-                    {
-                        notification.Progress = (float)i / fileCount;
-                    }
+                    notification?.Progress = (float)i / fileCount;
                 }
 
                 if (anyFileMissing)

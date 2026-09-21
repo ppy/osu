@@ -101,13 +101,21 @@ namespace osu.Game.Database
         /// 49   2025-06-10    Reset the LegacyOnlineID to -1 for all scores that have it set to 0 (which is semantically the same) for consistency of handling with OnlineID.
         /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
         /// 51   2025-07-22    Add ScoreInfo.Pauses.
+        /// 52   2026-07-28    Add RealmOnlineAsset.
         /// </summary>
-        private const int schema_version = 51;
+        private const int schema_version = 52;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
         /// </summary>
         private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// This <see cref="CancellationTokenSource"/> is cancelled on disposal
+        /// so that all callers of <see cref="getRealmInstance"/> who are blocked on <see cref="realmRetrievalLock"/>
+        /// can hard-fail the retrieval rather than spin on the semaphore forever.
+        /// </summary>
+        private readonly CancellationTokenSource realmRetrievalCancellation = new CancellationTokenSource();
 
         private readonly CountdownEvent pendingAsyncOperations = new CountdownEvent(0);
 
@@ -412,6 +420,12 @@ namespace osu.Game.Database
 
                     foreach (var s in pendingDeletePresets)
                         realm.Remove(s);
+
+                    var onlineAssetAccessCutoff = DateTimeOffset.Now.AddMonths(-1);
+                    var pendingDeleteOnlineAssets = realm.All<RealmOnlineAsset>().Where(a => a.LastAccessed < onlineAssetAccessCutoff);
+
+                    foreach (var a in pendingDeleteOnlineAssets)
+                        realm.Remove(a);
 
                     transaction.Commit();
                 }
@@ -771,7 +785,7 @@ namespace osu.Game.Database
                 // Ensure that the thread that currently has the `realmRetrievalLock` can retrieve nested contexts and not deadlock on itself.
                 if (!currentThreadHasRealmRetrievalLock.Value)
                 {
-                    realmRetrievalLock.Wait();
+                    realmRetrievalLock.Wait(realmRetrievalCancellation.Token);
                     currentThreadHasRealmRetrievalLock.Value = true;
                     tookSemaphoreLock = true;
                 }
@@ -1022,29 +1036,9 @@ namespace osu.Game.Database
                 case 29:
                 case 30:
                 {
-                    var scores = migration.NewRealm
-                                          .All<ScoreInfo>()
-                                          .Where(s => !s.IsLegacyScore);
-
-                    foreach (var score in scores)
-                    {
-                        try
-                        {
-                            if (StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised(score))
-                            {
-                                try
-                                {
-                                    long calculatedNew = StandardisedScoreMigrationTools.GetNewStandardised(score);
-                                    score.TotalScore = calculatedNew;
-                                }
-                                catch
-                                {
-                                }
-                            }
-                        }
-                        catch { }
-                    }
-
+                    // purposefully emptied 20260608
+                    // this previously contained score recalculation logic that is no longer really relevant at this time,
+                    // and thus has been dropped to simplify things
                     break;
                 }
 
@@ -1061,7 +1055,7 @@ namespace osu.Game.Database
                             score.LegacyTotalScore = score.TotalScore;
                         }
                         else
-                            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
+                            score.TotalScoreVersion = 30000003; // `LATEST_VERSION` at time of migration
                     }
 
                     break;
@@ -1227,7 +1221,7 @@ namespace osu.Game.Database
                         var oldKeyBindingsQuery = migration.NewRealm
                                                            .All<RealmKeyBinding>()
                                                            .Where(kb => kb.RulesetName == @"mania" && kb.Variant == variant);
-                        var oldKeyBindings = oldKeyBindingsQuery.Detach();
+                        var oldKeyBindings = oldKeyBindingsQuery.AsEnumerable().Detach();
 
                         migration.NewRealm.RemoveRange(oldKeyBindingsQuery);
 
@@ -1528,6 +1522,8 @@ namespace osu.Game.Database
                 // intentionally block realm retrieval indefinitely. this ensures that nothing can start consuming a new instance after disposal.
                 realmRetrievalLock.Wait();
                 realmRetrievalLock.Dispose();
+                // also unblock all readers who may be spinning on realm retrieval.
+                realmRetrievalCancellation.Cancel();
 
                 isDisposed = true;
             }

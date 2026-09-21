@@ -26,12 +26,12 @@ namespace osu.Game.Overlays.Toolbar
         private Statistic<int> globalRank = null!;
         private Statistic<int> pp = null!;
 
+        private ScheduledDelegate? shrinkDelegate;
+
         [BackgroundDependencyLoader]
         private void load(UserStatisticsWatcher? userStatisticsWatcher)
         {
             RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
-            Alpha = 0;
 
             InternalChild = new FillFlowContainer
             {
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Toolbar
                 Padding = new MarginPadding { Horizontal = 10 },
                 Spacing = new Vector2(10),
                 Direction = FillDirection.Horizontal,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     globalRank = new Statistic<int>(UsersStrings.ShowRankGlobalSimple, @"#", Comparer<int>.Create((before, after) => before - after)),
                     pp = new Statistic<int>(RankingsStrings.StatPerformance, string.Empty, Comparer<int>.Create((before, after) => Math.Sign(after - before))),
@@ -71,8 +71,7 @@ namespace osu.Game.Overlays.Toolbar
                     return;
 
                 FinishTransforms(true);
-
-                this.FadeIn(500, Easing.OutQuint);
+                shrinkDelegate?.Cancel();
 
                 if (update.After.GlobalRank != null)
                 {
@@ -90,7 +89,21 @@ namespace osu.Game.Overlays.Toolbar
                     pp.Display(before, delta, after);
                 }
 
-                this.Delay(5000).FadeOut(500, Easing.OutQuint);
+                this.FadeIn(500, Easing.OutQuint);
+
+                AutoSizeAxes = Axes.X;
+                AutoSizeDuration = 500;
+                AutoSizeEasing = Easing.OutQuint;
+
+                using (BeginDelayedSequence(5000))
+                {
+                    this.FadeOut(500, Easing.OutQuint);
+                    shrinkDelegate = Schedule(() =>
+                    {
+                        AutoSizeAxes = Axes.None;
+                        this.ResizeWidthTo(0, 500, Easing.OutQuint);
+                    });
+                }
             });
         }
 

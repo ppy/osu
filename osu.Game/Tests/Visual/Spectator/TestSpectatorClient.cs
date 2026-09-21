@@ -159,17 +159,18 @@ namespace osu.Game.Tests.Visual.Spectator
             }
         }
 
-        protected override Task BeginPlayingInternal(long? scoreToken, SpectatorState state)
+        protected override async Task<bool> BeginPlayingInternal(long? scoreToken, SpectatorState state)
         {
             // Track the local user's playing beatmap ID.
             Debug.Assert(state.BeatmapID != null);
             userBeatmapDictionary[api.LocalUser.Value.Id] = state.BeatmapID.Value;
             userModsDictionary[api.LocalUser.Value.Id] = state.Mods.ToArray();
 
-            return ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
+            await ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state).ConfigureAwait(false);
+            return true;
         }
 
-        protected override Task SendFramesInternal(FrameDataBundle bundle)
+        protected override Task SendFramesInternal(long? scoreToken, FrameDataBundle bundle)
         {
             FrameSendAttempts++;
 
@@ -179,7 +180,12 @@ namespace osu.Game.Tests.Visual.Spectator
             return ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, bundle);
         }
 
-        protected override Task EndPlayingInternal(SpectatorState state) => ((ISpectatorClient)this).UserFinishedPlaying(api.LocalUser.Value.Id, state);
+        protected override Task EndPlayingInternal(long? scoreToken, SpectatedUserState finalState) => ((ISpectatorClient)this).UserFinishedPlaying(api.LocalUser.Value.Id, new SpectatorState
+        {
+            BeatmapID = userBeatmapDictionary.GetValueOrDefault(api.LocalUser.Value.Id),
+            Mods = userModsDictionary.GetValueOrDefault(api.LocalUser.Value.Id) ?? [],
+            State = finalState,
+        });
 
         protected override Task WatchUserInternal(int userId)
         {
@@ -203,10 +209,16 @@ namespace osu.Game.Tests.Visual.Spectator
             });
         }
 
-        protected override async Task DisconnectInternal()
+        protected override Task DisconnectInternal()
         {
-            await base.DisconnectInternal().ConfigureAwait(false);
             isConnected.Value = false;
+            return Task.CompletedTask;
+        }
+
+        public override Task Reconnect()
+        {
+            isConnected.Value = true;
+            return Task.CompletedTask;
         }
     }
 }

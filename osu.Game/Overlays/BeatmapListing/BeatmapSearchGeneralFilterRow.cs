@@ -20,7 +20,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Utils;
 using osuTK.Graphics;
-using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = CommonStrings.ButtonsCancel,
+                    Text = WebCommonStrings.ButtonsCancel,
                 },
             };
         }
