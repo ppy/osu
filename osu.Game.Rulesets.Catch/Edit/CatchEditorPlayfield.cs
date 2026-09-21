@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch.Edit
     public partial class CatchEditorPlayfield : CatchPlayfield
     {
         public CatchEditorPlayfield(IBeatmapDifficultyInfo difficulty)
-            : base(difficulty)
+            : base(difficulty, transferToCatcher: false)
         {
         }
 
@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             // TODO: honor "hit animation" setting?
             Catcher.CatchFruitOnPlate = false;
-
-            // TODO: disable hit lighting as well
         }
     }
 }
