@@ -44,6 +44,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         private DrawableSample winSample = null!;
         private DrawableSample loseSample = null!;
 
+        private ShearedButton quitButton = null!;
+        private ShearedButton playAgainButton = null!;
+
+        private Container localRatingContainer = null!;
+        private Container opponentRatingContainer = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
@@ -81,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         Spacing = new Vector2(2),
                         Children = new Drawable[]
                         {
-                            new Container
+                            localRatingContainer = new Container
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -115,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                     }
                                 }
                             },
-                            new Container
+                            opponentRatingContainer = new Container
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -159,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         Direction = FillDirection.Horizontal,
                         Children = new Drawable[]
                         {
-                            new ShearedButton
+                            quitButton = new ShearedButton
                             {
                                 Width = 100,
                                 Text = "Quit",
@@ -167,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 DarkerColour = colours.Red3,
                                 LighterColour = colours.Red4,
                             },
-                            new ShearedButton
+                            playAgainButton = new ShearedButton
                             {
                                 Width = 200,
                                 Text = "Play Again",
@@ -233,10 +239,71 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 backgroundMusic.Unmute(5000);
             }, 9000);
 
-            if (matchInfo.RoomState.WinningUserId == Client.LocalUser!.UserID)
-                winSample.Play();
-            else
-                loseSample.Play();
+            Drawable[] pieces =
+            [
+                titleText,
+                titleSeparator,
+                localRatingContainer,
+                opponentRatingContainer,
+                playAgainButton,
+                quitButton,
+            ];
+
+            foreach (var p in pieces)
+                p.Hide();
+
+            // schedule required due to FinishTransforms call in ShearedButton.
+            ScheduleAfterChildren(() =>
+            {
+                bool localUserWon = matchInfo.RoomState.WinningUserId == Client.LocalUser!.UserID;
+
+                const double bpm = 60000 / 142.0;
+
+                if (localUserWon)
+                {
+                    winSample.Play();
+
+                    using (BeginDelayedSequence(400))
+                    {
+                        pieces[0].FadeIn();
+                        pieces[1].FadeIn();
+
+                        using (BeginDelayedSequence(bpm * 1))
+                        {
+                            pieces[2].FadeIn();
+                            pieces[3].FadeIn();
+                        }
+
+                        using (BeginDelayedSequence(bpm * 2))
+                        {
+                            pieces[4].FadeIn();
+                            pieces[5].FadeIn();
+                        }
+                    }
+                }
+                else
+                {
+                    loseSample.Play();
+
+                    using (BeginDelayedSequence(400))
+                    {
+                        using (BeginDelayedSequence(bpm * 0))
+                            pieces[0].FadeIn();
+                        using (BeginDelayedSequence(bpm * 0.5))
+                            pieces[1].FadeIn();
+                        using (BeginDelayedSequence(bpm * 1))
+                            pieces[2].FadeIn();
+                        using (BeginDelayedSequence(bpm * 1.5))
+                            pieces[3].FadeIn();
+
+                        using (BeginDelayedSequence(bpm * 2))
+                        {
+                            pieces[4].FadeIn();
+                            pieces[5].FadeIn();
+                        }
+                    }
+                }
+            });
         }
     }
 }
