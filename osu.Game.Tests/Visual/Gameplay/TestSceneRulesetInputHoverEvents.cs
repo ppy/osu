@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneRulesetInputHoverEvents : OsuManualInputManagerTestScene
+    public partial class TestSceneRulesetInputHoverEvents : OsuManualInputManagerTestScene
     {
         [TestCase(true)]
         [TestCase(false)]
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private OsuInputManager osuInputManager => this.ChildrenOfType<OsuInputManager>().First();
 
-        private class TestInputManager : PassThroughInputManager
+        private partial class TestInputManager : PassThroughInputManager
         {
             public bool HoverEvents { get; set; }
 
