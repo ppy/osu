@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -60,12 +59,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
 
         /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
+        /// Caption describing this control, displayed on top of the controls.
         /// </summary>
         public LocalisableString Caption { get; init; }
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Hint text containing an extended description of this control, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
 
@@ -254,7 +253,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool IsDisabled => current.Disabled;
 
-        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
 
         public float MainDrawHeight => DrawHeight;
     }
