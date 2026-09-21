@@ -170,10 +170,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             difficulty += terms / (1 + ratio);
 
             // Give bonus to near-1 ratios
-            difficulty += DiffUtils.BellCurve(ratio, 1, 0.5);
+            difficulty += DiffUtils.GaussianCurve(ratio, 1, 0.21);
 
             // Penalize ratios that are VERY near 1
-            difficulty -= DiffUtils.BellCurve(ratio, 1, 0.3);
+            difficulty -= DiffUtils.GaussianCurve(ratio, 1, 0.13);
 
             difficulty = Math.Max(difficulty, 0);
             difficulty /= Math.Sqrt(8);
