@@ -234,8 +234,8 @@ namespace osu.Game.Graphics
             var notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
-                Text = ScreenshotManagerStrings.UploadingScreenshot,
-                CompletionText = ScreenshotManagerStrings.UploadSuccess,
+                Text = NotificationsStrings.UploadingScreenshot,
+                CompletionText = NotificationsStrings.UploadSuccess,
                 Progress = 0,
             };
 
@@ -250,7 +250,7 @@ namespace osu.Game.Graphics
             uploadRequest.Failure += _ =>
             {
                 notification.State = ProgressNotificationState.Cancelled;
-                notification.Text = ScreenshotManagerStrings.UploadFailure;
+                notification.Text = NotificationsStrings.UploadFailure;
             };
 
             notificationOverlay.Post(notification);
