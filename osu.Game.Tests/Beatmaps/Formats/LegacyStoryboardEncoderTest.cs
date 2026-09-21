@@ -285,7 +285,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 Assert.That(decodedSprite.LoopingGroups, Has.Count.EqualTo(1));
                 var decodedLoopingGroup = decodedSprite.LoopingGroups.Single();
-                // Assert.That(decodedLoopingGroup.LoopStartTime, Is.EqualTo(1000));
+                Assert.That(decodedLoopingGroup.LoopStartTime, Is.EqualTo(1000));
                 Assert.That(decodedLoopingGroup.StartTime, Is.EqualTo(2000));
                 Assert.That(decodedLoopingGroup.Duration, Is.EqualTo(loopingGroup.Duration));
                 Assert.That(decodedLoopingGroup.TotalIterations, Is.EqualTo(45));
