@@ -21,5 +21,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("variant_id")]
         public int VariantId { get; set; }
+
+        public override string ToString() => Name;
     }
 }
