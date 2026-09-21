@@ -40,9 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 new SettingsItemV2(new FormCheckBox
                 {
                     Caption = AccountsStrings.PrivacyFriendsOnly.ToSentence(),
-                    // TODO: replace with below string once osu-resources has it available
-                    // HintText = AccountsStrings.PrivacyFriendsOnlyInfo.ToSentence(),
-                    HintText = "This block also applies to osu!lazer multiplayer invites and ranked play duel requests",
+                    HintText = AccountsStrings.PrivacyFriendsOnlyInfo.ToSentence(),
                     Current = config.GetBindable<bool>(OsuSetting.PMFriendsOnly),
                 }),
             };
