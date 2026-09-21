@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public class BeatmapLeaderboardWedgeStrings
+    public static class BeatmapLeaderboardWedgeStrings
     {
         private const string prefix = @"osu.Game.Resources.Localisation.BeatmapLeaderboardWedge";
 
@@ -68,6 +68,16 @@ namespace osu.Game.Localisation
         /// "Date"
         /// </summary>
         public static LocalisableString Date => new TranslatableString(getKey(@"date"), @"Date");
+
+        /// <summary>
+        /// "Personal Best"
+        /// </summary>
+        public static LocalisableString PersonalBest => new TranslatableString(getKey(@"personal_best"), @"Personal Best");
+
+        /// <summary>
+        /// "Personal Best (#{0:N0} of {1:N0})"
+        /// </summary>
+        public static LocalisableString PersonalBestWithPosition(int position, int totalCount) => new TranslatableString(getKey(@"personal_best_with_position"), @"Personal Best (#{0:N0} of {1:N0})", position, totalCount);
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

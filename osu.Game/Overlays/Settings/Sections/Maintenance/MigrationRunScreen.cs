@@ -15,12 +15,15 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public partial class MigrationRunScreen : OsuScreen
     {
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+
         private readonly DirectoryInfo destination;
 
         [Resolved(canBeNull: true)]
@@ -99,7 +102,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                 });
         }
 
-        protected virtual bool PerformMigration() => game?.Migrate(destination.FullName) != false;
+        protected virtual bool PerformMigration() => game?.MigrateUserData(destination.FullName) != false;
 
         public override void OnEntering(ScreenTransitionEvent e)
         {

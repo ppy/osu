@@ -32,8 +32,12 @@ namespace osu.Game.Audio
         private void load()
         {
             Track = GetTrack();
+
             if (Track != null)
+            {
                 Track.Completed += Stop;
+                Track.Looping = looping;
+            }
         }
 
         /// <summary>
@@ -55,6 +59,22 @@ namespace osu.Game.Audio
         /// Whether the track is playing.
         /// </summary>
         public bool IsRunning => Track?.IsRunning ?? false;
+
+        private bool looping;
+
+        /// <summary>
+        /// Whether the track should loop.
+        /// </summary>
+        public bool Looping
+        {
+            get => looping;
+            set
+            {
+                looping = value;
+
+                Track?.Looping = looping;
+            }
+        }
 
         private ScheduledDelegate? startDelegate;
 

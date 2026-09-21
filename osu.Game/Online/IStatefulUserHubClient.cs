@@ -26,5 +26,18 @@ namespace osu.Game.Online
         /// </list>
         /// </remarks>
         Task DisconnectRequested();
+
+        /// <summary>
+        /// Invoked when server begins a shutdown sequence.
+        /// </summary>
+        /// <remarks>
+        /// Server shutdowns are graceful.
+        ///
+        /// This will fire with hours of notice for clients to do what they need to and subsequently
+        /// disconnect. It's in the client's best interest to switch over to the new hubs as soon as
+        /// it can, so that the user can be on the same server as the majority of others (and avoid a
+        /// "server split" scenario where users are split across multiple shutting-down hubs).
+        /// </remarks>
+        Task ServerShuttingDown();
     }
 }

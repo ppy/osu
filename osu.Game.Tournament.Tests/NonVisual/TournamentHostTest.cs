@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Platform;
 
 namespace osu.Game.Tournament.Tests.NonVisual
@@ -27,7 +28,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 while (!result()) Thread.Sleep(200);
             });
 
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
+            ClassicAssert.True(task.Wait(timeout), failureMessage);
         }
     }
 }

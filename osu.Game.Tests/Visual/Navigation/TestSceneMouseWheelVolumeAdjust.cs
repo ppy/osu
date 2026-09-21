@@ -5,7 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Game.Configuration;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
 

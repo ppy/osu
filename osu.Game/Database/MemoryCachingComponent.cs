@@ -27,7 +27,7 @@ namespace osu.Game.Database
 
         protected MemoryCachingComponent()
         {
-            statistics = GlobalStatistics.Get<MemoryCachingStatistics>(nameof(MemoryCachingComponent<TLookup, TValue>), GetType().ReadableName());
+            statistics = GlobalStatistics.Get<MemoryCachingStatistics>(nameof(MemoryCachingComponent<,>), GetType().ReadableName());
             statistics.Value = new MemoryCachingStatistics();
         }
 
@@ -74,6 +74,15 @@ namespace osu.Game.Database
             }
 
             statistics.Value.Usage = cache.Count;
+        }
+
+        /// <summary>
+        /// Completely purge the cache.
+        /// </summary>
+        public virtual void Clear()
+        {
+            cache.Clear();
+            statistics.Value.Usage = 0;
         }
 
         protected bool CheckExists(TLookup lookup, [MaybeNullWhen(false)] out TValue value) =>

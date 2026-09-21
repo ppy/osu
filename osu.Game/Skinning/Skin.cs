@@ -19,14 +19,16 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkin
+    public abstract class Skin : IDisposable, ISkin, IHasComboColours, IHasCustomColours
     {
         private readonly IStorageResourceProvider? resources;
 
@@ -38,7 +40,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected internal ISampleStore? Samples { get; }
+        protected internal ISampleStore? Samples { get; private set; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -63,6 +65,8 @@ namespace osu.Game.Skinning
 
         public string Name { get; }
 
+        protected IResourceStore<byte[]>? FallbackStore { get; }
+
         /// <summary>
         /// Construct a new skin.
         /// </summary>
@@ -82,18 +86,7 @@ namespace osu.Game.Skinning
 
                 store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
 
-                var samples = resources.AudioManager?.GetSampleStore(store);
-
-                if (samples != null)
-                {
-                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-
-                    // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
-                    // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
-                    samples.AddExtension(@"ogg");
-                }
-
-                Samples = samples;
+                RecycleSamples();
                 Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, store));
             }
             else
@@ -102,6 +95,7 @@ namespace osu.Game.Skinning
                 SkinInfo = skin.ToLiveUnmanaged();
             }
 
+            FallbackStore = fallbackStore;
             if (fallbackStore != null)
                 store.AddStore(fallbackStore);
 
@@ -120,6 +114,7 @@ namespace osu.Game.Skinning
                     // generally won't be hit as we always write a `skin.ini` on import, but best be safe than sorry.
                     // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
                     LegacyVersion = SkinConfiguration.LATEST_VERSION,
+                    IsLatestVersion = true,
                 };
             }
 
@@ -148,6 +143,30 @@ namespace osu.Game.Skinning
                     Logger.Error(ex, "Failed to load skin configuration.");
                 }
             }
+        }
+
+        /// <summary>
+        /// Recreates <see cref="Samples"/>.
+        /// All users of samples from the skin are expected to manually re-retrieve their samples from this skin after this is called.
+        /// Exposed as public for the purpose of e.g. editing flows where the skin's set of available samples changes.
+        /// In such a scenario a full recycle of the store is required to avoid accidentally retrieving stale samples that don't exist in the skin anymore.
+        /// </summary>
+        public void RecycleSamples()
+        {
+            Samples?.Dispose();
+
+            var samples = resources?.AudioManager?.GetSampleStore(store);
+
+            if (samples != null)
+            {
+                samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                samples.AddExtension(@"ogg");
+            }
+
+            Samples = samples;
         }
 
         protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
@@ -339,6 +358,7 @@ namespace osu.Game.Skinning
 
             Textures?.Dispose();
             Samples?.Dispose();
+            FallbackStore?.Dispose();
 
             store.Dispose();
         }
@@ -389,5 +409,13 @@ namespace osu.Game.Skinning
             Enter,
             Exit
         }
+
+        #region Delegated colour access
+
+        IReadOnlyList<Color4>? IHasComboColours.ComboColours => Configuration.ComboColours;
+        List<Color4> IHasComboColours.CustomComboColours => Configuration.CustomComboColours;
+        Dictionary<string, Color4> IHasCustomColours.CustomColours => Configuration.CustomColours;
+
+        #endregion
     }
 }

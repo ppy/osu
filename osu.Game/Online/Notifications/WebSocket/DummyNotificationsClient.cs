@@ -16,7 +16,7 @@ namespace osu.Game.Online.Notifications.WebSocket
 
         public Func<SocketMessage, bool>? HandleMessage;
 
-        public Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = default)
+        public Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = null)
         {
             if (HandleMessage?.Invoke(message) != true)
                 throw new InvalidOperationException($@"{nameof(DummyNotificationsClient)} cannot process this message.");

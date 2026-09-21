@@ -245,10 +245,9 @@ namespace osu.Game.Overlays
 
                 Padding = new MarginPadding { Right = OsuGame.SCREEN_EDGE_MARGIN };
 
-                InternalChild = NextButton = new ShearedButton(0)
+                InternalChild = NextButton = new ShearedButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Width = 1,
                     Text = FirstRunSetupOverlayStrings.GetStarted,
                     DarkerColour = colourProvider.Colour3,
                     LighterColour = colourProvider.Colour2,

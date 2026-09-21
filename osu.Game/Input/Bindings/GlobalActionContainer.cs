@@ -105,6 +105,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.E }, GlobalAction.PreviousSkin),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.T }, GlobalAction.NextSkin),
 
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
             new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
@@ -128,6 +130,19 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
+            new KeyBinding(new[] { InputKey.Number1 }, GlobalAction.EditorSelectTool),
+            new KeyBinding(new[] { InputKey.Q }, GlobalAction.EditorToggleNewCombo),
+            new KeyBinding(new[] { InputKey.W }, GlobalAction.EditorToggleWhistleSound),
+            new KeyBinding(new[] { InputKey.E }, GlobalAction.EditorToggleFinishSound),
+            new KeyBinding(new[] { InputKey.R }, GlobalAction.EditorToggleClapSound),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.Q }, GlobalAction.EditorToggleNormalAutoBank),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.W }, GlobalAction.EditorToggleNormalNormalBank),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.E }, GlobalAction.EditorToggleNormalSoftBank),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.R }, GlobalAction.EditorToggleNormalDrumBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Q }, GlobalAction.EditorToggleAdditionAutoBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.W }, GlobalAction.EditorToggleAdditionNormalBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.E }, GlobalAction.EditorToggleAdditionSoftBank),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.R }, GlobalAction.EditorToggleAdditionDrumBank),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.EditorCloneSelection),
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
@@ -144,15 +159,32 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.None, GlobalAction.EditorToggleMoveControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.R }, GlobalAction.EditorToggleRotateControl),
             new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
+
+            new KeyBinding(new[] { InputKey.Left }, GlobalAction.EditorSeekBackwards),
+            new KeyBinding(new[] { InputKey.Right }, GlobalAction.EditorSeekForwards),
+
+            // These two keys are reversed from stable because it feels more natural (and matches mouse wheel scroll directionality).
+            new KeyBinding(new[] { InputKey.Up }, GlobalAction.EditorSeekToPreviousTimingPoint),
+            new KeyBinding(new[] { InputKey.Down }, GlobalAction.EditorSeekToNextTimingPoint),
+
             new KeyBinding(new[] { InputKey.Control, InputKey.Left }, GlobalAction.EditorSeekToPreviousHitObject),
             new KeyBinding(new[] { InputKey.Control, InputKey.Right }, GlobalAction.EditorSeekToNextHitObject),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Left }, GlobalAction.EditorSeekToPreviousSamplePoint),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Right }, GlobalAction.EditorSeekToNextSamplePoint),
+
+            new KeyBinding(new[] { InputKey.Z }, GlobalAction.EditorSeekToStart),
+            new KeyBinding(new[] { InputKey.X }, GlobalAction.EditorPlayFromStart),
+            new KeyBinding(new[] { InputKey.Space }, GlobalAction.EditorTogglePause),
+            new KeyBinding(new[] { InputKey.C }, GlobalAction.EditorTogglePause),
+            new KeyBinding(new[] { InputKey.V }, GlobalAction.EditorSeekToEnd),
+
             new KeyBinding(new[] { InputKey.Control, InputKey.B }, GlobalAction.EditorAddBookmark),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.B }, GlobalAction.EditorRemoveClosestBookmark),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.EditorSeekToPreviousBookmark),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.EditorSeekToNextBookmark),
             new KeyBinding(new[] { InputKey.Control, InputKey.L }, GlobalAction.EditorDiscardUnsavedChanges),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.U }, GlobalAction.EditorSubmitBeatmap),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.O }, GlobalAction.EditorEditExternally),
         };
 
         private static IEnumerable<KeyBinding> editorTestPlayKeyBindings => new[]
@@ -187,6 +219,7 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.TogglePauseReplay),
+            new KeyBinding(InputKey.Shift, GlobalAction.FastForwardReplay),
             new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
             new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
             new KeyBinding(InputKey.Comma, GlobalAction.StepReplayBackward),
@@ -520,6 +553,84 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleCurrentGroup))]
         ToggleCurrentGroup,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.PreviousSkin))]
+        PreviousSkin,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextSkin))]
+        NextSkin,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SubmitBeatmap))]
+        EditorSubmitBeatmap,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.EditExternally))]
+        EditorEditExternally,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.FastForwardReplay))]
+        FastForwardReplay,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SelectTool))]
+        EditorSelectTool,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNewCombo))]
+        EditorToggleNewCombo,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleWhistleSound))]
+        EditorToggleWhistleSound,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleFinishSound))]
+        EditorToggleFinishSound,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleClapSound))]
+        EditorToggleClapSound,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalAutoBank))]
+        EditorToggleNormalAutoBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalNormalBank))]
+        EditorToggleNormalNormalBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalSoftBank))]
+        EditorToggleNormalSoftBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleNormalDrumBank))]
+        EditorToggleNormalDrumBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionAutoBank))]
+        EditorToggleAdditionAutoBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionNormalBank))]
+        EditorToggleAdditionNormalBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionSoftBank))]
+        EditorToggleAdditionSoftBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleAdditionDrumBank))]
+        EditorToggleAdditionDrumBank,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekBackwards))]
+        EditorSeekBackwards,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekForwards))]
+        EditorSeekForwards,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToPreviousTimingPoint))]
+        EditorSeekToPreviousTimingPoint,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToNextTimingPoint))]
+        EditorSeekToNextTimingPoint,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToStart))]
+        EditorSeekToStart,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.PlayFromStart))]
+        EditorPlayFromStart,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.TogglePause))]
+        EditorTogglePause,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToEnd))]
+        EditorSeekToEnd,
     }
 
     public enum GlobalActionCategory

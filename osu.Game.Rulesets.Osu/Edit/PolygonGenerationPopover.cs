@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -25,10 +24,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class PolygonGenerationPopover : OsuPopover
     {
-        private SliderWithTextBoxInput<double> distanceSnapInput = null!;
-        private SliderWithTextBoxInput<int> offsetAngleInput = null!;
-        private SliderWithTextBoxInput<int> repeatCountInput = null!;
-        private SliderWithTextBoxInput<int> pointInput = null!;
+        private DependencyContainer dependencies = null!;
+
+        private FormSliderBar<double> distanceSnapInput { get; set; } = null!;
+        private FormSliderBar<int> offsetAngleInput { get; set; } = null!;
+        private FormSliderBar<int> repeatCountInput { get; set; } = null!;
+        private FormSliderBar<int> pointInput { get; set; } = null!;
         private RoundedButton commitButton = null!;
 
         private readonly List<HitCircle> insertedCircles = new List<HitCircle>();
@@ -50,25 +51,28 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Resolved]
         private HitObjectComposer composer { get; set; } = null!;
 
-        private Bindable<TernaryState> newComboState = null!;
+        private PlacementStateManager? placementStateManager;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var selectionHandler = (EditorSelectionHandler)composer.BlueprintContainer.SelectionHandler;
-            newComboState = selectionHandler.SelectionNewComboState.GetBoundCopy();
-
             AllowableAnchors = new[] { Anchor.CentreLeft, Anchor.CentreRight };
 
             Child = new FillFlowContainer
             {
                 Width = 220,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(20),
+                Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    distanceSnapInput = new SliderWithTextBoxInput<double>("Distance snap:")
+                    distanceSnapInput = new FormSliderBar<double>
                     {
+                        Caption = "Distance snap",
                         Current = new BindableNumber<double>(1)
                         {
                             MinValue = 0.1,
@@ -76,37 +80,40 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Precision = 0.1,
                             Value = ((OsuHitObjectComposer)composer).DistanceSnapProvider.DistanceSpacingMultiplier.Value,
                         },
-                        Instantaneous = true
+                        TabbableContentContainer = this
                     },
-                    offsetAngleInput = new SliderWithTextBoxInput<int>("Offset angle:")
+                    offsetAngleInput = new FormSliderBar<int>
                     {
+                        Caption = "Offset angle",
                         Current = new BindableNumber<int>
                         {
                             MinValue = 0,
                             MaxValue = 180,
                             Precision = 1
                         },
-                        Instantaneous = true
+                        TabbableContentContainer = this
                     },
-                    repeatCountInput = new SliderWithTextBoxInput<int>("Repeats:")
+                    repeatCountInput = new FormSliderBar<int>
                     {
+                        Caption = "Repeats",
                         Current = new BindableNumber<int>(1)
                         {
                             MinValue = 1,
                             MaxValue = 10,
                             Precision = 1
                         },
-                        Instantaneous = true
+                        TabbableContentContainer = this
                     },
-                    pointInput = new SliderWithTextBoxInput<int>("Vertices:")
+                    pointInput = new FormSliderBar<int>
                     {
+                        Caption = "Vertices",
                         Current = new BindableNumber<int>(3)
                         {
                             MinValue = 3,
                             MaxValue = 32,
                             Precision = 1,
                         },
-                        Instantaneous = true
+                        TabbableContentContainer = this
                     },
                     commitButton = new RoundedButton
                     {
@@ -116,6 +123,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     }
                 }
             };
+
+            // TODO: This is a pretty ugly dependency chain.
+            // We should look to rearrange things to avoid this altogether.
+            dependencies.CacheAs(composer.BlueprintContainer.SelectionHandler);
         }
 
         protected override void LoadComplete()
@@ -129,7 +140,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             offsetAngleInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             repeatCountInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             pointInput.Current.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
-            newComboState.BindValueChanged(_ => Scheduler.AddOnce(tryCreatePolygon));
             tryCreatePolygon();
         }
 
@@ -158,7 +168,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 float angle = float.DegreesToRadians(offsetAngleInput.Current.Value) + (i + 1) * (2 * float.Pi / pointInput.Current.Value);
                 var position = OsuPlayfield.BASE_SIZE / 2 + new Vector2(polygonRadius * float.Cos(angle), polygonRadius * float.Sin(angle));
-                bool newCombo = i == 0 && newComboState.Value == TernaryState.True;
 
                 HitCircle circle;
 
@@ -168,9 +177,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                     circle.Position = position;
                     circle.StartTime = startTime;
-                    circle.NewCombo = newCombo;
-
-                    editorBeatmap.Update(circle);
                 }
                 else
                 {
@@ -178,12 +184,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         Position = position,
                         StartTime = startTime,
-                        NewCombo = newCombo,
                     };
 
                     newlyAdded.Add(circle);
 
-                    // TODO: probably ensure samples also follow current ternary status (not trivial)
                     circle.Samples.Add(circle.CreateHitSampleInfo());
                 }
 
@@ -198,14 +202,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 startTime = beatSnapProvider.SnapTime(startTime + timeSpacing);
             }
 
-            var previousNewComboState = newComboState.Value;
-
             insertedCircles.AddRange(newlyAdded);
             editorBeatmap.AddRange(newlyAdded);
 
-            // When adding new hitObjects, newCombo state will get reset to false when no objects are selected.
-            // Since this is the case when this popover is showing, we need to restore the previous newCombo state
-            newComboState.Value = previousNewComboState;
+            placementStateManager?.RemoveAndDisposeImmediately();
+            Content.Add(placementStateManager = new PlacementStateManager(insertedCircles.Cast<HitObject>().ToArray())
+            {
+                PerformBeatmapUpdates = true,
+            });
 
             commitButton.Enabled.Value = true;
         }

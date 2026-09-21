@@ -7,12 +7,31 @@ namespace osu.Game.Storyboards
 {
     public interface IStoryboardElement
     {
+        /// <summary>
+        /// Whether this element was declared in the individual beatmap's <c>.osu</c> file,
+        /// or in a beatmapset-shared <c>.osb</c> file.
+        /// </summary>
+        StoryboardElementSource Source { get; }
+
         string Path { get; }
         bool IsDrawable { get; }
 
         double StartTime { get; }
 
         Drawable CreateDrawable();
+    }
+
+    public enum StoryboardElementSource
+    {
+        /// <summary>
+        /// This element was declared in the individual beatmap's <c>.osu</c> file.
+        /// </summary>
+        Beatmap,
+
+        /// <summary>
+        /// This element was declared in a beatmapset-shared <c>.osb</c> file.
+        /// </summary>
+        Shared
     }
 
     public static class StoryboardElementExtensions

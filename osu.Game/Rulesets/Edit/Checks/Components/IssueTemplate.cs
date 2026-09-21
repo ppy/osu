@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Graphics;
 using osuTK.Graphics;
 
@@ -42,7 +41,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// Returns the formatted message given the arguments used to format it.
         /// </summary>
         /// <param name="args">The arguments used to format the message.</param>
-        public string GetMessage(params object[] args) => UnformattedMessage.FormatWith(args);
+        public string GetMessage(params object[] args) => string.Format(UnformattedMessage, args);
 
         /// <summary>
         /// Returns the colour corresponding to the type of this issue.

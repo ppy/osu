@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.Dialog;
@@ -20,8 +21,10 @@ namespace osu.Game.Overlays.Settings.Sections.General
     {
         protected override LocalisableString Header => GeneralSettingsStrings.UpdateHeader;
 
-        private SettingsButton checkForUpdatesButton = null!;
-        private SettingsEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
+        private SettingsButtonV2 checkForUpdatesButton = null!;
+        private FormEnumDropdown<ReleaseStream> releaseStreamDropdown = null!;
+
+        private readonly Bindable<SettingsNote.Data?> releaseStreamDropdownNote = new Bindable<SettingsNote.Data?>();
 
         private readonly Bindable<ReleaseStream> configReleaseStream = new Bindable<ReleaseStream>();
 
@@ -47,26 +50,39 @@ namespace osu.Game.Overlays.Settings.Sections.General
             // For simplicity, hide the concept of release streams from mobile users.
             if (isDesktop)
             {
-                Add(releaseStreamDropdown = new SettingsEnumDropdown<ReleaseStream>
+                Add(new SettingsItemV2(releaseStreamDropdown = new FormEnumDropdown<ReleaseStream>
                 {
-                    LabelText = GeneralSettingsStrings.ReleaseStream,
+                    Caption = GeneralSettingsStrings.ReleaseStream,
                     Current = { Value = configReleaseStream.Value },
+                })
+                {
                     Keywords = new[] { @"version" },
+                    Note = { BindTarget = releaseStreamDropdownNote },
+                    ShowRevertToDefaultButton = updateManager!.FixedReleaseStream == null
                 });
 
                 if (updateManager!.FixedReleaseStream != null)
                 {
                     configReleaseStream.Value = updateManager.FixedReleaseStream.Value;
 
-                    releaseStreamDropdown.ShowsDefaultIndicator = false;
                     releaseStreamDropdown.Items = [updateManager.FixedReleaseStream.Value];
-                    releaseStreamDropdown.SetNoticeText(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning);
+                    releaseStreamDropdownNote.Value = new SettingsNote.Data(GeneralSettingsStrings.ChangeReleaseStreamPackageManagerWarning, SettingsNote.Type.Informational);
+                    releaseStreamDropdown.Current.Disabled = true;
+                }
+                else
+                {
+                    configReleaseStream.BindValueChanged(s =>
+                    {
+                        releaseStreamDropdownNote.Value = s.NewValue != ReleaseStream.Lazer
+                            ? new SettingsNote.Data(GeneralSettingsStrings.ReleaseStreamNonStableUpgradeInformation, SettingsNote.Type.Informational)
+                            : null;
+                    }, true);
                 }
 
                 releaseStreamDropdown.Current.BindValueChanged(releaseStreamChanged);
             }
 
-            Add(checkForUpdatesButton = new SettingsButton
+            Add(checkForUpdatesButton = new SettingsButtonV2
             {
                 Text = GeneralSettingsStrings.CheckUpdate,
                 Action = () => checkForUpdates().FireAndForget()
@@ -75,20 +91,22 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         private void releaseStreamChanged(ValueChangedEvent<ReleaseStream> stream)
         {
-            if (stream.NewValue == ReleaseStream.Tachyon)
+            switch (stream.NewValue)
             {
-                dialogOverlay?.Push(
-                    new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation,
-                        () => configReleaseStream.Value = ReleaseStream.Tachyon,
-                        () => releaseStreamDropdown.Current.Value = ReleaseStream.Lazer)
-                    {
-                        BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo
-                    });
+                case ReleaseStream.Lazer:
+                    configReleaseStream.Value = stream.NewValue;
+                    break;
 
-                return;
+                default:
+                    dialogOverlay?.Push(
+                        new ConfirmDialog(GeneralSettingsStrings.ChangeReleaseStreamConfirmation,
+                            () => configReleaseStream.Value = stream.NewValue,
+                            () => releaseStreamDropdown.Current.Value = stream.OldValue)
+                        {
+                            BodyText = GeneralSettingsStrings.ChangeReleaseStreamConfirmationInfo
+                        });
+                    break;
             }
-
-            configReleaseStream.Value = stream.NewValue;
         }
 
         private async Task checkForUpdates()
@@ -122,10 +140,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
             finally
             {
-                // This sequence allows the notification to be immediately dismissed without posting a continuation message.
-                checkingNotification.CompletionTarget = null;
-                checkingNotification.State = ProgressNotificationState.Completed;
-                checkingNotification.Close(false);
+                checkingNotification.CompleteSilently();
                 checkForUpdatesButton.Enabled.Value = true;
             }
         }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.IO.Stores;
 using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
@@ -21,9 +22,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             var skinSource = new SkinProvidingContainer(rawSkin);
             var skin = new CatchLegacySkinTransformer(skinSource);
 
-            Assert.AreEqual(new Color4(232, 185, 35, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value);
-            Assert.AreEqual(new Color4(232, 74, 35, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value);
-            Assert.AreEqual(new Color4(0, 255, 255, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value);
+            ClassicAssert.AreEqual(new Color4(232, 185, 35, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value);
+            ClassicAssert.AreEqual(new Color4(232, 74, 35, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value);
+            ClassicAssert.AreEqual(new Color4(0, 255, 255, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value);
         }
 
         private class TestLegacySkin : LegacySkin

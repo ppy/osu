@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
@@ -18,27 +21,28 @@ namespace osu.Game.Overlays.Settings.Sections.Online
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = OnlineSettingsStrings.NotifyOnMentioned,
+                    Caption = OnlineSettingsStrings.NotifyOnMentioned,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnUsernameMentioned)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = OnlineSettingsStrings.NotifyOnPrivateMessage,
+                    Caption = OnlineSettingsStrings.NotifyOnPrivateMessage,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnPrivateMessage)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = OnlineSettingsStrings.NotifyOnFriendPresenceChange,
-                    TooltipText = OnlineSettingsStrings.NotifyOnFriendPresenceChangeTooltip,
+                    Caption = OnlineSettingsStrings.NotifyOnFriendPresenceChange,
+                    HintText = OnlineSettingsStrings.NotifyOnFriendPresenceChangeTooltip,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnFriendPresenceChange),
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = OnlineSettingsStrings.HideCountryFlags,
-                    Current = config.GetBindable<bool>(OsuSetting.HideCountryFlags)
-                },
+                    Caption = AccountsStrings.PrivacyFriendsOnly.ToSentence(),
+                    HintText = AccountsStrings.PrivacyFriendsOnlyInfo.ToSentence(),
+                    Current = config.GetBindable<bool>(OsuSetting.PMFriendsOnly),
+                }),
             };
         }
     }

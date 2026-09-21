@@ -92,6 +92,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
+        /// The current beatmap.
+        /// </summary>
+        public readonly Bindable<IBeatmap?> Beatmap = new Bindable<IBeatmap?>();
+
+        /// <summary>
         /// The current rank.
         /// </summary>
         public IBindable<ScoreRank> Rank => rank;
@@ -206,18 +211,27 @@ namespace osu.Game.Rulesets.Scoring
 
             Mods.ValueChanged += mods =>
             {
-                scoreMultiplier = 1;
-
-                foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
-
+                updateScoreMultiplier();
                 updateScore();
                 updateRank();
+            };
+
+            Beatmap.ValueChanged += beatmap =>
+            {
+                updateScoreMultiplier();
             };
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
+            // NOTE: The ordering of operations here is significant.
+            // `Beatmap.Value` must be set before `base.ApplyBeatmap()` because changes to `Beatmap.Value`
+            // trigger recalculation of `scoreMultiplier`,
+            // and `base.ApplyBeatmap()` calls `SimulateAutoplay()` then `Reset(storeResults: true)`.
+            // failing to calculate the correct score multiplier *before* autoplay simulation would result in
+            // storing the incorrect value of `MaximumTotalScore`.
+            Beatmap.Value = beatmap;
+
             base.ApplyBeatmap(beatmap);
             beatmapApplied = true;
         }
@@ -399,6 +413,15 @@ namespace osu.Game.Rulesets.Scoring
                 newRank = mod.AdjustRank(newRank, Accuracy.Value);
 
             rank.Value = newRank;
+        }
+
+        private void updateScoreMultiplier()
+        {
+            if (Beatmap.Value == null)
+                return;
+
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(Beatmap.Value.BeatmapInfo.Difficulty));
+            scoreMultiplier = calculator.CalculateFor(Mods.Value);
         }
 
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)

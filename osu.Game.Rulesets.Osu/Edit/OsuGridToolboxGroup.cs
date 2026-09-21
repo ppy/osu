@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// Rotation of the grid lines in degrees.
         /// </summary>
-        public BindableFloat GridLinesRotation { get; } = new BindableFloat(0f)
+        public BindableFloat GridLinesRotation { get; } = new BindableFloat
         {
             MinValue = -180f,
             MaxValue = 180f,
@@ -125,13 +125,23 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 startPositionXSlider = new ExpandableSlider<float>
                 {
-                    Current = StartPositionX,
+                    Current = new BindableFloat
+                    {
+                        MinValue = -OsuPlayfield.BASE_SIZE.X / 2,
+                        MaxValue = OsuPlayfield.BASE_SIZE.X / 2,
+                        Precision = 0.1f,
+                    },
                     KeyboardStep = 1,
                     ExpandedLabelText = "X offset",
                 },
                 startPositionYSlider = new ExpandableSlider<float>
                 {
-                    Current = StartPositionY,
+                    Current = new BindableFloat
+                    {
+                        MinValue = -OsuPlayfield.BASE_SIZE.Y / 2,
+                        MaxValue = OsuPlayfield.BASE_SIZE.Y / 2,
+                        Precision = 0.1f,
+                    },
                     KeyboardStep = 1,
                     ExpandedLabelText = "Y offset",
                 },
@@ -157,22 +167,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                         gridTypeButtons = new EditorRadioButtonCollection
                         {
                             RelativeSizeAxes = Axes.X,
-                            Items = new[]
-                            {
-                                new RadioButton("Square",
-                                    () => GridType.Value = PositionSnapGridType.Square,
-                                    () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
-                                new RadioButton("Triangle",
-                                    () => GridType.Value = PositionSnapGridType.Triangle,
-                                    () => new OutlineTriangle(true, 20)),
-                                new RadioButton("Circle",
-                                    () => GridType.Value = PositionSnapGridType.Circle,
-                                    () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }),
-                            }
                         },
                     }
                 },
             };
+
+            gridTypeButtons.AddButton(new EditorRadioButton("Square",
+                () => GridType.Value = PositionSnapGridType.Square,
+                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }));
+            gridTypeButtons.AddButton(new EditorRadioButton("Triangle",
+                () => GridType.Value = PositionSnapGridType.Triangle,
+                () => new OutlineTriangle(true, 20)));
+            gridTypeButtons.AddButton(new EditorRadioButton("Circle",
+                () => GridType.Value = PositionSnapGridType.Circle,
+                () => new SpriteIcon { Icon = FontAwesome.Regular.Circle }));
 
             GridLineSpacing.Value = editorBeatmap.GridSize;
         }
@@ -186,14 +194,26 @@ namespace osu.Game.Rulesets.Osu.Edit
             StartPositionX.BindValueChanged(x =>
             {
                 startPositionXSlider.ContractedLabelText = $"X: {x.NewValue:#,0.##}";
+                startPositionXSlider.Current.Value = x.NewValue - OsuPlayfield.BASE_SIZE.X / 2;
                 StartPosition.Value = new Vector2(x.NewValue, StartPosition.Value.Y);
             }, true);
 
             StartPositionY.BindValueChanged(y =>
             {
                 startPositionYSlider.ContractedLabelText = $"Y: {y.NewValue:#,0.##}";
+                startPositionYSlider.Current.Value = y.NewValue - OsuPlayfield.BASE_SIZE.Y / 2;
                 StartPosition.Value = new Vector2(StartPosition.Value.X, y.NewValue);
             }, true);
+
+            startPositionXSlider.Current.BindValueChanged(x =>
+            {
+                StartPositionX.Value = x.NewValue + OsuPlayfield.BASE_SIZE.X / 2;
+            });
+
+            startPositionYSlider.Current.BindValueChanged(y =>
+            {
+                StartPositionY.Value = y.NewValue + OsuPlayfield.BASE_SIZE.Y / 2;
+            });
 
             StartPosition.BindValueChanged(pos =>
             {
@@ -217,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 GridLinesRotation.Disabled = v.NewValue == PositionSnapGridType.Circle;
 
-                gridTypeButtons.Items[(int)v.NewValue].Select();
+                gridTypeButtons.Items.ElementAt((int)v.NewValue).Select();
 
                 switch (v.NewValue)
                 {

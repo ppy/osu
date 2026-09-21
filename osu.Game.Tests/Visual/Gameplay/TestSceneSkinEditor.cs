@@ -24,7 +24,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
 using osu.Game.Tests.Resources;
@@ -151,7 +150,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             List<SkinBlueprint> blueprints = new List<SkinBlueprint>();
 
-            AddStep("clear list", () => blueprints.Clear());
+            AddStep("clear list", blueprints.Clear);
 
             for (int i = 0; i < 3; i++)
             {
@@ -314,22 +313,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestEditComponent()
         {
-            BarHitErrorMeter hitErrorMeter = null!;
+            ArgonAccuracyCounter accuracyCounter = null!;
 
-            AddStep("select bar hit error blueprint", () =>
+            AddStep("select argon accuracy counter blueprint", () =>
             {
-                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is ArgonAccuracyCounter);
 
-                hitErrorMeter = (BarHitErrorMeter)blueprint.Item;
+                accuracyCounter = (ArgonAccuracyCounter)blueprint.Item;
                 skinEditor.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
             });
 
             AddStep("move by keyboard", () => InputManager.Key(Key.Right));
 
-            AddAssert("hitErrorMeter moved", () => hitErrorMeter.X != 0);
+            AddAssert("accuracyCounter moved", () => accuracyCounter.X != -20);
 
-            AddAssert("value is default", () => hitErrorMeter.JudgementLineThickness.IsDefault);
+            AddAssert("value is default", () => accuracyCounter.WireframeOpacity.IsDefault);
 
             AddStep("hover first slider", () =>
             {
@@ -342,7 +341,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("adjust slider via keyboard", () => InputManager.Key(Key.Left));
 
-            AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
+            AddAssert("value is less than default", () => accuracyCounter.WireframeOpacity.Value < accuracyCounter.WireframeOpacity.Default);
         }
 
         [Test]
@@ -356,9 +355,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
             // no assertions. just make sure nothing crashes.
 
-            AddStep("select bar hit error blueprint", () =>
+            AddStep("select argon accuracy counter blueprint", () =>
             {
-                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is BarHitErrorMeter);
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().First(b => b.Item is ArgonAccuracyCounter);
                 skinEditor.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
             });
@@ -374,9 +373,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.Key(Key.V);
                 InputManager.ReleaseKey(Key.LControl);
             });
-            AddAssert("three hit error meters present",
-                () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is BarHitErrorMeter),
-                () => Is.EqualTo(3));
+            AddAssert("two argon accuracy counters present",
+                () => skinEditor.ChildrenOfType<SkinBlueprint>().Count(b => b.Item is ArgonAccuracyCounter),
+                () => Is.EqualTo(2));
         }
 
         [Test]
@@ -503,27 +502,27 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddStep("Right-click TopLeft anchor", () =>
+            AddStep("Click TopLeft anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("TopLeft"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("TopLeft item checked", () => (getMenuItemByText("TopLeft").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);
 
-            AddStep("Right-click Centre anchor", () =>
+            AddStep("Click Centre anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("Centre"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Centre item checked", () => (getMenuItemByText("Centre").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);
             AddAssert("TopLeft item unchecked", () => (getMenuItemByText("TopLeft").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.False);
 
-            AddStep("Right-click Closest anchor", () =>
+            AddStep("Click Closest anchor", () =>
             {
                 InputManager.MoveMouseTo(getMenuItemByText("Closest"));
-                InputManager.Click(MouseButton.Right);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Closest item checked", () => (getMenuItemByText("Closest").Item as TernaryStateRadioMenuItem)?.State.Value == TernaryState.True);

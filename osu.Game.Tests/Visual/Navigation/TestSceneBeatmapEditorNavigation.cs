@@ -19,6 +19,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -26,8 +27,8 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Screens.SelectV2;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 
@@ -47,8 +48,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("store difficulty name", () => difficultyName = getEditor().Beatmap.Value.BeatmapInfo.DifficultyName);
 
-            AddStep("open file menu", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "File").TriggerClick());
-            AddStep("click external edit", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "Edit externally").TriggerClick());
+            AddStep("open file menu", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value == CommonStrings.MenuBarFile).TriggerClick());
+            AddStep("click external edit", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value == EditorStrings.EditExternally).TriggerClick());
 
             AddUntilStep("wait for external edit screen", () => Game.ScreenStack.CurrentScreen is ExternalEditScreen externalEditScreen && externalEditScreen.IsLoaded);
 
@@ -73,8 +74,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("store difficulty name", () => difficultyName = getEditor().Beatmap.Value.BeatmapInfo.DifficultyName);
 
-            AddStep("open file menu", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "File").TriggerClick());
-            AddStep("click external edit", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value.ToString() == "Edit externally").TriggerClick());
+            AddStep("open file menu", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value == CommonStrings.MenuBarFile).TriggerClick());
+            AddStep("click external edit", () => getEditor().ChildrenOfType<Menu.DrawableMenuItem>().Single(m => m.Item.Text.Value == EditorStrings.EditExternally).TriggerClick());
 
             AddUntilStep("wait for external edit screen", () => Game.ScreenStack.CurrentScreen is ExternalEditScreen externalEditScreen && externalEditScreen.IsLoaded);
 
@@ -112,6 +113,27 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect songSelect
                                                        && songSelect.Beatmap.Value is DummyWorkingBeatmap);
+        }
+
+        [Test]
+        public void TestEditorRestoresModeOnReload()
+        {
+            prepareBeatmap();
+            openEditor();
+
+            makeMetadataChange(commit: false);
+
+            Editor editor1 = null!;
+
+            AddStep("store current editor", () => editor1 = getEditor());
+
+            AddStep("reload", () => getEditor().SwitchToDifficulty(getEditorBeatmap().BeatmapInfo));
+            AddUntilStep("save dialog displayed", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault()?.CurrentDialog is PromptForSaveDialog);
+            AddStep("confirm", () => InputManager.Key(Key.Number1));
+
+            AddUntilStep("wait for editor open", () => Game.ScreenStack.CurrentScreen is Editor editor && editor.ReadyForUse);
+            AddAssert("editor is new instance", () => getEditor() != editor1);
+            AddAssert("mode is still song setup", () => getEditor().Mode.Value == EditorScreenMode.SongSetup);
         }
 
         [Test]

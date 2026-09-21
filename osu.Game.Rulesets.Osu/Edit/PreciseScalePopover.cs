@@ -32,13 +32,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<PreciseScaleInfo> scaleInfo = new Bindable<PreciseScaleInfo>(new PreciseScaleInfo(1, EditorOrigin.GridCentre, true, true));
 
-        private SliderWithTextBoxInput<float> scaleInput = null!;
+        private FormSliderBar<float> scaleInput { get; set; } = null!;
         private BindableNumber<float> scaleInputBindable = null!;
         private EditorRadioButtonCollection scaleOrigin = null!;
 
-        private RadioButton gridCentreButton = null!;
-        private RadioButton playfieldCentreButton = null!;
-        private RadioButton selectionCentreButton = null!;
+        private EditorRadioButton gridCentreButton = null!;
+        private EditorRadioButton playfieldCentreButton = null!;
+        private EditorRadioButton selectionCentreButton = null!;
 
         private OsuCheckbox xCheckBox = null!;
         private OsuCheckbox yCheckBox = null!;
@@ -66,11 +66,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 Width = 220,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(20),
+                Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    scaleInput = new SliderWithTextBoxInput<float>("Scale:")
+                    scaleInput = new FormSliderBar<float>
                     {
+                        Caption = "Scale",
                         Current = scaleInputBindable = new BindableNumber<float>
                         {
                             MinValue = 0.05f,
@@ -80,23 +81,11 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Default = 1,
                         },
                         KeyboardStep = 0.01f,
-                        Instantaneous = true
+                        TabbableContentContainer = this
                     },
                     scaleOrigin = new EditorRadioButtonCollection
                     {
                         RelativeSizeAxes = Axes.X,
-                        Items = new[]
-                        {
-                            gridCentreButton = new RadioButton("Grid centre",
-                                () => setOrigin(EditorOrigin.GridCentre),
-                                () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
-                            playfieldCentreButton = new RadioButton("Playfield centre",
-                                () => setOrigin(EditorOrigin.PlayfieldCentre),
-                                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
-                            selectionCentreButton = new RadioButton("Selection centre",
-                                () => setOrigin(EditorOrigin.SelectionCentre),
-                                () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
-                        }
                     },
                     new FillFlowContainer
                     {
@@ -121,6 +110,17 @@ namespace osu.Game.Rulesets.Osu.Edit
                     },
                 }
             };
+
+            scaleOrigin.AddButton(gridCentreButton = new EditorRadioButton("Grid centre",
+                () => setOrigin(EditorOrigin.GridCentre),
+                () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }));
+            scaleOrigin.AddButton(playfieldCentreButton = new EditorRadioButton("Playfield centre",
+                () => setOrigin(EditorOrigin.PlayfieldCentre),
+                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }));
+            scaleOrigin.AddButton(selectionCentreButton = new EditorRadioButton("Selection centre",
+                () => setOrigin(EditorOrigin.SelectionCentre),
+                () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare }));
+
             gridCentreButton.Selected.DisabledChanged += isDisabled =>
             {
                 gridCentreButton.TooltipText = isDisabled ? "The current selection cannot be scaled relative to grid centre." : string.Empty;

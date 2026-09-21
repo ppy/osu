@@ -35,8 +35,10 @@ namespace osu.Game.Overlays.OSD
         private Bindable<double?> lastPlaybackTime;
 
         public TrackedSettingToast(SettingDescription description)
-            : base(description.Name, description.Value, description.Shortcut)
+            : base(description.Name, description.Value)
         {
+            ExtraText = description.Shortcut;
+
             FillFlowContainer<OptionLight> optionLights;
 
             Children = new Drawable[]
@@ -75,7 +77,7 @@ namespace osu.Game.Overlays.OSD
                     break;
             }
 
-            ValueText.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
+            ValueSpriteText.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
 
             for (int i = 0; i < optionCount; i++)
                 optionLights.Add(new OptionLight { Glowing = i == selectedOption });

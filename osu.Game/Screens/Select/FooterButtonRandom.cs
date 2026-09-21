@@ -1,38 +1,38 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
-#nullable disable
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
+using osu.Game.Screens.Footer;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class FooterButtonRandom : FooterButton
+    public partial class FooterButtonRandom : ScreenFooterButton
     {
-        public Action NextRandom { get; set; }
-        public Action PreviousRandom { get; set; }
+        public Action? NextRandom { get; set; }
+        public Action? PreviousRandom { get; set; }
 
-        private Container persistentText;
-        private OsuSpriteText randomSpriteText;
-        private OsuSpriteText rewindSpriteText;
+        private Container persistentText = null!;
+        private OsuSpriteText randomSpriteText = null!;
+        private OsuSpriteText rewindSpriteText = null!;
         private bool rewindSearch;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colour)
         {
-            SelectedColour = colours.Green;
-            DeselectedColour = SelectedColour.Opacity(0.5f);
-
+            //TODO: use https://fontawesome.com/icons/shuffle?s=solid&f=classic when local Fontawesome is updated
+            Icon = FontAwesome.Solid.Random;
+            AccentColour = colour.Blue1;
             TextContainer.Add(persistentText = new Container
             {
                 Anchor = Anchor.Centre,
@@ -43,17 +43,19 @@ namespace osu.Game.Screens.Select
                 {
                     randomSpriteText = new OsuSpriteText
                     {
+                        Font = OsuFont.TorusAlternate.With(size: 16),
                         AlwaysPresent = true,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Text = "random",
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Text = SongSelectStrings.Random,
                     },
                     rewindSpriteText = new OsuSpriteText
                     {
+                        Font = OsuFont.TorusAlternate.With(size: 16),
                         AlwaysPresent = true,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Text = "rewind",
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Text = SongSelectStrings.Rewind,
                         Alpha = 0f,
                     }
                 }
@@ -72,8 +74,9 @@ namespace osu.Game.Screens.Select
                         Alpha = 0,
                         Text = rewindSpriteText.Text,
                         AlwaysPresent = true, // make sure the button is sized large enough to always show this
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Font = OsuFont.TorusAlternate.With(size: 16),
                     });
 
                     fallingRewind.FadeOutFromOne(fade_time, Easing.In);
@@ -82,31 +85,25 @@ namespace osu.Game.Screens.Select
 
                     persistentText.FadeInFromZero(fade_time, Easing.In);
 
-                    PreviousRandom.Invoke();
+                    PreviousRandom?.Invoke();
                 }
                 else
                 {
-                    NextRandom.Invoke();
+                    NextRandom?.Invoke();
                 }
             };
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            updateText(e);
+            updateText(e.ShiftPressed);
             return base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            updateText(e);
+            updateText(e.ShiftPressed);
             base.OnKeyUp(e);
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            updateText(e);
-            return base.OnMouseDown(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -125,15 +122,14 @@ namespace osu.Game.Screens.Select
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            base.OnMouseUp(e);
-
             if (e.Button == MouseButton.Right && IsHovered)
             {
                 rewindSearch = true;
                 TriggerClick();
+                return;
             }
 
-            updateText(e);
+            base.OnMouseUp(e);
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -158,12 +154,10 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateText(UIEvent e)
+        private void updateText(bool rewind = false)
         {
-            bool aboutToRewind = e.ShiftPressed || e.CurrentState.Mouse.IsPressed(MouseButton.Right);
-
-            randomSpriteText.Alpha = aboutToRewind ? 0 : 1;
-            rewindSpriteText.Alpha = aboutToRewind ? 1 : 0;
+            randomSpriteText.Alpha = rewind ? 0 : 1;
+            rewindSpriteText.Alpha = rewind ? 1 : 0;
         }
     }
 }

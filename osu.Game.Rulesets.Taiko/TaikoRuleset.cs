@@ -6,41 +6,44 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
+using osu.Game.Localisation.Taiko;
+using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Rulesets.Taiko.Edit;
+using osu.Game.Rulesets.Taiko.Edit.Setup;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Argon;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
-using osu.Game.Overlays.Settings;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
-using osu.Game.Rulesets.Configuration;
-using osu.Game.Configuration;
-using osu.Game.Localisation;
-using osu.Game.Rulesets.Scoring.Legacy;
-using osu.Game.Rulesets.Taiko.Configuration;
-using osu.Game.Rulesets.Taiko.Edit.Setup;
-using osu.Game.Rulesets.Taiko.Skinning.Default;
-using osu.Game.Screens.Edit.Setup;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -75,15 +78,32 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.D, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.J, TaikoAction.RightCentre),
-            new KeyBinding(InputKey.K, TaikoAction.RightRim),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+                        new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
+                        new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
+                        new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
+                        new KeyBinding(InputKey.J, TaikoAction.RightCentre),
+                        new KeyBinding(InputKey.None, TaikoAction.RightCentre),
+                        new KeyBinding(InputKey.K, TaikoAction.RightRim),
+                        new KeyBinding(InputKey.None, TaikoAction.RightRim),
+                    };
+
+                case EDITOR_VARIANT:
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, TaikoAction.EditorHitTool),
+                        new KeyBinding(InputKey.Number3, TaikoAction.EditorDrumRollTool),
+                        new KeyBinding(InputKey.Number4, TaikoAction.EditorSwellTool),
+                    ];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
@@ -188,6 +208,8 @@ namespace osu.Game.Rulesets.Taiko
             }
         }
 
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new TaikoScoreMultiplierCalculator(context);
+
         public override string Description => "osu!taiko";
 
         public override string ShortName => SHORT_NAME;
@@ -222,15 +244,18 @@ namespace osu.Game.Rulesets.Taiko
 
         public override RulesetSettingsSubsection CreateSettings() => new TaikoSettingsSubsection(this);
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
                 HitResult.Great,
                 HitResult.Ok,
+                HitResult.Miss,
 
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 
@@ -254,21 +279,30 @@ namespace osu.Game.Rulesets.Taiko
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                new StatisticItem("Timing Distribution", () => new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
-                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
-                {
-                    new AverageHitError(timedHitEvents),
-                    new UnstableRate(timedHitEvents)
-                }), true)
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(15),
+                    Children = new Drawable[]
+                    {
+                        new HitEventTimingDistributionGraph(timedHitEvents)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 150
+                        },
+                        new SimpleStatisticTable(1, new SimpleStatisticItem[]
+                        {
+                            new AverageHitError(timedHitEvents),
+                            new UnstableRate(timedHitEvents)
+                        })
+                    }
+                }, true)
             };
         }
 
@@ -303,26 +337,26 @@ namespace osu.Game.Rulesets.Taiko
             double rate = ModUtils.CalculateRateWithMods(mods);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
             {
-                Description = "Affects timing requirements for hits and mash rate requirements for swells.",
+                Description = TaikoRulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               ))
-                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric("Hits per second required to clear swells", LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
+                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(TaikoRulesetStrings.HitsPerSecondRequiredToClearSwells, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
                                               .ToArray()
             };
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
             {
-                Description = "Affects the harshness of health drain and the health penalties for missing."
+                Description = SongSelectStrings.HPDrainDescription
             };
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
             {
-                Description = "Multiplier applied to the baseline scroll speed of the playfield when no mods are active."
+                Description = TaikoRulesetStrings.ScrollSpeedDescription
             };
         }
     }

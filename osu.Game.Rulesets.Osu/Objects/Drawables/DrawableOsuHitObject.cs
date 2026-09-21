@@ -141,6 +141,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public void MissForcefully() => ApplyMinResult();
 
+        // ReSharper disable once FunctionRecursiveOnAllPaths (TODO: remove after fixed https://youtrack.jetbrains.com/issue/RIDER-135036/Incorrect-recursive-on-all-execution-paths-inspection)
         private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent!.ScreenSpaceDrawQuad.AABBFloat;
 
         /// <summary>

@@ -14,16 +14,16 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         protected override LocalisableString Header => CommonStrings.Beatmaps;
 
-        private SettingsButton deleteBeatmapsButton = null!;
-        private SettingsButton deleteBeatmapVideosButton = null!;
-        private SettingsButton resetOffsetsButton = null!;
-        private SettingsButton restoreButton = null!;
-        private SettingsButton undeleteButton = null!;
+        private SettingsButtonV2 deleteBeatmapsButton = null!;
+        private SettingsButtonV2 deleteBeatmapVideosButton = null!;
+        private SettingsButtonV2 resetOffsetsButton = null!;
+        private SettingsButtonV2 restoreButton = null!;
+        private SettingsButtonV2 undeleteButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmaps, IDialogOverlay? dialogOverlay)
         {
-            Add(deleteBeatmapsButton = new DangerousSettingsButton
+            Add(deleteBeatmapsButton = new DangerousSettingsButtonV2
             {
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmaps,
                 Action = () =>
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            Add(deleteBeatmapVideosButton = new DangerousSettingsButton
+            Add(deleteBeatmapVideosButton = new DangerousSettingsButtonV2
             {
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmapVideos,
                 Action = () =>
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            Add(resetOffsetsButton = new DangerousSettingsButton
+            Add(resetOffsetsButton = new DangerousSettingsButtonV2
             {
                 Text = MaintenanceSettingsStrings.ResetAllOffsets,
                 Action = () =>
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             AddRange(new Drawable[]
             {
-                restoreButton = new SettingsButton
+                restoreButton = new SettingsButtonV2
                 {
                     Text = MaintenanceSettingsStrings.RestoreAllHiddenDifficulties,
                     Action = () =>
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Task.Run(beatmaps.RestoreAll).ContinueWith(_ => Schedule(() => restoreButton.Enabled.Value = true));
                     }
                 },
-                undeleteButton = new SettingsButton
+                undeleteButton = new SettingsButtonV2
                 {
                     Text = MaintenanceSettingsStrings.RestoreAllRecentlyDeletedBeatmaps,
                     Action = () =>

@@ -146,11 +146,11 @@ namespace osu.Desktop.Updater
             action();
         }
 
-        private void restartToApplyUpdate(Velopack.UpdateManager updateManager, UpdateInfo update) => Task.Run(async () =>
+        private void restartToApplyUpdate(Velopack.UpdateManager updateManager, UpdateInfo update)
         {
-            await updateManager.WaitExitThenApplyUpdatesAsync(update.TargetFullRelease).ConfigureAwait(false);
-            Schedule(() => game.AttemptExit());
-        });
+            game.RestartOnExitAction = () => updateManager.WaitExitThenApplyUpdates(update.TargetFullRelease);
+            game.AttemptExit();
+        }
 
         private static void log(string text) => Logger.Log($"VelopackUpdateManager: {text}");
     }

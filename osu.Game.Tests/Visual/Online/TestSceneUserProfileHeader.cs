@@ -40,6 +40,11 @@ namespace osu.Game.Tests.Visual.Online
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("set processing message", () =>
+            {
+                dummyAPI.ScoreProcessingNoticeUrl = "https://osu.ppy.sh/home/news/2026-07-03-performance-points-star-rating-updates";
+            });
+
             AddStep("create header", () =>
             {
                 Child = new OsuScrollContainer(Direction.Vertical)

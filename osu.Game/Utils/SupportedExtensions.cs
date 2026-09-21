@@ -11,9 +11,9 @@ namespace osu.Game.Utils
 
         public static readonly string[] ALL_EXTENSIONS =
         [
-            ..VIDEO_EXTENSIONS,
-            ..AUDIO_EXTENSIONS,
-            ..IMAGE_EXTENSIONS
+            .. VIDEO_EXTENSIONS,
+            .. AUDIO_EXTENSIONS,
+            .. IMAGE_EXTENSIONS
         ];
     }
 }

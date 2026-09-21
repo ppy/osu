@@ -39,6 +39,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString PlaySomeRuleset(string arg0) => new TranslatableString(getKey(@"play_some_ruleset"), @"play some {0}", arg0);
 
+        /// <summary>
+        /// "running"
+        /// </summary>
+        public static LocalisableString TimeRunning => new TranslatableString(getKey(@"time_running"), @"running");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

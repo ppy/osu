@@ -11,7 +11,6 @@ using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -31,8 +30,8 @@ namespace osu.Game.Overlays
     {
         public const float CONTENT_MARGINS = 20;
 
-        // extra margin to give room to the revert-to-default button in settings controls.
-        public const float CONTENT_MARGINS_RIGHT = 30;
+        // extra right padding to give room to the revert-to-default button in settings controls.
+        public static readonly MarginPadding CONTENT_PADDING = new MarginPadding { Left = 12, Right = 22 };
 
         public const float TRANSITION_LENGTH = 600;
 
@@ -81,8 +80,6 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
         }
-
-        protected virtual IEnumerable<SettingsSection> CreateSections() => null;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -133,8 +130,9 @@ namespace osu.Game.Overlays
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding
                         {
-                            Vertical = 20,
-                            Horizontal = CONTENT_MARGINS
+                            Vertical = 6,
+                            Left = CONTENT_PADDING.Left,
+                            Right = CONTENT_PADDING.Right,
                         },
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -154,8 +152,6 @@ namespace osu.Game.Overlays
                 BackButtonAction = Hide,
                 Width = sidebar_width
             });
-
-            CreateSections()?.ForEach(AddSection);
         }
 
         protected void AddSection(SettingsSection section)
@@ -265,13 +261,11 @@ namespace osu.Game.Overlays
 
                 SectionsContainer.SelectedSection.BindValueChanged(section =>
                 {
-                    if (selectedSidebarButton != null)
-                        selectedSidebarButton.Selected = false;
+                    selectedSidebarButton?.Selected = false;
 
                     selectedSidebarButton = Sidebar.Children.OfType<SidebarIconButton>().FirstOrDefault(b => b.Section == section.NewValue);
 
-                    if (selectedSidebarButton != null)
-                        selectedSidebarButton.Selected = true;
+                    selectedSidebarButton?.Selected = true;
                 }, true);
             });
         }
@@ -323,7 +317,7 @@ namespace osu.Game.Overlays
             {
                 HeaderBackground = new Box
                 {
-                    Colour = colourProvider.Background4,
+                    Colour = colourProvider.Background5,
                     RelativeSizeAxes = Axes.Both
                 };
 

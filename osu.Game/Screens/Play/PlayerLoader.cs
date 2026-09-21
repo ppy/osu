@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -26,21 +27,24 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Volume;
 using osu.Game.Performance;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
+using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Screens.Play
 {
@@ -84,6 +88,12 @@ namespace osu.Game.Screens.Play
 
         protected Task? DisposalTask { get; private set; }
 
+        /// <summary>
+        /// By default, the loader screen will block until the window is focused.
+        /// Can be overridden by setting this to <c>false</c>.
+        /// </summary>
+        protected bool WindowShouldBeActiveForGameplayStart { get; init; } = true;
+
         private FillFlowContainer disclaimers = null!;
         private GridContainer sideContent = null!;
 
@@ -105,6 +115,9 @@ namespace osu.Game.Screens.Play
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        [Resolved]
+        private GameHost host { get; set; } = null!;
+
         private const double quick_restart_initial_delay = 500;
 
         protected bool BackgroundBrightnessReduction
@@ -120,14 +133,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private bool readyForPush =>
-            !playerConsumed
-            // don't push unless the player is completely loaded
-            && CurrentPlayer?.LoadState == LoadState.Ready
-            // don't push unless the player is ready to start gameplay
-            && ReadyForGameplay;
-
         protected virtual bool ReadyForGameplay =>
+            (!WindowShouldBeActiveForGameplayStart || host.IsActive.Value) &&
             // not ready if the user is hovering one of the panes (logo is excluded), unless they are idle.
             (IsHovered || osuLogo?.IsHovered == true || idleTracker.IsIdle.Value)
             // not ready if the user is dragging a slider or otherwise.
@@ -192,7 +199,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, OsuConfigManager config)
+        private void load(SessionStatics sessionStatics, OsuConfigManager config, IAPIProvider api)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
@@ -303,6 +310,18 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value.Beatmap.EpilepsyWarning)
             {
                 disclaimers.Add(epilepsyWarning = new PlayerLoaderDisclaimer(PlayerLoaderStrings.EpilepsyWarningTitle, PlayerLoaderStrings.EpilepsyWarningContent));
+            }
+
+            if (!string.IsNullOrEmpty(api.ScoreProcessingNoticeUrl))
+            {
+                disclaimers.Add(new PlayerLoaderDisclaimer(
+                    UsersStrings.ShowScoreProcessingTitle(UsersStrings.ShowScoreProcessingTitleLink),
+                    UsersStrings.ShowScoreProcessingMessage
+                )
+                {
+                    Action = () => (Game as OsuGame)?.OpenUrlExternally(api.ScoreProcessingNoticeUrl),
+                    IsImportant = true,
+                });
             }
 
             switch (Beatmap.Value.BeatmapInfo.Status)
@@ -490,6 +509,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
+            MetadataInfo.UserBlocked = !ReadyForGameplay && CurrentPlayer?.LoadState == LoadState.Ready;
+
             // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
             // may also be handling the hover events.
             if (inputManager.HoveredDrawables.Contains(VisualSettings) || QuickRestart)
@@ -653,6 +674,13 @@ namespace osu.Game.Screens.Play
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
             if (!this.IsCurrentScreen()) return;
+
+            bool readyForPush =
+                !playerConsumed
+                // don't push unless the player is completely loaded
+                && CurrentPlayer?.LoadState == LoadState.Ready
+                // don't push unless the player is ready to start gameplay
+                && ReadyForGameplay;
 
             if (!readyForPush)
             {

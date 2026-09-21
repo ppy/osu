@@ -17,6 +17,6 @@ namespace osu.Game.Overlays.Mods.Input
         /// <param name="e">The event representing the user's keypress.</param>
         /// <param name="availableMods">The list of currently available mods.</param>
         /// <returns>Whether the supplied event was handled as a mod selection/deselection.</returns>
-        bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods);
+        bool HandleModHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods);
     }
 }

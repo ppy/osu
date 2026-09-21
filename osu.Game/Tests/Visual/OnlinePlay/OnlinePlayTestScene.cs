@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             });
         }
 
-        protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
 
         public override void SetUpSteps()

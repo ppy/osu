@@ -5,13 +5,9 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -19,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -62,12 +59,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
 
         /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
+        /// Caption describing this control, displayed on top of the controls.
         /// </summary>
         public LocalisableString Caption { get; init; }
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Hint text containing an extended description of this control, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
 
@@ -76,11 +73,19 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
-        private Box background = null!;
-        private Box flashLayer = null!;
+        /// <summary>
+        /// Maximum allowed length of text.
+        /// </summary>
+        public int? LengthLimit { get; init; }
+
+        public bool SelectAllOnFocus { get; init; }
+
+        private FormControlBackground background = null!;
         private InnerTextBox textBox = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
+
+        protected Container CaptionContainer { get; private set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -89,44 +94,43 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 50;
-
-            Masking = true;
-            CornerRadius = 5;
-            CornerExponent = 2.5f;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                background = new FormControlBackground(),
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
-                flashLayer = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Transparent,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(9),
+                    Spacing = new Vector2(0, 4),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        CaptionContainer = new Container
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
-                            Caption = Caption,
-                            TooltipText = HintText,
+                            Children = new Drawable[]
+                            {
+                                caption = new FormFieldCaption
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Caption = Caption,
+                                    TooltipText = HintText,
+                                },
+                            },
                         },
                         textBox = CreateTextBox().With(t =>
                         {
-                            t.Anchor = Anchor.BottomRight;
-                            t.Origin = Anchor.BottomRight;
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
+                            t.LengthLimit = LengthLimit;
+                            t.SelectAllOnFocus = SelectAllOnFocus;
                             t.Current = Current;
                             t.CommitOnFocusLost = true;
                             t.OnCommit += (textBox, newText) =>
@@ -134,16 +138,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 OnCommit?.Invoke(textBox, newText);
 
                                 if (!current.Disabled && !ReadOnly)
-                                {
-                                    flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
-                                    flashLayer.FadeOutFromOne(800, Easing.OutQuint);
-                                }
+                                    background.FlashOnCommit();
                             };
-                            t.OnInputError = () =>
-                            {
-                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
-                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
-                            };
+                            t.OnInputError = () => background.FlashOnInputError();
                             t.TabbableContentContainer = tabbableContentContainer;
                         }),
                     },
@@ -192,19 +189,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = disabled ? colourProvider.Background1 : colourProvider.Content2;
             textBox.Colour = disabled ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            BorderThickness = IsHovered || textBox.Focused.Value ? 2 : 0;
-
-            if (disabled)
-                BorderColour = colourProvider.Dark1;
-            else
-                BorderColour = textBox.Focused.Value ? colourProvider.Highlight1 : colourProvider.Light4;
-
-            if (textBox.Focused.Value)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (textBox.Focused.Value)
+                background.VisualStyle = VisualStyle.Focused;
             else if (IsHovered)
-                background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
+                background.VisualStyle = VisualStyle.Hovered;
             else
-                background.Colour = colourProvider.Background5;
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         internal partial class InnerTextBox : OsuTextBox
@@ -215,13 +207,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override float LeftRightPadding => 0;
 
+            public InnerTextBox()
+            {
+                DrawBorder = false;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 Height = 16;
                 TextContainer.Height = 1;
-                Masking = false;
                 BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
+                CornerRadius = 0;
             }
 
             protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
@@ -256,6 +253,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool IsDisabled => current.Disabled;
 
-        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
+
+        public float MainDrawHeight => DrawHeight;
     }
 }

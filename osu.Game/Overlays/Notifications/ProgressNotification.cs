@@ -38,6 +38,9 @@ namespace osu.Game.Overlays.Notifications
 
         /// <summary>
         /// The function to post completion notifications back to.
+        ///
+        /// If not set, it will be assumed by <see cref="NotificationOverlay"/> when posting.
+        /// If set, it will override <see cref="NotificationOverlay"/>'s handling.
         /// </summary>
         public Action<Notification>? CompletionTarget { get; set; }
 
@@ -250,6 +253,14 @@ namespace osu.Game.Overlays.Notifications
             });
 
             cancelSample = audioManager.Samples.Get(@"UI/notification-cancel");
+        }
+
+        public void CompleteSilently()
+        {
+            // This sequence allows the notification to be immediately dismissed without posting a continuation message.
+            CompletionTarget = _ => { };
+            State = ProgressNotificationState.Completed;
+            Close(false);
         }
 
         public override void Close(bool runFlingAnimation)

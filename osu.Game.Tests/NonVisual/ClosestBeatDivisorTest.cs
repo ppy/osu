@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
@@ -66,6 +67,18 @@ namespace osu.Game.Tests.NonVisual
             assertClosestDivisors(divisors, closestDivisors, cpi);
         }
 
+        [Test]
+        public void TestNegativeTimingPointOffset()
+        {
+            var cpi = new ControlPointInfo();
+            cpi.Add(-300000, new TimingControlPoint { BeatLength = 1000 });
+
+            double[] divisors = { 3.03d, 0.97d, 14, 13, 7.94d, 6.08d, 3.93d, 2.96d, 2.02d, 64 };
+            double[] closestDivisors = { 3, 1, 16, 12, 8, 6, 4, 3, 2, 1 };
+
+            assertClosestDivisors(divisors, closestDivisors, cpi);
+        }
+
         private static void assertClosestDivisors(IReadOnlyList<double> divisors, IReadOnlyList<double> closestDivisors, ControlPointInfo cpi, double step = 1)
         {
             List<HitObject> hitobjects = new List<HitObject>();
@@ -85,7 +98,7 @@ namespace osu.Game.Tests.NonVisual
             };
 
             for (int i = 0; i < divisors.Count; ++i)
-                Assert.AreEqual(closestDivisors[i], beatmap.ControlPointInfo.GetClosestBeatDivisor(beatmap.HitObjects[i].StartTime), $"at index {i}");
+                ClassicAssert.AreEqual(closestDivisors[i], beatmap.ControlPointInfo.GetClosestBeatDivisor(beatmap.HitObjects[i].StartTime), $"at index {i}");
         }
     }
 }

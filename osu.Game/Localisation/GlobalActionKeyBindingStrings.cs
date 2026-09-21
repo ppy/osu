@@ -230,6 +230,16 @@ namespace osu.Game.Localisation
         public static LocalisableString RandomSkin => new TranslatableString(getKey(@"random_skin"), @"Random skin");
 
         /// <summary>
+        /// "Previous skin"
+        /// </summary>
+        public static LocalisableString PreviousSkin => new TranslatableString(getKey(@"previous_skin"), @"Previous skin");
+
+        /// <summary>
+        /// "Next skin"
+        /// </summary>
+        public static LocalisableString NextSkin => new TranslatableString(getKey(@"next_skin"), @"Next skin");
+
+        /// <summary>
         /// "Pause / resume replay"
         /// </summary>
         public static LocalisableString TogglePauseReplay => new TranslatableString(getKey(@"toggle_pause_replay"), @"Pause / resume replay");
@@ -355,6 +365,11 @@ namespace osu.Game.Localisation
         public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
 
         /// <summary>
+        /// "Fast forward replay"
+        /// </summary>
+        public static LocalisableString FastForwardReplay => new TranslatableString(getKey(@"fast_forward_replay"), @"Fast forward replay");
+
+        /// <summary>
         /// "Toggle chat focus"
         /// </summary>
         public static LocalisableString ToggleChatFocus => new TranslatableString(getKey(@"toggle_chat_focus"), @"Toggle chat focus");
@@ -475,9 +490,9 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
 
         /// <summary>
-        /// "Discard unsaved changes"
+        /// "Discard unsaved changes..."
         /// </summary>
-        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
+        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

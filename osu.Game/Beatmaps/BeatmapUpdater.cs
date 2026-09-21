@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
         public void Queue(Live<BeatmapSetInfo> beatmapSet, MetadataLookupScope lookupScope = MetadataLookupScope.LocalCacheFirst)
         {
             Logger.Log($"Queueing change for local beatmap {beatmapSet}");
-            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, lookupScope)), default, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
+            Task.Factory.StartNew(() => beatmapSet.PerformRead(b => Process(b, lookupScope)), CancellationToken.None, TaskCreationOptions.HideScheduler | TaskCreationOptions.RunContinuationsAsynchronously,
                 updateScheduler);
         }
 
@@ -53,13 +53,11 @@ namespace osu.Game.Beatmaps
 
                 foreach (BeatmapInfo beatmap in beatmapSet.Beatmaps)
                 {
-                    difficultyCache.Invalidate(beatmap);
-
                     var working = workingBeatmapCache.GetWorkingBeatmap(beatmap);
+
+                    difficultyCache.Invalidate(beatmap, working.BeatmapInfo);
+
                     var ruleset = working.BeatmapInfo.Ruleset.CreateInstance();
-
-                    Debug.Assert(ruleset != null);
-
                     var calculator = ruleset.CreateDifficultyCalculator(working);
 
                     beatmap.StarRating = calculator.Calculate().StarRating;

@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
 using osu.Game.Rulesets.Mods;
@@ -57,7 +58,7 @@ SliderTickRate:0.5
 
                 // The last hitobject triggers the stacking
                 for (int i = 0; i < objects.Count - 1; i++)
-                    Assert.AreEqual(0, ((OsuHitObject)objects[i]).StackHeight);
+                    ClassicAssert.AreEqual(0, ((OsuHitObject)objects[i]).StackHeight);
             }
         }
 
@@ -104,7 +105,7 @@ SliderTickRate:1
 
                 // The last hitobject triggers the stacking
                 for (int i = 0; i < objects.Count - 1; i++)
-                    Assert.AreEqual(0, ((OsuHitObject)objects[i]).StackHeight);
+                    ClassicAssert.AreEqual(0, ((OsuHitObject)objects[i]).StackHeight);
             }
         }
     }

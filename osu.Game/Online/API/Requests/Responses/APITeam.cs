@@ -18,6 +18,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public string ShortName { get; set; } = string.Empty;
 
         [JsonProperty(@"flag_url")]
-        public string FlagUrl = string.Empty;
+        public string? FlagUrl = string.Empty;
     }
 }

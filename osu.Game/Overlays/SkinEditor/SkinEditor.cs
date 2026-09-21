@@ -769,8 +769,9 @@ namespace osu.Game.Overlays.SkinEditor
         private partial class SkinEditorToast : Toast
         {
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
-                : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
+                : base(SkinSettingsStrings.SkinLayoutEditor, value)
             {
+                ExtraText = skinDisplayName;
             }
         }
 
