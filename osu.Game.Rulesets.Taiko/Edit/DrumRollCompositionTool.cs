@@ -4,17 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Taiko.Edit.Blueprints;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class DrumRollCompositionTool : CompositionTool
+    public class DrumRollCompositionTool : CompositionTool<TaikoAction>
     {
         public DrumRollCompositionTool()
-            : base("Drum roll")
+            : base(TaikoEditorStrings.DrumRollTool)
         {
+            Action = TaikoAction.EditorDrumRollTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorDrumRoll };

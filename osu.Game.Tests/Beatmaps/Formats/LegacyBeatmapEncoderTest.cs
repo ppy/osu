@@ -130,7 +130,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(actual.Beatmap.HitObjects.Serialize(), Is.EqualTo(expected.Beatmap.HitObjects.Serialize()));
 
             // Check skin.
-            ClassicAssert.True(areComboColoursEqual(expected.Skin.Configuration, actual.Skin.Configuration));
+            Assert.That(actual.Skin.Configuration.ComboColours, Is.EquivalentTo(expected.Skin.Configuration.ComboColours!));
+            Assert.That(actual.Skin.Configuration.CustomColours, Is.EquivalentTo(expected.Skin.Configuration.CustomColours));
 
             // Do a rough pass on storyboard layers.
             foreach (string layer in actual.Storyboard.Layers.Concat(expected.Storyboard.Layers).Select(l => l.Name).Distinct())
@@ -271,16 +272,29 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(decodedAfterEncode.Beatmap.HitObjects[2].Samples[0].UseBeatmapSamples, Is.True);
         }
 
-        private static bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
+        [Test]
+        [SetCulture("pl-PL")]
+        public void TestSliderVelocityPresetCultureInvariance()
         {
-            // equal to null, no need to SequenceEqual
-            if (a.ComboColours == null && b.ComboColours == null)
-                return true;
+            var beatmap = new Beatmap();
 
-            if (a.ComboColours == null || b.ComboColours == null)
-                return false;
+            var encoded = EncodeToLegacy(new BeatmapComponents(beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty), new Storyboard()));
+            var decodedAfterEncode = DecodeFromLegacy(encoded, beatmaps_resource_store, string.Empty);
 
-            return a.ComboColours.SequenceEqual(b.ComboColours);
+            Assert.That(decodedAfterEncode.Beatmap.SliderVelocityPresets, Is.EquivalentTo(beatmap.SliderVelocityPresets));
+        }
+
+        [TestCaseSource(nameof(allBeatmaps))]
+        [SetCulture("pl-PL")]
+        public void TestCultureInvariance(string name)
+        {
+            var decoded = DecodeFromLegacy(beatmaps_resource_store.GetStream(name), beatmaps_resource_store, name);
+            var decodedAfterEncode = DecodeFromLegacy(EncodeToLegacy(decoded), beatmaps_resource_store, name);
+
+            Sort(decoded.Beatmap);
+            Sort(decodedAfterEncode.Beatmap);
+
+            CompareBeatmaps(decoded, decodedAfterEncode);
         }
 
         public static void Sort(IBeatmap beatmap)

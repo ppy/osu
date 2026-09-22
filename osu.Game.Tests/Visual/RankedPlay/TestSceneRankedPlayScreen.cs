@@ -219,6 +219,36 @@ namespace osu.Game.Tests.Visual.RankedPlay
         }
 
         [Test]
+        public void TestEndedScreenVictory()
+        {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+            AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = 2).WaitSafely());
+            AddWaitStep("wait for bgm", 30);
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Ended, s =>
+            {
+                s.WinningUserId = API.LocalUser.Value.OnlineID;
+                s.Users[API.LocalUser.Value.OnlineID].RatingAfter = 1520;
+                s.Users[2].RatingAfter = 1480;
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void TestEndedScreenDefeat()
+        {
+            AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
+            AddStep("load screen", () => LoadScreen(screen = new RankedPlayScreen(MultiplayerClient.ClientRoom!)));
+            AddStep("set play phase", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.CardPlay, state => state.ActiveUserId = 2).WaitSafely());
+            AddWaitStep("wait for bgm", 30);
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Ended, s =>
+            {
+                s.WinningUserId = 2;
+                s.Users[API.LocalUser.Value.OnlineID].RatingAfter = 1480;
+                s.Users[2].RatingAfter = 1520;
+            }).WaitSafely());
+        }
+
+        [Test]
         public void TestPreviewStopsOnEnteringGameplay()
         {
             AddStep("join other user", () => MultiplayerClient.AddUser(new APIUser { Id = 2 }));
