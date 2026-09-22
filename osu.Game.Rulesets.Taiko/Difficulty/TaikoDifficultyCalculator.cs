@@ -85,7 +85,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     noteObjects,
                     difficultyHitObjects.Count,
                     beatmap.ControlPointInfo,
-                    beatmap.Difficulty.SliderMultiplier
+                    beatmap.Difficulty.SliderMultiplier,
+                    mods
                 ));
             }
 

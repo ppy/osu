@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -124,16 +125,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         /// <summary>
         /// Selective bonus for maps with higher circle size.
+        /// It's always set to 1.0 for RX due to relax having easier precision requirements.
         /// </summary>
-        public double SmallCircleBonus => Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 70);
+        public double SmallCircleBonus => Mods.Any(x => x is OsuModRelax) ? 1.0 : Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 70);
 
         /// <summary>
         /// Object's immediate OverallDifficulty value calculated from the raw hitwindow.
         /// </summary>
         public double OverallDifficulty => (79.5 - HitWindowGreat / 2) / 6;
 
-        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
-            : base(hitObject, lastObject, clockRate, objects, index)
+        public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index, Mod[] mods)
+            : base(hitObject, lastObject, clockRate, objects, index, mods)
         {
             // Capped to 25ms to prevent difficulty calculation breaking from simultaneous objects.
             AdjustedDeltaTime = Math.Max(DeltaTime, MIN_DELTA_TIME);
