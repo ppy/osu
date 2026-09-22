@@ -164,7 +164,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Title = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
 
-            Padding = new MarginPadding { Top = Header.HEIGHT };
+            Padding = new MarginPadding
+            {
+                Top = Header.HEIGHT,
+                Horizontal = HORIZONTAL_OVERFLOW_PADDING
+            };
         }
 
         [BackgroundDependencyLoader]
