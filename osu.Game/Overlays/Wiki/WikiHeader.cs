@@ -30,6 +30,8 @@ namespace osu.Game.Overlays.Wiki
 
         public readonly Bindable<APIWikiPage> WikiPageData = new Bindable<APIWikiPage>();
 
+        public WikiLanguageDropdown LanguageDropdown;
+
         public Action ShowIndexPage;
         public Action ShowParentPage;
 
@@ -42,6 +44,38 @@ namespace osu.Game.Overlays.Wiki
 
             WikiPageData.BindValueChanged(onWikiPageChange);
             Current.BindValueChanged(onCurrentChange);
+        }
+
+        protected override Drawable CreateTabControlContent()
+        {
+            return new FillFlowContainer
+            {
+                Height = 40,
+                AutoSizeAxes = Axes.X,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(5),
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        AutoSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Child = LanguageDropdown = new WikiLanguageDropdown
+                        {
+                            Width = 200,
+                        },
+                    },
+                    new ShowOnGitHubButton
+                    {
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Size = new Vector2(32),
+                        TargetPath = { BindTarget = githubPath },
+                    },
+                },
+            };
         }
 
         private void onWikiPageChange(ValueChangedEvent<APIWikiPage> e)
@@ -69,27 +103,6 @@ namespace osu.Game.Overlays.Wiki
 
             TabControl.AddItem(e.NewValue.Title);
             Current.Value = e.NewValue.Title;
-        }
-
-        protected override Drawable CreateTabControlContent()
-        {
-            return new FillFlowContainer
-            {
-                Height = 40,
-                AutoSizeAxes = Axes.X,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5),
-                Children = new Drawable[]
-                {
-                    new ShowOnGitHubButton
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Size = new Vector2(32),
-                        TargetPath = { BindTarget = githubPath },
-                    },
-                },
-            };
         }
 
         private void onCurrentChange(ValueChangedEvent<LocalisableString?> e)
