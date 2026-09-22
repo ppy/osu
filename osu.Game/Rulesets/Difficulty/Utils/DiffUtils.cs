@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         }
 
         /// <summary>
-        /// Finds the P(-z < X < +z) for a normal distribution X with a mean of zero and standard deviation sigma 
+        /// Finds the P(-z &lt; X &lt; +z) for a normal distribution X with a mean of zero and standard deviation sigma
         /// </summary>
         /// <param name="z"> absolute value of the upper/lower bound </param>
         /// <param name="sigma"> standard deviation of the corresponding normal distribution</param>
