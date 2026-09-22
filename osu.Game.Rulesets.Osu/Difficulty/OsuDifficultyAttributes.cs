@@ -60,6 +60,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double SliderFactor { get; set; }
 
         /// <summary>
+        /// Describes how much of <see cref="AimDifficulty"/> is contributed to by cheesable patterns..
+        /// A value closer to 1.0 indicates most of <see cref="AimDifficulty"/> is contributed by normal patterns.
+        /// A value closer to 0.0 indicates most of <see cref="AimDifficulty"/> is contributed by cheesable patterns.
+        /// </summary>
+        [JsonProperty("cheese_factor")]
+        public double CheeseFactor { get; set; }
+
+        /// <summary>
         /// Describes how much of <see cref="AimDifficultStrainCount"/> is contributed to by hitcircles or sliders
         /// A value closer to 0.0 indicates most of <see cref="AimDifficultStrainCount"/> is contributed by hitcircles
         /// A value closer to Infinity indicates most of <see cref="AimDifficultStrainCount"/> is contributed by sliders
