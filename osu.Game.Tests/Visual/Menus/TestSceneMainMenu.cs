@@ -6,12 +6,17 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Menu;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Menus
@@ -125,6 +130,37 @@ namespace osu.Game.Tests.Visual.Menus
             });
 
             AddUntilStep("wait for dialog", () => Game.ChildrenOfType<DialogOverlay>().SingleOrDefault()?.CurrentDialog != null);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestEnterSkinEditorFromMainMenu(bool allowConverted)
+        {
+            RulesetInfo taikoRuleset = new TaikoRuleset().RulesetInfo;
+            AddStep("import test beatmap set", () => Game.BeatmapManager.Import(TestResources.GetTestBeatmapForImport()));
+            AddStep("set show converted beatmaps", () => Game.LocalConfig.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps).Value = allowConverted);
+            AddStep("select standard ruleset", () => Game.Ruleset.Value = new OsuRuleset().RulesetInfo);
+
+            //makes sure we're initially on an osu! standard beatmap
+            AddStep("enter song select", () =>
+            {
+                InputManager.Key(Key.P);
+                InputManager.Key(Key.P);
+                InputManager.Key(Key.P);
+            });
+            AddStep("exit song select", () => InputManager.Key(Key.Escape));
+            AddStep("Select taiko ruleset", () => Game.Ruleset.Value = taikoRuleset);
+            AddStep("enter skin editor", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressKey(Key.S);
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+                InputManager.ReleaseKey(Key.S);
+            });
+            AddWaitStep("wait for skin editor", 5);
+            AddAssert("ruleset is still taiko", () => Game.Ruleset.Value.Equals(taikoRuleset));
         }
     }
 }
