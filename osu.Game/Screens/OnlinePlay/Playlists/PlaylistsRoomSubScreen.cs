@@ -164,13 +164,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
 
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new PopoverContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                Children = new Drawable[]
                     {
                         roomUpdater = new PlaylistsRoomUpdater(room),
                         beatmapAvailabilityTracker,
@@ -197,10 +194,15 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     {
                                         new Drawable[]
                                         {
-                                            new PlaylistsRoomPanel(room)
+                                            new OsuContextMenuContainer
                                             {
-                                                SelectedItem = SelectedItem,
-                                                ShowDescription = true,
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Child = new PlaylistsRoomPanel(room)
+                                                {
+                                                    SelectedItem = SelectedItem,
+                                                    ShowDescription = true,
+                                                }
                                             }
                                         },
                                         null,
@@ -438,7 +440,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             }
                         }
                     }
-                }
+
             };
 
             LoadComponent(userModsSelectOverlay = new RoomModSelectOverlay
