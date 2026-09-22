@@ -393,8 +393,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateRoomName()
         {
-            if (roomName != null)
-                roomName.Text = Room.Name;
+            roomName?.Text = Room.Name;
         }
 
         private void updateRoomCategory()
@@ -407,20 +406,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateRoomType()
         {
-            if (endDateInfo != null)
-                endDateInfo.Alpha = Room.Type == MatchType.Playlists ? 1 : 0;
+            endDateInfo?.Alpha = Room.Type == MatchType.Playlists ? 1 : 0;
         }
 
         private void updateRoomHasPassword()
         {
-            if (passwordIcon != null)
-                passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
+            passwordIcon?.Alpha = Room.HasPassword ? 1 : 0;
         }
 
         private void updateRoomPinned()
         {
-            if (pinnedIcon != null)
-                pinnedIcon.Alpha = Room.Pinned ? 1 : 0;
+            pinnedIcon?.Alpha = Room.Pinned ? 1 : 0;
         }
 
         private int numberOfAvatars = 7;
@@ -432,8 +428,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 numberOfAvatars = value;
 
-                if (drawableRoomParticipantsList != null)
-                    drawableRoomParticipantsList.NumberOfCircles = value;
+                drawableRoomParticipantsList?.NumberOfCircles = value;
             }
         }
 

@@ -72,7 +72,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private LocalisableString caption;
 
         /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
+        /// Caption describing this control, displayed on top of the controls.
         /// </summary>
         public LocalisableString Caption
         {
@@ -87,7 +87,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Hint text containing an extended description of this control, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
 

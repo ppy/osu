@@ -957,6 +957,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.UserStyleChanged -= onUserStyleChanged;
                 client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
+                client.MatchEvent -= onMatchEvent;
             }
         }
 
