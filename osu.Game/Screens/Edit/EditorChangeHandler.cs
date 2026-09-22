@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 

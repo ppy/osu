@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +31,13 @@ namespace osu.Game.IO.Archives
 
         private readonly Stream archiveStream;
         private readonly IWritableArchive archive;
+
+        /// <summary>
+        /// Specifies the maximum permitted size of files (in bytes) in the archive.
+        /// If a ZIP archive specifies a file entry which exceeds this size,
+        /// attempting to access this file via <see cref="GetStream"/> will fail with <see cref="InsufficientMemoryException"/>.
+        /// </summary>
+        public long MaximumEntrySize { get; set; } = 100 * 1024 * 1024; // bytes
 
         static ZipArchiveReader()
         {
@@ -62,6 +70,9 @@ namespace osu.Game.IO.Archives
 
             using (Stream s = entry.OpenEntryStream())
             {
+                if (entry.Size > MaximumEntrySize)
+                    throw new InsufficientMemoryException($@"Size of file ""{name}"" exceeds allowable limit of {MaximumEntrySize} bytes");
+
                 if (entry.Size > 0)
                 {
                     var owner = MemoryAllocator.Default.Allocate<byte>((int)entry.Size);

@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public abstract partial class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
     {
+        [CanBeNull]
+        public new DrawableTaikoHitObject ParentHitObject => base.ParentHitObject as DrawableTaikoHitObject;
+
         protected readonly Container Content;
         private readonly Container proxiedContent;
 

@@ -206,7 +206,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         {
                                             new MultiplayerRoomPanel(room)
                                             {
-                                                OnEdit = () => settingsOverlay.Show()
+                                                OnEdit = () => settingsOverlay.Show(),
+                                                ShowDescription = true,
                                             }
                                         },
                                         null,
@@ -956,6 +957,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.UserStyleChanged -= onUserStyleChanged;
                 client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
+                client.MatchEvent -= onMatchEvent;
             }
         }
 

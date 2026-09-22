@@ -18,6 +18,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -128,6 +129,14 @@ namespace osu.Game.Screens.Edit
             {
                 BeginChange();
                 playableBeatmap.Bookmarks = Bookmarks.OrderBy(x => x).Distinct().ToArray();
+                EndChange();
+            });
+
+            SliderVelocityPresets = new BindableList<double>(playableBeatmap.SliderVelocityPresets);
+            SliderVelocityPresets.BindCollectionChanged((_, _) =>
+            {
+                BeginChange();
+                playableBeatmap.SliderVelocityPresets = SliderVelocityPresets.OrderBy(x => x).Distinct().ToArray();
                 EndChange();
             });
 
@@ -289,6 +298,14 @@ namespace osu.Game.Screens.Edit
         {
             get => PlayableBeatmap.Bookmarks;
             set => PlayableBeatmap.Bookmarks = value;
+        }
+
+        public readonly BindableList<double> SliderVelocityPresets;
+
+        double[] IBeatmap.SliderVelocityPresets
+        {
+            get => PlayableBeatmap.SliderVelocityPresets;
+            set => PlayableBeatmap.SliderVelocityPresets = value;
         }
 
         public int BeatmapVersion { get; set; }
@@ -530,6 +547,52 @@ namespace osu.Game.Screens.Edit
         }
 
         public double SnapTime(double time, double? referenceTime) => ControlPointInfo.GetClosestSnappedTime(time, BeatDivisor, referenceTime);
+
+        /// <summary>
+        /// Snaps every hit object's start time (and end time when applicable) to the current snap divisor.
+        /// </summary>
+        public void SnapAllHitObjectsToCurrentDivisor()
+        {
+            if (HitObjects.Count == 0)
+                return;
+
+            BeginChange();
+
+            foreach (var hitObject in HitObjects.ToArray())
+            {
+                double oldStart = hitObject.StartTime;
+                double oldEnd = hitObject.GetEndTime();
+
+                double newStart = SnapTime(oldStart, null);
+                double newEnd = Math.Max(newStart + GetBeatLengthAtTime(newStart), SnapTime(oldEnd, newStart));
+
+                hitObject.StartTime = newStart;
+
+                switch (hitObject)
+                {
+                    // Sliders and juice streams: end time comes from path length and velocity, so scale slider velocity to match the snapped duration.
+                    case IHasPathWithRepeats and IHasSliderVelocity sv:
+                    {
+                        double oldDuration = oldEnd - oldStart;
+                        double newDurationTarget = newEnd - newStart;
+
+                        if (oldDuration > 0)
+                            sv.SliderVelocityMultiplier *= oldDuration / newDurationTarget;
+
+                        break;
+                    }
+
+                    // Long notes with a real duration (spinners, hold notes, swells, etc.).
+                    case IHasDuration hasDuration:
+                        hasDuration.Duration = newEnd - newStart;
+                        break;
+                }
+            }
+
+            UpdateAllHitObjects();
+
+            EndChange();
+        }
 
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 

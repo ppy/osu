@@ -66,7 +66,10 @@ namespace osu.Game.Screens.Edit.Setup
                             Text = EditorSetupStrings.DragToSetBackground,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both
+                            TextAnchor = Anchor.Centre,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Padding = new MarginPadding { Horizontal = 9 },
                         }
                     };
                 }

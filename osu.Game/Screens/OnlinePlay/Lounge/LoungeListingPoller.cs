@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -41,7 +40,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             req.Success += result =>
             {
-                RoomsReceived(result.Where(r => r.Category != RoomCategory.DailyChallenge).ToArray());
+                result.RemoveAll(r => r.Category == RoomCategory.DailyChallenge);
+
+                if (!Filter.Value.Full)
+                    result.RemoveAll(r => r.ParticipantCount == r.MaxParticipants);
+
+                RoomsReceived(result.ToArray());
                 tcs.SetResult(true);
             };
 

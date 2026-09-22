@@ -148,7 +148,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 if (animated)
                     // Animation roughly matches `StarCounter`'s implementation.
-                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 100 + 80 * Math.Abs(c.NewValue.Stars - c.OldValue.Stars), Easing.OutQuint);
+                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, Math.Min(1000, 100 + 80 * Math.Abs(c.NewValue.Stars - c.OldValue.Stars)), Easing.OutQuint);
                 else
                     displayedStars.Value = c.NewValue.Stars;
             });

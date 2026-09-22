@@ -338,7 +338,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (config.Get<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps))
             {
-                if (!beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmap.BeatmapSet!.OnlineID }))
+                if (!beatmapManager.IsAvailableLocally(beatmap))
                     beatmapDownloader.Download(beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
             }
 

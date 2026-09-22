@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -23,15 +22,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => current.Current = value;
         }
 
+        /// <summary>
+        /// Whether this checkbox should be extra tall to match up with other form controls in vertical sizing scenarios.
+        /// </summary>
+        public bool ExtendedHeight { get; init; }
+
         private readonly BindableWithCurrent<bool> current = new BindableWithCurrent<bool>();
 
         /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
+        /// Caption describing this control, displayed on top of the controls.
         /// </summary>
         public LocalisableString Caption { get; init; }
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Hint text containing an extended description of this control, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
 
@@ -55,7 +59,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    Height = ExtendedHeight ? 52 : 0,
+                    AutoSizeAxes = ExtendedHeight ? Axes.None : Axes.Y,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {
@@ -130,7 +135,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 background.VisualStyle = VisualStyle.Normal;
         }
 
-        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
 
         public event Action? ValueChanged;
 

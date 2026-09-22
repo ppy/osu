@@ -135,7 +135,7 @@ namespace osu.Game.Storyboards
             return trigger;
         }
 
-        public void ApplyTransforms<TDrawable>(TDrawable drawable)
+        public void ApplyTransforms<TDrawable>(TDrawable drawable, StoryboardTriggerController triggerController)
             where TDrawable : Drawable, IFlippable, IVectorScalable
         {
             HashSet<string> appliedProperties = new HashSet<string>();
@@ -153,6 +153,9 @@ namespace osu.Game.Storyboards
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
                     command.ApplyTransforms(drawable);
             }
+
+            foreach (var triggerGroup in TriggerGroups)
+                triggerController.Bind(drawable, triggerGroup);
         }
     }
 }
