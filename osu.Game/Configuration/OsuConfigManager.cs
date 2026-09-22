@@ -96,6 +96,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ShowOnlineExplicitContent, false);
 
+            SetDefault(OsuSetting.ChatTicker, false);
             SetDefault(OsuSetting.NotifyOnUsernameMentioned, true);
             SetDefault(OsuSetting.NotifyOnPrivateMessage, true);
             SetDefault(OsuSetting.NotifyOnFriendPresenceChange, true);
@@ -417,6 +418,7 @@ namespace osu.Game.Configuration
         ScalingBackgroundDim,
         UIScale,
         IntroSequence,
+        ChatTicker,
         NotifyOnUsernameMentioned,
         NotifyOnPrivateMessage,
         NotifyOnFriendPresenceChange,
