@@ -33,6 +33,8 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public partial class SkinSection : SettingsSection
     {
+        private SkinDropdown skinDropdown;
+
         public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
         public override Drawable CreateIcon() => new SpriteIcon
@@ -42,40 +44,22 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "skins" });
 
+        private readonly List<Live<SkinInfo>> dropdownItems = new List<Live<SkinInfo>>();
+
+        [Resolved]
+        private SkinManager skins { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        private IDisposable realmSubscription;
+
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load([CanBeNull] SkinEditorOverlay skinEditor)
         {
             Children = new Drawable[]
             {
-                new CurrentSkinSettingsGroup(),
-                new SettingsButtonV2
-                {
-                    Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.ToggleVisibility(),
-                },
-            };
-        }
-
-        public partial class CurrentSkinSettingsGroup : SettingsFilterableGroup
-        {
-            private SkinDropdown skinDropdown;
-
-            private readonly List<Live<SkinInfo>> dropdownItems = new List<Live<SkinInfo>>();
-
-            [Resolved]
-            private SkinManager skins { get; set; }
-
-            [Resolved]
-            private RealmAccess realm { get; set; }
-
-            private IDisposable realmSubscription;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                InternalChild = new FillFlowContainer
+                new SettingsFilterableGroup
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -104,50 +88,55 @@ namespace osu.Game.Overlays.Settings.Sections
                                 new DeleteSkinButton { Padding = new MarginPadding { Left = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
                             }
                         },
-                    },
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
-                                                                             .Where(s => !s.DeletePending)
-                                                                             .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
-
-                skinDropdown.Current.BindValueChanged(skin =>
-                {
-                    if (skin.NewValue.ID == SkinInfo.RANDOM_SKIN)
-                    {
-                        // before selecting random, set the skin back to the previous selection.
-                        // this is done because at this point it will be random_skin_info, and would
-                        // cause SelectRandomSkin to be unable to skip the previous selection.
-                        skins.CurrentSkinInfo.Value = skin.OldValue;
-                        skins.SelectRandomSkin();
                     }
-                });
-            }
+                },
+                new SettingsButtonV2
+                {
+                    Text = SkinSettingsStrings.SkinLayoutEditor,
+                    Action = () => skinEditor?.ToggleVisibility(),
+                },
+            };
+        }
 
-            private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            realmSubscription = realm.RegisterForNotifications(_ => realm.Realm.All<SkinInfo>()
+                                                                         .Where(s => !s.DeletePending)
+                                                                         .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
+
+            skinDropdown.Current.BindValueChanged(skin =>
             {
-                // This can only mean that realm is recycling, else we would see the protected skins.
-                // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
-                if (!sender.Any())
-                    return;
-                // For simplicity repopulate the full list.
-                dropdownItems.Clear();
-                dropdownItems.AddRange(skins.GetAllUsableSkins());
+                if (skin.NewValue.ID == SkinInfo.RANDOM_SKIN)
+                {
+                    // before selecting random, set the skin back to the previous selection.
+                    // this is done because at this point it will be random_skin_info, and would
+                    // cause SelectRandomSkin to be unable to skip the previous selection.
+                    skins.CurrentSkinInfo.Value = skin.OldValue;
+                    skins.SelectRandomSkin();
+                }
+            });
+        }
 
-                Schedule(() => skinDropdown.Items = dropdownItems);
-            }
+        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes)
+        {
+            // This can only mean that realm is recycling, else we would see the protected skins.
+            // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
+            if (!sender.Any())
+                return;
+            // For simplicity repopulate the full list.
+            dropdownItems.Clear();
+            dropdownItems.AddRange(skins.GetAllUsableSkins());
 
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
+            Schedule(() => skinDropdown.Items = dropdownItems);
+        }
 
-                realmSubscription?.Dispose();
-            }
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            realmSubscription?.Dispose();
         }
 
         private partial class SkinDropdown : FormDropdown<Live<SkinInfo>>

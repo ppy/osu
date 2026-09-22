@@ -20,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public partial class AudioOffsetAdjustControl : SettingsFilterableGroup
+    public partial class AudioOffsetAdjustControl : FillFlowContainer
     {
         public Bindable<double> Current
         {
@@ -48,58 +48,63 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer
+            Direction = FillDirection.Vertical;
+            Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2);
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2),
-                Children = new Drawable[]
+                new SettingsFilterableGroup
                 {
-                    new SettingsItemV2(new FormSliderBar<double>
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2),
+                    Children = new Drawable[]
                     {
-                        Caption = AudioSettingsStrings.AudioOffset,
-                        RelativeSizeAxes = Axes.X,
-                        Current = { BindTarget = Current },
-                        KeyboardStep = 1,
-                        LabelFormat = v => $"{v:N0} ms",
-                        TooltipFormat = BeatmapOffsetControl.GetOffsetExplanatoryText,
-                    }),
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Padding = SettingsPanel.CONTENT_PADDING,
-                        Children = new Drawable[]
+                        new SettingsItemV2(new FormSliderBar<double>
                         {
-                            notchContainer = new Container<Circle>
+                            Caption = AudioSettingsStrings.AudioOffset,
+                            RelativeSizeAxes = Axes.X,
+                            Current = { BindTarget = Current },
+                            KeyboardStep = 1,
+                            LabelFormat = v => $"{v:N0} ms",
+                            TooltipFormat = BeatmapOffsetControl.GetOffsetExplanatoryText,
+                        }),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = SettingsPanel.CONTENT_PADDING,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Width = 0.5f,
-                                Height = 10,
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Padding = new MarginPadding
+                                notchContainer = new Container<Circle>
                                 {
-                                    Horizontal = FormSliderBar<double>.InnerSlider.NUB_WIDTH / 2
+                                    RelativeSizeAxes = Axes.X,
+                                    Width = 0.5f,
+                                    Height = 10,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = FormSliderBar<double>.InnerSlider.NUB_WIDTH / 2
+                                    },
                                 },
-                            },
-                            hintNote = new SettingsNote { RelativeSizeAxes = Axes.X },
-                        }
-                    },
-                    applySuggestion = new RoundedButton
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Text = AudioSettingsStrings.ApplySuggestedOffset,
-                        Padding = SettingsPanel.CONTENT_PADDING,
-                        Action = () =>
+                                hintNote = new SettingsNote { RelativeSizeAxes = Axes.X },
+                            }
+                        },
+                        applySuggestion = new RoundedButton
                         {
-                            if (SuggestedOffset.Value.HasValue)
-                                current.Value = SuggestedOffset.Value.Value;
-                            hitErrorTracker.ClearHistory();
+                            RelativeSizeAxes = Axes.X,
+                            Text = AudioSettingsStrings.ApplySuggestedOffset,
+                            Padding = SettingsPanel.CONTENT_PADDING,
+                            Action = () =>
+                            {
+                                if (SuggestedOffset.Value.HasValue)
+                                    current.Value = SuggestedOffset.Value.Value;
+                                hitErrorTracker.ClearHistory();
+                            }
                         }
                     }
-                }
+                },
             };
         }
 
