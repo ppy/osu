@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
+            if (current.BaseObject is Spinner spinner && spinner.SpinsRequired <= 0)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
