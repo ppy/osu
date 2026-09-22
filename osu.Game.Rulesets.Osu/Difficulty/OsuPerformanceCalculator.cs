@@ -260,7 +260,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double effectiveHitWindow = DiffUtils.SQRT2 * 20 * DiffUtils.Pow(4 / speedDifficulty, 0.35);
 
             // Find the proportion of 300s on speed notes assuming the hit window was the effective hit window.
-            double effectiveAccuracy = DiffUtils.Erf(effectiveHitWindow / ((double)speedDeviation) * DiffUtils.SQRT2);
+            double effectiveAccuracy = DiffUtils.ProbabilityNormal(effectiveHitWindow, (double)speedDeviation);
 
             // Scale speed value by normalized accuracy.
             speedValue *= DiffUtils.Pow(effectiveAccuracy, 2);
@@ -463,7 +463,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Subtract the deviation provided by tails that land outside the ok hit window from the deviation computed above.
                 // This is equivalent to calculating the deviation of a normal distribution truncated at +-okHitWindow.
                 double okHitWindowTailAmount = Math.Sqrt(2 / Math.PI) * okHitWindow * Math.Exp(-0.5 * DiffUtils.Pow(okHitWindow / deviation, 2))
-                                               / (deviation * DiffUtils.Erf(okHitWindow / (DiffUtils.SQRT2 * deviation)));
+                                               / (deviation * DiffUtils.ProbabilityNormal(okHitWindow, deviation));
 
                 deviation *= Math.Sqrt(1 - okHitWindowTailAmount);
             }

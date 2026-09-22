@@ -143,6 +143,16 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         }
 
         /// <summary>
+        /// Finds the P(-z < X < +z) for a normal distribution X with a mean of zero and standard deviation sigma 
+        /// </summary>
+        /// <param name="z"> absolute value of the upper/lower bound </param>
+        /// <param name="sigma"> standard deviation of the corresponding normal distribution</param>
+        public static double ProbabilityNormal(double z, double sigma)
+        {
+            return Erf(z / (sigma * SQRT2));
+        }
+
+        /// <summary>
         /// Error function (https://en.wikipedia.org/wiki/Error_function)
         /// </summary>
         /// <param name="x">Value to calculate the function for</param>
