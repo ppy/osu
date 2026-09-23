@@ -107,6 +107,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 else if (closeButton.Alpha > 0)
                     hideCloseButton();
             }
+            else
+                closeButton.Expire();
         }
 
         protected override void Dispose(bool isDisposing)
