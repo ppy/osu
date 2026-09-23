@@ -19,6 +19,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString PenSensitivity => new TranslatableString(getKey(@"pen_sensitivity"), @"Pen sensitivity");
 
+        /// <summary>
+        /// "Sensitivity anchor X"
+        /// </summary>
+        public static LocalisableString SensitivityAnchorX => new TranslatableString(getKey(@"sensitivity_anchor_x"), @"Sensitivity anchor X");
+
+        /// <summary>
+        /// "Sensitivity anchor Y"
+        /// </summary>
+        public static LocalisableString SensitivityAnchorY => new TranslatableString(getKey(@"sensitivity_anchor_y"), @"Sensitivity anchor Y");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

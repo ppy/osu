@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override LocalisableString Header => PenSettingsStrings.TabletExternal;
 
         private Bindable<double> handlerSensitivity = null!;
+        private Bindable<double> handlerSensitivityAnchorX = null!;
+        private Bindable<double> handlerSensitivityAnchorY = null!;
 
         public PenSettings(PenHandler penHandler)
             : base(penHandler)
@@ -29,6 +31,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private void load()
         {
             handlerSensitivity = penHandler.Sensitivity.GetBoundCopy();
+            handlerSensitivityAnchorX = penHandler.SensitivityAnchorX.GetBoundCopy();
+            handlerSensitivityAnchorY = penHandler.SensitivityAnchorY.GetBoundCopy();
 
             AddRange(new Drawable[]
             {
@@ -43,7 +47,23 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 })
                 {
                     Keywords = new[] { "speed", "velocity" },
-                }
+                },
+                new SettingsItemV2(new FormSliderBar<double>
+                {
+                    Caption = PenSettingsStrings.SensitivityAnchorX,
+                    Current = handlerSensitivityAnchorX,
+                    KeyboardStep = 0.01f,
+                    TransferValueOnCommit = true,
+                    DisplayAsPercentage = true,
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
+                {
+                    Caption = PenSettingsStrings.SensitivityAnchorY,
+                    Current = handlerSensitivityAnchorY,
+                    KeyboardStep = 0.01f,
+                    TransferValueOnCommit = true,
+                    DisplayAsPercentage = true,
+                })
             });
         }
     }
