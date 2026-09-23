@@ -309,9 +309,6 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TakeScreenshot))]
         TakeScreenshot,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TakeAndUploadScreenshot))]
-        TakeAndUploadScreeshot,
-
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.ToggleGameplayMouseButtons))]
         ToggleGameplayMouseButtons,
 
@@ -635,6 +632,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SeekToEnd))]
         EditorSeekToEnd,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.TakeAndUploadScreenshot))]
+        TakeAndUploadScreeshot,
     }
 
     public enum GlobalActionCategory
