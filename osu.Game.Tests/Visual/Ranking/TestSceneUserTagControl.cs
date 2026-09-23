@@ -35,8 +35,8 @@ namespace osu.Game.Tests.Visual.Ranking
 
         protected override Container<Drawable> Content => content;
 
-        [SetUp]
-        public void SetUp()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             base.Content.Child = new PopoverContainer
             {
