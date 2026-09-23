@@ -58,6 +58,9 @@ namespace osu.Game.Graphics
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
+        private Bindable<ScreenshotFormat> screenshotFormat = null!;
+        private Bindable<bool> captureMenuCursor = null!;
+
         private Storage storage = null!;
 
         private Sample? shutter;
@@ -67,6 +70,9 @@ namespace osu.Game.Graphics
         {
             this.storage = storage.GetStorageForDirectory(@"screenshots");
             shutter = audio.Samples.Get(@"UI/shutter");
+
+            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -96,16 +102,13 @@ namespace osu.Game.Graphics
 
         private volatile int screenShotTasks;
 
-        public Task<string?> TakeScreenshotAsync(bool forUpload = false) => Task.Run<string?>(async () =>
+        public Task<string?> TakeScreenshotAsync(bool copyToClipboard = true) => Task.Run<string?>(async () =>
         {
             Interlocked.Increment(ref screenShotTasks);
 
-            ScreenshotFormat screenshotFormat = config.Get<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
-            bool captureMenuCursor = config.Get<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
-
             try
             {
-                if (!captureMenuCursor)
+                if (!captureMenuCursor.Value)
                 {
                     cursorVisibility.Value = false;
 
@@ -156,20 +159,16 @@ namespace osu.Game.Graphics
                         });
                     }
 
-                    // Don't copy the image to clipboard when uploading a screenshot,
-                    // as it's going to be overwritten by the URL anyway.
-                    if (!forUpload)
-                    {
+                    if (copyToClipboard)
                         clipboard.SetImage(image);
-                    }
 
-                    (string? filename, Stream? stream) = getWritableStream(screenshotFormat);
+                    (string? filename, Stream? stream) = getWritableStream(screenshotFormat.Value);
 
                     if (filename == null) return null;
 
                     using (stream)
                     {
-                        switch (screenshotFormat)
+                        switch (screenshotFormat.Value)
                         {
                             case ScreenshotFormat.Png:
                                 await image.SaveAsPngAsync(stream).ConfigureAwait(false);
@@ -180,7 +179,7 @@ namespace osu.Game.Graphics
                                 break;
 
                             default:
-                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat}.");
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
 
@@ -206,27 +205,32 @@ namespace osu.Game.Graphics
 
         public Task UploadScreenshotAsync() => Task.Run(async () =>
         {
-            string? filename = await TakeScreenshotAsync(true).ConfigureAwait(false);
+            // Don't copy the image to clipboard when uploading a screenshot, as it's going to be overwritten by the URL
+            // anyway.
+            string? filename = await TakeScreenshotAsync(copyToClipboard: false).ConfigureAwait(false);
 
             if (filename == null)
-            {
                 return;
-            }
 
             Stream stream;
 
-            // Convert the taken screenshot to JPEG (to save storage) before uploading
-            // if user set their screenshots to save in a different format.
-            if (config.Get<ScreenshotFormat>(OsuSetting.ScreenshotFormat) != ScreenshotFormat.Jpg)
+            switch (screenshotFormat.Value)
             {
-                var image = await Image.LoadAsync(storage.GetFullPath(filename)).ConfigureAwait(false);
+                case ScreenshotFormat.Jpg:
+                    stream = storage.GetStream(filename, FileAccess.Read, FileMode.Open);
+                    break;
 
-                stream = new MemoryStream();
-                await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
-            }
-            else
-            {
-                stream = storage.GetStream(filename, FileAccess.Read, FileMode.Open);
+                case ScreenshotFormat.Png:
+                    // Convert the taken screenshot to JPEG (to save storage) before uploading if user set their screenshots to
+                    // save in a different format.
+                    var image = await Image.LoadAsync(storage.GetFullPath(filename)).ConfigureAwait(false);
+
+                    stream = new MemoryStream();
+                    await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             var uploadRequest = new UploadScreenshot(await stream.ReadAllBytesToArrayAsync().ConfigureAwait(false));
@@ -236,7 +240,6 @@ namespace osu.Game.Graphics
                 State = ProgressNotificationState.Active,
                 Text = NotificationsStrings.UploadingScreenshot,
                 CompletionText = NotificationsStrings.UploadSuccess,
-                Progress = 0,
             };
 
             uploadRequest.Progressed += (current, total) => notification.Progress = (float)current / total;
