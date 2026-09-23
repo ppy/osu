@@ -109,7 +109,7 @@ namespace osu.Game.Graphics
         {
             // Don't copy the image to clipboard when uploading a screenshot, as it's going to be overwritten by the URL
             // anyway.
-            string? filename = await TakeScreenshotAsync(copyToClipboard: false).ConfigureAwait(false);
+            string? filename = await TakeScreenshotAsync(copyToClipboard: false, showNotification: false).ConfigureAwait(false);
 
             if (filename == null)
                 return;
@@ -168,7 +168,7 @@ namespace osu.Game.Graphics
             api.Queue(uploadRequest);
         });
 
-        public Task<string?> TakeScreenshotAsync(bool copyToClipboard = true) => Task.Run<string?>(async () =>
+        public Task<string?> TakeScreenshotAsync(bool copyToClipboard = true, bool showNotification = true) => Task.Run<string?>(async () =>
         {
             Interlocked.Increment(ref screenShotTasks);
 
@@ -249,15 +249,18 @@ namespace osu.Game.Graphics
                         }
                     }
 
-                    notificationOverlay.Post(new SimpleNotification
+                    if (showNotification)
                     {
-                        Text = NotificationsStrings.ScreenshotSaved(filename),
-                        Activated = () =>
+                        notificationOverlay.Post(new SimpleNotification
                         {
-                            storage.PresentFileExternally(filename);
-                            return true;
-                        }
-                    });
+                            Text = NotificationsStrings.ScreenshotSaved(filename),
+                            Activated = () =>
+                            {
+                                storage.PresentFileExternally(filename);
+                                return true;
+                            }
+                        });
+                    }
 
                     return filename;
                 }
