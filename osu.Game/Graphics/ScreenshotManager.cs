@@ -47,6 +47,9 @@ namespace osu.Game.Graphics
         private GameHost host { get; set; } = null!;
 
         [Resolved]
+        private OsuGame? game { get; set; }
+
+        [Resolved]
         private Clipboard clipboard { get; set; } = null!;
 
         [Resolved]
@@ -141,10 +144,16 @@ namespace osu.Game.Graphics
                 CompletionText = NotificationsStrings.UploadSuccess,
             };
 
-            uploadRequest.Progressed += (current, total) => notification.Progress = (float)current / total;
+            uploadRequest.Progressed += (current, total) => notification.Progress = (float)current / total * 0.8f;
             uploadRequest.Success += content =>
             {
                 clipboard.SetText(content.Url);
+
+                notification.CompletionClickAction = () =>
+                {
+                    game?.OpenUrlExternally(content.Url);
+                    return true;
+                };
 
                 notification.Progress = 1;
                 notification.State = ProgressNotificationState.Completed;
