@@ -18,6 +18,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -662,6 +663,32 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("select second playlist item", () => screen.SelectedItem.Value = room.Playlist[1]);
             AddUntilStep("user mods validated", () => screen.UserMods.Value.Count == 1 && screen.UserMods.Value.OfType<OsuModDoubleTime>().Any());
             AddUntilStep("mods set", () => SelectedMods.Value.Count == 1 && SelectedMods.Value.OfType<OsuModDoubleTime>().Any());
+        }
+
+        [Test]
+        public void TestCloseButtonGoesAwayAfterGracePeriod()
+        {
+            Room room = null!;
+            PlaylistsRoomSubScreen roomScreen = null!;
+
+            AddStep("create room", () =>
+            {
+                room = new Room
+                {
+                    Name = @"Test Room",
+                    Host = API.LocalUser.Value,
+                    Category = RoomCategory.Normal,
+                    StartDate = DateTimeOffset.Now.AddMinutes(-5).AddSeconds(3),
+                    EndDate = DateTimeOffset.Now.AddMinutes(30)
+                };
+
+                API.Perform(new CreateRoomRequest(room));
+            });
+
+            AddStep("push screen", () => LoadScreen(roomScreen = new PlaylistsRoomSubScreen(room)));
+            AddUntilStep("wait for screen load", () => roomScreen.IsCurrentScreen());
+            AddAssert("close button present", () => roomScreen.ChildrenOfType<DangerousRoundedButton>().Any());
+            AddUntilStep("wait for close button to disappear", () => !roomScreen.ChildrenOfType<DangerousRoundedButton>().Any());
         }
 
         protected override void Dispose(bool isDisposing)
