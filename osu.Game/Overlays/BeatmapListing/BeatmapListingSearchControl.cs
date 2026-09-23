@@ -17,13 +17,18 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
+
 
 namespace osu.Game.Overlays.BeatmapListing
 {
     public partial class BeatmapListingSearchControl : CompositeDrawable
     {
+        private readonly BindableNumber<double> starRatingMin = new BindableNumber<double>(0) { MinValue = 0, MaxValue = 10, Precision = 0.1 };
+        private readonly BindableNumber<double> starRatingMax = new BindableNumber<double>(10) { MinValue = 0, MaxValue = 10, Precision = 0.1 };
+
         /// <summary>
         /// Any time the text box receives key events (even while masked).
         /// </summary>
@@ -48,6 +53,10 @@ namespace osu.Game.Overlays.BeatmapListing
         public Bindable<SearchPlayed> Played => playedFilter.Current;
 
         public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
+
+        public FilterControl.DifficultyRangeSlider DifficultyRange => difficultyRangeSlider;
+
+
 
         public APIBeatmapSet? BeatmapSet
         {
@@ -74,6 +83,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchScoreFilterRow ranksFilter;
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
         private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
+        private readonly FilterControl.DifficultyRangeSlider difficultyRangeSlider;
 
         private readonly Box background;
         private readonly UpdateableOnlineBeatmapSetCover beatmapCover;
@@ -138,6 +148,13 @@ namespace osu.Game.Overlays.BeatmapListing
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
                                     playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(BeatmapsStrings.ListingSearchFiltersPlayed),
                                     explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(BeatmapsStrings.ListingSearchFiltersNsfw),
+                                    difficultyRangeSlider = new FilterControl.DifficultyRangeSlider
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        MinRange = 0.1f,
+                                        LowerBound = starRatingMin,
+                                        UpperBound = starRatingMax,
+                                    },
                                 }
                             }
                         }

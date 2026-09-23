@@ -177,6 +177,8 @@ namespace osu.Game.Overlays.BeatmapListing
             searchControl.Ranks.CollectionChanged += (_, _) => queueUpdateSearch();
             searchControl.Played.BindValueChanged(_ => queueUpdateSearch());
             searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.DifficultyRange.LowerBound.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.DifficultyRange.UpperBound.BindValueChanged(_ => queueUpdateSearch());
 
             sortControl.Current.BindValueChanged(_ => queueUpdateSearch());
             sortControl.SortDirection.BindValueChanged(_ => queueUpdateSearch());
@@ -226,8 +228,15 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void performRequest()
         {
+            string query = searchControl.Query.Value;
+
+            if (!searchControl.DifficultyRange.LowerBound.IsDefault)
+                query += $" star>={searchControl.DifficultyRange.LowerBound.Value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}";
+            if (!searchControl.DifficultyRange.UpperBound.IsDefault)
+                query += $" star<={searchControl.DifficultyRange.UpperBound.Value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}";
+
             getSetsRequest = new SearchBeatmapSetsRequest(
-                searchControl.Query.Value,
+                query,
                 searchControl.Ruleset.Value,
                 lastResponse?.Cursor,
                 searchControl.General,
