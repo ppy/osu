@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace osu.Desktop.Windows
 {
-    internal class WindowsKey
+    internal static class WindowsKey
     {
         private delegate int LowLevelKeyboardProcDelegate(int nCode, int wParam, ref KdDllHookStruct lParam);
 

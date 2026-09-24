@@ -56,8 +56,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Blending = BlendingParameters.Additive;
             }
 
-            if (Texture != null)
-                Texture.ScaleAdjust *= LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
+            Texture?.ScaleAdjust *= LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
         }
 
         protected override double FadeDuration => DisjointTrail ? 150 : 500;

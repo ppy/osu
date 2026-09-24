@@ -110,8 +110,7 @@ namespace osu.Game.Rulesets.UI
             set
             {
                 frameStablePlayback = value;
-                if (frameStabilityContainer != null)
-                    frameStabilityContainer.FrameStablePlayback = value;
+                frameStabilityContainer?.FrameStablePlayback = value;
             }
         }
 
@@ -316,8 +315,7 @@ namespace osu.Game.Rulesets.UI
 
             HasReplayLoaded.Value = replayInputManager.ReplayInputHandler != null;
 
-            if (replayInputManager.ReplayInputHandler != null)
-                replayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
+            replayInputManager.ReplayInputHandler?.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
 
             if (!ProvidingUserCursor)
             {

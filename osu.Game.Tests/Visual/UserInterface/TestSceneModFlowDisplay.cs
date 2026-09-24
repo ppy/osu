@@ -37,14 +37,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddSliderStep("icon size", 0.1f, 2, 1, val =>
             {
-                if (modFlow != null)
-                    modFlow.IconScale = val;
+                modFlow?.IconScale = val;
             });
 
             AddSliderStep("flow width", 100, 500, 200, val =>
             {
-                if (modFlow != null)
-                    modFlow.Width = val;
+                modFlow?.Width = val;
             });
         }
     }

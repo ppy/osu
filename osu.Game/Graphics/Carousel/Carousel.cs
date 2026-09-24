@@ -445,8 +445,7 @@ namespace osu.Game.Graphics.Carousel
             if (spacing > 0)
             {
                 item.CarouselInputLenienceAbove = spacing / 2;
-                if (previousVisible != null)
-                    previousVisible.CarouselInputLenienceBelow = item.CarouselInputLenienceAbove;
+                previousVisible?.CarouselInputLenienceBelow = item.CarouselInputLenienceAbove;
             }
 
             if (item.IsVisible)

@@ -51,8 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             set
             {
                 heading = value;
-                if (headingText != null)
-                    headingText.Text = value;
+                headingText?.Text = value;
             }
         }
 
@@ -67,8 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             set
             {
                 caption = value;
-                if (captionText != null)
-                    captionText.Text = value;
+                captionText?.Text = value;
             }
         }
 
