@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -141,7 +142,7 @@ namespace osu.Game.Graphics
             {
                 State = ProgressNotificationState.Active,
                 Text = NotificationsStrings.UploadingScreenshot,
-                CompletionText = NotificationsStrings.UploadSuccess,
+                CompletionText = NotificationsStrings.ScreenshotUploadSuccess,
             };
 
             uploadRequest.Progressed += (current, total) => notification.Progress = (float)current / total * 0.8f;
@@ -158,10 +159,14 @@ namespace osu.Game.Graphics
                 notification.Progress = 1;
                 notification.State = ProgressNotificationState.Completed;
             };
-            uploadRequest.Failure += _ =>
+            uploadRequest.Failure += e =>
             {
                 notification.State = ProgressNotificationState.Cancelled;
-                notification.Text = NotificationsStrings.UploadFailure;
+
+                if (e is WebException webException && webException.Message == @"TooManyRequests")
+                    notification.Text = NotificationsStrings.ScreenshotTooManyUploads;
+                else
+                    notification.Text = NotificationsStrings.ScreenshotUploadFailure;
             };
 
             notificationOverlay.Post(notification);
