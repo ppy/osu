@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class ReadingAttributes : ISkillAttributes
     {
         public required double Difficulty { get; init; }
-        public required List<double> ObjectDifficulties { get; init; }
+        public required IReadOnlyList<double> ObjectDifficulties { get; init; }
         public required double TopWeightedObjectDifficultiesCount { get; init; }
     }
 

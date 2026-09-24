@@ -8,8 +8,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public class StrainSkillAttributes : ISkillAttributes
     {
         public required double Difficulty { get; init; }
-        public required List<double> ObjectDifficulties { get; init; }
-        public required List<StrainPeak> StrainPeaks { get; init; }
+        public required IReadOnlyList<double> ObjectDifficulties { get; init; }
+        public required IReadOnlyList<StrainPeak> StrainPeaks { get; init; }
         public required double TopWeightedStrainsCount { get; init; }
     }
 }

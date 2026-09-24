@@ -18,6 +18,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Difficulty values of <see cref="ISkill.DifficultyHitObjects"/>.
         /// </summary>
-        List<double> ObjectDifficulties { get; init; }
+        IReadOnlyList<double> ObjectDifficulties { get; init; }
     }
 }

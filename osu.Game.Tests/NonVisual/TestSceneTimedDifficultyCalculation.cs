@@ -201,7 +201,7 @@ namespace osu.Game.Tests.NonVisual
                 public class EmptySkillAttributes : ISkillAttributes
                 {
                     public double Difficulty { get; init; } = 0;
-                    public List<double> ObjectDifficulties { get; init; } = [];
+                    public IReadOnlyList<double> ObjectDifficulties { get; init; } = [];
                 }
 
                 public PassThroughSkill(IReadOnlyList<Mod> mods, IReadOnlyList<DifficultyHitObject> difficultyHitObjects)
