@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double ProcessInternal(DifficultyHitObject current)
         {
-            const double skill_multiplier = 2.5;
+            const double skill_multiplier = 2.17;
             const double reduced_difficulty_duration = 40 * 1000;
 
             double decay = strainDecay(current.DeltaTime);
@@ -84,10 +84,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
+            const double harmonic_scale = 5;
+
             if (ObjectDifficulties.Count == 0)
                 return 0;
 
-            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(ObjectDifficulties);
+            (double difficulty, harmonicWeightSum) = HarmonicSeries.Aggregate(ObjectDifficulties, harmonic_scale);
 
             return difficulty;
         }
