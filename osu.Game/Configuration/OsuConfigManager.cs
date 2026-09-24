@@ -51,6 +51,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.SongSelectGroupMode, GroupMode.None);
             SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
+            SetDefault(OsuSetting.SongSelectCollectionFilter, string.Empty);
 
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
             SetDefault(OsuSetting.ModSelectHotkeyStyle, ModSelectHotkeyStyle.Sequential);
@@ -132,7 +133,10 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.CursorRotation, true);
 
+#pragma warning disable CS0612 // Type or member is obsolete (setting default value to avoid risk of any future crashes)
             SetDefault(OsuSetting.MenuParallax, true);
+#pragma warning restore CS0612 // Type or member is obsolete
+            SetDefault(OsuSetting.MenuParallaxScale, 1.0f, 0.0f, 2.0f, 0.1f);
 
             // See https://stackoverflow.com/a/63307411 for default sourcing.
             SetDefault(OsuSetting.Prefer24HourTime, !CultureInfoHelper.SystemCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
@@ -365,7 +369,11 @@ namespace osu.Game.Configuration
         MenuVoice,
         MenuTips,
         CursorRotation,
-        MenuParallax,
+
+        [Obsolete]
+        MenuParallax, // todo: can be removed 20270101
+
+        MenuParallaxScale,
         Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapLeaderboardSortMode,
@@ -378,6 +386,7 @@ namespace osu.Game.Configuration
         DisplayStarsMaximum,
         SongSelectGroupMode,
         SongSelectSortingMode,
+        SongSelectCollectionFilter,
         RandomSelectAlgorithm,
         ModSelectHotkeyStyle,
         ShowFpsDisplay,

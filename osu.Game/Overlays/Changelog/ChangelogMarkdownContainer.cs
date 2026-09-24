@@ -12,6 +12,8 @@ namespace osu.Game.Overlays.Changelog
 {
     public partial class ChangelogMarkdownContainer : OsuMarkdownContainer
     {
+        protected override OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions();
+
         public override SpriteText CreateSpriteText() => new OsuSpriteText
         {
             Font = base.CreateSpriteText().Font.With(size: 12)

@@ -18,6 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -67,52 +68,39 @@ namespace osu.Game.Screens.Ranking
 
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(10),
-                    ColumnDimensions =
-                    [
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize)
-                    ],
-                    RowDimensions = [new Dimension(GridSizeMode.AutoSize, minSize: 40)],
-                    Content = new[]
+                    Height = 48,
+                    Masking = false,
+                    Child = new FillFlowContainer
                     {
-                        new Drawable[]
+                        Direction = FillDirection.Vertical,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(8),
+                        Children = new Drawable[]
                         {
-                            new FillFlowContainer
+                            tagFlow = new FillFlowContainer<DrawableUserTag>
                             {
-                                Direction = FillDirection.Vertical,
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(8),
-                                Children = new Drawable[]
-                                {
-                                    tagFlow = new FillFlowContainer<DrawableUserTag>
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Full,
-                                        Spacing = new Vector2(4),
-                                        Children = Writable
-                                            ?
-                                            [
-                                                addNewTagUserTag = new AddNewTagUserTag
-                                                {
-                                                    AvailableTags = { BindTarget = relevantTagsById },
-                                                    OnTagSelected = toggleVote,
-                                                }
-                                            ]
-                                            : []
-                                    }
-                                },
-                            },
-                        }
-                    }
-                },
+                                Direction = FillDirection.Full,
+                                Spacing = new Vector2(4),
+                            }
+                        },
+                    },
+                }
             };
+
+            if (Writable)
+            {
+                tagFlow.Add(addNewTagUserTag = new AddNewTagUserTag
+                {
+                    AvailableTags = { BindTarget = relevantTagsById },
+                    OnTagSelected = toggleVote,
+                });
+            }
 
             apiTags = sessionStatics.GetBindable<APITag[]?>(Static.AllBeatmapTags);
 

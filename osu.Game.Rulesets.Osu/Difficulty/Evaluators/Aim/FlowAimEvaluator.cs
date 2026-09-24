@@ -18,13 +18,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
+            var osuNextObj = (OsuDifficultyHitObject?)current.Next();
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous();
 
             if (current.BaseObject is Spinner || current.Index <= 1 || osuLastObj.BaseObject is Spinner)
                 return 0;
 
-            const double velocity_change_multiplier = 0.52;
+            const double velocity_change_multiplier = 0.55;
+            const double rhythm_change_cap = 0.1;
+            const double acute_angle_multiplier = 1.3;
 
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
@@ -49,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
 
             // Rhythm changes are harder to flow
-            flowDifficulty *= 1 + Math.Min(0.25,
+            flowDifficulty *= 1 + Math.Min(rhythm_change_cap,
                 DiffUtils.Pow((Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50, 4));
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
@@ -62,24 +65,50 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 flowDifficulty *= 0.8 + Math.Sqrt(angularVelocity / 270.0);
             }
 
-            // If all three notes are overlapping - don't reward bonuses as you don't have to do additional movement
-            double overlappedNotesWeight = 1;
-
-            if (current.Index > 2)
+            if (osuCurrObj.Angle != null && osuNextObj?.Angle != null)
             {
-                double o1 = calculateOverlapFactor(osuCurrObj, osuLastObj);
-                double o2 = calculateOverlapFactor(osuCurrObj, osuLastLastObj);
-                double o3 = calculateOverlapFactor(osuLastObj, osuLastLastObj);
+                double currAcuteness = AngleUtils.CalculateAcuteness(osuCurrObj.Angle.Value);
+                double nextAcuteness = AngleUtils.CalculateAcuteness(osuNextObj.Angle.Value);
 
-                overlappedNotesWeight = 1 - o1 * o2 * o3;
-            }
+                double acuteness, overlapWeight;
 
-            if (osuCurrObj.Angle != null)
-            {
-                // Acute angles are also hard to flow
+                // We want to evaluate flow turns at the center point of the actual turn, but curr.Angle is a prev2-prev-curr angle.
+                // The issue with changing that to prev-curr-next is that we might evaluate the second note of a flow pattern as snap if prev is acute.
+                // With min(curr,next) the evaluation (assuming acute affects snap/flow probability enough) behaves roughly like this:
+                //
+                //    flow (prev-curr-next and prev2-prev-curr evaluates as wide)
+                //     🡓🡓
+                //     ooo 🡐 flow (prev2-prev-curr evaluates as wide)
+                //      /
+                //   ooo 🡐 snap (prev2-prev-curr evaluates as acute)
+                //   🡑🡑
+                //  flow (prev-curr-next evaluates as wide)
+                //
+                //
+                //  flow (prev-curr-next and prev2-prev-curr evaluates as wide)
+                //   🡓🡓
+                //   ooo 🡐 flow (prev-curr-next and prev2-prev-curr evaluates as wide)
+                //      \
+                //     ooo 🡐 snap (prev-curr-next evaluates as acute as the center point of the turn)
+                //     🡑🡑
+                //    flow (prev-curr-next evaluates as wide)
+                //
+                // In both examples the first object in a flow pattern is evaluated as acute (likely snap) and the rest are wide (likely flow).
+                if (currAcuteness < nextAcuteness)
+                {
+                    acuteness = currAcuteness;
+                    overlapWeight = calculateOverlapWeight(osuCurrObj, osuLastObj, osuLastLastObj);
+                }
+                else
+                {
+                    acuteness = nextAcuteness;
+                    overlapWeight = calculateOverlapWeight(osuNextObj, osuCurrObj, osuLastObj);
+                }
+
                 flowDifficulty += currVelocity *
-                                  AngleUtils.CalculateAcuteness(osuCurrObj.Angle.Value) *
-                                  overlappedNotesWeight;
+                                  acuteness *
+                                  overlapWeight *
+                                  acute_angle_multiplier;
             }
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
@@ -98,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
                 flowDifficulty += overlapVelocityBuff *
                                   distRatio *
-                                  overlappedNotesWeight *
+                                  calculateOverlapWeight(osuCurrObj, osuLastObj, osuLastLastObj) *
                                   velocity_change_multiplier;
             }
 
@@ -113,6 +142,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             // Reduce difficulty for low spacing since spacing below radius is always to be flowed
             return flowDifficulty * DiffUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+        }
+
+        // If all three notes are overlapping - don't reward bonuses as you don't have to do additional movement
+        private static double calculateOverlapWeight(OsuDifficultyHitObject first, OsuDifficultyHitObject second, OsuDifficultyHitObject third)
+        {
+            double o1 = calculateOverlapFactor(first, second);
+            double o2 = calculateOverlapFactor(first, third);
+            double o3 = calculateOverlapFactor(second, third);
+
+            return 1 - o1 * o2 * o3;
         }
 
         private static double calculateOverlapFactor(OsuDifficultyHitObject first, OsuDifficultyHitObject second)

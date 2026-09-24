@@ -4,18 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
-using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class SpinnerCompositionTool : CompositionTool
+    public class SpinnerCompositionTool : CompositionTool<OsuAction>
     {
         public SpinnerCompositionTool()
-            : base(nameof(Spinner))
+            : base(OsuEditorStrings.SpinnerTool)
         {
+            Action = OsuAction.EditorSpinnerTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorSpinner };
