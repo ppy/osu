@@ -174,6 +174,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Child = new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         roomUpdater = new PlaylistsRoomUpdater(room),
