@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             new BananaShowerCompositionTool()
         };
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public new bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
@@ -131,11 +131,12 @@ namespace osu.Game.Rulesets.Catch.Edit
                     return true;
             }
 
-            return false;
+            return base.OnPressed(e);
         }
 
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        public new void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+            base.OnReleased(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
