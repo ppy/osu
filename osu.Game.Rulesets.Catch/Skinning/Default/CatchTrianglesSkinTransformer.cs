@@ -42,8 +42,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
                                 var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
 
-                                if (leaderboard != null)
-                                    leaderboard.Position = new Vector2(40, 60);
+                                leaderboard?.Position = new Vector2(40, 60);
 
                                 if (spectatorList != null)
                                 {

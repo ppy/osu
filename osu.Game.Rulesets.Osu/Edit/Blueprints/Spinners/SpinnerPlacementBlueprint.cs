@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
         public SpinnerPlacementBlueprint()
             : base(new Spinner { Position = OsuPlayfield.BASE_SIZE / 2 })
         {
-            InternalChild = piece = new SpinnerPiece { Alpha = 0.5f };
+            Child = piece = new SpinnerPiece { Alpha = 0.5f };
         }
 
         protected override void Update()

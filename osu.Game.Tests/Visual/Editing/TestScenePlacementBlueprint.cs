@@ -118,6 +118,48 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestSliderPlacementNewComboAppliedCorrectly()
+        {
+            Playfield playfield = null!;
+
+            AddStep("seek to 500", () => EditorClock.Seek(500));
+            AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
+            AddStep("grab playfield", () => playfield = this.ChildrenOfType<Playfield>().Single());
+
+            AddStep("start first slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("toggle new combo", () => InputManager.Key(Key.Q));
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end first slider", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("seek to 5000", () => EditorClock.Seek(5000));
+            AddStep("start second slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("toggle new combo", () => InputManager.Key(Key.Q));
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end second slider", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("seek to 2000", () => EditorClock.Seek(2000));
+            AddStep("start third slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("toggle new combo", () => InputManager.Key(Key.Q));
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end third slider", () => InputManager.Click(MouseButton.Right));
+
+            AddAssert("3 hit objects", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(3));
+            AddAssert("all sliders start combo", () => EditorBeatmap.HitObjects.OfType<Slider>().All(s => s.NewCombo));
+        }
+
+        [Test]
         public void TestPlacementOnSliderBodyDoesNotRemoveSlider()
         {
             Slider originalSlider = null!;
@@ -433,10 +475,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select drum bank", () =>
             {
                 InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LShift);
+
                 InputManager.PressKey(Key.LAlt);
                 InputManager.Key(Key.R);
                 InputManager.ReleaseKey(Key.LAlt);
-                InputManager.ReleaseKey(Key.LShift);
             });
             AddStep("enable clap addition", () => InputManager.Key(Key.R));
 
