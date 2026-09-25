@@ -15,11 +15,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Models;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
+using Realms;
 
 namespace osu.Game.Scoring
 {
@@ -164,6 +167,18 @@ namespace osu.Game.Scoring
                 this.totalScore = totalScore;
                 this.totalScore.BindValueChanged(v => Value = v.NewValue.ToString("N0"), true);
             }
+        }
+
+        public void DeleteGuest(bool silent = false)
+        {
+            Realm.Run(r =>
+            {
+                var guestScores = r.All<ScoreInfo>()
+                                   .Filter(@"DeletePending == false AND RealmUser.OnlineID == $0", APIUser.SYSTEM_USER_ID)
+                                   .ToList();
+
+                Delete(guestScores, silent);
+            });
         }
 
         public void Delete(Expression<Func<ScoreInfo, bool>>? filter = null, bool silent = false)

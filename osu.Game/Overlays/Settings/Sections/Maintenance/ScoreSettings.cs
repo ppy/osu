@@ -14,6 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         protected override LocalisableString Header => CommonStrings.Scores;
 
         private SettingsButtonV2 deleteScoresButton = null!;
+        private SettingsButtonV2 deleteGuestScoresButton = null!;
 
         [BackgroundDependencyLoader]
         private void load(ScoreManager scores, IDialogOverlay? dialogOverlay)
@@ -28,6 +29,18 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         deleteScoresButton.Enabled.Value = false;
                         Task.Run(() => scores.Delete()).ContinueWith(_ => Schedule(() => deleteScoresButton.Enabled.Value = true));
                     }, DeleteConfirmationContentStrings.Scores));
+                }
+            });
+            Add(deleteGuestScoresButton = new DangerousSettingsButtonV2
+            {
+                Text = MaintenanceSettingsStrings.DeleteGuestScores,
+                Action = () =>
+                {
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
+                    {
+                        deleteGuestScoresButton.Enabled.Value = false;
+                        Task.Run(() => scores.DeleteGuest()).ContinueWith(_ => Schedule(() => deleteGuestScoresButton.Enabled.Value = true));
+                    }, DeleteConfirmationContentStrings.GuestScores));
                 }
             });
         }
