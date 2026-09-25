@@ -182,7 +182,6 @@ namespace osu.Game.Screens.Menu
 
                 return UsingThemedIntro = initialBeatmap != null;
             }
-
         }
 
         public override void OnEntering(ScreenTransitionEvent e)
