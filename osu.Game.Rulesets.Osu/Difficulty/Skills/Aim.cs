@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -57,12 +56,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner)
-                return calculateSpinnerDifficulty(current);
-
             const double skill_multiplier_snap = 71.0;
             const double skill_multiplier_agility = 1.63;
             const double skill_multiplier_flow = 247.0;
+            const double skill_multiplier_spinner = 22.0;
+
+            if (current.BaseObject is Spinner)
+                return SpinnerEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_spinner;
 
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;
@@ -79,19 +79,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             totalDifficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
 
             return totalDifficulty;
-        }
-
-        private double calculateSpinnerDifficulty(DifficultyHitObject current)
-        {
-            if (current.BaseObject is not Spinner spinner || spinner.SpinsRequired <= 0)
-                return 0;
-
-            var osuCurrent = (OsuDifficultyHitObject)current;
-
-            // The average RPS required over the length of the spinner to clear the spinner.
-            double minRps = IBeatmapDifficultyInfo.DifficultyRange(osuCurrent.OverallDifficulty, Spinner.CLEAR_RPM_RANGE) / 60;
-
-            return 22.0 * minRps / (spinner.Duration / current.ClockRate / 1000); // the longer the spinner the more lenient spinning requirements are
         }
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
