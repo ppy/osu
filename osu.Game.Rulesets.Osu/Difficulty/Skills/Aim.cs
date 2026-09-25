@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner spinner)
+            if (current.BaseObject is Spinner)
                 return calculateSpinnerDifficulty(current);
 
             const double skill_multiplier_snap = 71.0;
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // The average RPS required over the length of the spinner to clear the spinner.
             double minRps = IBeatmapDifficultyInfo.DifficultyRange(osuCurrent.OverallDifficulty, Spinner.CLEAR_RPM_RANGE) / 60;
 
-            return 22.0 * minRps / (spinner.Duration / current.ClockRate / 1000);
+            return 22.0 * minRps / (spinner.Duration / current.ClockRate / 1000); // the longer the spinner the more lenient spinning requirements are
         }
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
