@@ -95,10 +95,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     Height = 0.5f,
                                     Masking = true,
                                     Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0.7f), colourProvider.Background4.Opacity(0)),
-                                    Child = new UserCoverBackground
+                                    Child = new CoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        User = leftUser.GetResultSafely()
+                                        Item = leftUser.GetResultSafely()
                                     }
                                 },
                                 new Container
@@ -109,10 +109,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     Height = 0.5f,
                                     Masking = true,
                                     Colour = ColourInfo.GradientHorizontal(colourProvider.Background4.Opacity(0), Color4.White.Opacity(0.7f)),
-                                    Child = new UserCoverBackground
+                                    Child = new CoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        User = rightUser.GetResultSafely()
+                                        Item = rightUser.GetResultSafely()
                                     }
                                 },
                                 leftResultLight = new Container

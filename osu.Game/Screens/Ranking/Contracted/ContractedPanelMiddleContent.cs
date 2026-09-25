@@ -78,10 +78,10 @@ namespace osu.Game.Screens.Ranking.Contracted
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4Extensions.FromHex("444")
                                 },
-                                new UserCoverBackground
+                                new CoverBackground
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    User = score.User,
+                                    Item = score.User,
                                     Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
                                 },
                                 new FillFlowContainer

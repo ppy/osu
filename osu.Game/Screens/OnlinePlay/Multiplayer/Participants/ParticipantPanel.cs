@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
         private SpriteIcon crown = null!;
 
-        private UserCoverBackground userCover = null!;
+        private CoverBackground userCover = null!;
         private FillFlowContainer userContent = null!;
         private UpdateableAvatar userAvatar = null!;
         private UpdateableFlag userFlag = null!;
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = backgroundColour
                                 },
-                                userCover = new UserCoverBackground
+                                userCover = new CoverBackground
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             {
                 var user = current.Value.User.User;
 
-                userCover.User = user;
+                userCover.Item = user;
                 userAvatar.User = user;
                 userFlag.CountryCode = user?.CountryCode ?? default;
                 teamFlagContainer.Child = new UpdateableTeamFlag(user?.Team)
