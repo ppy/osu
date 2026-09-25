@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Input.Events;
+using osu.Game.Input;
 
 namespace osu.Game.Overlays.Volume
 {
