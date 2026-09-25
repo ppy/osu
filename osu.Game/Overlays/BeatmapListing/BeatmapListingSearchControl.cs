@@ -26,8 +26,7 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public partial class BeatmapListingSearchControl : CompositeDrawable
     {
-        private readonly BindableNumber<double> starRatingMin = new BindableNumber<double>(0) { MinValue = 0, MaxValue = 10, Precision = 0.1 };
-        private readonly BindableNumber<double> starRatingMax = new BindableNumber<double>(10) { MinValue = 0, MaxValue = 10, Precision = 0.1 };
+
 
         /// <summary>
         /// Any time the text box receives key events (even while masked).
@@ -55,6 +54,7 @@ namespace osu.Game.Overlays.BeatmapListing
         public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
 
         public FilterControl.DifficultyRangeSlider DifficultyRange => difficultyRangeSlider;
+        public FilterControl.BPMRangeSlider BpmRange => bpmRangeSlider;
 
 
 
@@ -84,6 +84,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
         private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
         private readonly FilterControl.DifficultyRangeSlider difficultyRangeSlider;
+        private readonly FilterControl.BPMRangeSlider bpmRangeSlider;
 
         private readonly Box background;
         private readonly UpdateableOnlineBeatmapSetCover beatmapCover;
@@ -151,10 +152,20 @@ namespace osu.Game.Overlays.BeatmapListing
                                     difficultyRangeSlider = new FilterControl.DifficultyRangeSlider
                                     {
                                         RelativeSizeAxes = Axes.X,
+                                        Margin = new MarginPadding {Top = 5 },
                                         MinRange = 0.1f,
-                                        LowerBound = starRatingMin,
-                                        UpperBound = starRatingMax,
+                                        LowerBound = new BindableNumber<double>(0) { MinValue = 0, MaxValue = 10, Precision = 0.1 },
+                                        UpperBound = new BindableNumber<double>(10) { MinValue = 0, MaxValue = 10, Precision = 0.1 },
+
                                     },
+                                    bpmRangeSlider = new FilterControl.BPMRangeSlider
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Margin = new MarginPadding {Top = 5 },
+                                        MinRange = 1,
+                                        LowerBound = new BindableNumber<double>(100) { MinValue = 100, MaxValue = 300, Precision = 1 },
+                                        UpperBound = new BindableNumber<double>(300) { MinValue = 100, MaxValue = 300, Precision = 1 },
+                                    }
                                 }
                             }
                         }

@@ -179,6 +179,8 @@ namespace osu.Game.Overlays.BeatmapListing
             searchControl.ExplicitContent.BindValueChanged(_ => queueUpdateSearch());
             searchControl.DifficultyRange.LowerBound.BindValueChanged(_ => queueUpdateSearch());
             searchControl.DifficultyRange.UpperBound.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.BpmRange.LowerBound.BindValueChanged(_ => queueUpdateSearch());
+            searchControl.BpmRange.UpperBound.BindValueChanged(_ => queueUpdateSearch());
 
             sortControl.Current.BindValueChanged(_ => queueUpdateSearch());
             sortControl.SortDirection.BindValueChanged(_ => queueUpdateSearch());
@@ -234,6 +236,11 @@ namespace osu.Game.Overlays.BeatmapListing
                 query += $" star>={searchControl.DifficultyRange.LowerBound.Value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}";
             if (!searchControl.DifficultyRange.UpperBound.IsDefault)
                 query += $" star<={searchControl.DifficultyRange.UpperBound.Value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}";
+
+            if (!searchControl.BpmRange.LowerBound.IsDefault)
+                query += $" bpm>={searchControl.BpmRange.LowerBound.Value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}";
+            if (!searchControl.BpmRange.UpperBound.IsDefault)
+                query += $" bpm<={searchControl.BpmRange.UpperBound.Value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}";
 
             getSetsRequest = new SearchBeatmapSetsRequest(
                 query,
