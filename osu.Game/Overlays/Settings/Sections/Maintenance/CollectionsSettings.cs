@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             Add(new DangerousSettingsButtonV2
             {
-                Text = MaintenanceSettingsStrings.DeleteAllCollections,
+                Text = LocalisableString.Interpolate($@"{MaintenanceSettingsStrings.DeleteAllCollections}..."),
                 Action = () =>
                 {
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(deleteAllCollections, DeleteConfirmationContentStrings.Collections));

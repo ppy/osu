@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             Add(new SettingsButtonV2
             {
-                Text = GeneralSettingsStrings.OpenOsuFolder,
+                Text = LocalisableString.Interpolate($@"{GeneralSettingsStrings.OpenOsuFolder}..."),
                 Keywords = new[] { @"logs", @"files", @"access", "directory" },
                 Action = () => storage.PresentExternally(),
             });
