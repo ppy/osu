@@ -85,13 +85,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             if (current.BaseObject is not Spinner spinner || spinner.SpinsRequired <= 0)
                 return 0;
-            
+
             var osuCurrent = (OsuDifficultyHitObject)current;
 
             // The average RPS required over the length of the spinner to clear the spinner.
             double minRps = IBeatmapDifficultyInfo.DifficultyRange(osuCurrent.OverallDifficulty, Spinner.CLEAR_RPM_RANGE) / 60;
 
-            return 85 * minRps;
+            return 22.0 * minRps / (spinner.Duration / current.ClockRate / 1000);
         }
 
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
