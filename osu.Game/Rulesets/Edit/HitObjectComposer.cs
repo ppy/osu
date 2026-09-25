@@ -253,10 +253,14 @@ namespace osu.Game.Rulesets.Edit
                             },
                             RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
                             {
-                                Child = new EditorToolboxGroup("inspector")
+                                Children = new Drawable[]
                                 {
-                                    Child = CreateHitObjectInspector()
-                                },
+                                    new EditorToolboxGroup("inspector")
+                                    {
+                                        Child = CreateHitObjectInspector()
+                                    },
+                                    new EffectToolboxGroup(Ruleset.EditorShowScrollSpeed),
+                                }
                             }
                         }
                     },
