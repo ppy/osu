@@ -128,6 +128,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Beatmap has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
 
+            AddStep("Back to selection tool", () => InputManager.Key(Key.Number1));
             ReloadEditorToSameBeatmap();
 
             AddAssert("Beatmap still has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
