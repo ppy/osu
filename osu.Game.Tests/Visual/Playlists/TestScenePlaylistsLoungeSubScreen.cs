@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -59,6 +60,22 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddUntilStep("first room is masked", () => !checkRoomVisible(roomListing.DrawableRooms[0]));
             AddUntilStep("last room is not masked", () => checkRoomVisible(roomListing.DrawableRooms[^1]));
+        }
+
+        [Test]
+        public void TestCloseButtonHiddenWhenCreatingCopy()
+        {
+            createRooms(GenerateRooms(30));
+
+            AddStep("hover first room", () => InputManager.MoveMouseTo(roomListing.DrawableRooms[0]));
+            AddStep("right click first room", () => InputManager.Click(MouseButton.Right));
+            AddStep("hover create copy menu item",
+                () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuContextMenu>().Single().ChildrenOfType<DrawableOsuMenuItem>().Single(i => i.Item.Text.ToString() == "Create copy")));
+            AddStep("click create copy", () => InputManager.Click(MouseButton.Left));
+            AddUntilStep("wait for footer to load", () => this.ChildrenOfType<PlaylistsRoomFooter>().SingleOrDefault()?.IsLoaded == true);
+            AddAssert("close button hidden", () => !this.ChildrenOfType<PlaylistsRoomFooter>().Single().ChildrenOfType<DangerousRoundedButton>().Any());
+            AddStep("press esc", () => InputManager.Key(Key.Escape));
+            AddStep("confirm exit", () => InputManager.Key(Key.Enter));
         }
 
         private bool checkRoomVisible(RoomPanel panel) =>
