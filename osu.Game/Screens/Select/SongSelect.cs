@@ -763,6 +763,7 @@ namespace osu.Game.Screens.Select
             modSelectOverlay.SelectedMods.UnbindFrom(Mods);
             modSelectOverlay.Ruleset.UnbindFrom(Ruleset);
             modSelectOverlay.Beatmap.UnbindFrom(Beatmap);
+            modSelectOverlay.Hide();
 
             updateWedgeVisibility();
 

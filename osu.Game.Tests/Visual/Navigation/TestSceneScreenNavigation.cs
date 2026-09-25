@@ -316,6 +316,26 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestFooterButtonsAfterModSelectForceExit()
+        {
+            Screens.Select.SongSelect songSelect = null;
+            MainMenu mainMenu = null;
+
+            AddUntilStep("get main menu", () => (mainMenu = Game.ScreenStack.CurrentScreen as MainMenu) != null);
+            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            AddStep("show mods overlay", () => InputManager.Key(Key.F1));
+
+            // follows alt-f4 code path behavior, can't use home or `game.AttemptExit()` as those run `CloseAllOverlays()`
+            AddStep("force exit song select", () => mainMenu.MakeCurrent());
+
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
+            PushAndConfirm(() => new SoloSongSelect());
+            AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
+            AddStep("show options", () => InputManager.Key(Key.F3));
+            AddAssert("options is shown", () => Game!.ChildrenOfType<FooterButtonOptions.Popover>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+        }
+
+        [Test]
         public void TestAttemptPlayBeatmapWrongHashFails()
         {
             Screens.Select.SongSelect songSelect = null;
