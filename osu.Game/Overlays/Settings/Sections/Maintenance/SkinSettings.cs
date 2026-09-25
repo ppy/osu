@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             Add(deleteSkinsButton = new DangerousSettingsButtonV2
             {
-                Text = MaintenanceSettingsStrings.DeleteAllSkins,
+                Text = LocalisableString.Interpolate($@"{MaintenanceSettingsStrings.DeleteAllSkins}..."),
                 Action = () =>
                 {
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>

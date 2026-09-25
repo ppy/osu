@@ -67,7 +67,7 @@ namespace osu.Game.Collections
     public class ManageCollectionsFilterMenuItem : CollectionFilterMenuItem
     {
         public ManageCollectionsFilterMenuItem()
-            : base(CollectionsStrings.ManageCollections)
+            : base(LocalisableString.Interpolate($@"{CollectionsStrings.ManageCollections}..."))
         {
         }
 

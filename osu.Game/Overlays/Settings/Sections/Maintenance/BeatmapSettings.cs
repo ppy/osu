@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             Add(deleteBeatmapsButton = new DangerousSettingsButtonV2
             {
-                Text = MaintenanceSettingsStrings.DeleteAllBeatmaps,
+                Text = LocalisableString.Interpolate($@"{MaintenanceSettingsStrings.DeleteAllBeatmaps}..."),
                 Action = () =>
                 {
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Add(deleteBeatmapVideosButton = new DangerousSettingsButtonV2
             {
-                Text = MaintenanceSettingsStrings.DeleteAllBeatmapVideos,
+                Text = LocalisableString.Interpolate($@"{MaintenanceSettingsStrings.DeleteAllBeatmapVideos}..."),
                 Action = () =>
                 {
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Add(resetOffsetsButton = new DangerousSettingsButtonV2
             {
-                Text = MaintenanceSettingsStrings.ResetAllOffsets,
+                Text = LocalisableString.Interpolate($@"{MaintenanceSettingsStrings.ResetAllOffsets}..."),
                 Action = () =>
                 {
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
