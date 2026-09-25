@@ -348,5 +348,23 @@ And also **another bold** text.
 ";
             });
         }
+
+        [Test]
+        public void TestNestedInline()
+        {
+            AddStep("Add nested inline", () =>
+            {
+                markdownContainer.Text = @"**[bold link text](https://osu.ppy.sh)**
+*[italic link text](https://osu.ppy.sh)*
+[**bold link text**](https://osu.ppy.sh)
+[*italic link text*](https://osu.ppy.sh)
+[**bold and _italic_ link text**](https://osu.ppy.sh)
+[`inline code link text`](https://osu.ppy.sh)
+**`bold inline code`**
+*`italic inline code`*
+_**https://osu.ppy.sh**_
+_**<https://osu.ppy.sh>**_";
+            });
+        }
     }
 }
