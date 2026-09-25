@@ -5,8 +5,10 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -88,6 +90,20 @@ namespace osu.Game.Tests.Visual.RankedPlay
             {
                 health.Value = 1_000_000;
                 health.Value = 1;
+            });
+        }
+
+        [Test]
+        public void TestMods()
+        {
+            AddStep("set user mods", () => MultiplayerClient.ChangeUserMods(1001, [new APIMod(new OsuModHidden())]));
+
+            AddStep("reverse orientation", () => Child = new RankedPlayUserDisplay(new APIUser { Id = 1001, Username = "User 1001" }, Anchor.BottomRight, RankedPlayColourScheme.BLUE)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(256, 72),
+                Health = { BindTarget = health }
             });
         }
     }

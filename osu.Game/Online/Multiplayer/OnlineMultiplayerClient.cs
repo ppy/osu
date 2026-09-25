@@ -383,13 +383,13 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingLeaveLobby));
         }
 
-        public override Task MatchmakingJoinQueue(int poolId)
+        public override Task<MatchmakingJoinQueueResponse> MatchmakingJoinQueueWithParams(MatchmakingJoinQueueRequest request)
         {
             if (!IsConnected.Value)
-                return Task.CompletedTask;
+                return Task.FromResult(new MatchmakingJoinQueueResponse());
 
             Debug.Assert(connection != null);
-            return connection.InvokeAsync(nameof(IMatchmakingServer.MatchmakingJoinQueue), poolId);
+            return connection.InvokeAsync<MatchmakingJoinQueueResponse>(nameof(IMatchmakingServer.MatchmakingJoinQueueWithParams), request);
         }
 
         public override Task MatchmakingLeaveQueue()
