@@ -208,12 +208,16 @@ namespace osu.Game.Users
             [Key(3)]
             public string? BeatmapDisplayTitle { get; set; }
 
+            [IgnoreMember]
+            public int UserID { get; set; }
+
             public WatchingReplay(ScoreInfo score)
             {
                 ScoreID = score.OnlineID;
                 PlayerName = score.User.Username;
                 BeatmapID = score.BeatmapInfo?.OnlineID ?? -1;
                 BeatmapDisplayTitle = score.BeatmapInfo?.GetDisplayTitle();
+                UserID = score.User.OnlineID;
             }
 
             [SerializationConstructor]
