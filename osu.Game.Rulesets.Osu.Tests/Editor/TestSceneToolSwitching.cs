@@ -4,6 +4,8 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Visual;
@@ -50,6 +52,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select first slider", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects.OfType<Slider>().First()));
             AddStep("undo", () => Editor.Undo());
             AddAssert("slider has three anchors again", () => EditorBeatmap.HitObjects.OfType<Slider>().First().Path.ControlPoints, () => Has.Count.EqualTo(3));
+        }
+
+        [Test]
+        public void TestGoingBackGoesSelectFirst()
+        {
+            AddStep("switch to placement tool", () => InputManager.Key(Key.Number2));
+            AddAssert("select tool not selected", () => this.ChildrenOfType<HitObjectComposer>().Single().BlueprintContainer.CurrentTool is not SelectTool);
+            AddStep("press back global action", () => InputManager.Key(Key.Escape));
+            AddAssert("select tool selected", () => this.ChildrenOfType<HitObjectComposer>().Single().BlueprintContainer.CurrentTool is SelectTool);
         }
     }
 }
