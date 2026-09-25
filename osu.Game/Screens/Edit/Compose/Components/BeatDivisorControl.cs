@@ -425,7 +425,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.Centre,
                         RelativePositionAxes = Axes.Both,
-                        Colour = BindableBeatDivisor.GetColourFor(divisor, colours),
+                        Colour = BindableBeatDivisor.GetDefaultColourFor(divisor, colours),
                         X = tickIndex / (float)largestDivisor,
                     });
                 }
