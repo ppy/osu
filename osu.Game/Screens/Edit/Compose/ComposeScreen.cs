@@ -10,12 +10,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Compose
@@ -164,6 +166,17 @@ namespace osu.Game.Screens.Edit.Compose
 
             EditorBeatmap.SelectedHitObjects.Clear();
 
+            foreach (var ho in EditorBeatmap.HitObjects.ToArray())
+            {
+                foreach (var so in objects)
+                {
+                    if (Precision.AlmostEquals(so.StartTime, ho.StartTime, 2) && (!(so is IHasColumn) || !(ho is IHasColumn) || ((IHasColumn)so).Column == ((IHasColumn)ho).Column))
+                    {
+                        EditorBeatmap.Remove(ho);
+                        break;
+                    }
+                }
+            }
             EditorBeatmap.AddRange(objects);
             EditorBeatmap.SelectedHitObjects.AddRange(objects);
 
