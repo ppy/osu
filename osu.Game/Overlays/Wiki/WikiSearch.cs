@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Wiki
 {
     public partial class WikiSearch : CompositeDrawable
     {
-        private GetWikiSuggestionRequest? request;
+        private GetWikiSuggestionsRequest? request;
         private ScheduledDelegate? queryChangeDebounce;
         private string lastQuery = string.Empty;
 
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Wiki
             lastQuery = textBox.Current.Value;
 
             request?.Cancel();
-            request = new GetWikiSuggestionRequest(lastQuery, game.CurrentLanguage.Value);
+            request = new GetWikiSuggestionsRequest(lastQuery, game.CurrentLanguage.Value);
             request.Success += response => resultItems.Value = response.Select(r => new ResultItem
             {
                 Highlight = r.Highlight,

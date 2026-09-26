@@ -8,12 +8,12 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetWikiSuggestionRequest : APIRequest<APIWikiSuggestion[]>
+    public class GetWikiSuggestionsRequest : APIRequest<APIWikiSuggestion[]>
     {
         private readonly string query;
         private readonly Language language;
 
-        public GetWikiSuggestionRequest(string query, Language language = Language.en)
+        public GetWikiSuggestionsRequest(string query, Language language = Language.en)
         {
             this.query = query;
             this.language = language;

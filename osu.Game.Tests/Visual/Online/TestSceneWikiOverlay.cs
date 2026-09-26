@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 dummyAPI.HandleRequest = request =>
                 {
-                    if (!(request is GetWikiSuggestionRequest getWikiSuggestionRequest))
+                    if (!(request is GetWikiSuggestionsRequest getWikiSuggestionRequest))
                         return false;
 
                     getWikiSuggestionRequest.TriggerSuccess(responseWikiSuggestion);
