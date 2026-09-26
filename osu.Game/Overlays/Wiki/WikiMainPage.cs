@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Wiki
             {
                 new WikiSearch
                 {
-                    Depth = -1, // This depth is to ensure the suggestion result is always in front of other element.
+                    Depth = -1, // This depth is to ensure the suggestion result is always in front of other elements.
                 },
                 createBlurb(html),
                 new GridContainer
