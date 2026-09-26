@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Wiki
 
             textBox.Current.BindValueChanged(e =>
             {
-                if (e.NewValue == lastQuery || e.NewValue == selectedItem?.Title)
+                if (e.NewValue == lastQuery || e.NewValue == selectedItem?.Title || string.IsNullOrWhiteSpace(e.NewValue))
                     return;
 
                 queryChangeDebounce = Scheduler.AddDelayed(performRequest, 200);
