@@ -3,6 +3,7 @@
 
 using System.IO;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.Provider;
@@ -15,16 +16,31 @@ namespace osu.Android
         private readonly ContentResolver contentResolver;
 
         private readonly Uri uri;
+        private readonly bool supportsDocumentDeletion;
 
-        private AndroidImportTask(Stream stream, string filename, ContentResolver contentResolver, Uri uri)
+        private AndroidImportTask(Stream stream, string filename, ContentResolver contentResolver, Uri uri, bool supportsDocumentDeletion)
             : base(stream, filename)
         {
             this.contentResolver = contentResolver;
             this.uri = uri;
+            this.supportsDocumentDeletion = supportsDocumentDeletion;
         }
 
         public override void DeleteFile()
         {
+            if (supportsDocumentDeletion)
+            {
+                try
+                {
+                    if (DocumentsContract.DeleteDocument(contentResolver, uri))
+                        return;
+                }
+                catch
+                {
+                    // Fall back to ContentResolver.Delete().
+                }
+            }
+
             contentResolver.Delete(uri, null, null);
         }
 
@@ -44,6 +60,19 @@ namespace osu.Android
             int filenameColumn = cursor.GetColumnIndex(IOpenableColumns.DisplayName);
             string filename = cursor.GetString(filenameColumn) ?? uri.Path ?? string.Empty;
 
+            bool supportsDocumentDeletion = false;
+
+            if (DocumentsContract.IsDocumentUri(Application.Context, uri))
+            {
+                int flagsColumn = cursor.GetColumnIndex(DocumentsContract.Document.ColumnFlags);
+
+                if (flagsColumn >= 0)
+                {
+                    var flags = (DocumentContractFlags)cursor.GetInt(flagsColumn);
+                    supportsDocumentDeletion = (flags & DocumentContractFlags.SupportsDelete) != 0;
+                }
+            }
+
             // SharpCompress requires archive streams to be seekable, which the stream opened by
             // OpenInputStream() seems to not necessarily be.
             // copy to an arbitrary-access memory stream to be able to proceed with the import.
@@ -57,7 +86,7 @@ namespace osu.Android
                 await stream.CopyToAsync(copy).ConfigureAwait(false);
             }
 
-            return new AndroidImportTask(copy, filename, contentResolver, uri);
+            return new AndroidImportTask(copy, filename, contentResolver, uri, supportsDocumentDeletion);
         }
     }
 }
