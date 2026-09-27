@@ -13,6 +13,10 @@
     <Compile Include="..\osu.Game.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+
+    <Compile Include="..\osu.Android\AndroidImportTask.cs">
+      <Link>AndroidImportTask.cs</Link>
+    </Compile>
     <!-- TargetPath is relative to RootNamespace,
          and DllResourceStore is relative to AssemblyName. -->
     <EmbeddedResource Include="..\osu.Game.Tests\**\Resources\**\*">
