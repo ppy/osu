@@ -67,6 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public OsuSpriteText ErrorText = null!;
 
             private OsuEnumDropdown<StartMode> startModeDropdown = null!;
+            private FormSliderBar<int> customStartDelaySliderBar = null!;
             private OsuSpriteText typeLabel = null!;
             private LoadingLayer loadingLayer = null!;
 
@@ -201,13 +202,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Auto start")
                                                                 {
-                                                                    Child = new Container
+                                                                    Child = new FillFlowContainer
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
-                                                                        Height = 40,
-                                                                        Child = startModeDropdown = new OsuEnumDropdown<StartMode>
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        Direction = FillDirection.Vertical,
+                                                                        Spacing = new Vector2(0, 5),
+                                                                        Children = new Drawable[]
                                                                         {
-                                                                            RelativeSizeAxes = Axes.X
+                                                                            new Container
+                                                                            {
+                                                                                RelativeSizeAxes = Axes.X,
+                                                                                Height = 40,
+                                                                                Child = startModeDropdown = new OsuEnumDropdown<StartMode>
+                                                                                {
+                                                                                    RelativeSizeAxes = Axes.X
+                                                                                }
+                                                                            },
+                                                                            customStartDelaySliderBar = new FormSliderBar<int>
+                                                                            {
+                                                                                Caption = "Custom delay (seconds)",
+                                                                                RelativeSizeAxes = Axes.X,
+                                                                                Margin = new MarginPadding { Top = 5 },
+                                                                                Current = new BindableNumber<int>(10)
+                                                                                {
+                                                                                    MinValue = 1,
+                                                                                    MaxValue = 600,
+                                                                                },
+                                                                                Alpha = 0,
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -381,6 +404,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 {
                     maximumParticipantsSliderBar.Alpha = enabled.NewValue ? 1 : 0;
                 }, true);
+
+                startModeDropdown.Current.BindValueChanged(mode =>
+                {
+                    customStartDelaySliderBar.Alpha = mode.NewValue == StartMode.Custom ? 1 : 0;
+                }, true);
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -448,7 +476,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
 
             private void updateRoomAutoStartDuration()
-                => startModeDropdown.Current.Value = (StartMode)room.AutoStartDuration.TotalSeconds;
+            {
+                int seconds = (int)room.AutoStartDuration.TotalSeconds;
+
+                if (seconds == 0)
+                    startModeDropdown.Current.Value = StartMode.Off;
+                else if (Enum.IsDefined(typeof(StartMode), seconds))
+                    startModeDropdown.Current.Value = (StartMode)seconds;
+                else
+                {
+                    startModeDropdown.Current.Value = StartMode.Custom;
+                    customStartDelaySliderBar.Current.Value = seconds;
+                }
+            }
 
             private void updateRoomPlaylist()
                 => drawablePlaylist.Items.ReplaceRange(0, drawablePlaylist.Items.Count, room.Playlist);
@@ -467,6 +507,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     return;
 
                 byte? maxParticipants = maximumParticipantsCheckbox.Current.Value ? maximumParticipantsSliderBar.Current.Value : null;
+                TimeSpan autoStartDuration = startModeDropdown.Current.Value == StartMode.Custom
+                    ? TimeSpan.FromSeconds(customStartDelaySliderBar.Current.Value)
+                    : TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
 
                 ErrorText.FadeOut(50);
 
@@ -482,7 +525,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                               password: PasswordTextBox.Text,
                               matchType: TypePicker.Current.Value,
                               queueMode: QueueModeDropdown.Current.Value,
-                              autoStartDuration: TimeSpan.FromSeconds((int)startModeDropdown.Current.Value),
+                              autoStartDuration: autoStartDuration,
                               autoSkip: AutoSkipCheckbox.Current.Value,
                               maxParticipants: maxParticipants)
                           .ContinueWith(t => Schedule(() =>
@@ -499,7 +542,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     room.Password = PasswordTextBox.Text;
                     room.Type = TypePicker.Current.Value;
                     room.QueueMode = QueueModeDropdown.Current.Value;
-                    room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
+                    room.AutoStartDuration = autoStartDuration;
                     room.AutoSkip = AutoSkipCheckbox.Current.Value;
                     room.Playlist = drawablePlaylist.Items.ToArray();
                     room.MaxParticipants = maxParticipants;
@@ -598,7 +641,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Seconds180 = 180,
 
             [Description("5 minutes")]
-            Seconds300 = 300
+            Seconds300 = 300,
+
+            [Description("Custom")]
+            Custom = -1
         }
     }
 }
