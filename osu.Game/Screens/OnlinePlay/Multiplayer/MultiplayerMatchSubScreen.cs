@@ -182,7 +182,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 Child = new PopoverContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         beatmapAvailabilityTracker,
@@ -192,7 +191,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
-                                Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                                Horizontal = 30,
                                 Bottom = footer_height + footer_padding
                             },
                             Children = new[]
@@ -406,6 +405,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
                             Height = footer_height,
+                            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING },
                             Children = new Drawable[]
                             {
                                 new Box
