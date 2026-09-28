@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -19,9 +18,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osu.Game.Screens.Edit.Timing;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
@@ -83,10 +80,10 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestPopoverHasNoFocus()
+        public void TestPopoverHasFocus()
         {
             clickSamplePiece(0);
-            samplePopoverHasNoFocus();
+            samplePopoverHasFocus();
         }
 
         [Test]
@@ -133,7 +130,7 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
 
-            setAdditionBankViaPopover(EditorSelectionHandler.HIT_BANK_AUTO);
+            setAdditionBankViaPopover(HitObjectComposer.HIT_BANK_AUTO);
             hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
         }
@@ -693,7 +690,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             clickSamplePiece(0);
             samplePopoverIsOpen();
-            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
         }
 
         [Test]
@@ -741,7 +738,7 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(0);
             samplePopoverIsOpen();
             samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
-            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
             dismissPopover();
 
             AddStep("Move to 5000", () => EditorClock.Seek(5000));
@@ -758,7 +755,7 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(1);
             samplePopoverIsOpen();
             samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
-            samplePopoverHasSingleAdditionBank(EditorSelectionHandler.HIT_BANK_AUTO);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
         }
 
         [Test]
@@ -1214,13 +1211,100 @@ namespace osu.Game.Tests.Visual.Editing
             hitObjectHasAutoAdditionBankFlag(0, true);
         }
 
-        private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
+        [Test]
+        public void TestPolygonGenerationInheritsSettings()
         {
-            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+            AddStep("seek to 1000", () => EditorClock.Seek(1000));
+            AddStep("open polygon tool", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.D);
+                InputManager.ReleaseKey(Key.LControl);
+                InputManager.ReleaseKey(Key.LShift);
+            });
 
-            InputManager.MoveMouseTo(samplePiece);
-            InputManager.Click(MouseButton.Left);
-        });
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasAutoAdditionBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set addition bank to drum", () =>
+            {
+                InputManager.PressKey(Key.LAlt);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LAlt);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleNormalBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasSampleAdditionBank(i, HitSampleInfo.BANK_DRUM);
+                hitObjectHasAutoAdditionBankFlag(i, false);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set normal bank to normal", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleNormalBank(i, HitSampleInfo.BANK_NORMAL);
+                hitObjectHasAutoNormalBankFlag(i, false);
+                hitObjectHasSampleAdditionBank(i, HitSampleInfo.BANK_DRUM);
+                hitObjectHasAutoAdditionBankFlag(i, false);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set addition bank to auto", () =>
+            {
+                InputManager.PressKey(Key.LAlt);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.LAlt);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_NORMAL);
+                hitObjectHasAutoNormalBankFlag(i, false);
+                hitObjectHasAutoAdditionBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+        }
+
+        private void clickSamplePiece(int objectIndex)
+        {
+            AddStep("switch tool to select", () => InputManager.Key(Key.Number1));
+            AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
+            {
+                var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+
+                InputManager.MoveMouseTo(samplePiece);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
 
         private void clickNodeSamplePiece(int objectIndex, int nodeIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node sample piece", () =>
         {
@@ -1245,35 +1329,35 @@ namespace osu.Game.Tests.Visual.Editing
             return popover != null;
         });
 
-        private void samplePopoverHasNoFocus() => AddUntilStep("sample popover textbox not focused", () =>
+        private void samplePopoverHasFocus() => AddUntilStep("sample popover textbox not focused", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
             var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
 
-            return textbox?.HasFocus == false;
+            return textbox?.HasFocus == true;
         });
 
         private void samplePopoverHasSingleVolume(int volume) => AddUntilStep($"sample popover has volume {volume}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
 
-            return slider?.Current.Value == volume;
+            return slider?.Current.Value == volume && !slider.IsMultipleValues;
         });
 
         private void samplePopoverHasIndeterminateVolume() => AddUntilStep("sample popover has indeterminate volume", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
 
-            return slider != null && slider.Current.Value == null;
+            return slider != null && slider.IsMultipleValues;
         });
 
         private void samplePopoverHasSingleBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var dropdown = popover?.ChildrenOfType<LabelledDropdown<string>>().First();
+            var dropdown = popover?.ChildrenOfType<FormDropdown<string>>().First();
 
             return dropdown?.Current.Value == bank;
         });
@@ -1281,7 +1365,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void samplePopoverHasIndeterminateBank() => AddUntilStep("sample popover has indeterminate bank", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var dropdown = popover?.ChildrenOfType<LabelledDropdown<string>>().First();
+            var dropdown = popover?.ChildrenOfType<FormDropdown<string>>().First();
 
             return dropdown?.Current.Value == "(multiple)";
         });
@@ -1289,21 +1373,21 @@ namespace osu.Game.Tests.Visual.Editing
         private void samplePopoverHasSingleAdditionBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var dropdown = popover?.ChildrenOfType<LabelledDropdown<string>>().ElementAt(1);
+            var dropdown = popover?.ChildrenOfType<FormDropdown<string>>().ElementAt(1);
 
             return dropdown?.Current.Value == bank;
         });
 
         private void dismissPopover()
         {
-            AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
+            AddRepeatStep("dismiss popover", () => InputManager.Key(Key.Escape), 2);
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Any(popover => popover.IsPresent));
         }
 
         private void setVolumeViaPopover(int volume) => AddStep($"set volume {volume} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var slider = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
             slider.Current.Value = volume;
         });
 
@@ -1323,14 +1407,14 @@ namespace osu.Game.Tests.Visual.Editing
         private void setBankViaPopover(string bank) => AddStep($"set bank {bank} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var textBox = popover.ChildrenOfType<LabelledDropdown<string>>().First();
+            var textBox = popover.ChildrenOfType<FormDropdown<string>>().First();
             textBox.Current.Value = bank;
         });
 
         private void setAdditionBankViaPopover(string bank) => AddStep($"set addition bank {bank} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var textBox = popover.ChildrenOfType<LabelledDropdown<string>>().ToArray()[1];
+            var textBox = popover.ChildrenOfType<FormDropdown<string>>().ToArray()[1];
             textBox.Current.Value = bank;
         });
 
@@ -1407,6 +1491,6 @@ namespace osu.Game.Tests.Visual.Editing
                 return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
             });
 
-        private void editorTimeIs(double time) => AddAssert($"editor time is {time}", () => Precision.AlmostEquals(EditorClock.CurrentTimeAccurate, time, 1));
+        private void editorTimeIs(double time) => AddUntilStep($"editor time is {time}", () => EditorClock.CurrentTimeAccurate, () => Is.EqualTo(time).Within(1));
     }
 }

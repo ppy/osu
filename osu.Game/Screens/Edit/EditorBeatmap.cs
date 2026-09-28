@@ -132,6 +132,14 @@ namespace osu.Game.Screens.Edit
                 EndChange();
             });
 
+            SliderVelocityPresets = new BindableList<double>(playableBeatmap.SliderVelocityPresets);
+            SliderVelocityPresets.BindCollectionChanged((_, _) =>
+            {
+                BeginChange();
+                playableBeatmap.SliderVelocityPresets = SliderVelocityPresets.OrderBy(x => x).Distinct().ToArray();
+                EndChange();
+            });
+
             PreviewTime = new BindableInt(BeatmapInfo.Metadata.PreviewTime);
             PreviewTime.BindValueChanged(s =>
             {
@@ -290,6 +298,14 @@ namespace osu.Game.Screens.Edit
         {
             get => PlayableBeatmap.Bookmarks;
             set => PlayableBeatmap.Bookmarks = value;
+        }
+
+        public readonly BindableList<double> SliderVelocityPresets;
+
+        double[] IBeatmap.SliderVelocityPresets
+        {
+            get => PlayableBeatmap.SliderVelocityPresets;
+            set => PlayableBeatmap.SliderVelocityPresets = value;
         }
 
         public int BeatmapVersion { get; set; }

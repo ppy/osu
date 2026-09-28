@@ -43,10 +43,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 container.SelectedSection.ValueChanged += section =>
                 {
-                    if (section.OldValue != null)
-                        section.OldValue.Selected = false;
-                    if (section.NewValue != null)
-                        section.NewValue.Selected = true;
+                    section.OldValue?.Selected = false;
+                    section.NewValue?.Selected = true;
                 };
 
                 Child = container;
@@ -96,6 +94,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children.Last());
             AddUntilStep("wait for scroll to section", () => container.ScreenSpaceDrawQuad.AABBFloat.Contains(container.Children.Last().ScreenSpaceDrawQuad.AABBFloat));
+        }
+
+        [Test]
+        public void TestScrollToSectionChildren()
+        {
+            AddRepeatStep("add many sections", () => append(1f), 3);
+            AddStep("scroll to first section", () => container.ScrollTo(container.Children.First()));
+            AddStep("scroll to final section's text", () => container.ScrollTo(container.Children.Last().ChildrenOfType<OsuSpriteText>().Single()));
+            AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children.Last());
         }
 
         [Test]

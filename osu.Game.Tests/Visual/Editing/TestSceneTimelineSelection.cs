@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
-            AddAssert("context menu open", () => this.ChildrenOfType<OsuContextMenu>().SingleOrDefault()?.State == MenuState.Open);
+            AddAssert("context menu open", () => this.ChildrenOfType<OsuContextMenu>().Any(m => m.State == MenuState.Open));
         }
 
         [Test]
@@ -424,7 +424,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("move mouse to break", () => InputManager.MoveMouseTo(this.ChildrenOfType<TimelineBreak>().Single()));
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
 
-            AddStep("move mouse to delete menu item", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuContextMenu>().First().ChildrenOfType<DrawableOsuMenuItem>().First()));
+            AddStep("move mouse to delete menu item", () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuContextMenu>().First(m => m.State == MenuState.Open)
+                                                                                         .ChildrenOfType<DrawableOsuMenuItem>().First()));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
             AddAssert("beatmap has no breaks", () => EditorBeatmap.Breaks, () => Is.Empty);

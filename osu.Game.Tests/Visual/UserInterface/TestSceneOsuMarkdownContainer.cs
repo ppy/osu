@@ -256,5 +256,97 @@ Line below";
     - Any modification of these rules will be announced.";
             });
         }
+
+        [Test]
+        public void TestStyledAlert()
+        {
+            AddStep("Add styled alert", () =>
+            {
+                markdownContainer.Text = @"
+::: alert-note
+**Note**
+Note body text.
+:::
+
+::: alert-tip
+**Tip**
+Tip body text.
+:::
+
+::: alert-notice
+**Notice**
+Notice body text.
+:::
+
+::: alert-warning
+**Warning**
+Warning body text.
+:::
+
+::: alert-caution
+**Caution**
+Caution body text.
+:::
+
+::: alert-invalid
+**Invalid**
+Invalid body text.
+:::
+
+::: alert-note
+**Good to know**
+Custom title body text with [link](/link)
+:::
+
+::: alert-note
+**More bold**
+More **bold** body text
+
+And also **another bold** text.
+:::
+";
+            });
+        }
+
+        [Test]
+        public void TestStyledAlertInline()
+        {
+            AddStep("Add styled alert inline", () =>
+            {
+                markdownContainer.Text = @"
+::: alert-note
+**Note** Note inline text.
+:::
+
+::: alert-tip
+**Tip** Tip inline text.
+:::
+
+::: alert-notice
+**Notice** Notice inline text.
+:::
+
+::: alert-warning
+**Warning** Warning inline text.
+:::
+
+::: alert-caution
+**Caution** Caution inline text.
+:::
+
+::: alert-invalid
+**Invalid** Invalid inline text.
+:::
+
+::: alert-note
+**See also** [foo](/foo) and [bar](/bar).
+:::
+
+::: alert-note
+**Note:** more **bold** text.
+:::
+";
+            });
+        }
     }
 }

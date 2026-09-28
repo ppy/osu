@@ -165,8 +165,16 @@ namespace osu.Game.Beatmaps
         private SqliteConnection getConnection() =>
             new SqliteConnection(string.Concat(@"Data Source=", storage.GetFullPath(@"online.db", true)));
 
+        /// <summary>
+        /// Force an immediate fetch of the latest cache database.
+        /// </summary>
         public Task FetchCache()
         {
+            // This is guarded in the local call, but also included as a safety
+            // for any incorrect public usage.
+            if (DebugUtils.IsNUnitRunning)
+                return Task.CompletedTask;
+
             bool isRefetch = storage.Exists(cache_database_name);
 
             string cacheFilePath = storage.GetFullPath(cache_database_name);

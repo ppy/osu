@@ -164,7 +164,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Title = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
 
-            Padding = new MarginPadding { Top = Header.HEIGHT };
+            Padding = new MarginPadding
+            {
+                Top = Header.HEIGHT,
+                Horizontal = HORIZONTAL_OVERFLOW_PADDING
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -187,7 +191,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
-                                Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                                Horizontal = 30,
                                 Bottom = footer_height + footer_padding
                             },
                             Children = new[]
@@ -206,7 +210,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         {
                                             new MultiplayerRoomPanel(room)
                                             {
-                                                OnEdit = () => settingsOverlay.Show()
+                                                OnEdit = () => settingsOverlay.Show(),
+                                                ShowDescription = true,
                                             }
                                         },
                                         null,
@@ -400,6 +405,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
                             Height = footer_height,
+                            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING },
                             Children = new Drawable[]
                             {
                                 new Box
@@ -956,6 +962,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.UserStyleChanged -= onUserStyleChanged;
                 client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
+                client.MatchEvent -= onMatchEvent;
             }
         }
 

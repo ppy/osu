@@ -3,12 +3,14 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -18,6 +20,8 @@ using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -30,6 +34,8 @@ namespace osu.Game.Graphics
 {
     public partial class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
+        private const int jpeg_quality = 92;
+
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
         /// <summary>
@@ -42,13 +48,22 @@ namespace osu.Game.Graphics
         private GameHost host { get; set; } = null!;
 
         [Resolved]
+        private OsuGame? game { get; set; }
+
+        [Resolved]
         private Clipboard clipboard { get; set; } = null!;
 
         [Resolved]
         private INotificationOverlay notificationOverlay { get; set; } = null!;
 
         [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        private Bindable<ScreenshotFormat> screenshotFormat = null!;
+        private Bindable<bool> captureMenuCursor = null!;
 
         private Storage storage = null!;
 
@@ -58,7 +73,10 @@ namespace osu.Game.Graphics
         private void load(Storage storage, AudioManager audio)
         {
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-            shutter = audio.Samples.Get("UI/shutter");
+            shutter = audio.Samples.Get(@"UI/shutter");
+
+            screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
+            captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -72,6 +90,11 @@ namespace osu.Game.Graphics
                     shutter?.Play();
                     TakeScreenshotAsync().FireAndForget();
                     return true;
+
+                case GlobalAction.TakeAndUploadScreeshot:
+                    shutter?.Play();
+                    TakeAndUploadScreenshotAsync().FireAndForget();
+                    return true;
             }
 
             return false;
@@ -83,16 +106,80 @@ namespace osu.Game.Graphics
 
         private volatile int screenShotTasks;
 
-        public Task TakeScreenshotAsync() => Task.Run(async () =>
+        public Task TakeAndUploadScreenshotAsync() => Task.Run(async () =>
+        {
+            // Don't copy the image to clipboard when uploading a screenshot, as it's going to be overwritten by the URL
+            // anyway.
+            string? filename = await TakeScreenshotAsync(copyToClipboard: false, showNotification: false).ConfigureAwait(false);
+
+            if (filename == null)
+                return;
+
+            Stream stream;
+
+            switch (screenshotFormat.Value)
+            {
+                case ScreenshotFormat.Jpg:
+                    stream = storage.GetStream(filename, FileAccess.Read, FileMode.Open);
+                    break;
+
+                case ScreenshotFormat.Png:
+                    // Convert the taken screenshot to JPEG (to save storage) before uploading if user set their screenshots to
+                    // save in a different format.
+                    var image = await Image.LoadAsync(storage.GetFullPath(filename)).ConfigureAwait(false);
+
+                    stream = new MemoryStream();
+                    await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var uploadRequest = new UploadScreenshot(await stream.ReadAllBytesToArrayAsync().ConfigureAwait(false));
+
+            var notification = new ProgressNotification
+            {
+                State = ProgressNotificationState.Active,
+                Text = NotificationsStrings.UploadingScreenshot,
+                CompletionText = NotificationsStrings.ScreenshotUploadSuccess,
+            };
+
+            uploadRequest.Progressed += (current, total) => notification.Progress = (float)current / total * 0.8f;
+            uploadRequest.Success += content =>
+            {
+                clipboard.SetText(content.Url);
+
+                notification.CompletionClickAction = () =>
+                {
+                    game?.OpenUrlExternally(content.Url);
+                    return true;
+                };
+
+                notification.Progress = 1;
+                notification.State = ProgressNotificationState.Completed;
+            };
+            uploadRequest.Failure += e =>
+            {
+                notification.State = ProgressNotificationState.Cancelled;
+
+                if (e is WebException webException && webException.Message == @"TooManyRequests")
+                    notification.Text = NotificationsStrings.ScreenshotTooManyUploads;
+                else
+                    notification.Text = NotificationsStrings.ScreenshotUploadFailure;
+            };
+
+            notificationOverlay.Post(notification);
+            api.Queue(uploadRequest);
+        });
+
+        public Task<string?> TakeScreenshotAsync(bool copyToClipboard = true, bool showNotification = true) => Task.Run<string?>(async () =>
         {
             Interlocked.Increment(ref screenShotTasks);
 
-            ScreenshotFormat screenshotFormat = config.Get<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
-            bool captureMenuCursor = config.Get<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
-
             try
             {
-                if (!captureMenuCursor)
+                if (!captureMenuCursor.Value)
                 {
                     cursorVisibility.Value = false;
 
@@ -143,40 +230,44 @@ namespace osu.Game.Graphics
                         });
                     }
 
-                    clipboard.SetImage(image);
+                    if (copyToClipboard)
+                        clipboard.SetImage(image);
 
-                    (string? filename, Stream? stream) = getWritableStream(screenshotFormat);
+                    (string? filename, Stream? stream) = getWritableStream(screenshotFormat.Value);
 
-                    if (filename == null) return;
+                    if (filename == null) return null;
 
                     using (stream)
                     {
-                        switch (screenshotFormat)
+                        switch (screenshotFormat.Value)
                         {
                             case ScreenshotFormat.Png:
                                 await image.SaveAsPngAsync(stream).ConfigureAwait(false);
                                 break;
 
                             case ScreenshotFormat.Jpg:
-                                const int jpeg_quality = 92;
-
                                 await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
                                 break;
 
                             default:
-                                throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat}.");
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
 
-                    notificationOverlay.Post(new SimpleNotification
+                    if (showNotification)
                     {
-                        Text = NotificationsStrings.ScreenshotSaved(filename),
-                        Activated = () =>
+                        notificationOverlay.Post(new SimpleNotification
                         {
-                            storage.PresentFileExternally(filename);
-                            return true;
-                        }
-                    });
+                            Text = NotificationsStrings.ScreenshotSaved(filename),
+                            Activated = () =>
+                            {
+                                storage.PresentFileExternally(filename);
+                                return true;
+                            }
+                        });
+                    }
+
+                    return filename;
                 }
             }
             finally
@@ -186,7 +277,7 @@ namespace osu.Game.Graphics
             }
         });
 
-        private static readonly object filename_reservation_lock = new object();
+        private static readonly Lock filename_reservation_lock = new Lock();
 
         private (string? filename, Stream? stream) getWritableStream(ScreenshotFormat format)
         {

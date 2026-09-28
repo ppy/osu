@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ColoursHeader => new TranslatableString(getKey(@"colours_header"), @"Colours");
 
         /// <summary>
+        /// "Accent colours from beatmap background:"
+        /// </summary>
+        public static LocalisableString AccentColoursInBeatmapBackground => new TranslatableString(getKey(@"accent_colours_in_beatmap_background"), @"Accent colours from beatmap background:");
+
+        /// <summary>
         /// "Hit circle / Slider Combos"
         /// </summary>
         public static LocalisableString HitCircleSliderCombos => new TranslatableString(getKey(@"hit_circle_slider_combos"), @"Hit circle / Slider Combos");

@@ -50,7 +50,7 @@ jobs:
       uses: peter-evans/create-pull-request@v6
       with:
         title: Update mod definitions
-        body: "This PR has been auto-generated to update the mod definitions to match ppy/osu@${{ github.ref_name }}."
+        body: "This PR has been auto-generated to update the mod definitions to match ppy/osu@${{ github.ref_name }}. cc @peppy"
         branch: update-mod-definitions
         commit-message: Update mod definitions
         path: osu-web

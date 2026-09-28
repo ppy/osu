@@ -58,22 +58,21 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateTernaryStates()
         {
-            var usingClosestAnchor = GetStateFromSelection(SelectedBlueprints, c => !c.Item.UsesFixedAnchor);
+            var usingClosestAnchor = SelectedBlueprints.GetTernaryState(c => !c.Item.UsesFixedAnchor);
 
-            if (closestAnchor != null)
-                closestAnchor.State.Value = usingClosestAnchor;
+            closestAnchor?.State.Value = usingClosestAnchor;
 
             if (fixedAnchors != null)
             {
                 foreach (var fixedAnchor in fixedAnchors)
-                    fixedAnchor.State.Value = GetStateFromSelection(SelectedBlueprints, c => c.Item.UsesFixedAnchor && ((Drawable)c.Item).Anchor == fixedAnchor.Anchor);
+                    fixedAnchor.State.Value = SelectedBlueprints.GetTernaryState(c => c.Item.UsesFixedAnchor && ((Drawable)c.Item).Anchor == fixedAnchor.Anchor);
             }
 
             if (originMenu != null)
             {
                 foreach (var origin in originMenu.Items.OfType<AnchorMenuItem>())
                 {
-                    origin.State.Value = GetStateFromSelection(SelectedBlueprints, c => ((Drawable)c.Item).Origin == origin.Anchor);
+                    origin.State.Value = SelectedBlueprints.GetTernaryState(c => ((Drawable)c.Item).Origin == origin.Anchor);
                     origin.Action.Disabled = usingClosestAnchor == TernaryState.True;
                 }
             }

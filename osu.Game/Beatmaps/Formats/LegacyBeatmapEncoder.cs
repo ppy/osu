@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -124,11 +123,12 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("[Editor]");
 
             if (beatmap.Bookmarks.Length > 0)
-                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks)}"));
+                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks.Select(b => b.ToString(CultureInfo.InvariantCulture)))}"));
             writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.DistanceSpacing}"));
             writer.WriteLine(FormattableString.Invariant($"BeatDivisor: {beatmap.BeatmapInfo.BeatDivisor}"));
             writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
             writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
+            writer.WriteLine(FormattableString.Invariant($@"VelocityPresets: {string.Join(',', beatmap.SliderVelocityPresets.Select(sv => sv.ToString(CultureInfo.InvariantCulture)))}"));
         }
 
         private void handleMetadata(TextWriter writer)
@@ -399,23 +399,38 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleColours(TextWriter writer)
         {
-            var colours = skin?.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+            writer.WriteLine(@"[Colours]");
 
-            if (colours == null || colours.Count == 0)
-                return;
+            var comboColours = (skin as IHasComboColours)?.ComboColours;
 
-            writer.WriteLine("[Colours]");
-
-            for (int i = 0; i < Math.Min(colours.Count, LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT); i++)
+            if (comboColours != null)
             {
-                var comboColour = colours[i];
+                for (int i = 0; i < Math.Min(comboColours.Count, LegacyBeatmapDecoder.MAX_COMBO_COLOUR_COUNT); i++)
+                {
+                    var comboColour = comboColours[i];
 
-                writer.Write(FormattableString.Invariant($"Combo{1 + i}: "));
-                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.R * byte.MaxValue)},"));
-                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.G * byte.MaxValue)},"));
-                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.B * byte.MaxValue)},"));
-                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.A * byte.MaxValue)}"));
-                writer.WriteLine();
+                    writer.Write(FormattableString.Invariant($@"Combo{1 + i}: "));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(comboColour.R * byte.MaxValue)},"));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(comboColour.G * byte.MaxValue)},"));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(comboColour.B * byte.MaxValue)},"));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(comboColour.A * byte.MaxValue)}"));
+                    writer.WriteLine();
+                }
+            }
+
+            var customColours = (skin as IHasCustomColours)?.CustomColours;
+
+            if (customColours != null)
+            {
+                foreach ((string key, var colour) in customColours)
+                {
+                    writer.Write(FormattableString.Invariant($@"{key}: "));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(colour.R * byte.MaxValue)},"));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(colour.G * byte.MaxValue)},"));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(colour.B * byte.MaxValue)},"));
+                    writer.Write(FormattableString.Invariant($@"{(byte)(colour.A * byte.MaxValue)}"));
+                    writer.WriteLine();
+                }
             }
         }
 

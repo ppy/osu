@@ -275,7 +275,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var completedGameplayState = TestGameplayState.Create(new OsuRuleset());
                 completedGameplayState.HasPassed = true;
-                spectatorClient.EndPlaying(completedGameplayState);
+                spectatorClient.EndPlaying(null, completedGameplayState);
             });
 
             // We can't access API because we're an "online" test.

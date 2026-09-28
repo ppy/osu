@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 headPiece = new HitPiece
                 {

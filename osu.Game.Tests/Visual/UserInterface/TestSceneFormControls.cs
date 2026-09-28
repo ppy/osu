@@ -179,6 +179,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                             TooltipFormat = v => $"This setting has the value set to {v * 100:0.00} funometer.",
                                             TabbableContentContainer = this,
                                         },
+                                        new FormEnumDropdown<CountdownType>(),
                                         new FormEnumDropdown<CountdownType>
                                         {
                                             Caption = EditorSetupStrings.EnableCountdown,

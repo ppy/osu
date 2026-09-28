@@ -309,8 +309,7 @@ namespace osu.Game.Screens.Ranking
                 base.Size = value;
 
                 // Auto-size isn't used to avoid 1-frame issues and because the score panel is removed/re-added to the container.
-                if (trackingContainer != null)
-                    trackingContainer.Size = value;
+                trackingContainer?.Size = value;
             }
         }
 

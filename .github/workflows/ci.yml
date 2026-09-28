@@ -55,6 +55,7 @@ jobs:
           # this is WTF tier but if you don't specify *both* of these the defaults assume `build: true`
           build: false
           no-build: true
+          tool-version: '2026.2.1'
           solution: ./osu.Desktop.slnf
           caches-home: inspectcode
           verbosity: WARN
@@ -164,7 +165,7 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -178,10 +179,8 @@ jobs:
       - name: Install .NET Workloads
         run: dotnet workload install ios
 
-      # https://github.com/dotnet/macios/issues/19157
-      # https://github.com/actions/runner-images/issues/12758
-      - name: Use Xcode 16.4
-        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+      - name: Use Xcode 26.6
+        run: sudo xcode-select -switch /Applications/Xcode_26.6.app
 
       - name: Build
         run: dotnet build -c Debug osu.iOS.slnf

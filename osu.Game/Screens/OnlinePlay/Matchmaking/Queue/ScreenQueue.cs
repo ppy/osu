@@ -21,9 +21,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -727,14 +729,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     {
                         pushScreenDelegate = Schedule(() =>
                         {
+                            if (client.Room == null)
+                            {
+                                Logger.Log("Room became null, returning to idle");
+                                SetState(MatchmakingScreenState.Idle);
+                                return;
+                            }
+
                             switch (poolType)
                             {
                                 case MatchmakingPoolType.QuickPlay:
-                                    this.Push(new ScreenMatchmaking(client.Room!));
+                                    this.Push(new ScreenMatchmaking(client.Room));
                                     break;
 
                                 case MatchmakingPoolType.RankedPlay:
-                                    this.Push(new RankedPlayScreen(client.Room!));
+                                    this.Push(new RankedPlayScreen(client.Room));
                                     break;
                             }
                         });
@@ -893,7 +902,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 base.Update();
 
-                Text = queue.QueueTimer.Elapsed.ToString(@"mm\:ss");
+                Text = queue.QueueTimer.Elapsed.ToFormattedDuration();
             }
         }
     }

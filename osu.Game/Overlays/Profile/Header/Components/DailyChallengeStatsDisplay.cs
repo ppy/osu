@@ -54,7 +54,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 content = new Container
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    Height = MainDetails.BADGE_HEIGHT,
                     CornerRadius = 6,
                     BorderThickness = 2,
                     BorderColour = colourProvider.Background4,
@@ -71,17 +72,22 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Padding = new MarginPadding(3f),
-                            AutoSizeAxes = Axes.Both,
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
                                 label = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
                                 {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.Both,
-                                    Margin = new MarginPadding { Horizontal = 5f, Bottom = 2f },
+                                    Margin = new MarginPadding { Horizontal = 5f, },
                                 },
                                 new Container
                                 {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.X,
                                     RelativeSizeAxes = Axes.Y,
                                     CornerRadius = 3,
