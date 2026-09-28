@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             base.ApplyEmphasisedCreationParameters(spriteText, bold, italic);
 
-            spriteText.Font = spriteText.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic);
+            spriteText.Font = spriteText.Font.With(weight: bold ? FontWeight.Bold : null, italics: italic);
         }
 
         protected override void AddCustomComponent(CustomContainerInline inline)
