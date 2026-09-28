@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps
         BeatmapSetOnlineCovers Covers { get; }
 
         /// <summary>
-        /// A small sample clip of this beatmap set's song.
+        /// A URL containing a small sample clip of this beatmap set's song.
         /// </summary>
         string Preview { get; }
 
