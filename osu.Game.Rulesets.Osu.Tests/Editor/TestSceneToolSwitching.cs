@@ -55,10 +55,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestGoingBackGoesSelectFirst()
+        public void TestReturnToSelectToolOnEscape()
         {
             AddStep("switch to placement tool", () => InputManager.Key(Key.Number2));
             AddAssert("select tool not selected", () => this.ChildrenOfType<HitObjectComposer>().Single().BlueprintContainer.CurrentTool is not SelectTool);
+
             AddStep("press back global action", () => InputManager.Key(Key.Escape));
             AddAssert("select tool selected", () => this.ChildrenOfType<HitObjectComposer>().Single().BlueprintContainer.CurrentTool is SelectTool);
         }
