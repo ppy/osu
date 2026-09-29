@@ -503,13 +503,11 @@ namespace osu.Game.Rulesets.Edit
             switch (e.Action)
             {
                 case GlobalAction.Back:
-                    if (BlueprintContainer.CurrentTool is not SelectTool)
-                    {
-                        SetSelectTool();
-                        return true;
-                    }
+                    if (BlueprintContainer.CurrentTool is SelectTool)
+                        break;
 
-                    break;
+                    SetSelectTool();
+                    return true;
             }
 
             return false;
