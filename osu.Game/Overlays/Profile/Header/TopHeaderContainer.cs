@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             var user = data?.User;
 
-            cover.Item = user;
+            cover.Model = user;
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.Endpoints.WebsiteUrl}/users/{user?.Id ?? 0}";

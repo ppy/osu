@@ -269,7 +269,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             {
                 var user = current.Value.User.User;
 
-                userCover.Item = user;
+                userCover.Model = user;
                 userAvatar.User = user;
                 userFlag.CountryCode = user?.CountryCode ?? default;
                 teamFlagContainer.Child = new UpdateableTeamFlag(user?.Team)

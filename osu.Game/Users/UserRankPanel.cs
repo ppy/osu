@@ -104,7 +104,7 @@ namespace osu.Game.Users
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Item = User,
+                                Model = User,
                                 Alpha = 0.3f
                             },
                             new GridContainer

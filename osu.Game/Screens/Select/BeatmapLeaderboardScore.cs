@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Select
                                 new CoverBackground
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Item = Score.User,
+                                    Model = Score.User,
                                     Shear = sheared ? -OsuGame.SHEAR : Vector2.Zero,
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,

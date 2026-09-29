@@ -16,10 +16,10 @@ namespace osu.Game.Users
 {
     public partial class CoverBackground : ModelBackedDrawable<IHasCover?>
     {
-        public IHasCover? Item
+        public new IHasCover? Model
         {
-            get => Model;
-            set => Model = value;
+            get => base.Model;
+            set => base.Model = value;
         }
 
         protected override Drawable CreateDrawable(IHasCover? item) => new Cover(item);

@@ -170,7 +170,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = colours.Gray7,
-                        Item = User
+                        Model = User
                     },
                     new Container
                     {

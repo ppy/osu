@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Ranking
                                     new CoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Item = Score.User,
+                                        Model = Score.User,
                                         Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
                                     }
                                 }

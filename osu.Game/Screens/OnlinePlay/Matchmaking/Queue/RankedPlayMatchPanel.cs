@@ -98,7 +98,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     Child = new CoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Item = leftUser.GetResultSafely()
+                                        Model = leftUser.GetResultSafely()
                                     }
                                 },
                                 new Container
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                     Child = new CoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Item = rightUser.GetResultSafely()
+                                        Model = rightUser.GetResultSafely()
                                     }
                                 },
                                 leftResultLight = new Container

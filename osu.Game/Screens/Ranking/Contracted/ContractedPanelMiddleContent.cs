@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                 new CoverBackground
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Item = score.User,
+                                    Model = score.User,
                                     Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
                                 },
                                 new FillFlowContainer

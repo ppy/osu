@@ -125,7 +125,7 @@ namespace osu.Game.Users
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            Item = User
+            Model = User
         };
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
