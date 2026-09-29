@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
     /// <typeparam name="TAction">The enumeration type used for ruleset-specific editor key bindings.</typeparam>
-    public abstract partial class HitObjectComposer<TObject, TAction> : HitObjectComposer, IPlacementHandler
+    public abstract partial class HitObjectComposer<TObject, TAction> : HitObjectComposer, IPlacementHandler, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
         where TAction : struct, Enum
     {
@@ -495,6 +496,25 @@ namespace osu.Game.Rulesets.Edit
         public Hotkey HotkeyForAction(TAction action)
         {
             return new Hotkey(Ruleset.ShortName, Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(action, typeof(int)));
+        }
+
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            switch (e.Action)
+            {
+                case GlobalAction.Back:
+                    if (BlueprintContainer.CurrentTool is SelectTool)
+                        break;
+
+                    SetSelectTool();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 
