@@ -498,18 +498,24 @@ namespace osu.Game.Rulesets.Edit
             return new Hotkey(Ruleset.ShortName, Ruleset.EDITOR_VARIANT, (int)Convert.ChangeType(action, typeof(int)));
         }
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == GlobalAction.Back && BlueprintContainer.CurrentTool is not SelectTool)
+            switch (e.Action)
             {
-                SetSelectTool();
-                return true;
+                case GlobalAction.Back:
+                    if (BlueprintContainer.CurrentTool is not SelectTool)
+                    {
+                        SetSelectTool();
+                        return true;
+                    }
+
+                    break;
             }
 
             return false;
         }
 
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
     }

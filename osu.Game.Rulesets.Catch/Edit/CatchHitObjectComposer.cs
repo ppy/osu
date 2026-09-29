@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -27,7 +26,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Catch.Edit
 {
     [Cached]
-    public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject, CatchAction>, IKeyBindingHandler<GlobalAction>
+    public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject, CatchAction>
     {
         public const float DISTANCE_SNAP_RADIUS = 50;
 
@@ -115,7 +114,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             new BananaShowerCompositionTool()
         };
 
-        public new bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
@@ -132,11 +131,6 @@ namespace osu.Game.Rulesets.Catch.Edit
             }
 
             return base.OnPressed(e);
-        }
-
-        public new void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
-        {
-            base.OnReleased(e);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
