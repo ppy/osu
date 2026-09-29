@@ -34,8 +34,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly ITabletHandler tabletHandler;
 
-        private readonly Bindable<bool> enabled = new BindableBool(true);
-
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
         private readonly Bindable<Vector2> outputAreaSize = new Bindable<Vector2>();
@@ -200,9 +198,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
-            enabled.BindTo(tabletHandler.Enabled);
-            enabled.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
-
             rotation.BindTo(tabletHandler.Rotation);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
@@ -276,16 +271,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateVisibility()
         {
-            mainSettings.Hide();
-            noTabletMessage.Hide();
-
-            if (!tabletHandler.Enabled.Value)
-                return;
-
             if (tablet.Value != null)
+            {
+                noTabletMessage.Hide();
                 mainSettings.Show();
+            }
             else
+            {
+                mainSettings.Hide();
                 noTabletMessage.Show();
+            }
         }
 
         private void applyAspectRatio(BindableNumber<float> sizeChanged)
