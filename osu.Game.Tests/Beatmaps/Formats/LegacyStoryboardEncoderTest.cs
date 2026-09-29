@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Storyboards;
+using osu.Game.Storyboards.Commands;
 using osuTK;
 using osuTK.Graphics;
 
@@ -271,6 +272,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "test.jpg", Anchor.Centre, new Vector2(300));
             var loopingGroup = sprite.AddLoopingGroup(1000, 44);
+            // times of commands added to a looping group are relative to LoopStartTime -> runs from 2000 to 2500 in the first iteration absolute time
             loopingGroup.AddAlpha(Easing.OutQuint, 1000, 1500, 0, 1);
             initial.Storyboard.GetLayer("Background").Add(sprite);
 
@@ -283,13 +285,17 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 Assert.That(decodedSprite.LoopingGroups, Has.Count.EqualTo(1));
                 var decodedLoopingGroup = decodedSprite.LoopingGroups.Single();
-                Assert.That(decodedLoopingGroup.StartTime, Is.EqualTo(1000));
+                Assert.That(decodedLoopingGroup.LoopStartTime, Is.EqualTo(1000));
+                Assert.That(decodedLoopingGroup.StartTime, Is.EqualTo(2000));
+                Assert.That(decodedLoopingGroup.Duration, Is.EqualTo(loopingGroup.Duration));
                 Assert.That(decodedLoopingGroup.TotalIterations, Is.EqualTo(45));
 
                 var alphaCommand = decodedLoopingGroup.Alpha.Single();
                 Assert.That(alphaCommand.Easing, Is.EqualTo(Easing.OutQuint));
-                Assert.That(alphaCommand.StartTime, Is.EqualTo(1000));
-                Assert.That(alphaCommand.EndTime, Is.EqualTo(1500));
+                Assert.That(((IStoryboardLoopingCommand)alphaCommand).OriginalCommand.StartTime, Is.EqualTo(1000));
+                Assert.That(((IStoryboardLoopingCommand)alphaCommand).OriginalCommand.EndTime, Is.EqualTo(1500));
+                Assert.That(alphaCommand.StartTime, Is.EqualTo(2000));
+                Assert.That(alphaCommand.EndTime, Is.EqualTo(2500));
                 Assert.That(alphaCommand.StartValue, Is.EqualTo(0));
                 Assert.That(alphaCommand.EndValue, Is.EqualTo(1));
             });

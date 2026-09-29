@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -15,6 +17,8 @@ namespace osu.Game.Overlays.Settings.Sections.Online
     public partial class AlertsAndPrivacySettings : SettingsSubsection
     {
         protected override LocalisableString Header => OnlineSettingsStrings.AlertsAndPrivacyHeader;
+
+        public override IEnumerable<LocalisableString> FilterTerms => base.FilterTerms.Concat(new LocalisableString[] { "notifications" });
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
