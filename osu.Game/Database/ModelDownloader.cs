@@ -44,7 +44,7 @@ namespace osu.Game.Database
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize);
 
-        public bool Download(T model, bool minimiseDownloadSize = false) => Download(model, minimiseDownloadSize, null);
+        public bool Download(T model, bool minimiseDownloadSize) => Download(model, minimiseDownloadSize, null);
 
         public void DownloadAsUpdate(TModel originalModel, bool minimiseDownloadSize) => Download(originalModel, minimiseDownloadSize, originalModel);
 
