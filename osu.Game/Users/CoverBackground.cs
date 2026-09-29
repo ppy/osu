@@ -22,7 +22,7 @@ namespace osu.Game.Users
             set => base.Model = value;
         }
 
-        protected override Drawable CreateDrawable(IHasCover? item) => new Cover(item);
+        protected override Drawable CreateDrawable(IHasCover? model) => new Cover(model);
 
         protected override double LoadDelay => 300;
 
@@ -40,11 +40,11 @@ namespace osu.Game.Users
         [LongRunningLoad]
         private partial class Cover : CompositeDrawable
         {
-            private readonly IHasCover? item;
+            private readonly IHasCover? cover;
 
-            public Cover(IHasCover? item)
+            public Cover(IHasCover? cover)
             {
-                this.item = item;
+                this.cover = cover;
 
                 RelativeSizeAxes = Axes.Both;
             }
@@ -52,7 +52,7 @@ namespace osu.Game.Users
             [BackgroundDependencyLoader]
             private void load(OnlineAssetCachingStore textures)
             {
-                if (item?.CoverUrl == null)
+                if (cover?.CoverUrl == null)
                 {
                     InternalChild = new Box
                     {
@@ -65,7 +65,7 @@ namespace osu.Game.Users
                     InternalChild = new Sprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Texture = textures.Get(item.CoverUrl),
+                        Texture = textures.Get(cover.CoverUrl),
                         FillMode = FillMode.Fill,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
