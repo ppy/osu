@@ -1162,6 +1162,8 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
+
             loadComponentSingleFile(fpsCounter = new FPSCounter
             {
                 Anchor = Anchor.BottomRight,
@@ -1195,8 +1197,6 @@ namespace osu.Game
                         menuScreen.MakeCurrent();
                 },
             }, topMostOverlayContent.Add);
-
-            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
             onScreenDisplay = new OnScreenDisplay();
 
