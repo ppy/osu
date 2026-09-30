@@ -292,7 +292,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             base.Dispose(isDisposing);
 
             if (client.IsNotNull())
+            {
                 client.RoomUpdated -= onRoomUpdated;
+                client.UserModsChanged -= onUserModsChanged;
+            }
         }
 
         public partial class HealthBar : CompositeDrawable
