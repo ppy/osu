@@ -251,7 +251,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
