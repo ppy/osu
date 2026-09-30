@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -74,7 +73,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             foreach (string filename in downloadableFilenames)
             {
@@ -93,7 +92,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 // Note that this is downloading the beatmaps even if they are already downloaded.
                 // We could rely more on `BeatmapDownloadTracker`'s exposed state to avoid this.
-                beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
+                beatmapDownloader.Download(beatmapSet, false);
             }
         }
 
