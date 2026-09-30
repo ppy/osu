@@ -34,6 +34,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("total_score")]
         public long TotalScore { get; set; }
 
+        [JsonProperty("total_score_without_mods")]
+        public long TotalScoreWithoutMods { get; set; }
+
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
 
@@ -95,6 +98,7 @@ namespace osu.Game.Online.Rooms
             {
                 OnlineID = ID,
                 TotalScore = TotalScore,
+                TotalScoreWithoutMods = TotalScoreWithoutMods,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
                 Ruleset = ruleset,
