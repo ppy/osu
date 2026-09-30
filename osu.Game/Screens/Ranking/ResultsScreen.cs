@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Ranking
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new GlobalScrollAdjustsVolume(),
+                                        new ScrollAdjustsVolume(),
                                         StatisticsPanel = new StatisticsPanel
                                         {
                                             RelativeSizeAxes = Axes.Both,

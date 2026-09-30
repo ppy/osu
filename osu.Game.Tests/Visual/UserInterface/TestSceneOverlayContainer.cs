@@ -53,10 +53,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestAltScrollNotBlocked()
         {
-            TestGlobalAltScrollAdjustsVolume volumeAdjust = null!;
+            TestAltScrollAdjustsVolume volumeAdjust = null!;
 
             AddStep("load overlay", loadOverlay);
-            AddStep("add volume control receptor", () => Add(volumeAdjust = new TestGlobalAltScrollAdjustsVolume
+            AddStep("add volume control receptor", () => Add(volumeAdjust = new TestAltScrollAdjustsVolume
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue,
@@ -76,11 +76,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestAltScrollBlockedByOptOut()
         {
-            TestGlobalAltScrollAdjustsVolume volumeAdjust = null!;
+            TestAltScrollAdjustsVolume volumeAdjust = null!;
 
             AddStep("add blocker and receptor", () =>
             {
-                Add(volumeAdjust = new TestGlobalAltScrollAdjustsVolume
+                Add(volumeAdjust = new TestAltScrollAdjustsVolume
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MaxValue,
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }));
 
-        public partial class TestGlobalAltScrollAdjustsVolume : GlobalAltScrollAdjustsVolume
+        public partial class TestAltScrollAdjustsVolume : ScrollAdjustsVolume
         {
             public bool ScrollReceived { get; private set; }
 
