@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -51,7 +52,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame? game, ScoreModelDownloader scoreDownloader)
+        private void load(OsuGame? game, ScoreModelDownloader scoreDownloader, OsuConfigManager config)
         {
             InternalChild = shakeContainer = new ShakeContainer
             {

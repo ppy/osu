@@ -165,7 +165,7 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -178,9 +178,6 @@ jobs:
 
       - name: Install .NET Workloads
         run: dotnet workload install ios
-
-      - name: Use Xcode 26.6
-        run: sudo xcode-select -switch /Applications/Xcode_26.6.app
 
       - name: Build
         run: dotnet build -c Debug osu.iOS.slnf
