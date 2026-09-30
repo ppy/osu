@@ -92,7 +92,7 @@ namespace osu.Game.Online.Multiplayer
         /// Determines whether a user is able to add playlist items to this room.
         /// </summary>
         /// <param name="user">The user to check.</param>
-        public bool CanAddPlaylistItems(MultiplayerRoomUser user) => user.Equals(Host) || Settings.QueueMode != QueueMode.HostOnly;
+        public bool CanAddPlaylistItems(MultiplayerRoomUser user) => user.Equals(Host) || user.Role == MultiplayerRoomUserRole.Referee || Settings.QueueMode != QueueMode.HostOnly;
 
         public override string ToString() => $"RoomID:{RoomID} Host:{Host?.UserID} Users:{Users.Count} State:{State} Settings: [{Settings}]";
     }

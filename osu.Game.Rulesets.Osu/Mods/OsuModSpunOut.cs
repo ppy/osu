@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModSpunOut;
         public override ModType Type => ModType.Automation;
         public override LocalisableString Description => @"Spinners will be automatically completed.";
-        public override double ScoreMultiplier => 0.9;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot), typeof(OsuModTargetPractice) };
         public override bool Ranked => UsesDefaultConfiguration;
 

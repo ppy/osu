@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Checkout diffcalc-sheet-generator
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{ inputs.id }}
           repository: 'smoogipoo/diffcalc-sheet-generator'

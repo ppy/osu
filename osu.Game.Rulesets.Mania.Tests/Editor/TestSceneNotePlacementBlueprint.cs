@@ -5,6 +5,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
@@ -16,6 +17,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
 using osuTK.Input;
 
@@ -36,21 +38,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestPlaceBeforeCurrentTimeDownwards()
         {
+            AddStep("seek to 200", () => HitObjectContainer.Dependencies.Get<EditorClock>().Seek(200));
             AddStep("move mouse before current time", () =>
-            {
-                var column = this.ChildrenOfType<Column>().Single();
-                InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(-100));
-            });
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-
-            AddAssert("note start time < 0", () => getNote().StartTime < 0);
-        }
-
-        [Test]
-        public void TestPlaceAfterCurrentTimeDownwards()
-        {
-            AddStep("move mouse after current time", () =>
             {
                 var column = this.ChildrenOfType<Column>().Single();
                 InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(100));
@@ -58,7 +47,22 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("note start time > 0", () => getNote().StartTime > 0);
+            AddAssert("note start time < 200", () => getNote().StartTime < 200);
+        }
+
+        [Test]
+        public void TestPlaceAfterCurrentTimeDownwards()
+        {
+            AddStep("seek to 200", () => HitObjectContainer.Dependencies.Get<EditorClock>().Seek(200));
+            AddStep("move mouse after current time", () =>
+            {
+                var column = this.ChildrenOfType<Column>().Single();
+                InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(300));
+            });
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("note start time > 200", () => getNote().StartTime > 200);
         }
 
         private Note getNote() => this.ChildrenOfType<DrawableNote>().FirstOrDefault()?.HitObject;

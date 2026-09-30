@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Tests.Localisation
@@ -21,8 +22,8 @@ namespace osu.Game.Tests.Localisation
             };
             var romanisableString = metadata.GetDisplayTitleRomanisable();
 
-            Assert.AreEqual(metadata.ToString(), romanisableString.Romanised);
-            Assert.AreEqual($"{metadata.ArtistUnicode} - {metadata.TitleUnicode}", romanisableString.Original);
+            ClassicAssert.AreEqual(metadata.ToString(), romanisableString.Romanised);
+            ClassicAssert.AreEqual($"{metadata.ArtistUnicode} - {metadata.TitleUnicode}", romanisableString.Original);
         }
 
         [Test]
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.Localisation
             };
             var romanisableString = metadata.GetDisplayTitleRomanisable();
 
-            Assert.AreEqual(romanisableString.Romanised, romanisableString.Original);
+            ClassicAssert.AreEqual(romanisableString.Romanised, romanisableString.Original);
         }
     }
 }

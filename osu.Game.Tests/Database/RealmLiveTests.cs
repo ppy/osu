@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -25,7 +26,7 @@ namespace osu.Game.Tests.Database
 
                 Live<BeatmapInfo> beatmap2 = realm.Run(r => r.All<BeatmapInfo>().First().ToLive(realm));
 
-                Assert.AreEqual(beatmap, beatmap2);
+                ClassicAssert.AreEqual(beatmap, beatmap2);
             });
         }
 
@@ -52,7 +53,7 @@ namespace osu.Game.Tests.Database
                     using (realm.BlockAllOperations("testing"))
                         storage.Migrate(migratedStorage);
 
-                    Assert.IsFalse(liveBeatmap?.PerformRead(l => l.Hidden));
+                    ClassicAssert.False(liveBeatmap?.PerformRead(l => l.Hidden));
                 });
             }
         }
@@ -111,7 +112,7 @@ namespace osu.Game.Tests.Database
                             r.Add(beatmap)))
                 );
 
-                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+                ClassicAssert.False(liveBeatmap.PerformRead(l => l.Hidden));
             });
         }
 
@@ -126,7 +127,7 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(r => r.Write(_ => r.Add(beatmap)));
 
-                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+                ClassicAssert.False(liveBeatmap.PerformRead(l => l.Hidden));
             });
         }
 
@@ -136,15 +137,15 @@ namespace osu.Game.Tests.Database
             var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
             var liveBeatmap = beatmap.ToLiveUnmanaged();
 
-            Assert.IsFalse(beatmap.Hidden);
-            Assert.IsFalse(liveBeatmap.Value.Hidden);
-            Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+            ClassicAssert.False(beatmap.Hidden);
+            ClassicAssert.False(liveBeatmap.Value.Hidden);
+            ClassicAssert.False(liveBeatmap.PerformRead(l => l.Hidden));
 
             Assert.Throws<InvalidOperationException>(() => liveBeatmap.PerformWrite(l => l.Hidden = true));
 
-            Assert.IsFalse(beatmap.Hidden);
-            Assert.IsFalse(liveBeatmap.Value.Hidden);
-            Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+            ClassicAssert.False(beatmap.Hidden);
+            ClassicAssert.False(liveBeatmap.Value.Hidden);
+            ClassicAssert.False(liveBeatmap.PerformRead(l => l.Hidden));
         }
 
         [Test]
@@ -159,10 +160,10 @@ namespace osu.Game.Tests.Database
                 var liveBeatmap = beatmap.ToLive(realm);
 
                 Assert.Throws<InvalidOperationException>(() => liveBeatmap.PerformWrite(l => throw new InvalidOperationException()));
-                Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+                ClassicAssert.False(liveBeatmap.PerformRead(l => l.Hidden));
 
                 liveBeatmap.PerformWrite(l => l.Hidden = true);
-                Assert.IsTrue(liveBeatmap.PerformRead(l => l.Hidden));
+                ClassicAssert.True(liveBeatmap.PerformRead(l => l.Hidden));
             });
         }
 
@@ -188,8 +189,8 @@ namespace osu.Game.Tests.Database
                 {
                     liveBeatmap.PerformRead(beatmap =>
                     {
-                        Assert.IsTrue(beatmap.IsValid);
-                        Assert.IsFalse(beatmap.Hidden);
+                        ClassicAssert.True(beatmap.IsValid);
+                        ClassicAssert.False(beatmap.Hidden);
                     });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
@@ -216,7 +217,7 @@ namespace osu.Game.Tests.Database
                 Task.Factory.StartNew(() =>
                 {
                     liveBeatmap.PerformWrite(beatmap => { beatmap.Hidden = true; });
-                    liveBeatmap.PerformRead(beatmap => { Assert.IsTrue(beatmap.Hidden); });
+                    liveBeatmap.PerformRead(beatmap => { ClassicAssert.True(beatmap.Hidden); });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
@@ -333,17 +334,17 @@ namespace osu.Game.Tests.Database
                     Debug.Assert(liveBeatmap != null);
 
                     // not yet seen by main context
-                    Assert.AreEqual(0, outerRealm.All<BeatmapInfo>().Count());
-                    Assert.AreEqual(0, changesTriggered);
+                    ClassicAssert.AreEqual(0, outerRealm.All<BeatmapInfo>().Count());
+                    ClassicAssert.AreEqual(0, changesTriggered);
 
                     liveBeatmap.PerformRead(resolved =>
                     {
                         // retrieval causes an implicit refresh. even changes that aren't related to the retrieval are fired at this point.
-                        Assert.AreEqual(2, outerRealm.All<BeatmapInfo>().Count());
-                        Assert.AreEqual(1, changesTriggered);
+                        ClassicAssert.AreEqual(2, outerRealm.All<BeatmapInfo>().Count());
+                        ClassicAssert.AreEqual(1, changesTriggered);
 
                         // can access properties without a crash.
-                        Assert.IsFalse(resolved.Hidden);
+                        ClassicAssert.False(resolved.Hidden);
 
                         outerRealm.Write(r =>
                         {

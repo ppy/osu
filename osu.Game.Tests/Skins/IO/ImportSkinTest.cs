@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -15,6 +16,8 @@ using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers.Zip;
 
 namespace osu.Game.Tests.Skins.IO
 {
@@ -241,21 +244,21 @@ namespace osu.Game.Tests.Skins.IO
 
             await skinManager.CurrentSkinInfo.Value.PerformRead(async s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
 
                 await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
 
-                Assert.Greater(exportStream.Length, 0);
+                ClassicAssert.Greater(exportStream.Length, 0);
             });
 
             var imported = await skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
             imported.PerformRead(s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreNotEqual(originalSkinId, s.ID);
-                Assert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreNotEqual(originalSkinId, s.ID);
+                ClassicAssert.AreEqual(typeof(ArgonSkin), s.CreateInstance(skinManager).GetType());
             });
         });
 
@@ -274,21 +277,59 @@ namespace osu.Game.Tests.Skins.IO
 
             await skinManager.CurrentSkinInfo.Value.PerformRead(async s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
 
                 await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
 
-                Assert.Greater(exportStream.Length, 0);
+                ClassicAssert.Greater(exportStream.Length, 0);
             });
 
             var imported = await skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
             imported.PerformRead(s =>
             {
-                Assert.IsFalse(s.Protected);
-                Assert.AreNotEqual(originalSkinId, s.ID);
-                Assert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
+                ClassicAssert.False(s.Protected);
+                ClassicAssert.AreNotEqual(originalSkinId, s.ID);
+                ClassicAssert.AreEqual(typeof(DefaultLegacySkin), s.CreateInstance(skinManager).GetType());
+            });
+        });
+
+        [Test]
+        public Task TestExportRenameThenImportClassicSkin() => runSkinTest(async osu =>
+        {
+            var skinManager = osu.Dependencies.Get<SkinManager>();
+
+            skinManager.CurrentSkinInfo.Value = skinManager.DefaultClassicSkin.SkinInfo;
+
+            skinManager.EnsureMutableSkin();
+            skinManager.Rename(skinManager.CurrentSkinInfo.Value, "breadsticks");
+
+            MemoryStream exportStream = new MemoryStream();
+
+            Guid originalSkinId = skinManager.CurrentSkinInfo.Value.ID;
+
+            await skinManager.CurrentSkinInfo.Value.PerformRead(async s =>
+            {
+                Assert.That(s.Protected, Is.False);
+                Assert.That(s.CreateInstance(skinManager), Is.TypeOf<DefaultLegacySkin>());
+
+                await new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportToStreamAsync(skinManager.CurrentSkinInfo.Value, exportStream);
+
+                Assert.That(exportStream.Length, Is.GreaterThan(0));
+            });
+
+            // ReSharper disable once MethodHasAsyncOverload
+            osu.Dependencies.Get<RealmAccess>().Write(r => r.Remove(r.Find<SkinInfo>(originalSkinId)!));
+
+            var imported = await skinManager.Import(new ImportTask(exportStream, "breadsticks.osk"));
+
+            imported.PerformRead(s =>
+            {
+                Assert.That(s.Protected, Is.False);
+                Assert.That(s.ID, Is.Not.EqualTo(originalSkinId));
+                Assert.That(s.CreateInstance(skinManager), Is.TypeOf<DefaultLegacySkin>());
+                Assert.That(s.Name, Is.EqualTo("breadsticks"));
             });
         });
 
@@ -304,9 +345,9 @@ namespace osu.Game.Tests.Skins.IO
                     var osu = LoadOsuIntoHost(host);
 
                     var zipStream = new MemoryStream();
-                    using var zip = ZipArchive.Create();
-                    zip.AddEntry("folder/test.png", new MemoryStream(new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }));
-                    zip.SaveTo(zipStream);
+                    using var zip = ZipArchive.CreateArchive();
+                    zip.AddEntry("folder/test.png", new MemoryStream(new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }), true);
+                    zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
 
                     var import = await loadSkinIntoOsu(osu, new ImportTask(zipStream, "test skin.osk"));
 
@@ -353,9 +394,9 @@ namespace osu.Game.Tests.Skins.IO
                     var osu = LoadOsuIntoHost(host);
 
                     var zipStream = new MemoryStream();
-                    using var zip = ZipArchive.Create();
-                    zip.AddEntry("test?.png", new MemoryStream(new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }));
-                    zip.SaveTo(zipStream);
+                    using var zip = ZipArchive.CreateArchive();
+                    zip.AddEntry("test?.png", new MemoryStream(new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }), true);
+                    zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
 
                     var import = await loadSkinIntoOsu(osu, new ImportTask(zipStream, "test skin.osk"));
 
@@ -419,26 +460,26 @@ namespace osu.Game.Tests.Skins.IO
         private MemoryStream createEmptyOsk()
         {
             var zipStream = new MemoryStream();
-            using var zip = ZipArchive.Create();
-            zip.SaveTo(zipStream);
+            using var zip = ZipArchive.CreateArchive();
+            zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
             return zipStream;
         }
 
         private MemoryStream createOskWithNonIniFile()
         {
             var zipStream = new MemoryStream();
-            using var zip = ZipArchive.Create();
-            zip.AddEntry("hitcircle.png", new MemoryStream(new byte[] { 0, 1, 2, 3 }));
-            zip.SaveTo(zipStream);
+            using var zip = ZipArchive.CreateArchive();
+            zip.AddEntry("hitcircle.png", new MemoryStream(new byte[] { 0, 1, 2, 3 }), true);
+            zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
             return zipStream;
         }
 
         private MemoryStream createOskWithIni(string name, string author, bool makeUnique = false, string iniFilename = @"skin.ini", bool includeSectionHeader = true)
         {
             var zipStream = new MemoryStream();
-            using var zip = ZipArchive.Create();
-            zip.AddEntry(iniFilename, generateSkinIni(name, author, makeUnique, includeSectionHeader));
-            zip.SaveTo(zipStream);
+            using var zip = ZipArchive.CreateArchive();
+            zip.AddEntry(iniFilename, generateSkinIni(name, author, makeUnique, includeSectionHeader), true);
+            zip.SaveTo(zipStream, new ZipWriterOptions(CompressionType.Deflate));
             return zipStream;
         }
 

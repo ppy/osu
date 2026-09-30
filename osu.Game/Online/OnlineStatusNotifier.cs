@@ -8,6 +8,7 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
@@ -16,6 +17,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Online
 {
@@ -74,22 +76,16 @@ namespace osu.Game.Online
 
             apiState.BindValueChanged(state =>
             {
-                if (state.NewValue == APIState.Online)
+                switch (state.NewValue)
                 {
-                    userNotified = false;
-                    return;
-                }
+                    case APIState.Online:
+                        userNotified = false;
+                        return;
 
-                if (userNotified) return;
-
-                if (state.NewValue == APIState.Offline && getCurrentScreen() is OnlinePlayScreen)
-                {
-                    userNotified = true;
-                    notificationOverlay?.Post(new SimpleErrorNotification
-                    {
-                        Icon = FontAwesome.Solid.ExclamationCircle,
-                        Text = "Connection to API was lost. Can't continue with online play."
-                    });
+                    case APIState.Offline:
+                        if (getCurrentScreen() is OnlinePlayScreen)
+                            notifyApiDisconnection();
+                        break;
                 }
             });
 
@@ -101,22 +97,37 @@ namespace osu.Game.Online
                     return;
                 }
 
-                if (userNotified) return;
-
                 if (multiplayerClient.Room != null)
-                {
-                    userNotified = true;
-                    notificationOverlay?.Post(new SimpleErrorNotification
-                    {
-                        Icon = FontAwesome.Solid.ExclamationCircle,
-                        Text = "Connection to the multiplayer server was lost. Exiting multiplayer."
-                    });
-                }
+                    notifyApiDisconnection();
             }));
 
-            spectatorState.BindValueChanged(_ =>
+            spectatorState.BindValueChanged(connected => Schedule(() =>
             {
-                // TODO: handle spectator server failure somehow?
+                if (connected.NewValue)
+                {
+                    userNotified = false;
+                    return;
+                }
+
+                switch (getCurrentScreen())
+                {
+                    case SpectatorPlayer: // obvious issues
+                    case SubmittingPlayer: // replay sending issues
+                        notifyApiDisconnection();
+                        break;
+                }
+            }));
+        }
+
+        private void notifyApiDisconnection()
+        {
+            if (userNotified) return;
+
+            userNotified = true;
+            notificationOverlay?.Post(new SimpleErrorNotification
+            {
+                Icon = FontAwesome.Solid.ExclamationCircle,
+                Text = NotificationsStrings.APIConnectionInterrupted,
             });
         }
 
@@ -128,7 +139,7 @@ namespace osu.Game.Online
             notificationOverlay?.Post(new SimpleErrorNotification
             {
                 Icon = FontAwesome.Solid.ExclamationCircle,
-                Text = "You have been logged out on this device due to a login to your account on another device."
+                Text = NotificationsStrings.AnotherDeviceDisconnect,
             });
         }
 
@@ -142,7 +153,7 @@ namespace osu.Game.Online
             notificationOverlay?.Post(new SimpleErrorNotification
             {
                 Icon = FontAwesome.Solid.ExclamationCircle,
-                Text = "You have been logged out due to a change to your account. Please log in again."
+                Text = NotificationsStrings.AccountChangeDisconnect,
             });
         }
 

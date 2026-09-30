@@ -21,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public partial class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
+    public partial class OsuModBlinds : ModBlinds, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "Blinds";
         public override LocalisableString Description => "Play with blinds on your screen.";
@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModBlinds;
         public override ModType Type => ModType.DifficultyIncrease;
 
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
         public override bool Ranked => true;
 

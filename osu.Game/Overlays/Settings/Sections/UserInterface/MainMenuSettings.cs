@@ -1,13 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -18,9 +17,9 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
     {
         protected override LocalisableString Header => UserInterfaceStrings.MainMenuHeader;
 
-        private IBindable<APIUser> user;
+        private IBindable<APIUser> user = null!;
 
-        private SettingsEnumDropdown<BackgroundSource> backgroundSourceDropdown;
+        private readonly Bindable<SettingsNote.Data?> backgroundSourceNote = new Bindable<SettingsNote.Data?>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
@@ -29,38 +28,45 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = UserInterfaceStrings.ShowMenuTips,
+                    Caption = UserInterfaceStrings.ShowMenuTips,
                     Current = config.GetBindable<bool>(OsuSetting.MenuTips)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    Keywords = new[] { "intro", "welcome" },
-                    LabelText = UserInterfaceStrings.InterfaceVoices,
+                    Caption = UserInterfaceStrings.InterfaceVoices,
                     Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
-                },
-                new SettingsCheckbox
+                })
                 {
                     Keywords = new[] { "intro", "welcome" },
-                    LabelText = UserInterfaceStrings.OsuMusicTheme,
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = UserInterfaceStrings.OsuMusicTheme,
                     Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
-                },
-                new SettingsEnumDropdown<IntroSequence>
+                })
                 {
-                    LabelText = UserInterfaceStrings.IntroSequence,
+                    Keywords = new[] { "intro", "welcome" },
+                },
+                new SettingsItemV2(new FormEnumDropdown<IntroSequence>
+                {
+                    Caption = UserInterfaceStrings.IntroSequence,
                     Current = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
-                },
-                backgroundSourceDropdown = new SettingsEnumDropdown<BackgroundSource>
+                }),
+                new SettingsItemV2(new FormEnumDropdown<BackgroundSource>
                 {
-                    LabelText = UserInterfaceStrings.BackgroundSource,
+                    Caption = UserInterfaceStrings.BackgroundSource,
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
-                },
-                new SettingsEnumDropdown<SeasonalBackgroundMode>
+                })
                 {
-                    LabelText = UserInterfaceStrings.SeasonalBackgrounds,
+                    Note = { BindTarget = backgroundSourceNote },
+                },
+                new SettingsItemV2(new FormEnumDropdown<SeasonalBackgroundMode>
+                {
+                    Caption = UserInterfaceStrings.SeasonalBackgrounds,
                     Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
-                }
+                })
             };
         }
 
@@ -71,9 +77,9 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             user.BindValueChanged(u =>
             {
                 if (u.NewValue?.IsSupporter != true)
-                    backgroundSourceDropdown.SetNoticeText(UserInterfaceStrings.NotSupporterNote, true);
+                    backgroundSourceNote.Value = new SettingsNote.Data(UserInterfaceStrings.NotSupporterNote, SettingsNote.Type.Informational);
                 else
-                    backgroundSourceDropdown.ClearNoticeText();
+                    backgroundSourceNote.Value = null;
             }, true);
         }
     }

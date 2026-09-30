@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -92,11 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour =
-                                        ColourInfo.GradientVertical(
-                                            colourProvider.Dark2,
-                                            colourProvider.Dark1
-                                        ),
+                                    Colour = colourProvider.Dark3,
                                 },
                                 progressBar = new Box
                                 {
@@ -104,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                                     EdgeSmoothness = new Vector2(1),
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0,
-                                    Colour = colourProvider.Dark3,
+                                    Colour = colourProvider.Colour3,
                                 },
                                 new OsuSpriteText
                                 {

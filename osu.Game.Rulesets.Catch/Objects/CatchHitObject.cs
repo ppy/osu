@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_RANGE);
+            TimePreempt = IBeatmapDifficultyInfo.DifficultyRangeInt(difficulty.ApproachRate, PREEMPT_RANGE);
 
             Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize);
         }
@@ -172,8 +172,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 index++;
                 indexWithOffsets += ComboOffset + 1;
 
-                if (lastObj != null)
-                    lastObj.LastInCombo = true;
+                lastObj?.LastInCombo = true;
             }
 
             ComboIndex = index;

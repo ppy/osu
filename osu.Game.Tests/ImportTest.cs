@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
@@ -42,7 +43,7 @@ namespace osu.Game.Tests
                 while (!result()) Thread.Sleep(200);
             });
 
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
+            ClassicAssert.True(task.Wait(timeout), failureMessage);
         }
 
         public partial class TestOsuGameBase : OsuGameBase

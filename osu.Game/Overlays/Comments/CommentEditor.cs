@@ -234,7 +234,7 @@ namespace osu.Game.Overlays.Comments
 
             public EditorTextBox()
             {
-                Masking = false;
+                Masking = DrawBorder = false;
                 TextContainer.Height = 0.4f;
             }
 

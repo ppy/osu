@@ -31,9 +31,20 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        /// <summary>
+        /// Whether the user is currently pressing the hold note.
+        /// </summary>
         public IBindable<bool> IsHolding => isHolding;
 
         private readonly Bindable<bool> isHolding = new Bindable<bool>();
+
+        /// <summary>
+        /// The time at which the user starting missing the hold note.
+        /// This could be the time at which they missed the head, broke on the body, or missed the tail.
+        /// </summary>
+        public IBindable<double?> MissingStartTime => missingStartTime;
+
+        private readonly Bindable<double?> missingStartTime = new Bindable<double?>();
 
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
@@ -197,17 +208,26 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public override void OnKilled()
         {
             base.OnKilled();
+
             // flush the final state of holding on kill.
             // this matters because some skin implementations like legacy skin
             // insert drawables in the hierarchy that are not a child of this DHO
             // (see `LegacyBodyPiece` and related machinations with `lightContainer` being added at column level)
             isHolding.Value = Result.IsHolding(Time.Current);
+            missingStartTime.Value = null;
             (bodyPiece.Drawable as IHoldNoteBody)?.Recycle();
         }
 
         protected override void Update()
         {
             base.Update();
+
+            if (Head.Judged && !Head.IsHit)
+                missingStartTime.Value ??= Head.Result.TimeAbsolute;
+            if (Body.HasHoldBreak)
+                missingStartTime.Value ??= Body.Result.TimeAbsolute;
+            if (Tail.Judged && !Tail.IsHit)
+                missingStartTime.Value ??= Tail.Result.TimeAbsolute;
 
             isHolding.Value = Result.IsHolding(Time.Current);
 

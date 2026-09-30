@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
@@ -57,13 +58,13 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
-                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
-                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
-                    Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    ClassicAssert.AreEqual(toImport.Rank, imported.Rank);
+                    ClassicAssert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    ClassicAssert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    ClassicAssert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.User.Username);
+                    ClassicAssert.AreEqual(toImport.Date, imported.Date);
+                    ClassicAssert.AreEqual(toImport.OnlineID, imported.OnlineID);
                 }
                 finally
                 {
@@ -110,13 +111,13 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
-                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
-                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
-                    Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    ClassicAssert.AreEqual(toImport.Rank, imported.Rank);
+                    ClassicAssert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    ClassicAssert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    ClassicAssert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.User.Username);
+                    ClassicAssert.AreEqual(toImport.Date, imported.Date);
+                    ClassicAssert.AreEqual(toImport.OnlineID, imported.OnlineID);
 
                     if (isLocalUser)
                         Assert.That(imported.BeatmapInfo!.LastPlayed, Is.EqualTo(replayDate));
@@ -165,13 +166,13 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
-                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
-                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
-                    Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    ClassicAssert.AreEqual(toImport.Rank, imported.Rank);
+                    ClassicAssert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    ClassicAssert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    ClassicAssert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.User.Username);
+                    ClassicAssert.AreEqual(toImport.Date, imported.Date);
+                    ClassicAssert.AreEqual(toImport.OnlineID, imported.OnlineID);
 
                     Assert.That(imported.BeatmapInfo!.LastPlayed, Is.EqualTo(new DateTimeOffset(2023, 10, 30, 0, 0, 0, TimeSpan.Zero)));
                 }
@@ -204,8 +205,8 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.IsTrue(imported.Mods.Any(m => m is OsuModHardRock));
-                    Assert.IsTrue(imported.Mods.Any(m => m is OsuModDoubleTime));
+                    ClassicAssert.True(imported.Mods.Any(m => m is OsuModHardRock));
+                    ClassicAssert.True(imported.Mods.Any(m => m is OsuModDoubleTime));
                     Assert.That(imported.ClientVersion, Is.EqualTo(toImport.ClientVersion));
                 }
                 finally
@@ -269,8 +270,8 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Statistics[HitResult.Perfect], imported.Statistics[HitResult.Perfect]);
-                    Assert.AreEqual(toImport.Statistics[HitResult.Miss], imported.Statistics[HitResult.Miss]);
+                    ClassicAssert.AreEqual(toImport.Statistics[HitResult.Perfect], imported.Statistics[HitResult.Perfect]);
+                    ClassicAssert.AreEqual(toImport.Statistics[HitResult.Miss], imported.Statistics[HitResult.Miss]);
                 }
                 finally
                 {
@@ -364,15 +365,15 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
-                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
-                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
-                    Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
-                    Assert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
-                    Assert.AreEqual(1234, imported.RealmUser.OnlineID);
+                    ClassicAssert.AreEqual(toImport.Rank, imported.Rank);
+                    ClassicAssert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    ClassicAssert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    ClassicAssert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.User.Username);
+                    ClassicAssert.AreEqual(toImport.Date, imported.Date);
+                    ClassicAssert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
+                    ClassicAssert.AreEqual(1234, imported.RealmUser.OnlineID);
                 }
                 finally
                 {
@@ -430,15 +431,15 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
-                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
-                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
-                    Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
-                    Assert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
-                    Assert.AreEqual(1234, imported.RealmUser.OnlineID);
+                    ClassicAssert.AreEqual(toImport.Rank, imported.Rank);
+                    ClassicAssert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    ClassicAssert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    ClassicAssert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.User.Username);
+                    ClassicAssert.AreEqual(toImport.Date, imported.Date);
+                    ClassicAssert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
+                    ClassicAssert.AreEqual(1234, imported.RealmUser.OnlineID);
                 }
                 finally
                 {
@@ -497,14 +498,14 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
-                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
-                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.User.Username, imported.User.Username);
-                    Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
-                    Assert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
+                    ClassicAssert.AreEqual(toImport.Rank, imported.Rank);
+                    ClassicAssert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    ClassicAssert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    ClassicAssert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.User.Username);
+                    ClassicAssert.AreEqual(toImport.Date, imported.Date);
+                    ClassicAssert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    ClassicAssert.AreEqual(toImport.User.Username, imported.RealmUser.Username);
                     Assert.That(imported.RealmUser.OnlineID, Is.LessThanOrEqualTo(1));
                 }
                 finally
@@ -564,15 +565,15 @@ namespace osu.Game.Tests.Scores.IO
 
                     var imported = LoadScoreIntoOsu(osu, toImport);
 
-                    Assert.AreEqual(toImport.Rank, imported.Rank);
-                    Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
-                    Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
-                    Assert.AreEqual("Some other guy", imported.RealmUser.Username);
-                    Assert.AreEqual(5555, imported.RealmUser.OnlineID);
-                    Assert.AreEqual(CountryCode.DE, imported.RealmUser.CountryCode);
+                    ClassicAssert.AreEqual(toImport.Rank, imported.Rank);
+                    ClassicAssert.AreEqual(toImport.TotalScore, imported.TotalScore);
+                    ClassicAssert.AreEqual(toImport.Accuracy, imported.Accuracy);
+                    ClassicAssert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
+                    ClassicAssert.AreEqual(toImport.Date, imported.Date);
+                    ClassicAssert.AreEqual(toImport.OnlineID, imported.OnlineID);
+                    ClassicAssert.AreEqual("Some other guy", imported.RealmUser.Username);
+                    ClassicAssert.AreEqual(5555, imported.RealmUser.OnlineID);
+                    ClassicAssert.AreEqual(CountryCode.DE, imported.RealmUser.CountryCode);
                 }
                 finally
                 {

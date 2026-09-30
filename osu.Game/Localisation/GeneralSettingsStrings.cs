@@ -30,6 +30,16 @@ namespace osu.Game.Localisation
         public static LocalisableString Prefer24HourTimeDisplay => new TranslatableString(getKey(@"prefer_24_hour_time_display"), @"Prefer 24-hour time display");
 
         /// <summary>
+        /// "Installation"
+        /// </summary>
+        public static LocalisableString InstallationHeader => new TranslatableString(getKey(@"installation_header"), @"Installation");
+
+        /// <summary>
+        /// "Quick Actions"
+        /// </summary>
+        public static LocalisableString QuickActionsHeader => new TranslatableString(getKey(@"quick_actions_header"), @"Quick Actions");
+
+        /// <summary>
         /// "Updates"
         /// </summary>
         public static LocalisableString UpdateHeader => new TranslatableString(getKey(@"update_header"), @"Updates");
@@ -65,6 +75,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location...");
 
         /// <summary>
+        /// "Move your current data to a new folder, or point osu! to backed-up data at an existing location."
+        /// </summary>
+        public static LocalisableString ChangeFolderLocationTooltip => new TranslatableString(getKey(@"change_folder_location_tooltip"), @"Move your current data to a new folder, or point osu! to backed-up data at an existing location.");
+
+        /// <summary>
         /// "Run setup wizard"
         /// </summary>
         public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"run_setup_wizard"), @"Run setup wizard");
@@ -80,6 +95,16 @@ namespace osu.Game.Localisation
         public static LocalisableString LearnMoreAboutLazerTooltip => new TranslatableString(getKey(@"check_out_the_feature_comparison"), @"Check out the feature comparison and FAQ");
 
         /// <summary>
+        /// "Report an issue"
+        /// </summary>
+        public static LocalisableString ReportIssue => new TranslatableString(getKey(@"report_issue"), @"Report an issue");
+
+        /// <summary>
+        /// "Report a problem with the game to the developers."
+        /// </summary>
+        public static LocalisableString ReportIssueTooltip => new TranslatableString(getKey(@"report_issue_tooltip"), @"Report a problem with the game to the developers.");
+
+        /// <summary>
         /// "Check with your package manager / provider for other release streams."
         /// </summary>
         public static LocalisableString ChangeReleaseStreamPackageManagerWarning => new TranslatableString(getKey(@"change_release_stream_package_warning"), @"Check with your package manager / provider for other release streams.");
@@ -93,6 +118,11 @@ namespace osu.Game.Localisation
         /// "If you run into issues starting the game, you can usually run the installer from the official site to recover."
         /// </summary>
         public static LocalisableString ChangeReleaseStreamConfirmationInfo => new TranslatableString(getKey(@"change_release_stream_confirmation_info"), @"If you run into issues starting the game, you can usually run the installer from the official site to recover.");
+
+        /// <summary>
+        /// "Note that when using a non-stable release stream, the game may still update to a stable release if it is newer."
+        /// </summary>
+        public static LocalisableString ReleaseStreamNonStableUpgradeInformation => new TranslatableString(getKey(@"release_stream_non_stable_upgrade_information"), @"Note that when using a non-stable release stream, the game may still update to a stable release if it is newer.");
 
         /// <summary>
         /// "You are running the latest release ({0})"

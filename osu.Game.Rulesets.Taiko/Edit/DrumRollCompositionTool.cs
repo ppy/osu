@@ -2,22 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Taiko.Edit.Blueprints;
-using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class DrumRollCompositionTool : CompositionTool
+    public class DrumRollCompositionTool : CompositionTool<TaikoAction>
     {
         public DrumRollCompositionTool()
-            : base(nameof(DrumRoll))
+            : base(TaikoEditorStrings.DrumRollTool)
         {
+            Action = TaikoAction.EditorDrumRollTool;
         }
 
-        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders);
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorDrumRoll };
 
         public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new DrumRollPlacementBlueprint();
     }

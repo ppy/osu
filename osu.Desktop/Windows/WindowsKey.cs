@@ -11,7 +11,7 @@ using SDL;
 
 namespace osu.Desktop.Windows
 {
-    internal class WindowsKey
+    internal static class WindowsKey
     {
         /// <summary>
         /// Whether raw keyboard is enabled by default in SDL3. This is specified in <see href="https://wiki.libsdl.org/SDL3/SDL_HINT_WINDOWS_RAW_KEYBOARD"/>.

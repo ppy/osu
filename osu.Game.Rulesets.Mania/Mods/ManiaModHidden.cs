@@ -30,7 +30,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         private const float coverage_increase_per_combo = 0.5f;
 
         public override LocalisableString Description => @"Keys fade out before you hit them!";
-        public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {

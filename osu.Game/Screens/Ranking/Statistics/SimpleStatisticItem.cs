@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -17,7 +20,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// <summary>
         /// The text to display as the statistic's value.
         /// </summary>
-        protected string Value
+        protected LocalisableString Value
         {
             set => valueText.Text = value;
         }
@@ -41,9 +44,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// Creates a new simple statistic item.
         /// </summary>
         /// <param name="name">The name of the statistic.</param>
-        protected SimpleStatisticItem(string name)
+        protected SimpleStatisticItem(LocalisableString name)
         {
-            Name = name;
+            Name = name.ToString();
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -52,7 +55,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 nameText = new OsuSpriteText
                 {
-                    Text = Name,
+                    Text = name,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE)
@@ -91,9 +94,15 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// Used to convert <see cref="Value"/> to a text representation.
         /// Defaults to using <see cref="object.ToString"/>.
         /// </summary>
-        protected virtual string DisplayValue(TValue value) => value!.ToString() ?? string.Empty;
+        protected virtual LocalisableString DisplayValue(TValue value)
+        {
+            if (value is IFormattable formattable)
+                return formattable.ToLocalisableString();
 
-        public SimpleStatisticItem(string name)
+            return value!.ToString() ?? string.Empty;
+        }
+
+        public SimpleStatisticItem(LocalisableString name)
             : base(name)
         {
         }

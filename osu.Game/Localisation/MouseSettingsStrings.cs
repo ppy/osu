@@ -79,6 +79,12 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NeverConfine => new TranslatableString(getKey(@"never_confine"), @"Never");
 
+        /// <summary>
+        /// "Looking to change your pen tablet&#39;s sensitivity? Search for pen sensitivity instead."
+        /// </summary>
+        public static LocalisableString CursorSensitivityForTabletsElsewhere => new TranslatableString(getKey(@"cursor_sensitivity_for_tablets_elsewhere"),
+            @"Looking to change your pen tablet's sensitivity? Search for pen sensitivity instead.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

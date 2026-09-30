@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay
     public partial class ScreenGameplay : MultiplayerPlayer
     {
         public ScreenGameplay(Room room, PlaylistItem playlistItem, MultiplayerRoomUser[] users)
-            : base(room, playlistItem, users)
+            : base(room, playlistItem, users, showFailingOverlay: false)
         {
         }
 

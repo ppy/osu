@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString CurrentSkin => new TranslatableString(getKey(@"current_skin"), @"Current skin");
 
         /// <summary>
+        /// "Skin name"
+        /// </summary>
+        public static LocalisableString SkinName => new TranslatableString(getKey(@"skin_name"), @"Skin name");
+
+        /// <summary>
         /// "Skin layout editor"
         /// </summary>
         public static LocalisableString SkinLayoutEditor => new TranslatableString(getKey(@"skin_layout_editor"), @"Skin layout editor");

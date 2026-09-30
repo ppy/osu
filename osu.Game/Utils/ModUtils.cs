@@ -63,7 +63,7 @@ namespace osu.Game.Utils
                 {
                     var m = mods[j];
 
-                    if (candidate.Equals(m))
+                    if (candidate.GetType() == m.GetType())
                     {
                         invalidMods ??= new List<Mod>();
                         invalidMods.Add(m);
@@ -273,9 +273,9 @@ namespace osu.Game.Utils
         {
             // Round multiplier values away from 1.00x to two significant digits.
             if (scoreMultiplier > 1)
-                scoreMultiplier = Math.Ceiling(Math.Round(scoreMultiplier * 100, 12)) / 100;
+                scoreMultiplier = Math.Ceiling(Math.Round(scoreMultiplier * 100, 4)) / 100;
             else
-                scoreMultiplier = Math.Floor(Math.Round(scoreMultiplier * 100, 12)) / 100;
+                scoreMultiplier = Math.Floor(Math.Round(scoreMultiplier * 100, 4)) / 100;
 
             return scoreMultiplier.ToLocalisableString("0.00x");
         }

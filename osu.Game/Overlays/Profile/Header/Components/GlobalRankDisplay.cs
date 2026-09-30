@@ -13,6 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -123,7 +124,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 var rankHighestText = UsersStrings.ShowRankHighest(
                     rankHighest.Rank.ToLocalisableString("\\##,##0"),
-                    rankHighest.UpdatedAt.ToLocalisableString(@"d MMM yyyy"));
+                    rankHighest.UpdatedAt.ToLocalisedMediumDate());
 
                 if (result == null)
                     result = rankHighestText;

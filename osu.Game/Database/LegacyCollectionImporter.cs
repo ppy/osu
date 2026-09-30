@@ -10,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Collections;
 using osu.Game.IO.Legacy;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
@@ -63,7 +64,7 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
-                Text = "Collections import is initialising..."
+                Text = NotificationsStrings.CollectionsImportInitialising,
             };
 
             PostNotification?.Invoke(notification);
@@ -71,7 +72,7 @@ namespace osu.Game.Database
             var importedCollections = readCollections(stream, notification);
             await importCollections(importedCollections).ConfigureAwait(false);
 
-            notification.CompletionText = $"Imported {importedCollections.Count} collections";
+            notification.CompletionText = NotificationsStrings.CollectionsImportProgress(importedCollections.Count);
             notification.State = ProgressNotificationState.Completed;
         }
 
@@ -115,7 +116,7 @@ namespace osu.Game.Database
         {
             if (notification != null)
             {
-                notification.Text = "Reading collections...";
+                notification.Text = NotificationsStrings.ReadingCollections;
                 notification.Progress = 0;
             }
 
@@ -150,7 +151,7 @@ namespace osu.Game.Database
 
                         if (notification != null)
                         {
-                            notification.Text = $"Imported {i + 1} of {collectionCount} collections";
+                            notification.Text = NotificationsStrings.CollectionsImportProgressTotal(i + 1, collectionCount);
                             notification.Progress = (float)(i + 1) / collectionCount;
                         }
 

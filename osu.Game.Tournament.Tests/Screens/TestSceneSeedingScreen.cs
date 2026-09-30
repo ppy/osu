@@ -23,6 +23,8 @@ namespace osu.Game.Tournament.Tests.Screens
                 {
                     FullName = { Value = @"Japan" },
                     Acronym = { Value = "JPN" },
+                    Seed = { Value = "#28" },
+                    LastYearPlacing = { Value = "#17-24" },
                     SeedingResults =
                     {
                         new SeedingResult
@@ -36,20 +38,38 @@ namespace osu.Game.Tournament.Tests.Screens
                             Seed = { Value = 8 }
                         }
                     }
+                },
+                new TournamentTeam
+                {
+                    Acronym = { Value = "USA" },
+                    FlagName = { Value = "US" },
+                    FullName = { Value = "United States" },
                 }
             }
         };
 
-        [Test]
-        public void TestBasic()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            AddStep("create seeding screen", () => Add(new SeedingScreen
+            Add(new SeedingScreen
             {
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 16 / 9f
-            }));
+            });
+        }
 
-            AddStep("set team to Japan", () => this.ChildrenOfType<SettingsTeamDropdown>().Single().Current.Value = ladder.Teams.Single());
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("set team to Japan", () =>
+                this.ChildrenOfType<SettingsTeamDropdown>().Single().Current.Value = ladder.Teams.Single(t => t.FullName.Value == "Japan"));
+        }
+
+        [Test]
+        public void TestNoSeed()
+        {
+            AddStep("set team to USA", () =>
+                this.ChildrenOfType<SettingsTeamDropdown>().Single().Current.Value = ladder.Teams.Single(t => t.FullName.Value == "United States"));
         }
     }
 }

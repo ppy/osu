@@ -39,6 +39,11 @@ namespace osu.Game.IO
         {
             "framework.ini",
             "storage.ini",
+
+            // These may not be safe to move around.
+            "AuthNative.dll",
+            "AuthNative.so",
+            "AuthNative.dylib"
         };
 
         public override string[] IgnoreSuffixes => new[]

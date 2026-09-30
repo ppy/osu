@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -174,7 +175,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, HitResult.IgnoreMiss)]
         public void TestMinResults(HitResult hitResult, HitResult expectedMinResult)
         {
-            Assert.AreEqual(expectedMinResult, new TestJudgement(hitResult).MinResult);
+            ClassicAssert.AreEqual(expectedMinResult, new TestJudgement(hitResult).MinResult);
         }
 
         [TestCase(HitResult.None, false)]
@@ -195,7 +196,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsCombo(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.AffectsCombo());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.AffectsCombo());
         }
 
         [TestCase(HitResult.None, false)]
@@ -216,7 +217,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, false)]
         public void TestAffectsAccuracy(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.AffectsAccuracy());
         }
 
         [TestCase(HitResult.None, false)]
@@ -237,7 +238,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsBonus(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.IsBonus());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.IsBonus());
         }
 
         [TestCase(HitResult.None, false)]
@@ -258,7 +259,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsHit(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.IsHit());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.IsHit());
         }
 
         [TestCase(HitResult.None, false)]
@@ -279,7 +280,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(HitResult.LargeBonus, true)]
         public void TestIsScorable(HitResult hitResult, bool expectedReturnValue)
         {
-            Assert.AreEqual(expectedReturnValue, hitResult.IsScorable());
+            ClassicAssert.AreEqual(expectedReturnValue, hitResult.IsScorable());
         }
 
 #pragma warning disable CS0618
@@ -480,6 +481,29 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.That(scoreProcessor.HighestCombo.Value, Is.Zero);
         }
 
+        [Test]
+        public void TestScoreMultiplier()
+        {
+            Mod[] mods = new Mod[] { new OsuModHardRock() };
+
+            scoreProcessor = new TestScoreProcessor();
+            scoreProcessor.Mods.Value = mods;
+
+            var workingBeatmap = new TestWorkingBeatmap(beatmap);
+            var playableBeatmap = workingBeatmap.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, mods);
+
+            scoreProcessor.ApplyBeatmap(playableBeatmap);
+
+            var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), new OsuJudgement())
+            {
+                Type = HitResult.Great,
+            };
+            scoreProcessor.ApplyResult(judgementResult);
+
+            Assert.That(scoreProcessor.MaximumTotalScore, Is.EqualTo(1_000_000 * 1.1).Within(0.5d));
+            Assert.That(scoreProcessor.GetDisplayScore(ScoringMode.Standardised), Is.EqualTo(1_000_000 * 1.1).Within(0.5d));
+        }
+
         private class TestJudgement : Judgement
         {
             public override HitResult MaxResult { get; }
@@ -526,7 +550,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             // ReSharper disable once MemberHidesStaticFromOuterClass
             private class TestRuleset : Ruleset
             {
-                protected override IEnumerable<HitResult> GetValidHitResults() => new[] { HitResult.Great };
+                public override IEnumerable<HitResult> GetValidHitResults() => new[] { HitResult.Great };
 
                 public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
@@ -536,8 +560,19 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
                 public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
+                public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new TestScoreMultiplierCalculator(context);
+
                 public override string Description => string.Empty;
                 public override string ShortName => string.Empty;
+            }
+
+            private class TestScoreMultiplierCalculator : ScoreMultiplierCalculator
+            {
+                public TestScoreMultiplierCalculator(ScoreMultiplierContext context)
+                    : base(context)
+                {
+                    Single<OsuModHardRock>(hasMultiplier: context.BeatmapDifficultyWithoutMods.CircleSize == 4 ? 1.1 : 1.0);
+                }
             }
         }
     }

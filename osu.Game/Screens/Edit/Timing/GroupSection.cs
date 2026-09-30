@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class GroupSection : CompositeDrawable
     {
-        private LabelledTextBox textBox = null!;
+        private FormTextBox textBox = null!;
 
         private OsuButton button = null!;
 
@@ -53,9 +53,9 @@ namespace osu.Game.Screens.Edit.Timing
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        textBox = new LabelledTextBox
+                        textBox = new FormTextBox
                         {
-                            Label = "Time",
+                            Caption = "Time",
                             SelectAllOnFocus = true,
                         },
                         button = new RoundedButton
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 if (group.NewValue == null)
                 {
-                    textBox.Text = string.Empty;
+                    textBox.Current.Value = string.Empty;
 
                     // cannot use textBox.Current.Disabled due to https://github.com/ppy/osu-framework/issues/3919
                     textBox.ReadOnly = true;
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Edit.Timing
                 textBox.ReadOnly = false;
                 button.Enabled.Value = true;
 
-                textBox.Text = $"{group.NewValue.Time:n0}";
+                textBox.Current.Value = $"{group.NewValue.Time:n0}";
             }, true);
         }
 

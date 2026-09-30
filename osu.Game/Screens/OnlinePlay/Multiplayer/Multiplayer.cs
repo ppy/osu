@@ -90,6 +90,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.ChangeState(MultiplayerUserState.Idle).FireAndForget();
         }
 
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            if (base.OnExiting(e))
+                return true;
+
+            client.LeaveRoom().FireAndForget();
+            return false;
+        }
+
         protected override string ScreenTitle => "Multiplayer";
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();

@@ -26,6 +26,6 @@ namespace osu.Game.Online.Notifications.WebSocket
         /// <summary>
         /// Sends a <see cref="SocketMessage"/> to the notification server.
         /// </summary>
-        Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = default);
+        Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = null);
     }
 }

@@ -124,8 +124,6 @@ namespace osu.Game.Tests.Visual
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
 
-            public new ScreenStack ScreenStack => base.ScreenStack;
-
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 
             public new GlobalCursorDisplay GlobalCursorDisplay => base.GlobalCursorDisplay;

@@ -113,10 +113,12 @@ namespace osu.Game.Users
                             message.Anchor = Anchor.CentreLeft;
                             message.Origin = Anchor.CentreLeft;
                             message.Margin = new MarginPadding { Left = margin };
-                        })
+                        }),
                     }
                 }
             };
+
+            // TODO: add rank somewhere (needs design consideration).
 
             if (User.IsSupporter)
             {

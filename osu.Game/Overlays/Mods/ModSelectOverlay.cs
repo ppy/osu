@@ -26,6 +26,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Utils;
@@ -121,6 +122,7 @@ namespace osu.Game.Overlays.Mods
         private Sample? columnAppearSample;
 
         public readonly Bindable<WorkingBeatmap?> Beatmap = new Bindable<WorkingBeatmap?>();
+        public readonly Bindable<RulesetInfo?> Ruleset = new Bindable<RulesetInfo?>();
 
         [Resolved]
         private ScreenFooter? footer { get; set; }
@@ -283,6 +285,7 @@ namespace osu.Game.Overlays.Mods
         {
             Beatmap = { BindTarget = Beatmap },
             ActiveMods = { BindTarget = ActiveMods },
+            Ruleset = { BindTarget = Ruleset },
         };
 
         private static readonly LocalisableString input_search_placeholder = Resources.Localisation.Web.CommonStrings.InputSearch;

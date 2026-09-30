@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
             resetPlaceholderText();
 
             TextBox.HoldFocus = false;
-            TextBox.ReleaseFocusOnCommit = true;
+            TextBox.ReleaseFocusOnCommit = false;
             TextBox.Focus = () => TextBox.PlaceholderText = ChatStrings.InputPlaceholder;
             TextBox.FocusLost = resetPlaceholderText;
 

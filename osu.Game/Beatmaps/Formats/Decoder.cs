@@ -19,11 +19,11 @@ namespace osu.Game.Beatmaps.Formats
         {
             var output = CreateTemplateObject();
             foreach (LineBufferedReader stream in otherStreams.Prepend(primaryStream))
-                ParseStreamInto(stream, output);
+                ParseStreamInto(stream, stream == primaryStream, output);
             return output;
         }
 
-        protected abstract void ParseStreamInto(LineBufferedReader stream, TOutput output);
+        protected abstract void ParseStreamInto(LineBufferedReader stream, bool isPrimaryStream, TOutput output);
     }
 
     public abstract class Decoder

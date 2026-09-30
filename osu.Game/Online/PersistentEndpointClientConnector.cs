@@ -173,7 +173,7 @@ namespace osu.Game.Online
 
             // make sure a disconnect wasn't triggered (and this is still the active connection).
             if (!hasBeenCancelled)
-                await Task.Run(connect, default).ConfigureAwait(false);
+                await Task.Run(connect, CancellationToken.None).ConfigureAwait(false);
         }
 
         protected Task Disconnect() => disconnect(true);

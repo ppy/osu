@@ -115,5 +115,36 @@ namespace osu.Game.Online.Leaderboards
                     return Color4Extensions.FromHex(@"CC3333");
             }
         }
+
+        public static string GetLegacyRankTextureName(ScoreRank rank)
+        {
+            switch (rank)
+            {
+                case ScoreRank.XH:
+                    return "ranking-XH";
+
+                case ScoreRank.SH:
+                    return "ranking-SH";
+
+                case ScoreRank.X:
+                    return "ranking-X";
+
+                case ScoreRank.S:
+                    return "ranking-S";
+
+                case ScoreRank.A:
+                    return "ranking-A";
+
+                case ScoreRank.B:
+                    return "ranking-B";
+
+                case ScoreRank.C:
+                    return "ranking-C";
+
+                default:
+                case ScoreRank.D:
+                    return "ranking-D";
+            }
+        }
     }
 }

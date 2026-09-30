@@ -75,19 +75,15 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Container ButtonContent;
 
         /// <summary>
-        /// Creates a new <see cref="ShearedToggleButton"/>
+        /// Creates a new <see cref="ShearedButton"/>
         /// </summary>
-        /// <param name="width">
-        /// The width of the button.
-        /// <list type="bullet">
-        /// <item>If a non-<see langword="null"/> value is provided, this button will have a fixed width equal to the provided value.</item>
-        /// <item>If a <see langword="null"/> value is provided (or the argument is omitted entirely), the button will autosize in width to fit the text.</item>
-        /// </list>
-        /// </param>
-        /// <param name="height">The height of the button.</param>
-        public ShearedButton(float? width = null, float height = DEFAULT_HEIGHT)
+        /// <remarks>
+        /// By default, the button will have a height of <see cref="DEFAULT_HEIGHT"/>.
+        /// Width should be set for each usage.
+        /// </remarks>
+        public ShearedButton()
         {
-            Height = height;
+            Height = DEFAULT_HEIGHT;
 
             Shear = OsuGame.SHEAR;
 
@@ -99,27 +95,25 @@ namespace osu.Game.Graphics.UserInterface
             {
                 backgroundLayer = new Container
                 {
-                    RelativeSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     CornerRadius = CORNER_RADIUS,
                     Masking = true,
                     BorderThickness = BORDER_THICKNESS,
-                    Children = new Drawable[]
+                    Child = background = new Box
                     {
-                        background = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        ButtonContent = new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Shear = -OsuGame.SHEAR,
-                            Child = text = new OsuSpriteText
-                            {
-                                Font = OsuFont.TorusAlternate.With(size: 17),
-                            }
-                        },
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                },
+                ButtonContent = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Shear = -OsuGame.SHEAR,
+                    Child = text = new OsuSpriteText
+                    {
+                        Font = OsuFont.TorusAlternate.With(size: 17),
+                        Margin = new MarginPadding { Horizontal = 15 },
                     }
                 },
                 flashLayer = new Box
@@ -130,18 +124,6 @@ namespace osu.Game.Graphics.UserInterface
                     Alpha = 0,
                 },
             };
-
-            if (width != null)
-            {
-                Width = width.Value;
-                backgroundLayer.RelativeSizeAxes = Axes.Both;
-            }
-            else
-            {
-                AutoSizeAxes = Axes.X;
-                backgroundLayer.AutoSizeAxes = Axes.X;
-                text.Margin = new MarginPadding { Horizontal = 15 };
-            }
         }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet) { Enabled = { BindTarget = Enabled } };

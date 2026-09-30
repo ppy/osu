@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Dialog;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public ClosePlaylistDialog(Room room, Action closeAction)
         {
-            HeaderText = "Are you sure you want to close the following playlist:";
+            HeaderText = DialogStrings.ClosePlaylistHeaderText;
             BodyText = room.Name;
             DangerousAction = closeAction;
         }

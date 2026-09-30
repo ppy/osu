@@ -21,8 +21,10 @@ using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
@@ -136,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    new Header(ButtonSystemStrings.DailyChallenge.ToSentence(), null),
+                    createHeader(),
                     new PopoverContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -252,7 +254,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                                                             {
                                                                 new Drawable[]
                                                                 {
-                                                                    new SectionHeader("Chat")
+                                                                    new SectionHeader(OnlinePlayStrings.Chat)
                                                                 },
                                                                 [new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }]
                                                             },
@@ -315,6 +317,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 Beatmap = { BindTarget = Beatmap },
                 SelectedMods = { BindTarget = userMods },
+                Ruleset = { BindTarget = Ruleset },
                 IsValidMod = _ => false
             });
 
@@ -322,7 +325,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 footerButtons.Insert(-1, new UserModSelectButton
                 {
-                    Text = "Free mods",
+                    Text = OnlinePlayStrings.FooterButtonFreemods,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
@@ -374,6 +377,68 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                         Scheduler.AddOnce(() => leaderboard.RefetchScores());
                 });
             });
+        }
+
+        private Container createHeader()
+        {
+            var titleFlow = new FillFlowContainer
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(6, 0),
+                Children = new Drawable[]
+                {
+                    new OsuHoverContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Action = () => game?.ShowWiki(@"Gameplay/Daily_challenge"),
+                        Child = new OsuSpriteText
+                        {
+                            Font = OsuFont.TorusAlternate.With(size: 24),
+                            Text = ButtonSystemStrings.DailyChallenge.ToSentence(),
+                        }
+                    }
+                }
+            };
+
+            if (!string.IsNullOrEmpty(room.Description))
+            {
+                var subtitleFont = OsuFont.TorusAlternate.With(size: 16);
+
+                titleFlow.AddRange(new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = subtitleFont,
+                        Text = "·",
+                        Colour = colourProvider.Content2,
+                        Margin = new MarginPadding { Bottom = 3 },
+                    },
+                    new TruncatingSpriteText
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Font = subtitleFont,
+                        Text = room.Description,
+                        Colour = colourProvider.Content2,
+                        Margin = new MarginPadding { Bottom = 3 },
+                    }
+                });
+            }
+
+            return new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = Header.HEIGHT,
+                Padding = new MarginPadding { Left = WaveOverlayContainer.WIDTH_PADDING },
+                Child = titleFlow,
+            };
         }
 
         protected override void LoadComplete()
@@ -489,7 +554,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (!screen.IsCurrentScreen())
                 return;
 
-            var beatmap = beatmaps.QueryBeatmap($@"{nameof(BeatmapInfo.OnlineID)} == $0 AND {nameof(BeatmapInfo.MD5Hash)} == {nameof(BeatmapInfo.OnlineMD5Hash)}", item.Beatmap.OnlineID);
+            var beatmap = beatmaps.QueryOnlineBeatmapId(item.Beatmap.OnlineID);
 
             screen.Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap); // this will gracefully fall back to dummy beatmap if missing locally.
             screen.Ruleset.Value = rulesets.GetRuleset(item.RulesetID);
@@ -515,8 +580,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             var track = Beatmap.Value?.Track;
 
-            if (track != null)
-                track.Looping = false;
+            track?.Looping = false;
         }
 
         private void updateMods()

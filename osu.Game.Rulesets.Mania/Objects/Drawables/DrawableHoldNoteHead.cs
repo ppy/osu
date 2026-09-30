@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -14,6 +15,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public partial class DrawableHoldNoteHead : DrawableNote
     {
+        /// <summary>
+        /// The time at which the user starting missing the hold note.
+        /// This could be the time at which they missed the head, broke on the body, or missed the tail.
+        /// </summary>
+        public readonly IBindable<double?> MissingStartTime = new Bindable<double?>();
+
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteHead;
 
         public DrawableHoldNoteHead()
@@ -26,6 +33,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            if (ParentHitObject is DrawableHoldNote parentHold)
+                MissingStartTime.BindTo(parentHold.MissingStartTime);
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            if (ParentHitObject is DrawableHoldNote parentHold)
+                MissingStartTime.UnbindFrom(parentHold.MissingStartTime);
         }
 
         public bool UpdateResult() => base.UpdateResult(true);

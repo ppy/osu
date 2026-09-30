@@ -28,12 +28,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private readonly Bindable<PreciseRotationInfo> rotationInfo = new Bindable<PreciseRotationInfo>(new PreciseRotationInfo(0, EditorOrigin.GridCentre));
 
-        private SliderWithTextBoxInput<float> angleInput = null!;
+        private FormSliderBar<float> angleInput { get; set; } = null!;
         private EditorRadioButtonCollection rotationOrigin = null!;
 
-        private RadioButton gridCentreButton = null!;
-        private RadioButton playfieldCentreButton = null!;
-        private RadioButton selectionCentreButton = null!;
+        private EditorRadioButton gridCentreButton = null!;
+        private EditorRadioButton playfieldCentreButton = null!;
+        private EditorRadioButton selectionCentreButton = null!;
 
         private Bindable<EditorOrigin> configRotationOrigin = null!;
 
@@ -54,11 +54,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
                 Width = 220,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(20),
+                Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    angleInput = new SliderWithTextBoxInput<float>("Angle (degrees):")
+                    angleInput = new FormSliderBar<float>
                     {
+                        Caption = "Angle (degrees)",
                         Current = new BindableNumber<float>
                         {
                             MinValue = -360,
@@ -66,26 +67,25 @@ namespace osu.Game.Rulesets.Osu.Edit
                             Precision = 1
                         },
                         KeyboardStep = 1f,
-                        Instantaneous = true
+                        TabbableContentContainer = this
                     },
                     rotationOrigin = new EditorRadioButtonCollection
                     {
                         RelativeSizeAxes = Axes.X,
-                        Items = new[]
-                        {
-                            gridCentreButton = new RadioButton("Grid centre",
-                                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.GridCentre },
-                                () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }),
-                            playfieldCentreButton = new RadioButton("Playfield centre",
-                                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.PlayfieldCentre },
-                                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }),
-                            selectionCentreButton = new RadioButton("Selection centre",
-                                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.SelectionCentre },
-                                () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare })
-                        }
                     }
                 }
             };
+
+            rotationOrigin.AddButton(gridCentreButton = new EditorRadioButton("Grid centre",
+                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.GridCentre },
+                () => new SpriteIcon { Icon = FontAwesome.Regular.PlusSquare }));
+            rotationOrigin.AddButton(playfieldCentreButton = new EditorRadioButton("Playfield centre",
+                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.PlayfieldCentre },
+                () => new SpriteIcon { Icon = FontAwesome.Regular.Square }));
+            rotationOrigin.AddButton(selectionCentreButton = new EditorRadioButton("Selection centre",
+                () => rotationInfo.Value = rotationInfo.Value with { Origin = EditorOrigin.SelectionCentre },
+                () => new SpriteIcon { Icon = FontAwesome.Solid.VectorSquare }));
+
             selectionCentreButton.Selected.DisabledChanged += isDisabled =>
             {
                 selectionCentreButton.TooltipText = isDisabled ? "Select more than one object to perform selection-based rotation." : string.Empty;

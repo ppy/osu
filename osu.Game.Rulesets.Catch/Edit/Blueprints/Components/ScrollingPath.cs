@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         private readonly Path drawablePath;
 
         private readonly List<(double Time, float X)> vertices = new List<(double, float)>();
+        private readonly List<Vector2> sliderVertices = new List<Vector2>();
 
         public ScrollingPath()
         {
@@ -47,9 +48,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         private void computeTimeXs(JuiceStream hitObject)
         {
             vertices.Clear();
-
-            var sliderVertices = new List<Vector2>();
-            hitObject.Path.GetPathToProgress(sliderVertices, 0, 1);
+            sliderVertices.Clear();
+            sliderVertices.AddRange(hitObject.Path.CalculatedPath);
 
             if (sliderVertices.Count == 0)
                 return;

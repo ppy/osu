@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
@@ -342,9 +341,9 @@ namespace osu.Game.Screens.Menu
 
                             Add(icon);
                         }
-                        catch
+                        catch (Exception e)
                         {
-                            Logger.Log($"Could not create ruleset icon for {ruleset.Name}. Please check for an update from the developer.", level: LogLevel.Error);
+                            RulesetStore.LogRulesetFailure(ruleset, e);
                         }
                     }
                 }

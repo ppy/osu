@@ -65,8 +65,6 @@ namespace osu.Game.Beatmaps
 
         public SortedList<BreakPeriod> Breaks { get; set; } = new SortedList<BreakPeriod>(Comparer<BreakPeriod>.Default);
 
-        public List<string> UnhandledEventLines { get; set; } = new List<string>();
-
         [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
 
@@ -105,6 +103,7 @@ namespace osu.Game.Beatmaps
                                     return (beatLength: t.BeatLength, duration: nextTime - currentTime);
                                 })
                                 // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
+                                // Rounding is applied here (to 1e-3 milliseconds) to neutralise potential effects of floating point inaccuracies
                                 .GroupBy(t => Math.Round(t.beatLength * 1000) / 1000)
                                 .Select(g => (beatLength: g.Key, duration: g.Sum(t => t.duration)))
                                 // Get the most common one, or 0 as a suitable default (see handling below)
@@ -113,7 +112,12 @@ namespace osu.Game.Beatmaps
             if (mostCommon.beatLength == 0)
                 return TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
-            return mostCommon.beatLength;
+            // Because of the rounding applied to the beat length above, it is possible for the "most common" beat length as determined by the linq query above
+            // to actually be less or more than the raw range of unrounded beat lengths present in the map
+            // To ensure this does not become a problem anywhere else further, clamp the result to the known raw range
+            double minBeatLength = ControlPointInfo.TimingPoints.Min(t => t.BeatLength);
+            double maxBeatLength = ControlPointInfo.TimingPoints.Max(t => t.BeatLength);
+            return Math.Clamp(mostCommon.beatLength, minBeatLength, maxBeatLength);
         }
 
         public double AudioLeadIn { get; set; }
@@ -141,6 +145,8 @@ namespace osu.Game.Beatmaps
         public int CountdownOffset { get; set; }
 
         public int[] Bookmarks { get; set; } = Array.Empty<int>();
+
+        public double[] SliderVelocityPresets { get; set; } = [0.75, 1, 1.5];
 
         public int BeatmapVersion { get; set; } = LegacyBeatmapEncoder.FIRST_LAZER_VERSION;
 

@@ -15,7 +15,7 @@ using osu.Game.Users;
 namespace osu.Game.Online.API.Requests.Responses
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class APIUser : IEquatable<APIUser>, IUser
+    public class APIUser : IEquatable<APIUser>, IUser, IHasCover
     {
         /// <summary>
         /// A user ID which can be used to represent any system user which is not attached to a user profile.
@@ -75,14 +75,17 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"cover")]
+        [CanBeNull]
         public UserCover Cover;
 
         public class UserCover
         {
             [JsonProperty(@"custom_url")]
+            [CanBeNull]
             public string CustomUrl;
 
             [JsonProperty(@"url")]
+            [CanBeNull]
             public string Url;
 
             [JsonProperty(@"id")]
@@ -247,6 +250,20 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
+        // Only provided via /users/ batch lookups. Usually implicitly comes inside `UserStatistics`.
+        [JsonProperty(@"global_rank")]
+        [CanBeNull]
+        public GlobalRank Rank { get; set; }
+
+        public class GlobalRank
+        {
+            [JsonProperty(@"rank")]
+            public int? Rank;
+
+            [JsonProperty(@"ruleset_id")]
+            public int RulesetId;
+        }
+
         [JsonProperty(@"rank_history")]
         private APIRankHistory rankHistory
         {
@@ -283,6 +300,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("daily_challenge_user_stats")]
         public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
 
+        [JsonProperty("matchmaking_stats")]
+        public APIUserMatchmakingStatistics[] MatchmakingStatistics = [];
+
         public override string ToString() => Username;
 
         /// <summary>
@@ -293,6 +313,12 @@ namespace osu.Game.Online.API.Requests.Responses
             Id = SYSTEM_USER_ID,
             Username = "system",
             Colour = @"9c0101",
+        };
+
+        public static APIUser UnknownUser(int userId) => new APIUser
+        {
+            Id = userId,
+            Username = "Unknown user",
         };
 
         public int OnlineID => Id;

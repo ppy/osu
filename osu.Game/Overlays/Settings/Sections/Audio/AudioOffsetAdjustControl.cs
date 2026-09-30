@@ -11,13 +11,8 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Screens.Play.PlayerSettings;
@@ -25,157 +20,164 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public partial class AudioOffsetAdjustControl : SettingsItem<double>
+    public partial class AudioOffsetAdjustControl : CompositeDrawable
     {
-        public IBindable<double?> SuggestedOffset => ((AudioOffsetPreview)Control).SuggestedOffset;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        public Bindable<double> Current
         {
-            LabelText = AudioSettingsStrings.AudioOffset;
+            get => current.Current;
+            set => current.Current = value;
         }
 
-        protected override Drawable CreateControl() => new AudioOffsetPreview();
+        private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>();
 
-        private partial class AudioOffsetPreview : CompositeDrawable, IHasCurrentValue<double>
+        private readonly IBindableList<SessionAverageHitErrorTracker.DataPoint> averageHitErrorHistory = new BindableList<SessionAverageHitErrorTracker.DataPoint>();
+
+        public readonly Bindable<double?> SuggestedOffset = new Bindable<double?>();
+
+        private Container<Circle> notchContainer = null!;
+        private SettingsNote hintNote = null!;
+        private RoundedButton applySuggestion = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(SessionAverageHitErrorTracker hitErrorTracker)
         {
-            public Bindable<double> Current
+            averageHitErrorHistory.BindTo(hitErrorTracker.AverageHitErrorHistory);
+
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            InternalChild = new FillFlowContainer
             {
-                get => current.Current;
-                set => current.Current = value;
-            }
-
-            private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>();
-
-            private readonly IBindableList<SessionAverageHitErrorTracker.DataPoint> averageHitErrorHistory = new BindableList<SessionAverageHitErrorTracker.DataPoint>();
-
-            public readonly Bindable<double?> SuggestedOffset = new Bindable<double?>();
-
-            private Container<Box> notchContainer = null!;
-            private TextFlowContainer hintText = null!;
-            private RoundedButton applySuggestion = null!;
-
-            [BackgroundDependencyLoader]
-            private void load(SessionAverageHitErrorTracker hitErrorTracker)
-            {
-                averageHitErrorHistory.BindTo(hitErrorTracker.AverageHitErrorHistory);
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                InternalChild = new FillFlowContainer
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(10),
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    new SettingsItemV2(new FormSliderBar<double>
                     {
-                        new OffsetSliderBar
+                        Caption = AudioSettingsStrings.AudioOffset,
+                        RelativeSizeAxes = Axes.X,
+                        Current = { BindTarget = Current },
+                        KeyboardStep = 1,
+                        LabelFormat = v => $"{v:N0} ms",
+                        TooltipFormat = BeatmapOffsetControl.GetOffsetExplanatoryText,
+                    }),
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = SettingsPanel.CONTENT_PADDING,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Current = { BindTarget = Current },
-                            KeyboardStep = 1,
-                        },
-                        notchContainer = new Container<Box>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 10,
-                            Padding = new MarginPadding { Horizontal = Nub.DEFAULT_EXPANDED_SIZE / 2 },
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        hintText = new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 16))
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
-                        applySuggestion = new RoundedButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = AudioSettingsStrings.ApplySuggestedOffset,
-                            Action = () =>
+                            notchContainer = new Container<Circle>
                             {
-                                if (SuggestedOffset.Value.HasValue)
-                                    current.Value = SuggestedOffset.Value.Value;
-                                hitErrorTracker.ClearHistory();
-                            }
+                                RelativeSizeAxes = Axes.X,
+                                Width = 0.5f,
+                                Height = 10,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Padding = new MarginPadding
+                                {
+                                    Horizontal = FormSliderBar<double>.InnerSlider.NUB_WIDTH / 2
+                                },
+                            },
+                            hintNote = new SettingsNote { RelativeSizeAxes = Axes.X },
+                        }
+                    },
+                    applySuggestion = new RoundedButton
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = AudioSettingsStrings.ApplySuggestedOffset,
+                        Padding = SettingsPanel.CONTENT_PADDING,
+                        Action = () =>
+                        {
+                            if (SuggestedOffset.Value.HasValue)
+                                current.Value = SuggestedOffset.Value.Value;
+                            hitErrorTracker.ClearHistory();
                         }
                     }
-                };
-            }
+                }
+            };
+        }
 
-            protected override void LoadComplete()
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            averageHitErrorHistory.BindCollectionChanged(updateDisplay, true);
+            current.BindValueChanged(_ => updateHintText());
+            SuggestedOffset.BindValueChanged(_ => updateHintText(), true);
+        }
+
+        private void updateDisplay(object? _, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
             {
-                base.LoadComplete();
-
-                averageHitErrorHistory.BindCollectionChanged(updateDisplay, true);
-                current.BindValueChanged(_ => updateHintText());
-                SuggestedOffset.BindValueChanged(_ => updateHintText(), true);
-            }
-
-            private void updateDisplay(object? _, NotifyCollectionChangedEventArgs e)
-            {
-                switch (e.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (SessionAverageHitErrorTracker.DataPoint dataPoint in e.NewItems!)
+                case NotifyCollectionChangedAction.Add:
+                    foreach (SessionAverageHitErrorTracker.DataPoint dataPoint in e.NewItems!)
+                    {
+                        notchContainer.ForEach(n => n.Alpha *= 0.95f);
+                        notchContainer.Add(new Circle
                         {
-                            notchContainer.ForEach(n => n.Alpha *= 0.95f);
-                            notchContainer.Add(new Box
-                            {
-                                RelativeSizeAxes = Axes.Y,
-                                Width = 2,
-                                RelativePositionAxes = Axes.X,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                X = getXPositionForOffset(dataPoint.SuggestedGlobalAudioOffset)
-                            });
-                        }
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 2,
+                            RelativePositionAxes = Axes.X,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Colour = colourProvider.Light1,
+                            X = getXPositionForOffset(dataPoint.SuggestedGlobalAudioOffset)
+                        });
+                    }
 
-                        break;
+                    break;
 
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (SessionAverageHitErrorTracker.DataPoint dataPoint in e.OldItems!)
-                        {
-                            var notch = notchContainer.FirstOrDefault(n => n.X == getXPositionForOffset(dataPoint.SuggestedGlobalAudioOffset));
-                            Debug.Assert(notch != null);
-                            notchContainer.Remove(notch, true);
-                        }
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (SessionAverageHitErrorTracker.DataPoint dataPoint in e.OldItems!)
+                    {
+                        var notch = notchContainer.FirstOrDefault(n => n.X == getXPositionForOffset(dataPoint.SuggestedGlobalAudioOffset));
+                        Debug.Assert(notch != null);
+                        notchContainer.Remove(notch, true);
+                    }
 
-                        break;
+                    break;
 
-                    case NotifyCollectionChangedAction.Reset:
-                        notchContainer.Clear();
-                        break;
-                }
-
-                SuggestedOffset.Value = averageHitErrorHistory.Any() ? Math.Round(averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset)) : null;
+                case NotifyCollectionChangedAction.Reset:
+                    notchContainer.Clear();
+                    break;
             }
 
-            private float getXPositionForOffset(double offset) => (float)(Math.Clamp(offset, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
+            SuggestedOffset.Value = averageHitErrorHistory.Any() ? Math.Round(averageHitErrorHistory.Average(dataPoint => dataPoint.SuggestedGlobalAudioOffset)) : null;
+        }
 
-            private void updateHintText()
+        private float getXPositionForOffset(double offset) => (float)(Math.Clamp(offset, current.MinValue, current.MaxValue) / (2 * current.MaxValue));
+
+        private void updateHintText()
+        {
+            if (SuggestedOffset.Value == null)
             {
-                if (SuggestedOffset.Value == null)
-                {
-                    applySuggestion.Enabled.Value = false;
-                    hintText.Text = AudioSettingsStrings.SuggestedOffsetNote;
-                }
-                else if (Math.Abs(SuggestedOffset.Value.Value - current.Value) < 1)
-                {
-                    applySuggestion.Enabled.Value = false;
-                    hintText.Text = AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count);
-                }
-                else
-                {
-                    applySuggestion.Enabled.Value = true;
-                    hintText.Text = AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0));
-                }
+                applySuggestion.Enabled.Value = false;
+                notchContainer.Hide();
+                hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetNote, SettingsNote.Type.Informational);
+                hintNote.MoveToY(0, 200, Easing.OutQuint);
             }
-
-            private partial class OffsetSliderBar : RoundedSliderBar<double>
+            else if (Math.Abs(SuggestedOffset.Value.Value - current.Value) < 1)
             {
-                public override LocalisableString TooltipText => BeatmapOffsetControl.GetOffsetExplanatoryText(Current.Value);
+                applySuggestion.Enabled.Value = false;
+                notchContainer.Show();
+                hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count), SettingsNote.Type.Informational);
+                hintNote.MoveToY(10, 200, Easing.OutQuint);
+            }
+            else
+            {
+                applySuggestion.Enabled.Value = true;
+                notchContainer.Show();
+                hintNote.Current.Value =
+                    new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0)),
+                        SettingsNote.Type.Informational);
+                hintNote.MoveToY(10, 200, Easing.OutQuint);
             }
         }
     }

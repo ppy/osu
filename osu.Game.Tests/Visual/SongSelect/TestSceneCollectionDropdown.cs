@@ -24,9 +24,13 @@ using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 using Realms;
+using CollectionDropdown = osu.Game.Screens.Select.CollectionDropdown;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
+    /// <summary>
+    /// WARNING: TODO: we have TWO `CollectionDropdowns` with diverging functionality. This is not good.
+    /// </summary>
     public partial class TestSceneCollectionDropdown : OsuManualInputManagerTestScene
     {
         private RulesetStore rulesets = null!;
@@ -198,8 +202,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestManageCollectionsFilterIsNotSelected()
         {
-            bool received = false;
-
             addExpandHeaderStep();
 
             AddStep("add collection", () => writeAndRefresh(r => r.Add(new BeatmapCollection(name: "1", new List<string> { "abc" }))));
@@ -213,12 +215,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             addExpandHeaderStep();
 
-            AddStep("watch for filter requests", () =>
-            {
-                received = false;
-                dropdown.ChildrenOfType<CollectionDropdown>().First().RequestFilter = () => received = true;
-            });
-
             AddStep("click manage collections filter", () =>
             {
                 int lastItemIndex = dropdown.ChildrenOfType<CollectionDropdown>().Single().Items.Count() - 1;
@@ -227,8 +223,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("collection filter still selected", () => dropdown.Current.Value.CollectionName == "1");
-
-            AddAssert("filter request not fired", () => !received);
         }
 
         private void writeAndRefresh(Action<Realm> action) => Realm.Write(r =>
@@ -241,7 +235,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void assertCollectionHeaderDisplays(LocalisableString collectionName, bool shouldDisplay = true)
             => AddUntilStep($"collection dropdown header displays '{collectionName}'",
-                () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
+                () => shouldDisplay == dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Any(h => h.ChildrenOfType<SpriteText>().Any(t => t.Text == collectionName)));
 
         private void assertFirstButtonIs(IconUsage icon) => AddUntilStep($"button is {icon.Icon.ToString()}", () => getAddOrRemoveButton(1).Icon.Equals(icon));
 
@@ -255,7 +249,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void addExpandHeaderStep() => AddStep("expand header", () =>
         {
-            InputManager.MoveMouseTo(dropdown.ChildrenOfType<CollectionDropdown.OsuDropdownHeader>().Single());
+            InputManager.MoveMouseTo(dropdown.ChildrenOfType<CollectionDropdown.ShearedDropdownHeader>().Single());
             InputManager.Click(MouseButton.Left);
         });
 

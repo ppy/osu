@@ -1,16 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
+using osu.Game.Audio;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -21,10 +17,8 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public partial class HoverClickSounds : HoverSounds
     {
-        public Bindable<bool> Enabled = new Bindable<bool>(true);
-
-        private Sample sampleClick;
-        private Sample sampleClickDisabled;
+        private Sample? sampleClick;
+        private Sample? sampleClickDisabled;
 
         private readonly MouseButton[] buttons;
 
@@ -36,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Array of button codes which should trigger the click sound.
         /// If this optional parameter is omitted or set to <code>null</code>, the click sound will only be played on left click.
         /// </param>
-        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, MouseButton[] buttons = null)
+        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, MouseButton[]? buttons = null)
             : base(sampleSet)
         {
             this.buttons = buttons ?? new[] { MouseButton.Left };
@@ -45,11 +39,11 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select")
-                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetResourceName()}-select")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetResourceName()}-select");
 
-            sampleClickDisabled = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select-disabled")
-                                  ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select-disabled");
+            sampleClickDisabled = audio.Samples.Get($@"UI/{SampleSet.GetResourceName()}-select-disabled")
+                                  ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetResourceName()}-select-disabled");
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -60,23 +54,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(e);
         }
 
-        public override void PlayHoverSample()
-        {
-            if (!Enabled.Value)
-                return;
-
-            base.PlayHoverSample();
-        }
-
-        public void PlayClickSample()
-        {
-            var channel = Enabled.Value ? sampleClick?.GetChannel() : sampleClickDisabled?.GetChannel();
-
-            if (channel != null)
-            {
-                channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
-                channel.Play();
-            }
-        }
+        public void PlayClickSample() =>
+            SamplePlaybackHelper.PlayWithRandomPitch(Enabled.Value ? sampleClick : sampleClickDisabled, pitchVariation: 0.01);
     }
 }

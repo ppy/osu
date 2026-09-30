@@ -9,6 +9,8 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 using osuTK.Input;
@@ -90,5 +92,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private float getNoteHeight(Column resultPlayfield) =>
             resultPlayfield.ToScreenSpace(new Vector2(DefaultNotePiece.NOTE_HEIGHT)).Y -
             resultPlayfield.ToScreenSpace(Vector2.Zero).Y;
+
+        public override bool ReplacesExistingObject(HitObject existing)
+            => base.ReplacesExistingObject(existing) && HitObject.Column == ((IHasColumn)existing).Column;
     }
 }

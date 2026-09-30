@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Adjust offset", () =>
             {
-                InputManager.MoveMouseTo(timingScreen.ChildrenOfType<TimingAdjustButton>().First().ScreenSpaceDrawQuad.Centre + new Vector2(20, 0));
+                InputManager.MoveMouseTo(timingScreen.ChildrenOfType<DiscreteAdjustmentControl<double>>().First().ScreenSpaceDrawQuad.Centre + new Vector2(20, 0));
                 InputManager.Click(MouseButton.Left);
             });
 

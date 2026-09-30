@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private InputManager inputManager = null!;
 
-        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
+        protected override bool IsValidForPlacement => base.IsValidForPlacement && (PlacementActive == PlacementState.Waiting || Precision.DefinitelyBigger(HitObject.Duration, 0));
 
         public JuiceStreamPlacementBlueprint()
         {
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 scrollingPath = new ScrollingPath(),
                 nestedOutlineContainer = new NestedOutlineContainer(),
