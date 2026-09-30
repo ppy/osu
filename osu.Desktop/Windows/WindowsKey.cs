@@ -23,8 +23,6 @@ namespace osu.Desktop.Windows
 
         private delegate int LowLevelKeyboardProcDelegate(int nCode, int wParam, ref KdDllHookStruct lParam);
 
-        private static bool isBlocked;
-
         private const int wh_keyboard_ll = 13;
         private const int wm_keydown = 256;
         private const int wm_syskeyup = 261;
@@ -66,12 +64,11 @@ namespace osu.Desktop.Windows
                 return;
             }
 
-            if (keyHook != IntPtr.Zero || isBlocked)
+            // already blocked, no need to update.
+            if (keyHook != IntPtr.Zero)
                 return;
 
             keyHook = setWindowsHookEx(wh_keyboard_ll, (keyboardHookDelegate = lowLevelKeyboardProc), Marshal.GetHINSTANCE(System.Reflection.Assembly.GetExecutingAssembly().GetModules()[0]), 0);
-
-            isBlocked = true;
         }
 
         internal static void Enable()
@@ -82,15 +79,13 @@ namespace osu.Desktop.Windows
                 return;
             }
 
-            if (keyHook == IntPtr.Zero || !isBlocked)
+            // already released, no need to update.
+            if (keyHook == IntPtr.Zero)
                 return;
 
             keyHook = unhookWindowsHookEx(keyHook);
             keyboardHookDelegate = null;
-
             keyHook = IntPtr.Zero;
-
-            isBlocked = false;
         }
 
         [DllImport(@"user32.dll", EntryPoint = @"SetWindowsHookExA")]
