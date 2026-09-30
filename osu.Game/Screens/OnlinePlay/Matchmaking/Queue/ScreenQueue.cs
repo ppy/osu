@@ -41,6 +41,7 @@ using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
@@ -57,6 +58,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public override bool ShowFooter => true;
 
         public override bool? ApplyModTrackAdjustments => false;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private Container mainContent = null!;
         private CloudVisualisation cloud = null!;
@@ -76,19 +79,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private UserLookupCache userLookupCache { get; set; } = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
+        private MusicController music { get; set; } = null!;
 
         [Resolved]
-        private MusicController music { get; set; } = null!;
+        private RulesetStore rulesets { get; set; } = null!;
 
         [Resolved]
         private DashboardOverlay? dashboardOverlay { get; set; }
 
-        private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
+        [Resolved]
+        private IOverlayManager? overlayManager { get; set; }
 
+        private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
         private readonly Bindable<MatchmakingPool[]?> availablePools = new Bindable<MatchmakingPool[]?>();
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
+        private readonly Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>();
+
         private readonly MatchmakingPoolType poolType;
+
+        private readonly RankedPlayModSelectOverlay modSelectOverlay;
 
         private CancellationTokenSource userLookupCancellation = new CancellationTokenSource();
 
@@ -100,15 +109,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private DrawableSample waitingLoop = null!;
         private ScheduledDelegate? pushScreenDelegate;
 
-        private int? userRating;
-
         private GridContainer mainGrid = null!;
-
         private IBindable<bool> isConnected = null!;
+
+        private int? userRating;
+        private IDisposable? modSelectOverlayRegistration;
 
         public ScreenQueue(MatchmakingPoolType poolType)
         {
             this.poolType = poolType;
+
+            modSelectOverlay = new RankedPlayModSelectOverlay
+            {
+                SelectedMods = { BindTarget = selectedMods },
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -133,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         {
                             Horizontal = 20,
                             Top = 20,
-                            Bottom = ScreenFooter.HEIGHT + 20
+                            Bottom = ScreenFooter.HEIGHT + 50
                         },
                         RowDimensions =
                         [
@@ -363,6 +377,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             experimentalText.AddText(" and provide any ");
             experimentalText.AddLink("feedback", @"https://osu.ppy.sh/community/forums/topics/2198397", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
             experimentalText.AddText(" on the osu! forums!");
+
+            LoadComponent(modSelectOverlay);
         }
 
         protected override void LoadComplete()
@@ -389,7 +405,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             currentState.BindValueChanged(s => SetState(s.NewValue));
 
             selectedPool.BindTo(queue.SelectedPool);
-            selectedPool.BindValueChanged(e => refreshLobbyData());
+            selectedPool.BindValueChanged(onSelectedPoolChanged, true);
+
+            selectedMods.BindTo(queue.SelectedMods);
 
             isConnected = client.IsConnected.GetBoundCopy();
             isConnected.BindValueChanged(connected => Schedule(() =>
@@ -405,6 +423,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     clearLobbyData();
                 }
             }), true);
+
+            modSelectOverlayRegistration = overlayManager?.RegisterBlockingOverlay(modSelectOverlay);
+        }
+
+        private void onSelectedPoolChanged(ValueChangedEvent<MatchmakingPool?> e)
+        {
+            refreshLobbyData();
+
+            if (e.NewValue != null)
+                Ruleset.Value = rulesets.GetRuleset(e.NewValue.RulesetId);
+
+            if (e.NewValue?.Equals(e.OldValue) != true)
+                selectedMods.Value = [];
         }
 
         private async Task populateAvailablePools()
@@ -416,7 +447,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 availablePools.Value = pools;
 
                 // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
-                selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
+                selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == Ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
             });
         }
 
@@ -530,6 +561,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (base.OnExiting(e))
                 return true;
 
+            modSelectOverlay.Hide();
+
             stopWaitingLoopPlayback();
 
             switch (currentState.Value)
@@ -548,6 +581,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     // Block exit until it's initiated from inside the matchmaking screen.
                     return true;
             }
+        }
+
+        public override bool OnBackButton()
+        {
+            if (modSelectOverlay.State.Value == Visibility.Visible)
+            {
+                modSelectOverlay.Hide();
+                return true;
+            }
+
+            return base.OnBackButton();
         }
 
         public void SetState(MatchmakingScreenState newState)
@@ -595,7 +639,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Action = () =>
                                 {
                                     Debug.Assert(selectedPool.Value != null);
-                                    queue.JoinQueue(selectedPool.Value);
+                                    queue.JoinQueue(selectedPool.Value, selectedMods.Value.ToArray());
                                 },
                                 Text = "Begin queueing",
                             },
@@ -756,9 +800,20 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             }
         }
 
+        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() =>
+        [
+            new RankedPlayFooterButtonFreeMods(modSelectOverlay)
+            {
+                State = { BindTarget = currentState },
+                Mods = { BindTarget = selectedMods }
+            }
+        ];
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            modSelectOverlayRegistration?.Dispose();
 
             stopWaitingLoopPlayback();
 

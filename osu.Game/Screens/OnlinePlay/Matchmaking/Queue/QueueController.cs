@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,6 +17,7 @@ using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Matchmaking.Requests;
@@ -22,6 +25,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Intro;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
@@ -36,6 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     {
         public readonly Bindable<ScreenQueue.MatchmakingScreenState> CurrentState = new Bindable<ScreenQueue.MatchmakingScreenState>();
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
+        public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>([]);
 
         /// <summary>
         /// Timer since the queue was joined.
@@ -74,13 +79,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         /// Joins the matchmaking queue.
         /// </summary>
         /// <param name="pool">The pool to join.</param>
-        public void JoinQueue(MatchmakingPool pool)
+        /// <param name="mods">The requested mods.</param>
+        public void JoinQueue(MatchmakingPool pool, Mod[] mods)
         {
             lastDuelUser = null;
             lastDuelPool = null;
             QueueTimer.Restart();
 
-            client.MatchmakingJoinQueue(pool.Id).FireAndForget();
+            client.MatchmakingJoinQueueWithParams(new MatchmakingJoinQueueRequest
+            {
+                PoolId = pool.Id,
+                Mods = mods.Select(m => new APIMod(m)).ToArray()
+            }).FireAndForget();
         }
 
         /// <summary>
@@ -129,7 +139,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (lastDuelUser != null && lastDuelPool != null)
                 IssueDuel(lastDuelPool, lastDuelUser.Value);
             else if (SelectedPool.Value != null)
-                JoinQueue(SelectedPool.Value);
+                JoinQueue(SelectedPool.Value, SelectedMods.Value.ToArray());
         }
 
         /// <summary>
