@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Online
         public void TestNotificationMessage(IBeatmapSetInfo model)
         {
             AddStep("clear recent notification", () => recentNotification = null);
-            AddStep("download beatmap", () => beatmaps.Download(model));
+            AddStep("download beatmap", () => beatmaps.Download(model, false));
 
             AddUntilStep("wait for notification", () => recentNotification != null);
             AddUntilStep("notification text correct", () => recentNotification.Text.ToString() == "Downloading test author - test title (mapper)");
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestCancelDownloadFromRequest()
         {
-            AddStep("download beatmap", () => beatmaps.Download(test_db_model));
+            AddStep("download beatmap", () => beatmaps.Download(test_db_model, false));
 
             AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_db_model)!.Cancel());
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestCancelDownloadFromNotification()
         {
-            AddStep("download beatmap", () => beatmaps.Download(test_db_model));
+            AddStep("download beatmap", () => beatmaps.Download(test_db_model, false));
 
             AddStep("cancel download from notification", () => recentNotification.Close(true));
 
