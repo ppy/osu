@@ -473,6 +473,7 @@ namespace osu.Game.Rulesets.Scoring
             currentBonusPortion = 0;
 
             TotalScore.Value = 0;
+            TotalScoreWithoutMods.Value = 0;
             Accuracy.Value = 1;
             Combo.Value = 0;
             HighestCombo.Value = 0;
