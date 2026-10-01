@@ -25,9 +25,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (current.BaseObject is Spinner || current.Index <= 1 || osuLastObj.BaseObject is Spinner)
                 return 0;
 
-            const double velocity_change_multiplier = 0.55;
+            const double velocity_change_multiplier = 1.9;
             const double rhythm_change_cap = 0.1;
-            const double acute_angle_multiplier = 1.3;
+            const double acute_angle_multiplier = 0.9;
 
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             // Apply high circle size bonus to the base velocity.
             // We use reduced CS bonus here because the bonus was made for an evaluator with a different d/t scaling
-            flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
+            flowDifficulty *= DiffUtils.Pow(osuCurrObj.SmallCircleBonus, 0.55);
 
             // Rhythm changes are harder to flow
             flowDifficulty *= 1 + Math.Min(rhythm_change_cap,
@@ -118,15 +118,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                     currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
                 }
 
+                const double velocity_distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.1;
+
+                currVelocity = Math.Min(currVelocity, velocity_distance_cap / osuCurrObj.AdjustedDeltaTime);
+                prevVelocity = Math.Min(prevVelocity, velocity_distance_cap / osuLastObj.AdjustedDeltaTime);
+
                 // Scale with ratio of difference compared to 0.5 * max dist.
                 double distRatio = DiffUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity), 0, 1);
 
-                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime),
-                    Math.Abs(prevVelocity - currVelocity));
+                double velocityChangeBonus = Math.Abs(prevVelocity - currVelocity) * distRatio;
 
-                flowDifficulty += overlapVelocityBuff *
-                                  distRatio *
+                velocityChangeBonus *= DiffUtils.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), 3);
+
+                flowDifficulty += velocityChangeBonus *
                                   calculateOverlapWeight(osuCurrObj, osuLastObj, osuLastLastObj) *
                                   velocity_change_multiplier;
             }
