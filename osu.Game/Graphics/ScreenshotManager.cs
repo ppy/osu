@@ -163,7 +163,7 @@ namespace osu.Game.Graphics
             {
                 notification.State = ProgressNotificationState.Cancelled;
 
-                if (e is WebException webException && webException.Message == @"TooManyRequests")
+                if (e is APIException apiException && apiException.StatusCode == HttpStatusCode.TooManyRequests)
                     notification.Text = NotificationsStrings.ScreenshotTooManyUploads;
                 else
                     notification.Text = NotificationsStrings.ScreenshotUploadFailure;
