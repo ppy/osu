@@ -18,19 +18,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
-            var osuNextObj = (OsuDifficultyHitObject?)current.Next();
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous();
 
             if (current.BaseObject is Spinner || current.Index <= 1 || osuLastObj.BaseObject is Spinner)
                 return 0;
 
-            var osuLastLastObj = (OsuDifficultyHitObject?)current.Previous(1);
+            var osuNextObj = (OsuDifficultyHitObject?)current.Next();
+            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
             double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
 
-            double currVelocity = calculateCurrentVelocity(osuCurrObj, osuLastObj, currDistance, withSliderTravelDistance);
+            double currVelocity = calculateCurrentVelocity(
+                osuCurrObj,
+                osuLastObj,
+                currDistance,
+                withSliderTravelDistance);
+
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
             double flowDifficulty = currVelocity;
@@ -42,13 +47,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             flowDifficulty *= calculateRhythmChangeBonus(osuCurrObj, osuLastObj);
             flowDifficulty *= calculateAngularVelocityBonus(osuCurrObj, osuLastObj);
 
-            // If all three notes are overlapping - don't reward bonuses as you don't have to do additional movement
-            double overlappedNotesWeight = osuLastLastObj != null
-                ? calculateOverlappedNotesWeight(osuCurrObj, osuLastObj, osuLastLastObj)
-                : 1;
+            if (osuNextObj != null)
+            {
+                flowDifficulty += calculateAcuteAngleBonus(
+                    osuCurrObj,
+                    osuLastObj,
+                    osuLastLastObj,
+                    osuNextObj,
+                    currVelocity);
+            }
 
-            flowDifficulty += calculateAcuteAngleBonus(osuCurrObj, currVelocity, overlappedNotesWeight);
-            flowDifficulty += calculateVelocityChangeBonus(osuCurrObj, osuLastObj, currVelocity, prevVelocity, currDistance, overlappedNotesWeight, withSliderTravelDistance);
+            flowDifficulty += calculateVelocityChangeBonus(
+                osuCurrObj,
+                osuLastObj,
+                currVelocity,
+                prevVelocity,
+                currDistance,
+                calculateOverlapWeight(osuCurrObj, osuLastObj, osuLastLastObj),
+                withSliderTravelDistance);
 
             if (osuCurrObj.BaseObject is Slider && withSliderTravelDistance)
             {
@@ -62,12 +78,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             return flowDifficulty * DiffUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
         }
 
-        private static double calculateRhythmChangeBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
+        private static double calculateRhythmChangeBonus(OsuDifficultyHitObject current, OsuDifficultyHitObject last)
         {
-            const double maximum_rhythm_change_bonus = 0.25;
+            const double maximum_rhythm_change_bonus = 0.1;
 
             double bonus = DiffUtils.Pow(
-                (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) - Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) / 50,
+                (Math.Max(current.AdjustedDeltaTime, last.AdjustedDeltaTime) - Math.Min(current.AdjustedDeltaTime, last.AdjustedDeltaTime)) / 50,
                 4);
 
             return 1 + Math.Min(maximum_rhythm_change_bonus, bonus);
@@ -77,30 +93,76 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// Scales flow difficulty by angular velocity.
         /// This nerfs consistent angles whilst buffing "erratic" flow.
         /// </summary>
-        private static double calculateAngularVelocityBonus(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
+        private static double calculateAngularVelocityBonus(OsuDifficultyHitObject current, OsuDifficultyHitObject last)
         {
-            if (current.Angle == null || previous.Angle == null)
+            if (current.Angle == null || last.Angle == null)
                 return 1;
 
-            double angleDifference = Math.Abs(current.Angle.Value - previous.Angle.Value);
+            double angleDifference = Math.Abs(current.Angle.Value - last.Angle.Value);
             double angleDifferenceAdjusted = Math.Sin(angleDifference / 2) * 180.0;
             double angularVelocity = angleDifferenceAdjusted / (current.AdjustedDeltaTime * 0.1);
 
             return 0.8 + Math.Sqrt(angularVelocity / 270.0);
         }
 
-        private static double calculateAcuteAngleBonus(OsuDifficultyHitObject current, double currVelocity, double overlappedNotesWeight)
+        private static double calculateAcuteAngleBonus(
+            OsuDifficultyHitObject current,
+            OsuDifficultyHitObject last,
+            OsuDifficultyHitObject lastLast,
+            OsuDifficultyHitObject next,
+            double currVelocity)
         {
-            if (current.Angle == null)
+            const double acute_angle_multiplier = 1.3;
+
+            if (current.Angle == null || next.Angle == null)
                 return 0;
 
-            return currVelocity * AngleUtils.CalculateAcuteness(current.Angle.Value) * overlappedNotesWeight;
+            double currAcuteness = AngleUtils.CalculateAcuteness(current.Angle.Value);
+            double nextAcuteness = AngleUtils.CalculateAcuteness(next.Angle.Value);
+
+            double acuteness;
+            double overlapWeight;
+
+            // We want to evaluate flow turns at the center point of the actual turn, but curr.Angle is a prev2-prev-curr angle.
+            // The issue with changing that to prev-curr-next is that we might evaluate the second note of a flow pattern as snap if prev is acute.
+            // With min(curr,next) the evaluation (assuming acute affects snap/flow probability enough) behaves roughly like this:
+            //
+            //    flow (prev-curr-next and prev2-prev-curr evaluates as wide)
+            //     🡓🡓
+            //     ooo 🡐 flow (prev2-prev-curr evaluates as wide)
+            //      /
+            //   ooo 🡐 snap (prev2-prev-curr evaluates as acute)
+            //   🡑🡑
+            //  flow (prev-curr-next evaluates as wide)
+            //
+            //
+            //  flow (prev-curr-next and prev2-prev-curr evaluates as wide)
+            //   🡓🡓
+            //   ooo 🡐 flow (prev-curr-next and prev2-prev-curr evaluates as wide)
+            //      \
+            //     ooo 🡐 snap (prev-curr-next evaluates as acute as the center point of the turn)
+            //     🡑🡑
+            //    flow (prev-curr-next evaluates as wide)
+            //
+            // In both examples the first object in a flow pattern is evaluated as acute (likely snap) and the rest are wide (likely flow).
+            if (currAcuteness < nextAcuteness)
+            {
+                acuteness = currAcuteness;
+                overlapWeight = calculateOverlapWeight(current, last, lastLast);
+            }
+            else
+            {
+                acuteness = nextAcuteness;
+                overlapWeight = calculateOverlapWeight(next, current, last);
+            }
+
+            return currVelocity * acuteness * overlapWeight * acute_angle_multiplier;
         }
 
         private static double calculateVelocityChangeBonus(OsuDifficultyHitObject current, OsuDifficultyHitObject previous, double currVelocity, double prevVelocity,
                                                            double currDistance, double overlappedNotesWeight, bool withSliderTravelDistance)
         {
-            const double velocity_change_multiplier = 0.52;
+            const double velocity_change_multiplier = 0.55;
 
             if (Math.Max(prevVelocity, currVelocity) == 0)
                 return 0;
@@ -135,10 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             return currVelocity;
         }
 
-        /// <summary>
-        /// Reduces bonuses when the current and previous two objects all overlap, as no additional movement is required.
-        /// </summary>
-        private static double calculateOverlappedNotesWeight(OsuDifficultyHitObject current, OsuDifficultyHitObject previous, OsuDifficultyHitObject lastLast)
+        private static double calculateOverlapWeight(OsuDifficultyHitObject current, OsuDifficultyHitObject previous, OsuDifficultyHitObject lastLast)
         {
             double o1 = calculateOverlapFactor(current, previous);
             double o2 = calculateOverlapFactor(current, lastLast);
