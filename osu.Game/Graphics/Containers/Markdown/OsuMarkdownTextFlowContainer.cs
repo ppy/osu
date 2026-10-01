@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.Footnotes;
+using Markdig.Renderers.Html;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -52,27 +53,16 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override void AddCustomComponent(CustomContainerInline inline)
         {
-            if (!(inline.FirstChild is LiteralInline literal))
+            HtmlAttributes? attributes = inline.TryGetAttributes();
+            string? flag = attributes?.Properties?.SingleOrDefault(a => a.Key == @"flag").Value;
+
+            if (flag != null)
             {
-                base.AddCustomComponent(inline);
-                return;
+                if (!Enum.TryParse<CountryCode>(flag, out var countryCode))
+                    countryCode = CountryCode.Unknown;
+
+                AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
             }
-
-            string[] attributes = literal.Content.ToString().Trim(' ', '{', '}').Split();
-            string? flagAttribute = attributes.SingleOrDefault(a => a.StartsWith(@"flag", StringComparison.Ordinal));
-
-            if (flagAttribute == null)
-            {
-                base.AddCustomComponent(inline);
-                return;
-            }
-
-            string flag = flagAttribute.Split('=').Last().Trim('"');
-
-            if (!Enum.TryParse<CountryCode>(flag, out var countryCode))
-                countryCode = CountryCode.Unknown;
-
-            AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
         }
 
         private partial class OsuMarkdownInlineCode : Container

@@ -6,6 +6,7 @@ using Markdig.Extensions.AutoLinks;
 using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.EmphasisExtras;
 using Markdig.Extensions.Footnotes;
+using Markdig.Extensions.GenericAttributes;
 using osu.Game.Graphics.Containers.Markdown.Extensions;
 
 namespace osu.Game.Graphics.Containers.Markdown
@@ -34,10 +35,10 @@ namespace osu.Game.Graphics.Containers.Markdown
         public bool CustomContainers { get; init; }
 
         /// <summary>
-        /// Allows the <see cref="OsuMarkdownContainer"/> to parse custom attributes in block elements (used e.g. for custom anchor names in the wiki).
+        /// Allows the <see cref="OsuMarkdownContainer"/> to parse custom attributes in elements (used e.g. for custom anchor names in the wiki).
         /// </summary>
-        /// <seealso cref="BlockAttributeExtension"/>
-        public bool BlockAttributes { get; init; }
+        /// <seealso cref="GenericAttributesExtension"/>
+        public bool GenericAttributes { get; init; }
 
         /// <summary>
         /// Returns a prepared <see cref="MarkdownPipeline"/> according to the options specified by the current <see cref="OsuMarkdownContainerOptions"/> instance.
@@ -50,8 +51,14 @@ namespace osu.Game.Graphics.Containers.Markdown
             var pipeline = new MarkdownPipelineBuilder()
                            .UseAutoIdentifiers()
                            .UsePipeTables()
-                           .UseEmphasisExtras(EmphasisExtraOptions.Strikethrough)
                            .UseYamlFrontMatter();
+
+            // This extension should be added to the pipeline before any other extension that modify EmphasisInlineParse
+            // (e.g. CustomContainerExtension) to make our use case of generic attribute on the opening delimiter work.
+            if (GenericAttributes)
+                pipeline = pipeline.UseEmphasisAttributes();
+
+            pipeline = pipeline.UseEmphasisExtras(EmphasisExtraOptions.Strikethrough);
 
             if (Footnotes)
                 pipeline = pipeline.UseFootnotes();
@@ -62,8 +69,8 @@ namespace osu.Game.Graphics.Containers.Markdown
             if (CustomContainers)
                 pipeline = pipeline.UseCustomContainers();
 
-            if (BlockAttributes)
-                pipeline = pipeline.UseBlockAttributes();
+            if (GenericAttributes)
+                pipeline = pipeline.UseGenericAttributes();
 
             return pipeline.Build();
         }

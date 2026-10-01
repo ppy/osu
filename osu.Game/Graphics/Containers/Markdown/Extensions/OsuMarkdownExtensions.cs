@@ -8,13 +8,13 @@ namespace osu.Game.Graphics.Containers.Markdown.Extensions
     public static class OsuMarkdownExtensions
     {
         /// <summary>
-        /// Uses the block attributes extension.
+        /// Uses the emphasis attributes extension.
         /// </summary>
         /// <param name="pipeline">The pipeline.</param>
         /// <returns>The modified pipeline.</returns>
-        public static MarkdownPipelineBuilder UseBlockAttributes(this MarkdownPipelineBuilder pipeline)
+        public static MarkdownPipelineBuilder UseEmphasisAttributes(this MarkdownPipelineBuilder pipeline)
         {
-            pipeline.Extensions.AddIfNotAlready<BlockAttributeExtension>();
+            pipeline.Extensions.AddIfNotAlready<EmphasisAttributeExtension>();
             return pipeline;
         }
     }
