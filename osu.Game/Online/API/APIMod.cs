@@ -12,11 +12,12 @@ using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Online.API
 {
     [MessagePackObject]
-    public class APIMod : IEquatable<APIMod>
+    public class APIMod : IEquatable<APIMod>, IConfiguredMod
     {
         [JsonProperty("acronym")]
         [Key(0)]
@@ -109,5 +110,11 @@ namespace osu.Game.Online.API
 
             public int GetHashCode(KeyValuePair<string, object> obj) => HashCode.Combine(obj.Key, obj.Value.GetUnderlyingSettingValue());
         }
+
+        #region IConfiguredMod
+
+        IReadOnlyDictionary<string, object> IConfiguredMod.Settings => Settings;
+
+        #endregion
     }
 }
