@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Select
             LoadComponent(modSelectOverlay = CreateModSelectOverlay());
 
             configBackgroundBlur = config.GetBindable<bool>(OsuSetting.SongSelectBackgroundBlur);
-            configBackgroundBlur.BindValueChanged(e =>
+            configBackgroundBlur.BindValueChanged(_ =>
             {
                 if (!this.IsCurrentScreen())
                     return;
