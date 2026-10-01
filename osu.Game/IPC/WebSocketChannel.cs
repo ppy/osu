@@ -47,10 +47,12 @@ namespace osu.Game.IPC
 
         private async Task readWriteLoop()
         {
-            var token = runningTokenSource.Token;
-
-            while (!token.IsCancellationRequested)
+            // note that checking `IsCancellationRequested` via the source is safe even if it is disposed,
+            // but checking it via the source's *token* isn't as attempting to access the token itself will throw if the source is disposed
+            while (!runningTokenSource.IsCancellationRequested)
             {
+                var token = runningTokenSource.Token;
+
                 ValueWebSocketReceiveResult result;
 
                 try
@@ -163,6 +165,7 @@ namespace osu.Game.IPC
 
             isDisposed = true;
             webSocket.Dispose();
+            runningTokenSource.Cancel();
             runningTokenSource.Dispose();
         }
     }
