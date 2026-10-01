@@ -87,8 +87,11 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"last_read_id")]
         public long? LastReadId;
 
+        /// <summary>
+        /// Populated only for public channels. Will be <c>null</c> for private message channels and other special channel types.
+        /// </summary>
         [JsonProperty(@"active_user_count")]
-        public long ActiveUserCount;
+        public long? ActiveUserCount;
 
         /// <remarks>
         /// Purposefully nullable for the sake of <see cref="ChannelListing.ChannelListingChannel"/>.

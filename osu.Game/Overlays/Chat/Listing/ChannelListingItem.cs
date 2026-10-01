@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Chat.Listing
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = Channel.ActiveUserCount.ToLocalisableString("N0"),
+                                Text = Channel.ActiveUserCount?.ToLocalisableString("N0") ?? "-",
                                 Font = OsuFont.Torus.With(size: text_size),
                                 Margin = new MarginPadding { Bottom = 2 },
                                 Colour = colourProvider.Light3,
