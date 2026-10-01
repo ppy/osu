@@ -1156,15 +1156,16 @@ namespace osu.Game
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
                 new ConfineMouseTracker(),
-                new ScrollAdjustsVolume(requireAltPressed: true),
             });
+
+            // Load volume overlay before anything else, so users can adjust volume as soon as feasible after startup.
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
+            Add(new ScrollAdjustsVolume(requireAltPressed: true));
 
             dependencies.Cache(ScreenFooter);
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
-
-            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(fpsCounter = new FPSCounter
             {
