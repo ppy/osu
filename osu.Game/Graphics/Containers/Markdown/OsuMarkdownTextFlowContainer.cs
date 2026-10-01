@@ -62,6 +62,14 @@ namespace osu.Game.Graphics.Containers.Markdown
                     countryCode = CountryCode.Unknown;
 
                 AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
+                return;
+            }
+
+            string? user = attributes?.Properties?.SingleOrDefault(a => a.Key == @"user").Value;
+
+            if (user != null && int.TryParse(user, out int userId))
+            {
+                AddDrawable(new OsuMarkdownUserLink(inline, userId));
             }
         }
 

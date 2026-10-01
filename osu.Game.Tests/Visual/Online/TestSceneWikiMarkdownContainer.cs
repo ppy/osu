@@ -15,15 +15,20 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown.Footnotes;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
 using osu.Game.Users.Drawables;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public partial class TestSceneWikiMarkdownContainer : OsuManualInputManagerTestScene
     {
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
         private OverlayScrollContainer scrollContainer;
         private TestMarkdownContainer markdownContainer;
 
@@ -230,6 +235,38 @@ public class WikiMarkdownContainer : MarkdownContainer
 This is a line after the fenced code block!
 ";
             });
+        }
+
+        [Test]
+        public void TestUserLink()
+        {
+            AddStep("Set up response", () =>
+            {
+                dummyAPI.HandleRequest = request =>
+                {
+                    if (!(request is GetUserRequest getUserRequest))
+                        return false;
+
+                    getUserRequest.TriggerSuccess(new APIUser
+                    {
+                        Id = 2,
+                        Username = "peppy",
+                    });
+
+                    return true;
+                };
+            });
+
+            AddStep("Add user link", () =>
+            {
+                markdownContainer.Text = @"::peppy::{user=2}
+::_username **with** formatting_::{user=2}";
+            });
+
+            AddStep("Hover user link", () => InputManager.MoveMouseTo(markdownContainer.ChildrenOfType<OsuMarkdownUserLink>().First()));
+            AddUntilStep("Wait for tooltip to show", () => this.ChildrenOfType<UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Visible);
+            AddStep("Hover out", () => InputManager.MoveMouseTo(new Vector2(0)));
+            AddUntilStep("Wait for tooltip to hide", () => this.ChildrenOfType<UserCardTooltip>().FirstOrDefault()?.State.Value == Visibility.Hidden);
         }
 
         private partial class TestMarkdownContainer : WikiMarkdownContainer

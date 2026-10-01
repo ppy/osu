@@ -19,6 +19,11 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private readonly string? title;
 
+        public OsuMarkdownLinkText(string url, Inline contentInline)
+            : base(url, contentInline)
+        {
+        }
+
         public OsuMarkdownLinkText(LinkInline linkInline)
             : base(linkInline)
         {
