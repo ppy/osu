@@ -56,8 +56,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            const double skill_multiplier_snap = 78.2;
-            const double skill_multiplier_agility = 32.5;
+            const double skill_multiplier_snap = 78.3;
+            const double skill_multiplier_agility = 32.0;
             const double skill_multiplier_flow = 252.0;
 
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
-                agilityDifficulty = DiffUtils.Pow(agilityDifficulty, 0.9);
+                agilityDifficulty = DiffUtils.Pow(agilityDifficulty, 0.89);
                 snapDifficulty = DiffUtils.Pow(snapDifficulty, 0.93);
                 combinedSnapDifficulty = DiffUtils.Norm(combined_snap_norm_exponent, snapDifficulty, agilityDifficulty);
             }

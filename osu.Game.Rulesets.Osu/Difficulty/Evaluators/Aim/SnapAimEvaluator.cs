@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double calculateVelocityChangeBonus(bool withSliderTravelDistance, double prevVelocity, double currVelocity,
                                                            double currDistance, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
         {
-            const double velocity_change_multiplier = 0.9;
+            const double velocity_change_multiplier = 0.85;
 
             if (Math.Max(prevVelocity, currVelocity) == 0)
                 return 0;
