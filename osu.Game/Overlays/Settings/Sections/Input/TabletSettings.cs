@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation, OsuConfigManager osuConfig, OverlayColourProvider colourProvider)
+        private void load(OsuConfigManager osuConfig)
         {
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);

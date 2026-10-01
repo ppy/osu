@@ -15,7 +15,7 @@ namespace osu.Game.Overlays
     public partial class DevBuildBanner : VisibilityContainer
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures, OsuGameBase game)
+        private void load(OsuColour colours, TextureStore textures)
         {
             AutoSizeAxes = Axes.Both;
 
