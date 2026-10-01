@@ -124,12 +124,12 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine("[Editor]");
 
             if (beatmap.Bookmarks.Length > 0)
-                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks)}"));
+                writer.WriteLine(FormattableString.Invariant($"Bookmarks: {string.Join(',', beatmap.Bookmarks.Select(b => b.ToString(CultureInfo.InvariantCulture)))}"));
             writer.WriteLine(FormattableString.Invariant($"DistanceSpacing: {beatmap.DistanceSpacing}"));
             writer.WriteLine(FormattableString.Invariant($"BeatDivisor: {beatmap.BeatmapInfo.BeatDivisor}"));
             writer.WriteLine(FormattableString.Invariant($"GridSize: {beatmap.GridSize}"));
             writer.WriteLine(FormattableString.Invariant($"TimelineZoom: {beatmap.TimelineZoom}"));
-            writer.WriteLine(FormattableString.Invariant($@"VelocityPresets: {string.Join(',', beatmap.SliderVelocityPresets)}"));
+            writer.WriteLine(FormattableString.Invariant($@"VelocityPresets: {string.Join(',', beatmap.SliderVelocityPresets.Select(sv => sv.ToString(CultureInfo.InvariantCulture)))}"));
         }
 
         private void handleMetadata(TextWriter writer)

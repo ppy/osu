@@ -149,8 +149,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
 
                 case RecentActivityType.BeatmapsetDelete:
-                    addBeatmapsetLink();
-                    addText(" has been deleted.");
+                    addText($"{activity.Beatmapset.AsNonNull().Title} has been deleted.");
                     break;
 
                 case RecentActivityType.BeatmapsetRevive:

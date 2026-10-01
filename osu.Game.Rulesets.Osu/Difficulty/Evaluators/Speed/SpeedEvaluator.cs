@@ -23,13 +23,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             if (current.BaseObject is Spinner)
                 return 0;
 
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+            double doubleTapFeasibility = 1.0 - osuCurrObj.CalculateDoubleTapFeasibility((OsuDifficultyHitObject?)osuCurrObj.Next(0));
+
+            double speedDifficulty = DiffUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime);
+
+            speedDifficulty *= calculateSpeedBonus(osuCurrObj);
+
+            // Apply penalty if there's doubletappable doubles
+            return speedDifficulty * doubleTapFeasibility;
+        }
+
+        private static double calculateSpeedBonus(OsuDifficultyHitObject osuCurrObj)
+        {
             const double min_speed_bonus = 200; // 200 BPM 1/4th
             const double speed_balancing_factor = 40;
 
-            var osuCurrObj = (OsuDifficultyHitObject)current;
-
             double strainTime = osuCurrObj.AdjustedDeltaTime;
-            double doubleTapFeasibility = 1.0 - osuCurrObj.CalculateDoubleTapFeasibility((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
             // Cap deltatime to the OD 300 hitwindow.
             // 0.93 is derived from making sure 260bpm OD8 streams aren't nerfed harshly, whilst 0.92 limits the effect of the cap.
@@ -42,15 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             if (DiffUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
                 speedBonus = 0.75 * DiffUtils.Pow((DiffUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
 
-            // Base difficulty with all bonuses
-            double speedDifficulty = (1 + speedBonus) * 1000 / strainTime;
-
-            speedDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
-
-            // Apply penalty if there's doubletappable doubles
-            return speedDifficulty * doubleTapFeasibility;
+            return (1 + speedBonus) / strainTime;
         }
-
-        private static double highBpmBonus(double ms) => 1 / (1 - DiffUtils.Pow(0.3, ms / 1000));
     }
 }

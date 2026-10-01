@@ -263,9 +263,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
                 else
                 {
-                    foreach (var beatmap in newBeatmapSet.Beatmaps)
-                        beatmap.BeatmapSet = newBeatmapSet;
-
                     downloadTracker = new BeatmapDownloadTracker(newBeatmapSet);
                     downloadTracker.State.BindValueChanged(_ => updateDownloadButtons());
                     AddInternal(downloadTracker);

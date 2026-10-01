@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -17,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
+            var osuNextObj = (OsuDifficultyHitObject?)current.Next();
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous();
 
@@ -92,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (current.Angle == null)
                 return 0;
 
-            return currVelocity * SnapAimEvaluator.CalcAngleAcuteness(current.Angle.Value) * overlappedNotesWeight;
+            return currVelocity * AngleUtils.CalculateAcuteness(current.Angle.Value) * overlappedNotesWeight;
         }
 
         private static double calculateVelocityChangeBonus(OsuDifficultyHitObject current, OsuDifficultyHitObject previous, double currVelocity, double prevVelocity,

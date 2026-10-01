@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double ProcessInternal(DifficultyHitObject current)
         {
-            const double skill_multiplier = 1.16;
+            const double skill_multiplier = 66.2;
 
             if (Mods.Any(m => m is OsuModRelax))
                 return 0;

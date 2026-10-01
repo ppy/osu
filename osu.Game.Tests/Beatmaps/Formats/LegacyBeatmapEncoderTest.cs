@@ -271,6 +271,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(decodedAfterEncode.Beatmap.HitObjects[2].Samples[0].UseBeatmapSamples, Is.True);
         }
 
+        [Test]
+        [SetCulture("pl-PL")]
+        public void TestSliderVelocityPresetCultureInvariance()
+        {
+            var beatmap = new Beatmap();
+
+            var encoded = EncodeToLegacy(new BeatmapComponents(beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty), new Storyboard()));
+            var decodedAfterEncode = DecodeFromLegacy(encoded, beatmaps_resource_store, string.Empty);
+
+            Assert.That(decodedAfterEncode.Beatmap.SliderVelocityPresets, Is.EquivalentTo(beatmap.SliderVelocityPresets));
+        }
+
+        [TestCaseSource(nameof(allBeatmaps))]
+        [SetCulture("pl-PL")]
+        public void TestCultureInvariance(string name)
+        {
+            var decoded = DecodeFromLegacy(beatmaps_resource_store.GetStream(name), beatmaps_resource_store, name);
+            var decodedAfterEncode = DecodeFromLegacy(EncodeToLegacy(decoded), beatmaps_resource_store, name);
+
+            Sort(decoded.Beatmap);
+            Sort(decodedAfterEncode.Beatmap);
+
+            CompareBeatmaps(decoded, decodedAfterEncode);
+        }
+
         private static bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
         {
             // equal to null, no need to SequenceEqual

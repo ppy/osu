@@ -12,7 +12,9 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Models;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
@@ -226,6 +228,43 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 return false;
             }
+        }
+
+        [Test]
+        public void TestExportFailsOnDuplicateEntry()
+        {
+            IWorkingBeatmap beatmap = null!;
+            BeatmapSetInfo beatmapSetInfo = null!;
+            Exception exception = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"241526 Soleily - Renatus.osz"));
+            AddStep("add bogus duplicated file", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var refetchedSet = r.Find<BeatmapSetInfo>(((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!).ID);
+                    var fileToDuplicate = refetchedSet!.Files.First();
+                    var duplicate = new RealmNamedFileUsage(fileToDuplicate.File, fileToDuplicate.Filename);
+                    refetchedSet.Files.Add(duplicate);
+                    beatmapSetInfo = refetchedSet.Detach();
+                    beatmapSetInfo.Files.AddRange(refetchedSet.Files.Detach());
+                });
+            });
+            AddStep("attempt export", () =>
+            {
+                var outStream = new MemoryStream();
+
+                try
+                {
+                    new LegacyBeatmapExporter(LocalStorage)
+                        .ExportToStream(beatmapSetInfo, outStream, null);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+            });
+            AddUntilStep("exception thrown", () => exception, () => Is.Not.Null);
         }
 
         private IWorkingBeatmap importBeatmapFromStream(Stream stream)

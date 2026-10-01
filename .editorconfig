@@ -98,7 +98,7 @@ dotnet_naming_rule.public_static_readonly_all_upper.style = all_upper
 #Formatting - indentation options
 csharp_indent_case_contents = true
 csharp_indent_case_contents_when_block = false
-csharp_indent_labels = one_less_than_current
+csharp_indent_labels = no_change
 csharp_indent_switch_labels = true
 
 #Formatting - new line options
@@ -160,19 +160,19 @@ csharp_style_expression_bodied_properties = true:warning
 csharp_style_expression_bodied_local_functions = true:silent
 
 #Style - expression preferences
-dotnet_style_object_initializer = true:warning
+dotnet_style_object_initializer = true:silent
 dotnet_style_collection_initializer = true:warning
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:warning
 dotnet_style_prefer_auto_properties = true:warning
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
 dotnet_style_prefer_conditional_expression_over_return = true:silent
-dotnet_style_prefer_compound_assignment = true:warning
+dotnet_style_prefer_compound_assignment = true:silent
 
 #Style - null/type checks
-dotnet_style_coalesce_expression = true:warning
-dotnet_style_null_propagation = true:warning
+dotnet_style_coalesce_expression = true:silent
+dotnet_style_null_propagation = true:silent
 csharp_style_pattern_matching_over_is_with_cast_check = true:warning
-csharp_style_pattern_matching_over_as_with_null_check = true:warning
+csharp_style_pattern_matching_over_as_with_null_check = true:silent
 csharp_style_throw_expression = true:silent
 csharp_style_conditional_delegate_call = true:warning
 
@@ -183,8 +183,8 @@ csharp_style_unused_value_expression_statement_preference = discard_variable:sil
 csharp_style_unused_value_assignment_preference = discard_variable:warning
 
 #Style - variable declaration
-csharp_style_inlined_variable_declaration = true:warning
-csharp_style_deconstructed_variable_declaration = false:silent
+csharp_style_inlined_variable_declaration = true:silent
+csharp_style_deconstructed_variable_declaration = true:silent
 
 #Style - other C# 7.x features
 dotnet_style_prefer_inferred_tuple_names = true:warning
@@ -193,16 +193,19 @@ csharp_style_pattern_local_over_anonymous_function = true:warning
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:silent
 
 #Style - C# 8 features
-csharp_prefer_static_local_function = true:warning
+csharp_prefer_static_local_function = true:silent
 csharp_prefer_simple_using_statement = true:silent
-csharp_style_prefer_index_operator = false:silent
-csharp_style_prefer_range_operator = false:silent
+csharp_style_prefer_index_operator = true:silent
+csharp_style_prefer_range_operator = true:silent
 csharp_style_prefer_switch_expression = false:none
 
-csharp_style_namespace_declarations = block_scoped:warning
+#Style - C# 9 features
+csharp_style_prefer_pattern_matching = false:none
 
 #Style - C# 12 features
 csharp_style_prefer_primary_constructors = false
+
+csharp_style_namespace_declarations = block_scoped:warning
 
 [*.{yaml,yml}]
 insert_final_newline = true

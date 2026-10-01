@@ -4,18 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Mania;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
-using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class NoteCompositionTool : CompositionTool
+    public class NoteCompositionTool : CompositionTool<ManiaAction>
     {
         public NoteCompositionTool()
-            : base(nameof(Note))
+            : base(ManiaEditorStrings.NoteTool)
         {
+            Action = ManiaAction.EditorNoteTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorNote };

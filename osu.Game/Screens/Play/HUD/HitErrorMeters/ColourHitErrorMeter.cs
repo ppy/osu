@@ -163,7 +163,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             break;
 
                         case ShapeStyle.Square:
-                            content.Child = new Box { RelativeSizeAxes = Axes.Both };
+                            content.Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                // somewhat improves the appearance of uneven spacing on certain `JudgementSpacing` specifications
+                                EdgeSmoothness = new Vector2(0.5f),
+                            };
                             break;
                     }
                 }, true);
