@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.Ranking
                                            .AsEnumerable()
                                            .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
 
-                collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
+                collectionItems.Add(new OsuMenuItem(LocalisableString.Interpolate($@"{CommonStrings.Manage}..."), MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
 
                 return collectionItems.ToArray();
             }

@@ -450,8 +450,8 @@ namespace osu.Game.Screens.Edit
                                         Items = new MenuItem[]
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
-                                            new EditorMenuItem(EditorStrings.SnapAllNotesToCurrentSnapDivisor, MenuItemType.Destructive, confirmSnapAllHitObjectsToCurrentDivisor),
-                                            new EditorMenuItem(EditorStrings.Synchronise, MenuItemType.Destructive, confirmSyncTimingAttributes)
+                                            new EditorMenuItem(LocalisableString.Interpolate($@"{EditorStrings.SnapAllNotesToCurrentSnapDivisor}..."), MenuItemType.Destructive, confirmSnapAllHitObjectsToCurrentDivisor),
+                                            new EditorMenuItem(LocalisableString.Interpolate($@"{EditorStrings.Synchronise}..."), MenuItemType.Destructive, confirmSyncTimingAttributes)
                                             {
                                                 Action = { Disabled = loadableBeatmap.BeatmapSetInfo.Beatmaps.Count < 2 }
                                             },
@@ -1315,14 +1315,14 @@ namespace osu.Game.Screens.Edit
             yield return createDifficultyCreationMenu();
             yield return createDifficultySwitchMenu();
             yield return new OsuMenuItemSpacer();
-            yield return new EditorMenuItem(EditorStrings.DeleteDifficulty, MenuItemType.Destructive, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } };
+            yield return new EditorMenuItem(LocalisableString.Interpolate($@"{EditorStrings.DeleteDifficulty}..."), MenuItemType.Destructive, deleteDifficulty) { Action = { Disabled = Beatmap.Value.BeatmapSetInfo.Beatmaps.Count < 2 } };
             yield return new OsuMenuItemSpacer();
 
             var save = new EditorMenuItem(WebCommonStrings.ButtonsSave, MenuItemType.Standard, () => attemptMutationOperation(Save)) { Hotkey = new Hotkey(PlatformAction.Save) };
             saveRelatedMenuItems.Add(save);
             yield return save;
 
-            yield return discardChangesMenuItem = new EditorMenuItem(GlobalActionKeyBindingStrings.EditorDiscardUnsavedChanges, MenuItemType.Destructive, DiscardUnsavedChanges)
+            yield return discardChangesMenuItem = new EditorMenuItem(LocalisableString.Interpolate($@"{GlobalActionKeyBindingStrings.EditorDiscardUnsavedChanges}..."), MenuItemType.Destructive, DiscardUnsavedChanges)
             {
                 Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
             };
@@ -1333,7 +1333,7 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                var externalEdit = new EditorMenuItem(EditorStrings.EditExternally, MenuItemType.Standard, editExternally)
+                var externalEdit = new EditorMenuItem(LocalisableString.Interpolate($@"{EditorStrings.EditExternally}..."), MenuItemType.Standard, editExternally)
                 {
                     Hotkey = new Hotkey(GlobalAction.EditorEditExternally)
                 };
@@ -1347,7 +1347,7 @@ namespace osu.Game.Screens.Edit
 
             if (isSetMadeOfLegacyRulesetBeatmaps && submissionAvailable)
             {
-                var upload = new EditorMenuItem(EditorStrings.SubmitBeatmap, MenuItemType.Standard, submitBeatmap)
+                var upload = new EditorMenuItem(LocalisableString.Interpolate($@"{EditorStrings.SubmitBeatmap}..."), MenuItemType.Standard, submitBeatmap)
                 {
                     Hotkey = new Hotkey(GlobalAction.EditorSubmitBeatmap)
                 };
