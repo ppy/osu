@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Play
             if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
-            drawableStoryboard = storyboard.CreateDrawable(mods);
+            drawableStoryboard = new GameplayDrawableStoryboard(storyboard, mods);
             HasStoryboardEnded.BindTo(drawableStoryboard.HasStoryboardEnded);
 
             if (async)
@@ -111,6 +111,19 @@ namespace osu.Game.Screens.Play
         {
             Add(storyboard);
             OverlayLayerContainer.Add(storyboard.OverlayLayer.CreateProxy());
+        }
+
+        /// <summary>
+        /// Gameplay-only storyboard: completed transforms may be removed (the base type keeps them for replay seek).
+        /// </summary>
+        private partial class GameplayDrawableStoryboard : DrawableStoryboard
+        {
+            public override bool RemoveCompletedTransforms => true;
+
+            public GameplayDrawableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods)
+                : base(storyboard, mods)
+            {
+            }
         }
     }
 }
