@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,7 +13,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneOsuMarkdownContainer : OsuTestScene
     {
-        private OsuMarkdownContainer markdownContainer;
+        private TestMarkdownContainer markdownContainer = null!;
 
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -34,7 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(20),
-                    Child = markdownContainer = new OsuMarkdownContainer
+                    Child = markdownContainer = new TestMarkdownContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y
@@ -365,6 +363,15 @@ And also **another bold** text.
 _**https://osu.ppy.sh**_
 _**<https://osu.ppy.sh>**_";
             });
+        }
+
+        private partial class TestMarkdownContainer : OsuMarkdownContainer
+        {
+            protected override OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions
+            {
+                Autolinks = true,
+                CustomContainers = true,
+            };
         }
     }
 }
