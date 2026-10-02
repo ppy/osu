@@ -22,32 +22,37 @@ namespace osu.Game.Tournament.Screens.Setup
             FlowContainer.Insert(-1, numberBox = new OsuNumberBox
             {
                 Text = "1080",
-                Width = 100
+                Width = 100,
+                CommitOnFocusLost = false,
             });
 
-            base.Action = () =>
-            {
-                if (string.IsNullOrEmpty(numberBox.Text))
-                    return;
+            numberBox.OnCommit += (_, _) => checkAndApply();
+            base.Action = checkAndApply;
 
-                // box contains text
-                if (!int.TryParse(numberBox.Text, out int number))
-                {
-                    // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
-                    // so clamp to max allowed value
-                    number = maximum_window_height;
-                }
-                else
-                {
-                    number = Math.Clamp(number, minimum_window_height, maximum_window_height);
-                }
-
-                // in case number got clamped, reset number in numberBox
-                numberBox.Text = number.ToString();
-
-                Action?.Invoke(number);
-            };
             return drawable;
+        }
+
+        private void checkAndApply()
+        {
+            if (string.IsNullOrEmpty(numberBox?.Text))
+                return;
+
+            // box contains text
+            if (!int.TryParse(numberBox.Text, out int number))
+            {
+                // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
+                // so clamp to max allowed value
+                number = maximum_window_height;
+            }
+            else
+            {
+                number = Math.Clamp(number, minimum_window_height, maximum_window_height);
+            }
+
+            // in case number got clamped, reset number in numberBox
+            numberBox.Text = number.ToString();
+
+            Action?.Invoke(number);
         }
     }
 }

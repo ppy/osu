@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens;
 using osu.Game.Tournament.Screens.Drawings;
@@ -47,6 +48,9 @@ namespace osu.Game.Tournament
 
         [Cached]
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
+
+        [Cached]
+        private DialogOverlay dialogOverlay = new DialogOverlay();
 
         private Container chatContainer = null!;
         private FillFlowContainer buttons = null!;
@@ -154,6 +158,7 @@ namespace osu.Game.Tournament
                         },
                     },
                 },
+                dialogOverlay,
             };
 
             foreach (var drawable in screens)
