@@ -2,13 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 using osu.Game.Tests.Resources;
@@ -116,6 +120,75 @@ namespace osu.Game.Tests.Visual.SongSelect
                 c.UserStarDifficulty.Max = null;
             });
             CheckDisplayedBeatmapsCount(15);
+        }
+
+        [Test]
+        public void TestUserStarDifficultyFilterDoesNotResetDisplayedStars()
+        {
+            BeatmapInfo selectedBeatmap = null!;
+            double baseStars = 0;
+            double moddedStars = 0;
+            List<double> observedStarRatings = new List<double>();
+
+            AddStep("add mixed difficulty set", () =>
+            {
+                var set = TestResources.CreateTestBeatmapSetInfo(1);
+                set.Beatmaps.Clear();
+
+                foreach (int stars in new[] { 2, 4, 8 })
+                {
+                    set.Beatmaps.Add(new BeatmapInfo(new OsuRuleset().RulesetInfo, new BeatmapDifficulty(), new BeatmapMetadata())
+                    {
+                        BeatmapSet = set,
+                        DifficultyName = $"Stars: {stars}",
+                        StarRating = stars,
+                    });
+                }
+
+                BeatmapSets.Add(set);
+            });
+
+            WaitForDrawablePanels();
+
+            AddStep("select middle difficulty", () =>
+            {
+                selectedBeatmap = BeatmapSets.Single().Beatmaps[1];
+                baseStars = selectedBeatmap.StarRating;
+                Carousel.CurrentBeatmap = selectedBeatmap;
+            });
+            AddUntilStep("wait for selected beatmap", () => Carousel.CurrentBeatmap, () => Is.EqualTo(selectedBeatmap));
+            AddUntilStep("wait for selected panel", () => getSelectedBeatmapPanel() != null);
+
+            AddStep("apply hard rock", () => SelectedMods.Value = new Mod[] { new OsuModHardRock() });
+            AddUntilStep("wait for modded stars", () => Math.Abs(getSelectedStarDisplay().Current.Value.Stars - baseStars) > 0.01);
+
+            AddStep("start tracking displayed stars", () =>
+            {
+                var display = getSelectedStarDisplay();
+
+                moddedStars = display.Current.Value.Stars;
+                observedStarRatings.Clear();
+                observedStarRatings.Add(moddedStars);
+
+                display.Current.BindValueChanged(stars => observedStarRatings.Add(stars.NewValue.Stars), false);
+            });
+
+            ApplyToFilterAndWaitForFilter("filter to [0..7]", c =>
+            {
+                c.UserStarDifficulty.Min = 0;
+                c.UserStarDifficulty.Max = 7;
+            });
+
+            AddUntilStep("selection retained", () => Carousel.CurrentBeatmap, () => Is.EqualTo(selectedBeatmap));
+            CheckDisplayedBeatmapsCount(2);
+            AddWaitStep("wait for panel refresh", 5);
+
+            AddAssert("displayed stars never reset to base", () => observedStarRatings.All(stars => Math.Abs(stars - baseStars) > 0.01));
+            AddAssert("modded stars preserved", () => Math.Abs(getSelectedStarDisplay().Current.Value.Stars - moddedStars) < 0.01);
+
+            PanelBeatmap? getSelectedBeatmapPanel() => GetSelectedPanel() as PanelBeatmap;
+
+            StarRatingDisplay getSelectedStarDisplay() => getSelectedBeatmapPanel()!.ChildrenOfType<StarRatingDisplay>().Single();
         }
 
         [Test]
