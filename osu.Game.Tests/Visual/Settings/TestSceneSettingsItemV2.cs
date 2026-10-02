@@ -89,6 +89,21 @@ namespace osu.Game.Tests.Visual.Settings
                                             PlaceholderText = "Here is an artist",
                                             Current = { Value = string.Empty, Default = string.Empty, Disabled = true }
                                         }),
+                                        new SettingsItemV2(new FormTextBox
+                                        {
+                                            Caption = "Length limited Text",
+                                            HintText = "4 number pin code",
+                                            PlaceholderText = "ex. 9487",
+                                            LengthLimit = 4,
+                                            Current = { Value = string.Empty, Default = string.Empty }
+                                        }),
+                                        new SettingsItemV2(new FormPasswordTextBox
+                                        {
+                                            Caption = "2*3*7",
+                                            HintText = "42",
+                                            PlaceholderText = "Secret",
+                                            Current = { Value = string.Empty, Default = string.Empty }
+                                        }),
                                         new SettingsItemV2(new FormNumberBox(allowDecimals: true)
                                         {
                                             Caption = "Number",

@@ -56,17 +56,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public Action? SettingsApplied;
 
-            public OsuTextBox NameField = null!;
+            public FormTextBox NameField = null!;
             private FormSliderBar<byte> maximumParticipantsSliderBar = null!;
             private FormCheckBox maximumParticipantsCheckbox = null!;
             public MatchTypePicker TypePicker = null!;
-            public OsuEnumDropdown<QueueMode> QueueModeDropdown = null!;
-            public OsuTextBox PasswordTextBox = null!;
-            public OsuCheckbox AutoSkipCheckbox = null!;
+            public FormEnumDropdown<QueueMode> QueueModeDropdown = null!;
+            public FormPasswordTextBox PasswordTextBox = null!;
+            public FormCheckBox AutoSkipCheckbox = null!;
             public RoundedButton ApplyButton = null!;
             public OsuSpriteText ErrorText = null!;
 
-            private OsuEnumDropdown<StartMode> startModeDropdown = null!;
+            private FormEnumDropdown<StartMode> startModeDropdown = null!;
             private OsuSpriteText typeLabel = null!;
             private LoadingLayer loadingLayer = null!;
 
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                                        Vertical = 10
+                                        Vertical = 50
                                     },
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new[]
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(0, 10),
+                                            Spacing = new Vector2(0, 20),
                                             Children = new[]
                                             {
                                                 new Container
@@ -143,19 +143,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                     AutoSizeAxes = Axes.Y,
                                                     Children = new Drawable[]
                                                     {
-                                                        new SectionContainer
+                                                        new FillFlowContainer
                                                         {
                                                             Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
-                                                            Children = new[]
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Width = 0.5f,
+                                                            Spacing = new Vector2(0, 5),
+                                                            Children = new Drawable[]
                                                             {
-                                                                new Section("Room name")
+                                                                NameField = new FormTextBox
                                                                 {
-                                                                    Child = NameField = new OsuTextBox
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        TabbableContentContainer = this,
-                                                                        LengthLimit = 100,
-                                                                    },
+                                                                    Caption = "Room name",
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    TabbableContentContainer = this,
+                                                                    LengthLimit = 100,
                                                                 },
                                                                 // new Section("Room visibility")
                                                                 // {
@@ -165,104 +167,85 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 //         Enabled = { Value = false }
                                                                 //     },
                                                                 // },
-                                                                new Section("Game type")
+                                                                new FillFlowContainer
                                                                 {
-                                                                    Child = new FillFlowContainer
+                                                                    AutoSizeAxes = Axes.Y,
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    Padding = SettingsPanel.CONTENT_PADDING,
+                                                                    Direction = FillDirection.Vertical,
+                                                                    Spacing = new Vector2(7),
+                                                                    Children = new Drawable[]
                                                                     {
-                                                                        AutoSizeAxes = Axes.Y,
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Direction = FillDirection.Vertical,
-                                                                        Spacing = new Vector2(7),
-                                                                        Children = new Drawable[]
+                                                                        new OsuSpriteText
                                                                         {
-                                                                            TypePicker = new MatchTypePicker
-                                                                            {
-                                                                                RelativeSizeAxes = Axes.X,
-                                                                            },
-                                                                            typeLabel = new OsuSpriteText
-                                                                            {
-                                                                                Font = OsuFont.GetFont(size: 14),
-                                                                                Colour = colours.Yellow
-                                                                            },
+                                                                            Font = OsuFont.GetFont(size: 16),
+                                                                            Text = "Game Type"
+                                                                        },
+                                                                        TypePicker = new MatchTypePicker
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                        },
+                                                                        typeLabel = new OsuSpriteText
+                                                                        {
+                                                                            Font = OsuFont.GetFont(size: 14),
+                                                                            Colour = colours.Yellow
                                                                         },
                                                                     },
                                                                 },
-                                                                new Section("Queue mode")
+                                                                QueueModeDropdown = new FormEnumDropdown<QueueMode>
                                                                 {
-                                                                    Child = new Container
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 40,
-                                                                        Child = QueueModeDropdown = new OsuEnumDropdown<QueueMode>
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X
-                                                                        }
-                                                                    }
+                                                                    Caption = "Queue mode",
+                                                                    RelativeSizeAxes = Axes.X,
                                                                 },
-                                                                new Section("Auto start")
+                                                                startModeDropdown = new FormEnumDropdown<StartMode>
                                                                 {
-                                                                    Child = new Container
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Height = 40,
-                                                                        Child = startModeDropdown = new OsuEnumDropdown<StartMode>
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X
-                                                                        }
-                                                                    }
+                                                                    Caption = "Auto start",
+                                                                    RelativeSizeAxes = Axes.X,
                                                                 }
                                                             },
                                                         },
-                                                        new SectionContainer
+                                                        new FillFlowContainer
                                                         {
                                                             Anchor = Anchor.TopRight,
                                                             Origin = Anchor.TopRight,
+                                                            RelativeSizeAxes = Axes.X,
+                                                            AutoSizeAxes = Axes.Y,
+                                                            Width = 0.5f,
+                                                            Spacing = new Vector2(0, 5),
                                                             Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
-                                                            Children = new[]
+                                                            Children = new Drawable[]
                                                             {
-                                                                new Section("Player count")
+                                                                maximumParticipantsCheckbox = new FormCheckBox
                                                                 {
-                                                                    Children = new Drawable[]
+                                                                    Caption = "Limited slots",
+                                                                    HintText = "When enabled, total players allowed in a room will be limited. Unlimited when disabled."
+                                                                },
+                                                                maximumParticipantsSliderBar = new FormSliderBar<byte>
+                                                                {
+                                                                    Caption = "Slot count",
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    Current = new BindableNumber<byte>(16)
                                                                     {
-                                                                        maximumParticipantsCheckbox = new FormCheckBox
-                                                                        {
-                                                                            Caption = "Limited slots",
-                                                                            HintText = "When enabled, total players allowed in a room will be limited. Unlimited when disabled."
-                                                                        },
-                                                                        maximumParticipantsSliderBar = new FormSliderBar<byte>
-                                                                        {
-                                                                            Caption = "Slot count",
-                                                                            RelativeSizeAxes = Axes.X,
-                                                                            Margin = new MarginPadding { Top = 5 },
-                                                                            Current = new BindableNumber<byte>(16)
-                                                                            {
-                                                                                MinValue = 2,
-                                                                                MaxValue = 16,
-                                                                            }
-                                                                        },
+                                                                        MinValue = 2,
+                                                                        MaxValue = 16,
                                                                     },
                                                                 },
-                                                                new Section("Password (optional)")
+                                                                PasswordTextBox = new FormPasswordTextBox
                                                                 {
-                                                                    Child = PasswordTextBox = new OsuPasswordTextBox
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        TabbableContentContainer = this,
-                                                                        // Set quite small to avoid hitting rich presence limits.
-                                                                        // Note that we use JSON encoding so this needs to be well below the 128 byte limit discord end.
-                                                                        // See https://github.com/Lachee/discord-rpc-csharp/blob/master/DiscordRPC/Entities/Secrets.cs#L26-L42
-                                                                        //
-                                                                        // Note that we need at least 36 characters for tournament rooms:
-                                                                        // https://github.com/ppy/osu-server-spectator/blob/406ed09d5825f2fe60c9d5ca08e69db94d873e28/osu.Server.Spectator/Hubs/Referee/RefereeHub.cs#L101
-                                                                        LengthLimit = 40,
-                                                                    },
+                                                                    Caption = "Password (optional)",
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    TabbableContentContainer = this,
+                                                                    // Set quite small to avoid hitting rich presence limits.
+                                                                    // Note that we use JSON encoding so this needs to be well below the 128 byte limit discord end.
+                                                                    // See https://github.com/Lachee/discord-rpc-csharp/blob/master/DiscordRPC/Entities/Secrets.cs#L26-L42
+                                                                    //
+                                                                    // Note that we need at least 36 characters for tournament rooms:
+                                                                    // https://github.com/ppy/osu-server-spectator/blob/406ed09d5825f2fe60c9d5ca08e69db94d873e28/osu.Server.Spectator/Hubs/Referee/RefereeHub.cs#L101
+                                                                    LengthLimit = 40
                                                                 },
-                                                                new Section("Other")
+                                                                AutoSkipCheckbox = new FormCheckBox
                                                                 {
-                                                                    Child = AutoSkipCheckbox = new OsuCheckbox
-                                                                    {
-                                                                        LabelText = "Automatically skip the beatmap intro"
-                                                                    }
+                                                                    Caption = "Automatically skip the beatmap intro"
                                                                 }
                                                             }
                                                         }
@@ -422,7 +405,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
 
             private void updateRoomName()
-                => NameField.Text = room.Name;
+                => NameField.Current.Value = room.Name;
 
             private void updateRoomType()
                 => TypePicker.Current.Value = room.Type;
@@ -431,7 +414,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 => QueueModeDropdown.Current.Value = room.QueueMode;
 
             private void updateRoomPassword()
-                => PasswordTextBox.Text = room.Password ?? string.Empty;
+                => PasswordTextBox.Current.Value = room.Password ?? string.Empty;
 
             private void updateRoomAutoSkip()
                 => AutoSkipCheckbox.Current.Value = room.AutoSkip;
@@ -457,7 +440,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 base.Update();
 
-                ApplyButton.Enabled.Value = room.Playlist.Count > 0 && NameField.Text.Length > 0 && !operationInProgress.Value;
+                ApplyButton.Enabled.Value = room.Playlist.Count > 0 && NameField.Current.Value.Length > 0 && !operationInProgress.Value;
                 playlistContainer.Alpha = room.RoomID == null ? 1 : 0;
             }
 
@@ -478,8 +461,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (client.Room != null)
                 {
                     client.ChangeSettings(
-                              name: NameField.Text,
-                              password: PasswordTextBox.Text,
+                              name: NameField.Current.Value,
+                              password: PasswordTextBox.Current.Value,
                               matchType: TypePicker.Current.Value,
                               queueMode: QueueModeDropdown.Current.Value,
                               autoStartDuration: TimeSpan.FromSeconds((int)startModeDropdown.Current.Value),
@@ -495,8 +478,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 }
                 else
                 {
-                    room.Name = NameField.Text;
-                    room.Password = PasswordTextBox.Text;
+                    room.Name = NameField.Current.Value;
+                    room.Password = PasswordTextBox.Current.Value;
                     room.Type = TypePicker.Current.Value;
                     room.QueueMode = QueueModeDropdown.Current.Value;
                     room.AutoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
