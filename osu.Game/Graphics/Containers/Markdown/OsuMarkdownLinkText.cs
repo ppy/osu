@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -16,34 +16,31 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public partial class OsuMarkdownLinkText : MarkdownLinkText
     {
-        [Resolved(canBeNull: true)]
-        private ILinkHandler linkHandler { get; set; }
+        [Resolved]
+        private ILinkHandler? linkHandler { get; set; }
 
-        private readonly string text;
-        private readonly string title;
+        private readonly string? title;
 
-        public OsuMarkdownLinkText(string text, LinkInline linkInline)
-            : base(text, linkInline)
+        public OsuMarkdownLinkText(LinkInline linkInline)
+            : base(linkInline)
         {
-            this.text = text;
             title = linkInline.Title;
         }
 
-        public OsuMarkdownLinkText(AutolinkInline autolinkInline)
-            : base(autolinkInline)
+        public OsuMarkdownLinkText(AutolinkInline autolinkInline, bool bold, bool italic)
+            : base(autolinkInline, bold, italic)
         {
-            text = autolinkInline.Url;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var textDrawable = CreateSpriteText().With(t => t.Text = text);
+            var content = CreateContent();
 
             InternalChildren = new Drawable[]
             {
-                textDrawable,
-                new OsuMarkdownLinkCompiler(new[] { textDrawable })
+                content,
+                new OsuMarkdownLinkCompiler(content)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Action = OnLinkPressed,
@@ -56,10 +53,15 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private partial class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
-            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts)
-                : base(parts)
+            private readonly Drawable content;
+
+            public OsuMarkdownLinkCompiler(Drawable content)
+                : base(new[] { content })
             {
+                this.content = content;
             }
+
+            protected override IEnumerable<Drawable> EffectTargets => content.ChildrenOfType<SpriteText>();
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
