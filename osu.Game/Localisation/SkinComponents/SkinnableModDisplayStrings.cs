@@ -50,6 +50,16 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString AlwaysExpanded => new TranslatableString(getKey(@"always_expanded"), @"Always expanded");
 
+        /// <summary>
+        /// "Use legacy skin icons"
+        /// </summary>
+        public static LocalisableString UseSkinIcons => new TranslatableString(getKey(@"use_skin_icons"), @"Use legacy skin icons");
+
+        /// <summary>
+        /// "Whether to use legacy skin mod icons or the new ones."
+        /// </summary>
+        public static LocalisableString UseSkinIconsDescription => new TranslatableString(getKey(@"use_skin_icons_description"), @"Whether to use legacy skin mod icons or the new ones.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
