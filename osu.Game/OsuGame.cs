@@ -60,6 +60,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
@@ -1154,8 +1155,12 @@ namespace osu.Game
                 },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
-                new ConfineMouseTracker()
+                new ConfineMouseTracker(),
             });
+
+            // Load volume overlay before anything else, so users can adjust volume as soon as feasible after startup.
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
+            Add(new ScrollAdjustsVolume(requireAltPressed: true));
 
             dependencies.Cache(ScreenFooter);
 
@@ -1195,8 +1200,6 @@ namespace osu.Game
                         menuScreen.MakeCurrent();
                 },
             }, topMostOverlayContent.Add);
-
-            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
             onScreenDisplay = new OnScreenDisplay();
 
