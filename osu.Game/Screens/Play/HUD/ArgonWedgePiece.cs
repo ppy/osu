@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Inverted shear")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.InvertedShear))]
         public BindableBool InvertShear { get; } = new BindableBool();
 
         [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Colour))]

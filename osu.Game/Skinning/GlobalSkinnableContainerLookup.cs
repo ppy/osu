@@ -3,6 +3,8 @@
 
 using System;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Skinning
@@ -29,11 +31,11 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
         }
 
-        public override string ToString()
+        public LocalisableString GetLocalisableDescription()
         {
-            if (Ruleset == null) return Lookup.GetDescription();
+            if (Ruleset == null) return Lookup.GetLocalisableDescription();
 
-            return $"{Lookup.GetDescription()} (\"{Ruleset.Name}\" only)";
+            return SkinEditorStrings.WorkingLayerOfRuleset(Lookup.GetLocalisableDescription(), Ruleset.Name);
         }
 
         public bool Equals(GlobalSkinnableContainerLookup? other)
