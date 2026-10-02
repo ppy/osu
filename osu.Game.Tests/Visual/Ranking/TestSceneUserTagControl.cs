@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -29,6 +30,26 @@ namespace osu.Game.Tests.Visual.Ranking
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private int writeRequestCount;
+
+        private Container content = null!;
+
+        protected override Container<Drawable> Content => content;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            base.Content.Child = new PopoverContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 700,
+                    AutoSizeAxes = Axes.Y,
+                },
+            };
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -61,6 +82,7 @@ namespace osu.Game.Tests.Visual.Ranking
                                     },
                                     new APITag { Id = 4, Name = "tap/bursts", Description = "Patterns requiring continuous movement and alternating, typically 9 notes or less.", },
                                     new APITag { Id = 5, Name = "style/mono-heavy", Description = "Features monos used in large amounts.", RulesetId = 1, },
+                                    new APITag { Id = 6, Name = "style/freeform", Description = "An unrestrained and loose approach towards visual structure." },
                                 ]
                             }), 500);
                             return true;
@@ -139,6 +161,40 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestFilter()
+        {
+            AddStep("show", () =>
+            {
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                working.BeatmapInfo.OnlineID = 42;
+                Beatmap.Value = working;
+                Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
+                {
+                    Filter = t => (t.GroupName ?? "").StartsWith("style", StringComparison.Ordinal),
+                    Writable = true,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.X,
+                };
+            });
+            AddUntilStep("two tags are shown", () => getTagFlow().Count, () => Is.EqualTo(2));
+            AddAssert("add new button is not present", () => getTagFlow().ChildrenOfType<UserTagControl.DrawableUserTag>().Where(t => t.UserTag.DisplayName == "add"), () => Is.Empty);
+            AddStep("vote for tag 6", () =>
+            {
+                InputManager.MoveMouseTo(getDrawableTagById(6));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("tag 6 voted for", () => getDrawableTagById(6).UserTag.VoteCount.Value, () => Is.EqualTo(1));
+            AddStep("remove vote for tag 6", () =>
+            {
+                InputManager.MoveMouseTo(getDrawableTagById(6));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("tag 6 not voted for", () => getDrawableTagById(6).UserTag.VoteCount.Value, () => Is.EqualTo(0));
+            AddAssert("two tags are shown", () => getTagFlow().Count, () => Is.EqualTo(2));
+        }
+
+        [Test]
         public void TestTagsDoNotMoveUntilMouseMovesAway()
         {
             AddStep("show", () =>
@@ -173,24 +229,19 @@ namespace osu.Game.Tests.Visual.Ranking
             AddUntilStep("tag 2 voted for", () => getDrawableTagById(2).UserTag.VoteCount.Value, () => Is.EqualTo(4));
             AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddAssert("tag 2 reordered to first", () => getTagFlow().GetLayoutPosition(getDrawableTagById(2)), () => Is.EqualTo(0));
-
-            FillFlowContainer<UserTagControl.DrawableUserTag> getTagFlow() => this.ChildrenOfType<FillFlowContainer<UserTagControl.DrawableUserTag>>().Single();
-
-            UserTagControl.DrawableUserTag getDrawableTagById(long id) => getTagFlow().Single(t => t.UserTag.Id == id);
         }
+
+        private FillFlowContainer<UserTagControl.DrawableUserTag> getTagFlow() => this.ChildrenOfType<FillFlowContainer<UserTagControl.DrawableUserTag>>().Single();
+        private UserTagControl.DrawableUserTag getDrawableTagById(long id) => getTagFlow().Single(t => t.UserTag.Id == id);
 
         private void recreateControl(bool writable = true)
         {
-            Child = new PopoverContainer
+            Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = new UserTagControl(Beatmap.Value.BeatmapInfo)
-                {
-                    Writable = writable,
-                    Width = 700,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
+                Writable = writable,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.X,
             };
         }
     }
