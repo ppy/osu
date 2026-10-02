@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             base.LoadComplete();
 
             completedSpins = drawableSpinner.CompletedFullSpins.GetBoundCopy();
-            completedSpins.BindValueChanged(bonus =>
+            completedSpins.BindValueChanged(_ =>
             {
                 if (drawableSpinner.CurrentBonusScore <= 0)
                     return;
