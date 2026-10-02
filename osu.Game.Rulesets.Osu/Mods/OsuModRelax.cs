@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
@@ -77,13 +78,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             bool requiresHold = false;
             bool requiresHit = false;
+            bool isHoveringCircle = false;
 
             double time = playfield.Clock.CurrentTime;
 
             foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
                 // we are not yet close enough to the object.
-                if (time < h.HitObject.StartTime - RELAX_LENIENCY)
+                if (time < h.HitObject.StartTime - OsuHitWindows.MISS_WINDOW)
                     break;
 
                 // already hit or beyond the hittable end time.
@@ -101,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         if (!slider.HeadCircle.IsHit)
                             handleHitCircle(slider.HeadCircle);
 
-                        requiresHold |= slider.SliderInputManager.IsMouseInFollowArea(slider.Tracking.Value);
+                        requiresHold |= true;
                         break;
 
                     case DrawableSpinner spinner:
@@ -117,17 +119,26 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             if (requiresHold)
-                changeState(true);
+            {
+                // we dont want to hit an object that doesn't require a hit.
+                if (requiresHit || !isHoveringCircle)
+                {
+                    changeState(true);
+                }
+            }
             else if (isDownState && time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
+            {
                 changeState(false);
+            }
 
             void handleHitCircle(DrawableHitCircle circle)
             {
                 if (!circle.HitArea.IsHovered)
                     return;
 
+                isHoveringCircle = true;
                 Debug.Assert(circle.HitObject.HitWindows != null);
-                requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
+                requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime) && time >= circle.HitObject.StartTime - RELAX_LENIENCY;
             }
 
             void changeState(bool down)
