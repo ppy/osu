@@ -59,25 +59,35 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                new SettingsItemV2(skinDropdown = new SkinDropdown
-                {
-                    AlwaysShowSearchBar = true,
-                    AllowNonContiguousMatching = true,
-                    Caption = SkinSettingsStrings.CurrentSkin,
-                    Current = skins.CurrentSkinInfo,
-                }),
-                new FillFlowContainer
+                new SettingsFilterableGroup
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                    Padding = SettingsPanel.CONTENT_PADDING,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(ITEM_SPACING_V2),
                     Children = new Drawable[]
                     {
-                        // This is all super-temporary until we move skin settings to their own panel / overlay.
-                        new RenameSkinButton { Padding = new MarginPadding { Right = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
-                        new ExportSkinButton { Padding = new MarginPadding { Horizontal = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
-                        new DeleteSkinButton { Padding = new MarginPadding { Left = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
+                        new SettingsItemV2(skinDropdown = new SkinDropdown
+                        {
+                            AlwaysShowSearchBar = true,
+                            AllowNonContiguousMatching = true,
+                            Caption = SkinSettingsStrings.CurrentSkin,
+                            Current = skins.CurrentSkinInfo,
+                        }),
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Horizontal,
+                            Padding = SettingsPanel.CONTENT_PADDING,
+                            Children = new Drawable[]
+                            {
+                                // This is all super-temporary until we move skin settings to their own panel / overlay.
+                                new RenameSkinButton { Padding = new MarginPadding { Right = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
+                                new ExportSkinButton { Padding = new MarginPadding { Horizontal = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
+                                new DeleteSkinButton { Padding = new MarginPadding { Left = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
+                            }
+                        },
                     }
                 },
                 new SettingsButtonV2
