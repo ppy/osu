@@ -56,6 +56,9 @@ namespace osu.Game.Screens.Menu
 
         private OsuLogo? logo;
 
+        private readonly MainMenuButton exitButton;
+        private bool canExit;
+
         /// <summary>
         /// Assign the <see cref="OsuLogo"/> that this ButtonSystem should manage the position of.
         /// </summary>
@@ -69,7 +72,7 @@ namespace osu.Game.Screens.Menu
                 this.logo.Action = onOsuLogo;
 
                 // osuLogo.SizeForFlow relies on loading to be complete.
-                buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4), 0);
+                buttonArea.Flow.Position = new Vector2(WEDGE_WIDTH * 2 - (BUTTON_WIDTH + this.logo.SizeForFlow / 4) + (canExit ? BUTTON_WIDTH / 2 : 0), 0);
 
                 updateLogoState();
             }
@@ -109,29 +112,21 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new Drawable[]
             {
+                exitButton = new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(40, 40, 40, 255), (_, e) => OnExit?.Invoke(e), Key.Q),
                 new MainMenuButton(ButtonSystemStrings.Settings, string.Empty, OsuIcon.Settings, new Color4(85, 85, 85, 255), (_, _) => OnSettings?.Invoke(), Key.O, Key.S)
                 {
                     Padding = new MarginPadding { Right = WEDGE_WIDTH },
                 },
                 backButton = new MainMenuButton(ButtonSystemStrings.Back, @"back-to-top", OsuIcon.PrevCircle, new Color4(51, 58, 94, 255), (_, _) =>
                 {
-                    switch (State)
-                    {
-                        case ButtonSystemState.Multi:
-                            State = ButtonSystemState.Play;
-                            break;
-
-                        default:
-                            State = ButtonSystemState.TopLevel;
-                            break;
-                    }
+                    State = ButtonSystemState.TopLevel;
                 })
                 {
                     Padding = new MarginPadding { Right = WEDGE_WIDTH },
                     VisibleStateMin = ButtonSystemState.Play,
                     VisibleStateMax = ButtonSystemState.Edit,
                 },
-                logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f))
+                logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f)),
             });
 
             buttonArea.Flow.CentreTarget = logoTrackingContainer.LogoFacade;
@@ -149,11 +144,14 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, IdleTracker? idleTracker, GameHost host)
         {
+            canExit = host.CanExit;
+            if (!canExit)
+                buttonArea.Remove(exitButton, true);
+
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Solo, @"button-default-select", OsuIcon.Player, new Color4(102, 68, 204, 255), (_, _) => OnSolo?.Invoke(), Key.P)
             {
                 Padding = new MarginPadding { Left = WEDGE_WIDTH },
             });
-            buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-default-select", OsuIcon.Online, new Color4(94, 63, 186, 255), (_, _) => State = ButtonSystemState.Multi, Key.M));
             buttonsPlay.Add(new MainMenuButton(ButtonSystemStrings.Playlists, @"button-default-select", OsuIcon.Tournament, new Color4(94, 63, 186, 255), onPlaylists, Key.L));
             buttonsPlay.Add(new DailyChallengeButton(@"button-daily-select", new Color4(94, 63, 186, 255), onDailyChallenge, Key.D));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
@@ -163,8 +161,6 @@ namespace osu.Game.Screens.Menu
                 Padding = new MarginPadding { Left = WEDGE_WIDTH }
             });
             buttonsMulti.Add(new MainMenuButton(ButtonSystemStrings.RankedPlay, @"button-daily-select", FontAwesome.Solid.Crown, new Color4(94, 63, 186, 255), onRankedPlay, Key.R));
-            // disabled for now to give ranked play space.
-            // buttonsMulti.Add(new MainMenuButton(ButtonSystemStrings.QuickPlay, @"button-daily-select", FontAwesome.Solid.Bolt, new Color4(94, 63, 186, 255), onQuickPlay, Key.Q));
             buttonsMulti.ForEach(b => b.VisibleState = ButtonSystemState.Multi);
 
             buttonsEdit.Add(new MainMenuButton(EditorStrings.BeatmapEditor.ToLower(), @"button-default-select", OsuIcon.Beatmap, new Color4(238, 170, 0, 255), (_, _) => OnEditBeatmap?.Invoke(), Key.B,
@@ -175,17 +171,14 @@ namespace osu.Game.Screens.Menu
             buttonsEdit.Add(new MainMenuButton(SkinEditorStrings.SkinEditor.ToLower(), @"button-default-select", OsuIcon.SkinB, new Color4(220, 160, 0, 255), (_, _) => OnEditSkin?.Invoke(), Key.S));
             buttonsEdit.ForEach(b => b.VisibleState = ButtonSystemState.Edit);
 
-            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), (_, _) => State = ButtonSystemState.Play, Key.P, Key.M,
-                Key.L)
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Play, @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), (_, _) => State = ButtonSystemState.Play, Key.P)
             {
                 Padding = new MarginPadding { Left = WEDGE_WIDTH },
             });
+            buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Multi, @"button-play-select", OsuIcon.Online, new Color4(94, 63, 186, 255), (_, _) => State = ButtonSystemState.Multi, Key.M));
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Edit, @"button-play-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), (_, _) => State = ButtonSystemState.Edit, Key.E));
             buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Browse, @"button-default-select", OsuIcon.Beatmap, new Color4(165, 204, 0, 255), (_, _) => OnBeatmapListing?.Invoke(), Key.B,
                 Key.D));
-
-            if (host.CanExit)
-                buttonsTopLevel.Add(new MainMenuButton(ButtonSystemStrings.Exit, string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), (_, e) => OnExit?.Invoke(e), Key.Q));
 
             buttonArea.AddRange(buttonsMulti);
             buttonArea.AddRange(buttonsPlay);
