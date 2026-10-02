@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("add volume control receptor", () => Add(volumeAdjust = new TestAltScrollAdjustsVolume
             {
                 RelativeSizeAxes = Axes.Both,
-                Depth = float.MaxValue,
+                Depth = float.MinValue,
             }));
 
             AddStep("hold alt", () => InputManager.PressKey(Key.AltLeft));
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Add(volumeAdjust = new TestAltScrollAdjustsVolume
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
+                    Depth = float.MinValue,
                 });
             });
             AddStep("load blocking overlay", loadBlockingOverlay);
