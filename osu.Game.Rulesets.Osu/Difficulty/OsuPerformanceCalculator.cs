@@ -58,7 +58,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double approachRate;
         private double drainRate;
 
+        private double? totalDeviation;
         private double? speedDeviation;
+        private double cheeseFactor;
 
         private double aimEstimatedSliderBreaks;
         private double speedEstimatedSliderBreaks;
@@ -150,7 +152,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
             }
 
+            totalDeviation = calculateTotalDeviation(osuAttributes);
             speedDeviation = calculateSpeedDeviation(osuAttributes);
+            cheeseFactor = osuAttributes.CheeseFactor;
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
@@ -181,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModAutopilot))
+            if (score.Mods.Any(h => h is OsuModAutopilot) || totalDeviation == null)
                 return 0.0;
 
             double aimDifficulty = attributes.AimDifficulty;
@@ -203,7 +207,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     estimateImproperlyFollowedDifficultSliders = Math.Clamp(countSliderEndsDropped + countSliderTickMiss, 0, attributes.AimDifficultSliderCount);
                 }
 
-                double sliderNerfFactor = (1 - attributes.SliderFactor) * DiffUtils.Pow(1 - estimateImproperlyFollowedDifficultSliders / attributes.AimDifficultSliderCount, 3) + attributes.SliderFactor;
+                double sliderNerfFactor = (1 - attributes.SliderFactor) * DiffUtils.Pow(1 - estimateImproperlyFollowedDifficultSliders / attributes.AimDifficultSliderCount, 3)
+                                          + attributes.SliderFactor;
                 aimDifficulty *= sliderNerfFactor;
             }
 
@@ -228,7 +233,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + calculateTraceableBonus(attributes.SliderFactor);
             }
 
-            aimValue *= accuracy;
+            double baseNerf = 1 - DiffUtils.Smootherstep(cheeseFactor, 1, 0.9);
+
+            double cheeseNerf = baseNerf + (1 - baseNerf) * DiffUtils.Pow(DiffUtils.Erf(23.0 / totalDeviation.Value), 4);
+
+            aimValue *= accuracy * cheeseNerf;
 
             return aimValue;
         }
@@ -479,6 +488,50 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             deviation = Math.Sqrt(((relevantCountGreat + relevantCountOk) * DiffUtils.Pow(deviation, 2) + relevantCountMeh * mehVariance) / (relevantCountGreat + relevantCountOk + relevantCountMeh));
 
             return deviation;
+        }
+
+        /// <summary>
+        /// Estimates the player's total tapping deviation.
+        /// </summary>
+        private double? calculateTotalDeviation(OsuDifficultyAttributes attributes)
+        {
+            if (totalSuccessfulHits == 0)
+                return null;
+
+            if (!usingClassicSliderAccuracy)
+                return calculateDeviation(countGreat, countOk, countMeh);
+
+            int circleCount = attributes.HitCircleCount;
+            int missCountCircles = Math.Min(countMiss, circleCount);
+            int mehCountCircles = Math.Min(countMeh, circleCount - missCountCircles);
+            int okCountCircles = Math.Min(countOk, circleCount - missCountCircles - mehCountCircles);
+            int greatCountCircles = Math.Max(0, circleCount - missCountCircles - mehCountCircles - okCountCircles);
+
+            // Assume 100s, 50s, and misses happen on circles. If there are less non-300s on circles than 300s,
+            // compute the deviation on circles.
+            if (greatCountCircles > 0)
+            {
+                return calculateDeviation(greatCountCircles, okCountCircles, mehCountCircles);
+            }
+
+            // If there are more non-300s than there are circles, compute the deviation on sliders instead.
+            // Here, all that matters is whether or not the slider was missed, since it is impossible
+            // to get a 100 or 50 on a slider by mis-tapping it.
+            int sliderCount = attributes.SliderCount;
+            int missCountSliders = Math.Min(sliderCount, countMiss - missCountCircles);
+            int greatCountSliders = sliderCount - missCountSliders;
+
+            // We only get here if nothing was hit. In this case, there is no estimate for deviation.
+            // Note that this is never negative, so checking if this is only equal to 0 makes sense.
+            if (greatCountSliders == 0)
+            {
+                return null;
+            }
+
+            double greatProbabilitySlider = greatCountSliders / (sliderCount + 1.0);
+            double deviationOnSliders = mehHitWindow / (DiffUtils.SQRT2 * DiffUtils.ErfInv(greatProbabilitySlider));
+
+            return deviationOnSliders;
         }
 
         // Calculates multiplier for speed to account for improper tapping based on the deviation and speed difficulty

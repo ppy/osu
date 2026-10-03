@@ -33,14 +33,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods };
 
-            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
-            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
+            var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders && !a.AimCheese);
+            var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders && !a.AimCheese);
+            var aimWithCheese = skills.OfType<Aim>().Single(a => a.IncludeSliders && a.AimCheese);
             var speed = skills.OfType<Speed>().Single();
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             var reading = skills.OfType<Reading>().Single();
 
             double aimDifficultyValue = aim.DifficultyValue();
             double aimNoSlidersDifficultyValue = aimWithoutSliders.DifficultyValue();
+            double aimCheeseDifficultyValue = aimWithCheese.DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
             double readingDifficultyValue = reading.DifficultyValue();
 
@@ -68,9 +70,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
             double aimNoSlidersRating = calculateAimDifficultyRating(aimNoSlidersDifficultyValue);
+            double aimCheeseRating = calculateAimDifficultyRating(aimCheeseDifficultyValue);
 
             double sliderFactor = aimDifficultyValue > 0
                 ? aimNoSlidersRating / aimRating
+                : 1;
+
+            double cheeseFactor = aimDifficultyValue > 0
+                ? aimCheeseRating / aimRating
                 : 1;
 
             double speedRating = calculateDifficultyRating(speedDifficultyValue);
@@ -108,6 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 FlashlightDifficulty = flashlightRating,
                 ReadingDifficulty = readingRating,
                 SliderFactor = sliderFactor,
+                CheeseFactor = cheeseFactor,
                 AimDifficultStrainCount = aimDifficultStrainCount,
                 SpeedDifficultStrainCount = speedDifficultStrainCount,
                 ReadingDifficultNoteCount = readingDifficultNoteCount,
@@ -166,8 +174,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var skills = new List<Skill>
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
+                new Aim(mods, true, false),
+                new Aim(mods, false, false),
+                new Aim(mods, true, true),
                 new Speed(mods),
                 new Reading(mods)
             };
