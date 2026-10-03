@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<double> sliderStrains = new List<double>();
 
+        private readonly List<double> snapProbabilities = [];
+
         private double strainDecay(double ms) => DiffUtils.Pow(0.2, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
@@ -89,6 +91,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double pSnap = calculateSnapFlowProbability(flowDifficulty / combinedSnapDifficulty);
             double pFlow = 1 - pSnap;
+
+            snapProbabilities.Add(pSnap);
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
@@ -236,6 +240,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return strains.Skip(skipCount).OrderByDescending(p => p.Value);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Calculates the number of strains weighted against the top strain.
+        /// The result is scaled by clock rate as it affects the total number of strains.
+        /// </summary>
+        public override double CountTopWeightedStrains(double difficultyValue)
+        {
+            if (ObjectDifficulties.Count == 0)
+                return 0.0;
+
+            double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
+
+            if (consistentTopStrain == 0)
+                return ObjectDifficulties.Count;
+
+            // Use a weighted sum of all strains. Constants are arbitrary and give nice values
+            return ObjectDifficulties.Zip(snapProbabilities, (s, pSnap) => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 0.2 + 0.9 * pSnap)).Sum();
         }
     }
 }
