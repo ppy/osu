@@ -122,8 +122,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Dispose(bool isDisposing)
         {
-            if (Logo != null)
-                Logo.IsTracking = false;
+            Logo?.IsTracking = false;
 
             base.Dispose(isDisposing);
         }

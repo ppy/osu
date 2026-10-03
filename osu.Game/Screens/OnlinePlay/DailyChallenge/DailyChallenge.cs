@@ -580,8 +580,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             var track = Beatmap.Value?.Track;
 
-            if (track != null)
-                track.Looping = false;
+            track?.Looping = false;
         }
 
         private void updateMods()

@@ -100,7 +100,6 @@ namespace osu.Game.Screens.Select
                         if (dbBeatmap.MatchesOnlineVersion && dbBeatmap.Status != onlineBeatmap.Status)
                             dbBeatmap.Status = onlineBeatmap.Status;
 
-                        onlineBeatmap.BeatmapSet = onlineBeatmapSet;
                         HashSet<string> userTags = onlineBeatmap.GetTopUserTags(confirmedOnly: true)
                                                                 .Select(t => t.Tag.Name)
                                                                 .ToHashSet();

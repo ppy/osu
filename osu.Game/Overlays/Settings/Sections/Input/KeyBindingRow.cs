@@ -585,9 +585,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         /// </summary>
         private void updateBindTarget()
         {
-            if (bindTarget != null) bindTarget.IsBinding = false;
+            bindTarget?.IsBinding = false;
             bindTarget = buttons.FirstOrDefault(b => b.IsHovered) ?? buttons.FirstOrDefault();
-            if (bindTarget != null) bindTarget.IsBinding = true;
+            bindTarget?.IsBinding = true;
         }
 
         private void updateIsDefaultValue()

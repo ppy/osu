@@ -18,25 +18,25 @@ namespace osu.Game.Localisation
         // [Description(@"اَلْعَرَبِيَّةُ")]
         // ar,
 
-        [Description(@"Беларуская мова")]
+        [Description(@"беларуская мова")]
         be,
 
-        [Description(@"Български")]
+        [Description(@"български")]
         bg,
 
-        [Description(@"Català")]
+        [Description(@"català")]
         ca,
 
-        [Description(@"Česky")]
+        [Description(@"česky")]
         cs,
 
-        [Description(@"Dansk")]
+        [Description(@"dansk")]
         da,
 
         [Description(@"Deutsch")]
         de,
 
-        [Description(@"Ελληνικά")]
+        [Description(@"ελληνικά")]
         el,
 
         [Description(@"español")]
@@ -46,12 +46,11 @@ namespace osu.Game.Localisation
         // [Description(@"فارسی")]
         // fa_ir,
 
-        [Description(@"Suomi")]
+        [Description(@"suomi")]
         fi,
 
-        // TODO: Doesn't work as appropriate satellite assemblies aren't copied from resources (see: https://github.com/ppy/osu/discussions/18851#discussioncomment-3042170)
-        // [Description(@"Filipino")]
-        // fil,
+        [Description(@"wikang Filipino")]
+        fil,
 
         [Description(@"français")]
         fr,
@@ -63,13 +62,13 @@ namespace osu.Game.Localisation
         [Description(@"Hrvatski")]
         hr_hr,
 
-        [Description(@"Magyar")]
+        [Description(@"magyar")]
         hu,
 
-        [Description(@"Bahasa Indonesia")]
+        [Description(@"bahasa Indonesia")]
         id,
 
-        [Description(@"Italiano")]
+        [Description(@"italiano")]
         it,
 
         [Description(@"日本語")]
@@ -78,7 +77,7 @@ namespace osu.Game.Localisation
         [Description(@"한국어")]
         ko,
 
-        [Description(@"Lietuvių")]
+        [Description(@"lietuvių kalba")]
         lt,
 
         [Description(@"Latviešu")]
@@ -90,22 +89,22 @@ namespace osu.Game.Localisation
         [Description(@"Nederlands")]
         nl,
 
-        [Description(@"Norsk")]
+        [Description(@"norsk")]
         no,
 
         [Description(@"polski")]
         pl,
 
-        [Description(@"Português")]
+        [Description(@"português")]
         pt,
 
-        [Description(@"Português (Brasil)")]
+        [Description(@"português brasileiro")]
         pt_br,
 
-        [Description(@"Română")]
+        [Description(@"română")]
         ro,
 
-        [Description(@"Русский")]
+        [Description(@"русский")]
         ru,
 
         // TODO: Requires Sinhala glyphs to be added to resources.
@@ -113,16 +112,16 @@ namespace osu.Game.Localisation
         // [Description(@"සිංහල")]
         // si_lk,
 
-        [Description(@"Slovenčina")]
+        [Description(@"slovenčina")]
         sk,
 
-        [Description(@"Slovenščina")]
+        [Description(@"slovenščina")]
         sl,
 
-        [Description(@"Српски")]
+        [Description(@"српски")]
         sr,
 
-        [Description(@"Svenska")]
+        [Description(@"svenska")]
         sv,
 
         // Tajik has no associated localisations yet, and is not supported on Windows versions <10.
@@ -133,18 +132,13 @@ namespace osu.Game.Localisation
         [Description(@"ไทย")]
         th,
 
-        // Tagalog has no associated localisations yet, and is not supported on Xamarin platforms or Windows versions <10.
-        // Can be revisited if localisations ever arrive.
-        //[Description(@"Tagalog")]
-        //tl,
-
         [Description(@"Türkçe")]
         tr,
 
-        [Description(@"Українська мова")]
+        [Description(@"українська мова")]
         uk,
 
-        [Description(@"Tiếng Việt")]
+        [Description(@"tiếng Việt")]
         vi,
 
         [Description(@"简体中文")]

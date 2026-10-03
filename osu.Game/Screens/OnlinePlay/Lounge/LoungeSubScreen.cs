@@ -358,7 +358,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            JoinInternal(room, password, r =>
+            JoinInternal(room, password, _ =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();

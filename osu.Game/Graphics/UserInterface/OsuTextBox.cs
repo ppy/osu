@@ -88,8 +88,7 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundCommit = BorderColour = colourProvider?.Highlight1 ?? colour.Yellow;
             selectionColour = colourProvider?.Background1 ?? new Color4(249, 90, 255, 255);
 
-            if (caret != null)
-                caret.SelectionColour = selectionColour;
+            caret?.SelectionColour = selectionColour;
 
             Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
 
