@@ -47,15 +47,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             flowDifficulty *= calculateRhythmChangeBonus(osuCurrObj, osuLastObj);
             flowDifficulty *= calculateAngularVelocityBonus(osuCurrObj, osuLastObj);
 
-            if (osuNextObj != null)
-            {
-                flowDifficulty += calculateAcuteAngleBonus(
-                    osuCurrObj,
-                    osuLastObj,
-                    osuLastLastObj,
-                    osuNextObj,
-                    currVelocity);
-            }
+            flowDifficulty += calculateAcuteAngleBonus(
+                osuCurrObj,
+                osuLastObj,
+                osuLastLastObj,
+                osuNextObj,
+                currVelocity);
 
             flowDifficulty += calculateVelocityChangeBonus(
                 osuCurrObj,
@@ -109,12 +106,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             OsuDifficultyHitObject current,
             OsuDifficultyHitObject last,
             OsuDifficultyHitObject lastLast,
-            OsuDifficultyHitObject next,
+            OsuDifficultyHitObject? next,
             double currVelocity)
         {
             const double acute_angle_multiplier = 1.3;
 
-            if (current.Angle == null || next.Angle == null)
+            if (current.Angle == null || next?.Angle == null)
                 return 0;
 
             double currAcuteness = AngleUtils.CalculateAcuteness(current.Angle.Value);
@@ -159,8 +156,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             return currVelocity * acuteness * overlapWeight * acute_angle_multiplier;
         }
 
-        private static double calculateVelocityChangeBonus(OsuDifficultyHitObject current, OsuDifficultyHitObject previous, double currVelocity, double prevVelocity,
-                                                           double currDistance, double overlappedNotesWeight, bool withSliderTravelDistance)
+        private static double calculateVelocityChangeBonus(
+            OsuDifficultyHitObject current,
+            OsuDifficultyHitObject previous,
+            double currVelocity,
+            double prevVelocity,
+            double currDistance,
+            double overlappedNotesWeight,
+            bool withSliderTravelDistance)
         {
             const double velocity_change_multiplier = 0.55;
 
