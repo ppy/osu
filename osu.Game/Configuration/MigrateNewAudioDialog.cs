@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
@@ -21,27 +22,17 @@ namespace osu.Game.Configuration
         {
             Icon = FontAwesome.Regular.Bell;
 
+            LocalisableString uniqueBodyTextString;
+
             if (wasAlreadyUsing)
             {
-                HeaderText = @"New audio engine is now default!";
-                BodyText =
-                    $"""
-                     We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-
-                     As you were already using this engine, your audio offset has been adjusted to account for an internal offset change (no intervention required).
-
-                     If you have any issues, you can switch back to the legacy engine from settings via the "{AudioSettingsStrings.LegacyAudioLabel}" checkbox.
-                     """;
+                HeaderText = DialogStrings.MigrateNewAudioAlreadyUsingHeaderText;
+                uniqueBodyTextString = DialogStrings.MigrateNewAudioAlreadyUsingBodyText(AudioSettingsStrings.LegacyAudioLabel);
             }
             else
             {
-                HeaderText = @"New audio engine has been enabled";
-                BodyText =
-                    $"""
-                     We recently added a new "Experimental Audio" backend for Windows users to reduce hitsound latency. Due to overwhelmingly positive feedback, this is now the default mode.
-
-                     If you have any issues, you can switch back to the legacy engine below, or at any time in settings via the "{AudioSettingsStrings.LegacyAudioLabel}" checkbox.
-                     """;
+                HeaderText = DialogStrings.MigrateNewAudioHeaderText;
+                uniqueBodyTextString = DialogStrings.MigrateNewAudioBodyText(AudioSettingsStrings.LegacyAudioLabel);
 
                 MainContent.Add(new Container
                 {
@@ -57,6 +48,7 @@ namespace osu.Game.Configuration
                 });
             }
 
+            BodyText = LocalisableString.Interpolate($"{DialogStrings.MigrateNewAudioBaseBodyText}\n{uniqueBodyTextString}");
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
