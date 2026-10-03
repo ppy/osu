@@ -427,7 +427,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         {
             var testBeatmap = new Beatmap
             {
-                HitObjects = Enumerable.Range(1, 40).Select(i => new TestHitObject(HitResult.Perfect, HitResult.Miss)).ToList<HitObject>(),
+                HitObjects = Enumerable.Range(1, 40).Select(_ => new TestHitObject(HitResult.Perfect, HitResult.Miss)).ToList<HitObject>(),
             };
             scoreProcessor.ApplyBeatmap(testBeatmap);
 
@@ -479,6 +479,29 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             Assert.That(scoreProcessor.Combo.Value, Is.Zero);
             Assert.That(scoreProcessor.HighestCombo.Value, Is.Zero);
+        }
+
+        [Test]
+        public void TestScoreMultiplier()
+        {
+            Mod[] mods = new Mod[] { new OsuModHardRock() };
+
+            scoreProcessor = new TestScoreProcessor();
+            scoreProcessor.Mods.Value = mods;
+
+            var workingBeatmap = new TestWorkingBeatmap(beatmap);
+            var playableBeatmap = workingBeatmap.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, mods);
+
+            scoreProcessor.ApplyBeatmap(playableBeatmap);
+
+            var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), new OsuJudgement())
+            {
+                Type = HitResult.Great,
+            };
+            scoreProcessor.ApplyResult(judgementResult);
+
+            Assert.That(scoreProcessor.MaximumTotalScore, Is.EqualTo(1_000_000 * 1.1).Within(0.5d));
+            Assert.That(scoreProcessor.GetDisplayScore(ScoringMode.Standardised), Is.EqualTo(1_000_000 * 1.1).Within(0.5d));
         }
 
         private class TestJudgement : Judgement
@@ -537,8 +560,19 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
                 public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
 
+                public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new TestScoreMultiplierCalculator(context);
+
                 public override string Description => string.Empty;
                 public override string ShortName => string.Empty;
+            }
+
+            private class TestScoreMultiplierCalculator : ScoreMultiplierCalculator
+            {
+                public TestScoreMultiplierCalculator(ScoreMultiplierContext context)
+                    : base(context)
+                {
+                    Single<OsuModHardRock>(hasMultiplier: context.BeatmapDifficultyWithoutMods.CircleSize == 4 ? 1.1 : 1.0);
+                }
             }
         }
     }

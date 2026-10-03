@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.AccountCreation
 
                     apiState.BindValueChanged(state =>
                     {
-                        if (state.NewValue == APIState.RequiresSecondFactorAuth)
+                        if (this.IsCurrentScreen() && state.NewValue == APIState.RequiresSecondFactorAuth)
                             this.Push(new ScreenEmailVerification());
                     });
 

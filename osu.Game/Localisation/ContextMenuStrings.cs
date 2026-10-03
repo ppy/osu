@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SpectatePlayer => new TranslatableString(getKey(@"spectate_player"), @"Spectate");
 
         /// <summary>
+        /// "Duel"
+        /// </summary>
+        public static LocalisableString DuelPlayer => new TranslatableString(getKey(@"duel_player"), @"Duel");
+
+        /// <summary>
         /// "Are you sure you want to block {0}?"
         /// </summary>
         public static LocalisableString ConfirmBlockUser(string username) => new TranslatableString(getKey(@"confirm_block_user"), @"Are you sure you want to block {0}?", username);

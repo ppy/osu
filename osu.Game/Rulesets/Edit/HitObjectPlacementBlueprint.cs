@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -12,9 +13,9 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Edit
@@ -25,16 +26,6 @@ namespace osu.Game.Rulesets.Edit
     public abstract partial class HitObjectPlacementBlueprint : PlacementBlueprint
     {
         /// <summary>
-        /// Whether the sample bank should be taken from the previous hit object.
-        /// </summary>
-        public bool AutomaticBankAssignment { get; set; }
-
-        /// <summary>
-        /// Whether the sample addition bank should be taken from the previous hit objects.
-        /// </summary>
-        public bool AutomaticAdditionBankAssignment { get; set; }
-
-        /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
         public readonly HitObject HitObject;
@@ -42,17 +33,24 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         protected EditorClock EditorClock { get; private set; } = null!;
 
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container<Drawable> content = new Container<Drawable>
+        {
+            RelativeSizeAxes = Axes.Both,
+        };
+
         [Resolved]
         private EditorBeatmap beatmap { get; set; } = null!;
 
         private Bindable<double> startTimeBindable = null!;
 
-        private HitObject? getPreviousHitObject() => beatmap.HitObjects.TakeWhile(h => h.StartTime <= startTimeBindable.Value).LastOrDefault();
-
         protected override bool IsValidForPlacement => HitObject.StartTime >= beatmap.ControlPointInfo.TimingPoints.FirstOrDefault()?.Time;
 
         [Resolved]
         private IPlacementHandler placementHandler { get; set; } = null!;
+
+        private PlacementStateManager placementStateManager = null!;
 
         /// <summary>
         /// Acceptable leniency to account for rounding errors and minor unsnaps that we generally
@@ -80,6 +78,9 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
+            AddInternal(placementStateManager = new PlacementStateManager(HitObject));
+            AddInternal(content);
+
             startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
             startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
         }
@@ -119,45 +120,9 @@ namespace osu.Game.Rulesets.Edit
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double time)
         {
             if (PlacementActive == PlacementState.Waiting)
-            {
                 HitObject.StartTime = time;
 
-                if (HitObject is IHasComboInformation comboInformation)
-                    comboInformation.UpdateComboInformation(getPreviousHitObject() as IHasComboInformation);
-            }
-
-            var lastHitObject = getPreviousHitObject();
-            var lastHitNormal = lastHitObject?.Samples?.FirstOrDefault(o => o.Name == HitSampleInfo.HIT_NORMAL);
-
-            if (lastHitNormal != null && AutomaticBankAssignment)
-                // Inherit the bank from the previous hit object
-                HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newBank: lastHitNormal.Bank, newEditorAutoBank: true) : s).ToList();
-            else
-                HitObject.Samples = HitObject.Samples.Select(s => s.Name == HitSampleInfo.HIT_NORMAL ? s.With(newEditorAutoBank: false) : s).ToList();
-
-            if (lastHitNormal != null)
-            {
-                // Inherit the volume and sample set info from the previous hit object
-                HitObject.Samples = HitObject.Samples.Select(s => s.With(
-                    newVolume: lastHitNormal.Volume,
-                    newSuffix: lastHitNormal.Suffix,
-                    newUseBeatmapSamples: lastHitNormal.UseBeatmapSamples)).ToList();
-            }
-
-            if (AutomaticAdditionBankAssignment)
-            {
-                string bank = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank ?? HitSampleInfo.BANK_SOFT;
-                HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newBank: bank, newEditorAutoBank: true) : s).ToList();
-            }
-            else
-                HitObject.Samples = HitObject.Samples.Select(s => s.Name != HitSampleInfo.HIT_NORMAL ? s.With(newEditorAutoBank: false) : s).ToList();
-
-            if (HitObject is IHasRepeats hasRepeats)
-            {
-                // Make sure all the node samples are identical to the hit object's samples
-                for (int i = 0; i < hasRepeats.NodeSamples.Count; i++)
-                    hasRepeats.NodeSamples[i] = HitObject.Samples.Select(o => o.With()).ToList();
-            }
+            placementStateManager.CopyStateFromPreviousObject();
 
             return new SnapResult(screenSpacePosition, time);
         }
@@ -181,5 +146,8 @@ namespace osu.Game.Rulesets.Edit
             base.PopOut();
             placementHandler.HidePlacement();
         }
+
+        protected override void ClearInternal(bool disposeChildren = true) =>
+            throw new InvalidOperationException($"Clearing {nameof(InternalChildren)} will cause critical failure. Use {nameof(Clear)} instead.");
     }
 }

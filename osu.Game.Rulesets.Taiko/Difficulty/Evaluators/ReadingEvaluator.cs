@@ -38,17 +38,17 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // Apply a cap to prevent outlier values on maps that exceed the editor's parameters.
             double effectiveBPM = Math.Max(1.0, noteObject.EffectiveBPM);
 
-            double midVelocityDifficulty = 0.5 * DifficultyCalculationUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
+            double midVelocityDifficulty = 0.5 * DiffUtils.Logistic(effectiveBPM, midVelocity.Center, 1.0 / (midVelocity.Range / 10));
 
             // Expected DeltaTime is the DeltaTime this note would need to be spaced equally to a base slider velocity 1/4 note.
             double expectedDeltaTime = 21000.0 / effectiveBPM;
             double objectDensity = expectedDeltaTime / Math.Max(1.0, noteObject.DeltaTime);
 
             // High density is penalised at high velocity as it is generally considered easier to read. See https://www.desmos.com/calculator/u63f3ntdsi
-            double densityPenalty = DifficultyCalculationUtils.Logistic(objectDensity, 0.925, 15);
+            double densityPenalty = DiffUtils.Logistic(objectDensity, 0.925, 15);
 
             double highVelocityDifficulty = (1.0 - 0.33 * densityPenalty)
-                                            * DifficultyCalculationUtils.Logistic(effectiveBPM, highVelocity.Center + 8 * densityPenalty, (1.0 + 0.5 * densityPenalty) / (highVelocity.Range / 10));
+                                            * DiffUtils.Logistic(effectiveBPM, highVelocity.Center + 8 * densityPenalty, (1.0 + 0.5 * densityPenalty) / (highVelocity.Range / 10));
 
             return midVelocityDifficulty + highVelocityDifficulty;
         }

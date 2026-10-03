@@ -162,72 +162,36 @@ namespace osu.Game.Skinning
 
         public void UpdateSkinIniMetadata(SkinInfo item, Realm realm)
         {
-            string nameLine = @$"Name: {item.Name}";
-            string authorLine = @$"Author: {item.Creator}";
-
-            List<string> newLines = new List<string>
-            {
-                @"// The following content was automatically added by osu! in order to use metadata that more closely matches user expectations.",
-                @"[General]",
-                nameLine,
-                authorLine,
-            };
-
             var existingFile = item.GetFile(@"skin.ini");
 
+            // create a working instance of the skin.
+            // this implicitly decodes all contents of `skin.ini` into `skin.Configuration` and others.
+            // of note, `item` and `skin.Configuration.SkinInfo` are not the same object.
+            var skin = createInstance(item);
+
+            // `skin.Configuration.SkinInfo` will be in a post-decoding state,
+            // which means it will potentially be in a different state than `item`.
+            // write changes from `item` to `skin.SkinInfo` to definitively apply them.
+            skin.Configuration.SkinInfo.Name = item.Name;
+            skin.Configuration.SkinInfo.Creator = item.Creator;
+
+            using var outStream = new MemoryStream();
+
+            // now with the skin having the updated metadata, write out the full `skin.ini`.
+            using (var outWriter = new StreamWriter(outStream, Encoding.UTF8, 1024, true))
+            {
+                var encoder = new LegacySkinEncoder(skin);
+                encoder.Encode(outWriter);
+            }
+
             if (existingFile == null)
-            {
-                // skins without a skin.ini are supposed to import using the "latest version" spec, unless we're making a copy of the retro skin which specifies 1.0.
-                // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
-                decimal version = item.InstantiationInfo == typeof(RetroSkin).GetInvariantInstantiationInfo() ? 1.0M : SkinConfiguration.LATEST_VERSION;
-                newLines.Add(FormattableString.Invariant($"Version: {version}"));
-
-                // In the case a skin doesn't have a skin.ini yet, let's create one.
-                writeNewSkinIni();
-            }
+                modelManager.AddFile(item, outStream, @"skin.ini", realm);
             else
-            {
-                using (Stream stream = new MemoryStream())
-                {
-                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    {
-                        using (var existingStream = Files.Storage.GetStream(existingFile.File.GetStoragePath()))
-                        using (var sr = new StreamReader(existingStream))
-                        {
-                            string? line;
-                            while ((line = sr.ReadLine()) != null)
-                                sw.WriteLine(line);
-                        }
-
-                        sw.WriteLine();
-
-                        foreach (string line in newLines)
-                            sw.WriteLine(line);
-                    }
-
-                    modelManager.ReplaceFile(existingFile, stream, realm);
-                }
-            }
+                modelManager.ReplaceFile(existingFile, outStream, realm);
 
             // The hash is already populated at this point in import.
             // As we have changed files, it needs to be recomputed.
             item.Hash = ComputeHash(item);
-
-            void writeNewSkinIni()
-            {
-                using (Stream stream = new MemoryStream())
-                {
-                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                    {
-                        foreach (string line in newLines)
-                            sw.WriteLine(line);
-                    }
-
-                    modelManager.AddFile(item, stream, @"skin.ini", realm);
-                }
-
-                item.Hash = ComputeHash(item);
-            }
         }
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);

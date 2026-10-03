@@ -243,8 +243,7 @@ namespace osu.Game.Screens.Utility
 
                 case Key.Tab:
                     var firstArea = mainArea.FirstOrDefault(a => !a.IsActiveArea.Value);
-                    if (firstArea != null)
-                        firstArea.IsActiveArea.Value = true;
+                    firstArea?.IsActiveArea.Value = true;
                     return true;
             }
 

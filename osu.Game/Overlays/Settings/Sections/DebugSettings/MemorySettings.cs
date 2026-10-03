@@ -71,9 +71,16 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                         Text = @"Compact realm",
                         Action = () =>
                         {
-                            // Blocking operations implicitly causes a Compact().
-                            using (realm.BlockAllOperations(@"compact"))
+                            try
                             {
+                                // Blocking operations implicitly causes a Compact().
+                                using (realm.BlockAllOperations(@"compact"))
+                                {
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Error(e, @"Compacting realm failed");
                             }
                         }
                     },

@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             backgroundPreview.UpdateBackground();
             editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackgroundAsync());
+            setupScreen.BackgroundChanged?.Invoke();
             return true;
         }
 
@@ -255,14 +256,14 @@ namespace osu.Game.Screens.Edit.Setup
             if (source != null)
             {
                 // Choose a new filename that doesn't clash with any other existing files.
-                newFilename = $"{baseFilename}{source.Extension}";
+                newFilename = $@"{baseFilename}{source.Extension.ToLowerInvariant()}";
 
                 if (set.GetFile(newFilename) != null)
                 {
                     string[] existingFilenames = set.Files.Select(f => f.Filename).Where(f =>
                         f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
                         f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
-                    newFilename = NamingUtils.GetNextBestFilename(existingFilenames, $@"{baseFilename}{source.Extension}");
+                    newFilename = NamingUtils.GetNextBestFilename(existingFilenames, newFilename);
                 }
 
                 using (var stream = source.OpenRead())

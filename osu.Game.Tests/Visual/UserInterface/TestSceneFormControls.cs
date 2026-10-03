@@ -68,6 +68,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                                         },
                                         new FormTextBox
                                         {
+                                            Caption = "Length limited text",
+                                            PlaceholderText = "I can only hold 10 characters!",
+                                            LengthLimit = 10,
+                                            TabbableContentContainer = this,
+                                        },
+                                        new FormTextBox
+                                        {
                                             Caption = "Artist",
                                             HintText = "Poot artist here!",
                                             PlaceholderText = "Here is an artist",
@@ -172,6 +179,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                             TooltipFormat = v => $"This setting has the value set to {v * 100:0.00} funometer.",
                                             TabbableContentContainer = this,
                                         },
+                                        new FormEnumDropdown<CountdownType>(),
                                         new FormEnumDropdown<CountdownType>
                                         {
                                             Caption = EditorSetupStrings.EnableCountdown,
@@ -228,6 +236,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     Padding = new MarginPadding(10),
                                     Children = new Drawable[]
                                     {
+                                        new FormPasswordTextBox
+                                        {
+                                            Caption = "Password",
+                                            TabbableContentContainer = this,
+                                        },
                                         new FormNumberBox(allowDecimals: true)
                                         {
                                             Caption = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",

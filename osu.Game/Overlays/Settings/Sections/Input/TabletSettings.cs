@@ -34,8 +34,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly ITabletHandler tabletHandler;
 
-        private readonly Bindable<bool> enabled = new BindableBool(true);
-
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
         private readonly Bindable<Vector2> outputAreaSize = new Bindable<Vector2>();
@@ -88,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation, OsuConfigManager osuConfig, OverlayColourProvider colourProvider)
+        private void load(OsuConfigManager osuConfig)
         {
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
@@ -200,9 +198,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
-            enabled.BindTo(tabletHandler.Enabled);
-            enabled.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
-
             rotation.BindTo(tabletHandler.Rotation);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
@@ -276,16 +271,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateVisibility()
         {
-            mainSettings.Hide();
-            noTabletMessage.Hide();
-
-            if (!tabletHandler.Enabled.Value)
-                return;
-
             if (tablet.Value != null)
+            {
+                noTabletMessage.Hide();
                 mainSettings.Show();
+            }
             else
+            {
+                mainSettings.Hide();
                 noTabletMessage.Show();
+            }
         }
 
         private void applyAspectRatio(BindableNumber<float> sizeChanged)
@@ -345,14 +340,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private partial class NoTabletMessage : CompositeDrawable
         {
-            private readonly Bindable<Language> currentLanguage = new Bindable<Language>();
+            private IBindable<string> noTabletDetectedText = new Bindable<string>();
             private LinkFlowContainer linkContainer;
 
             [Resolved]
             private LocalisationManager localisation { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(OsuGameBase game, OsuColour colours, OverlayColourProvider colourProvider)
+            private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -406,26 +401,23 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                 };
 
-                if (game != null)
-                    currentLanguage.BindTo(game.CurrentLanguage);
+                const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
+                noTabletDetectedText = localisation.GetLocalisedBindableString(TabletSettingsStrings.NoTabletDetectedDescription(url));
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                currentLanguage.BindValueChanged(_ =>
-                    // schedule required because `LocalisationManager` won't have new language set correctly yet.
-                    Schedule(() =>
-                    {
-                        linkContainer.Clear();
-                        linkContainer.NewLine();
+                noTabletDetectedText.BindValueChanged(_ =>
+                {
+                    linkContainer.Clear();
+                    linkContainer.NewLine();
 
-                        const string url = @"https://opentabletdriver.net/Wiki/FAQ/General";
-                        var formattedSource = MessageFormatter.FormatText(localisation.GetLocalisedString(TabletSettingsStrings.NoTabletDetectedDescription(url)));
+                    var formattedSource = MessageFormatter.FormatText(noTabletDetectedText.Value);
 
-                        linkContainer.AddLinks(formattedSource.Text, formattedSource.Links);
-                    }), true);
+                    linkContainer.AddLinks(formattedSource.Text, formattedSource.Links);
+                }, true);
             }
         }
     }

@@ -13,7 +13,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public partial class ManiaModFlashlight : ModFlashlight<ManiaHitObject>
     {
-        public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
         public override BindableFloat SizeMultiplier { get; } = new BindableFloat(1)

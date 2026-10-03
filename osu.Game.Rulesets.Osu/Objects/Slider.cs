@@ -116,10 +116,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 classicSliderBehaviour = value;
-                if (HeadCircle != null)
-                    HeadCircle.ClassicSliderBehaviour = value;
-                if (TailCircle != null)
-                    TailCircle.ClassicSliderBehaviour = value;
+                HeadCircle?.ClassicSliderBehaviour = value;
+                TailCircle?.ClassicSliderBehaviour = value;
             }
         }
 
@@ -279,8 +277,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 }
             }
 
-            if (HeadCircle != null)
-                HeadCircle.Samples = this.GetNodeSamples(0);
+            HeadCircle?.Samples = this.GetNodeSamples(0);
 
             // The samples should be attached to the slider tail, however this can only be done if LastTick is removed otherwise they would play earlier than they're intended to.
             // (see mapping logic in `CreateNestedHitObjects` above)

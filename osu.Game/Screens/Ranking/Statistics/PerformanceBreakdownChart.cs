@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; } = null!;
 
-        public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
+        public PerformanceBreakdownChart(ScoreInfo score)
         {
             this.score = score;
         }

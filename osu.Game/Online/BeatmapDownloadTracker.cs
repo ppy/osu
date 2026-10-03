@@ -46,7 +46,13 @@ namespace osu.Game.Online
             realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => s.OnlineID == onlineId && !s.DeletePending), (items, _) =>
             {
                 if (items.Any())
-                    Schedule(() => UpdateState(DownloadState.LocallyAvailable));
+                {
+                    Schedule(() =>
+                    {
+                        UpdateState(DownloadState.LocallyAvailable);
+                        attachDownload(null);
+                    });
+                }
                 else
                 {
                     Schedule(() =>
@@ -100,7 +106,8 @@ namespace osu.Game.Online
             }
             else
             {
-                UpdateState(DownloadState.NotDownloaded);
+                if (State.Value == DownloadState.Downloading)
+                    UpdateState(DownloadState.NotDownloaded);
             }
         }
 

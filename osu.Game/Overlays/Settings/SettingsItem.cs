@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.Settings
             // IMPORTANT: all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
             // never loaded, but requires bindable storage.
             if (controlWithCurrent == null)
-                throw new ArgumentException(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<T>)}");
+                throw new ArgumentException(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<>)}");
 
             controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
             controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
@@ -246,8 +246,7 @@ namespace osu.Game.Overlays.Settings
 
         private void updateDisabled()
         {
-            if (labelText != null)
-                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
+            labelText?.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
     }
 }

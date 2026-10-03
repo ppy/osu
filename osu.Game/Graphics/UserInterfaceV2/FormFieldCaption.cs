@@ -69,13 +69,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             if (TooltipText != default)
             {
+                // Use a space to pad the icon drawable, so that it does not have
+                // an awkward left margin if it gets pushed to a new line.
+                textFlow.AddText(" ", t => t.Width = 5);
                 textFlow.AddArbitraryDrawable(new SpriteIcon
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Size = new Vector2(10),
                     Icon = FontAwesome.Solid.QuestionCircle,
-                    Margin = new MarginPadding { Left = 5 },
                     Y = 1f,
                 });
             }

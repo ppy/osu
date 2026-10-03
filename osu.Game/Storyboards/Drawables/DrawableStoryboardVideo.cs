@@ -40,7 +40,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(TextureStore textureStore)
+        private void load(TextureStore textureStore, StoryboardTriggerController triggerController)
         {
             var stream = textureStore.GetStream(Video.Path);
 
@@ -56,7 +56,7 @@ namespace osu.Game.Storyboards.Drawables
                 Alpha = 0,
             };
 
-            Video.ApplyTransforms(drawableVideo);
+            Video.ApplyTransforms(drawableVideo, triggerController);
         }
 
         protected override void LoadComplete()

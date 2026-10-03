@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
@@ -71,6 +72,9 @@ namespace osu.Game.Screens.Play
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
 
+        public IBindable<ISampleInfo[]?> LastPlayedSamples => lastPlayedSamples;
+        private readonly Bindable<ISampleInfo[]?> lastPlayedSamples = new Bindable<ISampleInfo[]?>();
+
         /// <summary>
         /// The local user's playing state (whether actively playing, paused, or not playing due to watching a replay or similar).
         /// </summary>
@@ -110,5 +114,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
         public void ApplyResult(JudgementResult result) => lastJudgementResult.Value = result;
+
+        public void ApplySamples(ISampleInfo[] samples) => lastPlayedSamples.Value = samples;
     }
 }

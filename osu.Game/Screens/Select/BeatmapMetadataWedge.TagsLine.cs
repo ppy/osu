@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -33,6 +34,7 @@ namespace osu.Game.Screens.Select
             private string[] tags = Array.Empty<string>();
 
             private TagsOverflowButton? overflowButton;
+            private readonly Bindable<int> tagsShownCount = new Bindable<int>();
 
             public string[] Tags
             {
@@ -78,21 +80,28 @@ namespace osu.Game.Screens.Select
                 Debug.Assert(overflowButton != null);
 
                 float limit = DrawWidth - overflowButton.DrawWidth - 5;
-                bool showOverflow = false;
+                int totalTagsShown = 0;
 
-                foreach (var text in Children)
+                foreach (var child in Children)
                 {
-                    if (text.X + text.DrawWidth < limit)
-                        text.Show();
+                    if (child is TagsOverflowButton) continue;
+
+                    if (child.X + child.DrawWidth < limit)
+                    {
+                        child.AlwaysPresent = true;
+                        child.Show();
+                        totalTagsShown += 1;
+                    }
                     else
                     {
-                        showOverflow = true;
-                        text.AlwaysPresent = false;
-                        text.Hide();
+                        child.AlwaysPresent = false;
+                        child.Hide();
                     }
                 }
 
-                if (showOverflow)
+                tagsShownCount.Value = totalTagsShown;
+
+                if (totalTagsShown < tags.Length)
                     overflowButton.Show();
                 else
                     overflowButton.Hide();
@@ -118,6 +127,7 @@ namespace osu.Game.Screens.Select
                 {
                     Alpha = 0f,
                     PerformSearch = s => PerformSearch?.Invoke(s),
+                    TagsShownCount = { BindTarget = tagsShownCount },
                 });
 
                 drawSizeLayout.Invalidate();
@@ -136,6 +146,8 @@ namespace osu.Game.Screens.Select
                 public float LineBaseHeight => text.LineBaseHeight;
 
                 public Action<string>? PerformSearch { get; init; }
+
+                public readonly Bindable<int> TagsShownCount = new Bindable<int>();
 
                 public TagsOverflowButton(string[] tags)
                 {
@@ -188,13 +200,20 @@ namespace osu.Game.Screens.Select
                     return true;
                 }
 
-                public Popover GetPopover() => new TagsOverflowPopover(tags, PerformSearch);
+                public Popover GetPopover() => new TagsOverflowPopover(tags, PerformSearch)
+                {
+                    TagsShownCount = { BindTarget = TagsShownCount },
+                };
             }
 
             public partial class TagsOverflowPopover : OsuPopover
             {
+                public readonly Bindable<int> TagsShownCount = new Bindable<int>();
+
                 private readonly string[] tags;
                 private readonly Action<string>? performSearch;
+
+                private LinkFlowContainer textFlow = null!;
 
                 public TagsOverflowPopover(string[] tags, Action<string>? performSearchAction)
                 {
@@ -205,19 +224,32 @@ namespace osu.Game.Screens.Select
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    LinkFlowContainer textFlow;
-
                     Child = textFlow = new LinkFlowContainer(t => t.Font = OsuFont.Style.Caption1)
                     {
                         Width = 200,
                         AutoSizeAxes = Axes.Y,
                     };
 
-                    foreach (string tag in tags)
+                    updateTags();
+                }
+
+                private void updateTags()
+                {
+                    textFlow.Clear();
+
+                    for (int i = TagsShownCount.Value; i < tags.Length; i++)
                     {
+                        string tag = tags[i];
                         textFlow.AddLink(tag, () => performSearch?.Invoke(tag));
                         textFlow.AddText(" ");
                     }
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    TagsShownCount.BindValueChanged(_ => updateTags());
                 }
             }
         }
