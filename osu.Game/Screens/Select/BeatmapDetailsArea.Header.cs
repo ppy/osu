@@ -31,7 +31,17 @@ namespace osu.Game.Screens.Select
 
             public IBindable<Selection> Type => tabControl.Current;
 
-            public IBindable<BeatmapLeaderboardScope> Scope => scopeDropdown.Current;
+            public IBindable<BeatmapLeaderboardScope> Scope => scope;
+
+            private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
+
+            public IBindable<int> ManualScopeChangeCounter => manualScopeChangeCounter;
+
+            private readonly Bindable<int> manualScopeChangeCounter = new Bindable<int>();
+
+            private BeatmapLeaderboardScope? displayedScopeOverride;
+            private bool applyingDisplayedScopeOverride;
+            private bool sortModeBoundToConfig;
 
             private readonly Bindable<BeatmapDetailTab> configDetailTab = new Bindable<BeatmapDetailTab>();
 
@@ -113,8 +123,22 @@ namespace osu.Game.Screens.Select
             {
                 base.LoadComplete();
 
-                scopeDropdown.Current.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scopeDropdown.Current.Value;
-                scopeDropdown.Current.BindValueChanged(_ => updateConfigDetailTab());
+                scope.Value = tryMapDetailTabToLeaderboardScope(configDetailTab.Value) ?? scope.Value;
+                updateDisplayedScope();
+
+                scope.BindValueChanged(_ => updateDisplayedScope());
+                scopeDropdown.Current.BindValueChanged(scopeChange =>
+                {
+                    updateSortMode(scopeChange.NewValue);
+
+                    if (applyingDisplayedScopeOverride)
+                        return;
+
+                    displayedScopeOverride = null;
+                    scope.Value = scopeChange.NewValue;
+                    updateConfigDetailTab();
+                    manualScopeChangeCounter.Value++;
+                });
 
                 tabControl.Current.Value = configDetailTab.Value == BeatmapDetailTab.Details ? Selection.Details : Selection.Ranking;
                 tabControl.Current.BindValueChanged(v =>
@@ -123,22 +147,57 @@ namespace osu.Game.Screens.Select
                     updateConfigDetailTab();
                 }, true);
 
-                scopeDropdown.Current.BindValueChanged(scope =>
-                {
-                    sortDropdown.Current.Disabled = false;
+                updateSortMode(scopeDropdown.Current.Value);
+            }
 
-                    if (scope.NewValue == BeatmapLeaderboardScope.Local)
+            public void SetDisplayedScopeOverride(BeatmapLeaderboardScope? scopeOverride)
+            {
+                displayedScopeOverride = scopeOverride;
+                updateDisplayedScope();
+            }
+
+            private void updateDisplayedScope()
+            {
+                var displayedScope = displayedScopeOverride ?? scope.Value;
+
+                applyingDisplayedScopeOverride = true;
+
+                try
+                {
+                    scopeDropdown.Current.Value = displayedScope;
+                }
+                finally
+                {
+                    applyingDisplayedScopeOverride = false;
+                }
+
+                updateSortMode(displayedScope);
+            }
+
+            private void updateSortMode(BeatmapLeaderboardScope displayedScope)
+            {
+                sortDropdown.Current.Disabled = false;
+
+                if (displayedScope == BeatmapLeaderboardScope.Local)
+                {
+                    if (!sortModeBoundToConfig)
                     {
                         sortDropdown.Current.BindTo(configLeaderboardSortMode);
+                        sortModeBoundToConfig = true;
                     }
-                    else
+                }
+                else
+                {
+                    // future implementation when we have web-side support.
+                    if (sortModeBoundToConfig)
                     {
-                        // future implementation when we have web-side support.
                         sortDropdown.Current.UnbindFrom(configLeaderboardSortMode);
-                        sortDropdown.Current.Value = LeaderboardSortMode.Score;
-                        sortDropdown.Current.Disabled = true;
+                        sortModeBoundToConfig = false;
                     }
-                }, true);
+
+                    sortDropdown.Current.Value = LeaderboardSortMode.Score;
+                    sortDropdown.Current.Disabled = true;
+                }
             }
 
             #region Reading / writing state from / to configuration
@@ -152,7 +211,7 @@ namespace osu.Game.Screens.Select
                         return;
 
                     case Selection.Ranking:
-                        configDetailTab.Value = mapLeaderboardScopeToDetailTab(scopeDropdown.Current.Value);
+                        configDetailTab.Value = mapLeaderboardScopeToDetailTab(scope.Value);
                         return;
 
                     default:
