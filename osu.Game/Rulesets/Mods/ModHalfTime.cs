@@ -12,7 +12,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHalfTime : ModRateAdjust
+    public abstract class ModHalfTime : ModRateAdjust, IAdjustableWhenReplay
     {
         public override string Name => "Half Time";
         public override string Acronym => "HT";
@@ -44,12 +44,15 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
+        public BindableBool IsDisabled { get; } = new BindableBool();
+
         private readonly RateAdjustModHelper rateAdjustHelper;
 
         protected ModHalfTime()
         {
             rateAdjustHelper = new RateAdjustModHelper(SpeedChange);
             rateAdjustHelper.HandleAudioAdjustments(AdjustPitch);
+            rateAdjustHelper.DisableSpeedChange.BindTo(IsDisabled);
         }
 
         public override void ApplyToTrack(IAdjustableAudioComponent track)
