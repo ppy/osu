@@ -59,6 +59,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             const double skill_multiplier_snap = 78.3;
             const double skill_multiplier_agility = 32.0;
             const double skill_multiplier_flow = 252.0;
+            const double skill_multiplier_spinner = 22.0;
+
+            if (current.BaseObject is Spinner)
+                return SpinnerEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_spinner;
 
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;
