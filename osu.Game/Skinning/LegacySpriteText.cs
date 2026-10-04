@@ -19,6 +19,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public const char PP_SUFFIX_CHAR = '\uebd9';
 
+        public const char FIXED_WIDTH_REFERENCE_CHARACTER = '5';
+
         public Vector2? MaxSizePerGlyph { get; init; }
         public bool FixedWidth { get; init; }
 
@@ -26,7 +28,7 @@ namespace osu.Game.Skinning
 
         private LegacyGlyphStore glyphStore = null!;
 
-        protected override char FixedWidthReferenceCharacter => '5';
+        protected override char FixedWidthReferenceCharacter => FIXED_WIDTH_REFERENCE_CHARACTER;
 
         protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x', PP_SUFFIX_CHAR };
 
