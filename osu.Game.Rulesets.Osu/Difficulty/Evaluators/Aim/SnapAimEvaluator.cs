@@ -70,10 +70,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (osuCurrObj.Angle == null || osuLastObj.Angle == null)
                 return 0;
 
-            // Only reward acute angles when rhythms are the same.
-            if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) >= 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime))
-                return 0;
-
             double acuteAngleBonus = AngleUtils.CalculateAcuteness(osuCurrObj.Angle.Value);
 
             // Penalize angle repetition. It is important to do it _before_ multiplying by anything because we compare raw acuteness here
@@ -84,6 +80,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
             acuteAngleBonus *= velocity * DiffUtils.Smootherstep(DiffUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
                                DiffUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_DIAMETER * 2);
+
+            // Penalize the bonus if previous rhythm was slower
+            acuteAngleBonus *= DiffUtils.ReverseLerp(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime * 0.7, osuLastObj.AdjustedDeltaTime * 0.9);
 
             return acuteAngleBonus * acute_angle_multiplier;
         }
