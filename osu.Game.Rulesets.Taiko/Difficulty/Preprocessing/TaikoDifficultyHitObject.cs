@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Taiko.Difficulty.Evaluators;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing.Colour;
@@ -69,14 +70,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
         /// <param name="index">The position of this <see cref="DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
         /// <param name="controlPointInfo">The control point info of the beatmap.</param>
         /// <param name="globalSliderVelocity">The global slider velocity of the beatmap.</param>
+        /// <param name="mods">Applied mods.</param>
         public TaikoDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate,
                                         List<DifficultyHitObject> objects,
                                         List<TaikoDifficultyHitObject> centreHitObjects,
                                         List<TaikoDifficultyHitObject> rimHitObjects,
                                         List<TaikoDifficultyHitObject> noteObjects, int index,
                                         ControlPointInfo controlPointInfo,
-                                        double globalSliderVelocity)
-            : base(hitObject, lastObject, clockRate, objects, index)
+                                        double globalSliderVelocity,
+                                        Mod[] mods)
+            : base(hitObject, lastObject, clockRate, objects, index, mods)
         {
             noteDifficultyHitObjects = noteObjects;
 

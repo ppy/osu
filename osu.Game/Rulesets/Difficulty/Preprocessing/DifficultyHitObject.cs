@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -54,6 +55,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly double HitWindowGreat;
 
         /// <summary>
+        /// Applied mods.
+        /// </summary>
+        public readonly Mod[] Mods;
+
+        /// <summary>
         /// Creates a new <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
@@ -61,8 +67,10 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <param name="objects">The list of <see cref="DifficultyHitObject"/>s in the current beatmap.</param>
         /// <param name="index">The index of this <see cref="DifficultyHitObject"/> in <paramref name="objects"/> list.</param>
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
+        /// <param name="mods">Applied mods.</param>
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index, Mod[] mods)
         {
+            Mods = mods;
             difficultyHitObjects = objects;
             Index = index;
             BaseObject = hitObject;
