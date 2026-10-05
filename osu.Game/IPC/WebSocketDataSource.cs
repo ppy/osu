@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading.Tasks;
 using osu.Framework.Graphics;
 using osu.Game.IPC.Messages;
 
@@ -11,7 +12,8 @@ namespace osu.Game.IPC
     {
         private readonly IWebSocketProvider provider;
 
-        public event Action<OsuWebSocketMessage>? MessageReceived;
+        public event Action<OsuWebSocketMessage>? BroadcastMessageReceived;
+        public event Action<int, OsuWebSocketMessage>? ClientMessageReceived;
 
         public WebSocketDataSource(IWebSocketProvider provider)
         {
@@ -20,7 +22,13 @@ namespace osu.Game.IPC
         }
 
         public void BroadcastMessage(OsuWebSocketMessage message)
-            => MessageReceived?.Invoke(message);
+            => BroadcastMessageReceived?.Invoke(message);
+
+        public void SendMessage(int clientId, OsuWebSocketMessage message)
+            => ClientMessageReceived?.Invoke(clientId, message);
+
+        public virtual Task OnClientConnected(int clientId)
+            => Task.CompletedTask;
 
         protected override void Dispose(bool isDisposing)
         {

@@ -49,7 +49,7 @@ namespace osu.Game.IPC.DataSources
                 if (val.NewValue.BeatmapInfo.OnlineID == val.OldValue.BeatmapInfo.OnlineID)
                     return;
 
-                updatePlayerState().FireAndForget();
+                broadcastBeatmapState().FireAndForget();
             });
 
             ruleset.BindValueChanged(val =>
@@ -57,7 +57,7 @@ namespace osu.Game.IPC.DataSources
                 if (val.NewValue.Equals(val.OldValue))
                     return;
 
-                updatePlayerState().FireAndForget();
+                broadcastBeatmapState().FireAndForget();
             });
 
             mods.BindValueChanged(val =>
@@ -67,21 +67,41 @@ namespace osu.Game.IPC.DataSources
 
                 modSettingChangeTracker?.Dispose();
 
-                updatePlayerState().FireAndForget();
+                broadcastBeatmapState().FireAndForget();
 
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.Value);
                 modSettingChangeTracker.SettingChanged += _ =>
                 {
                     debouncedModSettingsChange?.Cancel();
-                    debouncedModSettingsChange = Scheduler.AddDelayed(() => updatePlayerState().FireAndForget(), 100);
+                    debouncedModSettingsChange = Scheduler.AddDelayed(() => broadcastBeatmapState().FireAndForget(), 100);
                 };
             });
         }
 
-        private async Task updatePlayerState()
+        public override async Task OnClientConnected(int clientId)
+        {
+            BeatmapStateWebSocketMessage? message = await buildMessage().ConfigureAwait(false);
+
+            if (message is null)
+                return;
+
+            SendMessage(clientId, message);
+        }
+
+        private async Task broadcastBeatmapState()
+        {
+            BeatmapStateWebSocketMessage? message = await buildMessage().ConfigureAwait(false);
+
+            if (message is null)
+                return;
+
+            BroadcastMessage(message);
+        }
+
+        private async Task<BeatmapStateWebSocketMessage?> buildMessage()
         {
             if (working.Value is DummyWorkingBeatmap)
-                return;
+                return null;
 
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
@@ -91,7 +111,7 @@ namespace osu.Game.IPC.DataSources
             var adjustedDifficulty = ruleset.Value.CreateInstance().GetAdjustedDisplayDifficulty(beatmap, mods.Value);
             var starDifficulty = await difficultyCache.GetDifficultyAsync(beatmap, ruleset.Value, mods.Value).ConfigureAwait(false);
 
-            BroadcastMessage(new BeatmapStateWebSocketMessage
+            return new BeatmapStateWebSocketMessage
             {
                 Beatmap = new WebSocketBeatmap
                 {
@@ -129,7 +149,7 @@ namespace osu.Game.IPC.DataSources
                 },
                 RulesetId = ruleset.Value.OnlineID,
                 Mods = mods.Value.Select(modToWebSocketMod).ToArray(),
-            });
+            };
         }
 
         private static WebSocketMod modToWebSocketMod(Mod mod)

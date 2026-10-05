@@ -30,22 +30,42 @@ namespace osu.Desktop.IPC
                 port = portOverride;
 
             server = new WebSocketServer(port);
+            server.ClientConnected += onClientConnected;
             server.StartAsync().FireAndForget(onError: ex => Logger.Error(ex, "Failed to start websocket"));
         }
 
         public void Register(WebSocketDataSource dataSource)
         {
             dataSources.Add(dataSource);
-            dataSource.MessageReceived += onDataSourceMessageReceived;
+            dataSource.BroadcastMessageReceived += onDataSourceBroadcastMessageReceived;
+            dataSource.ClientMessageReceived += onDataSourceClientMessageReceived;
         }
 
         public void Unregister(WebSocketDataSource dataSource)
         {
-            dataSource.MessageReceived -= onDataSourceMessageReceived;
+            dataSource.ClientMessageReceived -= onDataSourceClientMessageReceived;
+            dataSource.BroadcastMessageReceived -= onDataSourceBroadcastMessageReceived;
             dataSources.Remove(dataSource);
         }
 
-        private void onDataSourceMessageReceived(OsuWebSocketMessage message) =>
+        private void onClientConnected(int clientId)
+        {
+            foreach (WebSocketDataSource dataSource in dataSources)
+                dataSource.OnClientConnected(clientId).FireAndForget();
+        }
+
+        private void onDataSourceClientMessageReceived(int clientId, OsuWebSocketMessage message) =>
+            Task.Run(async () =>
+                {
+                    if (server?.IsRunning != true)
+                        return;
+
+                    string messageString = JsonSerializer.Serialize(message, message.GetType());
+                    await server.SendAsync(clientId, messageString).ConfigureAwait(false);
+                })
+                .FireAndForget();
+
+        private void onDataSourceBroadcastMessageReceived(OsuWebSocketMessage message) =>
             Task.Run(async () =>
                 {
                     if (server?.IsRunning != true)
@@ -65,6 +85,7 @@ namespace osu.Desktop.IPC
                 var cts = new CancellationTokenSource();
                 cts.CancelAfter(TimeSpan.FromSeconds(10));
                 server.StopAsync(cts.Token).WaitSafely();
+                server.ClientConnected -= onClientConnected;
                 server = null;
             }
         }
