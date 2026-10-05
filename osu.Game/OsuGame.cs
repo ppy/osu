@@ -1376,6 +1376,9 @@ namespace osu.Game
 
                 Audio.UseExperimentalWasapi.Value = true;
 
+                // TODO: can be removed 20270101.
+                // leave the migration but just stop telling users about it. if they haven't been playing for this long they are more likely
+                // to setup offset again, or even have different hardware.
                 dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
             }
 
