@@ -35,7 +35,7 @@ namespace osu.Game.Online.Rooms
         public long TotalScore { get; set; }
 
         [JsonProperty("total_score_without_mods")]
-        public long TotalScoreWithoutMods { get; set; }
+        public long? TotalScoreWithoutMods { get; set; }
 
         [JsonProperty("accuracy")]
         public double Accuracy { get; set; }
@@ -98,7 +98,8 @@ namespace osu.Game.Online.Rooms
             {
                 OnlineID = ID,
                 TotalScore = TotalScore,
-                TotalScoreWithoutMods = TotalScoreWithoutMods,
+                // This mapping is always valid because these types of scores are always lazer-sourced.
+                TotalScoreWithoutMods = TotalScoreWithoutMods ?? TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
                 Ruleset = ruleset,
