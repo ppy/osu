@@ -313,10 +313,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (!score.Mods.Any(h => h is OsuModFlashlight))
+            if (!score.Mods.Any(h => h is OsuModFlashlight) || attributes.FlashlightDifficulty == null)
                 return 0.0;
 
-            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
+            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty.Value);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)

@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new OsuDifficultyAttributes { Mods = mods };
+                return new OsuDifficultyAttributes();
 
             var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = calculateDifficultyRating(speedDifficultyValue);
             double readingRating = calculateDifficultyRating(readingDifficultyValue);
 
-            double flashlightRating = 0.0;
+            double? flashlightRating = null;
 
             if (flashlight is not null)
                 flashlightRating = calculateDifficultyRating(flashlight.DifficultyValue());
@@ -90,7 +90,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseAimPerformance = OsuPerformanceCalculator.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
             double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
-            double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+
+            double baseFlashlightPerformance = flashlightRating != null
+                ? Flashlight.DifficultyToPerformance(flashlightRating.Value)
+                : 0.0;
+
             double baseCognitionPerformance = SumCognitionDifficulty(baseReadingPerformance, baseFlashlightPerformance);
 
             double basePerformance = DiffUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseCognitionPerformance);
@@ -100,7 +104,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             OsuDifficultyAttributes attributes = new OsuDifficultyAttributes
             {
                 StarRating = starRating,
-                Mods = mods,
                 AimDifficulty = aimRating,
                 AimDifficultSliderCount = difficultSliders,
                 SpeedDifficulty = speedRating,

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.EmptyFreeform
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
         {
-            return new DifficultyAttributes(mods, 0);
+            return new DifficultyAttributes(0);
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods) => Enumerable.Empty<DifficultyHitObject>();

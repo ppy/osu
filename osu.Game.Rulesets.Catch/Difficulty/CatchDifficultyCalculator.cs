@@ -33,12 +33,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new CatchDifficultyAttributes { Mods = mods };
+                return new CatchDifficultyAttributes();
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
                 StarRating = Math.Sqrt(skills.OfType<Movement>().Single().DifficultyValue()) * difficulty_multiplier,
-                Mods = mods,
                 MaxCombo = beatmap.GetMaxCombo(),
             };
 

@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new ManiaDifficultyAttributes { Mods = mods };
+                return new ManiaDifficultyAttributes();
 
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             ManiaDifficultyAttributes attributes = new ManiaDifficultyAttributes
             {
                 StarRating = skills.OfType<Strain>().Single().DifficultyValue() * difficulty_multiplier,
-                Mods = mods,
                 MaxCombo = beatmap.HitObjects.Sum(maxComboForObject),
             };
 

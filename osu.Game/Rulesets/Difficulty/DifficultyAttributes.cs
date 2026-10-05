@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -37,11 +35,6 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT = 49;
 
         /// <summary>
-        /// The mods which were applied to the beatmap.
-        /// </summary>
-        public Mod[] Mods { get; set; } = Array.Empty<Mod>();
-
-        /// <summary>
         /// The combined star rating of all skills.
         /// </summary>
         [JsonProperty("star_rating", Order = -3)]
@@ -63,11 +56,9 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Creates new <see cref="DifficultyAttributes"/>.
         /// </summary>
-        /// <param name="mods">The mods which were applied to the beatmap.</param>
         /// <param name="starRating">The combined star rating of all skills.</param>
-        public DifficultyAttributes(Mod[] mods, double starRating)
+        public DifficultyAttributes(double starRating)
         {
-            Mods = mods;
             StarRating = starRating;
         }
 
