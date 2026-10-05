@@ -131,9 +131,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private ScrollingTestContainer createStage(ScrollingDirection direction, ManiaAction action)
         {
-            var specialAction = ManiaAction.Special1;
-
-            var stage = new Stage(0, new StageDefinition(2), ref action, ref specialAction);
+            var stage = new Stage(0, new StageDefinition(2), ref action);
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)

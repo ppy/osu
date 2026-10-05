@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class GroupSection : CompositeDrawable
     {
-        private LabelledTextBox textBox = null!;
+        private FormTextBox textBox = null!;
 
         private OsuButton button = null!;
 
@@ -24,6 +25,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager configManager { get; set; } = null!;
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
@@ -49,9 +53,10 @@ namespace osu.Game.Screens.Edit.Timing
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        textBox = new LabelledTextBox
+                        textBox = new FormTextBox
                         {
-                            Label = "Time"
+                            Caption = "Time",
+                            SelectAllOnFocus = true,
                         },
                         button = new RoundedButton
                         {
@@ -82,7 +87,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 if (group.NewValue == null)
                 {
-                    textBox.Text = string.Empty;
+                    textBox.Current.Value = string.Empty;
 
                     // cannot use textBox.Current.Disabled due to https://github.com/ppy/osu-framework/issues/3919
                     textBox.ReadOnly = true;
@@ -93,7 +98,7 @@ namespace osu.Game.Screens.Edit.Timing
                 textBox.ReadOnly = false;
                 button.Enabled.Value = true;
 
-                textBox.Text = $"{group.NewValue.Time:n0}";
+                textBox.Current.Value = $"{group.NewValue.Time:n0}";
             }, true);
         }
 
@@ -109,7 +114,16 @@ namespace osu.Game.Screens.Edit.Timing
             Beatmap.ControlPointInfo.RemoveGroup(SelectedGroup.Value);
 
             foreach (var cp in currentGroupItems)
+            {
+                // Only adjust hit object offsets if the group contains a timing control point
+                if (cp is TimingControlPoint tp && configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
+                {
+                    TimingSectionAdjustments.AdjustHitObjectOffset(Beatmap, tp, time - SelectedGroup.Value.Time);
+                    Beatmap.UpdateAllHitObjects();
+                }
+
                 Beatmap.ControlPointInfo.Add(time, cp);
+            }
 
             // the control point might not necessarily exist yet, if currentGroupItems was empty.
             SelectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(time, true);

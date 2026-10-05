@@ -23,6 +23,6 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string Target => $@"chat/channels/{channel.Id}/users/{User.Id}";
+        protected override string Target => $@"chat/channels/{channel.Id}/users/{User!.Id}";
     }
 }

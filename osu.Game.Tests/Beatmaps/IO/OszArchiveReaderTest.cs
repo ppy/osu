@@ -4,6 +4,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps;
 using osu.Game.Tests.Resources;
 using osu.Game.Beatmaps.Formats;
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 };
                 string[] maps = reader.Filenames.ToArray();
                 foreach (string map in expected)
-                    Assert.Contains(map, maps);
+                    ClassicAssert.Contains(map, maps);
             }
         }
 
@@ -56,17 +57,17 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 var meta = beatmap.Metadata;
 
-                Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet?.OnlineID);
-                Assert.AreEqual("Soleily", meta.Artist);
-                Assert.AreEqual("Soleily", meta.ArtistUnicode);
-                Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
-                Assert.AreEqual("Deif", meta.Author.Username);
-                Assert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
-                Assert.AreEqual(164471, meta.PreviewTime);
-                Assert.AreEqual(string.Empty, meta.Source);
-                Assert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", meta.Tags);
-                Assert.AreEqual("Renatus", meta.Title);
-                Assert.AreEqual("Renatus", meta.TitleUnicode);
+                ClassicAssert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet?.OnlineID);
+                ClassicAssert.AreEqual("Soleily", meta.Artist);
+                ClassicAssert.AreEqual("Soleily", meta.ArtistUnicode);
+                ClassicAssert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
+                ClassicAssert.AreEqual("Deif", meta.Author.Username);
+                ClassicAssert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
+                ClassicAssert.AreEqual(164471, meta.PreviewTime);
+                ClassicAssert.AreEqual(string.Empty, meta.Source);
+                ClassicAssert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", meta.Tags);
+                ClassicAssert.AreEqual("Renatus", meta.Title);
+                ClassicAssert.AreEqual("Renatus", meta.TitleUnicode);
             }
         }
 
@@ -79,7 +80,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
-                    Assert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
+                    ClassicAssert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
                 }
             }
         }

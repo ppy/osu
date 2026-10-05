@@ -24,8 +24,8 @@ namespace osu.Game.Overlays.Mods.Input
             [Key.A] = new[] { typeof(ModHardRock) },
             [Key.S] = new[] { typeof(ModSuddenDeath), typeof(ModPerfect) },
             [Key.D] = new[] { typeof(ModDoubleTime), typeof(ModNightcore) },
-            [Key.F] = new[] { typeof(ModHidden) },
-            [Key.G] = new[] { typeof(ModFlashlight) },
+            [Key.F] = new[] { typeof(ModHidden), typeof(ModTraceable) },
+            [Key.G] = new[] { typeof(ModFlashlight), typeof(ModBlinds) },
             [Key.Z] = new[] { typeof(ModRelax) },
             [Key.V] = new[] { typeof(ModAutoplay), typeof(ModCinema) }
         };
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods.Input
             this.allowIncompatibleSelection = allowIncompatibleSelection;
         }
 
-        public bool HandleHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
+        public bool HandleModHotkeyPressed(KeyDownEvent e, IEnumerable<ModState> availableMods)
         {
             if (!mod_type_lookup.TryGetValue(e.Key, out var typesToMatch))
                 return false;

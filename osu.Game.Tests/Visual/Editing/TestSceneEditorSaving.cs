@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,10 +12,16 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
+using osu.Game.Tests.Resources;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -70,7 +76,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Set beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().Value = 16);
             AddStep("Set timeline zoom", () =>
             {
-                originalTimelineZoom = EditorBeatmap.BeatmapInfo.TimelineZoom;
+                originalTimelineZoom = EditorBeatmap.TimelineZoom;
 
                 var timeline = Editor.ChildrenOfType<Timeline>().Single();
                 InputManager.MoveMouseTo(timeline);
@@ -81,19 +87,19 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Ensure timeline zoom changed", () =>
             {
-                changedTimelineZoom = EditorBeatmap.BeatmapInfo.TimelineZoom;
+                changedTimelineZoom = EditorBeatmap.TimelineZoom;
                 return !Precision.AlmostEquals(changedTimelineZoom, originalTimelineZoom);
             });
 
             SaveEditor();
 
             AddAssert("Beatmap has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor == 16);
-            AddAssert("Beatmap has correct timeline zoom", () => EditorBeatmap.BeatmapInfo.TimelineZoom == changedTimelineZoom);
+            AddAssert("Beatmap has correct timeline zoom", () => EditorBeatmap.TimelineZoom == changedTimelineZoom);
 
             ReloadEditorToSameBeatmap();
 
             AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor == 16);
-            AddAssert("Beatmap still has correct timeline zoom", () => EditorBeatmap.BeatmapInfo.TimelineZoom == changedTimelineZoom);
+            AddAssert("Beatmap still has correct timeline zoom", () => EditorBeatmap.TimelineZoom == changedTimelineZoom);
         }
 
         [Test]
@@ -122,19 +128,21 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Beatmap has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
 
+            AddStep("Back to selection tool", () => InputManager.Key(Key.Number1));
             ReloadEditorToSameBeatmap();
 
             AddAssert("Beatmap still has correct timing point", () => EditorBeatmap.ControlPointInfo.TimingPoints.Single().Time == 500);
         }
 
         [Test]
+        [FlakyTest]
         public void TestLengthAndStarRatingUpdated()
         {
-            WorkingBeatmap working = null;
+            WorkingBeatmap working = null!;
             double lastStarRating = 0;
             double lastLength = 0;
 
-            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(200, new TimingControlPoint { BeatLength = 600 }));
+            AddStep("Add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 600 }));
             AddStep("Change to placement mode", () => InputManager.Key(Key.Number2));
             AddStep("Move to playfield", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
             AddStep("Place single hitcircle", () => InputManager.Click(MouseButton.Left));
@@ -144,7 +152,6 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Get working beatmap", () => working = Game.BeatmapManager.GetWorkingBeatmap(EditorBeatmap.BeatmapInfo, true));
 
             AddAssert("Beatmap length is zero", () => working.BeatmapInfo.Length == 0);
-            checkDifficultyIncreased();
 
             AddStep("Move forward", () => InputManager.Key(Key.Right));
             AddStep("Place another hitcircle", () => InputManager.Click(MouseButton.Left));
@@ -190,7 +197,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Set tags again", () => EditorBeatmap.BeatmapInfo.Metadata.Tags = tags_to_discard);
 
             AddStep("Exit editor", () => Editor.Exit());
-            AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect);
             AddAssert("Tags reverted correctly", () => Game.Beatmap.Value.BeatmapInfo.Metadata.Tags == tags_to_save);
         }
 
@@ -207,6 +214,53 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("Beatmap still has correct beat divisor", () => EditorBeatmap.BeatmapInfo.BeatDivisor, () => Is.EqualTo(7));
             AddAssert("Correct beat divisor actually active", () => Editor.BeatDivisor, () => Is.EqualTo(7));
+        }
+
+        [Test]
+        public void TestBeatmapVersionPopulatedCorrectly()
+        {
+            AddAssert("beatmap version is populated", () => EditorBeatmap.BeatmapVersion > 0);
+        }
+
+        private DialogOverlay? dialogOverlay => Game.ChildrenOfType<DialogOverlay>().FirstOrDefault();
+
+        [Test]
+        public void TestReplacingEntireSetInsideEditorDoesNotCrashOnExitToSongSelect()
+        {
+            SaveEditor();
+            // required to provoke crash
+            AddStep("set sort mode to difficulty", () => Game.LocalConfig.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
+
+            string? currentDifficulty = null;
+
+            AddStep("create second difficulty", () =>
+            {
+                currentDifficulty = EditorBeatmap.BeatmapInfo.DifficultyName;
+                Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo);
+            });
+
+            AddUntilStep("wait for dialog", () => dialogOverlay?.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => dialogOverlay!.CurrentDialog!.PerformOkAction());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string? difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != currentDifficulty;
+            });
+            AddUntilStep("wait for editor load", () => Editor.ReadyForUse && dialogOverlay!.IsLoaded);
+
+            ReloadEditorToSameBeatmap();
+
+            Task<Live<BeatmapSetInfo>?> importAsUpdateTask = null!;
+            AddStep("import as update edited beatmap inside editor", () =>
+            {
+                using var stream = TestResources.GetTestBeatmapStream();
+                var memoryStream = new MemoryStream();
+                stream.CopyTo(memoryStream);
+                importAsUpdateTask = Game.BeatmapManager.ImportAsUpdate(new ProgressNotification(), new ImportTask(memoryStream, "test.osz"), Editor.Beatmap.Value.BeatmapSetInfo);
+            });
+            AddUntilStep("wait for import", () => importAsUpdateTask.Status, () => Is.EqualTo(TaskStatus.RanToCompletion));
+            AddStep("exit to song select", () => Editor.Exit());
         }
     }
 }

@@ -70,6 +70,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TakeScreenshot => new TranslatableString(getKey(@"take_screenshot"), @"Take screenshot");
 
         /// <summary>
+        /// "Take and upload screenshot"
+        /// </summary>
+        public static LocalisableString TakeAndUploadScreenshot => new TranslatableString(getKey(@"take_and_upload_screenshot"), @"Take and upload screenshot");
+
+        /// <summary>
         /// "Toggle gameplay mouse buttons"
         /// </summary>
         public static LocalisableString ToggleGameplayMouseButtons => new TranslatableString(getKey(@"toggle_gameplay_mouse_buttons"), @"Toggle gameplay mouse buttons");
@@ -130,14 +135,29 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
-        /// "Select previous group"
+        /// "Activate previous set"
         /// </summary>
-        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Select previous group");
+        public static LocalisableString ActivatePreviousSet => new TranslatableString(getKey(@"activate_previous_set"), @"Activate previous set");
 
         /// <summary>
-        /// "Select next group"
+        /// "Activate next set"
         /// </summary>
-        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"Select next group");
+        public static LocalisableString ActivateNextSet => new TranslatableString(getKey(@"activate_next_set"), @"Activate next set");
+
+        /// <summary>
+        /// "Expand previous group"
+        /// </summary>
+        public static LocalisableString ExpandPreviousGroup => new TranslatableString(getKey(@"expand_previous_group"), @"Expand previous group");
+
+        /// <summary>
+        /// "Expand next group"
+        /// </summary>
+        public static LocalisableString ExpandNextGroup => new TranslatableString(getKey(@"expand_next_group"), @"Expand next group");
+
+        /// <summary>
+        /// "Toggle expansion of current group"
+        /// </summary>
+        public static LocalisableString ToggleCurrentGroup => new TranslatableString(getKey(@"toggle_current_group"), @"Toggle expansion of current group");
 
         /// <summary>
         /// "Home"
@@ -190,9 +210,14 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorCloneSelection => new TranslatableString(getKey(@"editor_clone_selection"), @"Clone selection");
 
         /// <summary>
-        /// "Cycle grid display mode"
+        /// "Cycle grid spacing"
         /// </summary>
-        public static LocalisableString EditorCycleGridDisplayMode => new TranslatableString(getKey(@"editor_cycle_grid_display_mode"), @"Cycle grid display mode");
+        public static LocalisableString EditorCycleGridSpacing => new TranslatableString(getKey(@"editor_cycle_grid_spacing"), @"Cycle grid spacing");
+
+        /// <summary>
+        /// "Cycle grid type"
+        /// </summary>
+        public static LocalisableString EditorCycleGridType => new TranslatableString(getKey(@"editor_cycle_grid_type"), @"Cycle grid type");
 
         /// <summary>
         /// "Test gameplay"
@@ -208,6 +233,16 @@ namespace osu.Game.Localisation
         /// "Random skin"
         /// </summary>
         public static LocalisableString RandomSkin => new TranslatableString(getKey(@"random_skin"), @"Random skin");
+
+        /// <summary>
+        /// "Previous skin"
+        /// </summary>
+        public static LocalisableString PreviousSkin => new TranslatableString(getKey(@"previous_skin"), @"Previous skin");
+
+        /// <summary>
+        /// "Next skin"
+        /// </summary>
+        public static LocalisableString NextSkin => new TranslatableString(getKey(@"next_skin"), @"Next skin");
 
         /// <summary>
         /// "Pause / resume replay"
@@ -325,14 +360,19 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekReplayBackward => new TranslatableString(getKey(@"seek_replay_backward"), @"Seek replay backward");
 
         /// <summary>
-        /// "Seek replay forward one frame"
+        /// "Step replay forward one frame"
         /// </summary>
-        public static LocalisableString StepReplayForward => new TranslatableString(getKey(@"step_replay_forward"), @"Seek replay forward one frame");
+        public static LocalisableString StepReplayForward => new TranslatableString(getKey(@"step_replay_forward"), @"Step replay forward one frame");
 
         /// <summary>
         /// "Step replay backward one frame"
         /// </summary>
         public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
+
+        /// <summary>
+        /// "Fast forward replay"
+        /// </summary>
+        public static LocalisableString FastForwardReplay => new TranslatableString(getKey(@"fast_forward_replay"), @"Fast forward replay");
 
         /// <summary>
         /// "Toggle chat focus"
@@ -403,6 +443,61 @@ namespace osu.Game.Localisation
         /// "Decrease mod speed"
         /// </summary>
         public static LocalisableString DecreaseModSpeed => new TranslatableString(getKey(@"decrease_mod_speed"), @"Decrease mod speed");
+
+        /// <summary>
+        /// "Seek to previous hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousHitObject => new TranslatableString(getKey(@"editor_seek_to_previous_hit_object"), @"Seek to previous hit object");
+
+        /// <summary>
+        /// "Seek to next hit object"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextHitObject => new TranslatableString(getKey(@"editor_seek_to_next_hit_object"), @"Seek to next hit object");
+
+        /// <summary>
+        /// "Seek to previous sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousSamplePoint => new TranslatableString(getKey(@"editor_seek_to_previous_sample_point"), @"Seek to previous sample point");
+
+        /// <summary>
+        /// "Seek to next sample point"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextSamplePoint => new TranslatableString(getKey(@"editor_seek_to_next_sample_point"), @"Seek to next sample point");
+
+        /// <summary>
+        /// "Add bookmark"
+        /// </summary>
+        public static LocalisableString EditorAddBookmark => new TranslatableString(getKey(@"editor_add_bookmark"), @"Add bookmark");
+
+        /// <summary>
+        /// "Remove closest bookmark"
+        /// </summary>
+        public static LocalisableString EditorRemoveClosestBookmark => new TranslatableString(getKey(@"editor_remove_closest_bookmark"), @"Remove closest bookmark");
+
+        /// <summary>
+        /// "Seek to previous bookmark"
+        /// </summary>
+        public static LocalisableString EditorSeekToPreviousBookmark => new TranslatableString(getKey(@"editor_seek_to_previous_bookmark"), @"Seek to previous bookmark");
+
+        /// <summary>
+        /// "Seek to next bookmark"
+        /// </summary>
+        public static LocalisableString EditorSeekToNextBookmark => new TranslatableString(getKey(@"editor_seek_to_next_bookmark"), @"Seek to next bookmark");
+
+        /// <summary>
+        /// "Absolute scroll song list"
+        /// </summary>
+        public static LocalisableString AbsoluteScrollSongList => new TranslatableString(getKey(@"absolute_scroll_song_list"), @"Absolute scroll song list");
+
+        /// <summary>
+        /// "Toggle movement control"
+        /// </summary>
+        public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
+
+        /// <summary>
+        /// "Discard unsaved changes..."
+        /// </summary>
+        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -35,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
         private readonly FontUsage largeFont = OsuFont.GetFont(size: 22, weight: FontWeight.Light);
 
-        private readonly TextColumn totalScoreColumn;
+        private readonly TotalScoreColumn totalScoreColumn;
         private readonly TextColumn accuracyColumn;
         private readonly TextColumn maxComboColumn;
         private readonly TextColumn ppColumn;
@@ -67,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
-                            totalScoreColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width),
+                            totalScoreColumn = new TotalScoreColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width),
                             accuracyColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, largeFont, top_columns_min_width),
                             maxComboColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, largeFont, top_columns_min_width)
                         }
@@ -96,10 +95,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             if (score != null)
+            {
                 totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
+
+                if (score.Accuracy == 1.0) accuracyColumn.TextColour = colours.GreenLight;
+#pragma warning disable CS0618
+                if (score.MaxCombo == score.BeatmapInfo!.MaxCombo) maxComboColumn.TextColour = colours.GreenLight;
+#pragma warning restore CS0618
+            }
         }
 
         private ScoreInfo score;
@@ -219,7 +225,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private partial class TextColumn : InfoColumn, IHasCurrentValue<string>
+        private partial class TextColumn : InfoColumn
         {
             private readonly OsuTextFlowContainer text;
 
@@ -228,24 +234,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set => text.Text = value;
             }
 
+            public Colour4 TextColour
+            {
+                set => text.Colour = value;
+            }
+
             public Drawable Drawable
             {
                 set
                 {
                     text.Clear();
                     text.AddArbitraryDrawable(value);
-                }
-            }
-
-            private Bindable<string> current;
-
-            public Bindable<string> Current
-            {
-                get => current;
-                set
-                {
-                    text.Clear();
-                    text.AddText(value.Value, t => t.Current = current = value);
                 }
             }
 
@@ -261,6 +260,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 : base(title, text, minWidth)
             {
                 this.text = text;
+            }
+        }
+
+        private partial class TotalScoreColumn : TextColumn
+        {
+            private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
+
+            public TotalScoreColumn(LocalisableString title, FontUsage font, float? minWidth = null)
+                : base(title, font, minWidth)
+            {
+            }
+
+            public Bindable<string> Current
+            {
+                get => current;
+                set => current.Current = value;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Current.BindValueChanged(_ => Text = current.Value, true);
             }
         }
 

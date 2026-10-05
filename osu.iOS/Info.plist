@@ -11,7 +11,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
-	<string>13.4</string>
+	<string>15.0</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
@@ -21,12 +21,27 @@
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>AppDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
 	</array>
-	<key>UIRequiresFullScreen</key>
-	<true/>
 	<key>UIStatusBarHidden</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -34,9 +49,11 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>We don't really use the camera.</string>
+	<string>We don't use the camera.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We don't really use the microphone.</string>
+	<string>We don't use the microphone.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>We don't use Bluetooth.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
@@ -49,8 +66,31 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 	</array>
-	<key>XSAppIconAssets</key>
-	<string>Assets.xcassets/AppIcon.appiconset</string>
+    <key>CFBundleIcons~ipad</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconFiles</key>
+            <array>
+                <string>AppIcon60x60</string>
+            </array>
+            <key>CFBundleIconName</key>
+            <string>AppIcon</string>
+        </dict>
+    </dict>
+    <key>CFBundleIcons</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconFiles</key>
+            <array>
+                <string>AppIcon60x60</string>
+                <string>AppIcon76x76</string>
+            </array>
+            <key>CFBundleIconName</key>
+            <string>AppIcon</string>
+        </dict>
+    </dict>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -68,6 +108,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! replay</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.osr</string>
 			<key>UTTypeTagSpecification</key>
@@ -81,6 +123,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! skin</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.osk</string>
 			<key>UTTypeTagSpecification</key>
@@ -94,6 +138,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! beatmap</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.osz</string>
 			<key>UTTypeTagSpecification</key>
@@ -107,6 +153,8 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>osu! beatmap</string>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.olz</string>
 			<key>UTTypeTagSpecification</key>
@@ -143,7 +191,15 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music-games</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
+	<!-- Game mode is supposed to be automatically enabled by the app category specification above,
+	     but for some reason it needs to be explicitly enabled with this key. -->
+	<key>GCSupportsGameMode</key>
+	<true/>
 </dict>
 </plist>

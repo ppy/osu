@@ -7,6 +7,7 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
@@ -18,11 +19,11 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private double placementStartTime;
         private double placementEndTime;
 
-        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(HitObject.Duration, 0);
+        protected override bool IsValidForPlacement => base.IsValidForPlacement && (PlacementActive == PlacementState.Waiting || Precision.DefinitelyBigger(HitObject.Duration, 0));
 
         public BananaShowerPlacementBlueprint()
         {
-            InternalChild = outline = new TimeSpanOutline();
+            Child = outline = new TimeSpanOutline();
         }
 
         protected override void LoadComplete()
@@ -59,11 +60,13 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             return base.OnMouseDown(e);
         }
 
-        public override void UpdateTimeAndPosition(SnapResult result)
+        public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
-            base.UpdateTimeAndPosition(result);
+            var result = Composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
 
-            if (!(result.Time is double time)) return;
+            base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
+
+            if (!(result.Time is double time)) return result;
 
             switch (PlacementActive)
             {
@@ -78,6 +81,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
             HitObject.StartTime = Math.Min(placementStartTime, placementEndTime);
             HitObject.EndTime = Math.Max(placementStartTime, placementEndTime);
+            return result;
         }
     }
 }

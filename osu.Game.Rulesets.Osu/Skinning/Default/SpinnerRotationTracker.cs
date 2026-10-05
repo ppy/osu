@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// <summary>
         /// Whether currently in the correct time range to allow spinning.
         /// </summary>
-        private bool isSpinnableTime => drawableSpinner.HitObject.StartTime <= Time.Current && drawableSpinner.HitObject.EndTime > Time.Current;
+        public bool IsSpinnableTime => drawableSpinner.HitObject.StartTime <= Time.Current && drawableSpinner.HitObject.EndTime > Time.Current;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 lastAngle = thisAngle;
             }
 
-            IsSpinning.Value = isSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
+            IsSpinning.Value = IsSpinnableTime && Math.Abs(currentRotation - Rotation) > 10f;
             Rotation = (float)Interpolation.Damp(Rotation, currentRotation, 0.99, Math.Abs(Time.Elapsed));
         }
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// <param name="delta">The delta angle.</param>
         public void AddRotation(float delta)
         {
-            if (!isSpinnableTime)
+            if (!IsSpinnableTime)
                 return;
 
             if (!rotationTransferred)

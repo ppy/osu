@@ -8,21 +8,22 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osu.Framework.Bindables;
 using osu.Game.Extensions;
+using osu.Game.Online.Metadata;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class APIUser : IEquatable<APIUser>, IUser
+    public class APIUser : IEquatable<APIUser>, IUser, IHasCover
     {
         /// <summary>
         /// A user ID which can be used to represent any system user which is not attached to a user profile.
         /// </summary>
         public const int SYSTEM_USER_ID = 0;
 
-        [JsonProperty(@"id")]
+        // In osu-web, deleted users have a null ID. When deserializing, we ignore the null value and use 1 instead.
+        [JsonProperty(@"id", NullValueHandling = NullValueHandling.Ignore)]
         public int Id { get; set; } = 1;
 
         [JsonProperty(@"join_date")]
@@ -56,9 +57,9 @@ namespace osu.Game.Online.API.Requests.Responses
             set => countryCodeString = value.ToString();
         }
 
-        public readonly Bindable<UserStatus?> Status = new Bindable<UserStatus?>();
-
-        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
+        [JsonProperty(@"team")]
+        [CanBeNull]
+        public APITeam Team { get; set; }
 
         [JsonProperty(@"profile_colour")]
         public string Colour;
@@ -74,14 +75,17 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"cover")]
+        [CanBeNull]
         public UserCover Cover;
 
         public class UserCover
         {
             [JsonProperty(@"custom_url")]
+            [CanBeNull]
             public string CustomUrl;
 
             [JsonProperty(@"url")]
+            [CanBeNull]
             public string Url;
 
             [JsonProperty(@"id")]
@@ -112,8 +116,13 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"is_active")]
         public bool Active;
 
+        /// <summary>
+        /// From osu-web's perspective, whether a user was recently online.
+        /// This doesn't imply the user is online in a lazer client (may be updated from stable or web browser).
+        /// Use <see cref="MetadataClient.GetPresence"/> for real-time lazer online status checks.
+        /// </summary>
         [JsonProperty(@"is_online")]
-        public bool IsOnline;
+        public bool WasRecentlyOnline;
 
         [JsonProperty(@"pm_friends_only")]
         public bool PMFriendsOnly;
@@ -201,6 +210,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"playmode")]
         public string PlayMode;
 
+        [JsonProperty(@"profile_hue")]
+        public int? ProfileHue;
+
         [JsonProperty(@"profile_order")]
         public string[] ProfileOrder;
 
@@ -220,8 +232,10 @@ namespace osu.Game.Online.API.Requests.Responses
 
         /// <summary>
         /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> or <see cref="GetFriendsRequest"/> response).
-        /// Otherwise empty.
         /// </summary>
+        /// <remarks>
+        /// This returns null when accessed from <see cref="IAPIProvider.LocalUser"/>. Use <see cref="LocalUserStatisticsProvider"/> instead.
+        /// </remarks>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
         {
@@ -234,6 +248,20 @@ namespace osu.Game.Online.API.Requests.Responses
 
                 statistics = value;
             }
+        }
+
+        // Only provided via /users/ batch lookups. Usually implicitly comes inside `UserStatistics`.
+        [JsonProperty(@"global_rank")]
+        [CanBeNull]
+        public GlobalRank Rank { get; set; }
+
+        public class GlobalRank
+        {
+            [JsonProperty(@"rank")]
+            public int? Rank;
+
+            [JsonProperty(@"ruleset_id")]
+            public int RulesetId;
         }
 
         [JsonProperty(@"rank_history")]
@@ -258,7 +286,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIUserHistoryCount[] ReplaysWatchedCounts;
 
         /// <summary>
-        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> response).
+        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> or <see cref="GetMeRequest"/> response).
         /// Otherwise empty. Can be altered for testing purposes.
         /// </summary>
         // todo: this should likely be moved to a separate UserCompact class at some point.
@@ -268,6 +296,12 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("groups")]
         public APIUserGroup[] Groups;
+
+        [JsonProperty("daily_challenge_user_stats")]
+        public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
+
+        [JsonProperty("matchmaking_stats")]
+        public APIUserMatchmakingStatistics[] MatchmakingStatistics = [];
 
         public override string ToString() => Username;
 
@@ -279,6 +313,12 @@ namespace osu.Game.Online.API.Requests.Responses
             Id = SYSTEM_USER_ID,
             Username = "system",
             Colour = @"9c0101",
+        };
+
+        public static APIUser UnknownUser(int userId) => new APIUser
+        {
+            Id = userId,
+            Username = "Unknown user",
         };
 
         public int OnlineID => Id;

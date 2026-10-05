@@ -39,7 +39,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
                 textContainer = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14))
                 {
-                    Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(10),

@@ -5,29 +5,30 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Screens.Edit.Timing
 {
     internal partial class EffectSection : Section<EffectControlPoint>
     {
-        private LabelledSwitchButton kiai = null!;
+        private FormCheckBox kiai = null!;
 
-        private SliderWithTextBoxInput<double> scrollSpeedSlider = null!;
+        private FormSliderBar<double> scrollSpeedSlider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Flow.AddRange(new Drawable[]
             {
-                kiai = new LabelledSwitchButton { Label = "Kiai Time" },
-                scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
+                kiai = new FormCheckBox { Caption = "Kiai Time" },
+                scrollSpeedSlider = new FormSliderBar<double>
                 {
+                    Caption = "Scroll Speed",
                     Current = new EffectControlPoint().ScrollSpeedBindable,
-                    KeyboardStep = 0.1f
-                }
+                    KeyboardStep = 0.1f,
+                    TransferValueOnCommit = true,
+                    TabbableContentContainer = this
+                },
             });
         }
 
@@ -38,8 +39,7 @@ namespace osu.Game.Screens.Edit.Timing
             kiai.Current.BindValueChanged(_ => saveChanges());
             scrollSpeedSlider.Current.BindValueChanged(_ => saveChanges());
 
-            var drawableRuleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateDrawableRulesetWith(Beatmap.PlayableBeatmap);
-            if (drawableRuleset is not IDrawableScrollingRuleset scrollingRuleset || scrollingRuleset.VisualisationMethod == ScrollVisualisationMethod.Constant)
+            if (!Beatmap.BeatmapInfo.Ruleset.CreateInstance().EditorShowScrollSpeed)
                 scrollSpeedSlider.Hide();
 
             void saveChanges()
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Timing
                 isRebinding = true;
 
                 kiai.Current = newEffectPoint.KiaiModeBindable;
-                scrollSpeedSlider.Current = new BindableDouble
+                scrollSpeedSlider.Current = new BindableDouble(1)
                 {
                     MinValue = 0.01,
                     MaxValue = 10,
@@ -84,9 +84,9 @@ namespace osu.Game.Screens.Edit.Timing
             effectPoint.ScrollSpeedBindable.Value = scrollSpeed.NewValue;
         }
 
-        protected override EffectControlPoint CreatePoint()
+        protected override EffectControlPoint CreatePoint(ControlPointGroup selectedGroup)
         {
-            var reference = Beatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.EffectPointAt(selectedGroup.Time);
 
             return new EffectControlPoint
             {

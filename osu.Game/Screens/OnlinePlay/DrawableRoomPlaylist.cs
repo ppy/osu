@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -26,22 +24,22 @@ namespace osu.Game.Screens.OnlinePlay
         /// The currently-selected item. Selection is visually represented with a border.
         /// May be updated by clicking playlist items if <see cref="AllowSelection"/> is <c>true</c>.
         /// </summary>
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem?> SelectedItem = new Bindable<PlaylistItem?>();
 
         /// <summary>
         /// Invoked when an item is requested to be deleted.
         /// </summary>
-        public Action<PlaylistItem> RequestDeletion;
+        public Action<PlaylistItem>? RequestDeletion;
 
         /// <summary>
         /// Invoked when an item requests its results to be shown.
         /// </summary>
-        public Action<PlaylistItem> RequestResults;
+        public Action<PlaylistItem>? RequestResults;
 
         /// <summary>
         /// Invoked when an item requests to be edited.
         /// </summary>
-        public Action<PlaylistItem> RequestEdit;
+        public Action<PlaylistItem>? RequestEdit;
 
         private bool allowReordering;
 
@@ -167,7 +165,8 @@ namespace osu.Game.Screens.OnlinePlay
             d.RequestDeletion = i => RequestDeletion?.Invoke(i);
             d.RequestResults = i =>
             {
-                SelectedItem.Value = i;
+                if (AllowSelection)
+                    SelectedItem.Value = i;
                 RequestResults?.Invoke(i);
             };
             d.RequestEdit = i => RequestEdit?.Invoke(i);
@@ -206,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay
                 ScrollContainer.ScrollIntoView(drawableItem);
         }
 
-        #region Key selection logic (shared with BeatmapCarousel and RoomsContainer)
+        #region Key selection logic (shared with BeatmapCarousel and RoomListing)
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -235,7 +234,7 @@ namespace osu.Game.Screens.OnlinePlay
         {
             var visibleItems = ListContainer.AsEnumerable().Where(r => r.IsPresent);
 
-            PlaylistItem item;
+            PlaylistItem? item;
 
             if (SelectedItem.Value == null)
                 item = visibleItems.FirstOrDefault()?.Model;

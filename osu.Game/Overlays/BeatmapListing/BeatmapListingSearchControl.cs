@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -29,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// Any time the text box receives key events (even while masked).
         /// </summary>
-        public Action TypingStarted;
+        public Action? TypingStarted;
 
         public Bindable<string> Query => textBox.Current;
 
@@ -51,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
 
-        public APIBeatmapSet BeatmapSet
+        public APIBeatmapSet? BeatmapSet
         {
             set
             {
@@ -67,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         private readonly BeatmapSearchTextBox textBox;
-        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchGeneral> generalFilter;
+        private readonly BeatmapSearchGeneralFilterRow generalFilter;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
@@ -151,7 +149,7 @@ namespace osu.Game.Overlays.BeatmapListing
             categoryFilter.Current.Value = SearchCategory.Leaderboard;
         }
 
-        private IBindable<bool> allowExplicitContent;
+        private IBindable<bool> allowExplicitContent = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
@@ -165,6 +163,13 @@ namespace osu.Game.Overlays.BeatmapListing
             }, true);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            generalFilter.Ruleset.BindTo(Ruleset);
+        }
+
         public void TakeFocus() => textBox.TakeFocus();
 
         private partial class BeatmapSearchTextBox : BasicSearchTextBox
@@ -172,7 +177,7 @@ namespace osu.Game.Overlays.BeatmapListing
             /// <summary>
             /// Any time the text box receives key events (even while masked).
             /// </summary>
-            public Action TextChanged;
+            public Action? TextChanged;
 
             protected override Color4 SelectionColour => Color4.Gray;
 

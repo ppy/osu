@@ -15,10 +15,9 @@ namespace osu.Game.Localisation
         public static LocalisableString Header => new TranslatableString(getKey(@"header"), @"Import");
 
         /// <summary>
-        /// "If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation's files in any way."
+        /// "If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation&#39;s files in any way."
         /// </summary>
-        public static LocalisableString Description => new TranslatableString(getKey(@"description"),
-            @"If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation's files in any way.");
+        public static LocalisableString Description => new TranslatableString(getKey(@"description"), @"If you have an installation of a previous osu! version, you can choose to migrate your existing content. Note that this will not affect your existing installation's files in any way.");
 
         /// <summary>
         /// "previous osu! install"
@@ -38,18 +37,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Your import will continue in the background. Check on its progress in the notifications sidebar!"
         /// </summary>
-        public static LocalisableString ImportInProgress =>
-            new TranslatableString(getKey(@"import_in_progress"), @"Your import will continue in the background. Check on its progress in the notifications sidebar!");
+        public static LocalisableString ImportInProgress => new TranslatableString(getKey(@"import_in_progress"), @"Your import will continue in the background. Check on its progress in the notifications sidebar!");
 
         /// <summary>
         /// "calculating..."
         /// </summary>
         public static LocalisableString Calculating => new TranslatableString(getKey(@"calculating"), @"calculating...");
-
-        /// <summary>
-        /// "{0} item(s)"
-        /// </summary>
-        public static LocalisableString Items(int arg0) => new TranslatableString(getKey(@"items"), @"{0} item(s)", arg0);
 
         /// <summary>
         /// "Data migration will use &quot;hard links&quot;. No extra disk space will be used, and you can delete either data folder at any point without affecting the other installation."

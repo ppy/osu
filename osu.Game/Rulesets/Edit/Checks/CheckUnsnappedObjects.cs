@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var controlPointInfo = context.Beatmap.ControlPointInfo;
+            var controlPointInfo = context.CurrentDifficulty.Playable.ControlPointInfo;
 
-            foreach (var hitobject in context.Beatmap.HitObjects)
+            foreach (var hitobject in context.CurrentDifficulty.Playable.HitObjects)
             {
                 double startUnsnap = hitobject.StartTime - controlPointInfo.GetClosestSnappedTime(hitobject.StartTime);
                 string startPostfix = hitobject is IHasDuration ? "start" : "";

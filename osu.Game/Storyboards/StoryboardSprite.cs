@@ -13,46 +13,60 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardSprite : IStoryboardElementWithDuration
     {
-        private readonly List<StoryboardLoopingGroup> loopingGroups = new List<StoryboardLoopingGroup>();
-        private readonly List<StoryboardTriggerGroup> triggerGroups = new List<StoryboardTriggerGroup>();
+        public readonly List<StoryboardLoopingGroup> LoopingGroups = new List<StoryboardLoopingGroup>();
+        public readonly List<StoryboardTriggerGroup> TriggerGroups = new List<StoryboardTriggerGroup>();
 
+        public StoryboardElementSource Source { get; }
         public string Path { get; }
-        public bool IsDrawable => HasCommands;
+        public virtual bool IsDrawable => HasCommands;
 
         public Anchor Origin;
         public Vector2 InitialPosition;
 
         public readonly StoryboardCommandGroup Commands = new StoryboardCommandGroup();
 
-        public double StartTime
+        public virtual double StartTime
         {
             get
             {
-                // To get the initial start time, we need to check whether the first alpha command to exist (across all loops) has a StartValue of zero.
-                // A StartValue of zero governs, above all else, the first valid display time of a sprite.
+                // Users that are crafting storyboards using raw osb scripting or external tools may create alpha events far before the actual display time
+                // of sprites.
                 //
-                // You can imagine that the first command of each type decides that type's start value, so if the initial alpha is zero,
-                // anything before that point can be ignored (the sprite is not visible after all).
-                var alphaCommands = new List<(double startTime, bool isZeroStartValue)>();
+                // To make sure lifetime optimisations work as efficiently as they can, let's locally find the first time a sprite becomes visible.
+                var alphaCommands = new List<StoryboardCommand<float>>();
 
-                var command = Commands.Alpha.FirstOrDefault();
-                if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
-
-                foreach (var loop in loopingGroups)
+                foreach (var command in Commands.Alpha)
                 {
-                    command = loop.Alpha.FirstOrDefault();
-                    if (command != null) alphaCommands.Add((command.StartTime, command.StartValue == 0));
+                    alphaCommands.Add(command);
+                    if (visibleAtStartOrEnd(command))
+                        break;
+                }
+
+                foreach (var loop in LoopingGroups)
+                {
+                    foreach (var command in loop.Alpha)
+                    {
+                        alphaCommands.Add(command);
+                        if (visibleAtStartOrEnd(command))
+                            break;
+                    }
                 }
 
                 if (alphaCommands.Count > 0)
                 {
-                    var firstAlpha = alphaCommands.MinBy(t => t.startTime);
+                    // Special care is given to cases where there's one or more no-op transforms (ie transforming from alpha 0 to alpha 0).
+                    // - If a 0->0 transform exists, we still need to check it to ensure the absolute first start value is non-visible.
+                    // - After ascertaining this, we then check the first non-noop transform to get the true start lifetime.
+                    var firstAlpha = alphaCommands.MinBy(c => c.StartTime);
+                    var firstRealAlpha = alphaCommands.Where(visibleAtStartOrEnd).MinBy(c => c.StartTime);
 
-                    if (firstAlpha.isZeroStartValue)
-                        return firstAlpha.startTime;
+                    if (firstAlpha!.StartValue == 0 && firstRealAlpha != null)
+                        return firstRealAlpha.StartTime;
                 }
 
                 return EarliestTransformTime;
+
+                bool visibleAtStartOrEnd(StoryboardCommand<float> command) => command.StartValue > 0 || command.EndValue > 0;
             }
         }
 
@@ -63,7 +77,7 @@ namespace osu.Game.Storyboards
                 // If we got to this point, either no alpha commands were present, or the earliest had a non-zero start value.
                 // The sprite's StartTime will be determined by the earliest command, regardless of type.
                 double earliestStartTime = Commands.StartTime;
-                foreach (var l in loopingGroups)
+                foreach (var l in LoopingGroups)
                     earliestStartTime = Math.Min(earliestStartTime, l.StartTime);
                 return earliestStartTime;
             }
@@ -75,7 +89,7 @@ namespace osu.Game.Storyboards
             {
                 double latestEndTime = Commands.EndTime;
 
-                foreach (var l in loopingGroups)
+                foreach (var l in LoopingGroups)
                     latestEndTime = Math.Max(latestEndTime, l.EndTime);
 
                 return latestEndTime;
@@ -88,17 +102,18 @@ namespace osu.Game.Storyboards
             {
                 double latestEndTime = Commands.EndTime;
 
-                foreach (var l in loopingGroups)
+                foreach (var l in LoopingGroups)
                     latestEndTime = Math.Max(latestEndTime, l.StartTime + l.Duration * l.TotalIterations);
 
                 return latestEndTime;
             }
         }
 
-        public bool HasCommands => Commands.HasCommands || loopingGroups.Any(l => l.HasCommands);
+        public bool HasCommands => Commands.HasCommands || LoopingGroups.Any(l => l.HasCommands);
 
-        public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
+        public StoryboardSprite(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition)
         {
+            Source = source;
             Path = path;
             Origin = origin;
             InitialPosition = initialPosition;
@@ -109,18 +124,18 @@ namespace osu.Game.Storyboards
         public StoryboardLoopingGroup AddLoopingGroup(double loopStartTime, int repeatCount)
         {
             var loop = new StoryboardLoopingGroup(loopStartTime, repeatCount);
-            loopingGroups.Add(loop);
+            LoopingGroups.Add(loop);
             return loop;
         }
 
         public StoryboardTriggerGroup AddTriggerGroup(string triggerName, double startTime, double endTime, int groupNumber)
         {
             var trigger = new StoryboardTriggerGroup(triggerName, startTime, endTime, groupNumber);
-            triggerGroups.Add(trigger);
+            TriggerGroups.Add(trigger);
             return trigger;
         }
 
-        public void ApplyTransforms<TDrawable>(TDrawable drawable)
+        public void ApplyTransforms<TDrawable>(TDrawable drawable, StoryboardTriggerController triggerController)
             where TDrawable : Drawable, IFlippable, IVectorScalable
         {
             HashSet<string> appliedProperties = new HashSet<string>();
@@ -128,7 +143,7 @@ namespace osu.Game.Storyboards
             // For performance reasons, we need to apply the commands in chronological order.
             // Not doing so will cause many functions to be interleaved, resulting in O(n^2) complexity.
             IEnumerable<IStoryboardCommand> commands = Commands.AllCommands;
-            commands = commands.Concat(loopingGroups.SelectMany(l => l.AllCommands));
+            commands = commands.Concat(LoopingGroups.SelectMany(l => l.AllCommands));
 
             foreach (var command in commands.OrderBy(c => c.StartTime))
             {
@@ -138,6 +153,9 @@ namespace osu.Game.Storyboards
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
                     command.ApplyTransforms(drawable);
             }
+
+            foreach (var triggerGroup in TriggerGroups)
+                triggerController.Bind(drawable, triggerGroup);
         }
     }
 }

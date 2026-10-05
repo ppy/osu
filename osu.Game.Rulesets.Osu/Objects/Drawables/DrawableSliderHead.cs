@@ -16,17 +16,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
-        public override bool DisplayResult
-        {
-            get
-            {
-                if (HitObject?.ClassicSliderBehaviour == true)
-                    return false;
-
-                return base.DisplayResult;
-            }
-        }
-
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;

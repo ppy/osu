@@ -13,6 +13,7 @@ using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD.ArgonHealthDisplayParts;
 using osu.Game.Skinning;
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD
             Precision = 1
         };
 
-        [SettingSource("Use relative size")]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.UseRelativeSize))]
         public BindableBool UseRelativeSize { get; } = new BindableBool(true);
 
         private ArgonHealthDisplayBar mainBar = null!;

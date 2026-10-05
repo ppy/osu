@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
@@ -14,11 +14,12 @@ namespace osu.Game.Scoring.Legacy
         public static long GetDisplayScore(this ScoreProcessor scoreProcessor, ScoringMode mode)
             => getDisplayScore(scoreProcessor.Ruleset.RulesetInfo.OnlineID, scoreProcessor.TotalScore.Value, mode, scoreProcessor.MaximumStatistics);
 
-        public static long GetDisplayScore(this ScoreInfo scoreInfo, ScoringMode mode)
+        public static long GetDisplayScore(this IScoreInfo scoreInfo, ScoringMode mode)
             => getDisplayScore(scoreInfo.Ruleset.OnlineID, scoreInfo.TotalScore, mode, scoreInfo.MaximumStatistics);
 
-        public static long GetDisplayScore(this SoloScoreInfo soloScoreInfo, ScoringMode mode)
-            => getDisplayScore(soloScoreInfo.RulesetID, soloScoreInfo.TotalScore, mode, soloScoreInfo.MaximumStatistics);
+        // TODO: implement `IScoreInfo` on `MultiplayerScore` and remove this overload
+        public static long GetDisplayScore(this MultiplayerScore multiplayerScore, ScoringMode mode)
+            => getDisplayScore(multiplayerScore.RulesetId, multiplayerScore.TotalScore, mode, multiplayerScore.MaximumStatistics);
 
         private static long getDisplayScore(int rulesetId, long score, ScoringMode mode, IReadOnlyDictionary<HitResult, int> maximumStatistics)
         {
@@ -64,7 +65,7 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCountGeki(this ScoreInfo scoreInfo)
+        public static int? GetCountGeki(this IScoreInfo scoreInfo)
         {
             switch (scoreInfo.Ruleset.OnlineID)
             {
@@ -94,11 +95,11 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCount300(this ScoreInfo scoreInfo) => getCount(scoreInfo, HitResult.Great);
+        public static int? GetCount300(this IScoreInfo scoreInfo) => getCount(scoreInfo, HitResult.Great);
 
         public static void SetCount300(this ScoreInfo scoreInfo, int value) => scoreInfo.Statistics[HitResult.Great] = value;
 
-        public static int? GetCountKatu(this ScoreInfo scoreInfo)
+        public static int? GetCountKatu(this IScoreInfo scoreInfo)
         {
             switch (scoreInfo.Ruleset.OnlineID)
             {
@@ -136,7 +137,7 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCount100(this ScoreInfo scoreInfo)
+        public static int? GetCount100(this IScoreInfo scoreInfo)
         {
             switch (scoreInfo.Ruleset.OnlineID)
             {
@@ -168,7 +169,7 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCount50(this ScoreInfo scoreInfo)
+        public static int? GetCount50(this IScoreInfo scoreInfo)
         {
             switch (scoreInfo.Ruleset.OnlineID)
             {
@@ -198,7 +199,7 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        public static int? GetCountMiss(this ScoreInfo scoreInfo)
+        public static int? GetCountMiss(this IScoreInfo scoreInfo)
         {
             switch (scoreInfo.Ruleset.OnlineID)
             {
@@ -219,7 +220,7 @@ namespace osu.Game.Scoring.Legacy
             // but we physically cannot recover that data anymore at this point.
             scoreInfo.Statistics[HitResult.Miss] = value;
 
-        private static int? getCount(ScoreInfo scoreInfo, HitResult result)
+        private static int? getCount(IScoreInfo scoreInfo, HitResult result)
         {
             if (scoreInfo.Statistics.TryGetValue(result, out int existing))
                 return existing;

@@ -19,6 +19,8 @@ namespace osu.Game.Storyboards.Commands
         /// </summary>
         double EndTime { get; }
 
+        Easing Easing { get; }
+
         /// <summary>
         /// The name of the <see cref="Drawable"/> property affected by this storyboard command.
         /// Used to apply initial property values based on the list of commands given in <see cref="StoryboardSprite"/>.
@@ -42,5 +44,10 @@ namespace osu.Game.Storyboards.Commands
         /// <returns>The sequence of transforms applied to the target drawable.</returns>
         TransformSequence<TDrawable> ApplyTransforms<TDrawable>(TDrawable d)
             where TDrawable : Drawable, IFlippable, IVectorScalable;
+    }
+
+    public interface IStoryboardLoopingCommand : IStoryboardCommand
+    {
+        IStoryboardCommand OriginalCommand { get; }
     }
 }

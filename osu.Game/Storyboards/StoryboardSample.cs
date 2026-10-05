@@ -10,6 +10,7 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardSampleInfo : IStoryboardElement, ISampleInfo
     {
+        public StoryboardElementSource Source { get; }
         public string Path { get; }
         public bool IsDrawable => true;
 
@@ -24,8 +25,9 @@ namespace osu.Game.Storyboards
             System.IO.Path.ChangeExtension(Path, null),
         };
 
-        public StoryboardSampleInfo(string path, double time, int volume)
+        public StoryboardSampleInfo(StoryboardElementSource source, string path, double time, int volume)
         {
+            Source = source;
             Path = path;
             StartTime = time;
             Volume = volume;

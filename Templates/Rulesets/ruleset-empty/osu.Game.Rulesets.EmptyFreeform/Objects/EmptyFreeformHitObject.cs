@@ -14,7 +14,16 @@ namespace osu.Game.Rulesets.EmptyFreeform.Objects
 
         public Vector2 Position { get; set; }
 
-        public float X => Position.X;
-        public float Y => Position.Y;
+        public float X
+        {
+            get => Position.X;
+            set => Position = new Vector2(value, Y);
+        }
+
+        public float Y
+        {
+            get => Position.Y;
+            set => Position = new Vector2(X, value);
+        }
     }
 }

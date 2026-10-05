@@ -2,13 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Catch.Objects;
@@ -18,15 +20,17 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject>, IKeyBindingHandler<GlobalAction>
+    [Cached]
+    public partial class CatchHitObjectComposer : ScrollingHitObjectComposer<CatchHitObject, CatchAction>
     {
-        private const float distance_snap_radius = 50;
+        public const float DISTANCE_SNAP_RADIUS = 50;
+
+        public override Bindable<TernaryState>? SelectionNewComboState { get; } = new Bindable<TernaryState>();
 
         private CatchDistanceSnapGrid distanceSnapGrid = null!;
 
@@ -44,9 +48,13 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
         }
 
+        private Bindable<bool> limitPlacementToCurrentTime = null!;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            limitPlacementToCurrentTime = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
+
             AddInternal(DistanceSnapProvider);
             DistanceSnapProvider.AttachToToolbox(RightToolbox);
 
@@ -70,7 +78,22 @@ namespace osu.Game.Rulesets.Catch.Edit
             }));
         }
 
-        protected override IEnumerable<TernaryButton> CreateTernaryButtons()
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        {
+            if (limitPlacementToCurrentTime.Value
+                && BlueprintContainer.CurrentHitObjectPlacement?.PlacementActive == PlacementBlueprint.PlacementState.Waiting)
+            {
+                var playfield = (CatchPlayfield)Playfield;
+                double time = BeatSnapProvider.SnapTime(EditorClock.CurrentTime);
+                return new SnapResult(playfield.ScreenSpacePositionAtTime(time), time, playfield);
+            }
+
+            return base.FindSnappedPositionAndTime(screenSpacePosition);
+        }
+
+        protected override Drawable CreateHitObjectInspector() => new CatchHitObjectInspector(DistanceSnapProvider);
+
+        protected override IEnumerable<Drawable> CreateTernaryButtons()
             => base.CreateTernaryButtons()
                    .Concat(DistanceSnapProvider.CreateTernaryButtons());
 
@@ -84,14 +107,14 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new CatchBeatSnapGrid();
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        protected override IReadOnlyList<CompositionTool<CatchAction>> CompositionTools => new CompositionTool<CatchAction>[]
         {
             new FruitCompositionTool(),
             new JuiceStreamCompositionTool(),
             new BananaShowerCompositionTool()
         };
 
-        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             switch (e.Action)
             {
@@ -107,29 +130,35 @@ namespace osu.Game.Rulesets.Catch.Edit
                     return true;
             }
 
-            return false;
+            return base.OnPressed(e);
         }
 
-        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.Repeat)
+                return false;
+
+            handleToggleViaKey(e);
+            return base.OnKeyDown(e);
         }
 
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
+        protected override void OnKeyUp(KeyUpEvent e)
         {
-            var result = base.FindSnappedPositionAndTime(screenSpacePosition, snapType);
+            handleToggleViaKey(e);
+            base.OnKeyUp(e);
+        }
 
-            result.ScreenSpacePosition.X = screenSpacePosition.X;
+        private void handleToggleViaKey(KeyboardEvent key)
+        {
+            DistanceSnapProvider.HandleToggleViaKey(key);
+        }
 
-            if (snapType.HasFlag(SnapType.RelativeGrids))
-            {
-                if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(result.ScreenSpacePosition) is SnapResult snapResult &&
-                    Vector2.Distance(snapResult.ScreenSpacePosition, result.ScreenSpacePosition) < distance_snap_radius)
-                {
-                    result = snapResult;
-                }
-            }
+        public SnapResult? TryDistanceSnap(Vector2 screenSpacePosition)
+        {
+            if (distanceSnapGrid.IsPresent && distanceSnapGrid.GetSnappedPosition(screenSpacePosition) is SnapResult snapResult)
+                return snapResult;
 
-            return result;
+            return null;
         }
 
         private PalpableCatchHitObject? getLastSnappableHitObject(double time)
@@ -207,5 +236,41 @@ namespace osu.Game.Rulesets.Catch.Edit
             distanceSnapGrid.StartTime = sourceHitObject.GetEndTime();
             distanceSnapGrid.StartX = sourceHitObject.EffectiveX;
         }
+
+        #region Clipboard handling
+
+        public override string ConvertSelectionToString()
+            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<CatchHitObject>().OrderBy(h => h.StartTime)
+                                             .Select(h => (h.IndexInCurrentCombo + 1).ToString(CultureInfo.InvariantCulture)));
+
+        // 1,2,3,4 ...
+        private static readonly Regex selection_regex = new Regex(@"^\d+(,\d+)*$", RegexOptions.Compiled);
+
+        public override void SelectFromTimestamp(double timestamp, string objectDescription)
+        {
+            if (!selection_regex.IsMatch(objectDescription))
+                return;
+
+            List<CatchHitObject> remainingHitObjects = EditorBeatmap.HitObjects.Cast<CatchHitObject>().Where(h => h.StartTime >= timestamp).ToList();
+            string[] splitDescription = objectDescription.Split(',');
+
+            for (int i = 0; i < splitDescription.Length; i++)
+            {
+                if (!int.TryParse(splitDescription[i], out int combo) || combo < 1)
+                    continue;
+
+                CatchHitObject? current = remainingHitObjects.FirstOrDefault(h => h.IndexInCurrentCombo + 1 == combo);
+
+                if (current == null)
+                    continue;
+
+                EditorBeatmap.SelectedHitObjects.Add(current);
+
+                if (i < splitDescription.Length - 1)
+                    remainingHitObjects = remainingHitObjects.Where(h => h != current && h.StartTime >= current.StartTime).ToList();
+            }
+        }
+
+        #endregion
     }
 }

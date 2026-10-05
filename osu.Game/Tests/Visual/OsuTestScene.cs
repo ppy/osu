@@ -274,6 +274,8 @@ namespace osu.Game.Tests.Visual
 
             var result = new APIBeatmapSet
             {
+                Genre = new BeatmapSetOnlineGenre { Id = 15, Name = "Future genre" },
+                Language = new BeatmapSetOnlineLanguage { Id = 15, Name = "Future language" },
                 OnlineID = original.BeatmapSet.OnlineID,
                 Status = BeatmapOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers
@@ -293,6 +295,34 @@ namespace osu.Game.Tests.Visual
                 },
                 Source = original.Metadata.Source,
                 Tags = original.Metadata.Tags,
+                BPM = original.BPM,
+                HasFavourited = false,
+                PlayCount = 123,
+                FavouriteCount = 456,
+                Submitted = DateTime.Now,
+                Ranked = DateTime.Now,
+                Ratings = Enumerable.Range(0, 11).ToArray(),
+                RelatedTags =
+                [
+                    new APITag
+                    {
+                        Id = 2,
+                        Name = "song representation/simple",
+                        Description = "Accessible and straightforward map design."
+                    },
+                    new APITag
+                    {
+                        Id = 4,
+                        Name = "style/clean",
+                        Description = "Visually uncluttered and organised patterns, often involving few overlaps and equal visual spacing between objects."
+                    },
+                    new APITag
+                    {
+                        Id = 23,
+                        Name = "aim/aim control",
+                        Description = "Patterns with velocity or direction changes which strongly go against a player's natural movement pattern."
+                    }
+                ],
                 Beatmaps = new[]
                 {
                     new APIBeatmap
@@ -305,6 +335,28 @@ namespace osu.Game.Tests.Visual
                         RulesetID = original.Ruleset.OnlineID,
                         StarRating = original.StarRating,
                         DifficultyName = original.DifficultyName,
+                        CircleSize = original.Difficulty.CircleSize,
+                        DrainRate = original.Difficulty.DrainRate,
+                        OverallDifficulty = original.Difficulty.OverallDifficulty,
+                        ApproachRate = original.Difficulty.ApproachRate,
+                        Length = original.Length,
+                        HitLength = original.Length,
+                        CircleCount = 111,
+                        SliderCount = 12,
+                        PlayCount = 222,
+                        BPM = original.BPM,
+                        PassCount = 21,
+                        FailTimes = new APIFailTimes
+                        {
+                            Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                            Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                        },
+                        TopTags =
+                        [
+                            new APIBeatmapTag { TagId = 4, VoteCount = 1 },
+                            new APIBeatmapTag { TagId = 2, VoteCount = 1 },
+                            new APIBeatmapTag { TagId = 23, VoteCount = 5 },
+                        ],
                     }
                 }
             };
@@ -330,6 +382,9 @@ namespace osu.Game.Tests.Visual
             if (MusicController?.TrackLoaded == true)
                 MusicController.Stop();
 
+            if (realm?.IsValueCreated == true)
+                Realm.Dispose();
+
             RecycleLocalStorage(true);
         }
 
@@ -338,8 +393,6 @@ namespace osu.Game.Tests.Visual
         public class ClockBackedTestWorkingBeatmap : TestWorkingBeatmap
         {
             private readonly Track track;
-
-            private readonly TrackVirtualStore store;
 
             /// <summary>
             /// Create an instance which creates a <see cref="TestBeatmap"/> for the provided ruleset when requested.
@@ -370,7 +423,7 @@ namespace osu.Game.Tests.Visual
 
                 if (referenceClock != null)
                 {
-                    store = new TrackVirtualStore(referenceClock);
+                    var store = new TrackVirtualStore(referenceClock);
                     audio.AddItem(store);
                     track = store.GetVirtual(trackLength);
                 }
@@ -381,12 +434,6 @@ namespace osu.Game.Tests.Visual
                 // To ease testability, ensure the track is available from point of construction.
                 // (Usually this would be done by MusicController for us).
                 LoadTrack();
-            }
-
-            ~ClockBackedTestWorkingBeatmap()
-            {
-                // Remove the track store from the audio manager
-                store?.Dispose();
             }
 
             protected override Track GetBeatmapTrack() => track;

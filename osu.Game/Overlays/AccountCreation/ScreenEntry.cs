@@ -18,6 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays.Settings;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -208,13 +209,11 @@ namespace osu.Game.Overlays.AccountCreation
                                 passwordDescription.AddErrors(errors.User.Password);
                             }
 
-                            if (!string.IsNullOrEmpty(errors.Redirect))
-                            {
-                                if (!string.IsNullOrEmpty(errors.Message))
-                                    passwordDescription.AddErrors(new[] { errors.Message });
+                            if (!string.IsNullOrEmpty(errors.Message))
+                                passwordDescription.AddErrors(new[] { errors.Message });
 
-                                game?.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", true);
-                            }
+                            if (!string.IsNullOrEmpty(errors.Redirect))
+                                game?.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", LinkWarnMode.NeverWarn);
                         }
                         else
                         {
@@ -228,7 +227,7 @@ namespace osu.Game.Overlays.AccountCreation
 
                     apiState.BindValueChanged(state =>
                     {
-                        if (state.NewValue == APIState.RequiresSecondFactorAuth)
+                        if (this.IsCurrentScreen() && state.NewValue == APIState.RequiresSecondFactorAuth)
                             this.Push(new ScreenEmailVerification());
                     });
 

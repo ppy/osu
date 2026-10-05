@@ -89,9 +89,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var loadedCovers = covers.Where(c => c.ChildrenOfType<OnlineBeatmapSetCover>().SingleOrDefault()?.IsLoaded ?? false);
 
-            AddUntilStep("some loaded", () => loadedCovers.Any());
+            AddUntilStep("some loaded", loadedCovers.Any);
             AddStep("scroll to end", () => scroll.ScrollToEnd());
-            AddUntilStep("all unloaded", () => !loadedCovers.Any());
+            AddUntilStep("all unloaded", loadedCovers.Any, () => Is.False);
         }
 
         [Test]

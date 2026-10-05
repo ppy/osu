@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -20,7 +21,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
 {
@@ -46,8 +46,8 @@ namespace osu.Game.Screens.Edit.Components
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Scale = new Vector2(1.4f),
-                    IconScale = new Vector2(1.4f),
+                    Scale = new Vector2(1.2f),
+                    IconScale = new Vector2(1.2f),
                     Icon = FontAwesome.Regular.PlayCircle,
                     Action = togglePause,
                 },
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Tempo, tempoAdjustment), true);
+            editorClock.AudioAdjustments.AddAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             if (editor != null)
                 currentScreenMode.BindTo(editor.Mode);
@@ -105,24 +105,10 @@ namespace osu.Game.Screens.Edit.Components
 
         protected override void Dispose(bool isDisposing)
         {
-            Track.Value?.RemoveAdjustment(AdjustableProperty.Frequency, tempoAdjustment);
+            if (editorClock.IsNotNull())
+                editorClock.AudioAdjustments.RemoveAdjustment(AdjustableProperty.Tempo, tempoAdjustment);
 
             base.Dispose(isDisposing);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Repeat)
-                return false;
-
-            switch (e.Key)
-            {
-                case Key.Space:
-                    togglePause();
-                    return true;
-            }
-
-            return base.OnKeyDown(e);
         }
 
         private void togglePause()
@@ -148,7 +134,7 @@ namespace osu.Game.Screens.Edit.Components
             public LocalisableString TooltipText { get; set; }
         }
 
-        private partial class PlaybackTabControl : OsuTabControl<double>
+        public partial class PlaybackTabControl : OsuTabControl<double>
         {
             private static readonly double[] tempo_values = { 0.25, 0.5, 0.75, 1 };
 

@@ -10,7 +10,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public partial class ShearedToggleButton : ShearedButton
     {
-        private Sample? sampleClick;
         private Sample? sampleOff;
         private Sample? sampleOn;
 
@@ -25,27 +24,11 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public BindableBool Active { get; } = new BindableBool();
 
-        /// <summary>
-        /// Creates a new <see cref="ShearedToggleButton"/>
-        /// </summary>
-        /// <param name="width">
-        /// The width of the button.
-        /// <list type="bullet">
-        /// <item>If a non-<see langword="null"/> value is provided, this button will have a fixed width equal to the provided value.</item>
-        /// <item>If a <see langword="null"/> value is provided (or the argument is omitted entirely), the button will autosize in width to fit the text.</item>
-        /// </list>
-        /// </param>
-        public ShearedToggleButton(float? width = null)
-            : base(width)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Samples.Get(@"UI/default-select");
-            sampleOn = audio.Samples.Get(@"UI/dropdown-open");
-            sampleOff = audio.Samples.Get(@"UI/dropdown-close");
+            sampleOn = audio.Samples.Get(@"UI/check-on");
+            sampleOff = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -72,8 +55,6 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample()
         {
-            sampleClick?.Play();
-
             if (PlayToggleSamples)
             {
                 if (Active.Value)

@@ -8,8 +8,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
@@ -29,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                                   && Precision.AlmostEquals(Player.ScoreProcessor.Accuracy.Value, 0.9836, 0.01)
                                   && Player.ScoreProcessor.TotalScore.Value == 946_049,
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
                 Difficulty = { OverallDifficulty = 10 },
@@ -54,9 +56,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                 Mod = doubleTime,
                 PassCondition = () => Player.ScoreProcessor.JudgedHits > 0
                                       && Player.ScoreProcessor.Accuracy.Value == 1
-                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * doubleTime.ScoreMultiplier),
+                                      && Player.ScoreProcessor.TotalScore.Value == (long)(1_000_000 * new ManiaScoreMultiplierCalculator(new ScoreMultiplierContext(new BeatmapDifficulty())).CalculateFor([doubleTime])),
                 Autoplay = false,
-                Beatmap = new Beatmap
+                CreateBeatmap = () => new Beatmap
                 {
                     BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
                     Difficulty = { OverallDifficulty = 10 },

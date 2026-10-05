@@ -27,6 +27,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("multi-segment-slider")]
         [TestCase("nan-slider")]
         [TestCase("1124896")]
+        [TestCase("1341554")]
+        [TestCase("2593923")]
+        [TestCase("801165")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
             Mod = new CatchModRelax(),
             Autoplay = false,
             PassCondition = passCondition,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {

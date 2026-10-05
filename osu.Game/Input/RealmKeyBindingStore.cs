@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Rulesets;
 using Realms;
 
@@ -24,6 +26,19 @@ namespace osu.Game.Input
         }
 
         /// <summary>
+        /// For a given <see cref="GlobalAction"/>, return a human-readable string representing the bindings bound to the action.
+        /// </summary>
+        public LocalisableString GetBindingsStringFor(GlobalAction globalAction)
+        {
+            var combinations = GetReadableKeyCombinationsFor(globalAction);
+
+            if (combinations.Count == 0)
+                return ToastStrings.NoKeyBound;
+
+            return string.Join(" / ", combinations);
+        }
+
+        /// <summary>
         /// Retrieve all user-defined key combinations (in a format that can be displayed) for a specific action.
         /// </summary>
         /// <param name="globalAction">The action to lookup.</param>
@@ -37,6 +52,32 @@ namespace osu.Game.Input
                 foreach (var action in context.All<RealmKeyBinding>().Where(b => string.IsNullOrEmpty(b.RulesetName) && (GlobalAction)b.ActionInt == globalAction))
                 {
                     string str = keyCombinationProvider.GetReadableString(action.KeyCombination);
+
+                    // even if found, the readable string may be empty for an unbound action.
+                    if (str.Length > 0)
+                        combinations.Add(str);
+                }
+            });
+
+            return combinations;
+        }
+
+        /// <summary>
+        /// Retrieve all user-defined key combinations (in a format that can be displayed) for a specific ruleset action.
+        /// </summary>
+        /// <param name="ruleset">The <see cref="RulesetInfo.ShortName"/> of the ruleset.</param>
+        /// <param name="variant">The ID of the key binding variant to look up.</param>
+        /// <param name="action">The ID of the specific action to look up.</param>
+        /// <returns></returns>
+        public IReadOnlyList<string> GetReadableKeyCombinationsFor(string ruleset, int variant, int action)
+        {
+            List<string> combinations = new List<string>();
+
+            realm.Run(context =>
+            {
+                foreach (var binding in context.All<RealmKeyBinding>().Where(b => b.RulesetName == ruleset && b.Variant == variant && b.ActionInt == action))
+                {
+                    string str = keyCombinationProvider.GetReadableString(binding.KeyCombination);
 
                     // even if found, the readable string may be empty for an unbound action.
                     if (str.Length > 0)
@@ -67,7 +108,7 @@ namespace osu.Game.Input
                     foreach (var ruleset in rulesets)
                     {
                         var instance = ruleset.CreateInstance();
-                        foreach (int variant in instance.AvailableVariants)
+                        foreach (int variant in instance.AllVariants)
                             insertDefaults(r, existingBindings, instance.GetDefaultKeyBindings(variant), ruleset.ShortName, variant);
                     }
 

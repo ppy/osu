@@ -42,6 +42,8 @@ namespace osu.Game.Graphics.UserInterface
             Margin = new MarginPadding { Left = 2 },
         };
 
+        protected bool DrawBorder { get; init; } = true;
+
         private OsuCaret? caret;
 
         private bool selectionStarted;
@@ -63,6 +65,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private Dictionary<FeedbackSampleType, Sample?[]> sampleMap = new Dictionary<FeedbackSampleType, Sample?[]>();
 
+        /// <summary>
+        /// Whether all text should be selected when the <see cref="OsuTextBox"/> gains focus.
+        /// </summary>
+        public bool SelectAllOnFocus { get; set; }
+
         public OsuTextBox()
         {
             Height = 40;
@@ -81,8 +88,7 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundCommit = BorderColour = colourProvider?.Highlight1 ?? colour.Yellow;
             selectionColour = colourProvider?.Background1 ?? new Color4(249, 90, 255, 255);
 
-            if (caret != null)
-                caret.SelectionColour = selectionColour;
+            caret?.SelectionColour = selectionColour;
 
             Placeholder.Colour = colourProvider?.Foreground1 ?? new Color4(180, 180, 180, 255);
 
@@ -251,15 +257,19 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnFocus(FocusEvent e)
         {
-            if (Masking)
+            if (DrawBorder)
                 BorderThickness = 3;
 
             base.OnFocus(e);
+
+            // we may become focused from an ongoing drag operation, we don't want to overwrite selection in that case.
+            if (SelectAllOnFocus && string.IsNullOrEmpty(SelectedText))
+                SelectAll();
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            if (Masking)
+            if (DrawBorder)
                 BorderThickness = 0;
 
             base.OnFocusLost(e);
@@ -268,8 +278,10 @@ namespace osu.Game.Graphics.UserInterface
         protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
         {
             AutoSizeAxes = Axes.Both,
-            Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: FontSize) },
+            Child = new OsuSpriteText { Text = c.ToString(), Font = Font },
         };
+
+        protected virtual FontUsage Font => OsuFont.GetFont(size: FontSize);
 
         protected override Caret CreateCaret() => caret = new OsuCaret
         {

@@ -24,7 +24,9 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Whether this <see cref="KeyCounter"/> is currently in the "activated" state because the associated key is currently pressed.
         /// </summary>
-        protected readonly Bindable<bool> IsActive = new BindableBool();
+        public IBindable<bool> IsActive => isActive;
+
+        private readonly Bindable<bool> isActive = new BindableBool();
 
         protected KeyCounter(InputTrigger trigger)
         {
@@ -34,14 +36,22 @@ namespace osu.Game.Screens.Play.HUD
             Trigger.OnDeactivate += Deactivate;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (Trigger.IsActive)
+                Activate();
+        }
+
         protected virtual void Activate(bool forwardPlayback = true)
         {
-            IsActive.Value = true;
+            isActive.Value = true;
         }
 
         protected virtual void Deactivate(bool forwardPlayback = true)
         {
-            IsActive.Value = false;
+            isActive.Value = false;
         }
 
         protected override void Dispose(bool isDisposing)

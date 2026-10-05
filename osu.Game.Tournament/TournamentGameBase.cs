@@ -53,6 +53,13 @@ namespace osu.Game.Tournament
             return new ProductionEndpointConfiguration();
         }
 
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+
+            host.Window?.Title = $"{Name} [tournament client]";
+        }
+
         private TournamentSpriteText initialisationText = null!;
 
         [BackgroundDependencyLoader]
@@ -171,7 +178,7 @@ namespace osu.Game.Tournament
 
                 ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
-                ladder.Ruleset.BindValueChanged(r =>
+                ladder.Ruleset.BindValueChanged(_ =>
                 {
                     // Refetch player rank data on next startup as the ruleset has changed.
                     foreach (var team in ladder.Teams)

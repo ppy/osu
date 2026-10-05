@@ -82,9 +82,10 @@ namespace osu.Game.Users
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(6),
-                                        Children = new Drawable[]
+                                        Children = new[]
                                         {
                                             CreateFlag(),
+                                            CreateTeamLogo(),
                                             // supporter icon is being added later
                                         }
                                     }
@@ -112,10 +113,12 @@ namespace osu.Game.Users
                             message.Anchor = Anchor.CentreLeft;
                             message.Origin = Anchor.CentreLeft;
                             message.Margin = new MarginPadding { Left = margin };
-                        })
+                        }),
                     }
                 }
             };
+
+            // TODO: add rank somewhere (needs design consideration).
 
             if (User.IsSupporter)
             {

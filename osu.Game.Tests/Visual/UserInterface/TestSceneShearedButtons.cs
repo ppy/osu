@@ -13,7 +13,6 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -37,8 +36,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 if (bigButton)
                 {
-                    Child = button = new ShearedButton(400, 80)
+                    Child = button = new ShearedButton
                     {
+                        Width = 400,
+                        Height = 80,
                         LighterColour = Colour4.FromHex("#FFFFFF"),
                         DarkerColour = Colour4.FromHex("#FFCC22"),
                         TextColour = Colour4.Black,
@@ -51,8 +52,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
                 else
                 {
-                    Child = button = new ShearedButton(200, 80)
+                    Child = button = new ShearedButton
                     {
+                        Width = 200,
+                        Height = 80,
                         LighterColour = Colour4.FromHex("#FF86DD"),
                         DarkerColour = Colour4.FromHex("#DE31AE"),
                         TextColour = Colour4.White,
@@ -80,8 +83,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(200)
+                Child = button = new ShearedToggleButton
                 {
+                    Width = 200,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
@@ -97,8 +101,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             ShearedToggleButton toggleButton = null;
 
-            AddStep("create fixed width button", () => Child = toggleButton = new ShearedToggleButton(200)
+            AddStep("create fixed width button", () => Child = toggleButton = new ShearedToggleButton
             {
+                Width = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "Fixed width"
@@ -110,6 +115,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create auto-sizing button", () => Child = toggleButton = new ShearedToggleButton
             {
+                AutoSizeAxes = Axes.X,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "This button autosizes to its text!"
@@ -131,8 +137,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(200)
+                Child = button = new ShearedToggleButton
                 {
+                    Width = 200,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
@@ -183,32 +190,34 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(2.5f),
                     Children = new Drawable[]
                     {
-                        new ShearedButton(120)
+                        new ShearedButton
                         {
+                            AutoSizeAxes = Axes.X,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = "Test",
+                            Text = "Button",
                             Action = () => { },
-                            Padding = new MarginPadding(),
+                            Height = 30,
                         },
-                        new ShearedButton(120, 40)
+                        new ShearedButton
                         {
+                            AutoSizeAxes = Axes.X,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = "Test",
+                            Text = "Button",
                             Action = () => { },
-                            Padding = new MarginPadding { Left = -1f },
+                            Height = 30,
                         },
-                        new ShearedButton(120, 70)
+                        new ShearedButton
                         {
+                            AutoSizeAxes = Axes.X,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = "Test",
+                            Text = "Button",
                             Action = () => { },
-                            Padding = new MarginPadding { Left = 3f },
+                            Height = 30,
                         },
                     }
                 }

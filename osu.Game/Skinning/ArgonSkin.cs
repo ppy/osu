@@ -93,19 +93,12 @@ namespace osu.Game.Skinning
             // Temporary until default skin has a valid hit lighting.
             if ((lookup as SkinnableSprite.SpriteComponentLookup)?.LookupName == @"lighting") return Drawable.Empty();
 
-            if (base.GetDrawableComponent(lookup) is Drawable c)
-                return c;
-
             switch (lookup)
             {
-                case SkinComponentsContainerLookup containerLookup:
-                    // Only handle global level defaults for now.
-                    if (containerLookup.Ruleset != null)
-                        return null;
-
-                    switch (containerLookup.Target)
+                case GlobalSkinnableContainerLookup containerLookup:
+                    switch (containerLookup.Lookup)
                     {
-                        case SkinComponentsContainerLookup.TargetArea.SongSelect:
+                        case GlobalSkinnableContainers.SongSelect:
                             var songSelectComponents = new DefaultSkinComponentsContainer(_ =>
                             {
                                 // do stuff when we need to.
@@ -113,8 +106,69 @@ namespace osu.Game.Skinning
 
                             return songSelectComponents;
 
-                        case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                            var skinnableTargetWrapper = new DefaultSkinComponentsContainer(container =>
+                        case GlobalSkinnableContainers.MainHUDComponents:
+                            if (containerLookup.Ruleset != null)
+                            {
+                                return new DefaultSkinComponentsContainer(container =>
+                                {
+                                    var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                    var comboCounter = container.OfType<ArgonComboCounter>().FirstOrDefault();
+                                    var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
+
+                                    leaderboard?.Position = new Vector2(36, 115);
+
+                                    Vector2 pos = new Vector2(36, -66);
+
+                                    if (comboCounter != null)
+                                    {
+                                        comboCounter.Position = pos;
+                                        pos -= new Vector2(0, comboCounter.DrawHeight * 1.4f + 20);
+                                    }
+
+                                    spectatorList?.Position = pos;
+
+                                    if (hitError != null)
+                                    {
+                                        hitError.Anchor = Anchor.CentreLeft;
+                                        hitError.Origin = Anchor.CentreLeft;
+                                    }
+
+                                    if (hitError2 != null)
+                                    {
+                                        hitError2.Anchor = Anchor.CentreRight;
+                                        hitError2.Scale = new Vector2(-1, 1);
+                                        // origin flipped to match scale above.
+                                        hitError2.Origin = Anchor.CentreLeft;
+                                    }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
+                                })
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new DrawableGameplayLeaderboard(),
+                                        new ArgonComboCounter
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Scale = new Vector2(1.3f),
+                                        },
+                                        new SpectatorList
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                        },
+                                        new BarHitErrorMeter(),
+                                        new BarHitErrorMeter(),
+                                    },
+                                };
+                            }
+
+                            var mainHUDComponents = new DefaultSkinComponentsContainer(container =>
                             {
                                 var health = container.OfType<ArgonHealthDisplay>().FirstOrDefault();
                                 var healthLine = container.OfType<BoxElement>().FirstOrDefault();
@@ -122,7 +176,6 @@ namespace osu.Game.Skinning
                                 var score = container.OfType<ArgonScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<ArgonAccuracyCounter>().FirstOrDefault();
                                 var performancePoints = container.OfType<ArgonPerformancePointsCounter>().FirstOrDefault();
-                                var combo = container.OfType<ArgonComboCounter>().FirstOrDefault();
                                 var songProgress = container.OfType<ArgonSongProgress>().FirstOrDefault();
                                 var keyCounter = container.OfType<ArgonKeyCounterDisplay>().FirstOrDefault();
 
@@ -170,47 +223,26 @@ namespace osu.Game.Skinning
                                         performancePoints.Origin = Anchor.TopRight;
                                     }
 
-                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-
-                                    if (hitError != null)
-                                    {
-                                        hitError.Anchor = Anchor.CentreLeft;
-                                        hitError.Origin = Anchor.CentreLeft;
-                                    }
-
-                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
-
-                                    if (hitError2 != null)
-                                    {
-                                        hitError2.Anchor = Anchor.CentreRight;
-                                        hitError2.Scale = new Vector2(-1, 1);
-                                        // origin flipped to match scale above.
-                                        hitError2.Origin = Anchor.CentreLeft;
-                                    }
-
                                     if (songProgress != null)
                                     {
                                         const float padding = 10;
                                         // Hard to find this at runtime, so taken from the most expanded state during replay.
                                         const float song_progress_offset_height = 36 + padding;
+                                        const float hit_error_offset_width = 26;
 
                                         songProgress.Position = new Vector2(0, -padding);
                                         songProgress.Scale = new Vector2(0.9f, 1);
 
-                                        if (keyCounter != null && hitError != null)
+                                        if (keyCounter != null)
                                         {
                                             keyCounter.Anchor = Anchor.BottomRight;
                                             keyCounter.Origin = Anchor.BottomRight;
-                                            keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
-                                        }
-
-                                        if (combo != null && hitError != null)
-                                        {
-                                            combo.Anchor = Anchor.BottomLeft;
-                                            combo.Origin = Anchor.BottomLeft;
-                                            combo.Position = new Vector2((hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
+                                            keyCounter.Position = new Vector2(-(hit_error_offset_width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 }
                             })
                             {
@@ -239,24 +271,18 @@ namespace osu.Game.Skinning
                                     {
                                         Scale = new Vector2(0.8f),
                                     },
-                                    new ArgonComboCounter
-                                    {
-                                        Scale = new Vector2(1.3f)
-                                    },
-                                    new BarHitErrorMeter(),
-                                    new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
                                     new ArgonKeyCounterDisplay(),
                                 }
                             };
 
-                            return skinnableTargetWrapper;
+                            return mainHUDComponents;
                     }
 
                     return null;
             }
 
-            return null;
+            return base.GetDrawableComponent(lookup);
         }
 
         public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)

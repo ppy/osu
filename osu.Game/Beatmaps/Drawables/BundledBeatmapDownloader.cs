@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 // Note that this is downloading the beatmaps even if they are already downloaded.
                 // We could rely more on `BeatmapDownloadTracker`'s exposed state to avoid this.
-                beatmapDownloader.Download(beatmapSet);
+                beatmapDownloader.Download(beatmapSet, false);
             }
         }
 
@@ -187,6 +187,13 @@ namespace osu.Game.Beatmaps.Drawables
             @"1841885 cYsmix - triangles.osz",
             // winner of https://osu.ppy.sh/home/news/2023-02-01-twin-trials-contest-beatmapping-phase
             @"1971987 James Landino - Aresene's Bazaar.osz",
+            // locus 2025 https://osu.ppy.sh/home/news/2025-08-21-locus-2025-results
+            "2412244 Kry.exe - Rift Walker.osz",
+            "2412260 Koto Spirit - Locus of Hexagram.osz",
+            "2412232 Will Stetson - Of Our Time.osz",
+            "2412292 ArXe - Locus Amoenus (feat. Megurine Luka).osz",
+            "2412328 Akiri - Vespera Stella.osz",
+            "2412331 takehirotei - Haiboku no Altra Vita.osz",
         };
 
         private static readonly string[] bundled_osu =
@@ -292,7 +299,7 @@ namespace osu.Game.Beatmaps.Drawables
             "1407228 II-L - VANGUARD-1.osz",
             "1422686 II-L - VANGUARD-2.osz",
             "1429217 Street - Phi.osz",
-            "1442235 2ToneDisco x Cosmicosmo - Shoelaces (feat. Puniden).osz",
+            "1442235 2ToneDisco x Cosmicosmo - Shoelaces (feat. Puniden).osz", // set is not marked as FA, but track is listed in https://osu.ppy.sh/beatmaps/artists/157
             "1447478 Cres. - End Time.osz",
             "1449942 m108 - Crescent Sakura.osz",
             "1463778 MuryokuP - A tree without a branch.osz",
@@ -336,8 +343,8 @@ namespace osu.Game.Beatmaps.Drawables
             "1854710 Blaster & Extra Terra - Spacecraft (Cut Ver.).osz",
             "1859322 Hino Isuka - Delightness Brightness.osz",
             "1884102 Maduk - Go (feat. Lachi) (Cut Ver.).osz",
-            "1884578 Neko Hacker - People People feat. Nanahira.osz",
-            "1897902 uma vs. Morimori Atsushi - Re: End of a Dream.osz",
+            "1884578 Neko Hacker - People People feat. Nanahira.osz", // set is not marked as FA, but track is listed in https://osu.ppy.sh/beatmaps/artists/266
+            "1897902 uma vs. Morimori Atsushi - Re: End of a Dream.osz", // set is not marked as FA, but track is listed in https://osu.ppy.sh/beatmaps/artists/108
             "1905582 KINEMA106 - Fly Away (Cut Ver.).osz",
             "1934686 ARForest - Rainbow Magic!!.osz",
             "1963076 METAROOM - S.N.U.F.F.Y.osz",
@@ -345,7 +352,6 @@ namespace osu.Game.Beatmaps.Drawables
             "1971951 James Landino - Shiba Paradise.osz",
             "1972518 Toromaru - Sleight of Hand.osz",
             "1982302 KINEMA106 - INVITE.osz",
-            "1983475 KNOWER - The Government Knows.osz",
             "2010165 Junk - Yellow Smile (bms edit).osz",
             "2022737 Andora - Euphoria (feat. WaMi).osz",
             "2025023 tephe - Genjitsu Escape.osz",
@@ -461,7 +467,6 @@ namespace osu.Game.Beatmaps.Drawables
             @"2055329 miraie & blackwinterwells - facade.osz",
             @"2069877 Sephid - Thunderstrike 1988.osz",
             @"2119716 Aethoro - Snowy.osz",
-            @"2120379 Synthion - VIVIDVELOCITY.osz",
             @"2124805 Frums (unknown ""lambda"") - 19ZZ.osz",
             @"2127811 Wiklund - Joy of Living (Cut Ver.).osz",
         };

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Catch.Edit.Checks;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Catch.Edit
@@ -13,7 +14,17 @@ namespace osu.Game.Rulesets.Catch.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
+            // Audio
+            new CheckCatchFewHitsounds(),
+
+            // Compose
             new CheckBananaShowerGap(),
+            new CheckConcurrentObjects(),
+
+            // Spread
+            new CheckCatchLowestDiffDrainTime(),
+
+            // Settings
             new CheckCatchAbnormalDifficultySettings(),
         };
 

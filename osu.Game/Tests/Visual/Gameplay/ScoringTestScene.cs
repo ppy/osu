@@ -209,13 +209,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 scoreV1Visible.BindValueChanged(_ => rescalePlots());
                 scoreV2Visible.BindValueChanged(_ => rescalePlots());
 
-                graphs.MissLocations.BindCollectionChanged((_, __) => Rerun());
-                graphs.NonPerfectLocations.BindCollectionChanged((_, __) => Rerun());
+                graphs.MissLocations.BindCollectionChanged((_, _) => Rerun());
+                graphs.NonPerfectLocations.BindCollectionChanged((_, _) => Rerun());
 
                 graphs.MaxCombo.BindTo(sliderMaxCombo.Current);
 
                 changeModsButton.Action = () => modSelect.Show();
-                SelectedMods.BindValueChanged(mods => Rerun());
+                SelectedMods.BindValueChanged(_ => Rerun());
 
                 Rerun();
             });
@@ -658,12 +658,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private partial class TestModSelectOverlay : UserModSelectOverlay
         {
-            protected override bool ShowModEffects => true;
-            protected override bool ShowPresets => false;
-
             public TestModSelectOverlay()
                 : base(OverlayColourScheme.Aquamarine)
             {
+                ShowPresets = false;
             }
         }
     }

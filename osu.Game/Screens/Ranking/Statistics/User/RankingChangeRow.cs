@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
@@ -17,9 +18,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics.User
 {
-    public abstract partial class RankingChangeRow<T> : CompositeDrawable
+    public abstract partial class RankingChangeRow<T> : CompositeDrawable, IHasTooltip
     {
-        public Bindable<UserStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<UserStatisticsUpdate?>();
+        public Bindable<ScoreBasedUserStatisticsUpdate?> StatisticsUpdate { get; } = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
         private readonly Func<UserStatistics, T> accessor;
 
@@ -113,7 +114,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
             StatisticsUpdate.BindValueChanged(onStatisticsUpdate, true);
         }
 
-        private void onStatisticsUpdate(ValueChangedEvent<UserStatisticsUpdate?> statisticsUpdate)
+        private void onStatisticsUpdate(ValueChangedEvent<ScoreBasedUserStatisticsUpdate?> statisticsUpdate)
         {
             var update = statisticsUpdate.NewValue;
 
@@ -153,6 +154,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
         }
 
         protected abstract LocalisableString Label { get; }
+        public virtual LocalisableString TooltipText => default;
 
         protected abstract LocalisableString FormatCurrentValue(T current);
         protected abstract int CalculateDifference(T previous, T current, out LocalisableString formattedDifference);

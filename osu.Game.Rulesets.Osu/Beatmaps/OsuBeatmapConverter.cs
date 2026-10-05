@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         ComboOffset = comboData?.ComboOffset ?? 0,
                         // prior to v8, speed multipliers don't adjust for how many ticks are generated over the same distance.
                         // this results in more (or less) ticks being generated in <v8 maps for the same time duration.
-                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(original.StartTime).SliderVelocity : 1,
+                        TickDistanceMultiplier = beatmap.BeatmapVersion < 8 ? 1f / ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(original.StartTime).SliderVelocity : 1,
                         GenerateTicks = generateTicksData?.GenerateTicks ?? true,
                         SliderVelocityMultiplier = sliderVelocityData?.SliderVelocityMultiplier ?? 1,
                     }.Yield();

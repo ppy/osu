@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -33,6 +34,7 @@ namespace osu.Game.Online.Chat
         private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
 
         private readonly Channel? target;
+        private IBindable<UserActivity?> userActivity = null!;
 
         /// <summary>
         /// Creates a new <see cref="NowPlayingCommand"/> to post the currently-playing beatmap to a parenting <see cref="IChannelPostTarget"/>.
@@ -41,6 +43,12 @@ namespace osu.Game.Online.Chat
         public NowPlayingCommand(Channel target)
         {
             this.target = target;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(SessionStatics session)
+        {
+            userActivity = session.GetBindable<UserActivity?>(Static.UserOnlineActivity);
         }
 
         protected override void LoadComplete()
@@ -52,7 +60,7 @@ namespace osu.Game.Online.Chat
             int beatmapOnlineID;
             string beatmapDisplayTitle;
 
-            switch (api.Activity.Value)
+            switch (userActivity.Value)
             {
                 case UserActivity.InGame game:
                     verb = "playing";
@@ -87,19 +95,19 @@ namespace osu.Game.Online.Chat
 
             string getBeatmapPart()
             {
-                return beatmapOnlineID > 0 ? $"[{api.WebsiteRootUrl}/b/{beatmapOnlineID} {beatmapDisplayTitle}]" : beatmapDisplayTitle;
+                return beatmapOnlineID > 0 ? $"[{api.Endpoints.WebsiteUrl}/b/{beatmapOnlineID} {beatmapDisplayTitle}]" : beatmapDisplayTitle;
             }
 
             string getRulesetPart()
             {
-                if (api.Activity.Value is not UserActivity.InGame) return string.Empty;
+                if (userActivity.Value is not UserActivity.InGame) return string.Empty;
 
                 return $"<{currentRuleset.Value.Name}>";
             }
 
             string getModPart()
             {
-                if (api.Activity.Value is not UserActivity.InGame) return string.Empty;
+                if (userActivity.Value is not UserActivity.InGame) return string.Empty;
 
                 if (selectedMods.Value.Count == 0)
                 {

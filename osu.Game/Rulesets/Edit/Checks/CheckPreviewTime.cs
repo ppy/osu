@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -19,19 +18,15 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var diffList = context.Beatmap.BeatmapInfo.BeatmapSet?.Beatmaps ?? new List<BeatmapInfo>();
-            int previewTime = context.Beatmap.BeatmapInfo.Metadata.PreviewTime;
+            int previewTime = context.CurrentDifficulty.Playable.BeatmapInfo.Metadata.PreviewTime;
 
             if (previewTime == -1)
                 yield return new IssueTemplateHasNoPreviewTime(this).Create();
 
-            foreach (var diff in diffList)
+            foreach (var beatmap in context.OtherDifficulties)
             {
-                if (diff.Equals(context.Beatmap.BeatmapInfo))
-                    continue;
-
-                if (diff.Metadata.PreviewTime != previewTime)
-                    yield return new IssueTemplatePreviewTimeConflict(this).Create(diff.DifficultyName, previewTime, diff.Metadata.PreviewTime);
+                if (beatmap.Playable.BeatmapInfo.Metadata.PreviewTime != previewTime)
+                    yield return new IssueTemplatePreviewTimeConflict(this).Create(beatmap.Playable.BeatmapInfo.DifficultyName, previewTime, beatmap.Playable.BeatmapInfo.Metadata.PreviewTime);
             }
         }
 

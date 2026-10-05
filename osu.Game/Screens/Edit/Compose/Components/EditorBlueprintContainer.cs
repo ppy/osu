@@ -3,13 +3,11 @@
 
 #nullable disable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
@@ -18,7 +16,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public partial class EditorBlueprintContainer : BlueprintContainer<HitObject>
+    public abstract partial class EditorBlueprintContainer : BlueprintContainer<HitObject>
     {
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
@@ -74,27 +72,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
             => blueprints.OrderBy(b => b.Item.StartTime);
 
-        protected override bool ApplySnapResult(SelectionBlueprint<HitObject>[] blueprints, SnapResult result)
+        protected void ApplySnapResultTime(SnapResult result, double referenceTime)
         {
-            if (!base.ApplySnapResult(blueprints, result))
-                return false;
+            if (!result.Time.HasValue)
+                return;
 
-            if (result.Time.HasValue)
-            {
-                // Apply the start time at the newly snapped-to position
-                double offset = result.Time.Value - blueprints.First().Item.StartTime;
+            // Apply the start time at the newly snapped-to position
+            double offset = result.Time.Value - referenceTime;
 
-                if (offset != 0)
-                {
-                    Beatmap.PerformOnSelection(obj =>
-                    {
-                        obj.StartTime += offset;
-                        Beatmap.Update(obj);
-                    });
-                }
-            }
-
-            return true;
+            if (offset != 0)
+                Beatmap.PerformOnSelection(obj => obj.StartTime += offset);
         }
 
         protected override void AddBlueprintFor(HitObject item)
@@ -132,11 +119,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
-        protected override IEnumerable<SelectionBlueprint<HitObject>> ApplySelectionOrder(IEnumerable<SelectionBlueprint<HitObject>> blueprints) =>
-            base.ApplySelectionOrder(blueprints)
-                .OrderBy(b => Math.Min(Math.Abs(EditorClock.CurrentTime - b.Item.GetEndTime()), Math.Abs(EditorClock.CurrentTime - b.Item.StartTime)));
-
-        protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
+        protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new EditorSelectionHandler();
 

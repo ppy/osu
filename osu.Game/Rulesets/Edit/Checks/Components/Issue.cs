@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
 
         public string GetEditorTimestamp()
         {
-            return Time == null ? string.Empty : Time.Value.ToEditorFormattedString();
+            return Time?.ToEditorFormattedString() ?? string.Empty;
         }
     }
 }

@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.CentreLeft,
                     Scale = new Vector2(0.8f),
                     RelativeSizeAxes = Axes.X,
-                    Shear = new Vector2(-OsuGame.SHEAR, 0)
+                    Shear = -OsuGame.SHEAR
                 });
                 ItemsFlow.Padding = new MarginPadding
                 {
@@ -348,7 +348,7 @@ namespace osu.Game.Overlays.Mods
             if (e.ControlPressed || e.AltPressed || e.SuperPressed || e.Repeat)
                 return false;
 
-            return hotkeyHandler.HandleHotkeyPressed(e, availableMods);
+            return hotkeyHandler.HandleModHotkeyPressed(e, availableMods);
         }
 
         #endregion

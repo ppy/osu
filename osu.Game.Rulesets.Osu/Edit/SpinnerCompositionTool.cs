@@ -2,23 +2,25 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
-using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class SpinnerCompositionTool : HitObjectCompositionTool
+    public class SpinnerCompositionTool : CompositionTool<OsuAction>
     {
         public SpinnerCompositionTool()
-            : base(nameof(Spinner))
+            : base(OsuEditorStrings.SpinnerTool)
         {
+            Action = OsuAction.EditorSpinnerTool;
         }
 
-        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners);
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorSpinner };
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new SpinnerPlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new SpinnerPlacementBlueprint();
     }
 }

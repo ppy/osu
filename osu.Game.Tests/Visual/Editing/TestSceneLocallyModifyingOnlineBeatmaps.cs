@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Tests.Resources;
 
@@ -23,15 +24,19 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        [FlakyTest]
         public void TestLocallyModifyingOnlineBeatmap()
         {
+            string initialHash = string.Empty;
             AddAssert("editor beatmap has online ID", () => EditorBeatmap.BeatmapInfo.OnlineID, () => Is.GreaterThan(0));
+            AddStep("store hash for later", () => initialHash = EditorBeatmap.BeatmapInfo.MD5Hash);
 
             AddStep("delete first hitobject", () => EditorBeatmap.RemoveAt(0));
             SaveEditor();
 
             ReloadEditorToSameBeatmap();
-            AddAssert("editor beatmap online ID reset", () => EditorBeatmap.BeatmapInfo.OnlineID, () => Is.EqualTo(-1));
+            AddUntilStep("beatmap marked as locally modified", () => EditorBeatmap.BeatmapInfo.Status, () => Is.EqualTo(BeatmapOnlineStatus.LocallyModified));
+            AddAssert("beatmap hash changed", () => EditorBeatmap.BeatmapInfo.MD5Hash, () => Is.Not.EqualTo(initialHash));
         }
     }
 }

@@ -304,11 +304,6 @@ namespace osu.Game.Tests.Visual.Background
         {
             private bool? lastLoadTriggerCausedChange;
 
-            public TestBackgroundScreenDefault()
-                : base(false)
-            {
-            }
-
             public override bool Next()
             {
                 bool didChange = base.Next();
@@ -360,6 +355,7 @@ namespace osu.Game.Tests.Visual.Background
                 public double StartTime => double.MinValue;
                 public double EndTime => double.MaxValue;
                 public double EndTimeForDisplay => double.MaxValue;
+                public StoryboardElementSource Source => StoryboardElementSource.Beatmap;
 
                 public Drawable CreateDrawable() => new DrawableTestStoryboardElement();
             }

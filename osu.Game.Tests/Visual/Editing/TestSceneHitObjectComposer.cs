@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
@@ -19,6 +20,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
@@ -83,15 +85,54 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestPlacementOutsideComposeScreen()
+        {
+            AddStep("clear all control points and hitobjects", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.Clear();
+            });
+
+            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+            AddStep("select circle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Text == OsuEditorStrings.HitCircleTool).TriggerClick());
+            AddStep("move mouse to compose", () => InputManager.MoveMouseTo(hitObjectComposer.ChildrenOfType<HitObjectContainer>().Single()));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("circle placed", () => editorBeatmap.HitObjects.Count == 1);
+
+            AddStep("move mouse outside compose", () => InputManager.MoveMouseTo(hitObjectComposer.ChildrenOfType<HitObjectContainer>().Single().ScreenSpaceDrawQuad.TopLeft - new Vector2(0f, 20f)));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no circle placed", () => editorBeatmap.HitObjects.Count == 1);
+        }
+
+        [Test]
+        public void TestDragSliderOutsideComposeScreen()
+        {
+            AddStep("clear all control points and hitobjects", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.Clear();
+            });
+
+            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+            AddStep("select slider", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Text == OsuEditorStrings.SliderTool).TriggerClick());
+
+            AddStep("move mouse to compose", () => InputManager.MoveMouseTo(hitObjectComposer.ChildrenOfType<HitObjectContainer>().Single()));
+            AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move mouse outside compose", () => InputManager.MoveMouseTo(hitObjectComposer.ChildrenOfType<HitObjectContainer>().Single().ScreenSpaceDrawQuad.TopLeft - new Vector2(0f, 80f)));
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddAssert("slider placed", () => editorBeatmap.HitObjects.Count == 1);
+        }
+
+        [Test]
         public void TestPlacementOnlyWorksWithTiming()
         {
             AddStep("clear all control points", () => editorBeatmap.ControlPointInfo.Clear());
 
             AddAssert("Tool is selection", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is SelectTool);
-            AddAssert("Hitcircle button not clickable", () => !hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
+            AddAssert("Hitcircle button not clickable", () => !hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Text == OsuEditorStrings.HitCircleTool).Enabled.Value);
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
-            AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
-            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
+            AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Text == OsuEditorStrings.HitCircleTool).Enabled.Value);
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Text == OsuEditorStrings.HitCircleTool).TriggerClick());
             AddAssert("Tool changed", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is HitCircleCompositionTool);
         }
 
@@ -106,7 +147,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
 
-            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Text == OsuEditorStrings.HitCircleTool).TriggerClick());
 
             ExpandingToolboxContainer toolboxContainer = null!;
 
@@ -146,7 +187,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
 
-            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Text == OsuEditorStrings.HitCircleTool).TriggerClick());
 
             AddStep("move mouse to scroll area", () =>
             {
@@ -165,7 +206,7 @@ namespace osu.Game.Tests.Visual.Editing
         {
             double originalSpacing = 0;
 
-            AddStep("retrieve original spacing", () => originalSpacing = editorBeatmap.BeatmapInfo.DistanceSpacing);
+            AddStep("retrieve original spacing", () => originalSpacing = editorBeatmap.DistanceSpacing);
 
             AddStep("hold ctrl", () => InputManager.PressKey(Key.LControl));
             AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
@@ -175,7 +216,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
             AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
 
-            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.DistanceSpacing == originalSpacing + 0.5);
         }
 
         public partial class EditorBeatmapContainer : PopoverContainer

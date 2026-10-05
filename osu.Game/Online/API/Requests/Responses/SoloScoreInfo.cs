@@ -87,6 +87,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("legacy_score_id")]
         public ulong? LegacyScoreId { get; set; }
 
+        [JsonProperty("pauses")]
+        public int[] Pauses { get; set; } = [];
+
         #region osu-web API additions (not stored to database).
 
         [JsonProperty("id")]
@@ -121,6 +124,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("ranked")]
         public bool Ranked { get; set; }
 
+        [JsonProperty("preserve")]
+        public bool Preserve { get; set; }
+
+        [JsonProperty("processed")]
+        public bool Processed { get; set; }
+
         // These properties are calculated or not relevant to any external usage.
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeUser() => false;
@@ -129,12 +138,14 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool ShouldSerializePP() => false;
         public bool ShouldSerializeOnlineID() => false;
         public bool ShouldSerializeHasReplay() => false;
+        public bool ShouldSerializePreserve() => false;
+        public bool ShouldSerializeProcessed() => false;
 
         // These fields only need to be serialised if they hold values.
         // Generally this is required because this model may be used by server-side components, but
         // we don't want to bother sending these fields in score submission requests, for instance.
         public bool ShouldSerializeEndedAt() => EndedAt != default;
-        public bool ShouldSerializeStartedAt() => StartedAt != default;
+        public bool ShouldSerializeStartedAt() => StartedAt != null;
         public bool ShouldSerializeLegacyScoreId() => LegacyScoreId != null;
         public bool ShouldSerializeLegacyTotalScore() => LegacyTotalScore != null;
         public bool ShouldSerializeMods() => Mods.Length > 0;
@@ -151,8 +162,18 @@ namespace osu.Game.Online.API.Requests.Responses
         IUser IScoreInfo.User => User!;
         DateTimeOffset IScoreInfo.Date => EndedAt;
         long IScoreInfo.LegacyOnlineID => (long?)LegacyScoreId ?? -1;
+
+        // TODO: This passthrough is unsafe because `Beatmap` is not guaranteed to be populated.
+        // An actual beatmap instance should be eventually injected here.
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap!;
-        IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
+
+        // TODO: This passthrough is unsafe because `APIRuleset` does not implement many members.
+        // An actual client-side ruleset instance should be eventually injected here.
+        IRulesetInfo IScoreInfo.Ruleset => new APIBeatmap.APIRuleset { OnlineID = RulesetID };
+
+        IEnumerable<IConfiguredMod> IScoreInfo.Mods => Mods;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.Statistics => Statistics;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.MaximumStatistics => MaximumStatistics;
 
         #endregion
 
@@ -252,6 +273,7 @@ namespace osu.Game.Online.API.Requests.Responses
             Mods = score.APIMods,
             Statistics = score.Statistics.Where(kvp => kvp.Value != 0).ToDictionary(),
             MaximumStatistics = score.MaximumStatistics.Where(kvp => kvp.Value != 0).ToDictionary(),
+            Pauses = score.Pauses.ToArray(),
         };
     }
 }

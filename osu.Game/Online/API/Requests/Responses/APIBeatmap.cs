@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -31,6 +33,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"playcount")]
         public int PlayCount { get; set; }
+
+        [JsonProperty(@"current_user_playcount")]
+        public int UserPlayCount { get; set; }
 
         [JsonProperty(@"passcount")]
         public int PassCount { get; set; }
@@ -95,6 +100,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"failtimes")]
         public APIFailTimes? FailTimes { get; set; }
 
+        [JsonProperty(@"top_tag_ids")]
+        public APIBeatmapTag[]? TopTags { get; set; }
+
+        [JsonProperty(@"current_user_tag_ids")]
+        public long[]? OwnTagIds { get; set; }
+
         [JsonProperty(@"max_combo")]
         public int? MaxCombo { get; set; }
 
@@ -102,6 +113,40 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset LastUpdated { get; set; }
 
         public double BPM { get; set; }
+
+        [JsonProperty(@"owners")]
+        public BeatmapOwner[] BeatmapOwners { get; set; } = Array.Empty<BeatmapOwner>();
+
+        /// <summary>
+        /// Minimum count of votes required to display a tag on the beatmap's page.
+        /// Should match value specified web-side as https://github.com/ppy/osu-web/blob/cae2fdf03cfb8c30c8e332cfb142e03188ceffef/config/osu.php#L59.
+        /// </summary>
+        public const int MINIMUM_USER_TAG_VOTES_FOR_DISPLAY = 5;
+
+        /// <summary>
+        /// Retrieves top user tags for the beatmap, ordered in a way matching osu!web.
+        /// Requires <see cref="BeatmapSet"/> to be populated.
+        /// </summary>
+        /// <param name="confirmedOnly">
+        /// If <see langword="true"/>, only tags above <see cref="MINIMUM_USER_TAG_VOTES_FOR_DISPLAY"/> will be shown.
+        /// If <see langword="false"/>, all tags regardless of vote count will be shown.
+        /// </param>
+        public (APITag Tag, int VoteCount)[] GetTopUserTags(bool confirmedOnly = true)
+        {
+            if (TopTags == null || TopTags.Length == 0 || BeatmapSet?.RelatedTags == null)
+                return [];
+
+            var tagsById = BeatmapSet.RelatedTags.ToDictionary(t => t.Id);
+
+            return TopTags
+                   .Select(t => (topTag: t, relatedTag: tagsById.GetValueOrDefault(t.TagId)))
+                   .Where(t => t.relatedTag != null && (!confirmedOnly || t.topTag.VoteCount >= MINIMUM_USER_TAG_VOTES_FOR_DISPLAY))
+                   // see https://github.com/ppy/osu-web/blob/bb3bd2e7c6f84f26066df5ea20a81c77ec9bb60a/resources/js/beatmapsets-show/controller.ts#L103-L106 for sort criteria
+                   .OrderByDescending(t => t.topTag.VoteCount)
+                   .ThenBy(t => t.relatedTag!.Name)
+                   .Select(t => (t.relatedTag!, t.topTag.VoteCount))
+                   .ToArray();
+        }
 
         #region Implementation of IBeatmapInfo
 
@@ -134,6 +179,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
             public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
 
+            [JsonIgnore]
             public string ShortName
             {
                 get
@@ -170,6 +216,15 @@ namespace osu.Game.Online.API.Requests.Responses
 
             // ReSharper disable once NonReadonlyMemberInGetHashCode
             public override int GetHashCode() => OnlineID;
+        }
+
+        public class BeatmapOwner
+        {
+            [JsonProperty(@"id")]
+            public int Id { get; set; }
+
+            [JsonProperty(@"username")]
+            public string Username { get; set; } = string.Empty;
         }
     }
 }

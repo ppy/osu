@@ -5,19 +5,23 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public partial class DrawableOsuJudgement : DrawableJudgement
     {
+        internal Color4 AccentColour { get; private set; }
+
         internal SkinnableLighting Lighting { get; private set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        private bool positionTransferred;
+        private Vector2? screenSpacePosition;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -32,37 +36,38 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
+        public override void Apply(JudgementResult result, DrawableHitObject? judgedObject)
+        {
+            base.Apply(result, judgedObject);
+
+            if (judgedObject is not DrawableOsuHitObject osuObject)
+                return;
+
+            AccentColour = osuObject.AccentColour.Value;
+
+            switch (osuObject)
+            {
+                case DrawableSlider slider:
+                    screenSpacePosition = slider.TailCircle.ToScreenSpace(slider.TailCircle.OriginPosition);
+                    break;
+
+                default:
+                    screenSpacePosition = osuObject.ToScreenSpace(osuObject.OriginPosition);
+                    break;
+            }
+
+            Scale = new Vector2(osuObject.HitObject.Scale);
+        }
+
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
 
             Lighting.ResetAnimation();
-            Lighting.SetColourFrom(JudgedObject, Result);
+            Lighting.SetColourFrom(this, Result);
 
-            positionTransferred = false;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!positionTransferred && JudgedObject is DrawableOsuHitObject osuObject && JudgedObject.IsInUse)
-            {
-                switch (osuObject)
-                {
-                    case DrawableSlider slider:
-                        Position = slider.TailCircle.ToSpaceOfOtherDrawable(slider.TailCircle.OriginPosition, Parent!);
-                        break;
-
-                    default:
-                        Position = osuObject.ToSpaceOfOtherDrawable(osuObject.OriginPosition, Parent!);
-                        break;
-                }
-
-                positionTransferred = true;
-
-                Scale = new Vector2(osuObject.HitObject.Scale);
-            }
+            if (screenSpacePosition != null)
+                Position = Parent!.ToLocalSpace(screenSpacePosition.Value);
         }
 
         protected override void ApplyHitAnimations()
@@ -84,7 +89,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ApplyHitAnimations();
         }
 
-        protected override Drawable CreateDefaultJudgement(HitResult result) => new OsuJudgementPiece(result);
+        protected override Drawable CreateDefaultJudgement(HitResult result) =>
+            // Tick hits don't show a judgement by default
+            result.IsHit() && result.IsTick() ? Empty() : new OsuJudgementPiece(result);
 
         private partial class OsuJudgementPiece : DefaultJudgementPiece
         {

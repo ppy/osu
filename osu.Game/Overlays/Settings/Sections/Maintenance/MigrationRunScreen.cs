@@ -6,39 +6,30 @@
 using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public partial class MigrationRunScreen : OsuScreen
     {
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+
         private readonly DirectoryInfo destination;
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
-        [Resolved]
-        private INotificationOverlay notifications { get; set; }
-
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
-        private GameHost host { get; set; }
-
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool AllowExternalScreenChange => false;
 
@@ -99,8 +90,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Beatmap.Value = Beatmap.Default;
 
-            var originalStorage = new NativeStorage(storage.GetFullPath(string.Empty), host);
-
             migrationTask = Task.Run(PerformMigration)
                                 .ContinueWith(task =>
                                 {
@@ -108,24 +97,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     {
                                         Logger.Error(task.Exception, $"Error during migration: {task.Exception?.Message}");
                                     }
-                                    else if (!task.GetResultSafely())
-                                    {
-                                        notifications.Post(new SimpleNotification
-                                        {
-                                            Text = MaintenanceSettingsStrings.FailedCleanupNotification,
-                                            Activated = () =>
-                                            {
-                                                originalStorage.PresentExternally();
-                                                return true;
-                                            }
-                                        });
-                                    }
 
                                     Schedule(this.Exit);
                                 });
         }
 
-        protected virtual bool PerformMigration() => game?.Migrate(destination.FullName) != false;
+        protected virtual bool PerformMigration() => game?.MigrateUserData(destination.FullName) != false;
 
         public override void OnEntering(ScreenTransitionEvent e)
         {

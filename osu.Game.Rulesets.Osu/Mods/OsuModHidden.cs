@@ -24,9 +24,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public Bindable<bool> OnlyFadeApproachCircles { get; } = new BindableBool();
 
         public override LocalisableString Description => @"Play with no approach circles and fading circles/sliders.";
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.06 : 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModDepth) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn), typeof(OsuModDepth), typeof(OsuModFreezeFrame) };
 
         public const double FADE_IN_DURATION_MULTIPLIER = 0.4;
         public const double FADE_OUT_DURATION_MULTIPLIER = 0.3;
@@ -42,7 +41,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             static void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+                // Sliders retain their default TimeFadeIn to match Stable
+                if (osuObject is not Slider)
+                    osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                     applyFadeInAdjustment(nested);
             }

@@ -13,6 +13,6 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The starting position of the HitObject.
         /// </summary>
-        Vector2 Position { get; }
+        Vector2 Position { get; set; }
     }
 }

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using Humanizer;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
@@ -18,13 +16,11 @@ namespace osu.Game.Overlays.Changelog
         {
             if (stream.IsFeatured)
                 Width *= 2;
+
+            MainText = Value.DisplayName;
+            AdditionalText = Value.LatestBuild.DisplayVersion;
+            InfoText = Value.UserCount > 0 ? $"{"user".ToQuantity(Value.UserCount, "N0")} online" : default(LocalisableString);
         }
-
-        protected override LocalisableString MainText => Value.DisplayName;
-
-        protected override LocalisableString AdditionalText => Value.LatestBuild.DisplayVersion;
-
-        protected override LocalisableString InfoText => Value.UserCount > 0 ? $"{"user".ToQuantity(Value.UserCount, "N0")} online" : null;
 
         protected override Color4 GetBarColour(OsuColour colours) => Value.Colour;
     }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace osu.Game.Utils
@@ -24,8 +25,17 @@ namespace osu.Game.Utils
         /// Whether the provided time is in any of the added periods.
         /// </summary>
         /// <param name="time">The time value to check.</param>
-        public bool IsInAny(double time)
+        public bool IsInAny(double time) => IsInAny(time, out _);
+
+        /// <summary>
+        /// Whether the provided time is in any of the added periods.
+        /// </summary>
+        /// <param name="time">The time value to check.</param>
+        /// <param name="period">The period which matched.</param>
+        public bool IsInAny(double time, [NotNullWhen(true)] out Period? period)
         {
+            period = null;
+
             if (periods.Count == 0)
                 return false;
 
@@ -41,7 +51,15 @@ namespace osu.Game.Utils
             }
 
             var nearest = periods[nearestIndex];
-            return time >= nearest.Start && time <= nearest.End;
+            bool isInAny = time >= nearest.Start && time <= nearest.End;
+
+            if (isInAny)
+            {
+                period = nearest;
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -56,6 +74,8 @@ namespace osu.Game.Utils
         /// The end time of this period.
         /// </summary>
         public readonly double End;
+
+        public double Duration => End - Start;
 
         public Period(double start, double end)
         {

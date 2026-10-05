@@ -3,11 +3,10 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osuTK;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
+using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -30,7 +29,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Text = BeatmapsetsStrings.ShowScoreboardSupporterOnly,
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                     },
                     text = new LinkFlowContainer(t => t.Font = t.Font.With(size: 11))
                     {

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.Mods;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -21,8 +22,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var ruleset = new CatchRuleset();
             var difficulty = new BeatmapDifficulty { ApproachRate = originalApproachRate };
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(difficulty, 1);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, []);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(originalApproachRate));
         }
@@ -32,8 +34,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var ruleset = new CatchRuleset();
             var difficulty = new BeatmapDifficulty();
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(difficulty, 0.75);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, [new CatchModHalfTime()]);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(1.67).Within(0.01));
         }
@@ -43,8 +46,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var ruleset = new CatchRuleset();
             var difficulty = new BeatmapDifficulty();
+            var beatmapInfo = new BeatmapInfo { Difficulty = difficulty };
 
-            var adjustedDifficulty = ruleset.GetRateAdjustedDisplayDifficulty(difficulty, 1.5);
+            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(beatmapInfo, [new CatchModDoubleTime()]);
 
             Assert.That(adjustedDifficulty.ApproachRate, Is.EqualTo(7.67).Within(0.01));
         }

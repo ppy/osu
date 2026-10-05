@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
                 var holdNote = (DrawableHoldNote)drawableObject;
 
                 AccentColour.BindTo(drawableObject.AccentColour);
-                IsHitting.BindTo(holdNote.IsHitting);
+                IsHitting.BindTo(holdNote.IsHolding);
             }
 
             AccentColour.BindValueChanged(onAccentChanged, true);

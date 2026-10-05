@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public partial class TestSceneTimingBasedNoteColouring : OsuTestScene
     {
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+
         private Bindable<bool> configTimingBasedNoteColouring;
 
         private ManualClock clock;
@@ -47,8 +49,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                         drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
                     }
                 };
-
-                drawableRuleset.AllowBackwardsSeeks = true;
             });
             AddStep("retrieve config bindable", () =>
             {

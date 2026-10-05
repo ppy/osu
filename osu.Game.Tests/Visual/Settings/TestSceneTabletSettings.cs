@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -69,7 +70,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             AddStep("Test with wide tablet", () => tabletHandler.SetTabletSize(new Vector2(160, 100)));
 
-            AddStep("Reset to full area", () => settings.ChildrenOfType<DangerousSettingsButton>().First().TriggerClick());
+            AddStep("Reset to full area", () => settings.ChildrenOfType<DangerousSettingsButtonV2>().First().TriggerClick());
             ensureValid();
 
             AddStep("rotate 10", () => tabletHandler.Rotation.Value = 10);
@@ -129,18 +130,27 @@ namespace osu.Game.Tests.Visual.Settings
 
         private void ensureInvalid() => AddAssert("area invalid", () => !settings.AreaSelection.IsWithinBounds);
 
-        public class TestTabletHandler : ITabletHandler
+        public class TestTabletHandler : InputHandler, ITabletHandler
         {
             public Bindable<Vector2> AreaOffset { get; } = new Bindable<Vector2>();
             public Bindable<Vector2> AreaSize { get; } = new Bindable<Vector2>();
+            public Bindable<Vector2> OutputAreaOffset { get; } = new Bindable<Vector2>();
+            public Bindable<Vector2> OutputAreaSize { get; } = new Bindable<Vector2>();
 
             public Bindable<float> Rotation { get; } = new Bindable<float>();
+
+            public BindableFloat PressureThreshold { get; } = new BindableFloat
+            {
+                MinValue = 0f,
+                MaxValue = 1f,
+                Precision = 0.005f,
+            };
 
             public IBindable<TabletInfo> Tablet => tablet;
 
             private readonly Bindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
-            public BindableBool Enabled { get; } = new BindableBool(true);
+            public override bool IsActive => true;
 
             public void SetTabletSize(Vector2 size)
             {

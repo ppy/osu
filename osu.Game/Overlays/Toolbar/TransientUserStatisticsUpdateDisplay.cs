@@ -21,17 +21,17 @@ namespace osu.Game.Overlays.Toolbar
 {
     public partial class TransientUserStatisticsUpdateDisplay : CompositeDrawable
     {
-        public Bindable<UserStatisticsUpdate?> LatestUpdate { get; } = new Bindable<UserStatisticsUpdate?>();
+        public Bindable<ScoreBasedUserStatisticsUpdate?> LatestUpdate { get; } = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
         private Statistic<int> globalRank = null!;
-        private Statistic<decimal> pp = null!;
+        private Statistic<int> pp = null!;
+
+        private ScheduledDelegate? shrinkDelegate;
 
         [BackgroundDependencyLoader]
         private void load(UserStatisticsWatcher? userStatisticsWatcher)
         {
             RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
-            Alpha = 0;
 
             InternalChild = new FillFlowContainer
             {
@@ -40,15 +40,15 @@ namespace osu.Game.Overlays.Toolbar
                 Padding = new MarginPadding { Horizontal = 10 },
                 Spacing = new Vector2(10),
                 Direction = FillDirection.Horizontal,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     globalRank = new Statistic<int>(UsersStrings.ShowRankGlobalSimple, @"#", Comparer<int>.Create((before, after) => before - after)),
-                    pp = new Statistic<decimal>(RankingsStrings.StatPerformance, string.Empty, Comparer<decimal>.Create((before, after) => Math.Sign(after - before))),
+                    pp = new Statistic<int>(RankingsStrings.StatPerformance, string.Empty, Comparer<int>.Create((before, after) => Math.Sign(after - before))),
                 }
             };
 
             if (userStatisticsWatcher != null)
-                ((IBindable<UserStatisticsUpdate?>)LatestUpdate).BindTo(userStatisticsWatcher.LatestUpdate);
+                ((IBindable<ScoreBasedUserStatisticsUpdate?>)LatestUpdate).BindTo(userStatisticsWatcher.LatestUpdate);
         }
 
         protected override void LoadComplete()
@@ -71,8 +71,7 @@ namespace osu.Game.Overlays.Toolbar
                     return;
 
                 FinishTransforms(true);
-
-                this.FadeIn(500, Easing.OutQuint);
+                shrinkDelegate?.Cancel();
 
                 if (update.After.GlobalRank != null)
                 {
@@ -83,9 +82,28 @@ namespace osu.Game.Overlays.Toolbar
                 }
 
                 if (update.After.PP != null)
-                    pp.Display(update.Before.PP ?? update.After.PP.Value, Math.Abs((update.After.PP - update.Before.PP) ?? 0M), update.After.PP.Value);
+                {
+                    int before = (int)Math.Round(update.Before.PP ?? update.After.PP.Value);
+                    int after = (int)Math.Round(update.After.PP.Value);
+                    int delta = Math.Abs(after - before);
+                    pp.Display(before, delta, after);
+                }
 
-                this.Delay(5000).FadeOut(500, Easing.OutQuint);
+                this.FadeIn(500, Easing.OutQuint);
+
+                AutoSizeAxes = Axes.X;
+                AutoSizeDuration = 500;
+                AutoSizeEasing = Easing.OutQuint;
+
+                using (BeginDelayedSequence(5000))
+                {
+                    this.FadeOut(500, Easing.OutQuint);
+                    shrinkDelegate = Schedule(() =>
+                    {
+                        AutoSizeAxes = Axes.None;
+                        this.ResizeWidthTo(0, 500, Easing.OutQuint);
+                    });
+                }
             });
         }
 

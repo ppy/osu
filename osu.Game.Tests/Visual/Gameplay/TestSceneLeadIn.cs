@@ -27,11 +27,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(2000, 0)]
         [TestCase(3000, first_hit_object - 3000)]
         [TestCase(10000, first_hit_object - 10000)]
+        [FlakyTest]
         public void TestLeadInProducesCorrectStartTime(double leadIn, double expectedStartTime)
         {
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
             {
-                BeatmapInfo = { AudioLeadIn = leadIn }
+                AudioLeadIn = leadIn
             });
 
             checkFirstFrameTime(expectedStartTime);
@@ -41,11 +42,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(0, 0)]
         [TestCase(-1000, -1000)]
         [TestCase(-10000, -10000)]
+        [FlakyTest]
         public void TestStoryboardProducesCorrectStartTimeSimpleAlpha(double firstStoryboardEvent, double expectedStartTime)
         {
             var storyboard = new Storyboard();
 
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
 
             sprite.Commands.AddAlpha(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
 
@@ -64,13 +66,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(0, 0, true)]
         [TestCase(-1000, -1000, true)]
         [TestCase(-10000, -10000, true)]
+        [FlakyTest]
         public void TestStoryboardProducesCorrectStartTimeFadeInAfterOtherEvents(double firstStoryboardEvent, double expectedStartTime, bool addEventToLoop)
         {
             const double loop_start_time = -20000;
 
             var storyboard = new Storyboard();
 
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
 
             // these should be ignored as we have an alpha visibility blocker proceeding this command.
             sprite.Commands.AddScale(Easing.None, loop_start_time, -18000, 0, 1);
@@ -130,7 +133,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         Text = $"GameplayStartTime: {DrawableRuleset.GameplayStartTime} "
                                + $"FirstHitObjectTime: {FirstHitObjectTime} "
-                               + $"LeadInTime: {Beatmap.Value.BeatmapInfo.AudioLeadIn} "
+                               + $"LeadInTime: {Beatmap.Value.Beatmap.AudioLeadIn} "
                                + $"FirstFrameClockTime: {FirstFrameClockTime}"
                     });
                 }

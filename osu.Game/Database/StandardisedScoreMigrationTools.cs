@@ -10,225 +10,41 @@ using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Scoring;
+using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Database
 {
     public static class StandardisedScoreMigrationTools
     {
-        public static bool ShouldMigrateToNewStandardised(ScoreInfo score)
+        /// <summary>
+        /// Updates <paramref name="score"/>'s <see cref="ScoreInfo.TotalScore"/> to the latest applicable version.
+        /// </summary>
+        /// <param name="score">The score to update.</param>
+        /// <param name="beatmap">The <see cref="WorkingBeatmap"/> applicable for this score.</param>
+        public static void UpdateToLatestScoring(ScoreInfo score, WorkingBeatmap beatmap)
         {
             if (score.IsLegacyScore)
-                return false;
-
-            if (score.TotalScoreVersion > 30000002)
-                return false;
-
-            // Recalculate the old-style standardised score to see if this was an old lazer score.
-            bool oldScoreMatchesExpectations = GetOldStandardised(score) == score.TotalScore;
-            // Some older scores don't have correct statistics populated, so let's give them benefit of doubt.
-            bool scoreIsVeryOld = score.Date < new DateTime(2023, 1, 1, 0, 0, 0);
-
-            return oldScoreMatchesExpectations || scoreIsVeryOld;
-        }
-
-        public static long GetNewStandardised(ScoreInfo score)
-        {
-            int maxJudgementIndex = 0;
-
-            // Avoid retrieving from realm inside loops.
-            int maxCombo = score.MaxCombo;
-
-            var ruleset = score.Ruleset.CreateInstance();
-            var processor = ruleset.CreateScoreProcessor();
-
-            processor.TrackHitEvents = false;
-
-            var beatmap = new Beatmap();
-
-            HitResult maxRulesetJudgement = ruleset.GetHitResults().First().result;
-
-            // This is a list of all results, ordered from best to worst.
-            // We are constructing a "best possible" score from the statistics provided because it's the best we can do.
-            List<HitResult> sortedHits = score.Statistics
-                                              .Where(kvp => kvp.Key.AffectsCombo())
-                                              .OrderByDescending(kvp => processor.GetBaseScoreForResult(kvp.Key))
-                                              .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value))
-                                              .ToList();
-
-            // Attempt to use maximum statistics from the database.
-            var maximumJudgements = score.MaximumStatistics
-                                         .Where(kvp => kvp.Key.AffectsCombo())
-                                         .OrderByDescending(kvp => processor.GetBaseScoreForResult(kvp.Key))
-                                         .SelectMany(kvp => Enumerable.Repeat(new FakeJudgement(kvp.Key), kvp.Value))
-                                         .ToList();
-
-            // Some older scores may not have maximum statistics populated correctly.
-            // In this case we need to fill them with best-known-defaults.
-            if (maximumJudgements.Count != sortedHits.Count)
+                UpdateFromLegacy(score, beatmap);
+            else
             {
-                maximumJudgements = sortedHits
-                                    .Select(r => new FakeJudgement(getMaxJudgementFor(r, maxRulesetJudgement)))
-                                    .ToList();
+                var ruleset = score.Ruleset.CreateInstance();
+                var scoreProcessor = ruleset.CreateScoreProcessor();
+
+                // accuracy and rank may not be populated on old lazer scores - ensure they're always there.
+                // warning: ordering is important here - rank is dependent on accuracy!
+                score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+                score.Rank = ComputeRank(score, scoreProcessor);
+
+                // update score to latest multipliers too, if possible.
+                if (score.TotalScoreWithoutMods > 0)
+                    UpdateToLatestScoreMultipliers(score, beatmap.BeatmapInfo.Difficulty);
             }
 
-            // This is required to get the correct maximum combo portion.
-            foreach (var judgement in maximumJudgements)
-                beatmap.HitObjects.Add(new FakeHit(judgement));
-            processor.ApplyBeatmap(beatmap);
-            processor.Mods.Value = score.Mods;
-
-            // Insert all misses into a queue.
-            // These will be nibbled at whenever we need to reset the combo.
-            Queue<HitResult> misses = new Queue<HitResult>(score.Statistics
-                                                                .Where(kvp => kvp.Key == HitResult.Miss || kvp.Key == HitResult.LargeTickMiss)
-                                                                .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value)));
-
-            foreach (var result in sortedHits)
-            {
-                // For the main part of this loop, ignore all misses, as they will be inserted from the queue.
-                if (result == HitResult.Miss || result == HitResult.LargeTickMiss)
-                    continue;
-
-                // Reset combo if required.
-                if (processor.Combo.Value == maxCombo)
-                    insertMiss();
-
-                processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
-                {
-                    Type = result
-                });
-            }
-
-            // Ensure we haven't forgotten any misses.
-            while (misses.Count > 0)
-                insertMiss();
-
-            var bonusHits = score.Statistics
-                                 .Where(kvp => kvp.Key.IsBonus())
-                                 .SelectMany(kvp => Enumerable.Repeat(kvp.Key, kvp.Value));
-
-            foreach (var result in bonusHits)
-                processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(result)) { Type = result });
-
-            // Not true for all scores for whatever reason. Oh well.
-            // Debug.Assert(processor.HighestCombo.Value == score.MaxCombo);
-
-            return processor.TotalScore.Value;
-
-            void insertMiss()
-            {
-                if (misses.Count > 0)
-                {
-                    processor.ApplyResult(new JudgementResult(null!, maximumJudgements[maxJudgementIndex++])
-                    {
-                        Type = misses.Dequeue(),
-                    });
-                }
-                else
-                {
-                    // We ran out of misses. But we can't let max combo increase beyond the known value,
-                    // so let's forge a miss.
-                    processor.ApplyResult(new JudgementResult(null!, new FakeJudgement(getMaxJudgementFor(HitResult.Miss, maxRulesetJudgement)))
-                    {
-                        Type = HitResult.Miss,
-                    });
-                }
-            }
-        }
-
-        private static HitResult getMaxJudgementFor(HitResult hitResult, HitResult max)
-        {
-            switch (hitResult)
-            {
-                case HitResult.Miss:
-                case HitResult.Meh:
-                case HitResult.Ok:
-                case HitResult.Good:
-                case HitResult.Great:
-                case HitResult.Perfect:
-                    return max;
-
-                case HitResult.SmallTickMiss:
-                case HitResult.SmallTickHit:
-                    return HitResult.SmallTickHit;
-
-                case HitResult.LargeTickMiss:
-                case HitResult.LargeTickHit:
-                    return HitResult.LargeTickHit;
-            }
-
-            return HitResult.IgnoreHit;
-        }
-
-        public static long GetOldStandardised(ScoreInfo score)
-        {
-            double accuracyScore =
-                (double)score.Statistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value)
-                / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value);
-            double comboScore = (double)score.MaxCombo / score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
-            double bonusScore = score.Statistics.Where(kvp => kvp.Key.IsBonus()).Sum(kvp => numericScoreFor(kvp.Key) * kvp.Value);
-
-            double accuracyPortion = 0.3;
-
-            switch (score.RulesetID)
-            {
-                case 1:
-                    accuracyPortion = 0.75;
-                    break;
-
-                case 3:
-                    accuracyPortion = 0.99;
-                    break;
-            }
-
-            double modMultiplier = 1;
-
-            foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
-
-            return (long)Math.Round((1000000 * (accuracyPortion * accuracyScore + (1 - accuracyPortion) * comboScore) + bonusScore) * modMultiplier);
-
-            static int numericScoreFor(HitResult result)
-            {
-                switch (result)
-                {
-                    default:
-                        return 0;
-
-                    case HitResult.SmallTickHit:
-                        return 10;
-
-                    case HitResult.LargeTickHit:
-                        return 30;
-
-                    case HitResult.Meh:
-                        return 50;
-
-                    case HitResult.Ok:
-                        return 100;
-
-                    case HitResult.Good:
-                        return 200;
-
-                    case HitResult.Great:
-                        return 300;
-
-                    case HitResult.Perfect:
-                        return 315;
-
-                    case HitResult.SmallBonus:
-                        return 10;
-
-                    case HitResult.LargeBonus:
-                        return 50;
-                }
-            }
+            score.TotalScoreVersion = LegacyScoreEncoder.LATEST_VERSION;
         }
 
         /// <summary>
@@ -245,8 +61,8 @@ namespace osu.Game.Database
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
-            score.Accuracy = computeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
+            score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
             (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, beatmap);
         }
 
@@ -269,8 +85,8 @@ namespace osu.Game.Database
             var scoreProcessor = ruleset.CreateScoreProcessor();
 
             // warning: ordering is important here - both total score and ranks are dependent on accuracy!
-            score.Accuracy = computeAccuracy(score, scoreProcessor);
-            score.Rank = computeRank(score, scoreProcessor);
+            score.Accuracy = ComputeAccuracy(score, scoreProcessor);
+            score.Rank = ComputeRank(score, scoreProcessor);
             (score.TotalScoreWithoutMods, score.TotalScore) = convertFromLegacyTotalScore(score, ruleset, difficulty, attributes);
         }
 
@@ -313,7 +129,8 @@ namespace osu.Game.Database
         /// <param name="difficulty">The beatmap difficulty.</param>
         /// <param name="attributes">The legacy scoring attributes for the beatmap which the score was set on.</param>
         /// <returns>The standardised total score.</returns>
-        private static (long withoutMods, long withMods) convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty, LegacyScoreAttributes attributes)
+        private static (long withoutMods, long withMods) convertFromLegacyTotalScore(ScoreInfo score, Ruleset ruleset, LegacyBeatmapConversionDifficultyInfo difficulty,
+                                                                                     LegacyScoreAttributes attributes)
         {
             if (!score.IsLegacyScore)
                 return (score.TotalScoreWithoutMods, score.TotalScore);
@@ -351,7 +168,8 @@ namespace osu.Game.Database
             long maximumLegacyBaseScore = maximumLegacyAccuracyScore + maximumLegacyComboScore;
             double bonusProportion = Math.Max(0, ((long)score.LegacyTotalScore - maximumLegacyBaseScore) * maximumLegacyBonusRatio);
 
-            double modMultiplier = score.Mods.Select(m => m.ScoreMultiplier).Aggregate(1.0, (c, n) => c * n);
+            var modMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(difficulty));
+            double modMultiplier = modMultiplierCalculator.CalculateFor(score.Mods);
 
             long convertedTotalScoreWithoutMods;
 
@@ -516,8 +334,8 @@ namespace osu.Game.Database
 
                 case 3:
                     convertedTotalScoreWithoutMods = (long)Math.Round(
-                        850000 * comboProportion
-                        + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        150000 * comboProportion
+                        + 850000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
                         + bonusProportion);
                     break;
 
@@ -620,26 +438,55 @@ namespace osu.Game.Database
             }
         }
 
-        private static double computeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+        public static double ComputeAccuracy(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+            => ComputeAccuracy(scoreInfo.Statistics, scoreInfo.MaximumStatistics, scoreProcessor);
+
+        public static double ComputeAccuracy(IReadOnlyDictionary<HitResult, int> statistics, IReadOnlyDictionary<HitResult, int> maximumStatistics, ScoreProcessor scoreProcessor)
         {
-            int baseScore = scoreInfo.Statistics.Where(kvp => kvp.Key.AffectsAccuracy())
-                                     .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
-            int maxBaseScore = scoreInfo.MaximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
-                                        .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int baseScore = statistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                      .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
+            int maxBaseScore = maximumStatistics.Where(kvp => kvp.Key.AffectsAccuracy())
+                                                .Sum(kvp => kvp.Value * scoreProcessor.GetBaseScoreForResult(kvp.Key));
 
             return maxBaseScore == 0 ? 1 : baseScore / (double)maxBaseScore;
         }
 
-        public static ScoreRank ComputeRank(ScoreInfo scoreInfo) => computeRank(scoreInfo, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo) =>
+            ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, scoreInfo.Ruleset.CreateInstance().CreateScoreProcessor());
 
-        private static ScoreRank computeRank(ScoreInfo scoreInfo, ScoreProcessor scoreProcessor)
+        public static ScoreRank ComputeRank(ScoreInfo scoreInfo, ScoreProcessor processor) =>
+            ComputeRank(scoreInfo.Accuracy, scoreInfo.Statistics, scoreInfo.Mods, processor);
+
+        public static ScoreRank ComputeRank(double accuracy, IReadOnlyDictionary<HitResult, int> statistics, IList<Mod> mods, ScoreProcessor scoreProcessor)
         {
-            var rank = scoreProcessor.RankFromScore(scoreInfo.Accuracy, scoreInfo.Statistics);
+            var rank = scoreProcessor.RankFromScore(accuracy, statistics);
 
-            foreach (var mod in scoreInfo.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, scoreInfo.Accuracy);
+            foreach (var mod in mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, accuracy);
 
             return rank;
+        }
+
+        /// <summary>
+        /// Updates <paramref name="scoreInfo"/>'s <see cref="ScoreInfo.TotalScore"/> to the newest score multipliers
+        /// using <see cref="ScoreInfo.TotalScoreWithoutMods"/> and <see cref="ScoreInfo.Mods"/>.
+        /// </summary>
+        /// <param name="scoreInfo">The score to update.</param>
+        /// <param name="beatmapDifficultyWithoutMods">The difficulty parameters of the beatmap applicable for the score, before application of mods.</param>
+        /// <exception cref="InvalidOperationException"><paramref name="scoreInfo"/> does not have <see cref="ScoreInfo.TotalScoreWithoutMods"/> correctly populated.</exception>
+        public static void UpdateToLatestScoreMultipliers(ScoreInfo scoreInfo, IBeatmapDifficultyInfo beatmapDifficultyWithoutMods)
+        {
+            // do nothing if the score multiplier is already up to date.
+            if (scoreInfo.TotalScoreVersion >= 30000017)
+                return;
+
+            if (scoreInfo.TotalScoreWithoutMods == 0 && scoreInfo.TotalScore > 0)
+                throw new InvalidOperationException($"Cannot recalculate score multiplier as {nameof(scoreInfo.TotalScoreWithoutMods)} is missing.");
+
+            var ruleset = scoreInfo.Ruleset.CreateInstance();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(beatmapDifficultyWithoutMods));
+            double scoreMultiplier = scoreMultiplierCalculator.CalculateFor(scoreInfo.Mods);
+            scoreInfo.TotalScore = (long)Math.Round(scoreInfo.TotalScoreWithoutMods * scoreMultiplier);
         }
 
         /// <summary>
@@ -671,28 +518,6 @@ namespace osu.Game.Database
             catch (Exception e)
             {
                 Logger.Error(e, $"Failed to read replay {replayFilename} during score migration", LoggingTarget.Database);
-            }
-        }
-
-        private class FakeHit : HitObject
-        {
-            private readonly Judgement judgement;
-
-            public override Judgement CreateJudgement() => judgement;
-
-            public FakeHit(Judgement judgement)
-            {
-                this.judgement = judgement;
-            }
-        }
-
-        private class FakeJudgement : Judgement
-        {
-            public override HitResult MaxResult { get; }
-
-            public FakeJudgement(HitResult maxResult)
-            {
-                MaxResult = maxResult;
             }
         }
     }

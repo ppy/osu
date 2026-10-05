@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -35,25 +33,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private partial class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
-            [Resolved(typeof(Room), nameof(Room.Playlist))]
-            private BindableList<PlaylistItem> roomPlaylist { get; set; }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                roomPlaylist.BindCollectionChanged((_, _) => InvalidateLayout());
-            }
-
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderBy(item => item.Model.PlaylistOrder);
         }
 
         private partial class QueuePlaylistItem : DrawableRoomPlaylistItem
         {
             [Resolved]
-            private IAPIProvider api { get; set; }
+            private IAPIProvider api { get; set; } = null!;
 
             [Resolved]
-            private MultiplayerClient multiplayerClient { get; set; }
+            private MultiplayerClient multiplayerClient { get; set; } = null!;
 
             public QueuePlaylistItem(PlaylistItem item)
                 : base(item)
@@ -77,8 +66,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 if (multiplayerClient.Room == null)
                     return;
 
-                bool isItemOwner = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost;
-                bool isValidItem = isItemOwner && !Item.Expired;
+                bool isItemOwnerOrReferee = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost || multiplayerClient.IsReferee;
+                bool isValidItem = isItemOwnerOrReferee && !Item.Expired;
 
                 AllowDeletion = isValidItem
                                 && (Item.ID != multiplayerClient.Room.Settings.PlaylistItemId // This is an optimisation for the following check.
@@ -91,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             {
                 base.Dispose(isDisposing);
 
-                if (multiplayerClient != null)
+                if (multiplayerClient.IsNotNull())
                     multiplayerClient.RoomUpdated -= onRoomUpdated;
             }
         }

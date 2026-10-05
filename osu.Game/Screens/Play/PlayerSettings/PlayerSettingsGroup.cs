@@ -2,13 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public partial class PlayerSettingsGroup : SettingsToolboxGroup
     {
-        public PlayerSettingsGroup(string title)
+        public PlayerSettingsGroup(LocalisableString title)
             : base(title)
         {
         }

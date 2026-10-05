@@ -35,24 +35,14 @@ namespace osu.Game.Localisation
         public static LocalisableString ProhibitedInteractDuringMigration => new TranslatableString(getKey(@"prohibited_interact_during_migration"), @"Please avoid interacting with the game!");
 
         /// <summary>
-        /// "Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up."
-        /// </summary>
-        public static LocalisableString FailedCleanupNotification => new TranslatableString(getKey(@"failed_cleanup_notification"), @"Some files couldn't be cleaned up during migration. Clicking this notification will open the folder so you can manually clean things up.");
-
-        /// <summary>
         /// "Please select a new location"
         /// </summary>
         public static LocalisableString SelectNewLocation => new TranslatableString(getKey(@"select_new_location"), @"Please select a new location");
 
         /// <summary>
-        /// "The target directory already seems to have an osu! install. Use that data instead?"
+        /// "The target directory already seems to have an osu! install. Use that data instead? osu! will restart."
         /// </summary>
-        public static LocalisableString TargetDirectoryAlreadyInstalledOsu => new TranslatableString(getKey(@"target_directory_already_installed_osu"), @"The target directory already seems to have an osu! install. Use that data instead?");
-
-        /// <summary>
-        /// "To complete this operation, osu! will close. Please open it again to use the new data location."
-        /// </summary>
-        public static LocalisableString RestartAndReOpenRequiredForCompletion => new TranslatableString(getKey(@"restart_and_re_open_required_for_completion"), @"To complete this operation, osu! will close. Please open it again to use the new data location.");
+        public static LocalisableString TargetDirectoryAlreadyInstalledOsu => new TranslatableString(getKey(@"target_directory_already_installed_osu"), @"The target directory already seems to have an osu! install. Use that data instead? osu! will restart.");
 
         /// <summary>
         /// "Delete ALL beatmaps"
@@ -63,6 +53,11 @@ namespace osu.Game.Localisation
         /// "Delete ALL beatmap videos"
         /// </summary>
         public static LocalisableString DeleteAllBeatmapVideos => new TranslatableString(getKey(@"delete_all_beatmap_videos"), @"Delete ALL beatmap videos");
+
+        /// <summary>
+        /// "Reset ALL beatmap offsets"
+        /// </summary>
+        public static LocalisableString ResetAllOffsets => new TranslatableString(getKey(@"reset_all_offsets"), @"Reset ALL beatmap offsets");
 
         /// <summary>
         /// "Delete ALL scores"
@@ -133,6 +128,16 @@ namespace osu.Game.Localisation
         /// "Please select your osu!stable install location"
         /// </summary>
         public static LocalisableString StableDirectorySelectHeader => new TranslatableString(getKey(@"stable_directory_select_header"), @"Please select your osu!stable install location");
+
+        /// <summary>
+        /// "All offsets have been reset!"
+        /// </summary>
+        public static LocalisableString AllOffsetsReset => new TranslatableString(getKey(@"all_offsets_reset"), @"All offsets have been reset!");
+
+        /// <summary>
+        /// "No videos found to delete!"
+        /// </summary>
+        public static LocalisableString NoVideosFoundToDelete => new TranslatableString(getKey(@"no_videos_found_to_delete"), @"No videos found to delete!");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

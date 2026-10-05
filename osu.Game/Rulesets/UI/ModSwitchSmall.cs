@@ -61,7 +61,6 @@ namespace osu.Game.Rulesets.UI
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Spacing = new Vector2(0, 4),
                     Direction = FillDirection.Vertical,
                     Child = tinySwitch = new ModSwitchTiny(mod)
                     {
@@ -79,7 +78,9 @@ namespace osu.Game.Rulesets.UI
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Size = new Vector2(21),
+                    Size = new Vector2(37, 26),
+                    // arbitrary adjustment for better vertical alignment
+                    Margin = new MarginPadding { Top = -1 },
                     Icon = mod.Icon.Value
                 });
                 tinySwitch.Scale = new Vector2(0.3f);

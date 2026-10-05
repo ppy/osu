@@ -44,7 +44,8 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Both,
                     TextAnchor = Anchor.TopRight,
                     Margin = new MarginPadding { Left = 5, Vertical = 10 },
-                    Text = string.Join('\n', gameHost.Threads.Select(t => t.Name))
+                    Text = string.Join('\n', gameHost.Threads.Select(t => t.Name)),
+                    ParagraphSpacing = 0,
                 },
                 textFlow = new OsuTextFlowContainer(cp =>
                 {
@@ -56,6 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                     Margin = new MarginPadding { Left = 35, Right = 10, Vertical = 10 },
                     AutoSizeAxes = Axes.Y,
                     TextAnchor = Anchor.TopRight,
+                    ParagraphSpacing = 0,
                 },
             };
         }
@@ -80,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
                         ? $"/{(clock.MaximumUpdateHz > 0 && clock.MaximumUpdateHz < 10000 ? clock.MaximumUpdateHz.ToString("0") : "∞"),4}"
                         : string.Empty;
 
-                    textFlow.AddParagraph($"{clock.FramesPerSecond:0}{maximum}fps ({clock.ElapsedFrameTime:0.00}ms)");
+                    textFlow.AddParagraph($"{clock.FramesPerSecond:0}{maximum} fps ({clock.ElapsedFrameTime:0.00} ms)");
                 }
             }
         }

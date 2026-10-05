@@ -20,14 +20,13 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Comments.Buttons;
 using osu.Game.Overlays.Dialog;
-using osu.Game.Overlays.OSD;
-using osu.Game.Resources.Localisation.Web;
+using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -47,7 +46,7 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableList<DrawableComment> Replies = new BindableList<DrawableComment>();
 
-        private readonly BindableBool childrenExpanded = new BindableBool(true);
+        private readonly BindableBool childrenExpanded;
 
         private int currentPage;
 
@@ -83,15 +82,14 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private Clipboard clipboard { get; set; } = null!;
-
-        [Resolved]
-        private OnScreenDisplay? onScreenDisplay { get; set; }
+        private OsuGame? game { get; set; }
 
         public DrawableComment(Comment comment, IReadOnlyList<CommentableMeta> meta)
         {
             Comment = comment;
             Meta = meta;
+
+            childrenExpanded = new BindableBool(!comment.Pinned);
         }
 
         [BackgroundDependencyLoader]
@@ -327,13 +325,13 @@ namespace osu.Game.Overlays.Comments
             if (WasDeleted)
                 makeDeleted();
 
-            actionsContainer.AddLink(CommonStrings.ButtonsPermalink, copyUrl);
+            actionsContainer.AddLink(WebCommonStrings.ButtonsPermalink, () => game?.CopyToClipboard($@"{api.Endpoints.APIUrl}/comments/{Comment.Id}"));
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
-            actionsContainer.AddLink(CommonStrings.ButtonsReply.ToLower(), toggleReply);
+            actionsContainer.AddLink(WebCommonStrings.ButtonsReply.ToLower(), toggleReply);
             actionsContainer.AddArbitraryDrawable(Empty().With(d => d.Width = 10));
 
             if (Comment.UserId.HasValue && Comment.UserId.Value == api.LocalUser.Value.Id)
-                actionsContainer.AddLink(CommonStrings.ButtonsDelete.ToLower(), deleteComment);
+                actionsContainer.AddLink(WebCommonStrings.ButtonsDelete.ToLower(), deleteComment);
             else
                 actionsContainer.AddArbitraryDrawable(new CommentReportButton(Comment));
 
@@ -387,7 +385,7 @@ namespace osu.Game.Overlays.Comments
             if (dialogOverlay == null)
                 deleteCommentRequest();
             else
-                dialogOverlay.Push(new ConfirmDialog("Do you really want to delete your comment?", deleteCommentRequest));
+                dialogOverlay.Push(new ConfirmDialog(DialogStrings.DeleteCommentBodyText, deleteCommentRequest));
         }
 
         /// <summary>
@@ -415,18 +413,12 @@ namespace osu.Game.Overlays.Comments
             api.Queue(request);
         }
 
-        private void copyUrl()
-        {
-            clipboard.SetText($@"{api.APIEndpointUrl}/comments/{Comment.Id}");
-            onScreenDisplay?.Display(new CopyUrlToast());
-        }
-
         private void toggleReply()
         {
             if (replyEditorContainer.Count == 0)
             {
                 replyEditorContainer.Show();
-                replyEditorContainer.Add(new ReplyCommentEditor(Comment)
+                replyEditorContainer.Add(new ReplyCommentEditor(Comment, Meta)
                 {
                     OnPost = comments =>
                     {

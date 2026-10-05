@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
@@ -13,25 +16,35 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneDrawableDate : OsuTestScene
     {
-        public TestSceneDrawableDate()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            Child = new FillFlowContainer
+            AddStep("Create 7 dates", () =>
             {
-                Direction = FillDirection.Vertical,
-                AutoSizeAxes = Axes.Both,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Children = new Drawable[]
+                Child = new FillFlowContainer
                 {
-                    new PokeyDrawableDate(DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(60))),
-                    new PokeyDrawableDate(DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(55))),
-                    new PokeyDrawableDate(DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(50))),
-                    new PokeyDrawableDate(DateTimeOffset.Now),
-                    new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(60))),
-                    new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(65))),
-                    new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(70))),
-                }
-            };
+                    Direction = FillDirection.Vertical,
+                    AutoSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        new PokeyDrawableDate(DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(60))),
+                        new PokeyDrawableDate(DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(55))),
+                        new PokeyDrawableDate(DateTimeOffset.Now.Subtract(TimeSpan.FromSeconds(50))),
+                        new PokeyDrawableDate(DateTimeOffset.Now),
+                        new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(60))),
+                        new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(65))),
+                        new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(70))),
+                    }
+                };
+            });
+        }
+
+        [Test]
+        public void TestSecondsUpdate()
+        {
+            AddUntilStep("4th date says \"2 seconds ago\"", () => this.ChildrenOfType<DrawableDate>().ElementAt(3).Current.Value == "2 seconds ago");
         }
 
         private partial class PokeyDrawableDate : CompositeDrawable

@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
@@ -32,9 +33,9 @@ namespace osu.Game.Tests.Skins
                     new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
 
-                Assert.AreEqual(expectedColors.Count, comboColors?.Count);
+                ClassicAssert.AreEqual(expectedColors.Count, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
-                    Assert.AreEqual(expectedColors[i], comboColors[i]);
+                    ClassicAssert.AreEqual(expectedColors[i], comboColors![i]);
             }
         }
 
@@ -49,9 +50,9 @@ namespace osu.Game.Tests.Skins
                 var comboColors = decoder.Decode(stream).ComboColours;
                 var expectedColors = SkinConfiguration.DefaultComboColours;
 
-                Assert.AreEqual(expectedColors.Count, comboColors?.Count);
+                ClassicAssert.AreEqual(expectedColors.Count, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
-                    Assert.AreEqual(expectedColors[i], comboColors[i]);
+                    ClassicAssert.AreEqual(expectedColors[i], comboColors![i]);
             }
         }
 
@@ -65,7 +66,7 @@ namespace osu.Game.Tests.Skins
             {
                 var skinConfiguration = decoder.Decode(stream);
                 skinConfiguration.AllowDefaultComboColoursFallback = false;
-                Assert.IsNull(skinConfiguration.ComboColours);
+                ClassicAssert.Null(skinConfiguration.ComboColours);
             }
         }
 
@@ -79,8 +80,8 @@ namespace osu.Game.Tests.Skins
             {
                 var config = decoder.Decode(stream);
 
-                Assert.AreEqual("test skin", config.SkinInfo.Name);
-                Assert.AreEqual("TestValue", config.ConfigDictionary["TestLookup"]);
+                ClassicAssert.AreEqual("test skin", config.SkinInfo.Name);
+                ClassicAssert.AreEqual("TestValue", config.ConfigDictionary["TestLookup"]);
             }
         }
 
@@ -90,7 +91,7 @@ namespace osu.Game.Tests.Skins
             var decoder = new LegacySkinDecoder();
             using (var resStream = TestResources.OpenResource("skin-20.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
+                ClassicAssert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
         }
 
         [Test]
@@ -99,7 +100,7 @@ namespace osu.Game.Tests.Skins
             var decoder = new LegacySkinDecoder();
             using (var resStream = TestResources.OpenResource("skin-with-space.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
+                ClassicAssert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
         }
 
         [Test]
@@ -108,7 +109,7 @@ namespace osu.Game.Tests.Skins
             var decoder = new LegacySkinDecoder();
             using (var resStream = TestResources.OpenResource("skin-latest.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.AreEqual(SkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
+                ClassicAssert.AreEqual(SkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
         }
 
         [Test]

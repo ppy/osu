@@ -92,6 +92,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
+        /// The current beatmap.
+        /// </summary>
+        public readonly Bindable<IBeatmap?> Beatmap = new Bindable<IBeatmap?>();
+
+        /// <summary>
         /// The current rank.
         /// </summary>
         public IBindable<ScoreRank> Rank => rank;
@@ -118,6 +123,11 @@ namespace osu.Game.Rulesets.Scoring
         /// The maximum achievable total score.
         /// </summary>
         public long MaximumTotalScore { get; private set; }
+
+        /// <summary>
+        /// The maximum achievable combo.
+        /// </summary>
+        public int MaximumCombo { get; private set; }
 
         /// <summary>
         /// The maximum sum of accuracy-affecting judgements at the current point in time.
@@ -181,6 +191,8 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
+        public IReadOnlyDictionary<HitResult, int> Statistics => ScoreResultCounts;
+
         private bool beatmapApplied;
 
         protected readonly Dictionary<HitResult, int> ScoreResultCounts = new Dictionary<HitResult, int>();
@@ -195,23 +207,31 @@ namespace osu.Game.Rulesets.Scoring
         {
             Ruleset = ruleset;
 
-            Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += _ => updateRank();
 
-            Mods.ValueChanged += mods =>
+            Mods.ValueChanged += _ =>
             {
-                scoreMultiplier = 1;
-
-                foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
-
+                updateScoreMultiplier();
                 updateScore();
                 updateRank();
+            };
+
+            Beatmap.ValueChanged += _ =>
+            {
+                updateScoreMultiplier();
             };
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
+            // NOTE: The ordering of operations here is significant.
+            // `Beatmap.Value` must be set before `base.ApplyBeatmap()` because changes to `Beatmap.Value`
+            // trigger recalculation of `scoreMultiplier`,
+            // and `base.ApplyBeatmap()` calls `SimulateAutoplay()` then `Reset(storeResults: true)`.
+            // failing to calculate the correct score multiplier *before* autoplay simulation would result in
+            // storing the incorrect value of `MaximumTotalScore`.
+            Beatmap.Value = beatmap;
+
             base.ApplyBeatmap(beatmap);
             beatmapApplied = true;
         }
@@ -231,7 +251,10 @@ namespace osu.Game.Rulesets.Scoring
             else if (result.Type.BreaksCombo())
                 Combo.Value = 0;
 
+            HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value);
+
             result.ComboAfterJudgement = Combo.Value;
+            result.HighestComboAfterJudgement = HighestCombo.Value;
 
             if (result.Judgement.MaxResult.AffectsAccuracy())
             {
@@ -274,8 +297,11 @@ namespace osu.Game.Rulesets.Scoring
             if (!TrackHitEvents)
                 throw new InvalidOperationException(@$"Rewind is not supported when {nameof(TrackHitEvents)} is disabled.");
 
-            Combo.Value = result.ComboAtJudgement;
-            HighestCombo.Value = result.HighestComboAtJudgement;
+            // the reason this is written so funnily rather than just using `ComboAtJudgement`
+            // is to nullify impact of ordering when reverting concurrent judgement results
+            // (think mania and multiple judgements within a frame).
+            Combo.Value -= (result.ComboAfterJudgement - result.ComboAtJudgement);
+            HighestCombo.Value -= (result.HighestComboAfterJudgement - result.HighestComboAtJudgement);
 
             if (result.FailedAtJudgement && !ApplyNewJudgementsWhenFailed)
                 return;
@@ -389,6 +415,15 @@ namespace osu.Game.Rulesets.Scoring
             rank.Value = newRank;
         }
 
+        private void updateScoreMultiplier()
+        {
+            if (Beatmap.Value == null)
+                return;
+
+            var calculator = Ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(Beatmap.Value.BeatmapInfo.Difficulty));
+            scoreMultiplier = calculator.CalculateFor(Mods.Value);
+        }
+
         protected virtual double ComputeTotalScore(double comboProgress, double accuracyProgress, double bonusPortion)
         {
             return 500000 * Accuracy.Value * comboProgress +
@@ -421,6 +456,7 @@ namespace osu.Game.Rulesets.Scoring
                 MaximumResultCounts.AddRange(ScoreResultCounts);
 
                 MaximumTotalScore = TotalScore.Value;
+                MaximumCombo = HighestCombo.Value;
             }
 
             ScoreResultCounts.Clear();

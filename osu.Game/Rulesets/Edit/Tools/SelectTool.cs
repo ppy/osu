@@ -6,18 +6,21 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 
 namespace osu.Game.Rulesets.Edit.Tools
 {
-    public class SelectTool : HitObjectCompositionTool
+    public class SelectTool : CompositionTool<GlobalAction>
     {
         public SelectTool()
-            : base("Select")
+            : base(EditorStrings.SelectTool)
         {
+            Action = GlobalAction.EditorSelectTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorSelect };
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => null;
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => null;
     }
 }

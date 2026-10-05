@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -19,8 +20,11 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -47,7 +51,11 @@ namespace osu.Game.Screens.Play
         [CanBeNull]
         private UserStatisticsWatcher userStatisticsWatcher { get; set; }
 
-        private readonly object scoreSubmissionLock = new object();
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        private INotificationOverlay notifications { get; set; }
+
+        private readonly Lock scoreSubmissionLock = new Lock();
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
@@ -98,9 +106,9 @@ namespace osu.Game.Screens.Play
                 return false;
             }
 
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn || api.State.Value == APIState.Failing)
             {
-                handleTokenFailure(new InvalidOperationException("API is not online."));
+                handleTokenFailure(new InvalidOperationException("Online functionality is not available."), displayNotification: api.State.Value == APIState.Failing);
                 return false;
             }
 
@@ -137,34 +145,13 @@ namespace osu.Game.Screens.Play
                 if (displayNotification || shouldExit)
                 {
                     string whatWillHappen = shouldExit
-                        ? "Play in this state is not permitted."
-                        : "Your score will not be submitted.";
+                        ? "Cannot start play"
+                        : "Score will not be submitted";
 
                     if (string.IsNullOrEmpty(exception.Message))
-                        Logger.Error(exception, $"Failed to retrieve a score submission token.\n\n{whatWillHappen}");
+                        notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, "Failed to retrieve a score submission token."));
                     else
-                    {
-                        switch (exception.Message)
-                        {
-                            case @"missing token header":
-                            case @"invalid client hash":
-                            case @"invalid verification hash":
-                                Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
-                                break;
-
-                            case @"invalid beatmap_hash":
-                                Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
-                                break;
-
-                            case @"expired token":
-                                Logger.Log($"Your system clock is set incorrectly. Please check your system time, date and timezone.\n\n{whatWillHappen}", level: LogLevel.Important);
-                                break;
-
-                            default:
-                                Logger.Log($"{whatWillHappen} {exception.Message}", level: LogLevel.Important);
-                                break;
-                        }
-                    }
+                        notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, getUserFacingAPIError(exception)));
                 }
 
                 if (shouldExit)
@@ -185,6 +172,24 @@ namespace osu.Game.Screens.Play
         /// <returns>Whether gameplay should be immediately exited as a result. Returning false allows the gameplay session to continue. Defaults to true.</returns>
         protected virtual bool ShouldExitOnTokenRetrievalFailure(Exception exception) => true;
 
+        public override bool AllowCriticalSettingsAdjustment
+        {
+            get
+            {
+                // General limitations to ensure players don't do anything too weird.
+                // These match stable for now.
+
+                // TODO: the blocking conditions should probably display a message.
+                if (!IsBreakTime.Value && GameplayClockContainer.CurrentTime - GameplayClockContainer.GameplayStartTime > 10000)
+                    return false;
+
+                if (GameplayClockContainer.IsPaused.Value)
+                    return false;
+
+                return base.AllowCriticalSettingsAdjustment;
+            }
+        }
+
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
@@ -192,7 +197,7 @@ namespace osu.Game.Screens.Play
             score.ScoreInfo.Date = DateTimeOffset.Now;
 
             await submitScore(score).ConfigureAwait(false);
-            spectatorClient.EndPlaying(GameplayState);
+            spectatorClient.EndPlaying(token, GameplayState);
             userStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
         }
 
@@ -208,36 +213,49 @@ namespace osu.Game.Screens.Play
             realm.WriteAsync(r =>
             {
                 var realmBeatmap = r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID);
-                if (realmBeatmap != null)
-                    realmBeatmap.LastPlayed = DateTimeOffset.Now;
+                realmBeatmap?.LastPlayed = DateTimeOffset.Now;
             });
 
             spectatorClient.BeginPlaying(token, GameplayState, Score);
         }
 
-        protected override void OnFail()
+        public override bool Pause()
         {
-            base.OnFail();
+            bool wasPaused = GameplayClockContainer.IsPaused.Value;
 
-            submitFromFailOrQuit();
+            bool paused = base.Pause();
+
+            if (!wasPaused && paused)
+                Score.ScoreInfo.Pauses.Add((int)Math.Round(GameplayClockContainer.CurrentTime));
+
+            return paused;
+        }
+
+        protected override void ConcludeFailedScore(Score score)
+        {
+            base.ConcludeFailedScore(score);
+            submitFromFailOrQuit(score);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
             bool exiting = base.OnExiting(e);
-            submitFromFailOrQuit();
+            submitFromFailOrQuit(Score);
             statics.SetValue(Static.LastLocalUserScore, Score?.ScoreInfo.DeepClone());
             return exiting;
         }
 
-        private void submitFromFailOrQuit()
+        private void submitFromFailOrQuit(Score score)
         {
             if (LoadedBeatmapSuccessfully)
             {
+                // compare: https://github.com/ppy/osu/blob/ccf1acce56798497edfaf92d3ece933469edcf0a/osu.Game/Screens/Play/Player.cs#L848-L851
+                var scoreCopy = score.DeepClone();
+
                 Task.Run(async () =>
                 {
-                    await submitScore(Score.DeepClone()).ConfigureAwait(false);
-                    spectatorClient.EndPlaying(GameplayState);
+                    await submitScore(scoreCopy).ConfigureAwait(false);
+                    spectatorClient.EndPlaying(token, GameplayState);
                 }).FireAndForget();
             }
         }
@@ -274,6 +292,23 @@ namespace osu.Game.Screens.Play
                 return Task.CompletedTask;
             }
 
+            // if the user never hit anything, this score should not be counted in any way.
+            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
+            {
+                Logger.Log("No hits registered, skipping score submission");
+                return Task.CompletedTask;
+            }
+
+            // zero scores should also never be submitted.
+            if (score.ScoreInfo.TotalScore == 0)
+            {
+                Logger.Log("Zero score, skipping score submission");
+                return Task.CompletedTask;
+            }
+
+            // mind the timing of this.
+            // once `scoreSubmissionSource` is created, it is presumed that submission is taking place in the background,
+            // so all exceptional circumstances that would disallow submission must be handled above.
             lock (scoreSubmissionLock)
             {
                 if (scoreSubmissionSource != null)
@@ -281,10 +316,6 @@ namespace osu.Game.Screens.Play
 
                 scoreSubmissionSource = new TaskCompletionSource<bool>();
             }
-
-            // if the user never hit anything, this score should not be counted in any way.
-            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
-                return Task.CompletedTask;
 
             Logger.Log($"Beginning score submission (token:{token.Value})...");
             var request = CreateSubmissionRequest(score, token.Value);
@@ -300,12 +331,40 @@ namespace osu.Game.Screens.Play
 
             request.Failure += e =>
             {
-                Logger.Error(e, $"Failed to submit score (token:{token.Value}): {e.Message}");
+                Logger.Error(e, $"{getUserFacingAPIError(e)}\n\nScore was not submitted (id: {token.Value})");
                 scoreSubmissionSource.SetResult(false);
             };
 
             api.Queue(request);
             return scoreSubmissionSource.Task;
         }
+
+        private static string getUserFacingAPIError(Exception exception)
+        {
+            switch (exception.Message)
+            {
+                case @"missing token header":
+                case @"invalid client hash":
+                case @"invalid verification hash":
+                case @"invalid token":
+                case @"outdated client":
+                    return "Please ensure that you are using the latest version of the official game releases.";
+
+                case @"invalid or missing beatmap_hash":
+                    return "This beatmap does not match the online version. Please update or redownload it.";
+
+                case @"expired token":
+                    return "Your system clock is set incorrectly. Please check your system time, date and timezone.";
+
+                default:
+                    return exception.Message;
+            }
+        }
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            AllowRetry = true,
+            IsLocalPlay = true,
+        };
     }
 }

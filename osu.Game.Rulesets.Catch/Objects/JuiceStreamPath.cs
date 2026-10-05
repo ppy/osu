@@ -175,8 +175,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </remarks>
         public void ConvertFromSliderPath(SliderPath sliderPath, double velocity)
         {
-            var sliderPathVertices = new List<Vector2>();
-            sliderPath.GetPathToProgress(sliderPathVertices, 0, 1);
+            var sliderPathVertices = sliderPath.CalculatedPath;
 
             double time = 0;
 

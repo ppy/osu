@@ -59,9 +59,12 @@ namespace osu.Game.Rulesets.Scoring
 
         protected override void RevertResultInternal(JudgementResult result)
         {
-            Health.Value = result.HealthAtJudgement;
+            HasFailed = result.FailedAtJudgement;
 
-            // Todo: Revert HasFailed state with proper player support
+            if (HasFailed)
+                return;
+
+            Health.Value = result.HealthAtJudgement;
         }
 
         /// <summary>

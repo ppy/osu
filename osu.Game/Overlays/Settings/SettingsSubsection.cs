@@ -14,6 +14,8 @@ namespace osu.Game.Overlays.Settings
 {
     public abstract partial class SettingsSubsection : FillFlowContainer, IFilterable
     {
+        public const float VERTICAL_PADDING = (header_height - header_font_size) * 0.5f;
+
         protected override Container<Drawable> Content => FlowContent;
 
         protected readonly FillFlowContainer FlowContent;
@@ -37,9 +39,8 @@ namespace osu.Game.Overlays.Settings
 
             FlowContent = new FillFlowContainer
             {
-                Margin = new MarginPadding { Top = SettingsSection.ITEM_SPACING },
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, SettingsSection.ITEM_SPACING),
+                Spacing = new Vector2(0, SettingsSection.ITEM_SPACING_V2),
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
             };
@@ -51,16 +52,29 @@ namespace osu.Game.Overlays.Settings
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
-                new OsuSpriteText
+                CreateHeader(),
+                // Separate container to ensure margin remains even if FlowContent is hidden.
+                new Container
                 {
-                    Text = Header,
-                    Margin = new MarginPadding { Vertical = (header_height - header_font_size) * 0.5f, Horizontal = SettingsPanel.CONTENT_MARGINS },
-                    Font = OsuFont.GetFont(size: header_font_size),
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Margin = new MarginPadding { Top = SettingsSection.ITEM_SPACING_V2 },
+                    Child = FlowContent
                 },
-                FlowContent
             });
+        }
+
+        protected virtual Drawable CreateHeader()
+        {
+            return new OsuSpriteText
+            {
+                Text = Header,
+                Font = OsuFont.GetFont(size: header_font_size),
+                Margin = new MarginPadding { Vertical = VERTICAL_PADDING, Horizontal = 5 },
+                Padding = SettingsPanel.CONTENT_PADDING,
+            };
         }
     }
 }

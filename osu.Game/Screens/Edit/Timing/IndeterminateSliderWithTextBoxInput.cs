@@ -17,7 +17,7 @@ using Vector2 = osuTK.Vector2;
 namespace osu.Game.Screens.Edit.Timing
 {
     /// <summary>
-    /// Analogous to <see cref="SliderWithTextBoxInput{T}"/>, but supports scenarios
+    /// Analogous to SliderWithTextBoxInput, but supports scenarios
     /// where multiple objects with multiple different property values are selected
     /// by providing an "indeterminate state".
     /// </summary>
@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Edit.Timing
                         textBox = new LabelledTextBox
                         {
                             Label = labelText,
+                            SelectAllOnFocus = true,
                         },
                         slider = new SettingsSlider<T>
                         {

@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
@@ -20,7 +22,6 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
@@ -89,6 +90,11 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public override ComposeBlueprintContainer BlueprintContainer => throw new NotImplementedException();
         public override IEnumerable<DrawableHitObject> HitObjects => Enumerable.Empty<DrawableHitObject>();
         public override bool CursorInPlacementArea => false;
+        public override Bindable<TernaryState> SelectionNewComboState => throw new NotImplementedException();
+        public override IReadOnlyDictionary<string, Bindable<TernaryState>> SelectionSampleStates => throw new NotImplementedException();
+        public override IReadOnlyDictionary<string, Bindable<TernaryState>> SelectionBankStates => throw new NotImplementedException();
+        public override IReadOnlyDictionary<string, Bindable<TernaryState>> SelectionAdditionBankStates => throw new NotImplementedException();
+        public override Bindable<bool> AutoSelectionBankEnabled => throw new NotImplementedException();
 
         public TestHitObjectComposer(Playfield playfield)
             : base(new ManiaRuleset())
@@ -99,11 +105,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         public Drawable Child
         {
             set => InternalChild = value;
-        }
-
-        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition, SnapType snapType = SnapType.All)
-        {
-            throw new NotImplementedException();
         }
     }
 }

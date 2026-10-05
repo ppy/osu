@@ -3,6 +3,8 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,12 +15,11 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
@@ -30,11 +31,10 @@ using osuTK;
 
 namespace osu.Game.Screens.Play
 {
-    [Cached(typeof(IPreviewTrackOwner))]
     public partial class SoloSpectatorScreen : SpectatorScreen, IPreviewTrackOwner
     {
         [Resolved]
-        private IAPIProvider api { get; set; } = null!;
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; } = null!;
@@ -60,9 +60,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private SpectatorGameplayState? immediateSpectatorGameplayState;
 
-        private GetBeatmapSetRequest? onlineBeatmapRequest;
+        private ScheduledDelegate? beatmapFetchCallback;
 
-        private APIBeatmapSet? beatmapSet;
+        private APIBeatmap? beatmap;
 
         public SoloSpectatorScreen(APIUser targetUser)
             : base(targetUser.Id)
@@ -70,9 +70,13 @@ namespace osu.Game.Screens.Play
             this.targetUser = targetUser;
         }
 
+        private Bindable<bool> preferNoVideo = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
+
             InternalChild = new Container
             {
                 Masking = true,
@@ -101,7 +105,7 @@ namespace osu.Game.Screens.Play
                         {
                             new OsuSpriteText
                             {
-                                Text = "Spectator Mode",
+                                Text = SoloSpectatorScreenStrings.SpectatorMode,
                                 Font = OsuFont.Default.With(size: 30),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -146,7 +150,7 @@ namespace osu.Game.Screens.Play
                             },
                             watchButton = new PurpleRoundedButton
                             {
-                                Text = "Start Watching",
+                                Text = SoloSpectatorScreenStrings.StartWatching,
                                 Width = 250,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -183,7 +187,7 @@ namespace osu.Game.Screens.Play
         {
             if (this.GetChildScreen() is SpectatorPlayerLoader loader)
             {
-                if (loader.GetChildScreen() is SpectatorPlayer player)
+                if (loader.GetChildScreen() is SoloSpectatorPlayer player)
                 {
                     player.AllowFail();
                     resetStartState();
@@ -210,7 +214,7 @@ namespace osu.Game.Screens.Play
         private void clearDisplay()
         {
             watchButton.Enabled.Value = false;
-            onlineBeatmapRequest?.Cancel();
+            beatmapFetchCallback?.Cancel();
             beatmapPanelContainer.Clear();
             previewTrackManager.StopAnyPlaying(this);
         }
@@ -244,35 +248,42 @@ namespace osu.Game.Screens.Play
         {
             Debug.Assert(state.BeatmapID != null);
 
-            onlineBeatmapRequest = new GetBeatmapSetRequest(state.BeatmapID.Value, BeatmapSetLookupType.BeatmapId);
-            onlineBeatmapRequest.Success += beatmapSet => Schedule(() =>
+            beatmapLookupCache.GetBeatmapAsync(state.BeatmapID.Value).ContinueWith(t => beatmapFetchCallback = Schedule(() =>
             {
-                this.beatmapSet = beatmapSet;
-                beatmapPanelContainer.Child = new BeatmapCardNormal(this.beatmapSet, allowExpansion: false);
-                checkForAutomaticDownload();
-            });
+                beatmap = t.GetResultSafely();
 
-            api.Queue(onlineBeatmapRequest);
+                if (beatmap?.BeatmapSet == null)
+                    return;
+
+                beatmapPanelContainer.Child = new BeatmapCardNormal(beatmap.BeatmapSet, allowExpansion: false);
+                checkForAutomaticDownload();
+            }));
         }
 
         private void checkForAutomaticDownload()
         {
-            if (beatmapSet == null)
+            if (beatmap?.BeatmapSet == null)
                 return;
 
             if (!automaticDownload.Current.Value)
                 return;
 
-            if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
+            if (beatmaps.IsAvailableLocally(beatmap))
                 return;
 
-            beatmapDownloader.Download(beatmapSet);
+            beatmapDownloader.Download(beatmap.BeatmapSet, preferNoVideo.Value);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
         {
             previewTrackManager.StopAnyPlaying(this);
             return base.OnExiting(e);
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            previewTrackManager.StopAnyPlaying(this);
+            base.OnSuspending(e);
         }
     }
 }

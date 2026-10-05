@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -16,8 +16,6 @@ namespace osu.Game.Tests.Editing.Checks
     {
         private CheckPreviewTime check = null!;
 
-        private IBeatmap beatmap = null!;
-
         [SetUp]
         public void Setup()
         {
@@ -27,62 +25,69 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestPreviewTimeNotSet()
         {
-            setNoPreviewTimeBeatmap();
-            var content = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            // single difficulty with no preview time
+            var current = createBeatmapWithPreviewPoint(-1, "Current");
+            var context = createContext(current, Array.Empty<IBeatmap>());
 
-            var issues = check.Run(content).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckPreviewTime.IssueTemplateHasNoPreviewTime);
         }
 
         [Test]
-        public void TestPreviewTimeconflict()
+        public void TestPreviewTimeConflict()
         {
-            setPreviewTimeConflictBeatmap();
+            var beatmaps = createBeatmapSetWithPreviewPoint(
+                ("Current", 10),
+                ("Test1", 5),
+                ("Test2", 10)
+            );
 
-            var content = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var context = createContext(beatmaps[0], new[] { beatmaps[1], beatmaps[2] });
 
-            var issues = check.Run(content).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckPreviewTime.IssueTemplatePreviewTimeConflict);
             Assert.That(issues.Single().Arguments.FirstOrDefault()?.ToString() == "Test1");
         }
 
-        private void setNoPreviewTimeBeatmap()
+        private IBeatmap[] createBeatmapSetWithPreviewPoint(params (string name, int preview)[] entries)
         {
-            beatmap = new Beatmap<HitObject>
+            var beatmapSet = new BeatmapSetInfo();
+            var beatmaps = new IBeatmap[entries.Length];
+
+            for (int i = 0; i < entries.Length; i++)
+            {
+                beatmaps[i] = createBeatmapWithPreviewPoint(entries[i].preview, entries[i].name);
+                beatmaps[i].BeatmapInfo.BeatmapSet = beatmapSet;
+            }
+
+            foreach (var b in beatmaps)
+                beatmapSet.Beatmaps.Add(b.BeatmapInfo);
+
+            return beatmaps;
+        }
+
+        private IBeatmap createBeatmapWithPreviewPoint(int previewTime, string difficultyName)
+        {
+            return new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    Metadata = new BeatmapMetadata { PreviewTime = -1 },
+                    DifficultyName = difficultyName,
+                    Metadata = new BeatmapMetadata { PreviewTime = previewTime }
                 }
             };
         }
 
-        private void setPreviewTimeConflictBeatmap()
+        private BeatmapVerifierContext createContext(IBeatmap currentBeatmap, IBeatmap[] otherDifficulties)
         {
-            beatmap = new Beatmap<HitObject>
-            {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata { PreviewTime = 10 },
-                    BeatmapSet = new BeatmapSetInfo(new List<BeatmapInfo>
-                    {
-                        new BeatmapInfo
-                        {
-                            DifficultyName = "Test1",
-                            Metadata = new BeatmapMetadata { PreviewTime = 5 },
-                        },
-                        new BeatmapInfo
-                        {
-                            DifficultyName = "Test2",
-                            Metadata = new BeatmapMetadata { PreviewTime = 10 },
-                        },
-                    })
-                }
-            };
+            var verifiedCurrentBeatmap = new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(currentBeatmap), currentBeatmap);
+            var verifiedOtherBeatmaps = otherDifficulties.Select(b => new BeatmapVerifierContext.VerifiedBeatmap(new TestWorkingBeatmap(b), b)).ToList();
+
+            return new BeatmapVerifierContext(verifiedCurrentBeatmap, verifiedOtherBeatmaps, DifficultyRating.ExpertPlus);
         }
     }
 }

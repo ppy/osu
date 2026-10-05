@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.Edit
 
             RelativeSizeAxes = Axes.X;
 
-            Height = 60;
+            Height = 50;
 
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.Edit
                     RelativeSizeAxes = Axes.Both,
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, 170),
+                        new Dimension(GridSizeMode.Absolute, 150),
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 220),
                         new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT),
@@ -82,11 +83,18 @@ namespace osu.Game.Screens.Edit
             saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
             composerFocusMode.BindValueChanged(_ =>
             {
-                float targetAlpha = composerFocusMode.Value ? 0.5f : 1;
-
+                // Transforms should be kept in sync with other usages of composer focus mode.
                 foreach (var c in this.ChildrenOfType<BottomBarContainer>())
-                    c.Background.FadeTo(targetAlpha, 400, Easing.OutQuint);
+                {
+                    if (!composerFocusMode.Value)
+                        c.Background.FadeIn(750, Easing.OutQuint);
+                    else
+                        c.Background.Delay(600).FadeTo(0.5f, 4000, Easing.OutQuint);
+                }
             }, true);
         }
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnClick(ClickEvent e) => true;
     }
 }

@@ -46,6 +46,7 @@ namespace osu.Game.Screens.Edit
             processHitObjects(result, () => newBeatmap ??= readBeatmap(newState));
             processTimingPoints(() => newBeatmap ??= readBeatmap(newState));
             processBreaks(() => newBeatmap ??= readBeatmap(newState));
+            processBookmarks(() => newBeatmap ??= readBeatmap(newState));
             processHitObjectLocalData(() => newBeatmap ??= readBeatmap(newState));
             editorBeatmap.EndChange();
         }
@@ -94,6 +95,29 @@ namespace osu.Game.Screens.Edit
                     continue;
 
                 editorBeatmap.Breaks.Add(newBreak);
+            }
+        }
+
+        private void processBookmarks(Func<IBeatmap> getNewBeatmap)
+        {
+            var newBookmarks = getNewBeatmap().Bookmarks.ToHashSet();
+
+            foreach (int oldBookmark in editorBeatmap.Bookmarks.ToArray())
+            {
+                if (newBookmarks.Contains(oldBookmark))
+                    continue;
+
+                editorBeatmap.Bookmarks.Remove(oldBookmark);
+            }
+
+            foreach (int newBookmark in newBookmarks)
+            {
+                if (editorBeatmap.Bookmarks.Contains(newBookmark))
+                    continue;
+
+                int idx = editorBeatmap.Bookmarks.BinarySearch(newBookmark);
+                if (idx < 0)
+                    editorBeatmap.Bookmarks.Insert(~idx, newBookmark);
             }
         }
 
@@ -155,22 +179,25 @@ namespace osu.Game.Screens.Edit
             removedIndices = new List<int>();
             addedIndices = new List<int>();
 
+            string[] oldArr = result.PiecesOld.ToArray();
+            string[] newArr = result.PiecesNew.ToArray();
+
             // Find the start and end indices of the relevant section headers in both the old and the new beatmap file. Lines changed outside of the modified ranges are ignored.
-            int oldSectionStartIndex = Array.IndexOf(result.PiecesOld, $"[{section}]");
+            int oldSectionStartIndex = Array.IndexOf(oldArr, $"[{section}]");
             if (oldSectionStartIndex == -1)
                 return;
 
-            int oldSectionEndIndex = Array.FindIndex(result.PiecesOld, oldSectionStartIndex + 1, s => s.StartsWith('['));
+            int oldSectionEndIndex = Array.FindIndex(oldArr, oldSectionStartIndex + 1, s => s.StartsWith('['));
             if (oldSectionEndIndex == -1)
-                oldSectionEndIndex = result.PiecesOld.Length;
+                oldSectionEndIndex = oldArr.Length;
 
-            int newSectionStartIndex = Array.IndexOf(result.PiecesNew, $"[{section}]");
+            int newSectionStartIndex = Array.IndexOf(newArr, $"[{section}]");
             if (newSectionStartIndex == -1)
                 return;
 
-            int newSectionEndIndex = Array.FindIndex(result.PiecesNew, newSectionStartIndex + 1, s => s.StartsWith('['));
+            int newSectionEndIndex = Array.FindIndex(newArr, newSectionStartIndex + 1, s => s.StartsWith('['));
             if (newSectionEndIndex == -1)
-                newSectionEndIndex = result.PiecesNew.Length;
+                newSectionEndIndex = newArr.Length;
 
             foreach (var block in result.DiffBlocks)
             {

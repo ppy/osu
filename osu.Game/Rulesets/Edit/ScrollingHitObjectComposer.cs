@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,8 +21,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract partial class ScrollingHitObjectComposer<TObject> : HitObjectComposer<TObject>
+    public abstract partial class ScrollingHitObjectComposer<TObject, TAction> : HitObjectComposer<TObject, TAction>
         where TObject : HitObject
+        where TAction : struct, Enum
     {
         [Resolved]
         private Editor? editor { get; set; }
@@ -56,7 +58,12 @@ namespace osu.Game.Rulesets.Edit
                         Spacing = new Vector2(0, 5),
                         Children = new[]
                         {
-                            new DrawableTernaryButton(new TernaryButton(showSpeedChanges, "Show speed changes", () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt }))
+                            new DrawableTernaryButton
+                            {
+                                Current = showSpeedChanges,
+                                Description = "Show speed changes",
+                                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.TachometerAlt },
+                            }
                         }
                     },
                 });
@@ -110,6 +117,23 @@ namespace osu.Game.Rulesets.Edit
                 else
                     beatSnapGrid.SelectionTimeRange = null;
             }
+        }
+
+        public virtual SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        {
+            var scrollingPlayfield = PlayfieldAtScreenSpacePosition(screenSpacePosition) as ScrollingPlayfield;
+            if (scrollingPlayfield == null)
+                return new SnapResult(screenSpacePosition, null);
+
+            double? targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+
+            // apply beat snapping
+            targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+
+            // convert back to screen space
+            screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+
+            return new SnapResult(screenSpacePosition, targetTime, scrollingPlayfield);
         }
 
         protected override void Dispose(bool isDisposing)

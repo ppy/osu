@@ -26,10 +26,10 @@ namespace osu.Game.Localisation
 
         /// <summary>
         /// "No performance points will be awarded.
-        /// Leaderboards may be reset by the beatmap creator."
+        /// Leaderboards may be reset."
         /// </summary>
         public static LocalisableString LovedBeatmapDisclaimerContent => new TranslatableString(getKey(@"loved_beatmap_disclaimer_content"), @"No performance points will be awarded.
-Leaderboards may be reset by the beatmap creator.");
+Leaderboards may be reset.");
 
         /// <summary>
         /// "This beatmap is qualified"
@@ -42,6 +42,11 @@ Leaderboards may be reset by the beatmap creator.");
         /// </summary>
         public static LocalisableString QualifiedBeatmapDisclaimerContent => new TranslatableString(getKey(@"qualified_beatmap_disclaimer_content"), @"No performance points will be awarded.
 Leaderboards will be reset when the beatmap is ranked.");
+
+        /// <summary>
+        /// "Loading paused..."
+        /// </summary>
+        public static LocalisableString LoadingPaused => new TranslatableString(getKey(@"loading_paused"), @"Loading paused...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

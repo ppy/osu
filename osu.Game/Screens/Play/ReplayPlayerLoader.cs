@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Play
                 throw new ArgumentException($"{nameof(score)} must have a non-null {nameof(score.Replay)}.", nameof(score));
 
             Score = score.ScoreInfo;
+            WindowShouldBeActiveForGameplayStart = false;
         }
 
         public override void OnEntering(ScreenTransitionEvent e)

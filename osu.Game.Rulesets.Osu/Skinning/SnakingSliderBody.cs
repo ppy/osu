@@ -105,7 +105,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 return;
 
             // Generate the entire curve
-            drawableSlider.HitObject.Path.GetPathToProgress(CurrentCurve, 0, 1);
+            CurrentCurve.Clear();
+            CurrentCurve.AddRange(drawableSlider.HitObject.Path.CalculatedPath);
             SetVertices(CurrentCurve);
 
             // Force the body to be the final path size to avoid excessive autosize computations

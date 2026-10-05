@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModSpunOut;
         public override ModType Type => ModType.Automation;
         public override LocalisableString Description => @"Spinners will be automatically completed.";
-        public override double ScoreMultiplier => 0.9;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot), typeof(OsuModTargetPractice) };
         public override bool Ranked => UsesDefaultConfiguration;
 
@@ -37,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var spinner = (DrawableSpinner)drawable;
 
-            spinner.RotationTracker.Tracking = true;
+            spinner.RotationTracker.Tracking = spinner.RotationTracker.IsSpinnableTime;
 
             // early-return if we were paused to avoid division-by-zero in the subsequent calculations.
             if (Precision.AlmostEquals(spinner.Clock.Rate, 0))

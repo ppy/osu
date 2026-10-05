@@ -5,8 +5,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
@@ -56,8 +59,11 @@ namespace osu.Game.Overlays
         /// <param name="configManager">The <see cref="ConfigManager{T}"/> to be tracked.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="configManager"/> is null.</exception>
         /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is already being tracked from the same <paramref name="source"/>.</exception>
-        public void BeginTracking(object source, ITrackableConfigManager configManager)
+        /// <returns>An object representing the registration, that may be disposed to stop tracking the <see cref="ConfigManager{T}"/>.</returns>
+        public IDisposable BeginTracking(object source, ITrackableConfigManager configManager)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             ArgumentNullException.ThrowIfNull(configManager);
 
             if (trackedConfigManagers.ContainsKey((source, configManager)))
@@ -65,32 +71,18 @@ namespace osu.Game.Overlays
 
             var trackedSettings = configManager.CreateTrackedSettings();
             if (trackedSettings == null)
-                return;
+                return new InvokeOnDisposal(() => { });
 
             configManager.LoadInto(trackedSettings);
             trackedSettings.SettingChanged += displayTrackedSettingChange;
-
             trackedConfigManagers.Add((source, configManager), trackedSettings);
-        }
 
-        /// <summary>
-        /// Unregisters a <see cref="ConfigManager{T}"/> from having its settings tracked by this <see cref="OnScreenDisplay"/>.
-        /// </summary>
-        /// <param name="source">The object that registered the <see cref="ConfigManager{T}"/> to be tracked.</param>
-        /// <param name="configManager">The <see cref="ConfigManager{T}"/> that is being tracked.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="configManager"/> is null.</exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is not being tracked from the same <paramref name="source"/>.</exception>
-        public void StopTracking(object source, ITrackableConfigManager configManager)
-        {
-            ArgumentNullException.ThrowIfNull(configManager);
-
-            if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
-                return;
-
-            existing.Unload();
-            existing.SettingChanged -= displayTrackedSettingChange;
-
-            trackedConfigManagers.Remove((source, configManager));
+            return new InvokeOnDisposal(() =>
+            {
+                trackedSettings.Unload();
+                trackedSettings.SettingChanged -= displayTrackedSettingChange;
+                trackedConfigManagers.Remove((source, configManager));
+            });
         }
 
         /// <summary>

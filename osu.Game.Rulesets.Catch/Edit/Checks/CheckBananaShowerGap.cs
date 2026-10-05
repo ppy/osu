@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var hitObjects = context.Beatmap.HitObjects;
+            var hitObjects = context.CurrentDifficulty.Playable.HitObjects;
             (int expectedStartDelta, int expectedEndDelta) = spinner_delta_threshold[context.InterpretedDifficulty];
 
             for (int i = 0; i < hitObjects.Count - 1; ++i)

@@ -12,26 +12,47 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Statistics.User;
 using osuTK;
+using Realms;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
     public partial class StatisticsPanel : VisibilityContainer
     {
-        public const float SIDE_PADDING = 30;
+        public const float SIDE_PADDING = 20;
 
         public readonly Bindable<ScoreInfo?> Score = new Bindable<ScoreInfo?>();
+
+        /// <summary>
+        /// The score which was achieved by the local user.
+        /// If this is set to a non-null score, an <see cref="OverallRanking"/> component will be displayed showing changes to the local user's ranking and statistics
+        /// when a statistics update related to this score is received from spectator server.
+        /// </summary>
+        public ScoreInfo? AchievedScore { get; init; }
 
         protected override bool StartHidden => true;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
 
         private readonly Container content;
         private readonly LoadingSpinner spinner;
@@ -48,10 +69,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding
                 {
-                    Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 3,
+                    Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 2,
                     Right = SIDE_PADDING,
-                    Top = SIDE_PADDING,
-                    Bottom = 50 // Approximate padding to the bottom of the score panel.
                 },
                 Children = new Drawable[]
                 {
@@ -97,7 +116,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
                 Container<Drawable> container;
 
-                var statisticItems = CreateStatisticItems(newScore, task.GetResultSafely());
+                var statisticItems = CreateStatisticItems(newScore, task.GetResultSafely()).ToArray();
 
                 if (!hitEventsAvailable && statisticItems.All(c => c.RequiresHitEvents))
                 {
@@ -122,24 +141,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                 else
                 {
                     FillFlowContainer flow;
-                    container = new OsuScrollContainer(Direction.Vertical)
+                    container = flow = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Masking = false,
-                        ScrollbarOverlapsContent = false,
-                        Alpha = 0,
-                        Children = new[]
-                        {
-                            flow = new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(30, 15),
-                                Direction = FillDirection.Full,
-                            }
-                        }
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
                     };
 
                     bool anyRequiredHitEvents = false;
@@ -199,8 +208,101 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         /// <param name="newScore">The score to create the rows for.</param>
         /// <param name="playableBeatmap">The beatmap on which the score was set.</param>
-        protected virtual ICollection<StatisticItem> CreateStatisticItems(ScoreInfo newScore, IBeatmap playableBeatmap)
-            => newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap);
+        protected virtual IEnumerable<StatisticItem> CreateStatisticItems(ScoreInfo newScore, IBeatmap playableBeatmap)
+        {
+            foreach (var statistic in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
+                yield return statistic;
+
+            if (AchievedScore != null
+                && newScore.UserID > 1
+                && newScore.UserID == AchievedScore.UserID
+                && newScore.OnlineID > 0
+                && newScore.OnlineID == AchievedScore.OnlineID)
+            {
+                yield return new StatisticItem("Overall Ranking", () => new OverallRanking(newScore)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                });
+            }
+
+            if (newScore.BeatmapInfo!.OnlineID > 0
+                && api.IsLoggedIn)
+            {
+                string? preventTaggingReason = null;
+
+                // We may want to iterate on the following conditions further in the future
+
+                var localUserScore = AchievedScore ?? realm.Run(r =>
+                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
+                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
+                     .AsEnumerable()
+                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
+                     .ThenByDescending(score => score.Rank)
+                     .FirstOrDefault());
+
+                if (localUserScore == null)
+                    preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
+                else if (localUserScore.Ruleset.OnlineID != newScore.BeatmapInfo!.Ruleset.OnlineID)
+                    preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
+                else if (localUserScore.Rank < ScoreRank.C)
+                    preventTaggingReason = "Set a better score to contribute to beatmap tags!";
+                else if (localUserScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
+                    preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
+
+                if (preventTaggingReason == null)
+                {
+                    yield return new StatisticItem("Beatmap tags", () => new UserTagControl(newScore.BeatmapInfo)
+                    {
+                        Writable = true,
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+                }
+                else
+                {
+                    yield return new StatisticItem("Beatmap tags", () => new Container
+                    {
+                        Children = new Drawable[]
+                        {
+                            new UserTagControl(newScore.BeatmapInfo)
+                            {
+                                Writable = false,
+                                RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            new Container
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                AutoSizeAxes = Axes.Both,
+                                Masking = true,
+                                EdgeEffect = new EdgeEffectParameters
+                                {
+                                    Radius = 60,
+                                    Roundness = 8,
+                                    Colour = OsuColour.Gray(0.18f),
+                                    Type = EdgeEffectType.Shadow,
+                                },
+                                Children = new Drawable[]
+                                {
+                                    new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Text = preventTaggingReason,
+                                    },
+                                }
+                            },
+                        },
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    });
+                }
+            }
+        }
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -221,7 +323,10 @@ namespace osu.Game.Screens.Ranking.Statistics
             this.FadeOut(250, Easing.OutQuint);
 
             if (wasOpened)
+            {
                 popOutSample?.Play();
+                this.HidePopover(); // targeted at the user tag control
+            }
         }
 
         protected override void Dispose(bool isDisposing)

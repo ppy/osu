@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -28,6 +29,8 @@ using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
 
+// ReSharper disable AccessToDisposedClosure
+
 namespace osu.Game.Tests.Beatmaps.Formats
 {
     [TestFixture]
@@ -42,9 +45,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                ClassicAssert.AreEqual(6, working.Beatmap.BeatmapVersion);
+                Assert.That(working.Beatmap.BeatmapInfo.Ruleset.Name, Is.Not.EqualTo("null placeholder ruleset"));
+                ClassicAssert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
             }
         }
 
@@ -59,11 +62,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = applyOffsets;
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
-                Assert.AreEqual(4, working.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.Beatmap.BeatmapInfo.BeatmapVersion);
-                Assert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapInfo.BeatmapVersion);
+                ClassicAssert.AreEqual(4, working.Beatmap.BeatmapVersion);
+                ClassicAssert.AreEqual(4, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo, Array.Empty<Mod>()).BeatmapVersion);
 
-                Assert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
+                ClassicAssert.AreEqual(-1, working.BeatmapInfo.Metadata.PreviewTime);
             }
         }
 
@@ -79,17 +81,17 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmap.Metadata;
 
-                Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", metadata.AudioFile);
-                Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
-                Assert.AreEqual(164471, metadata.PreviewTime);
-                Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
-                Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
-                Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
-                Assert.IsFalse(beatmapInfo.SpecialStyle);
-                Assert.IsFalse(beatmapInfo.WidescreenStoryboard);
-                Assert.IsFalse(beatmapInfo.SamplesMatchPlaybackRate);
-                Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);
-                Assert.AreEqual(0, beatmapInfo.CountdownOffset);
+                ClassicAssert.AreEqual("03. Renatus - Soleily 192kbps.mp3", metadata.AudioFile);
+                ClassicAssert.AreEqual(0, beatmap.AudioLeadIn);
+                ClassicAssert.AreEqual(164471, metadata.PreviewTime);
+                ClassicAssert.AreEqual(0.7f, beatmap.StackLeniency);
+                ClassicAssert.True(beatmapInfo.Ruleset.OnlineID == 0);
+                ClassicAssert.False(beatmap.LetterboxInBreaks);
+                ClassicAssert.False(beatmap.SpecialStyle);
+                ClassicAssert.False(beatmap.WidescreenStoryboard);
+                ClassicAssert.False(beatmap.SamplesMatchPlaybackRate);
+                ClassicAssert.AreEqual(CountdownType.None, beatmap.Countdown);
+                ClassicAssert.AreEqual(0, beatmap.CountdownOffset);
             }
         }
 
@@ -101,7 +103,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
-                var beatmapInfo = decoder.Decode(stream).BeatmapInfo;
+                var beatmap = decoder.Decode(stream);
 
                 int[] expectedBookmarks =
                 {
@@ -109,13 +111,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     95901, 106450, 116999, 119637, 130186, 140735, 151285,
                     161834, 164471, 175020, 185570, 196119, 206669, 209306
                 };
-                Assert.AreEqual(expectedBookmarks.Length, beatmapInfo.Bookmarks.Length);
+                ClassicAssert.AreEqual(expectedBookmarks.Length, beatmap.Bookmarks.Length);
                 for (int i = 0; i < expectedBookmarks.Length; i++)
-                    Assert.AreEqual(expectedBookmarks[i], beatmapInfo.Bookmarks[i]);
-                Assert.AreEqual(1.8, beatmapInfo.DistanceSpacing);
-                Assert.AreEqual(4, beatmapInfo.BeatDivisor);
-                Assert.AreEqual(4, beatmapInfo.GridSize);
-                Assert.AreEqual(2, beatmapInfo.TimelineZoom);
+                    ClassicAssert.AreEqual(expectedBookmarks[i], beatmap.Bookmarks[i]);
+                ClassicAssert.AreEqual(1.8, beatmap.DistanceSpacing);
+                ClassicAssert.AreEqual(4, beatmap.BeatmapInfo.BeatDivisor);
+                ClassicAssert.AreEqual(4, beatmap.GridSize);
+                ClassicAssert.AreEqual(2, beatmap.TimelineZoom);
             }
         }
 
@@ -131,16 +133,16 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmap.Metadata;
 
-                Assert.AreEqual("Renatus", metadata.Title);
-                Assert.AreEqual("Renatus", metadata.TitleUnicode);
-                Assert.AreEqual("Soleily", metadata.Artist);
-                Assert.AreEqual("Soleily", metadata.ArtistUnicode);
-                Assert.AreEqual("Gamu", metadata.Author.Username);
-                Assert.AreEqual("Insane", beatmapInfo.DifficultyName);
-                Assert.AreEqual(string.Empty, metadata.Source);
-                Assert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", metadata.Tags);
-                Assert.AreEqual(557821, beatmapInfo.OnlineID);
-                Assert.AreEqual(241526, beatmapInfo.BeatmapSet?.OnlineID);
+                ClassicAssert.AreEqual("Renatus", metadata.Title);
+                ClassicAssert.AreEqual("Renatus", metadata.TitleUnicode);
+                ClassicAssert.AreEqual("Soleily", metadata.Artist);
+                ClassicAssert.AreEqual("Soleily", metadata.ArtistUnicode);
+                ClassicAssert.AreEqual("Gamu", metadata.Author.Username);
+                ClassicAssert.AreEqual("Insane", beatmapInfo.DifficultyName);
+                ClassicAssert.AreEqual(string.Empty, metadata.Source);
+                ClassicAssert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", metadata.Tags);
+                ClassicAssert.AreEqual(557821, beatmapInfo.OnlineID);
+                ClassicAssert.AreEqual(241526, beatmapInfo.BeatmapSet?.OnlineID);
             }
         }
 
@@ -154,12 +156,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var difficulty = decoder.Decode(stream).Difficulty;
 
-                Assert.AreEqual(6.5f, difficulty.DrainRate);
-                Assert.AreEqual(4, difficulty.CircleSize);
-                Assert.AreEqual(8, difficulty.OverallDifficulty);
-                Assert.AreEqual(9, difficulty.ApproachRate);
-                Assert.AreEqual(1.8, difficulty.SliderMultiplier);
-                Assert.AreEqual(2, difficulty.SliderTickRate);
+                ClassicAssert.AreEqual(6.5f, difficulty.DrainRate);
+                ClassicAssert.AreEqual(4, difficulty.CircleSize);
+                ClassicAssert.AreEqual(8, difficulty.OverallDifficulty);
+                ClassicAssert.AreEqual(9, difficulty.ApproachRate);
+                ClassicAssert.AreEqual(1.8, difficulty.SliderMultiplier);
+                ClassicAssert.AreEqual(2, difficulty.SliderTickRate);
             }
         }
 
@@ -175,10 +177,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var metadata = beatmap.Metadata;
                 var breakPoint = beatmap.Breaks[0];
 
-                Assert.AreEqual("machinetop_background.jpg", metadata.BackgroundFile);
-                Assert.AreEqual(122474, breakPoint.StartTime);
-                Assert.AreEqual(140135, breakPoint.EndTime);
-                Assert.IsTrue(breakPoint.HasEffect);
+                ClassicAssert.AreEqual("machinetop_background.jpg", metadata.BackgroundFile);
+                ClassicAssert.AreEqual(122474, breakPoint.StartTime);
+                ClassicAssert.AreEqual(140135, breakPoint.EndTime);
+                ClassicAssert.True(breakPoint.HasEffect);
             }
         }
 
@@ -193,7 +195,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmap = decoder.Decode(stream);
                 var metadata = beatmap.Metadata;
 
-                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
+                ClassicAssert.AreEqual("BG.jpg", metadata.BackgroundFile);
             }
         }
 
@@ -208,7 +210,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmap = decoder.Decode(stream);
                 var metadata = beatmap.Metadata;
 
-                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
+                ClassicAssert.AreEqual("BG.jpg", metadata.BackgroundFile);
             }
         }
 
@@ -223,7 +225,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmap = decoder.Decode(stream);
                 var metadata = beatmap.Metadata;
 
-                Assert.AreEqual("BG.jpg", metadata.BackgroundFile);
+                ClassicAssert.AreEqual("BG.jpg", metadata.BackgroundFile);
             }
         }
 
@@ -238,67 +240,67 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var beatmap = decoder.Decode(stream);
                 var controlPoints = (LegacyControlPointInfo)beatmap.ControlPointInfo;
 
-                Assert.AreEqual(4, controlPoints.TimingPoints.Count);
-                Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
-                Assert.AreEqual(34, controlPoints.SamplePoints.Count);
-                Assert.AreEqual(8, controlPoints.EffectPoints.Count);
+                ClassicAssert.AreEqual(4, controlPoints.TimingPoints.Count);
+                ClassicAssert.AreEqual(5, controlPoints.DifficultyPoints.Count);
+                ClassicAssert.AreEqual(34, controlPoints.SamplePoints.Count);
+                ClassicAssert.AreEqual(8, controlPoints.EffectPoints.Count);
 
                 var timingPoint = controlPoints.TimingPointAt(0);
-                Assert.AreEqual(956, timingPoint.Time);
-                Assert.AreEqual(329.67032967033, timingPoint.BeatLength);
-                Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
-                Assert.IsFalse(timingPoint.OmitFirstBarLine);
+                ClassicAssert.AreEqual(956, timingPoint.Time);
+                ClassicAssert.AreEqual(329.67032967033, timingPoint.BeatLength);
+                ClassicAssert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                ClassicAssert.False(timingPoint.OmitFirstBarLine);
 
                 timingPoint = controlPoints.TimingPointAt(48428);
-                Assert.AreEqual(956, timingPoint.Time);
-                Assert.AreEqual(329.67032967033d, timingPoint.BeatLength);
-                Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
-                Assert.IsFalse(timingPoint.OmitFirstBarLine);
+                ClassicAssert.AreEqual(956, timingPoint.Time);
+                ClassicAssert.AreEqual(329.67032967033d, timingPoint.BeatLength);
+                ClassicAssert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                ClassicAssert.False(timingPoint.OmitFirstBarLine);
 
                 timingPoint = controlPoints.TimingPointAt(119637);
-                Assert.AreEqual(119637, timingPoint.Time);
-                Assert.AreEqual(659.340659340659, timingPoint.BeatLength);
-                Assert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
-                Assert.IsFalse(timingPoint.OmitFirstBarLine);
+                ClassicAssert.AreEqual(119637, timingPoint.Time);
+                ClassicAssert.AreEqual(659.340659340659, timingPoint.BeatLength);
+                ClassicAssert.AreEqual(TimeSignature.SimpleQuadruple, timingPoint.TimeSignature);
+                ClassicAssert.False(timingPoint.OmitFirstBarLine);
 
                 var difficultyPoint = controlPoints.DifficultyPointAt(0);
-                Assert.AreEqual(0, difficultyPoint.Time);
-                Assert.AreEqual(1.0, difficultyPoint.SliderVelocity);
+                ClassicAssert.AreEqual(0, difficultyPoint.Time);
+                ClassicAssert.AreEqual(1.0, difficultyPoint.SliderVelocity);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(48428);
-                Assert.AreEqual(0, difficultyPoint.Time);
-                Assert.AreEqual(1.0, difficultyPoint.SliderVelocity);
+                ClassicAssert.AreEqual(0, difficultyPoint.Time);
+                ClassicAssert.AreEqual(1.0, difficultyPoint.SliderVelocity);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(116999);
-                Assert.AreEqual(116999, difficultyPoint.Time);
-                Assert.AreEqual(0.75, difficultyPoint.SliderVelocity, 0.1);
+                ClassicAssert.AreEqual(116999, difficultyPoint.Time);
+                ClassicAssert.AreEqual(0.75, difficultyPoint.SliderVelocity, 0.1);
 
                 var soundPoint = controlPoints.SamplePointAt(0);
-                Assert.AreEqual(956, soundPoint.Time);
-                Assert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
-                Assert.AreEqual(60, soundPoint.SampleVolume);
+                ClassicAssert.AreEqual(956, soundPoint.Time);
+                ClassicAssert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
+                ClassicAssert.AreEqual(60, soundPoint.SampleVolume);
 
                 soundPoint = controlPoints.SamplePointAt(53373);
-                Assert.AreEqual(53373, soundPoint.Time);
-                Assert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
-                Assert.AreEqual(60, soundPoint.SampleVolume);
+                ClassicAssert.AreEqual(53373, soundPoint.Time);
+                ClassicAssert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
+                ClassicAssert.AreEqual(60, soundPoint.SampleVolume);
 
                 soundPoint = controlPoints.SamplePointAt(119637);
-                Assert.AreEqual(119637, soundPoint.Time);
-                Assert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
-                Assert.AreEqual(80, soundPoint.SampleVolume);
+                ClassicAssert.AreEqual(119637, soundPoint.Time);
+                ClassicAssert.AreEqual(HitSampleInfo.BANK_SOFT, soundPoint.SampleBank);
+                ClassicAssert.AreEqual(80, soundPoint.SampleVolume);
 
                 var effectPoint = controlPoints.EffectPointAt(0);
-                Assert.AreEqual(0, effectPoint.Time);
-                Assert.IsFalse(effectPoint.KiaiMode);
+                ClassicAssert.AreEqual(0, effectPoint.Time);
+                ClassicAssert.False(effectPoint.KiaiMode);
 
                 effectPoint = controlPoints.EffectPointAt(53703);
-                Assert.AreEqual(53703, effectPoint.Time);
-                Assert.IsTrue(effectPoint.KiaiMode);
+                ClassicAssert.AreEqual(53703, effectPoint.Time);
+                ClassicAssert.True(effectPoint.KiaiMode);
 
                 effectPoint = controlPoints.EffectPointAt(116637);
-                Assert.AreEqual(95901, effectPoint.Time);
-                Assert.IsFalse(effectPoint.KiaiMode);
+                ClassicAssert.AreEqual(95901, effectPoint.Time);
+                ClassicAssert.False(effectPoint.KiaiMode);
             }
         }
 
@@ -398,9 +400,38 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(255, 177, 140, 255),
                     new Color4(100, 100, 100, 255), // alpha is specified as 100, but should be ignored.
                 };
-                Assert.AreEqual(expectedColors.Length, comboColors.Count);
+                ClassicAssert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
-                    Assert.AreEqual(expectedColors[i], comboColors[i]);
+                    ClassicAssert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestComboColourCountIsLimitedToEight()
+        {
+            var decoder = new LegacySkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("too-many-combo-colours.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var comboColors = decoder.Decode(stream).ComboColours;
+
+                Debug.Assert(comboColors != null);
+
+                Color4[] expectedColors =
+                {
+                    new Color4(142, 199, 255, 255),
+                    new Color4(255, 128, 128, 255),
+                    new Color4(128, 255, 255, 255),
+                    new Color4(128, 255, 128, 255),
+                    new Color4(255, 187, 255, 255),
+                    new Color4(255, 177, 140, 255),
+                    new Color4(100, 100, 100, 255),
+                    new Color4(142, 199, 255, 255),
+                };
+                ClassicAssert.AreEqual(expectedColors.Length, comboColors.Count);
+                for (int i = 0; i < expectedColors.Length; i++)
+                    ClassicAssert.AreEqual(expectedColors[i], comboColors[i]);
             }
         }
 
@@ -436,12 +467,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(1, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
-                Assert.AreEqual(2, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
-                Assert.AreEqual(3, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
-                Assert.AreEqual(8, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
-                Assert.AreEqual(9, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(1, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(2, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(3, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(8, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(9, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
             }
         }
 
@@ -459,12 +490,46 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new CatchBeatmapProcessor(converted).PreProcess();
                 new CatchBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(1, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
-                Assert.AreEqual(2, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
-                Assert.AreEqual(3, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
-                Assert.AreEqual(8, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
-                Assert.AreEqual(9, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(1, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(2, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(3, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(8, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                ClassicAssert.AreEqual(9, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapHitObjectCoordinatesLegacy()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("hitobject-coordinates-legacy.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                var positionData = hitObjects[0] as IHasPosition;
+
+                ClassicAssert.NotNull(positionData);
+                ClassicAssert.AreEqual(new Vector2(256, 256), positionData!.Position);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapHitObjectCoordinatesLazer()
+        {
+            var decoder = new LegacyBeatmapDecoder(LegacyBeatmapEncoder.FIRST_LAZER_VERSION);
+
+            using (var resStream = TestResources.OpenResource("hitobject-coordinates-lazer.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                var positionData = hitObjects[0] as IHasPosition;
+
+                ClassicAssert.NotNull(positionData);
+                ClassicAssert.AreEqual(new Vector2(256.99853f, 256.001f), positionData!.Position);
             }
         }
 
@@ -481,18 +546,18 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var curveData = hitObjects[0] as IHasPathWithRepeats;
                 var positionData = hitObjects[0] as IHasPosition;
 
-                Assert.IsNotNull(positionData);
-                Assert.IsNotNull(curveData);
-                Assert.AreEqual(new Vector2(192, 168), positionData!.Position);
-                Assert.AreEqual(956, hitObjects[0].StartTime);
-                Assert.IsTrue(hitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
+                ClassicAssert.NotNull(positionData);
+                ClassicAssert.NotNull(curveData);
+                ClassicAssert.AreEqual(new Vector2(192, 168), positionData!.Position);
+                ClassicAssert.AreEqual(956, hitObjects[0].StartTime);
+                ClassicAssert.True(hitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
 
                 positionData = hitObjects[1] as IHasPosition;
 
-                Assert.IsNotNull(positionData);
-                Assert.AreEqual(new Vector2(304, 56), positionData!.Position);
-                Assert.AreEqual(1285, hitObjects[1].StartTime);
-                Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
+                ClassicAssert.NotNull(positionData);
+                ClassicAssert.AreEqual(new Vector2(304, 56), positionData!.Position);
+                ClassicAssert.AreEqual(1285, hitObjects[1].StartTime);
+                ClassicAssert.True(hitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
             }
         }
 
@@ -523,22 +588,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
-                Assert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
-                Assert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
-                Assert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
 
                 // The fourth object is a slider.
                 // `Samples` of a slider are presumed to control the volume of sounds that last the entire duration of the slider
                 // (such as ticks, slider slide sounds, etc.)
                 // Thus, the point of query of control points used for `Samples` is just beyond the start time of the slider.
-                Assert.AreEqual("Gameplay/soft-hitnormal11", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/soft-hitnormal11", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
 
                 // That said, the `NodeSamples` of the slider are responsible for the sounds of the slider's head / tail / repeats / large ticks etc.
                 // Therefore, they should be read at the time instant correspondent to the given node.
                 // This means that the tail should use bank 8 rather than 11.
-                Assert.AreEqual("Gameplay/soft-hitnormal11", ((ConvertSlider)hitObjects[4]).NodeSamples[0][0].LookupNames.First());
-                Assert.AreEqual("Gameplay/soft-hitnormal8", ((ConvertSlider)hitObjects[4]).NodeSamples[1][0].LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/soft-hitnormal11", ((ConvertSlider)hitObjects[4]).NodeSamples[0][0].LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/soft-hitnormal8", ((ConvertSlider)hitObjects[4]).NodeSamples[1][0].LookupNames.First());
             }
 
             static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
@@ -554,9 +619,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
-                Assert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
-                Assert.AreEqual("Gameplay/normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
             }
 
             static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
@@ -572,11 +637,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual("hit_1.wav", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
-                Assert.AreEqual("hit_2.wav", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
-                Assert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
-                Assert.AreEqual("hit_1.wav", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
-                Assert.AreEqual(70, getTestableSampleInfo(hitObjects[3]).Volume);
+                ClassicAssert.AreEqual("hit_1.wav", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
+                ClassicAssert.AreEqual("hit_2.wav", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
+                ClassicAssert.AreEqual("Gameplay/normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
+                ClassicAssert.AreEqual("hit_1.wav", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
+                ClassicAssert.AreEqual(70, getTestableSampleInfo(hitObjects[3]).Volume);
             }
 
             static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.Samples[0];
@@ -594,35 +659,35 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 var slider1 = (ConvertSlider)hitObjects[0];
 
-                Assert.AreEqual(1, slider1.NodeSamples[0].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[0][0].Name);
-                Assert.AreEqual(1, slider1.NodeSamples[1].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[1][0].Name);
-                Assert.AreEqual(1, slider1.NodeSamples[2].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[2][0].Name);
+                ClassicAssert.AreEqual(1, slider1.NodeSamples[0].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[0][0].Name);
+                ClassicAssert.AreEqual(1, slider1.NodeSamples[1].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[1][0].Name);
+                ClassicAssert.AreEqual(1, slider1.NodeSamples[2].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[2][0].Name);
 
                 var slider2 = (ConvertSlider)hitObjects[1];
 
-                Assert.AreEqual(2, slider2.NodeSamples[0].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[0][0].Name);
-                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[0][1].Name);
-                Assert.AreEqual(2, slider2.NodeSamples[1].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[1][0].Name);
-                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[1][1].Name);
-                Assert.AreEqual(2, slider2.NodeSamples[2].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[2][0].Name);
-                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[2][1].Name);
+                ClassicAssert.AreEqual(2, slider2.NodeSamples[0].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[0][0].Name);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[0][1].Name);
+                ClassicAssert.AreEqual(2, slider2.NodeSamples[1].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[1][0].Name);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[1][1].Name);
+                ClassicAssert.AreEqual(2, slider2.NodeSamples[2].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[2][0].Name);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[2][1].Name);
 
                 var slider3 = (ConvertSlider)hitObjects[2];
 
-                Assert.AreEqual(2, slider3.NodeSamples[0].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[0][0].Name);
-                Assert.AreEqual(HitSampleInfo.HIT_WHISTLE, slider3.NodeSamples[0][1].Name);
-                Assert.AreEqual(1, slider3.NodeSamples[1].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[1][0].Name);
-                Assert.AreEqual(2, slider3.NodeSamples[2].Count);
-                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[2][0].Name);
-                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
+                ClassicAssert.AreEqual(2, slider3.NodeSamples[0].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[0][0].Name);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_WHISTLE, slider3.NodeSamples[0][1].Name);
+                ClassicAssert.AreEqual(1, slider3.NodeSamples[1].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[1][0].Name);
+                ClassicAssert.AreEqual(2, slider3.NodeSamples[2].Count);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[2][0].Name);
+                ClassicAssert.AreEqual(HitSampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
             }
         }
 
@@ -636,7 +701,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
+                ClassicAssert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
             }
         }
 
@@ -677,10 +742,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             static void assertObjectHasBanks(HitObject hitObject, string normalBank, string? additionsBank = null)
             {
-                Assert.AreEqual(normalBank, hitObject.Samples[0].Bank);
+                ClassicAssert.AreEqual(normalBank, hitObject.Samples[0].Bank);
 
                 if (additionsBank != null)
-                    Assert.AreEqual(additionsBank, hitObject.Samples[1].Bank);
+                    ClassicAssert.AreEqual(additionsBank, hitObject.Samples[1].Bank);
             }
         }
 
@@ -694,11 +759,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
-                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                ClassicAssert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
-                Assert.IsNotNull(beatmap);
-                Assert.AreEqual("Beatmap with corrupted header", beatmap.Metadata.Title);
-                Assert.AreEqual("Evil Hacker", beatmap.Metadata.Author.Username);
+                ClassicAssert.NotNull(beatmap);
+                ClassicAssert.AreEqual("Beatmap with corrupted header", beatmap.Metadata.Title);
+                ClassicAssert.AreEqual("Evil Hacker", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -712,11 +777,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
-                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                ClassicAssert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
-                Assert.IsNotNull(beatmap);
-                Assert.AreEqual("Beatmap with no header", beatmap.Metadata.Title);
-                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.Author.Username);
+                ClassicAssert.NotNull(beatmap);
+                ClassicAssert.AreEqual("Beatmap with no header", beatmap.Metadata.Title);
+                ClassicAssert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -730,11 +795,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
-                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                ClassicAssert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
-                Assert.IsNotNull(beatmap);
-                Assert.AreEqual("Empty lines at start", beatmap.Metadata.Title);
-                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
+                ClassicAssert.NotNull(beatmap);
+                ClassicAssert.AreEqual("Empty lines at start", beatmap.Metadata.Title);
+                ClassicAssert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -748,11 +813,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
-                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                ClassicAssert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
-                Assert.IsNotNull(beatmap);
-                Assert.AreEqual("The dog ate the file header", beatmap.Metadata.Title);
-                Assert.AreEqual("Why does this keep happening", beatmap.Metadata.Author.Username);
+                ClassicAssert.NotNull(beatmap);
+                ClassicAssert.AreEqual("The dog ate the file header", beatmap.Metadata.Title);
+                ClassicAssert.AreEqual("Why does this keep happening", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -766,11 +831,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
-                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                ClassicAssert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
                 Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
-                Assert.IsNotNull(beatmap);
-                Assert.AreEqual("No empty line delimiting header from contents", beatmap.Metadata.Title);
-                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
+                ClassicAssert.NotNull(beatmap);
+                ClassicAssert.AreEqual("No empty line delimiting header from contents", beatmap.Metadata.Title);
+                ClassicAssert.AreEqual("Edge Case Hunter", beatmap.Metadata.Author.Username);
             }
         }
 
@@ -793,7 +858,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
-                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                ClassicAssert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
             }
 
             Assert.DoesNotThrow(LegacyDifficultyCalculatorBeatmapDecoder.Register);
@@ -802,7 +867,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = new LineBufferedReader(resStream))
             {
                 Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
-                Assert.IsInstanceOf<LegacyDifficultyCalculatorBeatmapDecoder>(decoder);
+                ClassicAssert.IsInstanceOf<LegacyDifficultyCalculatorBeatmapDecoder>(decoder);
             }
         }
 
@@ -959,15 +1024,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.Multiple(() =>
                 {
-                    Assert.That(decoded.BeatmapInfo.AudioLeadIn, Is.EqualTo(0));
-                    Assert.That(decoded.BeatmapInfo.StackLeniency, Is.EqualTo(0.7f));
-                    Assert.That(decoded.BeatmapInfo.SpecialStyle, Is.False);
-                    Assert.That(decoded.BeatmapInfo.LetterboxInBreaks, Is.False);
-                    Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
-                    Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
-                    Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
-                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
-                    Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
+                    Assert.That(decoded.AudioLeadIn, Is.EqualTo(0));
+                    Assert.That(decoded.StackLeniency, Is.EqualTo(0.7f));
+                    Assert.That(decoded.SpecialStyle, Is.False);
+                    Assert.That(decoded.LetterboxInBreaks, Is.False);
+                    Assert.That(decoded.WidescreenStoryboard, Is.False);
+                    Assert.That(decoded.EpilepsyWarning, Is.False);
+                    Assert.That(decoded.SamplesMatchPlaybackRate, Is.False);
+                    Assert.That(decoded.Countdown, Is.EqualTo(CountdownType.None));
+                    Assert.That(decoded.CountdownOffset, Is.EqualTo(0));
                     Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
                     Assert.That(decoded.BeatmapInfo.Ruleset.OnlineID, Is.EqualTo(0));
                 });

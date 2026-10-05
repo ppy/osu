@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Users;
 
@@ -33,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Texture = textures.Get(banner.Image),
             };
 
-            Action = () => game?.OpenUrlExternally($@"{api.WebsiteRootUrl}/community/tournaments/{banner.TournamentId}");
+            Action = () => game?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/community/tournaments/{banner.TournamentId}");
         }
 
         protected override void LoadComplete()
@@ -48,6 +49,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Height = DrawWidth * banner_aspect_ratio;
         }
 
-        public override LocalisableString TooltipText => "view in browser";
+        public override LocalisableString TooltipText => CommonStrings.ViewInBrowser;
     }
 }

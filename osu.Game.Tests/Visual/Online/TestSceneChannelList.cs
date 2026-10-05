@@ -1,21 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.ChannelList;
 using osu.Game.Overlays.Chat.Listing;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -28,9 +25,9 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
 
-        private OsuSpriteText selectedText;
-        private OsuSpriteText leaveText;
-        private ChannelList channelList;
+        private OsuSpriteText selectedText = null!;
+        private OsuSpriteText leaveText = null!;
+        private ChannelList channelList = null!;
 
         [SetUp]
         public void SetUp()
@@ -100,8 +97,8 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        [Test]
+        public void TestBasic()
         {
             AddStep("Add Public Channels", () =>
             {
@@ -115,16 +112,14 @@ namespace osu.Game.Tests.Visual.Online
                     channelList.AddChannel(createRandomPrivateChannel());
             });
 
+            AddStep("Add Team Channel", () => channelList.AddChannel(createRandomTeamChannel()));
+
             AddStep("Add Announce Channels", () =>
             {
                 for (int i = 0; i < 2; i++)
                     channelList.AddChannel(createRandomAnnounceChannel());
             });
-        }
 
-        [Test]
-        public void TestVisual()
-        {
             AddStep("Unread Selected", () =>
             {
                 if (validItem)
@@ -156,11 +151,23 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        [Test]
+        public void TestManyChannels()
+        {
+            AddStep("Add Public Channels", () =>
+            {
+                for (int i = 0; i < 500; i++)
+                    channelList.AddChannel(createRandomPublicChannel());
+                for (int i = 0; i < 500; i++)
+                    channelList.AddChannel(createRandomPrivateChannel());
+            });
+        }
+
         private bool validItem => selected.Value != null && !(selected.Value is ChannelListing.ChannelListingChannel);
 
         private Channel createRandomPublicChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = TestResources.GetNextTestID();
             return new Channel
             {
                 Name = $"#channel-{id}",
@@ -171,7 +178,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createRandomPrivateChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = TestResources.GetNextTestID();
             return new Channel(new APIUser
             {
                 Id = id,
@@ -181,11 +188,22 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel createRandomAnnounceChannel()
         {
-            int id = RNG.Next(0, 10000);
+            int id = TestResources.GetNextTestID();
             return new Channel
             {
                 Name = $"Announce {id}",
                 Type = ChannelType.Announce,
+                Id = id,
+            };
+        }
+
+        private Channel createRandomTeamChannel()
+        {
+            int id = TestResources.GetNextTestID();
+            return new Channel
+            {
+                Name = $"Team {id}",
+                Type = ChannelType.Team,
                 Id = id,
             };
         }

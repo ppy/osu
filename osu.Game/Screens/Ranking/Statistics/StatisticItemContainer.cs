@@ -5,11 +5,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -28,75 +28,99 @@ namespace osu.Game.Screens.Ranking.Statistics
             AutoSizeAxes = Axes.Y;
 
             Padding = new MarginPadding(5);
+            Width = item.FullWidth ? 1 : 0.5f;
 
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Masking = true,
-                CornerRadius = 6,
-                Children = new Drawable[]
+                CornerRadius = 20,
+                CornerExponent = 2.5f,
+                Children = new[]
                 {
                     new Box
                     {
                         Colour = ColourInfo.GradientVertical(
-                            OsuColour.Gray(0.25f),
-                            OsuColour.Gray(0.18f)
+                            OsuColour.Gray(0.25f).Opacity(0.8f),
+                            OsuColour.Gray(0.18f).Opacity(0.95f)
                         ),
-                        Alpha = 0.95f,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding(5),
+                        Padding = new MarginPadding(2),
                         Children = new[]
                         {
-                            createHeader(item),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding(10) { Top = 30 },
+                                Padding = new MarginPadding(15) { Top = 40 },
                                 Child = item.CreateContent()
-                            }
+                            },
                         }
                     },
-                }
-            };
-        }
-
-        private static Drawable createHeader(StatisticItem item)
-        {
-            if (LocalisableString.IsNullOrEmpty(item.Name))
-                return Empty();
-
-            return new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 20,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5, 0),
-                Children = new Drawable[]
-                {
-                    new Circle
+                    new Container
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Height = 9,
-                        Width = 4,
-                        Colour = Color4Extensions.FromHex("#00FFAA")
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = ColourInfo.GradientVertical(
+                                    OsuColour.Gray(0.25f),
+                                    OsuColour.Gray(0.25f).Opacity(0)
+                                ),
+                                RelativeSizeAxes = Axes.X,
+                                Height = 30,
+                            },
+                            new Box
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Colour = ColourInfo.GradientVertical(
+                                    OsuColour.Gray(0.18f).Opacity(0),
+                                    OsuColour.Gray(0.18f)
+                                ),
+                                RelativeSizeAxes = Axes.X,
+                                Height = 20,
+                            },
+                        }
                     },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Text = item.Name,
-                        Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold),
-                    }
+                    LocalisableString.IsNullOrEmpty(item.Name)
+                        ? Empty()
+                        : new StatisticItemHeader
+                        {
+                            Text = item.Name
+                        },
                 }
             };
+
+            AddInternal(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 20,
+                CornerExponent = 2.5f,
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Radius = 2,
+                    Hollow = true,
+                    Colour = OsuColour.Gray(0.18f),
+                    Type = EdgeEffectType.Shadow,
+                },
+                Children = new[]
+                {
+                    new Box
+                    {
+                        Colour = Color4.Transparent,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                }
+            });
         }
     }
 }

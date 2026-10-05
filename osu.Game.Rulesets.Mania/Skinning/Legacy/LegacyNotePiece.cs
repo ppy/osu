@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private Drawable noteAnimation = null!;
 
-        private float? minimumColumnWidth;
+        private float? widthForNoteHeightScale;
 
         public LegacyNotePiece()
         {
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, IScrollingInfo scrollingInfo)
         {
-            minimumColumnWidth = skin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.MinimumColumnWidth))?.Value;
+            widthForNoteHeightScale = skin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.WidthForNoteHeightScale))?.Value;
 
             InternalChild = directionContainer = new Container
             {
@@ -60,9 +60,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             if (texture != null)
             {
-                // The height is scaled to the minimum column width, if provided.
-                float minimumWidth = minimumColumnWidth ?? DrawWidth;
-                noteAnimation.Scale = Vector2.Divide(new Vector2(DrawWidth, minimumWidth), texture.DisplayWidth);
+                float noteHeight = widthForNoteHeightScale ?? DrawWidth;
+                noteAnimation.Scale = Vector2.Divide(new Vector2(DrawWidth, noteHeight), texture.DisplayWidth);
             }
         }
 

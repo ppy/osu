@@ -10,7 +10,7 @@ namespace osu.Game.Screens
     /// </summary>
     public abstract partial class StartupScreen : OsuScreen
     {
-        public override bool AllowBackButton => false;
+        public override bool AllowUserExit => false;
 
         public override bool HideOverlaysOnEnter => true;
 

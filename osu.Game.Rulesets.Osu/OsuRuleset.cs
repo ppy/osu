@@ -4,7 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -12,11 +15,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
+using osu.Game.Localisation.Osu;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
@@ -39,6 +45,8 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -58,14 +66,32 @@ namespace osu.Game.Rulesets.Osu
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.Z, OsuAction.LeftButton),
-            new KeyBinding(InputKey.X, OsuAction.RightButton),
-            new KeyBinding(InputKey.C, OsuAction.Smoke),
-            new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
-            new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.Z, OsuAction.LeftButton),
+                        new KeyBinding(InputKey.X, OsuAction.RightButton),
+                        new KeyBinding(InputKey.C, OsuAction.Smoke),
+                        new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
+                        new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
+                    };
+
+                case EDITOR_VARIANT:
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, OsuAction.EditorHitCircleTool),
+                        new KeyBinding(InputKey.Number3, OsuAction.EditorSliderTool),
+                        new KeyBinding(InputKey.Number4, OsuAction.EditorSpinnerTool),
+                        new KeyBinding(InputKey.Number5, OsuAction.EditorGridFromPointsTool),
+                        new KeyBinding(InputKey.T, OsuAction.EditorToggleGridSnap),
+                        new KeyBinding(InputKey.Y, OsuAction.EditorToggleDistanceSnap),
+                    ];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
@@ -168,7 +194,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModHardRock(),
                         new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
-                        new OsuModHidden(),
+                        new MultiMod(new OsuModHidden(), new OsuModTraceable()),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
                         new OsuModStrictTracking(),
                         new OsuModAccuracyChallenge(),
@@ -202,7 +228,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModSpinIn(),
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
                         new MultiMod(new ModWindUp(), new ModWindDown()),
-                        new OsuModTraceable(),
                         new OsuModBarrelRoll(),
                         new OsuModApproachDifferent(),
                         new OsuModMuted(),
@@ -212,7 +237,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModFreezeFrame(),
                         new OsuModBubbles(),
                         new OsuModSynesthesia(),
-                        new OsuModDepth()
+                        new OsuModDepth(),
+                        new OsuModBloom()
                     };
 
                 case ModType.System:
@@ -225,6 +251,14 @@ namespace osu.Game.Rulesets.Osu
                 default:
                     return Array.Empty<Mod>();
             }
+        }
+
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context)
+        {
+            if (context.Score != null && context.Score.TotalScoreVersion < 30000017)
+                return new OsuScoreMultiplierCalculatorV1(context);
+
+            return new OsuScoreMultiplierCalculatorV2(context);
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
@@ -270,19 +304,24 @@ namespace osu.Game.Rulesets.Osu
 
         public override IRulesetConfigManager CreateConfig(SettingsStore? settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
                 HitResult.Great,
                 HitResult.Ok,
                 HitResult.Meh,
+                HitResult.Miss,
 
                 HitResult.LargeTickHit,
+                HitResult.LargeTickMiss,
                 HitResult.SmallTickHit,
+                HitResult.SmallTickMiss,
                 HitResult.SliderTailHit,
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 
@@ -313,47 +352,147 @@ namespace osu.Game.Rulesets.Osu
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                new StatisticItem("Timing Distribution", () => new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(15),
+                    Children = new Drawable[]
+                    {
+                        new HitEventTimingDistributionGraph(timedHitEvents)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 150
+                        },
+                        new SimpleStatisticTable(1, new SimpleStatisticItem[]
+                        {
+                            new AverageHitError(timedHitEvents),
+                            new UnstableRate(timedHitEvents)
+                        })
+                    }
+                }, requiresHitEvents: true, fullWidth: false),
                 new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
-                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
-                {
-                    new AverageHitError(timedHitEvents),
-                    new UnstableRate(timedHitEvents)
-                }), true)
+                    Height = 150 + 15 + StatisticItem.FONT_SIZE * 2,
+                }, requiresHitEvents: true, fullWidth: false),
             };
         }
 
-        public override RulesetSetupSection CreateEditorSetupSection() => new OsuSetupSection();
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
+        [
+            new MetadataSection(),
+            new OsuDifficultySection(),
+            new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(SetupScreen.SPACING),
+                Children = new Drawable[]
+                {
+                    new ResourcesSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    },
+                    new ColoursSection
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    }
+                }
+            },
+            new DesignSection(),
+        ];
 
         /// <seealso cref="OsuHitObject.ApplyDefaultsToSelf"/>
         /// <seealso cref="OsuHitWindows"/>
-        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo difficulty, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(difficulty, mods);
+            double rate = ModUtils.CalculateRateWithMods(mods);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
             preempt /= rate;
             adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
 
-            var greatHitWindowRange = OsuHitWindows.OSU_RANGES.Single(range => range.Result == HitResult.Great);
-            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, OsuHitWindows.GREAT_WINDOW_RANGE);
             greatHitWindow /= rate;
-            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, OsuHitWindows.GREAT_WINDOW_RANGE);
 
             return adjustedDifficulty;
         }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var originalDifficulty = beatmapInfo.Difficulty;
+            // `modAdjustedDifficulty` contains only the direct effect of mods.
+            // `effectiveDifficulty` contains the "perceived" effect of rate-adjusting mods on OD and AR.
+            // we make a distinction here, because some of the calculations below will require very careful maneuvering between the two for correct results.
+            var modAdjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var effectiveDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
+
+            // for circle size, we can use `effectiveDifficulty` directly
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
+            {
+                Description = OsuRulesetStrings.CircleSizeDescription,
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.HitCircleRadius,
+                        (OsuHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize, applyFudge: true)).ToLocalisableString("0.#"))
+                ]
+            };
+
+            // for approach rate, we can use `effectiveDifficulty` directly, and it is even convenient to do so (it correctly handles rate-changing mods like DT/HT)
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
+            {
+                Description = OsuRulesetStrings.ApproachRateDescription,
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.ApproachTime,
+                        LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, OsuHitObject.PREEMPT_RANGE):#,0.##} ms"))
+                ]
+            };
+
+            // for OD is where it gets difficult.
+            // when displaying hit window ranges with rate-changing mods active, we will want to adjust for rate ourselves, as `effectiveDifficulty` may not be accurate
+            // because `OsuHitWindows` applies a floor-and-round operation that will result in inaccurate results
+            // (the floor-and-round needs to happen *before* rate is taken into account, not after).
+            // for spinner RPM requirements, we do not want to involve rate-changing mods *at all*,
+            // because rate-adjusting mods do not change the spin requirement (see `SpinnerRotationTracker.AddRotation()`).
+            var hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(modAdjustedDifficulty.OverallDifficulty);
+            double rate = ModUtils.CalculateRateWithMods(mods);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
+            {
+                Description = OsuRulesetStrings.AccuracyDescription,
+                AdditionalMetrics = hitWindows.GetAllAvailableWindows()
+                                              .Reverse()
+                                              .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
+                                                  colours.ForHitResult(window.result)
+                                              )).Concat([
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToClearSpinners,
+                                                      LocalisableString.Interpolate(
+                                                          $@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.CLEAR_RPM_RANGE):N0} RPM")),
+                                                  new RulesetBeatmapAttribute.AdditionalMetric(OsuRulesetStrings.RpmRequiredToGetFullSpinnerBonus,
+                                                      LocalisableString.Interpolate(
+                                                          $@"{IBeatmapDifficultyInfo.DifficultyRange(modAdjustedDifficulty.OverallDifficulty, Spinner.COMPLETE_RPM_RANGE):N0} RPM")),
+                                              ]).ToArray()
+            };
+
+            // HP drain is thankfully simple enough.
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
+            {
+                Description = SongSelectStrings.HPDrainDescription
+            };
+        }
+
+        public override bool EditorShowScrollSpeed => false;
     }
 }

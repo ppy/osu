@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public abstract partial class DrawableTaikoHitObject : DrawableHitObject<TaikoHitObject>, IKeyBindingHandler<TaikoAction>
     {
+        [CanBeNull]
+        public new DrawableTaikoHitObject ParentHitObject => base.ParentHitObject as DrawableTaikoHitObject;
+
         protected readonly Container Content;
         private readonly Container proxiedContent;
 
@@ -130,7 +133,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public new TObject HitObject => (TObject)base.HitObject;
 
-        protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
         protected DrawableTaikoHitObject([CanBeNull] TObject hitObject)
@@ -152,14 +154,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected virtual void RecreatePieces()
         {
-            Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
-
             if (MainPiece != null)
                 Content.Remove(MainPiece, true);
 
-            Content.Add(MainPiece = CreateMainPiece());
+            MainPiece = CreateMainPiece();
+
+            if (MainPiece != null)
+                Content.Add(MainPiece);
         }
 
+        [CanBeNull]
         protected abstract SkinnableDrawable CreateMainPiece();
     }
 }

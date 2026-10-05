@@ -3,15 +3,14 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
@@ -26,35 +25,33 @@ namespace osu.Game.Tests.Editing
     public partial class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
     {
         private TestHitObjectComposer composer = null!;
-
-        [Cached(typeof(EditorBeatmap))]
-        [Cached(typeof(IBeatSnapProvider))]
-        private readonly EditorBeatmap editorBeatmap;
-
-        protected override Container<Drawable> Content { get; } = new PopoverContainer { RelativeSizeAxes = Axes.Both };
-
-        public TestSceneHitObjectComposerDistanceSnapping()
-        {
-            base.Content.Add(new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    editorBeatmap = new EditorBeatmap(new OsuBeatmap
-                    {
-                        BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
-                    }),
-                    Content
-                },
-            });
-        }
+        private EditorBeatmap editorBeatmap = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Children = new Drawable[]
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap
             {
-                composer = new TestHitObjectComposer()
+                BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo },
+            });
+
+            Child = new DependencyProvidingContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                CachedDependencies =
+                [
+                    (typeof(EditorBeatmap), editorBeatmap),
+                    (typeof(IBeatSnapProvider), editorBeatmap)
+                ],
+                Children = new Drawable[]
+                {
+                    editorBeatmap,
+                    new PopoverContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = composer = new TestHitObjectComposer()
+                    }
+                }
             };
 
             BeatDivisor.Value = 1;
@@ -70,17 +67,7 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
 
-            assertSnapDistance(100 * multiplier, null, true);
-        }
-
-        [TestCase(1)]
-        [TestCase(2)]
-        public void TestSpeedMultiplierDoesNotChangeDistanceSnap(float multiplier)
-        {
-            assertSnapDistance(100, new Slider
-            {
-                SliderVelocityMultiplier = multiplier
-            }, false);
+            assertSnapDistance(100 * multiplier);
         }
 
         [TestCase(1)]
@@ -90,7 +77,7 @@ namespace osu.Game.Tests.Editing
             assertSnapDistance(100 * multiplier, new Slider
             {
                 SliderVelocityMultiplier = multiplier
-            }, true);
+            });
         }
 
         [TestCase(1)]
@@ -99,7 +86,7 @@ namespace osu.Game.Tests.Editing
         {
             AddStep($"set divisor = {divisor}", () => BeatDivisor.Value = divisor);
 
-            assertSnapDistance(100f / divisor, null, true);
+            assertSnapDistance(100f / divisor);
         }
 
         /// <summary>
@@ -115,10 +102,10 @@ namespace osu.Game.Tests.Editing
             {
                 SliderVelocityMultiplier = slider_velocity
             };
+            AddStep("add to beatmap", () => composer.EditorBeatmap.Add(referenceObject));
 
-            assertSnapDistance(base_distance * slider_velocity, referenceObject, true);
+            assertSnapDistance(base_distance * slider_velocity, referenceObject);
             assertSnappedDistance(base_distance * slider_velocity + 10, base_distance * slider_velocity, referenceObject);
-            assertSnappedDuration(base_distance * slider_velocity + 10, 1000, referenceObject);
 
             assertDistanceToDuration(base_distance * slider_velocity, 1000, referenceObject);
             assertDurationToDistance(1000, base_distance * slider_velocity, referenceObject);
@@ -167,39 +154,6 @@ namespace osu.Game.Tests.Editing
         }
 
         [Test]
-        public void TestGetSnappedDurationFromDistance()
-        {
-            assertSnappedDuration(0, 0);
-            assertSnappedDuration(50, 1000);
-            assertSnappedDuration(100, 1000);
-            assertSnappedDuration(150, 2000);
-            assertSnappedDuration(200, 2000);
-            assertSnappedDuration(250, 3000);
-
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = 2);
-
-            assertSnappedDuration(0, 0);
-            assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 1000);
-            assertSnappedDuration(150, 1000);
-            assertSnappedDuration(200, 1000);
-            assertSnappedDuration(250, 1000);
-
-            AddStep("set beat length = 500", () =>
-            {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
-            });
-
-            assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 500);
-            assertSnappedDuration(150, 500);
-            assertSnappedDuration(200, 500);
-            assertSnappedDuration(250, 500);
-            assertSnappedDuration(400, 1000);
-        }
-
-        [Test]
         public void GetSnappedDistanceFromDistance()
         {
             assertSnappedDistance(50, 0);
@@ -231,41 +185,84 @@ namespace osu.Game.Tests.Editing
         }
 
         [Test]
+        public void TestUnsnappedObject()
+        {
+            var slider = new Slider
+            {
+                StartTime = 0,
+                Path = new SliderPath
+                {
+                    ControlPoints =
+                    {
+                        new PathControlPoint(),
+                        // simulate object snapped to 1/3rds
+                        // this object's end time will be 2000 / 3 = 666.66... ms
+                        new PathControlPoint(new Vector2(200 / 3f, 0)),
+                    }
+                }
+            };
+
+            AddStep("add slider", () => composer.EditorBeatmap.Add(slider));
+            AddStep("set snap to 1/4", () => BeatDivisor.Value = 4);
+
+            // with default beat length of 1000ms and snap at 1/4, the valid snap times are 500ms, 750ms, and 1000ms
+            // with default settings, the snapped distance will be a tenth of the difference of the time delta
+
+            // (500 - 666.66...) / 10 = -16.66... = -100 / 6
+            assertSnappedDistance(0, -100 / 6f, slider);
+            assertSnappedDistance(7, -100 / 6f, slider);
+
+            // (750 - 666.66...) / 10 = 8.33... = 100 / 12
+            assertSnappedDistance(9, 100 / 12f, slider);
+            assertSnappedDistance(33, 100 / 12f, slider);
+
+            // (1000 - 666.66...) / 10 = 33.33... = 100 / 3
+            assertSnappedDistance(34, 100 / 3f, slider);
+        }
+
+        [Test]
         public void TestUseCurrentSnap()
         {
+            ExpandableButton getCurrentSnapButton() => composer.ChildrenOfType<EditorToolboxGroup>().Single(g => g.Name == "snapping")
+                                                               .ChildrenOfType<ExpandableButton>().Single();
+
             AddStep("add objects to beatmap", () =>
             {
                 editorBeatmap.Add(new HitCircle { StartTime = 1000 });
                 editorBeatmap.Add(new HitCircle { Position = new Vector2(100), StartTime = 2000 });
             });
 
-            AddStep("hover use current snap button", () => InputManager.MoveMouseTo(composer.ChildrenOfType<ExpandableButton>().Single()));
-            AddUntilStep("use current snap expanded", () => composer.ChildrenOfType<ExpandableButton>().Single().Expanded.Value, () => Is.True);
+            AddStep("hover use current snap button", () => InputManager.MoveMouseTo(getCurrentSnapButton()));
+            AddUntilStep("use current snap expanded", () => getCurrentSnapButton().Expanded.Value, () => Is.True);
 
             AddStep("seek before first object", () => EditorClock.Seek(0));
-            AddUntilStep("use current snap not available", () => composer.ChildrenOfType<ExpandableButton>().Single().Enabled.Value, () => Is.False);
+            AddUntilStep("use current snap not available", () => getCurrentSnapButton().Enabled.Value, () => Is.False);
 
             AddStep("seek to between objects", () => EditorClock.Seek(1500));
-            AddUntilStep("use current snap available", () => composer.ChildrenOfType<ExpandableButton>().Single().Enabled.Value, () => Is.True);
+            AddUntilStep("use current snap available", () => getCurrentSnapButton().Enabled.Value, () => Is.True);
 
             AddStep("seek after last object", () => EditorClock.Seek(2500));
-            AddUntilStep("use current snap not available", () => composer.ChildrenOfType<ExpandableButton>().Single().Enabled.Value, () => Is.False);
+            AddUntilStep("use current snap not available", () => getCurrentSnapButton().Enabled.Value, () => Is.False);
         }
 
-        private void assertSnapDistance(float expectedDistance, HitObject? referenceObject, bool includeSliderVelocity)
-            => AddAssert($"distance is {expectedDistance}", () => composer.DistanceSnapProvider.GetBeatSnapDistanceAt(referenceObject ?? new HitObject(), includeSliderVelocity), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
+        private void assertSnapDistance(float expectedDistance, IHasSliderVelocity? hasSliderVelocity = null)
+            => AddAssert($"distance is {expectedDistance}", () => composer.DistanceSnapProvider.GetBeatSnapDistance(hasSliderVelocity),
+                () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
         private void assertDurationToDistance(double duration, float expectedDistance, HitObject? referenceObject = null)
-            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DistanceSnapProvider.DurationToDistance(referenceObject ?? new HitObject(), duration), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
+            => AddAssert($"duration = {duration} -> distance = {expectedDistance}",
+                () => composer.DistanceSnapProvider.DurationToDistance(duration, referenceObject?.StartTime ?? 0, referenceObject as IHasSliderVelocity),
+                () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
         private void assertDistanceToDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceSnapProvider.DistanceToDuration(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
-
-        private void assertSnappedDuration(float distance, double expectedDuration, HitObject? referenceObject = null)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.DistanceSnapProvider.FindSnappedDuration(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
+            => AddAssert($"distance = {distance} -> duration = {expectedDuration}",
+                () => composer.DistanceSnapProvider.DistanceToDuration(distance, referenceObject?.StartTime ?? 0, referenceObject as IHasSliderVelocity),
+                () => Is.EqualTo(expectedDuration).Within(Precision.FLOAT_EPSILON));
 
         private void assertSnappedDistance(float distance, float expectedDistance, HitObject? referenceObject = null)
-            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.DistanceSnapProvider.FindSnappedDistance(referenceObject ?? new HitObject(), distance), () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
+            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)",
+                () => composer.DistanceSnapProvider.FindSnappedDistance(distance, referenceObject?.GetEndTime() ?? 0, referenceObject as IHasSliderVelocity),
+                () => Is.EqualTo(expectedDistance).Within(Precision.FLOAT_EPSILON));
 
         private partial class TestHitObjectComposer : OsuHitObjectComposer
         {

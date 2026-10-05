@@ -5,6 +5,7 @@
 
 using JetBrains.Annotations;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -12,8 +13,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public partial class OsuDistanceSnapGrid : CircularDistanceSnapGrid
     {
-        public OsuDistanceSnapGrid(OsuHitObject hitObject, [CanBeNull] OsuHitObject nextHitObject = null)
-            : base(hitObject, hitObject.StackedEndPosition, hitObject.GetEndTime(), nextHitObject?.StartTime - 1)
+        public OsuDistanceSnapGrid(OsuHitObject hitObject, [CanBeNull] OsuHitObject nextHitObject = null, [CanBeNull] IHasSliderVelocity sliderVelocitySource = null)
+            : base(hitObject.StackedEndPosition, hitObject.GetEndTime(), nextHitObject?.StartTime - 1, sliderVelocitySource)
         {
             Masking = true;
         }

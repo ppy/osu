@@ -73,6 +73,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("end slider placement", () => InputManager.Click(MouseButton.Right));
 
+            AddStep("seek to slider end", () =>
+            {
+                var slider = (Slider)EditorBeatmap.HitObjects.Single();
+                EditorClock.Seek(slider.EndTime);
+            });
+
             AddStep("enter circle placement mode", () => InputManager.Key(Key.Number2));
 
             AddStep("move mouse slightly", () => InputManager.MoveMouseTo(playfield.ScreenSpaceDrawQuad.Centre + new Vector2(playfield.ScreenSpaceDrawQuad.Width * 0.205f, 0)));

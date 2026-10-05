@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -20,32 +21,37 @@ namespace osu.Game.Rulesets.Scoring
         /// A non-null <see langword="double"/> value if unstable rate could be calculated,
         /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
         /// </returns>
-        public static double? CalculateUnstableRate(this IEnumerable<HitEvent> hitEvents)
+        public static UnstableRateCalculationResult? CalculateUnstableRate(this IReadOnlyList<HitEvent> hitEvents, UnstableRateCalculationResult? result = null)
         {
             Debug.Assert(hitEvents.All(ev => ev.GameplayRate != null));
 
-            int count = 0;
-            double mean = 0;
-            double sumOfSquares = 0;
+            result ??= new UnstableRateCalculationResult();
 
-            foreach (var e in hitEvents)
+            // Handle rewinding in the simplest way possible.
+            if (hitEvents.Count < result.LastProcessedIndex + 1)
+                result = new UnstableRateCalculationResult();
+
+            for (int i = result.LastProcessedIndex + 1; i < hitEvents.Count; i++)
             {
-                if (!affectsUnstableRate(e))
+                result.LastProcessedIndex = i;
+                HitEvent e = hitEvents[i];
+
+                if (!AffectsUnstableRate(e))
                     continue;
 
-                count++;
+                result.EventCount++;
 
                 // Division by gameplay rate is to account for TimeOffset scaling with gameplay rate.
                 double currentValue = e.TimeOffset / e.GameplayRate!.Value;
-                double nextMean = mean + (currentValue - mean) / count;
-                sumOfSquares += (currentValue - mean) * (currentValue - nextMean);
-                mean = nextMean;
+                double nextMean = result.Mean + (currentValue - result.Mean) / result.EventCount;
+                result.SumOfSquares += (currentValue - result.Mean) * (currentValue - nextMean);
+                result.Mean = nextMean;
             }
 
-            if (count == 0)
+            if (result.EventCount == 0)
                 return null;
 
-            return 10.0 * Math.Sqrt(sumOfSquares / count);
+            return result;
         }
 
         /// <summary>
@@ -57,7 +63,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </returns>
         public static double? CalculateAverageHitError(this IEnumerable<HitEvent> hitEvents)
         {
-            double[] timeOffsets = hitEvents.Where(affectsUnstableRate).Select(ev => ev.TimeOffset).ToArray();
+            double[] timeOffsets = hitEvents.Where(AffectsUnstableRate).Select(ev => ev.TimeOffset).ToArray();
 
             if (timeOffsets.Length == 0)
                 return null;
@@ -65,6 +71,64 @@ namespace osu.Game.Rulesets.Scoring
             return timeOffsets.Average();
         }
 
-        private static bool affectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
+        /// <summary>
+        /// Calculates the median hit offset/error for a sequence of <see cref="HitEvent"/>s, where negative numbers mean the user hit too early on average.
+        /// </summary>
+        /// <returns>
+        /// A non-null <see langword="double"/> value if unstable rate could be calculated,
+        /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
+        /// </returns>
+        public static double? CalculateMedianHitError(this IEnumerable<HitEvent> hitEvents)
+        {
+            double[] timeOffsets = hitEvents.Where(AffectsUnstableRate).Select(ev => ev.TimeOffset).OrderBy(x => x).ToArray();
+
+            if (timeOffsets.Length == 0)
+                return null;
+
+            int center = timeOffsets.Length / 2;
+
+            // Use average of the 2 central values if length is even
+            return timeOffsets.Length % 2 == 0 ? (timeOffsets[center - 1] + timeOffsets[center]) / 2 : timeOffsets[center];
+        }
+
+        public static bool AffectsUnstableRate(HitEvent e) => AffectsUnstableRate(e.HitObject, e.Result);
+        public static bool AffectsUnstableRate(HitObject hitObject, HitResult result) => hitObject.HitWindows != HitWindows.Empty && result.IsHit();
+
+        /// <summary>
+        /// Data type returned by <see cref="HitEventExtensions.CalculateUnstableRate"/> which allows efficient incremental processing.
+        /// </summary>
+        /// <remarks>
+        /// This should be passed back into future <see cref="HitEventExtensions.CalculateUnstableRate"/> calls as a parameter.
+        ///
+        /// The optimisations used here rely on hit events being a consecutive sequence from a single gameplay session.
+        /// When a new gameplay session is started, any existing results should be disposed.
+        /// </remarks>
+        public class UnstableRateCalculationResult
+        {
+            /// <summary>
+            /// The last result index processed. For internal incremental calculation use.
+            /// </summary>
+            public int LastProcessedIndex = -1;
+
+            /// <summary>
+            /// Total events processed. For internal incremental calculation use.
+            /// </summary>
+            public int EventCount;
+
+            /// <summary>
+            /// Last sum-of-squares value. For internal incremental calculation use.
+            /// </summary>
+            public double SumOfSquares;
+
+            /// <summary>
+            /// Last mean value. For internal incremental calculation use.
+            /// </summary>
+            public double Mean;
+
+            /// <summary>
+            /// The unstable rate.
+            /// </summary>
+            public double Result => EventCount == 0 ? 0 : 10.0 * Math.Sqrt(SumOfSquares / EventCount);
+        }
     }
 }

@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,9 +17,9 @@ using osu.Game.Overlays.Settings.Sections;
 namespace osu.Game.Overlays.FirstRunSetup
 {
     [LocalisableDescription(typeof(FirstRunSetupOverlayStrings), nameof(FirstRunSetupOverlayStrings.Behaviour))]
-    public partial class ScreenBehaviour : FirstRunSetupScreen
+    public partial class ScreenBehaviour : WizardScreen
     {
-        private SearchContainer<SettingsSection> searchContainer;
+        private SearchContainer<SettingsSection> searchContainer = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -85,12 +83,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                         // InputSection is intentionally omitted for now due to its sub-panel being a pain to set up.
                         new UserInterfaceSection(),
                         new GameplaySection(),
-                        new RulesetSection(),
                         new AudioSection(),
                         new GraphicsSection(),
                         new OnlineSection(),
                         new MaintenanceSection(),
-                        new DebugSection(),
+                        new DebugSection()
                     },
                     SearchTerm = SettingsItem<bool>.CLASSIC_DEFAULT_SEARCH_TERM,
                 }

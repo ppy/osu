@@ -3,13 +3,18 @@
 
 #nullable disable
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.IO.Stores;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -21,6 +26,15 @@ namespace osu.Game.Overlays.Toolbar
     {
         protected Drawable ModeButtonLine { get; private set; }
 
+        [Resolved]
+        private MusicController musicController { get; set; }
+
+        private readonly Dictionary<RulesetInfo, Sample> rulesetSelectionSample = new Dictionary<RulesetInfo, Sample>();
+        private readonly Dictionary<RulesetInfo, SampleChannel> rulesetSelectionChannel = new Dictionary<RulesetInfo, SampleChannel>();
+        private Sample defaultSelectSample;
+
+        private ISampleStore samples;
+
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
@@ -28,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio, OsuGameBase game)
         {
             AddRangeInternal(new[]
             {
@@ -54,6 +68,20 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 },
             });
+
+            var store = new ResourceStore<byte[]>(game.Resources);
+            samples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(store, "Samples"), audio.SampleMixer);
+
+            foreach (var r in Rulesets.AvailableRulesets)
+            {
+                store.AddStore(r.CreateInstance().CreateResourceStore());
+
+                rulesetSelectionSample[r] = samples.Get($@"UI/ruleset-select-{r.ShortName}");
+            }
+
+            defaultSelectSample = audio.Samples.Get(@"UI/default-select");
+
+            Current.ValueChanged += playRulesetSelectionSample;
         }
 
         protected override void LoadComplete()
@@ -82,6 +110,32 @@ namespace osu.Game.Overlays.Toolbar
                 ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 500, Easing.OutElasticQuarter);
                 hasInitialPosition = true;
             }
+        }
+
+        private void playRulesetSelectionSample(ValueChangedEvent<RulesetInfo> r)
+        {
+            // Don't play sample on first setting of value
+            if (r.OldValue == null)
+                return;
+
+            var channel = rulesetSelectionSample[r.NewValue]?.GetChannel();
+
+            // Skip sample choking and ducking for the default/fallback sample
+            if (channel == null)
+            {
+                defaultSelectSample.Play();
+                return;
+            }
+
+            foreach (var pair in rulesetSelectionChannel)
+                pair.Value?.Stop();
+
+            rulesetSelectionChannel[r.NewValue] = channel;
+            channel.Play();
+
+            // Longer unduck delay for Mania sample
+            int unduckDelay = r.NewValue.OnlineID == 3 ? 750 : 500;
+            musicController?.DuckMomentarily(unduckDelay, new DuckParameters { DuckDuration = 0 });
         }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
@@ -114,6 +168,13 @@ namespace osu.Game.Overlays.Toolbar
             }
 
             return false;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            samples?.Dispose();
+
+            base.Dispose(isDisposing);
         }
     }
 }

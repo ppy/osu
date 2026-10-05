@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             cursorSize = config.GetBindable<float>(OsuSetting.GameplayCursorSize).GetBoundCopy();
+            AllowPartRotation = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorTrailRotate)?.Value ?? true;
 
             Texture = skin.GetTexture("cursortrail");
 
@@ -55,11 +56,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Blending = BlendingParameters.Additive;
             }
 
-            if (Texture != null)
-            {
-                // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
-                Texture.ScaleAdjust *= 1.6f;
-            }
+            Texture?.ScaleAdjust *= LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
         }
 
         protected override double FadeDuration => DisjointTrail ? 150 : 500;

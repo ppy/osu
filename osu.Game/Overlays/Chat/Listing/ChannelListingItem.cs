@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -31,7 +32,11 @@ namespace osu.Game.Overlays.Chat.Listing
 
         public bool FilteringActive { get; set; }
         public IEnumerable<LocalisableString> FilterTerms => new LocalisableString[] { Channel.Name, Channel.Topic ?? string.Empty };
-        public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
+
+        public bool MatchingFilter
+        {
+            set => this.FadeTo(value ? 1f : 0f, 100);
+        }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
 
@@ -135,7 +140,7 @@ namespace osu.Game.Overlays.Chat.Listing
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = "0",
+                                Text = Channel.ActiveUserCount?.ToLocalisableString("N0") ?? "-",
                                 Font = OsuFont.Torus.With(size: text_size),
                                 Margin = new MarginPadding { Bottom = 2 },
                                 Colour = colourProvider.Light3,

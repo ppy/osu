@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Screens.Footer;
 
 namespace osu.Game.Graphics.UserInterface
@@ -14,11 +14,11 @@ namespace osu.Game.Graphics.UserInterface
     // todo: remove this once all screens migrate to display the new game footer and back button.
     public partial class BackButton : VisibilityContainer
     {
-        public Action Action;
+        public Action? Action { get; init; }
 
         private readonly TwoLayerButton button;
 
-        public BackButton(ScreenFooter.BackReceptor receptor = null)
+        public BackButton(ScreenFooter.BackReceptor? receptor = null)
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
-                Text = @"back",
+                Text = CommonStrings.Back.ToLower(),
                 Icon = OsuIcon.LeftCircle,
                 Action = () => Action?.Invoke()
             };

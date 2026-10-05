@@ -4,37 +4,46 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
+using osu.Game.Localisation.Taiko;
+using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Scoring.Legacy;
 using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Configuration;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Rulesets.Taiko.Edit;
+using osu.Game.Rulesets.Taiko.Edit.Setup;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.Taiko.Skinning.Argon;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Rulesets.Taiko.Skinning.Legacy;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
-using osu.Game.Overlays.Settings;
 using osu.Game.Scoring;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
-using osu.Game.Rulesets.Configuration;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Scoring.Legacy;
-using osu.Game.Rulesets.Taiko.Configuration;
+using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -55,6 +64,9 @@ namespace osu.Game.Rulesets.Taiko
                 case ArgonSkin:
                     return new TaikoArgonSkinTransformer(skin);
 
+                case TrianglesSkin:
+                    return new TaikoTrianglesSkinTransformer(skin);
+
                 case LegacySkin:
                     return new TaikoLegacySkinTransformer(skin);
             }
@@ -66,15 +78,32 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.D, TaikoAction.LeftRim),
-            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
-            new KeyBinding(InputKey.J, TaikoAction.RightCentre),
-            new KeyBinding(InputKey.K, TaikoAction.RightRim),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+                        new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
+                        new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
+                        new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
+                        new KeyBinding(InputKey.J, TaikoAction.RightCentre),
+                        new KeyBinding(InputKey.None, TaikoAction.RightCentre),
+                        new KeyBinding(InputKey.K, TaikoAction.RightRim),
+                        new KeyBinding(InputKey.None, TaikoAction.RightRim),
+                    };
+
+                case EDITOR_VARIANT:
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, TaikoAction.EditorHitTool),
+                        new KeyBinding(InputKey.Number3, TaikoAction.EditorDrumRollTool),
+                        new KeyBinding(InputKey.Number4, TaikoAction.EditorSwellTool),
+                    ];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
@@ -128,6 +157,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModEasy(),
                         new TaikoModNoFail(),
                         new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
+                        new TaikoModSimplifiedRhythm(),
                     };
 
                 case ModType.DifficultyIncrease:
@@ -178,6 +208,8 @@ namespace osu.Game.Rulesets.Taiko
             }
         }
 
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new TaikoScoreMultiplierCalculator(context);
+
         public override string Description => "osu!taiko";
 
         public override string ShortName => SHORT_NAME;
@@ -187,6 +219,14 @@ namespace osu.Game.Rulesets.Taiko
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
         public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
+
+        public override IEnumerable<Drawable> CreateEditorSetupSections() =>
+        [
+            new MetadataSection(),
+            new TaikoDifficultySection(),
+            new ResourcesSection(),
+            new DesignSection(),
+        ];
 
         public override IBeatmapVerifier CreateBeatmapVerifier() => new TaikoBeatmapVerifier();
 
@@ -204,15 +244,18 @@ namespace osu.Game.Rulesets.Taiko
 
         public override RulesetSettingsSubsection CreateSettings() => new TaikoSettingsSubsection(this);
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
                 HitResult.Great,
                 HitResult.Ok,
+                HitResult.Miss,
 
                 HitResult.SmallBonus,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 
@@ -236,35 +279,85 @@ namespace osu.Game.Rulesets.Taiko
 
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 }),
-                new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                new StatisticItem("Timing Distribution", () => new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 250
-                }, true),
-                new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
-                {
-                    new AverageHitError(timedHitEvents),
-                    new UnstableRate(timedHitEvents)
-                }), true)
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(15),
+                    Children = new Drawable[]
+                    {
+                        new HitEventTimingDistributionGraph(timedHitEvents)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 150
+                        },
+                        new SimpleStatisticTable(1, new SimpleStatisticItem[]
+                        {
+                            new AverageHitError(timedHitEvents),
+                            new UnstableRate(timedHitEvents)
+                        })
+                    }
+                }, true)
             };
         }
 
         /// <seealso cref="TaikoHitWindows"/>
-        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            double rate = ModUtils.CalculateRateWithMods(mods);
 
-            var greatHitWindowRange = TaikoHitWindows.TAIKO_RANGES.Single(range => range.Result == HitResult.Great);
-            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            double greatHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, TaikoHitWindows.GREAT_WINDOW_RANGE);
             greatHitWindow /= rate;
-            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, greatHitWindowRange.Min, greatHitWindowRange.Average, greatHitWindowRange.Max);
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(greatHitWindow, TaikoHitWindows.GREAT_WINDOW_RANGE);
 
             return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var originalDifficulty = beatmapInfo.Difficulty;
+            // `modAdjustedDifficulty` contains only the direct effect of mods.
+            // `effectiveDifficulty` contains the "perceived" effect of rate-adjusting mods on OD and AR.
+            // we make a distinction here, because some of the calculations below will require very careful maneuvering between the two for correct results.
+            var modAdjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var effectiveDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
+
+            // when displaying hit window ranges with rate-changing mods active, we will want to adjust for rate ourselves, as `effectiveDifficulty` may not be accurate
+            // because `TaikoHitWindows` applies a floor-and-round operation that will result in inaccurate results
+            // (the floor-and-round needs to happen *before* rate is taken into account, not after).
+            var hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(modAdjustedDifficulty.OverallDifficulty);
+            double rate = ModUtils.CalculateRateWithMods(mods);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, effectiveDifficulty.OverallDifficulty, 10)
+            {
+                Description = TaikoRulesetStrings.AccuracyDescription,
+                AdditionalMetrics = hitWindows.GetAllAvailableWindows()
+                                              .Reverse()
+                                              .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result) / rate:0.##} ms"),
+                                                  colours.ForHitResult(window.result)
+                                              ))
+                                              .Append(new RulesetBeatmapAttribute.AdditionalMetric(TaikoRulesetStrings.HitsPerSecondRequiredToClearSwells, LocalisableString.Interpolate($@"{TaikoBeatmapConverter.RequiredSwellHitsPerSecond(modAdjustedDifficulty.OverallDifficulty):0.#}")))
+                                              .ToArray()
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
+            {
+                Description = SongSelectStrings.HPDrainDescription
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ScrollSpeed, @"SS", 1f, (float)(effectiveDifficulty.SliderMultiplier / originalDifficulty.SliderMultiplier), 4)
+            {
+                Description = TaikoRulesetStrings.ScrollSpeedDescription
+            };
         }
     }
 }

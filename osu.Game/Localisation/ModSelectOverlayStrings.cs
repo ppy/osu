@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Mods(int count) => new TranslatableString(getKey(@"mods"), @"{0} mods", count);
 
         /// <summary>
+        /// "all mods"
+        /// </summary>
+        public static LocalisableString AllMods => new TranslatableString(getKey(@"all_mods"), @"all mods");
+
+        /// <summary>
         /// "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun."
         /// </summary>
         public static LocalisableString ModSelectDescription => new TranslatableString(getKey(@"mod_select_description"),
@@ -74,6 +79,16 @@ namespace osu.Game.Localisation
         /// "Performance points will not be granted due to active mods."
         /// </summary>
         public static LocalisableString UnrankedExplanation => new TranslatableString(getKey(@"unranked_explanation"), @"Performance points will not be granted due to active mods.");
+
+        /// <summary>
+        /// "Customise"
+        /// </summary>
+        public static LocalisableString CustomisationPanelHeader => new TranslatableString(getKey(@"customisation_panel_header"), @"Customise");
+
+        /// <summary>
+        /// "No mod selected which can be customised."
+        /// </summary>
+        public static LocalisableString CustomisationPanelDisabledReason => new TranslatableString(getKey(@"customisation_panel_disabled_reason"), @"No mod selected which can be customised.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

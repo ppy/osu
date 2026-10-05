@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ExceptionExtensions;
+using osu.Framework.Logging;
 using osu.Game.Online.API;
 
 namespace osu.Game.Database
@@ -69,7 +71,7 @@ namespace osu.Game.Database
 
         private readonly Queue<(TLookup id, TaskCompletionSource<TValue?>)> pendingTasks = new Queue<(TLookup, TaskCompletionSource<TValue?>)>();
         private Task? pendingRequestTask;
-        private readonly object taskAssignmentLock = new object();
+        private readonly Lock taskAssignmentLock = new Lock();
 
         private Task<TValue?> queryValue(TLookup id)
         {
@@ -81,7 +83,7 @@ namespace osu.Game.Database
                 pendingTasks.Enqueue((id, tcs));
 
                 // Create a request task if there's not already one.
-                if (pendingRequestTask == null)
+                if (pendingRequestTask == null || pendingRequestTask.IsFaulted)
                     createNewTask();
 
                 return tcs.Task;
@@ -163,6 +165,14 @@ namespace osu.Game.Database
             }
         }
 
-        private void createNewTask() => pendingRequestTask = Task.Run(performLookup);
+        private void createNewTask()
+        {
+            var nextTask = Task.Run(performLookup);
+            nextTask.ContinueWith(t =>
+            {
+                Logger.Error(t.Exception.AsSingular(), $"{nameof(OnlineLookupCache<,,>)} lookup request failed!");
+            }, TaskContinuationOptions.OnlyOnFaulted);
+            pendingRequestTask = nextTask;
+        }
     }
 }

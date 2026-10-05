@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using Humanizer;
@@ -33,15 +31,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             TimeSpan.FromMinutes(2)
         };
 
-        public new Action<TimeSpan> Action;
-
-        public Action CancelAction;
-
-        [Resolved]
-        private MultiplayerClient multiplayerClient { get; set; }
+        public new required Action<TimeSpan> Action;
+        public required Action CancelAction;
 
         [Resolved]
-        private OsuColour colours { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         private readonly Drawable background;
 
@@ -123,7 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 });
             }
 
-            if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && multiplayerClient.IsHost)
+            if (multiplayerClient.Room?.ActiveCountdowns.Any(c => c is MatchStartCountdown) == true && (multiplayerClient.IsHost || multiplayerClient.IsReferee))
             {
                 flow.Add(new RoundedButton
                 {

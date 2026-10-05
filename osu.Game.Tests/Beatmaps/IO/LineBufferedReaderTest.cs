@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.IO;
 
 namespace osu.Game.Tests.Beatmaps.IO
@@ -20,10 +21,10 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.AreEqual("line 1", bufferedReader.ReadLine());
-                Assert.AreEqual("line 2", bufferedReader.ReadLine());
-                Assert.AreEqual("line 3", bufferedReader.ReadLine());
-                Assert.IsNull(bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("line 1", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("line 2", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("line 3", bufferedReader.ReadLine());
+                ClassicAssert.Null(bufferedReader.ReadLine());
             }
         }
 
@@ -35,11 +36,11 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.AreEqual("line 1", bufferedReader.ReadLine());
-                Assert.AreEqual("peek this", bufferedReader.PeekLine());
-                Assert.AreEqual("peek this", bufferedReader.ReadLine());
-                Assert.AreEqual("line 3", bufferedReader.ReadLine());
-                Assert.IsNull(bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("line 1", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("peek this", bufferedReader.PeekLine());
+                ClassicAssert.AreEqual("peek this", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("line 3", bufferedReader.ReadLine());
+                ClassicAssert.Null(bufferedReader.ReadLine());
             }
         }
 
@@ -51,14 +52,14 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.AreEqual("peek this once", bufferedReader.PeekLine());
-                Assert.AreEqual("peek this once", bufferedReader.ReadLine());
-                Assert.AreEqual("line 2", bufferedReader.ReadLine());
-                Assert.AreEqual("peek this a lot", bufferedReader.PeekLine());
-                Assert.AreEqual("peek this a lot", bufferedReader.PeekLine());
-                Assert.AreEqual("peek this a lot", bufferedReader.PeekLine());
-                Assert.AreEqual("peek this a lot", bufferedReader.ReadLine());
-                Assert.IsNull(bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("peek this once", bufferedReader.PeekLine());
+                ClassicAssert.AreEqual("peek this once", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("line 2", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("peek this a lot", bufferedReader.PeekLine());
+                ClassicAssert.AreEqual("peek this a lot", bufferedReader.PeekLine());
+                ClassicAssert.AreEqual("peek this a lot", bufferedReader.PeekLine());
+                ClassicAssert.AreEqual("peek this a lot", bufferedReader.ReadLine());
+                ClassicAssert.Null(bufferedReader.ReadLine());
             }
         }
 
@@ -70,11 +71,11 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.AreEqual("first line", bufferedReader.ReadLine());
-                Assert.AreEqual("second line", bufferedReader.ReadLine());
-                Assert.IsNull(bufferedReader.PeekLine());
-                Assert.IsNull(bufferedReader.ReadLine());
-                Assert.IsNull(bufferedReader.PeekLine());
+                ClassicAssert.AreEqual("first line", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("second line", bufferedReader.ReadLine());
+                ClassicAssert.Null(bufferedReader.PeekLine());
+                ClassicAssert.Null(bufferedReader.ReadLine());
+                ClassicAssert.Null(bufferedReader.PeekLine());
             }
         }
 
@@ -84,10 +85,10 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var stream = new MemoryStream())
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.IsNull(bufferedReader.PeekLine());
-                Assert.IsNull(bufferedReader.ReadLine());
-                Assert.IsNull(bufferedReader.ReadLine());
-                Assert.IsNull(bufferedReader.PeekLine());
+                ClassicAssert.Null(bufferedReader.PeekLine());
+                ClassicAssert.Null(bufferedReader.ReadLine());
+                ClassicAssert.Null(bufferedReader.ReadLine());
+                ClassicAssert.Null(bufferedReader.PeekLine());
             }
         }
 
@@ -99,7 +100,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.AreEqual(contents, bufferedReader.ReadToEnd());
+                ClassicAssert.AreEqual(contents, bufferedReader.ReadToEnd());
             }
         }
 
@@ -111,14 +112,14 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
-                Assert.AreEqual("this line is gone", bufferedReader.ReadLine());
-                Assert.AreEqual("this one shouldn't be", bufferedReader.PeekLine());
+                ClassicAssert.AreEqual("this line is gone", bufferedReader.ReadLine());
+                ClassicAssert.AreEqual("this one shouldn't be", bufferedReader.PeekLine());
 
                 string[] endingLines = bufferedReader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                Assert.AreEqual(3, endingLines.Length);
-                Assert.AreEqual("this one shouldn't be", endingLines[0]);
-                Assert.AreEqual("these ones", endingLines[1]);
-                Assert.AreEqual("definitely not", endingLines[2]);
+                ClassicAssert.AreEqual(3, endingLines.Length);
+                ClassicAssert.AreEqual("this one shouldn't be", endingLines[0]);
+                ClassicAssert.AreEqual("these ones", endingLines[1]);
+                ClassicAssert.AreEqual("definitely not", endingLines[2]);
             }
         }
     }

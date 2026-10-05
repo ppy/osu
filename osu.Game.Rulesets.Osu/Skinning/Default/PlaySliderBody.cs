@@ -44,10 +44,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             SnakingOut.BindTo(configSnakingOut);
 
-            BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
+            BorderColour = GetBorderColour(skin);
         }
 
-        protected virtual Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour) =>
-            skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? hitObjectAccentColour;
+        protected virtual Color4 GetBorderColour(ISkinSource skin) => Color4.White;
+
+        protected virtual Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour) => hitObjectAccentColour;
     }
 }

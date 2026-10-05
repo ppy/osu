@@ -3,10 +3,14 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -31,10 +35,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             num100 = score.GetCount100() ?? 0; // HitResult.LargeTickHit
             num50 = score.GetCount50() ?? 0; // HitResult.SmallTickHit
             numKatu = score.GetCountKatu() ?? 0; // HitResult.SmallTickMiss
-            numMiss = score.GetCountMiss() ?? 0; // HitResult.Miss PLUS HitResult.LargeTickMiss
+            numMiss = Math.Max(0, score.GetCountMiss() ?? 0); // HitResult.Miss PLUS HitResult.LargeTickMiss
+
+            double scoreMaxCombo = Math.Clamp(score.MaxCombo, 0, catchAttributes.MaxCombo);
 
             // We are heavily relying on aim in catch the beat
-            double value = Math.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
+            double value = DiffUtils.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
             int numTotalHits = totalComboHits();
@@ -44,13 +50,23 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
             value *= lengthBonus;
 
-            value *= Math.Pow(0.97, numMiss);
+            value *= DiffUtils.Pow(0.97, numMiss);
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(score.MaxCombo, 0.8) / Math.Pow(catchAttributes.MaxCombo, 0.8), 1.0);
+                value *= Math.Min(DiffUtils.Pow(scoreMaxCombo, 0.35) / DiffUtils.Pow(catchAttributes.MaxCombo, 0.35), 1.0);
 
-            double approachRate = catchAttributes.ApproachRate;
+            var difficulty = score.BeatmapInfo!.Difficulty.Clone();
+
+            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
+
+            double clockRate = ModUtils.CalculateRateWithMods(score.Mods);
+
+            // this is the same as osu!, so there's potential to share the implementation... maybe
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
+            double approachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0;
+
             double approachRateFactor = 1.0;
             if (approachRate > 9.0)
                 approachRateFactor += 0.1 * (approachRate - 9.0); // 10% for each AR above 9
@@ -73,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight))
                 value *= 1.35 * lengthBonus;
 
-            value *= Math.Pow(accuracy(), 5.5);
+            value *= DiffUtils.Pow(accuracy(), 5.5);
 
             if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);

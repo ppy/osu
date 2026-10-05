@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -33,9 +34,33 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            OsuResumeOverlayInputBlocker? inputBlocker = null;
+
+            var drawableOsuRuleset = (DrawableOsuRuleset?)drawableRuleset;
+
+            if (drawableOsuRuleset != null)
+            {
+                var osuPlayfield = drawableOsuRuleset.Playfield;
+                osuPlayfield.AttachResumeOverlayInputBlocker(inputBlocker = new OsuResumeOverlayInputBlocker());
+            }
+
             Add(cursorScaleContainer = new Container
             {
-                Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
+                Child = clickToResumeCursor = new OsuClickToResumeCursor
+                {
+                    ResumeRequested = action =>
+                    {
+                        // since the user had to press a button to tap the resume cursor,
+                        // block that press event from potentially reaching a hit circle that's behind the cursor.
+                        // we cannot do this from OsuClickToResumeCursor directly since we're in a different input manager tree than the gameplay one,
+                        // so we rely on a dedicated input blocking component that's implanted in there to do that for us.
+                        // note this only matters when the user didn't pause while they were holding the same key that they are resuming with.
+                        if (inputBlocker != null && !drawableOsuRuleset.AsNonNull().KeyBindingInputManager.PressedActions.Contains(action))
+                            inputBlocker.BlockNextPress = true;
+
+                        Resume();
+                    }
+                }
             });
         }
 
@@ -73,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             public override bool HandlePositionalInput => true;
 
-            public Action? ResumeRequested;
+            public Action<OsuAction>? ResumeRequested;
             private Container scaleTransitionContainer = null!;
 
             public OsuClickToResumeCursor()
@@ -115,8 +140,7 @@ namespace osu.Game.Rulesets.Osu.UI
                             return false;
 
                         scaleTransitionContainer.ScaleTo(2, TRANSITION_TIME, Easing.OutQuint);
-
-                        ResumeRequested?.Invoke();
+                        ResumeRequested?.Invoke(e.Action);
                         return true;
                 }
 
@@ -139,6 +163,28 @@ namespace osu.Game.Rulesets.Osu.UI
             private void updateColour()
             {
                 this.FadeColour(IsHovered ? Color4.White : Color4.Orange, 400, Easing.OutQuint);
+            }
+        }
+
+        public partial class OsuResumeOverlayInputBlocker : Drawable, IKeyBindingHandler<OsuAction>
+        {
+            public bool BlockNextPress;
+
+            public OsuResumeOverlayInputBlocker()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Depth = float.MinValue;
+            }
+
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
+            {
+                bool block = BlockNextPress;
+                BlockNextPress = false;
+                return block;
+            }
+
+            public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
+            {
             }
         }
     }

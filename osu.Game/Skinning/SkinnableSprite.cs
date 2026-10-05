@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,6 +14,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Skinning
@@ -28,8 +29,16 @@ namespace osu.Game.Skinning
         [Resolved]
         private TextureStore textures { get; set; } = null!;
 
-        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), nameof(SkinnableComponentStrings.SpriteNameDescription), SettingControlType = typeof(SpriteSelectorControl))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.SpriteName), SettingControlType = typeof(SpriteSelectorControl))]
         public Bindable<string> SpriteName { get; } = new Bindable<string>(string.Empty);
+
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Opacity), SettingControlType = typeof(SettingsPercentageSlider<float>))]
+        public BindableNumber<float> Opacity { get; } = new BindableNumber<float>(1)
+        {
+            MinValue = 0.01f,
+            MaxValue = 1f,
+            Precision = 0.01f,
+        };
 
         [Resolved]
         private ISkinSource source { get; set; } = null!;
@@ -52,6 +61,7 @@ namespace osu.Game.Skinning
                 if (IsLoaded)
                     SkinChanged(CurrentSkin);
             });
+            Opacity.BindValueChanged(opacity => Alpha = opacity.NewValue, true);
         }
 
         protected override Drawable CreateDefault(ISkinComponentLookup lookup)
@@ -93,10 +103,10 @@ namespace osu.Game.Skinning
                 // but that requires further thought.
                 var highestPrioritySkin = getHighestPriorityUserSkin(((SkinnableSprite)SettingSourceObject).source.AllSources) as Skin;
 
-                string[]? availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(s => s.Files
-                                                                                           .Where(f => f.Filename.EndsWith(".png", StringComparison.Ordinal)
-                                                                                                       || f.Filename.EndsWith(".jpg", StringComparison.Ordinal))
-                                                                                           .Select(f => f.Filename).Distinct()).ToArray();
+                string[]? availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(
+                    s => s.Files
+                          .Where(f => SupportedExtensions.IMAGE_EXTENSIONS.Contains(Path.GetExtension(f.Filename).ToLowerInvariant()))
+                          .Select(f => f.Filename).Distinct()).ToArray();
 
                 if (availableFiles?.Length > 0)
                     Items = availableFiles;
@@ -121,6 +131,7 @@ namespace osu.Game.Skinning
                        || skin.GetType() == typeof(ArgonProSkin)
                        || skin.GetType() == typeof(ArgonSkin)
                        || skin.GetType() == typeof(DefaultLegacySkin)
+                       || skin.GetType() == typeof(RetroSkin)
                        || skin.GetType() == typeof(LegacySkin);
             }
         }

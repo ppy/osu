@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Storyboard createStoryboard(double duration)
         {
             var storyboard = new Storyboard();
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
             sprite.Commands.AddAlpha(Easing.None, 0, duration, 1, 0);
             storyboard.GetLayer("Background").Add(sprite);
             return storyboard;
@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected partial class OutroPlayer : TestPlayer
         {
-            public void ExitViaPause() => PerformExit(true);
+            public void ExitViaPause() => PerformExitWithConfirmation();
 
             public new FailOverlay FailOverlay => base.FailOverlay;
 

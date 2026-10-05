@@ -8,7 +8,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -31,7 +30,6 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    [Cached]
     public partial class DrawableManiaRuleset : DrawableScrollingRuleset<ManiaHitObject>
     {
         /// <summary>
@@ -50,13 +48,18 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
+        public override bool RequiresPortraitOrientation => Beatmap.Stages.Count == 1 && mobileLayout.Value == ManiaMobileLayout.Portrait;
+
         protected override bool RelativeScaleBeatLengths => true;
 
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
-        private readonly BindableInt configScrollSpeed = new BindableInt();
-        private double smoothTimeRange;
+        private readonly BindableDouble configScrollSpeed = new BindableDouble();
+        private readonly Bindable<ManiaMobileLayout> mobileLayout = new Bindable<ManiaMobileLayout>();
+        private readonly Bindable<bool> touchOverlay = new Bindable<bool>();
+
+        public double TargetTimeRange { get; protected set; }
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -101,11 +104,36 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollSpeed, configScrollSpeed);
-            configScrollSpeed.BindValueChanged(speed => this.TransformTo(nameof(smoothTimeRange), ComputeScrollTime(speed.NewValue), 200, Easing.OutQuint));
+            configScrollSpeed.BindValueChanged(speed =>
+            {
+                if (!AllowScrollSpeedAdjustment)
+                    return;
 
-            TimeRange.Value = smoothTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+                TargetTimeRange = ComputeScrollTime(speed.NewValue);
+            });
 
-            KeyBindingInputManager.Add(new ManiaTouchInputArea());
+            TimeRange.Value = TargetTimeRange = ComputeScrollTime(configScrollSpeed.Value);
+
+            Config.BindWith(ManiaRulesetSetting.MobileLayout, mobileLayout);
+            mobileLayout.BindValueChanged(_ => updateMobileLayout(), true);
+
+            Config.BindWith(ManiaRulesetSetting.TouchOverlay, touchOverlay);
+            touchOverlay.BindValueChanged(_ => updateMobileLayout(), true);
+        }
+
+        private ManiaTouchInputArea? touchInputArea;
+
+        private void updateMobileLayout()
+        {
+            if (touchOverlay.Value)
+                KeyBindingInputManager.Add(touchInputArea = new ManiaTouchInputArea(this));
+            else
+            {
+                if (touchInputArea != null)
+                    KeyBindingInputManager.Remove(touchInputArea, true);
+
+                touchInputArea = null;
+            }
         }
 
         protected override void AdjustScrollSpeed(int amount) => configScrollSpeed.Value += amount;
@@ -144,7 +172,7 @@ namespace osu.Game.Rulesets.Mania.UI
             // This scaling factor preserves the scroll speed as the scroll length varies from changes to the hit position.
             float scale = lengthToHitPosition / length_to_default_hit_position;
 
-            TimeRange.Value = smoothTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value * scale;
+            TimeRange.Value = TargetTimeRange * speedAdjustmentTrack.AggregateTempo.Value * speedAdjustmentTrack.AggregateFrequency.Value * scale;
         }
 
         /// <summary>
@@ -152,9 +180,9 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="scrollSpeed">The scroll speed.</param>
         /// <returns>The scroll time.</returns>
-        public static double ComputeScrollTime(int scrollSpeed) => MAX_TIME_RANGE / scrollSpeed;
+        public static double ComputeScrollTime(double scrollSpeed) => MAX_TIME_RANGE / scrollSpeed;
 
-        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer(this);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 

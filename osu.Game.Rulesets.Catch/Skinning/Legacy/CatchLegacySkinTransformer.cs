@@ -4,8 +4,10 @@
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
@@ -28,76 +30,128 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable? GetDrawableComponent(ISkinComponentLookup lookup)
         {
-            if (lookup is SkinComponentsContainerLookup containerLookup)
+            switch (lookup)
             {
-                switch (containerLookup.Target)
-                {
-                    case SkinComponentsContainerLookup.TargetArea.MainHUDComponents:
-                        var components = base.GetDrawableComponent(lookup) as Container;
+                case GlobalSkinnableContainerLookup containerLookup:
+                    // Only handle per ruleset defaults here.
+                    if (containerLookup.Ruleset == null)
+                        return base.GetDrawableComponent(lookup);
 
-                        if (providesComboCounter && components != null)
-                        {
-                            // catch may provide its own combo counter; hide the default.
-                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
-                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                                legacyComboCounter.HiddenByRulesetImplementation = false;
-                        }
-
-                        return components;
-                }
-            }
-
-            if (lookup is CatchSkinComponentLookup catchSkinComponent)
-            {
-                switch (catchSkinComponent.Component)
-                {
-                    case CatchSkinComponents.Fruit:
-                        if (hasPear)
-                            return new LegacyFruitPiece();
-
+                    // we don't have enough assets to display these components (this is especially the case on a "beatmap" skin).
+                    if (!IsProvidingLegacyResources)
                         return null;
 
-                    case CatchSkinComponents.Banana:
-                        if (GetTexture("fruit-bananas") != null)
-                            return new LegacyBananaPiece();
+                    // Our own ruleset components default.
+                    switch (containerLookup.Lookup)
+                    {
+                        case GlobalSkinnableContainers.MainHUDComponents:
+                            // todo: remove CatchSkinComponents.CatchComboCounter and refactor LegacyCatchComboCounter to be added here instead.
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
+                                var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
-                        return null;
+                                if (keyCounter != null)
+                                {
+                                    // set the anchor to top right so that it won't squash to the return button to the top
+                                    keyCounter.Anchor = Anchor.CentreRight;
+                                    keyCounter.Origin = Anchor.TopRight;
+                                    keyCounter.Position = new Vector2(0, -40) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
+                                }
 
-                    case CatchSkinComponents.Droplet:
-                        if (GetTexture("fruit-drop") != null)
-                            return new LegacyDropletPiece();
+                                if (spectatorList != null)
+                                {
+                                    spectatorList.Anchor = Anchor.BottomLeft;
+                                    spectatorList.Origin = Anchor.BottomLeft;
+                                    spectatorList.Position = new Vector2(10, -10);
+                                }
 
-                        return null;
+                                if (leaderboard != null)
+                                {
+                                    leaderboard.Anchor = Anchor.CentreLeft;
+                                    leaderboard.Origin = Anchor.CentreLeft;
+                                    leaderboard.X = 10;
+                                }
 
-                    case CatchSkinComponents.Catcher:
-                        decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
+                                if (hitError is ColourHitErrorMeter colourHitError)
+                                {
+                                    colourHitError.Anchor = Anchor.BottomCentre;
+                                    colourHitError.Origin = Anchor.CentreLeft;
+                                    colourHitError.Rotation = -90;
+                                    colourHitError.Scale = new Vector2(1.7f, 1.7f);
+                                    colourHitError.JudgementCount.Value = 28;
+                                    colourHitError.JudgementSpacing.Value = 1.25f;
+                                    colourHitError.JudgementShape.Value = ColourHitErrorMeter.ShapeStyle.Square;
+                                }
 
-                        if (version < 2.3m)
-                        {
-                            if (hasOldStyleCatcherSprite())
-                                return new LegacyCatcherOld();
-                        }
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
+                            })
+                            {
+                                Children = new Drawable[]
+                                {
+                                    new LegacyKeyCounterDisplay(),
+                                    new SpectatorList(),
+                                    new DrawableGameplayLeaderboard(),
+                                    new ColourHitErrorMeter(),
+                                }
+                            };
+                    }
 
-                        if (hasNewStyleCatcherSprite())
-                            return new LegacyCatcherNew();
+                    return null;
 
-                        return null;
+                case CatchSkinComponentLookup catchSkinComponent:
+                    switch (catchSkinComponent.Component)
+                    {
+                        case CatchSkinComponents.Fruit:
+                            if (hasPear)
+                                return new LegacyFruitPiece();
 
-                    case CatchSkinComponents.CatchComboCounter:
-                        if (providesComboCounter)
-                            return new LegacyCatchComboCounter();
+                            return null;
 
-                        return null;
+                        case CatchSkinComponents.Banana:
+                            if (GetTexture("fruit-bananas") != null)
+                                return new LegacyBananaPiece();
 
-                    case CatchSkinComponents.HitExplosion:
-                        if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
-                            return new LegacyHitExplosion();
+                            return null;
 
-                        return null;
+                        case CatchSkinComponents.Droplet:
+                            if (GetTexture("fruit-drop") != null)
+                                return new LegacyDropletPiece();
 
-                    default:
-                        throw new UnsupportedSkinComponentException(lookup);
-                }
+                            return null;
+
+                        case CatchSkinComponents.Catcher:
+                            decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
+
+                            if (version < 2.3m)
+                            {
+                                if (hasOldStyleCatcherSprite())
+                                    return new LegacyCatcherOld();
+                            }
+
+                            if (hasNewStyleCatcherSprite())
+                                return new LegacyCatcherNew();
+
+                            return null;
+
+                        case CatchSkinComponents.CatchComboCounter:
+                            if (providesComboCounter)
+                                return new LegacyCatchComboCounter();
+
+                            return null;
+
+                        case CatchSkinComponents.HitExplosion:
+                            if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
+                                return new LegacyHitExplosion();
+
+                            return null;
+
+                        default:
+                            throw new UnsupportedSkinComponentException(lookup);
+                    }
             }
 
             return base.GetDrawableComponent(lookup);

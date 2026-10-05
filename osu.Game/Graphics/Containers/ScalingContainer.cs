@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Layout;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -26,17 +26,17 @@ namespace osu.Game.Graphics.Containers
     {
         internal const float TRANSITION_DURATION = 500;
 
-        private Bindable<float> sizeX;
-        private Bindable<float> sizeY;
-        private Bindable<float> posX;
-        private Bindable<float> posY;
-        private Bindable<bool> applySafeAreaPadding;
+        private Bindable<float> sizeX = null!;
+        private Bindable<float> sizeY = null!;
+        private Bindable<float> posX = null!;
+        private Bindable<float> posY = null!;
+        private Bindable<bool> applySafeAreaPadding = null!;
 
-        private Bindable<MarginPadding> safeAreaPadding;
+        private Bindable<MarginPadding> safeAreaPadding = null!;
 
         private readonly ScalingMode? targetMode;
 
-        private Bindable<ScalingMode> scalingMode;
+        private Bindable<ScalingMode> scalingMode = null!;
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
@@ -45,12 +45,14 @@ namespace osu.Game.Graphics.Containers
 
         private readonly Container sizableContainer;
 
-        private BackgroundScreenStack backgroundStack;
+        private BackgroundScreenStack? backgroundStack;
 
-        private Bindable<float> scalingMenuBackgroundDim;
+        private Bindable<float> scalingMenuBackgroundDim = null!;
 
         private RectangleF? customRect;
         private bool customRectIsRelativePosition;
+
+        private ITabletHandler? tabletHandler;
 
         /// <summary>
         /// Set a custom position and scale which overrides any user specification.
@@ -88,7 +90,8 @@ namespace osu.Game.Graphics.Containers
         public partial class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
-            private Bindable<float> uiScale;
+
+            private Bindable<float>? uiScale;
 
             protected float CurrentScale { get; private set; } = 1;
 
@@ -98,6 +101,9 @@ namespace osu.Game.Graphics.Containers
             {
                 this.applyUIScale = applyUIScale;
             }
+
+            [Resolved(canBeNull: true)]
+            private OsuGame? game { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager osuConfig)
@@ -111,6 +117,8 @@ namespace osu.Game.Graphics.Containers
 
             protected override void Update()
             {
+                if (game != null)
+                    TargetDrawSize = game.ScalingContainerTargetDrawSize;
                 Scale = new Vector2(CurrentScale);
                 Size = new Vector2(1 / CurrentScale);
 
@@ -119,7 +127,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, ISafeArea safeArea)
+        private void load(GameHost host, OsuConfigManager config, ISafeArea safeArea)
         {
             scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
             scalingMode.ValueChanged += _ => Scheduler.AddOnce(updateSize);
@@ -144,6 +152,8 @@ namespace osu.Game.Graphics.Containers
 
             scalingMenuBackgroundDim = config.GetBindable<float>(OsuSetting.ScalingBackgroundDim);
             scalingMenuBackgroundDim.ValueChanged += _ => Scheduler.AddOnce(updateSize);
+
+            tabletHandler = host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
         }
 
         protected override void LoadComplete()
@@ -218,6 +228,13 @@ namespace osu.Game.Graphics.Containers
             // An example of how this can occur is when the skin editor is visible and the game screen scaling is set to "Everything".
             sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, TRANSITION_DURATION, requiresMasking ? Easing.OutQuart : Easing.None)
                             .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
+
+            // when "everything" scaling mode is active, tablets are expected to constrain output area to the scaled size of the game
+            if (tabletHandler != null)
+            {
+                tabletHandler.OutputAreaSize.Value = scalingMode.Value == ScalingMode.Everything ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
+                tabletHandler.OutputAreaOffset.Value = scalingMode.Value == ScalingMode.Everything ? new Vector2(posX.Value, posY.Value) : new Vector2(0.5f);
+            }
         }
 
         private partial class ScalingBackgroundScreen : BackgroundScreenDefault
@@ -233,13 +250,13 @@ namespace osu.Game.Graphics.Containers
         private partial class SizeableAlwaysInputContainer : Container
         {
             [Resolved]
-            private GameHost host { get; set; }
+            private GameHost host { get; set; } = null!;
 
             [Resolved]
-            private ISafeArea safeArea { get; set; }
+            private ISafeArea safeArea { get; set; } = null!;
 
             [Resolved]
-            private OsuConfigManager config { get; set; }
+            private OsuConfigManager config { get; set; } = null!;
 
             private readonly bool confineHostCursor;
             private readonly LayoutValue cursorRectCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);

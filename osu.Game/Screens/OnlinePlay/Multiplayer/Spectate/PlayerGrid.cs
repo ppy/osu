@@ -31,6 +31,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public Facade MaximisedFacade { get; }
 
+        /// <summary>
+        /// The currently-maximised cell.
+        /// </summary>
+        public Cell? MaximisedCell { get; private set; }
+
         private readonly Container paddingContainer;
         private readonly FillFlowContainer<Facade> facadeContainer;
         private readonly Container<Cell> cellContainer;
@@ -99,7 +104,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void toggleMaximisationState(Cell target)
         {
             // in the case the target is the already maximised cell (or there is only one cell), no cell should be maximised.
-            bool hasMaximised = !target.IsMaximised && cellContainer.Count > 1;
+            bool hasMaximised = target != MaximisedCell && cellContainer.Count > 1;
+            MaximisedCell = hasMaximised ? target : null;
 
             // Iterate through all cells to ensure only one is maximised at any time.
             foreach (var cell in cellContainer.ToList())

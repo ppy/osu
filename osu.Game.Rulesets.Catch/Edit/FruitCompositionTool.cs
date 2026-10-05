@@ -2,23 +2,25 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Localisation.Catch;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class FruitCompositionTool : HitObjectCompositionTool
+    public class FruitCompositionTool : CompositionTool<CatchAction>
     {
         public FruitCompositionTool()
-            : base(nameof(Fruit))
+            : base(CatchEditorStrings.FruitTool)
         {
+            Action = CatchAction.EditorFruitTool;
         }
 
-        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorFruit };
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new FruitPlacementBlueprint();
+        public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new FruitPlacementBlueprint();
     }
 }

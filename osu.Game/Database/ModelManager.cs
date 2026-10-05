@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Database
@@ -85,6 +87,11 @@ namespace osu.Game.Database
         /// </summary>
         public void AddFile(TModel item, Stream contents, string filename, Realm realm)
         {
+            filename = filename.ToStandardisedPath();
+
+            if (FilesystemSanityCheckHelpers.IncursPathTraversalRisk(filename))
+                throw new InvalidOperationException($@"Filename ""{filename}"" is not allowed.");
+
             var existing = item.GetFile(filename);
 
             if (existing != null)

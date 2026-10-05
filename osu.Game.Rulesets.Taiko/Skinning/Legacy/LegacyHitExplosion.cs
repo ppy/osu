@@ -60,10 +60,16 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             const double animation_time = 120;
 
-            (sprite as IFramedAnimation)?.GotoFrame(0);
+            var animation = sprite as IFramedAnimation;
+
+            animation?.GotoFrame(0);
             (strongSprite as IFramedAnimation)?.GotoFrame(0);
 
             this.FadeInFromZero(animation_time).Then().FadeOut(animation_time * 1.5);
+
+            // legacy judgements don't play any transforms if they are an animation.
+            if (animation?.FrameCount > 1)
+                return;
 
             this.ScaleTo(0.6f)
                 .Then().ScaleTo(1.1f, animation_time * 0.8)

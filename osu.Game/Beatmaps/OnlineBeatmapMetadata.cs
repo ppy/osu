@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Beatmaps
 {
@@ -57,5 +58,10 @@ namespace osu.Game.Beatmaps
         /// The date when this metadata was last updated.
         /// </summary>
         public DateTimeOffset LastUpdated { get; init; }
+
+        /// <summary>
+        /// The list of tags that users have assigned to this beatmap.
+        /// </summary>
+        public List<string> UserTags { get; } = [];
     }
 }

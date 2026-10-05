@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -15,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
 
 namespace osu.Game.Configuration
 {
@@ -122,10 +122,10 @@ namespace osu.Game.Configuration
                         throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} had an unsupported custom control type ({controlType.ReadableName()})");
 
                     var control = (Drawable)Activator.CreateInstance(controlType)!;
-                    controlType.GetProperty(nameof(SettingsItem<object>.SettingSourceObject))?.SetValue(control, obj);
-                    controlType.GetProperty(nameof(SettingsItem<object>.LabelText))?.SetValue(control, attr.Label);
-                    controlType.GetProperty(nameof(SettingsItem<object>.TooltipText))?.SetValue(control, attr.Description);
-                    controlType.GetProperty(nameof(SettingsItem<object>.Current))?.SetValue(control, value);
+                    controlType.GetProperty(nameof(SettingsItem<>.SettingSourceObject))?.SetValue(control, obj);
+                    controlType.GetProperty(nameof(SettingsItem<>.LabelText))?.SetValue(control, attr.Label);
+                    controlType.GetProperty(nameof(SettingsItem<>.TooltipText))?.SetValue(control, attr.Description);
+                    controlType.GetProperty(nameof(SettingsItem<>.Current))?.SetValue(control, value);
 
                     yield return control;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Configuration
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
                             Current = bNumber,
-                            KeyboardStep = 0.1f,
+                            KeyboardStep = bNumber.Precision,
                         };
 
                         break;
@@ -151,7 +151,7 @@ namespace osu.Game.Configuration
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
                             Current = bNumber,
-                            KeyboardStep = 0.1f,
+                            KeyboardStep = (float)bNumber.Precision,
                         };
 
                         break;
@@ -161,7 +161,8 @@ namespace osu.Game.Configuration
                         {
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
-                            Current = bNumber
+                            Current = bNumber,
+                            KeyboardStep = bNumber.Precision,
                         };
 
                         break;
@@ -186,13 +187,23 @@ namespace osu.Game.Configuration
 
                         break;
 
+                    case BindableColour4 bColour:
+                        yield return new SettingsColour
+                        {
+                            LabelText = attr.Label,
+                            TooltipText = attr.Description,
+                            Current = bColour
+                        };
+
+                        break;
+
                     case IBindable bindable:
                         var dropdownType = typeof(ModSettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType)!;
 
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.LabelText))?.SetValue(dropdown, attr.Label);
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.TooltipText))?.SetValue(dropdown, attr.Description);
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.Current))?.SetValue(dropdown, bindable);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<>.LabelText))?.SetValue(dropdown, attr.Label);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<>.TooltipText))?.SetValue(dropdown, attr.Description);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<>.Current))?.SetValue(dropdown, bindable);
 
                         yield return dropdown;
 
@@ -227,11 +238,11 @@ namespace osu.Game.Configuration
                 case Bindable<bool> b:
                     return b.Value;
 
+                case BindableColour4 c:
+                    return c.Value.ToHex();
+
                 case IBindable u:
-                    // An unknown (e.g. enum) generic type.
-                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
-                    Debug.Assert(valueMethod != null);
-                    return valueMethod.GetValue(u)!;
+                    return BindableValueAccessor.GetValue(u);
 
                 default:
                     // fall back for non-bindable cases.

@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,6 +18,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
@@ -35,10 +35,14 @@ namespace osu.Game.Overlays.Volume
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
+        protected static readonly Vector2 LABEL_SIZE = new Vector2(120, 20);
+
         public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1, Precision = 0.01 };
-        private readonly float circleSize;
+
+        protected readonly float CircleSize;
+
         private readonly Color4 meterColour;
-        private readonly string name;
+        private readonly LocalisableString name;
 
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
@@ -71,9 +75,9 @@ namespace osu.Game.Overlays.Volume
 
         private const float transition_length = 500;
 
-        public VolumeMeter(string name, float circleSize, Color4 meterColour)
+        public VolumeMeter(LocalisableString name, float circleSize, Color4 meterColour)
         {
-            this.circleSize = circleSize;
+            CircleSize = circleSize;
             this.meterColour = meterColour;
             this.name = name;
 
@@ -83,7 +87,7 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-hover");
+            hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetResourceName()}-hover");
             notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
 
@@ -101,7 +105,7 @@ namespace osu.Game.Overlays.Volume
             {
                 new Container
                 {
-                    Size = new Vector2(circleSize),
+                    Size = new Vector2(CircleSize),
                     Children = new Drawable[]
                     {
                         new BufferedContainer
@@ -199,7 +203,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
+                            Font = OsuFont.Numeric.With(size: 0.16f * CircleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
@@ -209,10 +213,11 @@ namespace osu.Game.Overlays.Volume
                 },
                 new Container
                 {
-                    Size = new Vector2(120, 20),
+                    Size = LABEL_SIZE,
+                    AutoSizeAxes = Axes.X,
                     CornerRadius = 10,
                     Masking = true,
-                    Margin = new MarginPadding { Left = circleSize + 10 },
+                    Margin = new MarginPadding { Left = CircleSize + 10 },
                     Origin = Anchor.CentreLeft,
                     Anchor = Anchor.CentreLeft,
                     Children = new Drawable[]
@@ -224,6 +229,10 @@ namespace osu.Game.Overlays.Volume
                         },
                         new OsuSpriteText
                         {
+                            Margin = new MarginPadding
+                            {
+                                Horizontal = 32,
+                            },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
@@ -316,6 +325,8 @@ namespace osu.Game.Overlays.Volume
         private void resetAcceleration() => accelerationModifier = 1;
 
         private float dragDelta;
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true; // handle to prevent drawables behind from potentially receiving the mouse down
 
         protected override bool OnDragStart(DragStartEvent e)
         {

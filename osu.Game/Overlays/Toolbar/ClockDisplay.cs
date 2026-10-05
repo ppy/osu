@@ -10,6 +10,14 @@ namespace osu.Game.Overlays.Toolbar
     {
         private int? lastSecond;
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            UpdateDisplay(DateTimeOffset.Now);
+            FinishTransforms(true);
+        }
+
         protected override void Update()
         {
             base.Update();

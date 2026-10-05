@@ -17,19 +17,26 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenBackButton : ShearedButton
     {
-        // todo: see https://github.com/ppy/osu-framework/issues/3271
-        private const float torus_scale_factor = 1.2f;
-
         public const float BUTTON_WIDTH = 240;
 
-        public ScreenBackButton()
-            : base(BUTTON_WIDTH, 70)
+        public sealed override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
         {
+            // Ensure clicks in the corner of the screen still trigger the back button.
+            // Need to apply more than 1x inflation due to shear.
+            var inputRectangle = DrawRectangle.Inflate(new MarginPadding
+            {
+                Left = OsuGame.SCREEN_EDGE_MARGIN * 2,
+                Bottom = OsuGame.SCREEN_EDGE_MARGIN * 2,
+            });
+
+            return inputRectangle.Contains(ToLocalSpace(screenSpacePos));
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Width = BUTTON_WIDTH;
+
             ButtonContent.Child = new FillFlowContainer
             {
                 X = -10f,
@@ -42,14 +49,14 @@ namespace osu.Game.Screens.Footer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(20f),
+                        Size = new Vector2(17f),
                         Icon = FontAwesome.Solid.ChevronLeft,
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = OsuFont.TorusAlternate.With(size: 20 * torus_scale_factor),
+                        Font = OsuFont.TorusAlternate.With(size: 17),
                         Text = CommonStrings.Back,
                         UseFullGlyphHeight = false,
                     }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 
@@ -14,9 +13,6 @@ namespace osu.Game.Screens.OnlinePlay
         public virtual string ShortTitle => Title;
 
         protected sealed override bool PlayExitSound => false;
-
-        [Resolved]
-        protected IRoomManager? RoomManager { get; private set; }
 
         protected OnlinePlaySubScreen()
         {

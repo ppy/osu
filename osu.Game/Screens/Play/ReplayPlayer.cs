@@ -1,24 +1,28 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Skinning;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
@@ -30,30 +34,58 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
-        private readonly bool replayIsFailedScore;
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly SoloGameplayLeaderboardProvider leaderboardProvider = new SoloGameplayLeaderboardProvider();
 
-        protected override UserActivity InitialActivity => new UserActivity.WatchingReplay(Score.ScoreInfo);
+        protected override UserActivity? InitialActivity =>
+            // score may be null if LoadedBeatmapSuccessfully is false.
+            Score == null ? null : new UserActivity.WatchingReplay(Score.ScoreInfo);
 
-        // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
+        private bool isAutoplayPlayback => GameplayState.Mods.OfType<ModAutoplay>().Any();
+
+        private double? lastFrameTime;
+
+        private double userPlaybackRateBeforeFastForward;
+
+        private ReplayFailIndicator? failIndicator;
+        private PlaybackSettings? playbackSettings;
+
+        public ReplayOverlay ReplayOverlay { get; private set; } = null!;
+
         protected override bool CheckModsAllowFailure()
         {
-            if (!replayIsFailedScore && !GameplayState.Mods.OfType<ModAutoplay>().Any())
-                return false;
+            // autoplay should be able to fail if the beatmap is not humanly beatable
+            if (isAutoplayPlayback)
+                return base.CheckModsAllowFailure();
 
-            return base.CheckModsAllowFailure();
+            // non-autoplay replays should be able to fail, but only after they've exhausted their frames.
+            // note that the rank isn't checked here - that's because it is generally unreliable.
+            // stable replays, as well as lazer replays recorded prior to https://github.com/ppy/osu/pull/28058,
+            // do not even *contain* the user's rank.
+            // not to mention possible gameplay mechanics changes that could make a replay fail sooner than it really should.
+            if (GameplayClockContainer.CurrentTime >= lastFrameTime)
+                return base.CheckModsAllowFailure();
+
+            return false;
         }
 
-        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Score score, PlayerConfiguration? configuration = null)
             : this((_, _) => score, configuration)
         {
-            replayIsFailedScore = score.ScoreInfo.Rank == ScoreRank.F;
         }
 
-        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration? configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
+            Configuration.ShowLeaderboard = true;
         }
+
+        /// <summary>
+        /// Add a settings group to the HUD overlay. Intended to be used by rulesets to add replay-specific settings.
+        /// </summary>
+        /// <param name="settings">The settings group to be shown.</param>
+        public void AddSettings(PlayerSettingsGroup settings) => Schedule(() => ReplayOverlay.Settings.Add(settings));
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -61,7 +93,11 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            var playbackSettings = new PlaybackSettings
+            AddInternal(leaderboardProvider);
+
+            GameplayClockContainer.Add(ReplayOverlay = new ReplayOverlay());
+
+            playbackSettings = new PlaybackSettings
             {
                 Depth = float.MaxValue,
                 Expanded = { BindTarget = config.GetBindable<bool>(OsuSetting.ReplayPlaybackControlsExpanded) }
@@ -70,12 +106,50 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 playbackSettings.UserPlaybackRate.BindTo(master.UserPlaybackRate);
 
-            HUDOverlay.PlayerSettingsOverlay.AddAtStart(playbackSettings);
+            ReplayOverlay.Settings.AddAtStart(playbackSettings);
+
+            OsuTextFlowContainer message = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Body) { AutoSizeAxes = Axes.Both };
+            message.AddText("Watching ");
+            message.AddText(Score.ScoreInfo.User.Username, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" play ");
+            message.AddText(Beatmap.Value.BeatmapInfo.GetDisplayTitleRomanisable(), s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
+            message.AddText(" on ");
+            message.AddArbitraryDrawable(new PlayedOnText(Score.ScoreInfo.Date, false)
+            {
+                Font = OsuFont.Style.Body.With(weight: FontWeight.SemiBold),
+            });
+
+            ReplayOverlay.SetMessage(new ScrollingMessage(message)
+            {
+                Y = 96,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+            });
+
+            RulesetSkinProvidingContainer rulesetSkinProvider;
+            AddInternal(rulesetSkinProvider = new RulesetSkinProvidingContainer(GameplayState.Ruleset, GameplayState.Beatmap, Beatmap.Value.Skin)
+            {
+                Child = failIndicator = new ReplayFailIndicator(GameplayClockContainer)
+                {
+                    GoToResults = () =>
+                    {
+                        if (!this.IsCurrentScreen())
+                            return;
+
+                        ValidForResume = false;
+                        this.Push(new SoloResultsScreen(Score.ScoreInfo));
+                    }
+                }
+            });
+            config.BindWith(OsuSetting.BeatmapSkins, rulesetSkinProvider.BeatmapSkins);
+            config.BindWith(OsuSetting.BeatmapColours, rulesetSkinProvider.BeatmapColours);
+            config.BindWith(OsuSetting.BeatmapHitsounds, rulesetSkinProvider.BeatmapHitsounds);
         }
 
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
+            lastFrameTime = Score.Replay.Frames.LastOrDefault()?.Time;
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
@@ -83,19 +157,18 @@ namespace osu.Game.Screens.Play
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
 
-        public readonly BindableList<ScoreInfo> LeaderboardScores = new BindableList<ScoreInfo>();
-
-        protected override GameplayLeaderboard CreateGameplayLeaderboard() =>
-            new SoloGameplayLeaderboard(Score.ScoreInfo.User)
-            {
-                AlwaysVisible = { Value = true },
-                Scores = { BindTarget = LeaderboardScores }
-            };
-
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score);
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)
+        {
+            // Only show the relevant button otherwise things look silly.
+            AllowWatchingReplay = !isAutoplayPlayback,
+            AllowRetry = isAutoplayPlayback,
+        };
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (!LoadedBeatmapSuccessfully)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.StepReplayBackward:
@@ -107,11 +180,11 @@ namespace osu.Game.Screens.Play
                     return true;
 
                 case GlobalAction.SeekReplayBackward:
-                    SeekInDirection(-5);
+                    SeekInDirection(-5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.SeekReplayForward:
-                    SeekInDirection(5);
+                    SeekInDirection(5 * (float)playbackSettings!.UserPlaybackRate.Value);
                     return true;
 
                 case GlobalAction.TogglePauseReplay:
@@ -119,6 +192,13 @@ namespace osu.Game.Screens.Play
                         GameplayClockContainer.Start();
                     else
                         GameplayClockContainer.Stop();
+                    return true;
+
+                case GlobalAction.FastForwardReplay:
+                    if (e.Repeat) return false;
+
+                    userPlaybackRateBeforeFastForward = playbackSettings!.UserPlaybackRate.Value;
+                    playbackSettings!.UserPlaybackRate.Value *= 2;
                     return true;
             }
 
@@ -149,6 +229,44 @@ namespace osu.Game.Screens.Play
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
+            switch (e.Action)
+            {
+                case GlobalAction.FastForwardReplay:
+                    playbackSettings!.UserPlaybackRate.Value = userPlaybackRateBeforeFastForward;
+                    return;
+            }
+        }
+
+        protected override void PerformFail()
+        {
+            // base logic intentionally suppressed - we have our own custom fail interaction
+            ScoreProcessor.FailScore(Score.ScoreInfo);
+            failIndicator!.Display();
+        }
+
+        public override void OnSuspending(ScreenTransitionEvent e)
+        {
+            stopAllAudioEffects();
+            base.OnSuspending(e);
+        }
+
+        public override bool OnExiting(ScreenExitEvent e)
+        {
+            // safety against filters or samples from the indicator playing long after the screen is exited
+            failIndicator?.RemoveAndDisposeImmediately();
+            return base.OnExiting(e);
+        }
+
+        private void stopAllAudioEffects()
+        {
+            // safety against filters or samples from the indicator playing long after the screen is exited
+            failIndicator?.RemoveAndDisposeImmediately();
+
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+            {
+                playbackSettings?.UserPlaybackRate.UnbindFrom(master.UserPlaybackRate);
+                master.UserPlaybackRate.SetDefault();
+            }
         }
     }
 }

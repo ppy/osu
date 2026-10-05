@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.AccountCreation
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding(20),
-                    Spacing = new Vector2(0, 5),
+                    Spacing = new Vector2(0, 7),
                     Children = new Drawable[]
                     {
                         new Container

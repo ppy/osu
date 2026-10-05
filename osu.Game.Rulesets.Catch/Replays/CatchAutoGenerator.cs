@@ -16,9 +16,12 @@ namespace osu.Game.Rulesets.Catch.Replays
     {
         public new CatchBeatmap Beatmap => (CatchBeatmap)base.Beatmap;
 
+        private readonly float halfCatcherWidth;
+
         public CatchAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
+            halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.Difficulty) * 0.5f;
         }
 
         protected override void GenerateFrames()
@@ -47,10 +50,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 bool dashRequired = speedRequired > Catcher.BASE_WALK_SPEED;
                 bool impossibleJump = speedRequired > Catcher.BASE_DASH_SPEED;
 
-                // todo: get correct catcher size, based on difficulty CS.
-                const float catcher_width_half = Catcher.BASE_SIZE * 0.3f * 0.5f;
-
-                if (lastPosition - catcher_width_half < h.EffectiveX && lastPosition + catcher_width_half > h.EffectiveX)
+                if (lastPosition - halfCatcherWidth < h.EffectiveX && lastPosition + halfCatcherWidth > h.EffectiveX)
                 {
                     // we are already in the correct range.
                     lastTime = h.StartTime;

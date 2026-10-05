@@ -26,6 +26,8 @@ namespace osu.Game.Skinning
         /// </summary>
         public decimal? LegacyVersion { get; internal set; }
 
+        internal bool IsLatestVersion;
+
         public enum LegacySetting
         {
             Version,
@@ -38,6 +40,7 @@ namespace osu.Game.Skinning
             AnimationFramerate,
             LayeredHitSounds,
             AllowSliderBallTint,
+            InputOverlayText,
         }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>

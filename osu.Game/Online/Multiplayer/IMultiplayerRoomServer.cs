@@ -16,7 +16,6 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Request to leave the currently joined room.
         /// </summary>
-        /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
         Task LeaveRoom();
 
         /// <summary>
@@ -56,6 +55,13 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="newBeatmapAvailability">The proposed new beatmap availability state.</param>
         Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
+
+        /// <summary>
+        /// Change the local user's style in the currently joined room.
+        /// </summary>
+        /// <param name="beatmapId">The beatmap.</param>
+        /// <param name="rulesetId">The ruleset.</param>
+        Task ChangeUserStyle(int? beatmapId, int? rulesetId);
 
         /// <summary>
         /// Change the local user's mods in the currently joined room.
@@ -104,6 +110,11 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="playlistItemId">The item to remove.</param>
         Task RemovePlaylistItem(long playlistItemId);
+
+        /// <summary>
+        /// Votes to skip the beatmap intro.
+        /// </summary>
+        Task VoteToSkipIntro();
 
         /// <summary>
         /// Invites a player to the current room.

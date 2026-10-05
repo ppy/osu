@@ -146,22 +146,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 }
                             }
                         },
-                        new Drawable[]
-                        {
-                            new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
-                            {
-                                Padding = new MarginPadding { Horizontal = 15, Vertical = 8 },
-                                Text = "beat snap",
-                                RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre,
-                            },
-                        },
                     },
                     RowDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, 30),
+                        new Dimension(GridSizeMode.Absolute, 40),
                         new Dimension(GridSizeMode.Absolute, 20),
-                        new Dimension(GridSizeMode.Absolute, 15)
                     }
                 }
             };
@@ -177,6 +166,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     lastCustomDivisor = valid.NewValue.Presets.Last();
             }, true);
         }
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        protected override bool OnClick(ClickEvent e) => true;
 
         private void cycleDivisorType(int direction)
         {
@@ -330,13 +322,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private void setPresetsFromTextBoxEntry()
             {
-                if (!int.TryParse(divisorTextBox.Text, out int divisor) || divisor < 1 || divisor > 64)
+                if (!int.TryParse(divisorTextBox.Text, out int divisor) || !BeatDivisor.SetArbitraryDivisor(divisor))
                 {
+                    // the text either didn't parse as a divisor, or the divisor was not set due to being out of range.
+                    // force a state update to reset the text box's value to the last sane value.
                     updateState();
                     return;
                 }
-
-                BeatDivisor.SetArbitraryDivisor(divisor);
 
                 this.HidePopover();
             }
@@ -381,10 +373,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, OverlayColourProvider colourProvider)
             {
-                IconColour = Color4.Black;
-                HoverColour = colours.Gray7;
+                IconColour = colourProvider.Light3;
+                IconHoverColour = Color4.White;
+                HoverColour = colours.Gray6;
                 FlashColour = colours.Gray9;
             }
         }
@@ -397,6 +390,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private OsuColour colours { get; set; } = null!;
 
             private readonly BindableBeatDivisor beatDivisor;
+
+            public override bool AcceptsFocus => false;
 
             public TickSliderBar(BindableBeatDivisor beatDivisor)
             {
@@ -526,7 +521,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     AlwaysDisplayed = alwaysDisplayed;
                     Divisor = divisor;
 
-                    Size = new Vector2(6f, 12) * BindableBeatDivisor.GetSize(divisor);
+                    Size = new Vector2(4, 18) * BindableBeatDivisor.GetSize(divisor);
                     Alpha = alwaysDisplayed ? 1 : 0;
 
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };

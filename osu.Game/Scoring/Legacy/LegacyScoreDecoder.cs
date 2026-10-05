@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
@@ -31,7 +32,7 @@ namespace osu.Game.Scoring.Legacy
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
-        private float beatmapOffset;
+        private long beatmapOffset;
 
         public Score Parse(Stream stream)
         {
@@ -57,9 +58,7 @@ namespace osu.Game.Scoring.Legacy
                 // TotalScoreVersion gets initialised to LATEST_VERSION.
                 // In the case where the incoming score has either an osu!stable or old lazer version, we need
                 // to mark it with the correct version increment to trigger reprocessing to new standardised scoring.
-                //
-                // See StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised().
-                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : LegacyScoreEncoder.LATEST_VERSION;
+                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : version;
 
                 string beatmapHash = sr.ReadString();
 
@@ -96,7 +95,7 @@ namespace osu.Game.Scoring.Legacy
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
-                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
+                beatmapOffset = currentBeatmap.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
@@ -109,6 +108,9 @@ namespace osu.Game.Scoring.Legacy
                     scoreInfo.LegacyOnlineID = sr.ReadInt64();
                 else if (version >= 20121008)
                     scoreInfo.LegacyOnlineID = sr.ReadInt32();
+
+                if (scoreInfo.LegacyOnlineID == 0)
+                    scoreInfo.LegacyOnlineID = -1;
 
                 byte[] compressedScoreInfo = null;
 
@@ -139,6 +141,8 @@ namespace osu.Game.Scoring.Legacy
                             score.ScoreInfo.TotalScoreWithoutMods = totalScoreWithoutMods;
                         else
                             PopulateTotalScoreWithoutMods(score.ScoreInfo);
+
+                        score.ScoreInfo.Pauses.AddRange(readScore.Pauses);
                     });
                 }
             }
@@ -148,7 +152,7 @@ namespace osu.Game.Scoring.Legacy
             if (score.ScoreInfo.IsLegacyScore)
                 score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
 
-            StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
+            StandardisedScoreMigrationTools.UpdateToLatestScoring(score.ScoreInfo, workingBeatmap);
 
             if (decodedRank != null)
                 score.ScoreInfo.Rank = decodedRank.Value;
@@ -182,7 +186,7 @@ namespace osu.Game.Scoring.Legacy
 
                 long compressedSize = replayInStream.Length - replayInStream.Position;
 
-                using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
+                using (var lzma = LzmaStream.Create(properties, replayInStream, compressedSize, outSize))
                 using (var reader = new StreamReader(lzma))
                     readFunc(reader);
             }
@@ -205,7 +209,7 @@ namespace osu.Game.Scoring.Legacy
             var scoreProcessor = rulesetInstance.CreateScoreProcessor();
 
             // Populate the maximum statistics.
-            HitResult maxBasicResult = rulesetInstance.GetHitResults()
+            HitResult maxBasicResult = rulesetInstance.GetHitResultsForDisplay()
                                                       .Select(h => h.result)
                                                       .Where(h => h.IsBasic()).MaxBy(scoreProcessor.GetBaseScoreForResult);
 
@@ -252,17 +256,18 @@ namespace osu.Game.Scoring.Legacy
 
         public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
         {
-            double modMultiplier = 1;
+            Debug.Assert(score.BeatmapInfo != null);
 
-            foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score.BeatmapInfo.Difficulty, score));
+            double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
 
             score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
-            float lastTime = beatmapOffset;
+            long lastTime = beatmapOffset;
             var legacyFrames = new List<LegacyReplayFrame>();
 
             string[] frames = reader.ReadToEnd().Split(',');
@@ -280,8 +285,27 @@ namespace osu.Game.Scoring.Legacy
                     continue;
                 }
 
-                float diff = Parsing.ParseFloat(split[0]);
-                float mouseX = Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE);
+                // In mania, mouseX encodes the pressed keys in the lower 20 bits
+                int mouseXParseLimit = currentRuleset.RulesetInfo.OnlineID == 3 ? (1 << 20) - 1 : Parsing.MAX_COORDINATE_VALUE;
+
+                // the legacy replay format as defined by stable expects frame delta times
+                // ('delta time' here meaning the amount of time between consecutive frames)
+                // to be integral and does not allow fractional values.
+                // one particular reason why this matters is that integral deltas
+                // avoid nasty floating point traps like accumulation error from summation or round-off error.
+                // however, there was a period in lazer's lifetime wherein lazer emitted replays
+                // with fractional (float) frame deltas, up until https://github.com/ppy/osu/pull/12583.
+                // despite the fact that gameplay mechanics changed multiple times since
+                // and the replay isn't going to play back anywhere near accurately anyway,
+                // no mistakes are ever forgiven, thus this attempts to parse the delta as an integer once,
+                // and if that fails, tries again as float.
+                // notably this cannot just be `(int)Parsing.ParseFloat(split[0])`, because that can lose information
+                // (`float` numbers have 24 bits of significand precision, which is not enough to accurately represent every possible value of `int`).
+                int diff;
+                if (!int.TryParse(split[0], out diff))
+                    diff = (int)Math.Round(Parsing.ParseFloat(split[0]));
+
+                float mouseX = Parsing.ParseFloat(split[1], mouseXParseLimit);
                 float mouseY = Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE);
 
                 lastTime += diff;

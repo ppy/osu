@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -201,6 +202,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                 .FadeEdgeEffectTo(1, pre_beat_transition_time, Easing.OutQuint)
                 .Then()
                 .FadeEdgeEffectTo(edge_alpha_kiai, duration, Easing.OutQuint);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableHitObject.IsNotNull())
+                drawableHitObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

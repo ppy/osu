@@ -82,10 +82,11 @@ namespace osu.Game.Tests.Visual
         [TearDownSteps]
         public virtual void TearDownSteps()
         {
-            if (DebugUtils.IsNUnitRunning && Game != null)
+            if (DebugUtils.IsNUnitRunning)
             {
-                AddStep("exit game", () => Game.Exit());
-                AddUntilStep("wait for game exit", () => Game.Parent == null);
+                AddStep("exit game", () => Game?.Exit());
+                AddUntilStep("wait for game exit", () => Game?.Parent == null);
+                AddStep("dispose game", () => Game?.Dispose());
             }
         }
 
@@ -122,8 +123,6 @@ namespace osu.Game.Tests.Visual
         public partial class TestOsuGame : OsuGame
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
-
-            public new ScreenStack ScreenStack => base.ScreenStack;
 
             public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 

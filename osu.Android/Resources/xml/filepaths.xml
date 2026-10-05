@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- https://developer.android.com/reference/androidx/core/content/FileProvider -->
+    <external-files-path path="logs" name="logs" />
+    <external-files-path path="exports" name="exports" />
+</paths>

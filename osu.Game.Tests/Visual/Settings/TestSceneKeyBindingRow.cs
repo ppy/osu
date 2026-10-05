@@ -10,6 +10,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Testing;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.Visual.Settings
                 row.KeyBindings.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.Escape)));
                 row.KeyBindings.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.ExtraMouseButton1)));
             });
-            AddUntilStep("revert to default button not shown", () => row.ChildrenOfType<RevertToDefaultButton<bool>>().Single().Alpha, () => Is.Zero);
+            AddUntilStep("revert to default button not shown", () => row.ChildrenOfType<SettingsRevertToDefaultButton>().Single().Alpha, () => Is.Zero);
 
             AddStep("change key bindings", () =>
             {
@@ -54,7 +55,7 @@ namespace osu.Game.Tests.Visual.Settings
                 row.KeyBindings.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.Z)));
                 row.KeyBindings.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.I)));
             });
-            AddUntilStep("revert to default button not shown", () => row.ChildrenOfType<RevertToDefaultButton<bool>>().Single().Alpha, () => Is.Not.Zero);
+            AddUntilStep("revert to default button not shown", () => row.ChildrenOfType<SettingsRevertToDefaultButton>().Single().Alpha, () => Is.Not.Zero);
         }
     }
 }

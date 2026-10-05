@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModAlternate(),
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 4,
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModAlternate(),
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 0 && Player.ScoreProcessor.HighestCombo.Value == 1,
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModAlternate(),
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 1,
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModAlternate(),
             PassCondition = () => Player.ScoreProcessor.Combo.Value == 0 && Player.ScoreProcessor.HighestCombo.Value == 2,
             Autoplay = false,
-            Beatmap = new Beatmap
+            CreateBeatmap = () => new Beatmap
             {
                 Breaks =
                 {

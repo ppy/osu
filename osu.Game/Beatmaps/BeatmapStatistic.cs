@@ -16,7 +16,19 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Drawable> CreateIcon;
 
-        public string Content;
+        /// <summary>
+        /// The name of this statistic.
+        /// </summary>
         public LocalisableString Name;
+
+        /// <summary>
+        /// The text representing the value of this statistic.
+        /// </summary>
+        public string Content;
+
+        /// <summary>
+        /// The length of a bar which visually represents this statistic's relevance in the beatmap.
+        /// </summary>
+        public float? BarDisplayLength;
     }
 }

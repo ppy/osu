@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Database
                 Assert.That(lastChanges?.ModifiedIndices, Is.Empty);
                 Assert.That(lastChanges?.NewModifiedIndices, Is.Empty);
 
-                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().CountdownOffset = 5);
+                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().EditorTimestamp = 5);
                 realm.Run(r => r.Refresh());
 
                 Assert.That(collectionChanges, Is.EqualTo(1));
@@ -68,6 +68,35 @@ namespace osu.Game.Tests.Database
                 {
                     Interlocked.Increment(ref propertyChanges);
                 }
+            }
+        }
+
+        [Test]
+        public void TestSubscriptionInitialChangeSetNull()
+        {
+            ChangeSet? firstChanges = null;
+            int receivedChangesCount = 0;
+
+            RunTestWithRealm((realm, _) =>
+            {
+                var registration = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>(), onChanged);
+
+                realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo())).WaitSafely();
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(receivedChangesCount, Is.EqualTo(1));
+                Assert.That(firstChanges, Is.Null);
+
+                registration.Dispose();
+            });
+
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes)
+            {
+                if (receivedChangesCount == 0)
+                    firstChanges = changes;
+
+                receivedChangesCount++;
             }
         }
 

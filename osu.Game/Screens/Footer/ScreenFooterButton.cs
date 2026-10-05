@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -25,22 +26,28 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        private const float shear = OsuGame.SHEAR;
+        public const int CORNER_RADIUS = 10;
 
-        protected const int CORNER_RADIUS = 10;
-        protected const int BUTTON_HEIGHT = 90;
-        protected const int BUTTON_WIDTH = 140;
+        public const int HEIGHT = 75;
+        protected const int BUTTON_WIDTH = 116;
 
-        public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
+        /// <summary>
+        /// If this footer button controls the visibility of an overlay, it will be bound to this bindable.
+        /// </summary>
+        public readonly Bindable<Visibility> OverlayState = new Bindable<Visibility>();
 
-        protected static readonly Vector2 BUTTON_SHEAR = new Vector2(shear, 0);
+        /// <summary>
+        /// Used to tell whether this button is currently on screen.
+        /// <see cref="ScreenFooter"/> controls this to convey when buttons are hidden temporarily via <see cref="ScreenFooter.RegisterActiveOverlayContainer"/>.
+        /// </summary>
+        public readonly Bindable<Visibility> State = new Bindable<Visibility>(Visibility.Visible);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         private Colour4 buttonAccentColour;
 
-        protected Colour4 AccentColour
+        public Colour4 AccentColour
         {
             set
             {
@@ -50,15 +57,35 @@ namespace osu.Game.Screens.Footer
             }
         }
 
-        protected IconUsage Icon
+        public IconUsage Icon
         {
             set => icon.Icon = value;
         }
 
         public LocalisableString Text
         {
+            get => text.Text;
             set => text.Text = value;
         }
+
+        public new Action? Action
+        {
+            set
+            {
+                if (value == null)
+                    base.Action = null;
+                else
+                {
+                    base.Action = () =>
+                    {
+                        if (State.Value != Visibility.Hidden)
+                            value.Invoke();
+                    };
+                }
+            }
+        }
+
+        private readonly Container shearedContent;
 
         private readonly SpriteText text;
         private readonly SpriteIcon icon;
@@ -75,11 +102,11 @@ namespace osu.Game.Screens.Footer
         {
             Overlay = overlay;
 
-            Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
+            Size = new Vector2(BUTTON_WIDTH, HEIGHT);
 
             Children = new Drawable[]
             {
-                new Container
+                shearedContent = new Container
                 {
                     EdgeEffect = new EdgeEffectParameters
                     {
@@ -89,7 +116,7 @@ namespace osu.Game.Screens.Footer
                         Colour = Colour4.Black.Opacity(0.25f),
                         Offset = new Vector2(0, 2),
                     },
-                    Shear = BUTTON_SHEAR,
+                    Shear = OsuGame.SHEAR,
                     Masking = true,
                     CornerRadius = CORNER_RADIUS,
                     RelativeSizeAxes = Axes.Both,
@@ -108,7 +135,7 @@ namespace osu.Game.Screens.Footer
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Shear = -BUTTON_SHEAR,
+                            Shear = -OsuGame.SHEAR,
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -116,19 +143,18 @@ namespace osu.Game.Screens.Footer
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Y = 42,
+                                    Y = 35,
                                     AutoSizeAxes = Axes.Both,
                                     Child = text = new OsuSpriteText
                                     {
-                                        // figma design says the size is 16, but due to the issues with font sizes 19 matches better
-                                        Font = OsuFont.TorusAlternate.With(size: 19),
+                                        Font = OsuFont.TorusAlternate.With(size: 16),
                                         AlwaysPresent = true
                                     }
                                 },
                                 icon = new SpriteIcon
                                 {
-                                    Y = 12,
-                                    Size = new Vector2(20),
+                                    Y = 10,
+                                    Size = new Vector2(16),
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre
                                 },
@@ -136,11 +162,11 @@ namespace osu.Game.Screens.Footer
                         },
                         new Container
                         {
-                            Shear = -BUTTON_SHEAR,
+                            Shear = -OsuGame.SHEAR,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.Centre,
                             Y = -CORNER_RADIUS,
-                            Size = new Vector2(120, 6),
+                            Size = new Vector2(100, 5),
                             Masking = true,
                             CornerRadius = 3,
                             Child = bar = new Box
@@ -167,11 +193,14 @@ namespace osu.Game.Screens.Footer
             if (Overlay != null)
                 OverlayState.BindTo(Overlay.State);
 
-            OverlayState.BindValueChanged(_ => updateDisplay());
-            Enabled.BindValueChanged(_ => updateDisplay(), true);
+            OverlayState.BindValueChanged(_ => UpdateDisplay());
+            Enabled.BindValueChanged(_ => UpdateDisplay(), true);
 
             FinishTransforms(true);
         }
+
+        // account for shear and buttons temporarily hidden with DisappearToBottom.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => shearedContent.ReceivePositionalInputAt(screenSpacePos);
 
         public GlobalAction? Hotkey;
 
@@ -187,11 +216,11 @@ namespace osu.Game.Screens.Footer
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateDisplay();
+            UpdateDisplay();
             return true;
         }
 
-        protected override void OnHoverLost(HoverLostEvent e) => updateDisplay();
+        protected override void OnHoverLost(HoverLostEvent e) => UpdateDisplay();
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
@@ -203,7 +232,7 @@ namespace osu.Game.Screens.Footer
 
         public virtual void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
 
-        private void updateDisplay()
+        public void UpdateDisplay()
         {
             Color4 backgroundColour = OverlayState.Value == Visibility.Visible ? buttonAccentColour : colourProvider.Background3;
             Color4 textColour = OverlayState.Value == Visibility.Visible ? colourProvider.Background6 : colourProvider.Content1;
@@ -228,6 +257,7 @@ namespace osu.Game.Screens.Footer
 
         public void AppearFromLeft(double delay)
         {
+            Content.FinishTransforms();
             Content.MoveToX(-300f)
                    .FadeOut()
                    .Delay(delay)
@@ -237,6 +267,7 @@ namespace osu.Game.Screens.Footer
 
         public void AppearFromBottom(double delay)
         {
+            Content.FinishTransforms();
             Content.MoveToY(100f)
                    .FadeOut()
                    .Delay(delay)
@@ -244,22 +275,26 @@ namespace osu.Game.Screens.Footer
                    .FadeIn(240, Easing.OutCubic);
         }
 
-        public void DisappearToRightAndExpire(double delay)
+        public void DisappearToRight(double delay, bool expire)
         {
+            Content.FinishTransforms();
             Content.Delay(delay)
                    .FadeOut(240, Easing.InOutCubic)
                    .MoveToX(300f, 360, Easing.InOutCubic);
 
-            this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
         }
 
-        public void DisappearToBottomAndExpire(double delay)
+        public void DisappearToBottom(double delay, bool expire)
         {
+            Content.FinishTransforms();
             Content.Delay(delay)
                    .FadeOut(240, Easing.InOutCubic)
                    .MoveToY(100f, 240, Easing.InOutCubic);
 
-            this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
         }
     }
 }

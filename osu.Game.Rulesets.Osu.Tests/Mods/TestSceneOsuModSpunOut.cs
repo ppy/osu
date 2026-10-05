@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Mod = new OsuModSpunOut(),
                 Autoplay = false,
-                Beatmap = singleSpinnerBeatmap,
+                CreateBeatmap = singleSpinnerBeatmap,
                 PassCondition = () =>
                 {
                     // Bind to the first spinner's results for further tracking.
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Mods = mods,
                 Autoplay = false,
-                Beatmap = singleSpinnerBeatmap,
+                CreateBeatmap = singleSpinnerBeatmap,
                 PassCondition = () =>
                 {
                     var counter = Player.ChildrenOfType<SpinnerSpmCalculator>().SingleOrDefault();
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Mod = new OsuModSpunOut(),
                 Autoplay = false,
-                Beatmap = singleSpinnerBeatmap,
+                CreateBeatmap = singleSpinnerBeatmap,
                 PassCondition = () =>
                 {
                     // Bind to the first spinner's results for further tracking.
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             });
         }
 
-        private Beatmap singleSpinnerBeatmap => new Beatmap
+        private Beatmap singleSpinnerBeatmap() => new Beatmap
         {
             HitObjects = new List<HitObject>
             {

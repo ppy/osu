@@ -26,6 +26,9 @@ namespace osu.Game.Storyboards.Drawables
         [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }
 
+        [Cached(typeof(StoryboardTriggerController))]
+        public StoryboardTriggerController TriggerController { get; }
+
         /// <summary>
         /// Whether the storyboard is considered finished.
         /// </summary>
@@ -35,7 +38,7 @@ namespace osu.Game.Storyboards.Drawables
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
-        protected override Vector2 DrawScale => new Vector2(Parent!.DrawHeight / 480);
+        protected override Vector2 DrawScale => new Vector2((Parent?.DrawHeight ?? 0) / 480);
 
         public override bool RemoveCompletedTransforms => false;
 
@@ -67,7 +70,7 @@ namespace osu.Game.Storyboards.Drawables
 
             bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).All(e => e is StoryboardVideo);
 
-            Width = Height * (storyboard.BeatmapInfo.WidescreenStoryboard || onlyHasVideoElements ? 16 / 9f : 4 / 3f);
+            Width = Height * (storyboard.Beatmap.WidescreenStoryboard || onlyHasVideoElements ? 16 / 9f : 4 / 3f);
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -77,6 +80,10 @@ namespace osu.Game.Storyboards.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+            });
+            AddInternal(TriggerController = new StoryboardTriggerController
+            {
+                Passing = passing,
             });
         }
 
@@ -107,7 +114,14 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.LoadComplete();
 
-            health.BindValueChanged(val => passing.Value = val.NewValue >= 0.5, true);
+            health.BindValueChanged(val =>
+            {
+                // TODO: this is very arbitrary and doesn't work how it is historically supposed to.
+                // - For taiko ruleset, this will cause the first half of a perfect play to be "failing".
+                // - For all cases, it can flip-flop states too often (on stable it only updated at end of combo).
+                // - Also, in stable a different condition was used for non-break-time passing state (local combo performance).
+                passing.Value = val.NewValue >= 0.5;
+            }, true);
             passing.BindValueChanged(_ => updateLayerVisibility(), true);
         }
 
@@ -127,7 +141,7 @@ namespace osu.Game.Storyboards.Drawables
                 layer.Enabled = passing.Value ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
 
-        private class StoryboardResourceLookupStore : IResourceStore<byte[]>
+        public class StoryboardResourceLookupStore : IResourceStore<byte[]>
         {
             private readonly IResourceStore<byte[]> realmFileStore;
             private readonly Storyboard storyboard;
