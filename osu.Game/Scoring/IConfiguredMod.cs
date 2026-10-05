@@ -38,6 +38,9 @@ namespace osu.Game.Scoring
     {
         public static Mod ToMod(this IConfiguredMod configuredMod, Ruleset ruleset)
         {
+            if (configuredMod is Mod modAlready)
+                return modAlready;
+
             Mod? resultMod = ruleset.CreateModFromAcronym(configuredMod.Acronym);
 
             if (resultMod == null)
