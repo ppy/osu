@@ -325,7 +325,7 @@ namespace osu.Game.Screens.Select
                                                     Children = new Drawable[]
                                                     {
                                                         new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
-                                                            Score.MaxCombo == Score.GetMaximumAchievableCombo(), 60),
+                                                            Score.IsPerfect(), 60),
                                                         new ScoreComponentLabel(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
                                                             55),
                                                     },

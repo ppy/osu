@@ -97,7 +97,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
-          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+          path: ${{github.workspace}}/**/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
 
   test-results:
     name: Test results
@@ -121,7 +121,7 @@ jobs:
         uses: dorny/test-reporter@v3.0.0
         with:
           name: Results
-          path: "*.trx"
+          path: "**/*.trx"
           reporter: dotnet-trx
           list-suites: 'failed'
           list-tests: 'failed'
