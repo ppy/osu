@@ -82,7 +82,7 @@ namespace osu.Game.IPC
             // - Use of HTTP (no efforts are taken to make HTTPS work).
             // - Attack surface reduction (doesn't accidentally listen on all interfaces, potentially getting hit by something external).
             // Some users with setups that use a second "streaming PC" or similar will complain. They can set up proxies at their own peril.
-            prefix = $@"http://localhost:{port}/";
+            prefix = $@"http://127.0.0.1:{port}/";
 
             logger = Logger.GetLogger(@"websocket");
         }
