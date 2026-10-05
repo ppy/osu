@@ -23,10 +23,10 @@ namespace osu.Game.IPC.DataSources
     public partial class BeatmapStateWebSocketDataSource : WebSocketDataSource
     {
         [Resolved]
-        private Bindable<WorkingBeatmap> workingBeatmap { get; set; } = null!;
+        private Bindable<WorkingBeatmap> working { get; set; } = null!;
 
         [Resolved]
-        private IBindable<RulesetInfo> rulesetInfo { get; set; } = null!;
+        private IBindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; } = null!;
@@ -44,7 +44,7 @@ namespace osu.Game.IPC.DataSources
         {
             base.LoadComplete();
 
-            workingBeatmap.BindValueChanged(val =>
+            working.BindValueChanged(val =>
             {
                 if (val.NewValue.BeatmapInfo.OnlineID == val.OldValue.BeatmapInfo.OnlineID)
                     return;
@@ -52,7 +52,7 @@ namespace osu.Game.IPC.DataSources
                 updatePlayerState().FireAndForget();
             });
 
-            rulesetInfo.BindValueChanged(val =>
+            ruleset.BindValueChanged(val =>
             {
                 if (val.NewValue.Equals(val.OldValue))
                     return;
@@ -80,33 +80,34 @@ namespace osu.Game.IPC.DataSources
 
         private async Task updatePlayerState()
         {
-            if (workingBeatmap.Value is DummyWorkingBeatmap)
+            if (working.Value is DummyWorkingBeatmap)
                 return;
 
             double rate = ModUtils.CalculateRateWithMods(mods.Value);
 
-            var ruleset = rulesetInfo.Value.CreateInstance();
-            var adjustedDifficulty = ruleset.GetAdjustedDisplayDifficulty(workingBeatmap.Value.BeatmapInfo, mods.Value);
+            var beatmap = working.Value.BeatmapInfo;
+            var metadata = beatmap.Metadata;
 
-            var starDifficulty = await difficultyCache.GetDifficultyAsync(workingBeatmap.Value.BeatmapInfo, rulesetInfo.Value, mods.Value).ConfigureAwait(false);
+            var adjustedDifficulty = ruleset.Value.CreateInstance().GetAdjustedDisplayDifficulty(beatmap, mods.Value);
+            var starDifficulty = await difficultyCache.GetDifficultyAsync(beatmap, ruleset.Value, mods.Value).ConfigureAwait(false);
 
-            var msg = new BeatmapStateWebSocketMessage
+            BroadcastMessage(new BeatmapStateWebSocketMessage
             {
                 Beatmap = new WebSocketBeatmap
                 {
-                    BeatmapId = workingBeatmap.Value.BeatmapInfo.OnlineID,
-                    BeatmapSetId = workingBeatmap.Value.BeatmapSetInfo.OnlineID,
-                    BeatmapHash = workingBeatmap.Value.BeatmapInfo.OnlineMD5Hash,
+                    BeatmapId = beatmap.OnlineID,
+                    BeatmapSetId = working.Value.BeatmapSetInfo.OnlineID,
+                    BeatmapHash = beatmap.OnlineMD5Hash,
                     Metadata = new WebSocketBeatmapMetadata
                     {
-                        Artist = workingBeatmap.Value.BeatmapInfo.Metadata.Artist,
-                        ArtistUnicode = workingBeatmap.Value.BeatmapInfo.Metadata.ArtistUnicode,
-                        Title = workingBeatmap.Value.BeatmapInfo.Metadata.Title,
-                        TitleUnicode = workingBeatmap.Value.BeatmapInfo.Metadata.TitleUnicode,
-                        Author = workingBeatmap.Value.BeatmapInfo.Metadata.Author.Username,
-                        Source = workingBeatmap.Value.BeatmapInfo.Metadata.Source,
-                        Tags = workingBeatmap.Value.BeatmapInfo.Metadata.Tags,
-                        UserTags = workingBeatmap.Value.BeatmapInfo.Metadata.UserTags.ToArray(),
+                        Artist = metadata.Artist,
+                        ArtistUnicode = metadata.ArtistUnicode,
+                        Title = metadata.Title,
+                        TitleUnicode = metadata.TitleUnicode,
+                        Author = metadata.Author.Username,
+                        Source = metadata.Source,
+                        Tags = metadata.Tags,
+                        UserTags = metadata.UserTags.ToArray(),
                     },
                     Difficulty = new WebSocketBeatmapDifficulty
                     {
@@ -115,22 +116,20 @@ namespace osu.Game.IPC.DataSources
                         DrainRate = Math.Round(adjustedDifficulty.DrainRate, 2),
                         OverallDifficulty = Math.Round(adjustedDifficulty.OverallDifficulty, 2),
                     },
-                    DifficultyName = workingBeatmap.Value.BeatmapInfo.DifficultyName,
-                    RulesetId = workingBeatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-                    BPM = FormatUtils.RoundBPM(workingBeatmap.Value.BeatmapInfo.BPM, rate),
-                    StarRating = starDifficulty?.Stars.FloorToDecimalDigits(2) ?? workingBeatmap.Value.BeatmapInfo.StarRating.FloorToDecimalDigits(2),
+                    DifficultyName = beatmap.DifficultyName,
+                    RulesetId = beatmap.Ruleset.OnlineID,
+                    BPM = FormatUtils.RoundBPM(beatmap.BPM, rate),
+                    StarRating = starDifficulty?.Stars.FloorToDecimalDigits(2) ?? beatmap.StarRating.FloorToDecimalDigits(2),
                     MaximumPP = Math.Round(starDifficulty?.PerformanceAttributes?.Total ?? 0, 2),
                     MaxCombo = starDifficulty?.MaxCombo ?? 0,
-                    Status = workingBeatmap.Value.BeatmapInfo.Status,
-                    TotalLength = (int)Math.Round(workingBeatmap.Value.BeatmapInfo.Length / rate),
-                    DrainLength = (int)Math.Round(workingBeatmap.Value.Beatmap.CalculateDrainLength() / rate),
-                    ObjectCount = workingBeatmap.Value.BeatmapInfo.TotalObjectCount,
+                    Status = beatmap.Status,
+                    TotalLength = (int)Math.Round(beatmap.Length / rate),
+                    DrainLength = (int)Math.Round(working.Value.Beatmap.CalculateDrainLength() / rate),
+                    ObjectCount = beatmap.TotalObjectCount,
                 },
-                RulesetId = rulesetInfo.Value.OnlineID,
+                RulesetId = ruleset.Value.OnlineID,
                 Mods = mods.Value.Select(modToWebSocketMod).ToArray(),
-            };
-
-            BroadcastMessage(msg);
+            });
         }
 
         private static WebSocketMod modToWebSocketMod(Mod mod)
