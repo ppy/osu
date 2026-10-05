@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Utils;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays.News
         {
             if (post.Slug != null)
             {
-                TooltipText = "view in browser";
+                TooltipText = CommonStrings.ViewInBrowser;
                 Action = () => game?.OpenUrlExternally(@"/home/news/" + post.Slug);
             }
 

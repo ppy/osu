@@ -61,7 +61,7 @@ namespace osu.Game.IPC
         /// </summary>
         public event Action<int, string>? MessageReceived;
 
-        private readonly object syncRoot = new object();
+        private readonly Lock syncRoot = new Lock();
 
         private readonly string prefix;
         private readonly Logger logger;

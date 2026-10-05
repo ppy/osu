@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 {
-    public class OverallStrainEvaluator
+    public static class OverallStrainEvaluator
     {
         private const double release_threshold = 30;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
             // 0.0 +--------+-+---------------> Release Difference / ms
             //         release_threshold
             if (isOverlapping)
-                holdAddition = DifficultyCalculationUtils.Logistic(x: closestEndTime, multiplier: 0.27, midpointOffset: release_threshold);
+                holdAddition = DiffUtils.Logistic(x: closestEndTime, multiplier: 0.27, midpointOffset: release_threshold);
 
             return (1 + holdAddition) * holdFactor;
         }

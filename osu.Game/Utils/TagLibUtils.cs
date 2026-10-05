@@ -8,7 +8,7 @@ using File = TagLib.File;
 
 namespace osu.Game.Utils
 {
-    public class TagLibUtils
+    public static class TagLibUtils
     {
         /// <summary>
         /// Creates a <see cref="TagLib.File"/> with culture-invariant MIME type detection, based on stream data.
@@ -30,7 +30,7 @@ namespace osu.Game.Utils
             File.Create(filePath, getMimeType(filePath), ReadStyle.Average | ReadStyle.PictureLazy);
 
         // Manual MIME type resolution to avoid culture variance (ie. https://github.com/ppy/osu/issues/32962)
-        private static string getMimeType(string fileName) => @"taglib/" + Path.GetExtension(fileName).TrimStart('.');
+        private static string getMimeType(string fileName) => @"taglib/" + Path.GetExtension(fileName.ToLowerInvariant()).TrimStart('.');
 
         private class StreamFileAbstraction : File.IFileAbstraction
         {

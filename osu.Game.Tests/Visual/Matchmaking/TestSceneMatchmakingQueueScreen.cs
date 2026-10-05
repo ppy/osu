@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Online.Matchmaking;
@@ -19,9 +18,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneMatchmakingQueueScreen : MultiplayerTestScene
     {
-        [Cached]
-        private readonly QueueController controller = new QueueController();
-
         private ScreenQueue? queueScreen => Stack.CurrentScreen as ScreenQueue;
 
         [SetUpSteps]
@@ -84,6 +80,18 @@ namespace osu.Game.Tests.Visual.Matchmaking
             // if the room goes to `null` in that time, things die very hard.
             // therefore the wait here is to check that things don't die very hard.
             // if they do the test will throw an exception and fail.
+            AddWaitStep("wait a little bit", 10);
+        }
+
+        [Test]
+        public void TestRoomScreenPushNullHandling()
+        {
+            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
+
+            AddWaitStep("wait for room leave", 5);
+
+            AddStep("change state to in room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom));
+
             AddWaitStep("wait a little bit", 10);
         }
 

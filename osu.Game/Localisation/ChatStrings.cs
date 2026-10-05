@@ -29,6 +29,22 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString InGameInputPlaceholder(LocalisableString keyBind) => new TranslatableString(getKey(@"in_game_input_placeholder"), @"press {0} to chat...", keyBind);
 
+        /// <summary>
+        /// "Chat moderators have been alerted. Thanks for your help."
+        /// </summary>
+        public static LocalisableString ReportConfirmation => new TranslatableString(getKey(@"report_confirmation"), @"Chat moderators have been alerted. Thanks for your help.");
+
+        /// <summary>
+        /// "Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
+        /// You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
+        /// You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting &quot;Block&quot;."
+        /// </summary>
+        public static LocalisableString ReportConfirmationPM => new TranslatableString(getKey(@"report_confirmation_pm"), """
+                                                                                                                          Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
+                                                                                                                          You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
+                                                                                                                          You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
+                                                                                                                          """);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

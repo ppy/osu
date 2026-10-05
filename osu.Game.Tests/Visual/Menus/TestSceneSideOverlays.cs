@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Menus
                 AddUntilStep("right screen offset applied", () => Precision.AlmostEquals(Game.ScreenOffsetContainer.X, SettingsPanel.WIDTH * TestOsuGame.SIDE_OVERLAY_OFFSET_RATIO));
 
                 AddStep("hide settings", () => Game.Settings.Hide());
-                AddUntilStep("screen offset removed", () => Game.ScreenOffsetContainer.X == 0f);
+                AddUntilStep("screen offset removed", () => Game.ScreenOffsetContainer.X, () => Is.EqualTo(0).Within(float.Epsilon));
             }
         }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Menus
                 AddUntilStep("right screen offset applied", () => Precision.AlmostEquals(Game.ScreenOffsetContainer.X, -NotificationOverlay.WIDTH * TestOsuGame.SIDE_OVERLAY_OFFSET_RATIO));
 
                 AddStep("hide notifications", () => Game.Notifications.Hide());
-                AddUntilStep("screen offset removed", () => Game.ScreenOffsetContainer.X == 0f);
+                AddUntilStep("screen offset removed", () => Game.ScreenOffsetContainer.X, () => Is.EqualTo(0).Within(float.Epsilon));
             }
         }
     }

@@ -4,17 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Catch;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class BananaShowerCompositionTool : CompositionTool
+    public class BananaShowerCompositionTool : CompositionTool<CatchAction>
     {
         public BananaShowerCompositionTool()
-            : base("Banana shower")
+            : base(CatchEditorStrings.BananaShowerTool)
         {
+            Action = CatchAction.EditorBananaShowerTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorBananaShower };

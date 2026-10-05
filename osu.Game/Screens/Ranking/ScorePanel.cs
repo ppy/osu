@@ -172,10 +172,10 @@ namespace osu.Game.Screens.Ranking
                                 Children = new[]
                                 {
                                     middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
-                                    new UserCoverBackground
+                                    new CoverBackground
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        User = Score.User,
+                                        Model = Score.User,
                                         Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
                                     }
                                 }
@@ -309,8 +309,7 @@ namespace osu.Game.Screens.Ranking
                 base.Size = value;
 
                 // Auto-size isn't used to avoid 1-frame issues and because the score panel is removed/re-added to the container.
-                if (trackingContainer != null)
-                    trackingContainer.Size = value;
+                trackingContainer?.Size = value;
             }
         }
 
