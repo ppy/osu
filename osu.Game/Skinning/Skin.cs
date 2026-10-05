@@ -19,14 +19,16 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkin
+    public abstract class Skin : IDisposable, ISkin, IHasComboColours, IHasCustomColours
     {
         private readonly IStorageResourceProvider? resources;
 
@@ -407,5 +409,13 @@ namespace osu.Game.Skinning
             Enter,
             Exit
         }
+
+        #region Delegated colour access
+
+        IReadOnlyList<Color4>? IHasComboColours.ComboColours => Configuration.ComboColours;
+        List<Color4> IHasComboColours.CustomComboColours => Configuration.CustomComboColours;
+        Dictionary<string, Color4> IHasCustomColours.CustomColours => Configuration.CustomColours;
+
+        #endregion
     }
 }

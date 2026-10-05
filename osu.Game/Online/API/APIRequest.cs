@@ -101,6 +101,7 @@ namespace osu.Game.Online.API
         /// The state of this request, from an outside perspective.
         /// This is used to ensure correct notification events are fired.
         /// </summary>
+        [JsonIgnore]
         public APIRequestCompletionState CompletionState { get; private set; }
 
         /// <summary>

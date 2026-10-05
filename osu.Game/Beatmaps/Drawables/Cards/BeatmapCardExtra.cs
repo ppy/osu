@@ -51,7 +51,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapSetOverlay? beatmapSetOverlay)
+        private void load()
         {
             Width = WIDTH;
             Height = height;

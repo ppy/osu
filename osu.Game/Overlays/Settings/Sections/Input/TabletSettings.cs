@@ -34,19 +34,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly ITabletHandler tabletHandler;
 
-        private readonly Bindable<bool> enabled = new BindableBool(true);
-
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
         private readonly Bindable<Vector2> outputAreaSize = new Bindable<Vector2>();
         private readonly Bindable<Vector2> outputAreaOffset = new Bindable<Vector2>();
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
-        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 1 };
-        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0, Precision = 1 };
+        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0, Precision = 0.01f };
+        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0, Precision = 0.01f };
 
-        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10, Precision = 1 };
-        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10, Precision = 1 };
+        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10, Precision = 0.01f };
+        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10, Precision = 0.01f };
 
         private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360, Precision = 1 };
 
@@ -88,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationManager localisation, OsuConfigManager osuConfig, OverlayColourProvider colourProvider)
+        private void load(OsuConfigManager osuConfig)
         {
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
@@ -143,18 +141,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.XOffset,
+                            KeyboardStep = 1,
                             Current = offsetX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.YOffset,
+                            KeyboardStep = 1,
                             Current = offsetY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.Rotation,
+                            KeyboardStep = 1,
                             Current = rotation,
                         }),
                         new RotationPresetButtons(tabletHandler)
@@ -176,12 +177,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Width,
+                            KeyboardStep = 1,
                             Current = sizeX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Height,
+                            KeyboardStep = 1,
                             Current = sizeY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
@@ -199,9 +202,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            enabled.BindTo(tabletHandler.Enabled);
-            enabled.BindValueChanged(_ => Scheduler.AddOnce(updateVisibility));
 
             rotation.BindTo(tabletHandler.Rotation);
 
@@ -276,16 +276,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateVisibility()
         {
-            mainSettings.Hide();
-            noTabletMessage.Hide();
-
-            if (!tabletHandler.Enabled.Value)
-                return;
-
             if (tablet.Value != null)
+            {
+                noTabletMessage.Hide();
                 mainSettings.Show();
+            }
             else
+            {
+                mainSettings.Hide();
                 noTabletMessage.Show();
+            }
         }
 
         private void applyAspectRatio(BindableNumber<float> sizeChanged)

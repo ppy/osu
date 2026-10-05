@@ -53,10 +53,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             string[] split = text.Split(',');
 
-            Vector2 pos =
-                formatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
-                    ? new Vector2(Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE))
-                    : new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
+            // compare: https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L837-L838
+            float x = Math.Clamp(Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), 0, 512);
+            float y = Math.Clamp(Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE), 0, 512);
+
+            Vector2 pos = formatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
+                ? new Vector2(x, y)
+                : new Vector2((int)x, (int)y);
 
             double startTime = Parsing.ParseDouble(split[2]) + offset;
 

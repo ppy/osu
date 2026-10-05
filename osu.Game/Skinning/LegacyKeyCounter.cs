@@ -103,7 +103,7 @@ namespace osu.Game.Skinning
         {
             base.Activate(forwardPlayback);
 
-            keyContainer.ScaleTo(0.75f, transition_duration, Easing.Out);
+            keyContainer.ScaleTo(0.8f, transition_duration, Easing.Out);
             keySprite.Colour = ActiveColour;
 
             overlayKeyText.Text = CountPresses.Value.ToString();
