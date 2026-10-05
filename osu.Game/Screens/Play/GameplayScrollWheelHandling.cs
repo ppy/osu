@@ -34,8 +34,9 @@ namespace osu.Game.Screens.Play
             if (gameplayClock.IsPaused.Value)
                 return base.OnScroll(e);
 
-            // Block any parent handling of scroll if the user has asked for it (special case when holding "Alt").
-            if (mouseWheelDisabled.Value && !e.AltPressed)
+            // Block any parent handling of scroll if the user has asked for it.
+            // Volume adjustments are still allowed if holding Alt - this is handled by the global `ScrollAdjustsVolume` instance in `OsuGame`.
+            if (mouseWheelDisabled.Value)
                 return true;
 
             return base.OnScroll(e);
