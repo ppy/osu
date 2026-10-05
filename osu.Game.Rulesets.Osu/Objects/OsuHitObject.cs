@@ -22,9 +22,21 @@ namespace osu.Game.Rulesets.Osu.Objects
         public const float OBJECT_RADIUS = 64;
 
         /// <summary>
+        /// On osu-stable, hitcircles have 5 pixels of transparent padding on each side to allow for shadows etc.
+        /// Their hittable area is 128px, but the actual circle portion is 118px.
+        /// We must account for some gameplay elements such as slider bodies, where this padding is not present.
+        /// </summary>
+        public const float VISUAL_OBJECT_RADIUS = OBJECT_RADIUS - 5;
+
+        /// <summary>
         /// The width and height any element participating in display of a hitcircle (or similarly sized object) should be.
         /// </summary>
         public static readonly Vector2 OBJECT_DIMENSIONS = new Vector2(OBJECT_RADIUS * 2);
+
+        /// <summary>
+        /// The visual width and height any element participating in display of a hitcircle (or similarly sized object) should be.
+        /// </summary>
+        public static readonly Vector2 VISUAL_OBJECT_DIMENSIONS = new Vector2(VISUAL_OBJECT_RADIUS * 2);
 
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second (ie. the speed slider balls move through their track).

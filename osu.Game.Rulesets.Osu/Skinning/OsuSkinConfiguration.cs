@@ -5,7 +5,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public enum OsuSkinConfiguration
     {
-        SliderPathRadius,
         CursorCentre,
         CursorExpand,
         CursorRotate,
