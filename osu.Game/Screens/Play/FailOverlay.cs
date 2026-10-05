@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Play
         public Func<Task<ScoreInfo>>? SaveReplay { get; init; }
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.FailedHeader;
+        public override string BackgroundSpriteName => "fail-background";
 
         [BackgroundDependencyLoader]
         private void load()

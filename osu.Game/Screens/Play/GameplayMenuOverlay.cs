@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -65,6 +66,8 @@ namespace osu.Game.Screens.Play
 
         public abstract LocalisableString Header { get; }
 
+        public abstract string BackgroundSpriteName { get; }
+
         public Container FooterContent { get; private set; } = null!;
 
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons = null!;
@@ -81,7 +84,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost? host)
+        private void load(OsuColour colours, GameHost? host, ISkinSource source)
         {
             Children = new Drawable[]
             {
@@ -95,6 +98,14 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                     Alpha = background_alpha,
+                },
+                new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    FillMode = FillMode.Fill,
+                    Texture = source.GetTexture(BackgroundSpriteName)
                 },
                 new GridContainer
                 {
