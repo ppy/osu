@@ -141,18 +141,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.XOffset,
+                            KeyboardStep = 1,
                             Current = offsetX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.YOffset,
+                            KeyboardStep = 1,
                             Current = offsetY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = TabletSettingsStrings.Rotation,
+                            KeyboardStep = 1,
                             Current = rotation,
                         }),
                         new RotationPresetButtons(tabletHandler)
@@ -174,12 +177,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Width,
+                            KeyboardStep = 1,
                             Current = sizeX,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
                         {
                             TransferValueOnCommit = true,
                             Caption = CommonStrings.Height,
+                            KeyboardStep = 1,
                             Current = sizeY,
                         }),
                         new SettingsItemV2(new FormSliderBar<float>
