@@ -59,6 +59,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString BeatmapHitsounds => new TranslatableString(getKey(@"beatmap_hitsounds"), @"Beatmap hitsounds");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Gameplay volume"
+        /// </summary>
+        public static LocalisableString GameplayVolume => new TranslatableString(getKey(@"gameplay_volume"), @"Gameplay volume");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

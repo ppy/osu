@@ -37,6 +37,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 }),
                 new SettingsItemV2(new FormSliderBar<double>
                 {
+                    Caption = AudioSettingsStrings.MusicVolume,
+                    Current = audio.VolumeTrack,
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true,
+                    PlaySamplesOnAdjust = false,
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
+                {
                     Caption = AudioSettingsStrings.EffectVolume,
                     Current = audio.VolumeSample,
                     KeyboardStep = 0.01f,
@@ -45,8 +53,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 }),
                 new SettingsItemV2(new FormSliderBar<double>
                 {
-                    Caption = AudioSettingsStrings.MusicVolume,
-                    Current = audio.VolumeTrack,
+                    Caption = AudioSettingsStrings.GameplayVolume,
+                    Current = config.GetBindable<double>(OsuSetting.GameplayVolume),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true,
                     PlaySamplesOnAdjust = false,

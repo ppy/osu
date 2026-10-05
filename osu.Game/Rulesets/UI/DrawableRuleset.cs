@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.UI
 
         public override IAdjustableAudioComponent Audio => audioContainer;
 
-        private readonly AudioContainer audioContainer = new AudioContainer { RelativeSizeAxes = Axes.Both };
+        private readonly DrawableAudioMixer audioContainer = new DrawableAudioMixer { RelativeSizeAxes = Axes.Both, Name = "GameplayMixer" };
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -103,6 +104,8 @@ namespace osu.Game.Rulesets.UI
         private DrawableRulesetDependencies dependencies;
 
         private bool frameStablePlayback = true;
+
+        private Bindable<double> gameplayVolume;
 
         internal override bool FrameStablePlayback
         {
@@ -194,6 +197,9 @@ namespace osu.Game.Rulesets.UI
                     .WithChild(CreatePlayfieldAdjustmentContainer()
                         .WithChild(ResumeOverlay)));
             }
+
+            gameplayVolume = config.GetBindable<double>(OsuSetting.GameplayVolume);
+            audioContainer.Volume.BindTo(gameplayVolume);
 
             applyRulesetMods(Mods, config);
 
