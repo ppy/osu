@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
@@ -313,8 +314,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
-            if (!score.Mods.Any(h => h is OsuModFlashlight) || attributes.FlashlightDifficulty == null)
+            if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
+
+            Debug.Assert(attributes.FlashlightDifficulty != null);
 
             double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty.Value);
 
