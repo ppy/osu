@@ -67,6 +67,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="starRating">The combined star rating of all skills.</param>
         public DifficultyAttributes(Mod[] mods, double starRating)
         {
+            Mods = mods;
             StarRating = starRating;
         }
 
