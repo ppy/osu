@@ -101,6 +101,7 @@ namespace osu.Game.IPC
                 listener = new HttpListener();
                 listener.Prefixes.Add($@"http://127.0.0.1:{port}/");
                 listener.Prefixes.Add($@"http://localhost:{port}/");
+                listener.Prefixes.Add($@"http://[::1]:{port}/");
                 listener.Start();
                 handleRequestTask = Task.Run(handleRequests, cancellationToken);
                 logger.Add($@"Listening on http://localhost:{port}/.");
