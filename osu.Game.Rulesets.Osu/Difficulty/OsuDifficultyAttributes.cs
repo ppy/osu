@@ -140,7 +140,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SpeedDifficulty = values[ATTRIB_ID_SPEED];
             ReadingDifficulty = values[ATTRIB_ID_READING];
             StarRating = values[ATTRIB_ID_DIFFICULTY];
-            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
+
+            if (values.TryGetValue(ATTRIB_ID_FLASHLIGHT, out double flashlightDifficulty))
+                FlashlightDifficulty = flashlightDifficulty;
+
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
             AimDifficultStrainCount = values[ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT];
             SpeedDifficultStrainCount = values[ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT];
