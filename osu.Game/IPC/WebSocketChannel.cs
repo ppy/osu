@@ -139,12 +139,12 @@ namespace osu.Game.IPC
 
             // WebSocket only supports one send at a time
             // See https://learn.microsoft.com/en-us/dotNet/api/system.net.websockets.websocket.sendasync?view=net-10.0#remarks.
-            await sendLock.WaitAsync().ConfigureAwait(false);
+            await sendLock.WaitAsync(runningTokenSource.Token).ConfigureAwait(false);
 
             try
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(message);
-                await webSocket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None).ConfigureAwait(false);
+                await webSocket.SendAsync(bytes, WebSocketMessageType.Text, true, runningTokenSource.Token).ConfigureAwait(false);
             }
             finally
             {
