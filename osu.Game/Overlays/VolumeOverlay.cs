@@ -36,6 +36,7 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMusic = null!;
         private VolumeMeter volumeMeterGameplay = null!;
 
+        // ReSharper disable once NotAccessedField.Local
         private Bindable<double> volumeGameplay = null!;
 
         private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters = null!;
