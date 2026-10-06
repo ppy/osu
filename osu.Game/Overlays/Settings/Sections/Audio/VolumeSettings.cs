@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 }),
                 new SettingsItemV2(new FormSliderBar<double>
                 {
-                    Caption = AudioSettingsStrings.GameplayVolume,
+                    Caption = AudioSettingsStrings.HitsoundVolume,
                     Current = config.GetBindable<double>(OsuSetting.GameplayVolume),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true,

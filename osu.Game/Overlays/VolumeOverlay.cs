@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
                                 volumeMeterMaster = new MasterVolumeMeter(AudioSettingsStrings.MasterVolume.ToUpper(), 140, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
                                 volumeMeterMusic = new VolumeMeter(AudioSettingsStrings.MusicVolume.ToUpper(), 100, colours.BlueDarker),
                                 volumeMeterEffect = new VolumeMeter(AudioSettingsStrings.EffectVolume.ToUpper(), 100, colours.BlueDarker),
-                                volumeMeterGameplay = new VolumeMeter(AudioSettingsStrings.GameplayVolume.ToUpper(), 100, colours.BlueDarker),
+                                volumeMeterGameplay = new VolumeMeter(AudioSettingsStrings.HitsoundVolume.ToUpper(), 100, colours.BlueDarker),
                             }
                         },
                     },

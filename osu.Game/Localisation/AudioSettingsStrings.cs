@@ -55,9 +55,9 @@ namespace osu.Game.Localisation
         public static LocalisableString MusicVolume => new TranslatableString(getKey(@"music_volume"), @"Music");
 
         /// <summary>
-        /// "Gameplay"
+        /// "Hitsound"
         /// </summary>
-        public static LocalisableString GameplayVolume => new TranslatableString(getKey(@"gameplay_volume"), @"Gameplay");
+        public static LocalisableString HitsoundVolume => new TranslatableString(getKey(@"hitsound_volume"), @"Hitsound");
 
         /// <summary>
         /// "Offset Adjustment"
