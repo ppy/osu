@@ -179,6 +179,7 @@ namespace osu.Game.IPC
             webSocket.Dispose();
             runningTokenSource.Cancel();
             runningTokenSource.Dispose();
+            sendLock.Dispose();
         }
     }
 }
