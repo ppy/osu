@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.EmptyScrolling
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
         {
-            return new DifficultyAttributes(0);
+            return new DifficultyAttributes(mods, 0);
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods) => Enumerable.Empty<DifficultyHitObject>();

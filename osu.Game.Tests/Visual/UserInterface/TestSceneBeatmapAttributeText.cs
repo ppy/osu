@@ -209,7 +209,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
-                => new DifficultyAttributes(mods.OfType<TestMod>().SingleOrDefault()?.Difficulty.Value ?? 0);
+                => new DifficultyAttributes(mods, mods.OfType<TestMod>().SingleOrDefault()?.Difficulty.Value ?? 0);
 
             protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
                 => Array.Empty<DifficultyHitObject>();

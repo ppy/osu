@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new TaikoDifficultyAttributes();
+                return new TaikoDifficultyAttributes { Mods = mods };
 
             var rhythm = skills.OfType<Rhythm>().Single();
             var reading = skills.OfType<Reading>().Single();
@@ -137,6 +137,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             TaikoDifficultyAttributes attributes = new TaikoDifficultyAttributes
             {
                 StarRating = starRating,
+                Mods = mods,
                 MechanicalDifficulty = mechanicalDifficulty,
                 RhythmDifficulty = rhythmDifficulty,
                 ReadingDifficulty = readingDifficulty,
