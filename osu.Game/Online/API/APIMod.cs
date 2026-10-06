@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
@@ -45,8 +44,6 @@ namespace osu.Game.Online.API
                     Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
             }
         }
-
-        public Mod ToMod(Ruleset ruleset) => ConfiguredModExtensions.ToMod(this, ruleset);
 
         public bool ShouldSerializeSettings() => Settings.Count > 0;
 
