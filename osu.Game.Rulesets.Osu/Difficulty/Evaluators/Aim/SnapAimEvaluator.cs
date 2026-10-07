@@ -153,7 +153,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double distRatio = DiffUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity), 0, 1);
 
             // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-            double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), Math.Abs(prevVelocity - currVelocity));
+            double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime),
+                Math.Abs(prevVelocity - currVelocity));
 
             double velocityChangeBonus = overlapVelocityBuff * distRatio;
 
@@ -215,7 +216,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
         private static double vectorAngleRepetition(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
         {
-            if (current.Angle == null || previous.Angle == null)
+            if (
+                current.Angle == null ||
+                previous.Angle == null ||
+                previous.BaseObject is Spinner ||
+                previous.Previous(0).BaseObject is Spinner)
                 return 1;
 
             const double note_limit = 6;
@@ -228,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             {
                 OsuDifficultyHitObject? prevObj = (OsuDifficultyHitObject)current.Previous(index);
 
-                if (prevObj == null)
+                if (prevObj == null || prevObj.BaseObject is Spinner)
                     break;
 
                 // Only consider vectors in the same jump section, stopping to change rhythm ruins momentum
