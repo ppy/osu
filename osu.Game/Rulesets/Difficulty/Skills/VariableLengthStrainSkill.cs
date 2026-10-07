@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// This class intends to replace <see cref="StrainSkill"/> eventually as it fixes bugs with that implementation.
     /// Has not yet been applied globally as it changes resultant PP values in ways which may require discretion.
     /// </remarks>
-    public abstract class VariableLengthStrainSkill : Skill
+    public abstract class VariableLengthStrainSkill : ISkill
     {
         /// <summary>
         /// The weight by which each strain value decays.
@@ -54,15 +54,20 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private readonly List<(double StrainValue, double StartTime)> queuedStrains = new List<(double, double)>();
 
+        public IReadOnlyList<Mod> Mods { get; init; }
+        public IReadOnlyList<DifficultyHitObject> DifficultyHitObjects { get; init; }
+
         /// <summary>
         /// Create a new <see cref="VariableLengthStrainSkill"/>.
         /// </summary>
         /// <param name="mods">The mods.</param>
+        /// <param name="difficultyHitObjects"></param>
         /// <param name="decayWeight">The weight by which each strain value decays.</param>
         /// <param name="maxSectionLength">The maximum length of each strain section.</param>
-        protected VariableLengthStrainSkill(Mod[] mods, double decayWeight = 0.9, int maxSectionLength = 400)
-            : base(mods)
+        protected VariableLengthStrainSkill(Mod[] mods, DifficultyHitObject[] difficultyHitObjects, double decayWeight = 0.9, int maxSectionLength = 400)
         {
+            Mods = mods;
+            DifficultyHitObjects = difficultyHitObjects;
             DecayWeight = decayWeight;
             MaxSectionLength = maxSectionLength;
 
@@ -77,7 +82,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        protected sealed override double ProcessInternal(DifficultyHitObject current)
+        protected double ProcessObject(DifficultyHitObject current)
         {
             // If we're on the first object, set up the first section to end `MaxSectionLength` after it.
             if (current.Index == 0)
@@ -231,36 +236,60 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Calculates the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public virtual double CountTopWeightedStrains(double difficultyValue)
+        protected virtual double CountTopWeightedStrains(List<double> objectDifficulties, double difficultyValue)
         {
-            if (ObjectDifficulties.Count == 0)
+            if (objectDifficulties.Count == 0)
                 return 0.0;
 
             double consistentTopStrain = difficultyValue * (1 - DecayWeight); // What would the top strain be if all strain values were identical
 
             if (consistentTopStrain == 0)
-                return ObjectDifficulties.Count;
+                return objectDifficulties.Count;
 
             // Use a weighted sum of all strains. Constants are arbitrary and give nice values
-            return ObjectDifficulties.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
+            return objectDifficulties.Sum(s => DiffUtils.Logistic(s / consistentTopStrain, 0.88, 10, 1.1));
         }
 
-        /// <summary>
-        /// Used to store the difficulty of a section of a map.
-        /// </summary>
-        public readonly record struct StrainPeak : IComparable<StrainPeak>
+        protected abstract double Aggregate();
+
+        public virtual ISkillAttributes Process()
         {
-            public StrainPeak(double value, double sectionLength)
+            var objectDifficulties = new List<double>();
+
+            foreach (var difficultyHitObject in DifficultyHitObjects)
             {
-                Value = value;
-                SectionLength = Math.Round(sectionLength);
+                objectDifficulties.Add(ProcessObject(difficultyHitObject));
             }
 
-            public double Value { get; }
-            public double SectionLength { get; }
+            double difficulty = Aggregate();
 
-            // Reverse sort, highest is first.
-            public int CompareTo(StrainPeak other) => other.Value.CompareTo(Value);
+            return new StrainSkillAttributes
+            {
+                Difficulty = difficulty,
+                ObjectDifficulties = objectDifficulties,
+                StrainPeaks = GetCurrentStrainPeaks().ToList(),
+                TopWeightedStrainsCount = CountTopWeightedStrains(objectDifficulties, difficulty)
+            };
+        }
+
+        public virtual IEnumerable<TimedSkillAttributes> ProcessTimed()
+        {
+            var objectDifficulties = new List<double>();
+
+            foreach (var difficultyHitObject in DifficultyHitObjects)
+            {
+                objectDifficulties.Add(ProcessObject(difficultyHitObject));
+
+                double difficulty = Aggregate();
+
+                yield return new TimedSkillAttributes(new StrainSkillAttributes
+                {
+                    Difficulty = difficulty,
+                    ObjectDifficulties = objectDifficulties,
+                    StrainPeaks = GetCurrentStrainPeaks().ToList(),
+                    TopWeightedStrainsCount = CountTopWeightedStrains(objectDifficulties, difficulty)
+                }, difficultyHitObject.EndTime);
+            }
         }
     }
 }
