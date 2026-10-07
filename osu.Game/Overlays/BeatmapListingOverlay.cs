@@ -102,6 +102,13 @@ namespace osu.Game.Overlays
             }));
         }
 
+        /// <summary>
+        /// Performs escaping of the given <paramref name="term"/> when used in a <c>keyword=""term""</c>-style beatmap listing query.
+        /// </summary>
+        /// <seealso href="https://github.com/ppy/osu-web/blob/e86b6876342ea8c326bb12ced22143b81f997860/resources/js/utils/beatmapset-helper.ts#L37-L39"/>
+        public static string EscapeKeywordSearchTerm(string term)
+            => term.Replace(@"""", @"\""");
+
         public void ShowWithSearch(string query)
         {
             filterControl.Search(query);

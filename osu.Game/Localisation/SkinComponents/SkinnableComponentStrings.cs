@@ -75,6 +75,11 @@ namespace osu.Game.Localisation.SkinComponents
         /// </summary>
         public static LocalisableString Opacity => new TranslatableString(getKey(@"opacity"), @"Opacity");
 
+        /// <summary>
+        /// "Animation sequence"
+        /// </summary>
+        public static LocalisableString AnimationSequence => new TranslatableString(getKey(@"animation_sequence"), @"Animation sequence");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
