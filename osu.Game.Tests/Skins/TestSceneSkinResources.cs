@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Skins
 
             public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 
-            public override ISample GetSample(ISampleInfo sampleInfo) => GetSample(SAMPLE_NAME, sampleInfo.IsHitsound)!;
+            public override ISample GetSample(ISampleInfo sampleInfo) => GetSampleFromSkinFiles(SAMPLE_NAME, sampleInfo.IsHitsound)!;
         }
     }
 }

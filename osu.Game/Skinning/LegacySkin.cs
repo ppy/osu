@@ -596,7 +596,7 @@ namespace osu.Game.Skinning
 
             foreach (string lookup in lookupNames)
             {
-                var sample = GetSample(lookup, sampleInfo.IsHitsound);
+                var sample = GetSampleFromSkinFiles(lookup, sampleInfo.IsHitsound);
 
                 if (sample != null)
                 {

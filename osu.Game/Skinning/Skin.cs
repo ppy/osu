@@ -46,11 +46,11 @@ namespace osu.Game.Skinning
 
         private readonly ISampleStore? resourceHitSamples;
 
-        protected internal ISample? GetSample(string lookup, bool isHitsound) => (isHitsound ? hitSamples : samples)?.Get(lookup);
-
         public IEnumerable<string> AllAvailableSamples => hitSamples?.GetAvailableResources() ?? Array.Empty<string>();
 
-        protected internal ISample? GetResourceSample(string lookup, bool isHitsound) => (isHitsound ? resourceHitSamples : resources?.AudioManager?.Samples)?.Get(lookup);
+        protected internal ISample? GetSampleFromSkinFiles(string lookup, bool isHitsound) => (isHitsound ? hitSamples : samples)?.Get(lookup);
+
+        protected internal ISample? GetSampleFromResourceFiles(string lookup, bool isHitsound) => (isHitsound ? resourceHitSamples : resources?.AudioManager?.Samples)?.Get(lookup);
 
         public readonly Live<SkinInfo> SkinInfo;
 
