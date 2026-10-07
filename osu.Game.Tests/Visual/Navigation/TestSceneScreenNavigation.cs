@@ -255,7 +255,9 @@ namespace osu.Game.Tests.Visual.Navigation
             SoloSongSelect songSelect = null;
             double scrollPosition = 0;
 
+            AddStep("move to screen centre", () => InputManager.MoveMouseTo(Game));
             AddStep("set game volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeUniversal, 1d));
+            AddStep("set effect volume to max", () => Game.Dependencies.Get<FrameworkConfigManager>().SetValue(FrameworkSetting.VolumeEffect, 1d));
             AddUntilStep("wait for volume overlay to hide", () => Game.ChildrenOfType<VolumeOverlay>().SingleOrDefault()?.State.Value, () => Is.EqualTo(Visibility.Hidden));
             PushAndConfirm(() => songSelect = new SoloSongSelect());
             AddUntilStep("wait for song select", () => songSelect.IsLoaded);
@@ -294,7 +296,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.ScrollVerticalBy(-1);
                 InputManager.ReleaseKey(Key.AltLeft);
             }, 5);
-            AddAssert("game volume decreased", () => Game.Dependencies.Get<FrameworkConfigManager>().Get<double>(FrameworkSetting.VolumeUniversal), () => Is.LessThan(1));
+            AddAssert("effect volume decreased", () => Game.Dependencies.Get<FrameworkConfigManager>().Get<double>(FrameworkSetting.VolumeEffect), () => Is.LessThan(1));
 
             AddStep("move to carousel", () => InputManager.MoveMouseTo(songSelect.ChildrenOfType<BeatmapCarousel>().Single()));
             AddStep("scroll down", () => InputManager.ScrollVerticalBy(-1));
