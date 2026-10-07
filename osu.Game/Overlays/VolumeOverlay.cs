@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMaster = null!;
         private VolumeMeter volumeMeterEffect = null!;
         private VolumeMeter volumeMeterMusic = null!;
-        private VolumeMeter volumeMeterGameplay = null!;
+        private VolumeMeter volumeMeterHitsound = null!;
 
         // ReSharper disable once NotAccessedField.Local
         private Bindable<double> volumeGameplay = null!;
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
                                 volumeMeterMaster = new MasterVolumeMeter(AudioSettingsStrings.MasterVolume.ToUpper(), 140, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
                                 volumeMeterMusic = new VolumeMeter(AudioSettingsStrings.MusicVolume.ToUpper(), 100, colours.BlueDarker),
                                 volumeMeterEffect = new VolumeMeter(AudioSettingsStrings.EffectVolume.ToUpper(), 100, colours.BlueDarker),
-                                volumeMeterGameplay = new VolumeMeter(AudioSettingsStrings.HitsoundVolume.ToUpper(), 100, colours.BlueDarker),
+                                volumeMeterHitsound = new VolumeMeter(AudioSettingsStrings.HitsoundVolume.ToUpper(), 100, colours.BlueDarker),
                             }
                         },
                     },
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
-            volumeMeterGameplay.Bindable.BindTo(volumeGameplay = config.GetBindable<double>(OsuSetting.GameplayVolume));
+            volumeMeterHitsound.Bindable.BindTo(volumeGameplay = config.GetBindable<double>(OsuSetting.HitsoundVolume));
         }
 
         protected override void LoadComplete()

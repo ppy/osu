@@ -75,9 +75,9 @@ namespace osu.Game.Rulesets.UI
 
         public override Container Overlays { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
-        public override IAdjustableAudioComponent Audio => audioContainer;
+        public override IAdjustableAudioComponent Audio => gameplayMixer;
 
-        private readonly DrawableAudioMixer audioContainer = new DrawableAudioMixer { RelativeSizeAxes = Axes.Both, Name = "GameplayMixer" };
+        private readonly DrawableAudioMixer gameplayMixer = new DrawableAudioMixer { RelativeSizeAxes = Axes.Both, Name = "GameplayMixer" };
 
         public override Container FrameStableComponents { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.UI
 
         private bool frameStablePlayback = true;
 
-        private Bindable<double> gameplayVolume;
+        private Bindable<double> hitsoundVolume;
 
         internal override bool FrameStablePlayback
         {
@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.UI
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
-                    audioContainer.WithChild(KeyBindingInputManager
+                    gameplayMixer.WithChild(KeyBindingInputManager
                         .WithChildren(new Drawable[]
                         {
                             playfieldAdjustmentContainer.WithChild(Playfield),
@@ -198,8 +198,8 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            gameplayVolume = config.GetBindable<double>(OsuSetting.GameplayVolume);
-            audioContainer.Volume.BindTo(gameplayVolume);
+            hitsoundVolume = config.GetBindable<double>(OsuSetting.HitsoundVolume);
+            gameplayMixer.Volume.BindTo(hitsoundVolume);
 
             applyRulesetMods(Mods, config);
 

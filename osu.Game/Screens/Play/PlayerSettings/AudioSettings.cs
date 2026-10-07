@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 new PlayerSliderBar<double>
                 {
                     LabelText = SkinSettingsStrings.HitsoundVolume,
-                    Current = config.GetBindable<double>(OsuSetting.GameplayVolume),
+                    Current = config.GetBindable<double>(OsuSetting.HitsoundVolume),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true,
                 },
