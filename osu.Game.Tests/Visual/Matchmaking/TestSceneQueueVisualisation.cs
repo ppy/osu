@@ -4,24 +4,38 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Matchmaking
 {
-    public partial class TestSceneMatchmakingCloud : OsuTestScene
+    public partial class TestSceneQueueVisualisation : OsuTestScene
     {
-        private CloudVisualisation cloud = null!;
+        private QueueVisualisation visualisation = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Child = cloud = new CloudVisualisation
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
+                new Circle
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(300),
+                    Colour = Color4.Red,
+                },
+                visualisation = new QueueVisualisation
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    SafeRadius = 150,
+                },
             };
         }
 
@@ -37,7 +51,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     Id = RNG.Next(2, 30000000),
                 }).ToArray();
 
-                cloud.Users = testUsers;
+                visualisation.Users = testUsers;
             });
         }
     }

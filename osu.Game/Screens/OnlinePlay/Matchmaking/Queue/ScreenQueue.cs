@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public override bool? ApplyModTrackAdjustments => false;
 
         private Container mainContent = null!;
-        private CloudVisualisation cloud = null!;
+        private QueueVisualisation cloud = null!;
         private RatingDistributionGraph ratingGraph = null!;
         private FillFlowContainer resultPanelContainer = null!;
 
@@ -206,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                             RelativeSizeAxes = Axes.Both,
                                                             Children = new Drawable[]
                                                             {
-                                                                cloud = new CloudVisualisation
+                                                                cloud = new QueueVisualisation
                                                                 {
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,

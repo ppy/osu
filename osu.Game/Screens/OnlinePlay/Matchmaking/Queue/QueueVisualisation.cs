@@ -9,6 +9,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
@@ -21,12 +22,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     /// A visualisation at the top level of matchmaking which shows the overall system status.
     /// This is intended to be something which users can watch while idle, for fun or otherwise.
     /// </summary>
-    public partial class CloudVisualisation : CompositeDrawable
+    public partial class QueueVisualisation : CompositeDrawable
     {
-        private APIUser[] users = [];
-        private Container usersContainer = null!;
+        private const int min_scale = 1;
+        private const int max_scale = 3;
+        private const int safe_radius_padding = 20;
 
+        private APIUser[] users = [];
+        private readonly Container usersContainer;
+
+        private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
+
+        private readonly Bindable<float> safeRadius = new Bindable<float>();
         private readonly Bindable<double?> lastSamplePlayback = new Bindable<double?>();
+
+        /// <summary>
+        /// Radius (in pixels) of an area originating in the centre of the visualisation
+        /// which is going to be avoided by the displayed avatars.
+        /// </summary>
+        public float SafeRadius { get; init; }
 
         public APIUser[] Users
         {
@@ -44,7 +58,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             foreach (var u in usersContainer)
                 u.Delay(RNG.Next(0, 1000)).FadeOut(500).Expire();
 
-            LoadComponentsAsync(users.Select(u => new MovingAvatar(u, lastSamplePlayback)), avatars =>
+            LoadComponentsAsync(users.Select(u => new MovingAvatar(u)
+            {
+                SafeRadius = { BindTarget = safeRadius },
+                LastSamplePlayback = { BindTarget = lastSamplePlayback },
+            }), avatars =>
             {
                 if (usersContainer.Count == 0)
                 {
@@ -56,45 +74,61 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             });
         }
 
-        protected override void LoadComplete()
+        public QueueVisualisation()
         {
-            base.LoadComplete();
-
             InternalChildren = new Drawable[]
             {
                 usersContainer = new AspectContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Y,
                 },
             };
 
+            AddLayout(layout);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             refresh();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!layout.IsValid)
+            {
+                safeRadius.Value = (SafeRadius + MatchmakingAvatar.SIZE.Y * max_scale / 2 + safe_radius_padding) / usersContainer.DrawHeight;
+                layout.Validate();
+            }
         }
 
         public partial class MovingAvatar : MatchmakingAvatar
         {
             private float angle;
-            private float angularSpeed;
+            private float radius;
 
-            private float targetSpeed;
             private float targetScale;
             private float targetAlpha;
 
-            private readonly Bindable<double?> lastSamplePlayback = new Bindable<double?>();
+            public readonly Bindable<double?> LastSamplePlayback = new Bindable<double?>();
+            public readonly IBindable<float> SafeRadius = new Bindable<float>();
 
             private const int num_appear_samples = 6;
             private Sample? playerAppearSample;
 
-            public MovingAvatar(APIUser apiUser, Bindable<double?> lastSamplePlayback)
+            public MovingAvatar(APIUser apiUser)
                 : base(apiUser)
             {
                 RelativePositionAxes = Axes.Both;
                 Scale = new Vector2(2);
 
+                Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                this.lastSamplePlayback.BindTo(lastSamplePlayback);
             }
 
             [BackgroundDependencyLoader]
@@ -110,20 +144,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 updateParams();
 
                 angle = RNG.NextSingle(0f, MathF.Tau);
+                radius = RNG.NextSingle(SafeRadius.Value, 0.5f);
 
-                angularSpeed = targetSpeed;
                 Scale = new Vector2(targetScale);
 
                 Hide();
                 int appearDelay = RNG.Next(0, 1000);
                 this.Delay(appearDelay).FadeTo(targetAlpha, 2000, Easing.OutQuint);
                 Scheduler.AddDelayed(playAppearSample, appearDelay);
+
+                SafeRadius.BindValueChanged(e => radius -= e.OldValue - e.NewValue);
             }
 
             private void updateParams()
             {
-                targetSpeed = RNG.NextSingle(0.05f, 0.5f);
-                targetScale = RNG.NextSingle(0.2f, 3f);
+                targetScale = RNG.NextSingle(min_scale, max_scale);
                 targetAlpha = RNG.NextSingle(0.5f, 1f);
 
                 Scheduler.AddDelayed(updateParams, RNG.Next(500, 5000));
@@ -131,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             private void playAppearSample()
             {
-                bool enoughTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+                bool enoughTimeElapsed = !LastSamplePlayback.Value.HasValue || Time.Current - LastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
                 if (!enoughTimeElapsed) return;
 
                 var chan = playerAppearSample?.GetChannel();
@@ -141,7 +176,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 chan.Balance.Value = MathF.Cos(angle) * OsuGameBase.SFX_STEREO_STRENGTH;
                 chan.Play();
 
-                lastSamplePlayback.Value = Time.Current;
+                LastSamplePlayback.Value = Time.Current;
             }
 
             protected override void Update()
@@ -152,12 +187,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 Scale = new Vector2((float)Interpolation.Lerp(Scale.X, targetScale, elapsed / 100));
                 Alpha = (float)Interpolation.Lerp(Alpha, targetAlpha, elapsed / 100);
-                angularSpeed = (float)Interpolation.Lerp(angularSpeed, targetSpeed, elapsed / 100);
 
-                angle += angularSpeed * elapsed * 0.5f;
+                angle += radius * elapsed * 0.5f;
 
-                Position = new Vector2(0.5f) +
-                           new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * angularSpeed;
+                Position = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * radius;
             }
         }
     }
