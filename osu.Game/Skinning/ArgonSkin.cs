@@ -77,9 +77,9 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(lookup)
-                             ?? Resources.AudioManager?.Samples.Get(lookup.Replace(@"Gameplay/", @"Gameplay/Argon/"))
-                             ?? Resources.AudioManager?.Samples.Get(lookup);
+                var sample = GetSample(lookup, sampleInfo.IsHitsound)
+                             ?? GetResourceSample(lookup.Replace(@"Gameplay/", @"Gameplay/Argon/"), sampleInfo.IsHitsound)
+                             ?? GetResourceSample(lookup, sampleInfo.IsHitsound);
 
                 if (sample != null)
                     return sample;

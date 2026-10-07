@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Rendering.Dummy;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -104,7 +103,7 @@ namespace osu.Game.Tests.Skins
 
             public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 
-            public override ISample GetSample(ISampleInfo sampleInfo) => Samples.AsNonNull().Get(SAMPLE_NAME);
+            public override ISample GetSample(ISampleInfo sampleInfo) => GetSample(SAMPLE_NAME, sampleInfo.IsHitsound)!;
         }
     }
 }
