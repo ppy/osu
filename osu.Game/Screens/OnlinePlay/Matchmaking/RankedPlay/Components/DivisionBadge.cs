@@ -57,6 +57,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                 },
                 new Sprite
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = textures.Get($@"Online/RankedPlay/Tiers/Stars/{division.Key}"),
+                    FillMode = FillMode.Fit,
+                },
+                new Sprite
+                {
                     Size = division.Tier switch
                     {
                         RankingTier.Bronze => new Vector2(33),
@@ -75,12 +81,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
                         _ => throw new ArgumentOutOfRangeException()
                     },
                     Texture = textures.Get($@"Online/RankedPlay/Tiers/Rulesets/{ruleset.ShortName}"),
-                },
-                new Sprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Texture = textures.Get($@"Online/RankedPlay/Tiers/Stars/{division.Key}"),
-                    FillMode = FillMode.Fit,
                 },
                 new CompactDivisionBadge(division, rank)
                 {
