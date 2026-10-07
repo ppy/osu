@@ -58,8 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double snapDifficulty = currVelocity; // Start difficulty with regular velocity.
 
             // Penalize angle repetition.
-            if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.1 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
-                snapDifficulty *= vectorAngleRepetition(osuCurrObj, osuLastObj);
+            snapDifficulty *= vectorAngleRepetition(osuCurrObj, osuLastObj);
 
             if (osuCurrObj.Angle != null && osuLastObj.Angle != null)
             {
@@ -173,7 +172,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
         private static double vectorAngleRepetition(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
         {
-            if (current.Angle == null || previous.Angle == null)
+            if (current.Angle == null || previous.Angle == null ||
+                Math.Max(current.AdjustedDeltaTime, previous.AdjustedDeltaTime) < 1.1 * Math.Min(current.AdjustedDeltaTime, previous.AdjustedDeltaTime))
                 return 1;
 
             const double note_limit = 6;
