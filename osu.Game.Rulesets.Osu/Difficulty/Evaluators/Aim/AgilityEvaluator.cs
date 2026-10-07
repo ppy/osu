@@ -25,10 +25,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = (OsuDifficultyHitObject?)current.Previous();
 
-            double baseDifficulty = 1;
-
-            baseDifficulty += calculateAngleSwitchingBonus(osuCurrObj, osuPrevObj);
-
             // For objects that are stacked we want to reduce the agility difficulty slightly by combining delta times of both objects together
             // Because we can assume that they likely would be done in one movement.
             double previousDelta = 0;
@@ -41,7 +37,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double combinedDelta = osuCurrObj.AdjustedDeltaTime + previousDelta * previous_delta_influence;
 
-            double agilityDifficulty = baseDifficulty * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
+            double angleSwitchingBonus = calculateAngleSwitchingBonus(osuCurrObj, osuPrevObj);
+
+            double agilityDifficulty = (1 + angleSwitchingBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
 
             agilityDifficulty *= osuCurrObj.SmallCircleBonus;
 
