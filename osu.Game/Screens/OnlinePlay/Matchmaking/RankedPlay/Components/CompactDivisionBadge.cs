@@ -20,7 +20,7 @@ using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Online.RankedPlay
+namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 {
     public partial class CompactDivisionBadge : CompositeDrawable, IHasTooltip
     {

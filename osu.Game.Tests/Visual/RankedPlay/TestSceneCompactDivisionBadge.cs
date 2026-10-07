@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.RankedPlay;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.RankedPlay
