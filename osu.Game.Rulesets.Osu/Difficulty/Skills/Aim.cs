@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             const double skill_multiplier_snap = 78.3;
             const double skill_multiplier_agility = 32.5;
-            const double skill_multiplier_flow = 252.0;
+            const double skill_multiplier_flow = 251.0;
             const double skill_multiplier_spinner = 22.0;
 
             if (current.BaseObject is Spinner)
