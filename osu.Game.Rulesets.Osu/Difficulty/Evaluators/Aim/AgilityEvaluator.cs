@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double agilityDifficulty = DiffUtils.Pow(1000 / combinedDelta, 2);
 
-            agilityDifficulty *= DiffUtils.Pow(osuCurrObj.SmallCircleBonus, 1.5);
+            agilityDifficulty += osuCurrObj.SmallCircleBonus * 10.0;
 
             return agilityDifficulty;
         }

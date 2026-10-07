@@ -39,10 +39,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double flowDifficulty = currVelocity;
 
-            // Apply high circle size bonus to the base velocity.
-            // We use reduced CS bonus here because the bonus was made for an evaluator with a different d/t scaling
-            flowDifficulty *= Math.Sqrt(osuCurrObj.SmallCircleBonus);
-
             flowDifficulty *= calculateRhythmChangeBonus(osuCurrObj, osuLastObj);
             flowDifficulty *= calculateAngularVelocityBonus(osuCurrObj, osuLastObj);
 
@@ -69,6 +65,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
             flowDifficulty = DiffUtils.Pow(flowDifficulty, 1.45);
+
+            flowDifficulty += osuCurrObj.SmallCircleBonus;
 
             // Reduce difficulty for low spacing since spacing below radius is always to be flowed
             return flowDifficulty * DiffUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
