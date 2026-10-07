@@ -35,11 +35,6 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                     HintText = OnlineSettingsStrings.NotifyOnFriendPresenceChangeTooltip,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnFriendPresenceChange),
                 }),
-                new SettingsItemV2(new FormCheckBox
-                {
-                    Caption = OnlineSettingsStrings.HideCountryFlags,
-                    Current = config.GetBindable<bool>(OsuSetting.HideCountryFlags)
-                }),
             };
         }
     }

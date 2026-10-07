@@ -10,9 +10,9 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
-    public partial class WebSettings : SettingsSubsection
+    public partial class ContentDownloadSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => OnlineSettingsStrings.WebHeader;
+        protected override LocalisableString Header => OnlineSettingsStrings.ContentDownloadsHeader;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -47,7 +47,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 })
                 {
                     Keywords = new[] { "nsfw", "18+", "offensive" },
-                }
+                },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = OnlineSettingsStrings.HideCountryFlags,
+                    Current = config.GetBindable<bool>(OsuSetting.HideCountryFlags)
+                }),
             };
         }
     }

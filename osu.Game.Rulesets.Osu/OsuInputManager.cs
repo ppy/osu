@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Lists;
 using osu.Framework.Localisation;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -114,5 +115,23 @@ namespace osu.Game.Rulesets.Osu
 
         [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.Smoke))]
         Smoke,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.HitCircleTool))]
+        EditorHitCircleTool = 10000,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.SliderTool))]
+        EditorSliderTool,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.SpinnerTool))]
+        EditorSpinnerTool,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.GridFromPointsTool))]
+        EditorGridFromPointsTool,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.ToggleGridSnap))]
+        EditorToggleGridSnap,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleDistanceSnap))]
+        EditorToggleDistanceSnap,
     }
 }

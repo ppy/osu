@@ -2,9 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
@@ -24,5 +29,17 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             return actualDistance / expectedDistance;
         }
+
+        public override IEnumerable<DrawableTernaryButton> CreateTernaryButtons() => new[]
+        {
+            new DrawableTernaryButton<CatchAction>
+            {
+                Current = DistanceSnapToggle,
+                Description = "Distance Snap",
+                CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap },
+                Action = CatchAction.EditorToggleDistanceSnap,
+                Hotkey = new Hotkey(CatchRuleset.SHORT_NAME, Ruleset.EDITOR_VARIANT, (int)CatchAction.EditorToggleDistanceSnap),
+            }
+        };
     }
 }

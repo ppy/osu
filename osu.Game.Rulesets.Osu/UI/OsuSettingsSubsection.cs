@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
@@ -15,8 +14,6 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public partial class OsuSettingsSubsection : RulesetSettingsSubsection
     {
-        protected override LocalisableString Header => "osu!";
-
         public OsuSettingsSubsection(Ruleset ruleset)
             : base(ruleset)
         {

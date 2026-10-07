@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -84,8 +85,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             // We are detecting this exact scenario. The first back and forth is counted but all subsequent ones are nullified.
             // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and NORMALIZED_HALF_CATCHER_WIDTH)
             if (current.Index >= 2 && Math.Abs(catchCurrent.ExactDistanceMoved) <= CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2
-                                   && catchCurrent.ExactDistanceMoved == -catchLast.ExactDistanceMoved && catchLast.ExactDistanceMoved == -catchLastLast.ExactDistanceMoved
-                                   && catchCurrent.StrainTime == catchLast.StrainTime && catchLast.StrainTime == catchLastLast.StrainTime)
+                                   && Precision.AlmostEquals(catchCurrent.ExactDistanceMoved, -catchLast.ExactDistanceMoved)
+                                   && Precision.AlmostEquals(catchLast.ExactDistanceMoved, -catchLastLast.ExactDistanceMoved)
+                                   && Precision.AlmostEquals(catchCurrent.StrainTime, catchLast.StrainTime)
+                                   && Precision.AlmostEquals(catchLast.StrainTime, catchLastLast.StrainTime))
                 distanceAddition = 0;
 
             return distanceAddition / weightedStrainTime;

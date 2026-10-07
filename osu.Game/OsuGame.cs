@@ -139,6 +139,8 @@ namespace osu.Game
 
         private LoginOverlay loginOverlay;
 
+        private NowPlayingOverlay nowPlayingOverlay;
+
         private BeatmapSetOverlay beatmapSetOverlay;
 
         private WikiOverlay wikiOverlay;
@@ -1239,7 +1241,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new NowPlayingOverlay
+            loadComponentSingleFile(nowPlayingOverlay = new NowPlayingOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -1259,7 +1261,7 @@ namespace osu.Game
             Add(new FriendPresenceNotifier());
 
             // side overlays which cancel each other.
-            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay, loginOverlay };
+            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay, loginOverlay, nowPlayingOverlay };
 
             foreach (var overlay in singleDisplaySideOverlays)
             {
@@ -1375,6 +1377,13 @@ namespace osu.Game
                 Audio.UseExperimentalWasapi.Value = true;
 
                 dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
+            }
+
+            if (combined < 20260728)
+            {
+#pragma warning disable CS0612 // Type or member is obsolete (MenuParallax exists solely to make this migration work, it should not be used anywhere else)
+                LocalConfig.SetValue<float>(OsuSetting.MenuParallaxScale, LocalConfig.Get<bool>(OsuSetting.MenuParallax) ? 1 : 0);
+#pragma warning restore CS0612 // Type or member is obsolete
             }
         }
 

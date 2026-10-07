@@ -95,6 +95,23 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
+        [TestCase("diffcalc-test")]
+        [TestCase("801165")]
+        [TestCase("5542176")] // real example of a map whose difficulty decreased with more objects
+        public void TestDifficultyDoesNotDecreaseWithMoreObjects(string name)
+        {
+            var timedAttributes = CreateDifficultyCalculator(GetBeatmap(name))
+                .CalculateTimed([new OsuModEasy(), new OsuModHidden()]);
+
+            for (int i = 1; i < timedAttributes.Count; i++)
+            {
+                var previous = (OsuDifficultyAttributes)timedAttributes[i - 1].Attributes;
+                var current = (OsuDifficultyAttributes)timedAttributes[i].Attributes;
+
+                Assert.That(current.StarRating, Is.GreaterThanOrEqualTo(previous.StarRating).Within(CHECK_PRECISION));
+            }
+        }
+
         protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset().RulesetInfo, beatmap);
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();

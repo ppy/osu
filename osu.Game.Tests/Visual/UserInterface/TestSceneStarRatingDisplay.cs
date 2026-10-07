@@ -68,6 +68,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (starRating != null)
                     starRating.Current.Value = new StarDifficulty(d, 1);
             });
+
+            AddStep("set absurdly high value", () => starRating.Current.Value = new StarDifficulty(1000, 1));
         }
     }
 }
