@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
@@ -27,18 +28,34 @@ namespace osu.Game.IPC.DataSources
         {
             base.LoadComplete();
 
-            userActivity.BindValueChanged(onUserActivityChange);
+            userActivity.BindValueChanged(_ => broadcastUserActivity());
         }
 
-        private void onUserActivityChange(ValueChangedEvent<UserActivity?> change)
+        public override Task OnClientConnected(int clientId)
         {
-            if (change.NewValue == null)
+            if (userActivity.Value == null)
+                return Task.CompletedTask;
+
+            var msg = new UserActivityWebSocketMessage
+            {
+                Status = userActivity.Value.GetType().Name,
+                Data = getUserActivityData(userActivity.Value),
+            };
+
+            SendMessage(clientId, msg);
+
+            return Task.CompletedTask;
+        }
+
+        private void broadcastUserActivity()
+        {
+            if (userActivity.Value == null)
                 return;
 
             var msg = new UserActivityWebSocketMessage
             {
-                Status = change.NewValue.GetType().Name,
-                Data = getUserActivityData(change.NewValue),
+                Status = userActivity.Value.GetType().Name,
+                Data = getUserActivityData(userActivity.Value),
             };
 
             BroadcastMessage(msg);
