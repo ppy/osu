@@ -9,7 +9,7 @@ namespace osu.Game.Online.RankedPlay
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum Division
+    public enum RankedPlayDivision
     {
         I = 1,
         II = 2,

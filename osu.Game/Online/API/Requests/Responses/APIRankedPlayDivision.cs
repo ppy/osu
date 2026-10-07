@@ -18,7 +18,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public RankingTier Tier;
 
         [JsonProperty(@"division")]
-        public Division Division;
+        public RankedPlayDivision Division;
 
         [JsonProperty(@"display_name")]
         public string DisplayName = string.Empty;
