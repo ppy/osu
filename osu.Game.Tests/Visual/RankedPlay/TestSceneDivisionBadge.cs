@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
 
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(10),
                                 ChildrenEnumerable = Enumerable.Range(1, 100).Where(i => i == 1 || i == 100 || i % 20 == 0).Select(i => new DivisionBadge(
-                                    new RankedPlayDivision { Key = "Lustrous", Tier = Tier.Lustrous, DisplayName = "Lustrous", StartRating = 2400, EndRating = 3000 },
+                                    new APIRankedPlayDivision { Key = "Lustrous", Tier = RankingTier.Lustrous, DisplayName = "Lustrous", StartRating = 2400, EndRating = 3000 },
                                     ruleset,
                                     i
                                 )),

@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.RankedPlay;
+using osu.Game.Scoring;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.RankedPlay
@@ -44,7 +45,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(10),
                             ChildrenEnumerable = Enumerable.Range(1, 100).Where(i => i == 1 || i == 100 || i % 5 == 0).Select(i => new CompactDivisionBadge(
-                                new RankedPlayDivision { Tier = Tier.Lustrous, DisplayName = "Lustrous", StartRating = 2400, EndRating = 3000 },
+                                new APIRankedPlayDivision { Tier = RankingTier.Lustrous, DisplayName = "Lustrous", StartRating = 2400, EndRating = 3000 },
                                 i
                             )),
                         }
@@ -53,26 +54,26 @@ namespace osu.Game.Tests.Visual.RankedPlay
             };
         }
 
-        public static readonly RankedPlayDivision[] DIVISIONS =
+        public static readonly APIRankedPlayDivision[] DIVISIONS =
         [
-            new RankedPlayDivision { Key = "Bronze-I", Tier = Tier.Bronze, Division = Division.I, DisplayName = "Bronze I", StartRating = 600, EndRating = 699 },
-            new RankedPlayDivision { Key = "Bronze-II", Tier = Tier.Bronze, Division = Division.II, DisplayName = "Bronze II", StartRating = 700, EndRating = 799 },
-            new RankedPlayDivision { Key = "Bronze-III", Tier = Tier.Bronze, Division = Division.III, DisplayName = "Bronze III", StartRating = 800, EndRating = 899 },
-            new RankedPlayDivision { Key = "Silver-I", Tier = Tier.Silver, Division = Division.I, DisplayName = "Silver I", StartRating = 900, EndRating = 999 },
-            new RankedPlayDivision { Key = "Silver-II", Tier = Tier.Silver, Division = Division.II, DisplayName = "Silver II", StartRating = 1000, EndRating = 1099 },
-            new RankedPlayDivision { Key = "Silver-III", Tier = Tier.Silver, Division = Division.III, DisplayName = "Silver III", StartRating = 1100, EndRating = 1199 },
-            new RankedPlayDivision { Key = "Gold-I", Tier = Tier.Gold, Division = Division.I, DisplayName = "Gold I", StartRating = 1200, EndRating = 1299 },
-            new RankedPlayDivision { Key = "Gold-II", Tier = Tier.Gold, Division = Division.II, DisplayName = "Gold II", StartRating = 1300, EndRating = 1399 },
-            new RankedPlayDivision { Key = "Gold-III", Tier = Tier.Gold, Division = Division.III, DisplayName = "Gold III", StartRating = 1400, EndRating = 1499 },
-            new RankedPlayDivision { Key = "Platinum-I", Tier = Tier.Platinum, Division = Division.I, DisplayName = "Platinum I", StartRating = 1500, EndRating = 1599 },
-            new RankedPlayDivision { Key = "Platinum-II", Tier = Tier.Platinum, Division = Division.II, DisplayName = "Platinum II", StartRating = 1600, EndRating = 1699 },
-            new RankedPlayDivision { Key = "Platinum-III", Tier = Tier.Platinum, Division = Division.III, DisplayName = "Platinum III", StartRating = 1700, EndRating = 1799 },
-            new RankedPlayDivision { Key = "Rhodium-I", Tier = Tier.Rhodium, Division = Division.I, DisplayName = "Rhodium I", StartRating = 1800, EndRating = 1899 },
-            new RankedPlayDivision { Key = "Rhodium-II", Tier = Tier.Rhodium, Division = Division.II, DisplayName = "Rhodium II", StartRating = 1900, EndRating = 1999 },
-            new RankedPlayDivision { Key = "Rhodium-III", Tier = Tier.Rhodium, Division = Division.III, DisplayName = "Rhodium III", StartRating = 2000, EndRating = 2099 },
-            new RankedPlayDivision { Key = "Radiant-I", Tier = Tier.Radiant, Division = Division.I, DisplayName = "Radiant I", StartRating = 2100, EndRating = 2199 },
-            new RankedPlayDivision { Key = "Radiant-II", Tier = Tier.Radiant, Division = Division.II, DisplayName = "Radiant II", StartRating = 2200, EndRating = 2299 },
-            new RankedPlayDivision { Key = "Radiant-III", Tier = Tier.Radiant, Division = Division.III, DisplayName = "Radiant III", StartRating = 2300, EndRating = 2399 },
+            new APIRankedPlayDivision { Key = "Bronze-I", Tier = RankingTier.Bronze, Division = Division.I, DisplayName = "Bronze I", StartRating = 600, EndRating = 699 },
+            new APIRankedPlayDivision { Key = "Bronze-II", Tier = RankingTier.Bronze, Division = Division.II, DisplayName = "Bronze II", StartRating = 700, EndRating = 799 },
+            new APIRankedPlayDivision { Key = "Bronze-III", Tier = RankingTier.Bronze, Division = Division.III, DisplayName = "Bronze III", StartRating = 800, EndRating = 899 },
+            new APIRankedPlayDivision { Key = "Silver-I", Tier = RankingTier.Silver, Division = Division.I, DisplayName = "Silver I", StartRating = 900, EndRating = 999 },
+            new APIRankedPlayDivision { Key = "Silver-II", Tier = RankingTier.Silver, Division = Division.II, DisplayName = "Silver II", StartRating = 1000, EndRating = 1099 },
+            new APIRankedPlayDivision { Key = "Silver-III", Tier = RankingTier.Silver, Division = Division.III, DisplayName = "Silver III", StartRating = 1100, EndRating = 1199 },
+            new APIRankedPlayDivision { Key = "Gold-I", Tier = RankingTier.Gold, Division = Division.I, DisplayName = "Gold I", StartRating = 1200, EndRating = 1299 },
+            new APIRankedPlayDivision { Key = "Gold-II", Tier = RankingTier.Gold, Division = Division.II, DisplayName = "Gold II", StartRating = 1300, EndRating = 1399 },
+            new APIRankedPlayDivision { Key = "Gold-III", Tier = RankingTier.Gold, Division = Division.III, DisplayName = "Gold III", StartRating = 1400, EndRating = 1499 },
+            new APIRankedPlayDivision { Key = "Platinum-I", Tier = RankingTier.Platinum, Division = Division.I, DisplayName = "Platinum I", StartRating = 1500, EndRating = 1599 },
+            new APIRankedPlayDivision { Key = "Platinum-II", Tier = RankingTier.Platinum, Division = Division.II, DisplayName = "Platinum II", StartRating = 1600, EndRating = 1699 },
+            new APIRankedPlayDivision { Key = "Platinum-III", Tier = RankingTier.Platinum, Division = Division.III, DisplayName = "Platinum III", StartRating = 1700, EndRating = 1799 },
+            new APIRankedPlayDivision { Key = "Rhodium-I", Tier = RankingTier.Rhodium, Division = Division.I, DisplayName = "Rhodium I", StartRating = 1800, EndRating = 1899 },
+            new APIRankedPlayDivision { Key = "Rhodium-II", Tier = RankingTier.Rhodium, Division = Division.II, DisplayName = "Rhodium II", StartRating = 1900, EndRating = 1999 },
+            new APIRankedPlayDivision { Key = "Rhodium-III", Tier = RankingTier.Rhodium, Division = Division.III, DisplayName = "Rhodium III", StartRating = 2000, EndRating = 2099 },
+            new APIRankedPlayDivision { Key = "Radiant-I", Tier = RankingTier.Radiant, Division = Division.I, DisplayName = "Radiant I", StartRating = 2100, EndRating = 2199 },
+            new APIRankedPlayDivision { Key = "Radiant-II", Tier = RankingTier.Radiant, Division = Division.II, DisplayName = "Radiant II", StartRating = 2200, EndRating = 2299 },
+            new APIRankedPlayDivision { Key = "Radiant-III", Tier = RankingTier.Radiant, Division = Division.III, DisplayName = "Radiant III", StartRating = 2300, EndRating = 2399 },
         ];
     }
 }

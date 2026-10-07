@@ -16,6 +16,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,12 +24,12 @@ namespace osu.Game.Online.RankedPlay
 {
     public partial class CompactDivisionBadge : CompositeDrawable, IHasTooltip
     {
-        private readonly RankedPlayDivision division;
+        private readonly APIRankedPlayDivision division;
         private readonly int? rank;
 
-        public CompactDivisionBadge(RankedPlayDivision division, int? rank = null)
+        public CompactDivisionBadge(APIRankedPlayDivision division, int? rank = null)
         {
-            if (division.Tier == Tier.Lustrous && rank == null)
+            if (division.Tier == RankingTier.Lustrous && rank == null)
                 throw new ArgumentException("Must specify a rank for Lustrous tier.");
 
             this.division = division;
@@ -46,7 +47,7 @@ namespace osu.Game.Online.RankedPlay
                 Texture = textures.Get(@$"Online/RankedPlay/Tiers/Compact/{division.Tier}"),
             };
 
-            if (division.Tier != Tier.Lustrous)
+            if (division.Tier != RankingTier.Lustrous)
             {
                 AddInternal(new FillFlowContainer
                 {
