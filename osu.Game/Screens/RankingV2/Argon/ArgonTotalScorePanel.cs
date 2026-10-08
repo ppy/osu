@@ -39,7 +39,7 @@ namespace osu.Game.Screens.RankingV2.Argon
         public static readonly ColourInfo TEXT_GRADIENT = ColourInfo.GradientVertical(Colour4.White, Colour4.FromHex(@"B2E5FE"));
 
         private Container scoreContainer = null!;
-        private Sprite perfectIndicator = null!;
+        private Drawable perfectIndicator = null!;
         private Container personalBestIndicator = null!;
         private Box personalBestFlash = null!;
         private TotalScoreCounter totalScoreText = null!;
@@ -100,20 +100,7 @@ namespace osu.Game.Screens.RankingV2.Argon
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Size = new Vector2(65),
-                                    Child = perfectIndicator = new Sprite
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Texture = textures.Get(@"Icons/Ranking/perfect"),
-                                        Size = new Vector2(75),
-                                        Colour = new ColourInfo
-                                        {
-                                            TopLeft = Colour4.FromHex(@"00FFAA"),
-                                            TopRight = Colour4.FromHex(@"7CF6FF"),
-                                            BottomLeft = Colour4.FromHex(@"7CF6FF"),
-                                            BottomRight = Colour4.FromHex(@"FF9AD7"),
-                                        }
-                                    },
+                                    Child = perfectIndicator = new PerfectIndicator()
                                 },
                                 totalScoreText = new TotalScoreCounter
                                 {
@@ -253,14 +240,12 @@ namespace osu.Game.Screens.RankingV2.Argon
             if (score.Value.MaxCombo == score.Value.GetMaximumAchievableCombo())
             {
                 perfectIndicator.FadeOut()
-                                .RotateTo(30)
-                                .ScaleTo(new Vector2(1.2f));
+                                .ScaleTo(new Vector2(0.7f));
 
-                using (BeginAbsoluteSequence(latestTransformEndTime))
+                using (BeginAbsoluteSequence(latestTransformEndTime - 650))
                 {
                     perfectIndicator.FadeIn(150, Easing.OutQuint)
-                                    .RotateTo(0, 500, Easing.InOutElastic)
-                                    .ScaleTo(Vector2.One, 500, Easing.InOutElastic);
+                                    .ScaleTo(Vector2.One, 750, Easing.OutElasticHalf);
 
                     latestTransformEndTime = perfectIndicator.LatestTransformEndTime;
 
@@ -277,13 +262,15 @@ namespace osu.Game.Screens.RankingV2.Argon
             if (isScorePersonalBest(score.Value))
             {
                 personalBestIndicator.FadeOut()
-                                     .ScaleTo(new Vector2(1.2f));
+                                     .ScaleTo(new Vector2(1.6f));
 
-                using (BeginAbsoluteSequence(latestTransformEndTime))
+                using (BeginAbsoluteSequence(latestTransformEndTime - 250))
                 {
-                    personalBestIndicator.FadeIn(150, Easing.OutQuint)
-                                         .ScaleTo(Vector2.One, 500, Easing.InOutElastic);
-                    personalBestFlash.FadeOutFromOne(1000, Easing.OutSine);
+                    personalBestIndicator.FadeIn(400, Easing.OutQuint)
+                                         .ScaleTo(Vector2.One, 400, Easing.In);
+                    personalBestFlash
+                        .Delay(400)
+                        .FadeOutFromOne(2600, Easing.OutQuint);
 
                     latestTransformEndTime = personalBestIndicator.LatestTransformEndTime;
                 }
@@ -307,6 +294,78 @@ namespace osu.Game.Screens.RankingV2.Argon
         }
 
         #endregion
+
+        private partial class PerfectIndicator : CompositeDrawable
+        {
+            private Sprite star = null!;
+            private Sprite sparkle = null!;
+            private Sprite textAdditive = null!;
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                Size = new Vector2(75);
+
+                Colour = new ColourInfo
+                {
+                    TopLeft = Colour4.FromHex(@"00FFAA"),
+                    TopRight = Colour4.FromHex(@"7CF6FF"),
+                    BottomLeft = Colour4.FromHex(@"7CF6FF"),
+                    BottomRight = Colour4.FromHex(@"FF9AD7"),
+                };
+
+                InternalChildren = new Drawable[]
+                {
+                    star = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = textures.Get(@"Icons/Ranking/perfect-star"),
+                    },
+                    sparkle = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = textures.Get(@"Icons/Ranking/perfect-sparkle"),
+                    },
+                    new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Texture = textures.Get(@"Icons/Ranking/perfect-text"),
+                    },
+                    textAdditive = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Blending = BlendingParameters.Additive,
+                        Texture = textures.Get(@"Icons/Ranking/perfect-text"),
+                    },
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                sparkle.Spin(36000, RotationDirection.Clockwise);
+
+                star.RotateTo(4).Then()
+                    .RotateTo(-4, 2000, Easing.InOutSine).Then()
+                    .RotateTo(4, 2000, Easing.InOutSine).Loop();
+
+                textAdditive.FadeOut()
+                            .FadeIn(150, Easing.OutQuint)
+                            .Then()
+                            .FadeOut(3000, Easing.OutQuint)
+                            .Then()
+                            .Delay(3000)
+                            .Loop();
+            }
+        }
 
         public partial class TotalScoreCounter : RollingCounter<long>
         {
