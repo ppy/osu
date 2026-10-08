@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
@@ -16,25 +17,36 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneQueueVisualisation : OsuTestScene
     {
+        private Container container = null!;
         private QueueVisualisation visualisation = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Children = new Drawable[]
+            Child = container = new Container
             {
-                new Circle
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(300),
-                    Colour = Color4.Red,
-                },
-                visualisation = new QueueVisualisation
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Child = new DrawSizePreservingFillContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    SafeRadius = 150,
+                    Children = new Drawable[]
+                    {
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(300),
+                            Colour = Color4.Red,
+                        },
+                        visualisation = new QueueVisualisation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            SafeRadius = 150,
+                        },
+                    },
                 },
             };
         }
@@ -42,6 +54,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestBasic()
         {
+            AddSliderStep("width", 0.5f, 1f, 1f, value => container.Width = value);
             AddStep("refresh users", () =>
             {
                 var testUsers = Enumerable.Range(0, 50).Select(_ => new APIUser
