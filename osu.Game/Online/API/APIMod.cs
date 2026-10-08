@@ -7,10 +7,8 @@ using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
@@ -45,37 +43,6 @@ namespace osu.Game.Online.API
                 if (!bindable.IsDefault)
                     Settings.Add(property.Name.ToSnakeCase(), bindable.GetUnderlyingSettingValue());
             }
-        }
-
-        public Mod ToMod(Ruleset ruleset)
-        {
-            Mod? resultMod = ruleset.CreateModFromAcronym(Acronym);
-
-            if (resultMod == null)
-            {
-                Logger.Log($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
-                return new UnknownMod(Acronym);
-            }
-
-            if (Settings.Count > 0)
-            {
-                foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
-                {
-                    if (!Settings.TryGetValue(property.Name.ToSnakeCase(), out object? settingValue))
-                        continue;
-
-                    try
-                    {
-                        resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod)!, settingValue);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Log($"Failed to copy mod setting value '{settingValue}' to \"{property.Name}\": {ex.Message}");
-                    }
-                }
-            }
-
-            return resultMod;
         }
 
         public bool ShouldSerializeSettings() => Settings.Count > 0;
