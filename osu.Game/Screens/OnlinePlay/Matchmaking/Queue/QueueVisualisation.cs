@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly LayoutValue layout = new LayoutValue(Invalidation.DrawSize);
 
-        private readonly Bindable<float> safeRadius = new Bindable<float>();
+        private readonly Bindable<float> safeRadiusRelative = new Bindable<float>();
         private readonly Bindable<double?> lastSamplePlayback = new Bindable<double?>();
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             LoadComponentsAsync(users.Select(u => new MovingAvatar(u)
             {
-                SafeRadius = { BindTarget = safeRadius },
+                SafeRadius = { BindTarget = safeRadiusRelative },
                 LastSamplePlayback = { BindTarget = lastSamplePlayback },
             }), avatars =>
             {
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             if (!layout.IsValid)
             {
-                safeRadius.Value = (SafeRadius + MatchmakingAvatar.SIZE.Y * max_scale / 2 + safe_radius_padding) / usersContainer.DrawHeight;
+                safeRadiusRelative.Value = (SafeRadius + MatchmakingAvatar.SIZE.Y * max_scale / 2 + safe_radius_padding) / usersContainer.DrawHeight;
                 layout.Validate();
             }
         }
