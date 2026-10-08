@@ -30,6 +30,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoPPForFailedScores => new TranslatableString(getKey(@"no_pp_for_failed_scores"), @"Performance points are not granted for failed scores.");
 
+        /// <summary>
+        /// "Personal best"
+        /// </summary>
+        public static LocalisableString PersonalBest => new TranslatableString(getKey(@"personal_best"), @"Personal best");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
