@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        public override int Version => 20251020;
+        public override int Version => 20260706;
 
         public OsuDifficultyCalculator(IRulesetInfo ruleset, IWorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -66,15 +66,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int totalHits = beatmap.HitObjects.Count;
 
+            double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
+            double aimNoSlidersRating = calculateAimDifficultyRating(aimNoSlidersDifficultyValue);
+
             double sliderFactor = aimDifficultyValue > 0
-                ? calculateAimDifficultyRating(aimNoSlidersDifficultyValue) / calculateAimDifficultyRating(aimDifficultyValue)
+                ? aimNoSlidersRating / aimRating
                 : 1;
 
-            double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
             double speedRating = calculateDifficultyRating(speedDifficultyValue);
             double readingRating = calculateDifficultyRating(readingDifficultyValue);
 
-            double flashlightRating = 0.0;
+            double? flashlightRating = null;
 
             if (flashlight is not null)
                 flashlightRating = calculateDifficultyRating(flashlight.DifficultyValue());
@@ -88,7 +90,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseAimPerformance = OsuPerformanceCalculator.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = HarmonicSkill.DifficultyToPerformance(speedRating);
             double baseReadingPerformance = HarmonicSkill.DifficultyToPerformance(readingRating);
-            double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+
+            double baseFlashlightPerformance = flashlightRating != null
+                ? Flashlight.DifficultyToPerformance(flashlightRating.Value)
+                : 0.0;
+
             double baseCognitionPerformance = SumCognitionDifficulty(baseReadingPerformance, baseFlashlightPerformance);
 
             double basePerformance = DiffUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseCognitionPerformance);

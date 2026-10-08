@@ -88,10 +88,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
-                    fp.FadeIn(end.TimeFadeIn);
-                    fp.ScaleTo(end.Scale, end.TimeFadeIn, Easing.Out);
-                    fp.MoveTo(pointEndPosition, end.TimeFadeIn, Easing.Out);
-                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(end.TimeFadeIn).Expire();
+                    // stable uses `HitObjectManager.TimeFadeIn` for this
+                    // (https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameplayElements/HitObjectManager.cs#L1918-L1924),
+                    // which is a constant equal to 400.
+                    // `OsuHitObject.TimeFadeIn` is not used here because `OsuModHidden` changes it.
+                    const float duration = 400;
+
+                    fp.FadeIn(duration);
+                    fp.ScaleTo(end.Scale, duration, Easing.Out);
+                    fp.MoveTo(pointEndPosition, duration, Easing.Out);
+                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(duration).Expire();
 
                     finalTransformEndTime = fp.LifetimeEnd;
                 }

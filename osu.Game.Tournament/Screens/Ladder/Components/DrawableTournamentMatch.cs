@@ -170,10 +170,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 if (selected)
                 {
                     selectionBox.Show();
+
                     if (editor && editorInfo != null)
                         editorInfo.Selected.Value = Match;
-                    else if (ladderInfo != null)
-                        ladderInfo.CurrentMatch.Value = Match;
+                    else
+                        ladderInfo?.CurrentMatch.Value = Match;
                 }
                 else
                     selectionBox.Hide();

@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Reading : HarmonicSkill
     {
-        private readonly List<DifficultyHitObject> objectList = new List<DifficultyHitObject>();
-
         private readonly bool hasHiddenMod;
 
         public Reading(Mod[] mods)
@@ -29,18 +27,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain;
 
+        private double reducedNoteCount;
+        private double? reducedDuration;
+
         private double strainDecay(double ms) => DiffUtils.Pow(0.8, ms / 1000);
 
         protected override double ObjectDifficultyOf(DifficultyHitObject current)
         {
             const double skill_multiplier = 2.5;
-
-            objectList.Add(current);
+            const double reduced_difficulty_duration = 60 * 1000;
 
             double decay = strainDecay(current.DeltaTime);
 
             currentStrain *= decay;
             currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
+
+            // This currently operates under the assumption that `ObjectDifficultyOf` is called once per object, and in order.
+            // Under that assumption, we can trust that `current.StartTime` refers to the start time of the first object in the case that `reducedDuration` is yet to be set.
+            reducedDuration ??= current.StartTime + reduced_difficulty_duration;
+
+            // This relies on the same assumption, as calling in order means that we can safely increase the note count until we reach the first object after the reduced duration.
+            if (current.StartTime <= reducedDuration)
+                reducedNoteCount++;
 
             return currentStrain;
         }
@@ -75,37 +83,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             const double reduced_difficulty_base_line = 0.0; // Assume the first seconds are completely memorised
 
-            int reducedNoteCount = calculateReducedNoteCount();
-
             for (int i = 0; i < Math.Min(difficulties.Count, reducedNoteCount); i++)
             {
-                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((double)i / reducedNoteCount, 0, 1)));
+                double scale = Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp(i / reducedNoteCount, 0, 1)));
                 difficulties[i] *= Interpolation.Lerp(reduced_difficulty_base_line, 1.0, scale);
             }
 
             return difficulties;
-        }
-
-        private int calculateReducedNoteCount()
-        {
-            const double reduced_difficulty_duration = 60 * 1000;
-
-            if (objectList.Count == 0)
-                return 0;
-
-            double reducedDuration = objectList.First().StartTime + reduced_difficulty_duration;
-
-            int reducedNoteCount = 0;
-
-            foreach (var hitObject in objectList)
-            {
-                if (hitObject.StartTime > reducedDuration)
-                    break;
-
-                reducedNoteCount++;
-            }
-
-            return reducedNoteCount;
         }
 
         public override double CountTopWeightedObjectDifficulties(double difficultyValue)

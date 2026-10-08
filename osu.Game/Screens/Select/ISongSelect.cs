@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Select
         void PresentScore(ScoreInfo score, ScorePresentType presentType = ScorePresentType.Results);
 
         /// <summary>
-        /// Set the current filter text query to the provided string.
+        /// Add provided string to the current filter text query.
         /// </summary>
-        void Search(string query);
+        void AddToSearch(string query);
 
         /// <summary>
         /// Gets relevant actionable items for beatmap context menus, based on the type of song select.

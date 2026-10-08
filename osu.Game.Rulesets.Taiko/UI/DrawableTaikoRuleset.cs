@@ -98,8 +98,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             var playfieldScreen = Playfield.ScreenSpaceDrawQuad;
 
-            if (scroller != null)
-                scroller.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
+            scroller?.Height = ToLocalSpace(playfieldScreen.TopLeft + new Vector2(0, playfieldScreen.Height / 20)).Y;
         }
 
         public MultiplierControlPoint ControlPointAt(double time)

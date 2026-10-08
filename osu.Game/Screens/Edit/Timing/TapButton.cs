@@ -318,11 +318,8 @@ namespace osu.Game.Screens.Edit.Timing
 
             var timingPoint = selectedGroup?.Value.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
 
-            if (timingPoint != null)
-            {
-                // Intentionally use the rounded BPM here.
-                timingPoint.BeatLength = 60000 / bpm;
-            }
+            // Intentionally use the rounded BPM here.
+            timingPoint?.BeatLength = 60000 / bpm;
         }
 
         private void reset()

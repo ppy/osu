@@ -38,8 +38,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             ClientWebSocket socket = new ClientWebSocket();
             socket.Options.SetRequestHeader(@"Authorization", @$"Bearer {api.AccessToken}");
             socket.Options.Proxy = WebRequest.DefaultWebProxy;
-            if (socket.Options.Proxy != null)
-                socket.Options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+            socket.Options.Proxy?.Credentials = CredentialCache.DefaultCredentials;
 
             var client = new WebSocketNotificationsClient(socket, endpoint);
             client.MessageReceived += msg => MessageReceived?.Invoke(msg);
