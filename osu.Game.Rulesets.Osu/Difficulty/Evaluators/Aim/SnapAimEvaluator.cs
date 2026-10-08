@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double vectorAngleRepetition(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
         {
             if (current.Angle == null || previous.Angle == null ||
-                Math.Max(current.AdjustedDeltaTime, previous.AdjustedDeltaTime) < 1.1 * Math.Min(current.AdjustedDeltaTime, previous.AdjustedDeltaTime))
+                Math.Max(current.AdjustedDeltaTime, previous.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, previous.AdjustedDeltaTime))
                 return 1;
 
             const double note_limit = 6;
