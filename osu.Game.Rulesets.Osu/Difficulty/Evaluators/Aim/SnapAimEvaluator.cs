@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double vectorAngleRepetition(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
         {
             if (current.Angle == null || previous.Angle == null ||
-                Math.Max(current.AdjustedDeltaTime, previous.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, previous.AdjustedDeltaTime))
+                (Math.Max(current.AdjustedDeltaTime, previous.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, previous.AdjustedDeltaTime) && previous.BaseObject is not Slider))
                 return 1;
 
             const double note_limit = 6;
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                     break;
 
                 // Only consider vectors in the same jump section, stopping to change rhythm ruins momentum
-                if (Math.Max(current.AdjustedDeltaTime, prevObj.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, prevObj.AdjustedDeltaTime))
+                if (Math.Max(current.AdjustedDeltaTime, prevObj.AdjustedDeltaTime) > 1.1 * Math.Min(current.AdjustedDeltaTime, prevObj.AdjustedDeltaTime) && prevObj.BaseObject is not Slider)
                     break;
 
                 if (prevObj.NormalisedVectorAngle == null || current.NormalisedVectorAngle == null)
@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double baseNerf = 1 - maximum_base_repetition_nerf * AngleUtils.CalculateAcuteness(lastAngle) * angleDifferenceAdjusted;
 
-            return DiffUtils.Pow(baseNerf + (1 - baseNerf) * vectorRepetition * maximum_vector_influence * stackFactor, 2.5);
+            return DiffUtils.Pow(baseNerf + (1 - baseNerf) * vectorRepetition * maximum_vector_influence * stackFactor, 2.4);
         }
 
         private static double highBpmBonus(double ms) => 1 / (1 - DiffUtils.Pow(0.03, DiffUtils.Pow(ms / 1000, 0.65)));
