@@ -329,7 +329,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("force exit song select", () => mainMenu.MakeCurrent());
 
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).GetResultSafely());
-            PushAndConfirm(() => new SoloSongSelect());
+            PushAndConfirm(() => songSelect = new SoloSongSelect());
             AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
             AddStep("show options", () => InputManager.Key(Key.F3));
             AddAssert("options is shown", () => Game!.ChildrenOfType<FooterButtonOptions.Popover>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
