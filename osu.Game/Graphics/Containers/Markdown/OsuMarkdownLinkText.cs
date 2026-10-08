@@ -6,8 +6,6 @@ using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Testing;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -53,15 +51,15 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private partial class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
-            private readonly Drawable content;
+            private readonly MarkdownTextFlowContainer content;
 
-            public OsuMarkdownLinkCompiler(Drawable content)
+            public OsuMarkdownLinkCompiler(MarkdownTextFlowContainer content)
                 : base(new[] { content })
             {
                 this.content = content;
             }
 
-            protected override IEnumerable<Drawable> EffectTargets => content.ChildrenOfType<SpriteText>();
+            protected override IEnumerable<Drawable> EffectTargets => content.Children;
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
