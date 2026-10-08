@@ -209,9 +209,16 @@ namespace osu.Game.Scoring
         [MapTo(nameof(Rank))]
         public int RankInt { get; set; }
 
+        #region IScoreInfo
+
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
+        IEnumerable<IConfiguredMod> IScoreInfo.Mods => APIMods;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.Statistics => Statistics;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.MaximumStatistics => MaximumStatistics;
+
+        #endregion
 
         #region Properties required to make things work with existing usages
 
