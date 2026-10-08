@@ -91,7 +91,7 @@ namespace osu.Game.Skinning
 
             if (resources != null)
             {
-                resourceHitSamples = resources.AudioManager?.GetSampleStore(applyGlobalSampleVolume: false);
+                resourceHitSamples = resources.AudioManager?.GetSampleStore(applyGlobalAdjustments: false);
 
                 SkinInfo = skin.ToLive(resources.RealmAccess);
 
@@ -167,7 +167,7 @@ namespace osu.Game.Skinning
             samples?.Dispose();
             hitSamples?.Dispose();
 
-            samples = resources?.AudioManager?.GetSampleStore(store, applyGlobalSampleVolume: true);
+            samples = resources?.AudioManager?.GetSampleStore(store, applyGlobalAdjustments: true);
 
             if (samples != null)
             {
@@ -178,7 +178,7 @@ namespace osu.Game.Skinning
                 samples.AddExtension(@"ogg");
             }
 
-            hitSamples = resources?.AudioManager?.GetSampleStore(store, applyGlobalSampleVolume: false);
+            hitSamples = resources?.AudioManager?.GetSampleStore(store, applyGlobalAdjustments: false);
 
             if (hitSamples != null)
             {
