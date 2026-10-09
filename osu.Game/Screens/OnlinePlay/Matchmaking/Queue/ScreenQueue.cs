@@ -396,12 +396,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 if (connected.NewValue)
                 {
-                    populateAvailablePools().FireAndForget();
+                    // If we've already fetched the pools during this session (i.e. a network reconnect),
+                    // assume they haven't changed as they should remain unchanged during a single season.
+                    if (availablePools.Value == null)
+                        populateAvailablePools().FireAndForget();
+
                     refreshLobbyData();
                 }
                 else
                 {
-                    availablePools.Value = null;
                     clearLobbyData();
                 }
             }), true);
@@ -576,12 +579,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         Spacing = new Vector2(10),
                         Children = new Drawable[]
                         {
-                            new PoolSelector
+                            new Container
                             {
+                                AutoSizeAxes = Axes.X,
+                                Height = 100,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                AvailablePools = { BindTarget = availablePools },
-                                SelectedPool = { BindTarget = selectedPool }
+                                Child = new PoolSelector
+                                {
+                                    Enabled = { BindTarget = isConnected },
+                                    AvailablePools = { BindTarget = availablePools },
+                                    SelectedPool = { BindTarget = selectedPool },
+                                },
                             },
                             new BeginQueueingButton
                             {

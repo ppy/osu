@@ -68,6 +68,16 @@ namespace osu.Game.Tests.Visual.Matchmaking
         }
 
         [Test]
+        public void TestConnectionLoss()
+        {
+            AddUntilStep("wait for pool selector", () => this.ChildrenOfType<PoolSelector>().FirstOrDefault()?.IsLoaded, () => Is.True);
+            AddStep("disconnect", () => MultiplayerClient.Disconnect());
+            AddUntilStep("pool selector is disabled", () => this.ChildrenOfType<PoolSelector>().Single().Enabled.Value, () => Is.False);
+            AddStep("connect", () => MultiplayerClient.Connect());
+            AddUntilStep("pool selector is enabled", () => this.ChildrenOfType<PoolSelector>().Single().Enabled.Value, () => Is.True);
+        }
+
+        [Test]
         public void TestDelayedRoomScreenPushDoesNotRunIfRoomIsLeftPrematurely()
         {
             AddStep("change state to in room then immediately leave room", () =>
