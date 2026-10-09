@@ -73,11 +73,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// Removes an <see cref="SpectatorPlayerClock"/>, stopping it from being managed by this <see cref="SpectatorSyncManager"/>.
         /// </summary>
         /// <param name="clock">The <see cref="SpectatorPlayerClock"/> to remove.</param>
-        public void RemoveManagedClock(SpectatorPlayerClock clock)
+        /// <param name="drain">Whether to let the clock drain remaining frames.</param>
+        public void RemoveManagedClock(SpectatorPlayerClock clock, bool drain = false)
         {
             playerClocks.Remove(clock);
-            Logger.Log($"Removing managed clock from {nameof(SpectatorSyncManager)} ({playerClocks.Count} remain)");
-            clock.IsRunning = false;
+            Logger.Log($"Removing managed clock from {nameof(SpectatorSyncManager)} (drain={drain}, {playerClocks.Count} remain)");
+
+            clock.IsCatchingUp = false;
+            clock.IsRunning = drain;
         }
 
         protected override void Update()
