@@ -30,6 +30,8 @@ namespace osu.Game.Audio
         // new bank used exclusively by taiko for now.
         public const string BANK_STRONG = @"strong";
 
+        public bool IsHitsound => true;
+
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>
