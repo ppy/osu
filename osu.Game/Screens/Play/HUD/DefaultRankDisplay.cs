@@ -27,15 +27,23 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource(typeof(DefaultRankDisplayStrings), nameof(DefaultRankDisplayStrings.PlaySamplesOnRankChange))]
         public BindableBool PlaySamples { get; set; } = new BindableBool(true);
 
+        [SettingSource(typeof(GameplaySettingsStrings), nameof(GameplaySettingsStrings.HideDuringGameplay))]
+        public BindableBool HideDuringGameplay { get; set; } = new BindableBool();
+
         private UpdateableRank rankDisplay = null!;
 
         private SkinnableSound rankDownSample = null!;
         private SkinnableSound rankUpSample = null!;
 
         private Bindable<double?> lastSamplePlayback = null!;
+        private readonly IBindable<LocalUserPlayingState> userPlayingState = new Bindable<LocalUserPlayingState>();
+        private readonly IBindable<bool> holdingForHUD = new Bindable<bool>();
         private double lastChangeTime;
+        private bool lastHiddenStatus;
 
         private ScoreRank? displayedRank;
+
+        private bool isHidden => HideDuringGameplay.Value && userPlayingState.Value == LocalUserPlayingState.Playing && !holdingForHUD.Value;
 
         private const int time_between_changes = 1500;
 
@@ -45,7 +53,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinEditor? skinEditor, SessionStatics statics)
+        private void load(SkinEditor? skinEditor, SessionStatics statics, GameplayState? gameplayState, HUDOverlay? hudOverlay)
         {
             InternalChildren = new Drawable[]
             {
@@ -61,6 +69,12 @@ namespace osu.Game.Screens.Play.HUD
                 PlaySamples.Value = false;
 
             lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
+
+            if (gameplayState != null)
+                userPlayingState.BindTo(gameplayState.PlayingState);
+
+            if (hudOverlay != null)
+                holdingForHUD.BindTo(hudOverlay.HoldingForHUD);
         }
 
         protected override void LoadComplete()
@@ -76,11 +90,21 @@ namespace osu.Game.Screens.Play.HUD
 
             var currentRank = scoreProcessor.Rank.Value;
 
+            bool currentHiddenStatus = isHidden;
+            if (currentHiddenStatus != lastHiddenStatus)
+                updateDisplayStatus(currentHiddenStatus);
+
             if (currentRank == displayedRank)
                 return;
 
             if (Time.Current - lastChangeTime >= time_between_changes || scoreProcessor.HasCompleted.Value || currentRank == ScoreRank.F)
                 updateRank(currentRank);
+        }
+
+        private void updateDisplayStatus(bool currentHiddenStatus)
+        {
+            rankDisplay.Alpha = currentHiddenStatus ? 0 : 1;
+            lastHiddenStatus = currentHiddenStatus;
         }
 
         private void updateRank(ScoreRank rank)
@@ -90,8 +114,8 @@ namespace osu.Game.Screens.Play.HUD
             // Check sample time separately to ensure two copies of the rank display don't both play samples on a change.
             bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
 
-            // Also don't play rank-down sfx on quit/retry/initial update.
-            if (displayedRank != null && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed)
+            // Also don't play rank-down sfx on quit/retry/initial update or being hidden.
+            if (displayedRank != null && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed && !isHidden)
             {
                 if (rank > displayedRank)
                     rankUpSample.Play();
