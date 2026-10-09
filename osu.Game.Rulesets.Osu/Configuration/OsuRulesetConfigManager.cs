@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
             base.InitialiseDefaults();
             SetDefault(OsuRulesetSetting.SnakingInSliders, true);
             SetDefault(OsuRulesetSetting.SnakingOutSliders, true);
+            SetDefault(OsuRulesetSetting.ShowSliderTickMissMarkers, true);
             SetDefault(OsuRulesetSetting.HitAnimations, true);
             SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
             SetDefault(OsuRulesetSetting.ShowCursorRipples, false);
@@ -36,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
     {
         SnakingInSliders,
         SnakingOutSliders,
+        ShowSliderTickMissMarkers,
         HitAnimations,
         ShowCursorTrail,
         ShowCursorRipples,
