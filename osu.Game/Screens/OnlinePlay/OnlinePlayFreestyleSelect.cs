@@ -74,6 +74,13 @@ namespace osu.Game.Screens.OnlinePlay
             criteria.Length.Max = itemLength + 30000;
             criteria.Length.IsLowerInclusive = true;
             criteria.Length.IsUpperInclusive = true;
+
+            // Dismiss the user's config-persisted search criteria (difficulty range, selected collection, converts).
+            // In the context of freestyle selection applying them is counterproductive and can cause no beatmaps to be displayed at all.
+            criteria.UserStarDifficulty.Min = null;
+            criteria.UserStarDifficulty.Max = null;
+            criteria.CollectionBeatmapMD5Hashes = null;
+            criteria.AllowConvertedBeatmaps = true;
         }
 
         private bool isValidForSelection()
