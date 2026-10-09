@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.Linq;
 using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.Footnotes;
+using Markdig.Renderers.Html;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -24,18 +23,21 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public partial class OsuMarkdownTextFlowContainer : MarkdownTextFlowContainer
     {
-        protected override void AddLinkText(string text, LinkInline linkInline)
-            => AddDrawable(new OsuMarkdownLinkText(text, linkInline));
+        protected override void AddLinkText(LinkInline linkInline)
+            => AddDrawable(new OsuMarkdownLinkText(linkInline));
 
-        protected override void AddAutoLink(AutolinkInline autolinkInline)
-            => AddDrawable(new OsuMarkdownLinkText(autolinkInline));
+        protected override void AddAutoLink(AutolinkInline autolinkInline, bool bold = false, bool italic = false)
+            => AddDrawable(new OsuMarkdownLinkText(autolinkInline, bold, italic));
 
         protected override void AddImage(LinkInline linkInline) => AddDrawable(new OsuMarkdownImage(linkInline));
 
         // TODO : Change font to monospace
-        protected override void AddCodeInLine(CodeInline codeInline) => AddDrawable(new OsuMarkdownInlineCode
+
+        protected override void AddCodeInLine(CodeInline codeInline, bool bold = false, bool italic = false) => AddDrawable(new OsuMarkdownInlineCode
         {
-            Text = codeInline.Content
+            Text = codeInline.Content,
+            Bold = bold,
+            Italic = italic,
         });
 
         protected override void AddFootnoteLink(FootnoteLink footnoteLink) => AddDrawable(new OsuMarkdownFootnoteLink(footnoteLink));
@@ -46,40 +48,39 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             base.ApplyEmphasisedCreationParameters(spriteText, bold, italic);
 
-            spriteText.Font = spriteText.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic);
+            spriteText.Font = spriteText.Font.With(weight: bold ? FontWeight.Bold : null, italics: italic);
         }
 
         protected override void AddCustomComponent(CustomContainerInline inline)
         {
-            if (!(inline.FirstChild is LiteralInline literal))
+            HtmlAttributes? attributes = inline.TryGetAttributes();
+            string? flag = attributes?.Properties?.SingleOrDefault(a => a.Key == @"flag").Value;
+
+            if (flag != null)
             {
-                base.AddCustomComponent(inline);
+                if (!Enum.TryParse<CountryCode>(flag, out var countryCode))
+                    countryCode = CountryCode.Unknown;
+
+                AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
                 return;
             }
 
-            string[] attributes = literal.Content.ToString().Trim(' ', '{', '}').Split();
-            string flagAttribute = attributes.SingleOrDefault(a => a.StartsWith(@"flag", StringComparison.Ordinal));
+            string? user = attributes?.Properties?.SingleOrDefault(a => a.Key == @"user").Value;
 
-            if (flagAttribute == null)
+            if (user != null && int.TryParse(user, out int userId))
             {
-                base.AddCustomComponent(inline);
-                return;
+                AddDrawable(new OsuMarkdownUserLink(inline, userId));
             }
-
-            string flag = flagAttribute.Split('=').Last().Trim('"');
-
-            if (!Enum.TryParse<CountryCode>(flag, out var countryCode))
-                countryCode = CountryCode.Unknown;
-
-            AddDrawable(new DrawableFlag(countryCode) { Size = new Vector2(20, 15) });
         }
 
         private partial class OsuMarkdownInlineCode : Container
         {
             [Resolved]
-            private IMarkdownTextComponent parentTextComponent { get; set; }
+            private IMarkdownTextComponent parentTextComponent { get; set; } = null!;
 
-            public string Text;
+            public required string Text;
+            public required bool Bold;
+            public required bool Italic;
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -98,6 +99,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     {
                         t.Colour = colourProvider.Light1;
                         t.Text = Text;
+                        t.Font = t.Font.With(weight: Bold ? FontWeight.Bold : FontWeight.Regular, italics: Italic);
                         t.Padding = new MarginPadding
                         {
                             Vertical = 1,
