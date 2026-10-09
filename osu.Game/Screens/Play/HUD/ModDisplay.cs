@@ -101,8 +101,10 @@ namespace osu.Game.Screens.Play.HUD
             iconsContainer.Clear();
 
             foreach (Mod mod in mods.NewValue.AsOrdered())
-                iconsContainer.Add(new ModIcon(mod, showExtendedInformation: showExtendedInformation) { Scale = new Vector2(MOD_ICON_SCALE) });
+                iconsContainer.Add(CreateModIcon(mod, showExtendedInformation).With(m => m.Scale = new Vector2(MOD_ICON_SCALE)));
         }
+
+        protected virtual ModIcon CreateModIcon(Mod mod, bool showExtendedInformation) => new ModIcon(mod, showExtendedInformation);
 
         private void updateExpansionMode(double duration = 500)
         {
