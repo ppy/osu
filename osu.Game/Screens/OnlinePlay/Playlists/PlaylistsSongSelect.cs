@@ -201,6 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 return true;
 
             addToPlaylistFooterButton.Disappear().Expire();
+            freeModSelect.Hide();
             return false;
         }
 

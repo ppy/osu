@@ -187,7 +187,6 @@ namespace osu.Game.Screens.Footer
 
         public void SetButtons(IReadOnlyList<ScreenFooterButton> buttons)
         {
-            temporarilyHiddenButtons.Clear();
             overlays.Clear();
 
             this.HidePopover();
