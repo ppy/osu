@@ -45,9 +45,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SetPreviewPointToCurrent => new TranslatableString(getKey(@"set_preview_point_to_current"), @"Set preview point to current time");
 
         /// <summary>
-        /// "Snap all notes to current snap divisor..."
+        /// "Snap all notes to current snap divisor"
         /// </summary>
-        public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor...");
+        public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor");
 
         /// <summary>
         /// "Move already placed objects when changing timing"
@@ -81,19 +81,19 @@ namespace osu.Game.Localisation
         public static LocalisableString ChangeDifficulty => new TranslatableString(getKey(@"change_difficulty"), @"Change difficulty");
 
         /// <summary>
-        /// "Delete difficulty..."
+        /// "Delete difficulty"
         /// </summary>
-        public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty...");
+        public static LocalisableString DeleteDifficulty => new TranslatableString(getKey(@"delete_difficulty"), @"Delete difficulty");
 
         /// <summary>
-        /// "Edit externally..."
+        /// "Edit externally"
         /// </summary>
-        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally...");
+        public static LocalisableString EditExternally => new TranslatableString(getKey(@"edit_externally"), @"Edit externally");
 
         /// <summary>
-        /// "Submit beatmap..."
+        /// "Submit beatmap"
         /// </summary>
-        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap...");
+        public static LocalisableString SubmitBeatmap => new TranslatableString(getKey(@"submit_beatmap"), @"Submit beatmap");
 
         /// <summary>
         /// "setup"
@@ -211,9 +211,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SeekToNextBookmark => new TranslatableString(getKey(@"seek_to_next_bookmark"), @"Seek to next bookmark");
 
         /// <summary>
-        /// "Reset bookmarks..."
+        /// "Reset bookmarks"
         /// </summary>
-        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks..."), @"Reset bookmarks...");
+        public static LocalisableString ResetBookmarks => new TranslatableString(getKey(@"reset_bookmarks..."), @"Reset bookmarks");
 
         /// <summary>
         /// "Open beatmap info page"
@@ -317,9 +317,9 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectTool => new TranslatableString(getKey(@"select_tool"), @"Select");
 
         /// <summary>
-        /// "Synchronise..."
+        /// "Synchronise"
         /// </summary>
-        public static LocalisableString Synchronise => new TranslatableString(getKey(@"synchronise"), @"Synchronise...");
+        public static LocalisableString Synchronise => new TranslatableString(getKey(@"synchronise"), @"Synchronise");
 
         /// <summary>
         /// "Seek backwards"

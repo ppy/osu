@@ -139,6 +139,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NoVideosFoundToDelete => new TranslatableString(getKey(@"no_videos_found_to_delete"), @"No videos found to delete!");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

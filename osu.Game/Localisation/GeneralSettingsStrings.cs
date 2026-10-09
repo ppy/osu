@@ -70,9 +70,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ExportLogs => new TranslatableString(getKey(@"export_logs"), @"Export logs");
 
         /// <summary>
-        /// "Change folder location..."
+        /// "Change folder location"
         /// </summary>
-        public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location...");
+        public static LocalisableString ChangeFolderLocation => new TranslatableString(getKey(@"change_folder_location"), @"Change folder location");
 
         /// <summary>
         /// "Move your current data to a new folder, or point osu! to backed-up data at an existing location."
