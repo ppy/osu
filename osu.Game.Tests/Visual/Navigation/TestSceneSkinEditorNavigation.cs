@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -17,6 +18,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
@@ -132,6 +134,55 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("accuracy meter state unchanged",
                 () => JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()),
                 () => Is.EqualTo(state));
+        }
+
+        [Test]
+        public void TestRevertToDefaultUndoneInSingleStep()
+        {
+            AddStep("set default skin", () => Game.Dependencies.Get<SkinManager>().CurrentSkinInfo.SetDefault());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
+            openSkinEditor();
+            AddUntilStep("current skin is mutable", () => !Game.Dependencies.Get<SkinManager>().CurrentSkin.Value.SkinInfo.Value.Protected);
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return Game.ScreenStack.CurrentScreen is Player;
+            });
+
+            AddUntilStep("wait for components loaded", allTargetsLoaded);
+
+            int customisedComponentCount = 0;
+
+            AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
+            AddStep("store component count", () => customisedComponentCount = totalComponentCount());
+
+            AddStep("open file menu", () =>
+            {
+                InputManager.MoveMouseTo(getMenuItem("File"));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("click revert to default", () =>
+            {
+                InputManager.MoveMouseTo(getMenuItem("Revert to default"));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for dialog", () => Game.ChildrenOfType<SkinEditor.RevertConfirmDialog>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("confirm revert", () => Game.ChildrenOfType<SkinEditor.RevertConfirmDialog>().Single().PerformAction<PopupDialogDangerousButton>());
+
+            AddUntilStep("components reverted", () => allTargetsLoaded() && totalComponentCount() < customisedComponentCount);
+
+            AddStep("undo", () => InputManager.Keys(PlatformAction.Undo));
+            AddUntilStep("customised layout restored", totalComponentCount, () => Is.EqualTo(customisedComponentCount));
+
+            IEnumerable<SkinnableContainer> playerTargets() => Game.ChildrenOfType<Player>().SingleOrDefault()?.ChildrenOfType<SkinnableContainer>() ?? Enumerable.Empty<SkinnableContainer>();
+
+            bool allTargetsLoaded() => playerTargets().Any() && playerTargets().All(t => t.ComponentsLoaded);
+
+            int totalComponentCount() => playerTargets().Sum(t => t.Components.Count);
+
+            Menu.DrawableMenuItem getMenuItem(string text) => skinEditor.ChildrenOfType<Menu.DrawableMenuItem>().First(i => i.Item.Text.Value.ToString() == text);
         }
 
         [Test]

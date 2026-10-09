@@ -556,12 +556,29 @@ namespace osu.Game.Overlays.SkinEditor
         {
             SkinnableContainer[] targetContainers = availableTargets.ToArray();
 
+            var revertChangeHandler = changeHandler;
+
+            revertChangeHandler?.BeginChange();
+
             foreach (var t in targetContainers)
             {
                 currentSkin.Value.ResetDrawableTarget(t);
 
+                t.OnComponentsLoaded += onComponentsLoaded;
+
                 // add back default components
-                getTarget(t.Lookup)?.Reload();
+                t.Reload();
+            }
+
+            if (targetContainers.Length == 0)
+                revertChangeHandler?.EndChange();
+
+            void onComponentsLoaded(Drawable d)
+            {
+                ((SkinnableContainer)d).OnComponentsLoaded -= onComponentsLoaded;
+
+                if (targetContainers.All(c => c.ComponentsLoaded))
+                    Schedule(() => revertChangeHandler?.EndChange());
             }
         }
 
