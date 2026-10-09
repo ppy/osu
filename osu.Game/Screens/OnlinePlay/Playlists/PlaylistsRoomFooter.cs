@@ -87,6 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 case nameof(Room.Status):
                 case nameof(Room.Host):
                 case nameof(Room.StartDate):
+                case nameof(Room.EndDate):
                     updateState();
                     break;
             }
@@ -107,6 +108,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 else if (closeButton.Alpha > 0)
                     hideCloseButton();
             }
+            else
+                closeButton.Expire();
         }
 
         protected override void Dispose(bool isDisposing)
