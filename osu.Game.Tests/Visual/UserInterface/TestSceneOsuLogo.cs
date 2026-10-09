@@ -2,7 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Menu;
 using osu.Game.Seasonal;
 using osuTK;
@@ -52,6 +58,47 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Scale = new Vector2(scale),
                 };
             });
+        }
+
+        [Test]
+        public void TestHighBPM()
+        {
+            AddStep("Add logo", () =>
+            {
+                Child = new HighBPMContainer
+                {
+                    Child = logo = new OsuLogoChristmas
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(scale),
+                    }
+                };
+            });
+        }
+
+        public partial class HighBPMContainer : Container, IBeatSyncProvider
+        {
+            public ChannelAmplitudes CurrentAmplitudes { get; } = new ChannelAmplitudes();
+
+            public ControlPointInfo? ControlPoints { get; } = new ControlPointInfo();
+
+            IClock IBeatSyncProvider.Clock { get; } = new StopwatchClock(true);
+
+            [Resolved]
+            private IBeatSyncProvider parentProvider { get; set; } = null!;
+
+            public HighBPMContainer()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                RelativeSizeAxes = Axes.Both;
+
+                ControlPoints.Add(0, new TimingControlPoint
+                {
+                    BeatLength = 60000 / 10000.0,
+                });
+            }
         }
     }
 }
