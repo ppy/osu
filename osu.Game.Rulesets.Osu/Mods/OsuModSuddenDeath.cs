@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(OsuModTargetPractice),
         }).ToArray();
 
-        [SettingSource("Also fail when missing a slider tail")]
+        [SettingSource("Require perfect combo", "Also fail when missing a slider tail.")]
         public BindableBool FailOnSliderTail { get; } = new BindableBool();
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
