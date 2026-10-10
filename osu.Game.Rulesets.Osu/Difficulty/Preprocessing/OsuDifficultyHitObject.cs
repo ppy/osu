@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Selective bonus for maps with higher circle size.
         /// </summary>
-        public double SmallCircleBonus => Math.Max(1.0, 1.0 + (30 - BaseObject.Radius) / 70);
+        public double SmallCircleBonus => Math.Max(0.0, (30 - BaseObject.Radius) / 70);
 
         /// <summary>
         /// Object's immediate OverallDifficulty value calculated from the raw hitwindow.
