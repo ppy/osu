@@ -17,13 +17,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            const double previous_delta_influence = 0.75;
+            const double previous_delta_influence = 0.25;
 
             if (current.BaseObject is Spinner)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = (OsuDifficultyHitObject?)current.Previous();
+
+            // Assume that the player always uses at least the full great hitwindow for the movement
+            double currentDelta = Math.Max(osuCurrObj.AdjustedDeltaTime, osuCurrObj.HitWindowGreat);
 
             // For objects that are stacked we want to reduce the agility difficulty slightly by combining delta times of both objects together
             // Because we can assume that they likely would be done in one movement.
@@ -35,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                                 DiffUtils.ReverseLerp(osuPrevObj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_RADIUS, 0);
             }
 
-            double combinedDelta = osuCurrObj.AdjustedDeltaTime + previousDelta * previous_delta_influence;
+            double combinedDelta = currentDelta + previousDelta * previous_delta_influence;
 
             double angleSwitchingBonus = calculateAngleSwitchingBonus(osuCurrObj, osuPrevObj);
 

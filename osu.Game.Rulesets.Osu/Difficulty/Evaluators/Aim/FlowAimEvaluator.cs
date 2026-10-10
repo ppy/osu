@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double overlappedNotesWeight,
             bool withSliderTravelDistance)
         {
-            const double velocity_change_multiplier = 1.95;
+            const double velocity_change_multiplier = 1.9;
 
             if (Math.Max(prevVelocity, currVelocity) == 0)
                 return 0;
