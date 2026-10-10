@@ -253,6 +253,26 @@ Click to see what's new!", version);
 {0}", filename);
 
         /// <summary>
+        /// "Uploading screenshot..."
+        /// </summary>
+        public static LocalisableString UploadingScreenshot => new TranslatableString(getKey(@"uploading_screenshot"), @"Uploading screenshot...");
+
+        /// <summary>
+        /// "Screenshot uploaded! The link has been copied to the clipboard."
+        /// </summary>
+        public static LocalisableString ScreenshotUploadSuccess => new TranslatableString(getKey(@"screenshot_upload_success"), @"Screenshot uploaded! The link has been copied to the clipboard.");
+
+        /// <summary>
+        /// "Failed to upload screenshot."
+        /// </summary>
+        public static LocalisableString ScreenshotUploadFailure => new TranslatableString(getKey(@"screenshot_upload_failure"), @"Failed to upload screenshot.");
+
+        /// <summary>
+        /// "You are trying to upload screenshots too fast!"
+        /// </summary>
+        public static LocalisableString ScreenshotTooManyUploads => new TranslatableString(getKey(@"screenshot_too_many_uploads"), @"You are trying to upload screenshots too fast!");
+
+        /// <summary>
         /// "The multiplayer server will be right back..."
         /// </summary>
         public static LocalisableString MultiplayerServerShuttingDownImmediately => new TranslatableString(getKey(@"multiplayer_server_shutting_down_immediately"), @"The multiplayer server will be right back...");

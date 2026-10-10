@@ -121,7 +121,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 }
             });
 
-            State.BindValueChanged(state => chatToggle.Current.Value = State.Value == TourneyState.Idle, true);
+            State.BindValueChanged(_ => chatToggle.Current.Value = State.Value == TourneyState.Idle, true);
             chatToggle.Current.BindValueChanged(v => State.Value = v.NewValue ? TourneyState.Idle : TourneyState.Playing);
 
             LadderInfo.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);

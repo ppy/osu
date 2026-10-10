@@ -36,8 +36,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
                                 var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
 
-                                if (leaderboard != null)
-                                    leaderboard.Position = new Vector2(36, 115);
+                                leaderboard?.Position = new Vector2(36, 115);
 
                                 Vector2 pos = new Vector2(36, -66);
 
@@ -47,8 +46,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Argon
                                     pos -= new Vector2(0, comboCounter.DrawHeight * 1.4f + 20);
                                 }
 
-                                if (spectatorList != null)
-                                    spectatorList.Position = pos;
+                                spectatorList?.Position = pos;
 
                                 if (hitError is ColourHitErrorMeter colourHitError)
                                 {

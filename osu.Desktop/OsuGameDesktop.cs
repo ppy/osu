@@ -125,12 +125,23 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
+            if (IsPackageManaged || !IsDeployedBuild)
+                return false;
+
             RestartOnExitAction = () => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId);
             return true;
         }
 
         protected override void LoadComplete()
         {
+            // this is done before `base.LoadComplete` so that the game can immediately register data sources.
+            if (EnableWebSocketServer)
+            {
+                var provider = new OsuWebSocketProvider();
+                Add(provider);
+                Dependencies.CacheAs<IWebSocketProvider>(provider);
+            }
+
             base.LoadComplete();
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
@@ -151,9 +162,6 @@ namespace osu.Desktop
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
             archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
-
-            if (EnableWebSocketServer)
-                Add(new OsuWebSocketProvider());
         }
 
         public override void SetHost(GameHost host)

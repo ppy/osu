@@ -291,8 +291,7 @@ namespace osu.Game.Screens.Play.HUD
 
             private void updateEnabledState()
             {
-                if (linkCompiler != null)
-                    linkCompiler.Enabled.Value = UserPlayingState.Value != LocalUserPlayingState.Playing;
+                linkCompiler?.Enabled.Value = UserPlayingState.Value != LocalUserPlayingState.Playing;
             }
         }
 
