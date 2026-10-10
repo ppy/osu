@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// <summary>
         /// Evaluates difficulty of "flow aim" - aiming pattern where player doesn't stop their cursor on every object and instead "flows" through them.
         /// </summary>
-        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
+        public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance, bool aimCheese)
         {
             if (current.Index <= 1 || current.BaseObject is Spinner)
                 return 0;
@@ -70,8 +70,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
             flowDifficulty = DiffUtils.Pow(flowDifficulty, 1.45);
 
-            // Reduce difficulty for low spacing since spacing below radius is always to be flowed
-            return flowDifficulty * DiffUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_RADIUS);
+            // Check how much of the difficulty relies on small distances that can be cheesed by playing them improperly
+            if (aimCheese)
+                flowDifficulty *= DiffUtils.Smootherstep(currDistance, 0, OsuDifficultyHitObject.NORMALISED_DIAMETER);
+
+            return flowDifficulty;
         }
 
         private static double calculateRhythmChangeBonus(OsuDifficultyHitObject current, OsuDifficultyHitObject last)
