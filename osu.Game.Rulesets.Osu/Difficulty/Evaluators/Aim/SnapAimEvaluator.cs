@@ -215,7 +215,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
         private static double vectorAngleRepetition(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
         {
-            if (current.Angle == null || previous.Angle == null)
+            if (
+                current.Angle == null ||
+                previous.Angle == null ||
+                previous.BaseObject is Spinner ||
+                previous.Previous(0).BaseObject is Spinner)
                 return 1;
 
             const double note_limit = 6;
@@ -228,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             {
                 OsuDifficultyHitObject? prevObj = (OsuDifficultyHitObject)current.Previous(index);
 
-                if (prevObj == null)
+                if (prevObj == null || prevObj.BaseObject is Spinner)
                     break;
 
                 // Only consider vectors in the same jump section, stopping to change rhythm ruins momentum
