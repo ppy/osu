@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Online
             AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapInfo));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
+            AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet, false));
             addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0f));
 
             AddStep("set progress 40%", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)!).SetProgress(0.4f));
@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Online
             AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapInfo));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
+            AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet, false));
             addAvailabilityCheckStep("state downloading", () => BeatmapAvailability.Downloading(0.0f));
 
             AddStep("import beatmap externally", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());

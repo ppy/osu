@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                new GlobalScrollAdjustsVolume(),
+                new ScrollAdjustsVolume(),
                 (content = new LogoTrackingContainer
                 {
                     Anchor = Anchor.Centre,

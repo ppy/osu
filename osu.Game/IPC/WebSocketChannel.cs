@@ -27,6 +27,7 @@ namespace osu.Game.IPC
         private Task? readWriteTask;
         private readonly CancellationTokenSource runningTokenSource = new CancellationTokenSource();
         private bool isDisposed;
+        private readonly SemaphoreSlim sendLock = new SemaphoreSlim(1, 1);
 
         public WebSocketChannel(WebSocket webSocket)
         {
@@ -47,10 +48,12 @@ namespace osu.Game.IPC
 
         private async Task readWriteLoop()
         {
-            var token = runningTokenSource.Token;
-
-            while (!token.IsCancellationRequested)
+            // note that checking `IsCancellationRequested` via the source is safe even if it is disposed,
+            // but checking it via the source's *token* isn't as attempting to access the token itself will throw if the source is disposed
+            while (!runningTokenSource.IsCancellationRequested)
             {
+                var token = runningTokenSource.Token;
+
                 ValueWebSocketReceiveResult result;
 
                 try
@@ -134,8 +137,19 @@ namespace osu.Game.IPC
             if (readWriteTask == null)
                 throw new InvalidOperationException($@"Must {nameof(Start)} first.");
 
-            byte[] bytes = Encoding.UTF8.GetBytes(message);
-            await webSocket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None).ConfigureAwait(false);
+            // WebSocket only supports one send at a time
+            // See https://learn.microsoft.com/en-us/dotNet/api/system.net.websockets.websocket.sendasync?view=net-10.0#remarks.
+            await sendLock.WaitAsync(runningTokenSource.Token).ConfigureAwait(false);
+
+            try
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(message);
+                await webSocket.SendAsync(bytes, WebSocketMessageType.Text, true, runningTokenSource.Token).ConfigureAwait(false);
+            }
+            finally
+            {
+                sendLock.Release();
+            }
         }
 
         /// <summary>
@@ -163,7 +177,9 @@ namespace osu.Game.IPC
 
             isDisposed = true;
             webSocket.Dispose();
+            runningTokenSource.Cancel();
             runningTokenSource.Dispose();
+            sendLock.Dispose();
         }
     }
 }

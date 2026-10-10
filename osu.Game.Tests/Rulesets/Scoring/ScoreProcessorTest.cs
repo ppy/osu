@@ -427,7 +427,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         {
             var testBeatmap = new Beatmap
             {
-                HitObjects = Enumerable.Range(1, 40).Select(i => new TestHitObject(HitResult.Perfect, HitResult.Miss)).ToList<HitObject>(),
+                HitObjects = Enumerable.Range(1, 40).Select(_ => new TestHitObject(HitResult.Perfect, HitResult.Miss)).ToList<HitObject>(),
             };
             scoreProcessor.ApplyBeatmap(testBeatmap);
 

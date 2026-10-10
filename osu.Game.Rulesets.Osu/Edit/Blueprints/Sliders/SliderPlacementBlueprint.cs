@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
 
-                freehandToolboxGroup.CircleThreshold.BindValueChanged(e =>
+                freehandToolboxGroup.CircleThreshold.BindValueChanged(_ =>
                 {
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
