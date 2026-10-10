@@ -312,7 +312,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                DurationField.Current.BindValueChanged(duration =>
+                DurationField.Current.BindValueChanged(_ =>
                 {
                     if (hasValidDuration)
                         durationNoticeText.Hide();
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 updateRoomMaxAttempts();
                 updateRoomPlaylist();
 
-                playlist.Items.BindCollectionChanged((_, __) => room.Playlist = playlist.Items.ToArray());
+                playlist.Items.BindCollectionChanged((_, _) => room.Playlist = playlist.Items.ToArray());
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)

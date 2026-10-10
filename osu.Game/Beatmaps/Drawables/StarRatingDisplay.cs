@@ -47,6 +47,13 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public Color4 DisplayedDifficultyTextColour => starsText.Colour;
 
+        /// <summary>
+        /// A colour to use for foreground text that matches this instance's star rating colours.
+        /// Can be used to have other components match the spectrum animation.
+        /// </summary>
+        public Color4 ForegroundTextColour =>
+            DisplayedStars.Value >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? DisplayedDifficultyTextColour : DisplayedDifficultyColour;
+
         private readonly Bindable<double> displayedStars = new BindableDouble();
 
         /// <summary>
