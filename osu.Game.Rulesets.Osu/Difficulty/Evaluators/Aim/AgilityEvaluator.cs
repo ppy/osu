@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            const double previous_delta_influence = 0.25;
+            const double previous_delta_influence = 0.5;
 
             if (current.BaseObject is Spinner)
                 return 0;
