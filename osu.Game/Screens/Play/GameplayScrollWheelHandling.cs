@@ -13,9 +13,9 @@ namespace osu.Game.Screens.Play
     /// Primarily handles volume adjustment in gameplay.
     ///
     /// - If the user has mouse wheel disabled, only allow during break time or when holding alt. Also block scroll from parent handling.
-    /// - Otherwise always allow, as per <see cref="GlobalScrollAdjustsVolume"/> implementation.
+    /// - Otherwise always allow, as per <see cref="ScrollAdjustsVolume"/> implementation.
     /// </summary>
-    internal partial class GameplayScrollWheelHandling : GlobalScrollAdjustsVolume
+    internal partial class GameplayScrollWheelHandling : ScrollAdjustsVolume
     {
         private Bindable<bool> mouseWheelDisabled = null!;
 
@@ -34,8 +34,9 @@ namespace osu.Game.Screens.Play
             if (gameplayClock.IsPaused.Value)
                 return base.OnScroll(e);
 
-            // Block any parent handling of scroll if the user has asked for it (special case when holding "Alt").
-            if (mouseWheelDisabled.Value && !e.AltPressed)
+            // Block any parent handling of scroll if the user has asked for it.
+            // Volume adjustments are still allowed if holding Alt - this is handled by the global `ScrollAdjustsVolume` instance in `OsuGame`.
+            if (mouseWheelDisabled.Value)
                 return true;
 
             return base.OnScroll(e);

@@ -78,8 +78,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public override void PlaySamples()
         {
             base.PlaySamples();
-            if (Samples != null)
-                Samples.Frequency.Value = 0.77f + ((Banana)HitObject).BananaIndex * 0.006f;
+            Samples?.Frequency.Value = 0.77f + ((Banana)HitObject).BananaIndex * 0.006f;
         }
     }
 }

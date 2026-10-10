@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (searchAction != null)
                     loaded.AddLink(tag, () => searchAction(tag));
                 else
-                    loaded.AddLink(tag, LinkAction.SearchBeatmapSet, $@"tag=""""{tag}""""");
+                    loaded.AddLink(tag, LinkAction.SearchBeatmapSet, $@"tag=""""{BeatmapListingOverlay.EscapeKeywordSearchTerm(tag)}""""");
 
                 if (i != tags.Length - 1)
                     loaded.AddText(" ");

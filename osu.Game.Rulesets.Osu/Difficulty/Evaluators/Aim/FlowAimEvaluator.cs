@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             var osuNextObj = (OsuDifficultyHitObject?)current.Next();
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)current.Previous();
+
             var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
 
             double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
@@ -106,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             OsuDifficultyHitObject? next,
             double currVelocity)
         {
-            const double acute_angle_multiplier = 1.3;
+            const double acute_angle_multiplier = 0.9;
 
             if (current.Angle == null || next?.Angle == null)
                 return 0;
@@ -162,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double overlappedNotesWeight,
             bool withSliderTravelDistance)
         {
-            const double velocity_change_multiplier = 0.55;
+            const double velocity_change_multiplier = 1.9;
 
             if (Math.Max(prevVelocity, currVelocity) == 0)
                 return 0;
@@ -170,14 +171,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (withSliderTravelDistance)
                 currVelocity = currDistance / current.AdjustedDeltaTime;
 
+            const double velocity_distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.1;
+
+            currVelocity = Math.Min(currVelocity, velocity_distance_cap / current.AdjustedDeltaTime);
+            prevVelocity = Math.Min(prevVelocity, velocity_distance_cap / previous.AdjustedDeltaTime);
+
             // Scale with ratio of difference compared to 0.5 * max dist.
             double distRatio = DiffUtils.Smoothstep(Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity), 0, 1);
 
-            // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-            double overlapVelocityBuff = Math.Min(OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.25 / Math.Min(current.AdjustedDeltaTime, previous.AdjustedDeltaTime),
-                Math.Abs(prevVelocity - currVelocity));
+            double velocityChangeBonus = Math.Abs(prevVelocity - currVelocity) * distRatio;
 
-            return overlapVelocityBuff * distRatio * overlappedNotesWeight * velocity_change_multiplier;
+            velocityChangeBonus *= DiffUtils.Pow(Math.Min(current.AdjustedDeltaTime, previous.AdjustedDeltaTime) / Math.Max(current.AdjustedDeltaTime, previous.AdjustedDeltaTime), 3);
+
+            return velocityChangeBonus *
+                   overlappedNotesWeight *
+                   velocity_change_multiplier;
         }
 
         private static double calculateSliderBonus(OsuDifficultyHitObject current)

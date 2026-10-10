@@ -148,8 +148,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     bodySprite.Anchor = Anchor.BottomCentre; // needs to be flipped due to scale flip in Update.
                 }
 
-                if (light != null)
-                    light.Anchor = Anchor.TopCentre;
+                light?.Anchor = Anchor.TopCentre;
             }
             else
             {
@@ -159,8 +158,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     bodySprite.Anchor = Anchor.TopCentre;
                 }
 
-                if (light != null)
-                    light.Anchor = Anchor.BottomCentre;
+                light?.Anchor = Anchor.BottomCentre;
             }
         }
 
@@ -193,8 +191,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             {
                 case LegacyManiaSkinConfiguration.LegacyNoteBodyStyle.Stretch:
                     // this is how lazer works by default. nothing required.
-                    if (bodySprite != null)
-                        bodySprite.Scale = new Vector2(1, scaleDirection);
+                    bodySprite?.Scale = new Vector2(1, scaleDirection);
                     break;
 
                 default:
