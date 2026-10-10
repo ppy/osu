@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.UI
             public void Apply(InputState state, IInputStateChangeHandler handler)
             {
                 if (!(state is RulesetInputManagerInputState<T> inputState))
-                    throw new InvalidOperationException($"{nameof(ReplayState<T>)} should only be applied to a {nameof(RulesetInputManagerInputState<T>)}");
+                    throw new InvalidOperationException($"{nameof(ReplayState<>)} should only be applied to a {nameof(RulesetInputManagerInputState<>)}");
 
                 new MouseButtonInput([], state.Mouse.Buttons).Apply(state, handler);
                 new KeyboardKeyInput([], state.Keyboard.Keys).Apply(state, handler);
