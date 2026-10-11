@@ -18,14 +18,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
-            if (current.Index <= 1 || current.BaseObject is Spinner)
-                return 0;
-
             var osuNextObj = (OsuDifficultyHitObject?)current.Next();
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)current.Previous();
+            var osuLastObj = (OsuDifficultyHitObject?)current.Previous();
+            var osuLastLastObj = (OsuDifficultyHitObject?)current.Previous(1);
 
-            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous(1);
+            if (current.BaseObject is Spinner || osuLastObj == null || osuLastLastObj == null)
+                return 0;
 
             double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
             double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
