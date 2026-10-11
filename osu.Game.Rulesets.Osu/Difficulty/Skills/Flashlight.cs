@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Evaluators;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -70,7 +71,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Mods.Any(m => m is OsuModAutopilot))
                 difficulty *= 0.4;
 
-            difficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
+            // Spinner OD is a special case wherein we don't want to apply rates, and the available hit windows on the object itself are all empty.
+            // Trying to account for this is more effort than its worth, so skip OD scaling.
+            if (current.BaseObject is not Spinner)
+                difficulty *= 0.985 + DiffUtils.Pow(Math.Max(0, ((OsuDifficultyHitObject)current).OverallDifficulty), 2) / 4000;
 
             return difficulty;
         }
