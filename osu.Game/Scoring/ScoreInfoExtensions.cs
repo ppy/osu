@@ -66,7 +66,12 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
         /// <returns>The maximum achievable combo.</returns>
-        public static int GetMaximumAchievableCombo(this ScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
+        public static int GetMaximumAchievableCombo(this IScoreInfo score) => score.MaximumStatistics.Where(kvp => kvp.Key.AffectsCombo()).Sum(kvp => kvp.Value);
+
+        /// <summary>
+        /// Returns whether the supplied <paramref name="score"/> is a "perfect" score (also referred to as "full combo").
+        /// </summary>
+        public static bool IsPerfect(this IScoreInfo score) => score.MaxCombo == score.GetMaximumAchievableCombo();
 
         /// <summary>
         /// Performs a realm filter that returns all scores that belong to the user with the given <paramref name="userId"/>.

@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             bool didSelect = false;
 
-            configRotationOrigin.BindValueChanged(val =>
+            configRotationOrigin.BindValueChanged(_ =>
             {
                 switch (configRotationOrigin.Value)
                 {

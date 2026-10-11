@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            selectedItems.CollectionChanged += (_, __) => updateState();
+            selectedItems.CollectionChanged += (_, _) => updateState();
             editorBeatmap.HitObjectUpdated += hitObjectUpdated;
             updateState();
         }

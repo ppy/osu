@@ -142,8 +142,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 localConfig.SetValue(OsuSetting.KeyOverlay, false);
                 var kcd = hudOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault();
-                if (kcd != null)
-                    kcd.AlwaysVisible.Value = false;
+                kcd?.AlwaysVisible.Value = false;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);

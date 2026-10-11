@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             user.BindValueChanged(_ => updateScoreBindings());
-            scores.BindCollectionChanged((_, __) => updateScoreBindings(), true);
+            scores.BindCollectionChanged((_, _) => updateScoreBindings(), true);
 
             showLeaderboard.BindValueChanged(_ => updateVisibility());
             localUserPlayingState.BindValueChanged(_ => updateVisibility(), true);

@@ -2,12 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -42,8 +39,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The difficulty corresponding to the flashlight skill.
         /// </summary>
-        [JsonProperty("flashlight_difficulty")]
-        public double FlashlightDifficulty { get; set; }
+        [JsonProperty("flashlight_difficulty", NullValueHandling = NullValueHandling.Ignore)]
+        public double? FlashlightDifficulty { get; set; }
 
         /// <summary>
         /// The difficulty corresponding to the reading skill.
@@ -118,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_READING, ReadingDifficulty);
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
 
-            if (ShouldSerializeFlashlightDifficulty())
+            if (FlashlightDifficulty != null)
                 yield return (ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
@@ -143,7 +140,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SpeedDifficulty = values[ATTRIB_ID_SPEED];
             ReadingDifficulty = values[ATTRIB_ID_READING];
             StarRating = values[ATTRIB_ID_DIFFICULTY];
-            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
+
+            if (values.TryGetValue(ATTRIB_ID_FLASHLIGHT, out double flashlightDifficulty))
+                FlashlightDifficulty = flashlightDifficulty;
+
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
             AimDifficultStrainCount = values[ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT];
             SpeedDifficultStrainCount = values[ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT];
@@ -159,16 +159,5 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
         }
-
-        #region Newtonsoft.Json implicit ShouldSerialize() methods
-
-        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
-        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
-        // unless the fields are also renamed.
-
-        [UsedImplicitly]
-        public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
-
-        #endregion
     }
 }
