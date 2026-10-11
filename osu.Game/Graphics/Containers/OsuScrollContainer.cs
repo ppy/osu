@@ -57,15 +57,6 @@ namespace osu.Game.Graphics.Containers
                 ScrollTo(maxPos - DisplayableContent + extraScroll, animated);
         }
 
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            // allow for controlling volume when alt is held.
-            // mostly for compatibility with osu-stable.
-            if (e.AltPressed) return false;
-
-            return base.OnScroll(e);
-        }
-
         #region Absolute scrolling
 
         /// <summary>

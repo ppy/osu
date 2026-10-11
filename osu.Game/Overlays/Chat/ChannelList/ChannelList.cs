@@ -205,7 +205,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             new OsuSpriteText
                             {
                                 Text = label,
-                                Margin = new MarginPadding { Left = 18, Bottom = 5 },
+                                Margin = new MarginPadding { Left = 10, Bottom = 5 },
                                 Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
                             },
                             new SpriteIcon

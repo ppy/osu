@@ -61,9 +61,9 @@ namespace osu.Game.IPC
         /// </summary>
         public event Action<int, string>? MessageReceived;
 
-        private readonly object syncRoot = new object();
+        private readonly Lock syncRoot = new Lock();
 
-        private readonly string prefix;
+        private readonly int port;
         private readonly Logger logger;
 
         private HttpListener? listener;
@@ -82,7 +82,7 @@ namespace osu.Game.IPC
             // - Use of HTTP (no efforts are taken to make HTTPS work).
             // - Attack surface reduction (doesn't accidentally listen on all interfaces, potentially getting hit by something external).
             // Some users with setups that use a second "streaming PC" or similar will complain. They can set up proxies at their own peril.
-            prefix = $@"http://localhost:{port}/";
+            this.port = port;
 
             logger = Logger.GetLogger(@"websocket");
         }
@@ -99,10 +99,11 @@ namespace osu.Game.IPC
                     throw new InvalidOperationException($@"Cannot call {nameof(StartAsync)} multiple times.");
 
                 listener = new HttpListener();
-                listener.Prefixes.Add(prefix);
+                listener.Prefixes.Add($@"http://127.0.0.1:{port}/");
+                listener.Prefixes.Add($@"http://localhost:{port}/");
                 listener.Start();
                 handleRequestTask = Task.Run(handleRequests, cancellationToken);
-                logger.Add($@"Listening on {prefix}.");
+                logger.Add($@"Listening on http://localhost:{port}/.");
             }
         }, cancellationToken);
 
