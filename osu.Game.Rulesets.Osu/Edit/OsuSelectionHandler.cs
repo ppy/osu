@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
-            Quad quad = GeometryUtils.GetSurroundingQuad(hitObjects);
+            Quad quad = GeometryUtils.GetSurroundingQuad(hitObjects, true);
 
             Vector2 delta = Vector2.Zero;
 

@@ -19,14 +19,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            double od = context.Beatmap.Difficulty.OverallDifficulty;
+            double od = context.CurrentDifficulty.Playable.Difficulty.OverallDifficulty;
 
             // These are meant to reflect the duration necessary for auto to score at least 1000 points on the spinner.
             // It's difficult to eliminate warnings here, as auto achieving 1000 points depends on the approach angle on some spinners.
             double warningThreshold = 500 + (od < 5 ? (5 - od) * -21.8 : (od - 5) * 20); // Anything above this is always ok.
             double problemThreshold = 450 + (od < 5 ? (5 - od) * -17 : (od - 5) * 17); // Anything below this is never ok.
 
-            foreach (var hitObject in context.Beatmap.HitObjects)
+            foreach (var hitObject in context.CurrentDifficulty.Playable.HitObjects)
             {
                 if (!(hitObject is Spinner spinner))
                     continue;

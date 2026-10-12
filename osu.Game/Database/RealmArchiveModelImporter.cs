@@ -17,6 +17,7 @@ using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Database
@@ -47,14 +48,16 @@ namespace osu.Game.Database
         /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
         /// It is mainly being used as a queue mechanism for large imports.
         /// </remarks>
-        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<>));
 
         /// <summary>
         /// A second scheduler for batch imports.
         /// For simplicity, these will just run in parallel with normal priority imports, but a future refactor would see this implemented via a custom scheduler/queue.
         /// See https://gist.github.com/peppy/f0e118a14751fc832ca30dd48ba3876b for an incomplete version of this.
         /// </summary>
-        private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<>));
 
         /// <summary>
         /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
@@ -208,9 +211,28 @@ namespace osu.Game.Database
             foreach (var realmFile in model.Files)
             {
                 string sourcePath = Files.Storage.GetFullPath(realmFile.File.GetStoragePath());
-                string destinationPath = Path.Join(mountedPath, realmFile.Filename);
+                // there are edge cases where externalising an imported model to the filesystem could fail due to invalid filenames.
+                // one scenario where this happens goes something like this:
+                // - stable user exports an archive, which contains filenames that get mangled by stable's default zip encoding codepage (Shift-JIS)
+                // - said archive is imported to lazer, but the invalid filename is not actually an issue due to lazer file store structure
+                //   (the file is stored under a filename correspondent to its SHA instead, and its real filename is only stored in realm)
+                // - however attempts to externally edit the model fail as the external edit attempts and fails to produce the file's "real" filename in the mounted path
+                // to prevent this bricking external edit, strip invalid characters on external edit.
+                // the presumption here is that whatever produced the mangled archive is primarily at fault here, and we're just trying to trudge on locally as best as possible.
+                // if there are further troubles related to similar issues, reevaluate moving this sort of check to the import side instead (sanitising filenames on import from archive).
+                string destinationPath = mountedPath;
+                foreach (string piece in realmFile.Filename.Split('/').Select(f => f.GetValidFilename()))
+                    destinationPath = Path.Combine(destinationPath, piece);
 
-                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+                string destinationDirectory = Path.GetDirectoryName(destinationPath)!;
+
+                if (!FilesystemSanityCheckHelpers.IsSubDirectory(parent: mountedPath, child: destinationDirectory))
+                {
+                    Logger.Log($@"Skipping attempt to mount {realmFile.Filename} due to detected escape out of mounted path.", LoggingTarget.Database);
+                    continue;
+                }
+
+                Directory.CreateDirectory(destinationDirectory);
 
                 // Consider using hard links here to make this instant.
                 using (var inStream = Files.Storage.GetStream(sourcePath))
@@ -350,6 +372,9 @@ namespace osu.Game.Database
                     // We intentionally delay adding to realm to avoid blocking on a write during disk operations.
                     foreach (var filenames in getShortenedFilenames(archive))
                     {
+                        if (FilesystemSanityCheckHelpers.IncursPathTraversalRisk(filenames.shortened))
+                            throw new InvalidOperationException($@"Filename ""{filenames.original}"" is not allowed.");
+
                         using (Stream s = archive.GetStream(filenames.original))
                             files.Add(new RealmNamedFileUsage(Files.Add(s, realm, false, parameters.PreferHardLinks), filenames.shortened));
                     }
@@ -463,8 +488,10 @@ namespace osu.Game.Database
 
             foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
             {
-                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
-                    s.CopyTo(hashable);
+                using (Stream? s = Files.Store.GetStream(file.File.GetStoragePath()))
+                {
+                    s?.CopyTo(hashable);
+                }
             }
 
             if (hashable.Length > 0)
@@ -495,8 +522,20 @@ namespace osu.Game.Database
             if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
+            // filename lookups on models are case insensitive (see `BeatmapSetInfoExtensions.GetFile()`), but an
+            // archive can contain both "audio.mp3" and "Audio.MP3". importing such a pair would result in a model which
+            // throws on any file lookup or be unclear which file should be chosen should that be guarded
+            var seenFilenames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             foreach (string file in reader.Filenames)
-                yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
+            {
+                string shortened = file.Substring(prefix.Length).ToStandardisedPath();
+
+                if (!seenFilenames.Add(shortened))
+                    throw new InvalidOperationException($@"Multiple files with the name ""{shortened}"" (ignoring case) are present. Only one of them can be kept.");
+
+                yield return (file, shortened);
+            }
         }
 
         /// <summary>

@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             for (int i = 0; i < 100; i++)
             {
-                Assert.True(Precision.AlmostEquals(sliderPathPerfect.PositionAt(i / 100.0f), sliderPathBezier.PositionAt(i / 100.0f)));
+                ClassicAssert.True(Precision.AlmostEquals(sliderPathPerfect.PositionAt(i / 100.0f), sliderPathBezier.PositionAt(i / 100.0f)));
             }
         }
 
@@ -174,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 double theta = circularArcProperties.ThetaStart + (circularArcProperties.Direction * progress * circularArcProperties.ThetaRange);
                 Vector2 vector = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * circularArcProperties.Radius;
 
-                Assert.True(Precision.AlmostEquals(circularArcProperties.Centre + vector, path.PositionAt(progress), 0.01f),
+                ClassicAssert.True(Precision.AlmostEquals(circularArcProperties.Centre + vector, path.PositionAt(progress), 0.01f),
                     "A perfect circle with points " + string.Join(", ", path.ControlPoints.Select(x => x.Position)) + " and radius" + circularArcProperties.Radius + "from SliderPath does not almost equal a theoretical perfect circle with " + subpoints + " subpoints"
                     + ": " + (circularArcProperties.Centre + vector) + " - " + path.PositionAt(progress)
                     + " = " + (circularArcProperties.Centre + vector - path.PositionAt(progress))

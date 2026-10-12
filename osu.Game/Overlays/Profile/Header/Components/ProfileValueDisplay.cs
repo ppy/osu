@@ -14,22 +14,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
     public partial class ProfileValueDisplay : CompositeDrawable
     {
         private readonly OsuSpriteText title;
-        private readonly ContentText content;
 
         public LocalisableString Title
         {
             set => title.Text = value;
         }
 
-        public LocalisableString Content
-        {
-            set => content.Text = value;
-        }
-
-        public LocalisableString ContentTooltipText
-        {
-            set => content.TooltipText = value;
-        }
+        public ContentText Content { get; }
 
         public ProfileValueDisplay(bool big = false, int minimumWidth = 60)
         {
@@ -44,9 +35,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         Font = OsuFont.GetFont(size: 12)
                     },
-                    content = new ContentText
+                    Content = new ContentText
                     {
-                        Font = OsuFont.GetFont(size: big ? 30 : 20, weight: FontWeight.Light),
+                        Font = OsuFont.GetFont(size: big ? 30 : 20, weight: big ? FontWeight.Regular : FontWeight.Light),
                     },
                     new Container // Add a minimum size to the FillFlowContainer
                     {
@@ -60,10 +51,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void load(OverlayColourProvider colourProvider)
         {
             title.Colour = colourProvider.Content1;
-            content.Colour = colourProvider.Content2;
+            Content.Colour = colourProvider.Content2;
         }
 
-        private partial class ContentText : OsuSpriteText, IHasTooltip
+        public partial class ContentText : OsuSpriteText, IHasTooltip
         {
             public LocalisableString TooltipText { get; set; }
         }

@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private SpriteText playCount = null!;
         private SpriteText totalScore = null!;
         private SpriteText totalHits = null!;
+        private SpriteText hitsPerPlay = null!;
         private SpriteText maximumCombo = null!;
         private SpriteText replaysWatched = null!;
 
@@ -56,6 +57,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsPlayCount },
                             new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsTotalScore },
                             new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsTotalHits },
+                            new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsHitsPerPlay },
                             new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsMaximumCombo },
                             new OsuSpriteText { Font = font, Text = UsersStrings.ShowStatsReplaysWatchedByOthers },
                         }
@@ -73,6 +75,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             playCount = new OsuSpriteText { Font = font },
                             totalScore = new OsuSpriteText { Font = font },
                             totalHits = new OsuSpriteText { Font = font },
+                            hitsPerPlay = new OsuSpriteText { Font = font },
                             maximumCombo = new OsuSpriteText { Font = font },
                             replaysWatched = new OsuSpriteText { Font = font },
                         }
@@ -86,6 +89,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
             base.LoadComplete();
 
             User.BindValueChanged(user => updateStatistics(user.NewValue?.User.Statistics), true);
+        }
+
+        private int getHitsPerPlay(UserStatistics statistics)
+        {
+            return statistics.PlayCount == 0 ? 0 : statistics.TotalHits / statistics.PlayCount;
         }
 
         private void updateStatistics(UserStatistics? statistics)
@@ -103,6 +111,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             playCount.Text = statistics.PlayCount.ToLocalisableString(@"N0");
             totalScore.Text = statistics.TotalScore.ToLocalisableString(@"N0");
             totalHits.Text = statistics.TotalHits.ToLocalisableString(@"N0");
+            hitsPerPlay.Text = getHitsPerPlay(statistics).ToLocalisableString(@"N0");
             maximumCombo.Text = statistics.MaxCombo.ToLocalisableString(@"N0");
             replaysWatched.Text = statistics.ReplaysWatched.ToLocalisableString(@"N0");
         }

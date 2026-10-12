@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public abstract partial class KeyBindingsSubsection : SettingsSubsection
     {
+        private ResetButton resetButton = null!;
+
         /// <summary>
         /// After a successful binding, automatically select the next binding row to make quickly
         /// binding a large set of keys easier on the user.
@@ -49,11 +51,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         row.BindingUpdated = onBindingUpdated;
                         row.GetAllSectionBindings = getAllBindings;
                     });
+
                 row.KeyBindings.AddRange(bindings.Where(b => b.ActionInt.Equals(intKey)));
+
                 Add(row);
+
+                row.IsDefault.BindValueChanged(_ => updateDefaultButtonState());
             }
 
-            Add(new ResetButton
+            Add(resetButton = new ResetButton
             {
                 Action = () =>
                 {
@@ -69,6 +75,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     reloadAllBindings();
                 }
             });
+
+            updateDefaultButtonState();
+        }
+
+        private void updateDefaultButtonState()
+        {
+            resetButton.Enabled.Value = !Children.OfType<KeyBindingRow>().All(r => r.IsDefault.Value);
         }
 
         protected abstract IEnumerable<RealmKeyBinding> GetKeyBindings(Realm realm);
@@ -111,18 +124,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
     }
 
-    public partial class ResetButton : DangerousSettingsButton
+    public partial class ResetButton : DangerousSettingsButtonV2
     {
         [BackgroundDependencyLoader]
         private void load()
         {
             Text = InputSettingsStrings.ResetSectionButton;
             RelativeSizeAxes = Axes.X;
-            Width = 0.8f;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
-            Margin = new MarginPadding { Top = 15 };
-            Height = 30;
+            Margin = new MarginPadding { Top = 5 };
+            Height = 40;
 
             Content.CornerRadius = 5;
         }

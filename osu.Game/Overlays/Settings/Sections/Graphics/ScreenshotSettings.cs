@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -18,16 +19,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             Children = new Drawable[]
             {
-                new SettingsEnumDropdown<ScreenshotFormat>
+                new SettingsItemV2(new FormEnumDropdown<ScreenshotFormat>
                 {
-                    LabelText = GraphicsSettingsStrings.ScreenshotFormat,
+                    Caption = GraphicsSettingsStrings.ScreenshotFormat,
                     Current = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GraphicsSettingsStrings.ShowCursorInScreenshots,
+                    Caption = GraphicsSettingsStrings.ShowCursorInScreenshots,
                     Current = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
-                }
+                })
             };
         }
     }

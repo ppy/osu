@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         /// <param name="snapped">Whether to snap to the closest beat after seeking.</param>
         /// <param name="amount">The relative amount (magnitude) which should be seeked.</param>
-        public void SeekBackward(bool snapped = false, double amount = 1) => seek(-1, snapped, amount + (IsRunning ? 1.5 : 0));
+        public void SeekBackward(bool snapped = false, double amount = 1) => seek(-1, snapped, amount);
 
         /// <summary>
         /// Seeks forwards by one beat length.
@@ -112,6 +112,16 @@ namespace osu.Game.Screens.Edit
             if (amount <= 0) throw new ArgumentException("Value should be greater than zero", nameof(amount));
 
             var timingPoint = ControlPointInfo.TimingPointAt(current);
+
+            if (IsRunning)
+            {
+                // when track is playing, seek a bit more than usual.
+                // the amount adjusted matches stable, because don't-break-what-works.
+                // https://github.com/peppy/osu-stable-reference/blob/7519cafd1823f1879c0d9c991ba0e5c7fd3bfa02/osu!/GameModes/Edit/Editor.cs#L1639-L1640
+                //
+                // ReSharper disable once PossibleLossOfFraction
+                amount *= 1 + 250 / (int)timingPoint.BeatLength;
+            }
 
             if (direction < 0 && timingPoint.Time == current)
                 // When going backwards and we're at the boundary of two timing points, we compute the seek distance with the timing point which we are seeking into
@@ -199,7 +209,7 @@ namespace osu.Game.Screens.Edit
         }
 
         /// <summary>
-        /// Seek smoothly to the provided destination.
+        /// Seek smoothly to the provided destination, if within a certain proximity to the current viewport.
         /// Use <see cref="Seek"/> to perform an immediate seek.
         /// </summary>
         /// <param name="seekDestination"></param>
@@ -207,12 +217,17 @@ namespace osu.Game.Screens.Edit
         {
             seekingOrStopped.Value = true;
 
-            if (IsRunning)
-                Seek(seekDestination);
-            else
+            // The whole point of seeking smoothly is to maintain continuity for the user.
+            // Above a certain proximity, there's little reason to do this as the jump is already huge.
+            const double smooth_seek_max_proximity = 5000;
+
+            if (IsRunning || Math.Abs(seekDestination - currentTime) > smooth_seek_max_proximity)
             {
-                transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
+                Seek(seekDestination);
+                return;
             }
+
+            transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
         }
 
         public void BindAdjustments() => track.Value?.BindAdjustments(AudioAdjustments);

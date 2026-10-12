@@ -39,7 +39,8 @@ namespace osu.Game.Online.API.Requests.Responses
             ["stable"] = new Color4(34, 153, 187, 255),
             ["beta40"] = new Color4(255, 221, 85, 255),
             ["cuttingedge"] = new Color4(238, 170, 0, 255),
-            [OsuGameBase.CLIENT_STREAM_NAME] = new Color4(237, 18, 33, 255),
+            ["lazer"] = new Color4(237, 18, 33, 255),
+            ["tachyon"] = new Color4(206, 0, 255, 255),
             ["web"] = new Color4(136, 102, 238, 255)
         };
 

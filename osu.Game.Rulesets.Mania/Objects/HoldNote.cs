@@ -33,8 +33,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             {
                 duration = value;
 
-                if (Tail != null)
-                    Tail.StartTime = EndTime;
+                Tail?.StartTime = EndTime;
             }
         }
 
@@ -45,11 +44,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             {
                 base.StartTime = value;
 
-                if (Head != null)
-                    Head.StartTime = value;
+                Head?.StartTime = value;
 
-                if (Tail != null)
-                    Tail.StartTime = EndTime;
+                Tail?.StartTime = EndTime;
             }
         }
 
@@ -60,11 +57,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             {
                 base.Column = value;
 
-                if (Head != null)
-                    Head.Column = value;
+                Head?.Column = value;
 
-                if (Tail != null)
-                    Tail.Column = value;
+                Tail?.Column = value;
             }
         }
 
@@ -85,6 +80,11 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// This is an invisible and silent object that tracks the holding state of the <see cref="HoldNote"/>.
         /// </summary>
         public HoldNoteBody Body { get; protected set; }
+
+        /// <summary>
+        /// Whether sliding samples should be played when held.
+        /// </summary>
+        public bool PlaySlidingSamples { get; init; }
 
         public override double MaximumJudgementOffset => Tail.MaximumJudgementOffset;
 
@@ -113,7 +113,8 @@ namespace osu.Game.Rulesets.Mania.Objects
             AddNested(Body = new HoldNoteBody
             {
                 StartTime = StartTime,
-                Column = Column
+                Column = Column,
+                Duration = Duration
             });
         }
 

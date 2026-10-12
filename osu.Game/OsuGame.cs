@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
@@ -27,17 +26,19 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Pen;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -46,6 +47,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
@@ -66,12 +68,13 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.DailyChallenge;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Seasonal;
 using osu.Game.Skinning;
 using osu.Game.Updater;
@@ -80,6 +83,7 @@ using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using Sentry;
+using IntroScreen = osu.Game.Screens.Menu.IntroScreen;
 using MatchType = osu.Game.Online.Rooms.MatchType;
 
 namespace osu.Game
@@ -113,6 +117,9 @@ namespace osu.Game
         /// </summary>
         public const float SCREEN_EDGE_MARGIN = 12f;
 
+        private const double general_log_debounce = 60000;
+        private const string tablet_log_prefix = @"[Tablet] ";
+
         public Toolbar Toolbar { get; private set; }
 
         private ChatOverlay chatOverlay;
@@ -129,6 +136,10 @@ namespace osu.Game
         private NewsOverlay news;
 
         private UserProfileOverlay userProfile;
+
+        private LoginOverlay loginOverlay;
+
+        private NowPlayingOverlay nowPlayingOverlay;
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
@@ -156,6 +167,8 @@ namespace osu.Game
 
         private OnScreenDisplay onScreenDisplay;
 
+        private DialogOverlay dialogOverlay;
+
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
 
@@ -167,7 +180,7 @@ namespace osu.Game
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
-        protected SentryLogger SentryLogger;
+        private SentryLogger sentryLogger;
 
         public virtual StableStorage GetStorageForStableInstall() => null;
 
@@ -185,19 +198,14 @@ namespace osu.Game
         /// </summary>
         public readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        /// <summary>
-        /// Whether the back button is currently displayed.
-        /// </summary>
-        private readonly IBindable<bool> backButtonVisibility = new BindableBool();
-
         IBindable<LocalUserPlayingState> ILocalUserPlayInfo.PlayingState => UserPlayingState;
 
         protected readonly Bindable<LocalUserPlayingState> UserPlayingState = new Bindable<LocalUserPlayingState>();
 
-        protected OsuScreenStack ScreenStack;
+        public OsuScreenStack ScreenStack { get; private set; }
 
-        protected BackButton BackButton;
-        protected ScreenFooter ScreenFooter;
+        protected BackButton BackButton => screenStackFooter.BackButton;
+        protected ScreenFooter ScreenFooter => screenStackFooter.Footer;
 
         protected SettingsOverlay Settings;
 
@@ -227,6 +235,10 @@ namespace osu.Game
 
         private Bindable<string> configSkin;
 
+        private RealmDetachedBeatmapStore detachedBeatmapStore;
+
+        private ScreenStackFooter screenStackFooter;
+
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
@@ -239,12 +251,26 @@ namespace osu.Game
         /// </summary>
         public virtual bool HideUnlicensedContent => false;
 
+        private bool tabletLogNotifyOnWarning = true;
+        private bool tabletLogNotifyOnError = true;
+        private int generalLogRecentCount;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
 
-            forwardGeneralLogsToNotifications();
-            forwardTabletLogsToNotifications();
+            Logger.NewEntry += forwardGeneralLogToNotifications;
+            Logger.NewEntry += forwardTabletLogToNotifications;
+
+            Schedule(() =>
+            {
+                ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
+                tablet?.Tablet.BindValueChanged(_ =>
+                {
+                    tabletLogNotifyOnWarning = true;
+                    tabletLogNotifyOnError = true;
+                }, true);
+            });
         }
 
         #region IOverlayManager
@@ -312,6 +338,8 @@ namespace osu.Game
             foreach (var overlay in focusedOverlays)
                 overlay.Hide();
 
+            ScreenFooter.ActiveOverlay?.Hide();
+
             if (hideToolbar) Toolbar.Hide();
         }
 
@@ -333,7 +361,7 @@ namespace osu.Game
         public override void SetupLogging(Storage gameStorage, Storage cacheStorage)
         {
             base.SetupLogging(gameStorage, cacheStorage);
-            SentryLogger = new SentryLogger(this, cacheStorage);
+            sentryLogger = new SentryLogger(this, cacheStorage);
         }
 
         public override void SetHost(GameHost host)
@@ -343,47 +371,49 @@ namespace osu.Game
             if (host.Window != null)
             {
                 host.Window.CursorState |= CursorState.Hidden;
-                host.Window.DragDrop += path =>
-                {
-                    // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
-                    if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                    {
-                        HandleLink(path);
-                        return;
-                    }
-
-                    lock (dragDropFiles)
-                    {
-                        dragDropFiles.Add(path);
-
-                        Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
-
-                        // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
-                        // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
-                        dragDropImportSchedule?.Cancel();
-                        dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
-                    }
-                };
+                host.Window.DragDrop += onWindowDragDrop;
             }
         }
 
-        private void handlePendingDragDropImports()
+        private void onWindowDragDrop(string path)
         {
+            // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
+            if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                HandleLink(path);
+                return;
+            }
+
             lock (dragDropFiles)
             {
-                Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+                dragDropFiles.Add(path);
 
-                string[] paths = dragDropFiles.ToArray();
-                dragDropFiles.Clear();
+                Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
 
-                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+                // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                dragDropImportSchedule?.Cancel();
+                dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
+            }
+
+            void handlePendingDragDropImports()
+            {
+                lock (dragDropFiles)
+                {
+                    Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+
+                    string[] paths = dragDropFiles.ToArray();
+                    dragDropFiles.Clear();
+
+                    Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+                }
             }
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            SentryLogger.AttachUser(API.LocalUser);
+            sentryLogger.AttachUser(API.LocalUser);
 
             if (SeasonalUIConfig.ENABLED)
                 dependencies.CacheAs(osuLogo = new OsuLogoChristmas { Alpha = 0 });
@@ -519,7 +549,7 @@ namespace osu.Game
                     else
                     {
                         string[] changelogArgs = argString.Split("/");
-                        ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
+                        ShowChangelogBuild($"{changelogArgs[1]}-{changelogArgs[0]}");
                     }
 
                     break;
@@ -600,9 +630,8 @@ namespace osu.Game
         /// <summary>
         /// Show changelog's build as an overlay
         /// </summary>
-        /// <param name="updateStream">The update stream name</param>
-        /// <param name="version">The build version of the update stream</param>
-        public void ShowChangelogBuild(string updateStream, string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(updateStream, version));
+        /// <param name="version">The build version, including stream suffix.</param>
+        public void ShowChangelogBuild(string version) => waitForReady(() => changelogOverlay, _ => changelogOverlay.ShowBuild(version));
 
         /// <summary>
         /// Joins a multiplayer or playlists room with the given <paramref name="id"/>.
@@ -742,7 +771,7 @@ namespace osu.Game
                 }
             }, validScreens: new[]
             {
-                typeof(SongSelect), typeof(Screens.SelectV2.SongSelect), typeof(IHandlePresentBeatmap)
+                typeof(SongSelect), typeof(IHandlePresentBeatmap)
             });
         }
 
@@ -845,7 +874,7 @@ namespace osu.Game
             // which may not match the score, and thus crash.
             IEnumerable<Type> validScreens =
                 Beatmap.Value.BeatmapInfo.Equals(databasedBeatmap) && Ruleset.Value.Equals(databasedScore.ScoreInfo.Ruleset)
-                    ? new[] { typeof(SongSelect), typeof(Screens.SelectV2.SongSelect), typeof(DailyChallenge) }
+                    ? new[] { typeof(SongSelect), typeof(DailyChallenge) }
                     : Array.Empty<Type>();
 
             PerformFromScreen(screen =>
@@ -1001,8 +1030,19 @@ namespace osu.Game
 
         protected override void Dispose(bool isDisposing)
         {
+            // Without this, tests may deadlock due to cancellation token not becoming cancelled before disposal.
+            // To reproduce, run `TestSceneButtonSystemNavigation` ensuring `TestConstructor` runs before `TestFastShortcutKeys`.
+            detachedBeatmapStore?.Dispose();
+
             base.Dispose(isDisposing);
-            SentryLogger.Dispose();
+
+            sentryLogger.Dispose();
+
+            if (Host?.Window != null)
+                Host.Window.DragDrop -= onWindowDragDrop;
+
+            Logger.NewEntry -= forwardGeneralLogToNotifications;
+            Logger.NewEntry -= forwardTabletLogToNotifications;
         }
 
         protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
@@ -1015,39 +1055,13 @@ namespace osu.Game
                 { FrameworkSetting.VolumeUniversal, 0.6 },
                 { FrameworkSetting.VolumeMusic, 0.6 },
                 { FrameworkSetting.VolumeEffect, 0.6 },
+                { FrameworkSetting.AudioUseExperimentalWasapi, true },
             };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (RuntimeInfo.EntryAssembly.GetCustomAttribute<OfficialBuildAttribute>() == null)
-                Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
-
-            var languages = Enum.GetValues<Language>();
-
-            var mappings = languages.Select(language =>
-            {
-#if DEBUG
-                if (language == Language.debug)
-                    return new LocaleMapping("debug", new DebugLocalisationStore());
-#endif
-
-                string cultureCode = language.ToCultureCode();
-
-                try
-                {
-                    return new LocaleMapping(new ResourceManagerLocalisationStore(cultureCode));
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
-                    return null;
-                }
-            }).Where(m => m != null);
-
-            Localisation.AddLocaleMappings(mappings);
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
@@ -1069,6 +1083,9 @@ namespace osu.Game
 
             MultiplayerClient.PostNotification = n => Notifications.Post(n);
             MultiplayerClient.PresentMatch = PresentMultiplayerMatch;
+
+            if (API is APIAccess api)
+                api.PostNotification = n => Notifications.Post(n);
 
             ScreenFooter.BackReceptor backReceptor;
 
@@ -1101,12 +1118,6 @@ namespace osu.Game
                             {
                                 backReceptor = new ScreenFooter.BackReceptor(),
                                 ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                                BackButton = new BackButton(backReceptor)
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Action = handleBackButton,
-                                },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                                 // TODO: what is this? why is this?
                                 // TODO: this is being screen scaled even though it's probably AN OVERLAY.
@@ -1117,9 +1128,10 @@ namespace osu.Game
                                 },
                                 new PopoverContainer
                                 {
+                                    // Ensure the footer is displayed above any content and/or overlays.
                                     Depth = -1,
                                     RelativeSizeAxes = Axes.Both,
-                                    Child = ScreenFooter = new ScreenFooter(backReceptor)
+                                    Child = screenStackFooter = new ScreenStackFooter(ScreenStack, backReceptor)
                                     {
                                         // TODO: this is really really weird and should not exist.
                                         RequestLogoInFront = inFront => ScreenContainer.ChangeChildDepth(logoContainer, inFront ? float.MinValue : 0),
@@ -1223,24 +1235,25 @@ namespace osu.Game
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
-            loadComponentSingleFile(new LoginOverlay
+            loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new NowPlayingOverlay
+            loadComponentSingleFile(nowPlayingOverlay = new NowPlayingOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
 
             loadComponentSingleFile(new BackgroundDataStoreProcessor(), Add);
-            loadComponentSingleFile<BeatmapStore>(new RealmDetachedBeatmapStore(), Add, true);
+            loadComponentSingleFile<BeatmapStore>(detachedBeatmapStore = new RealmDetachedBeatmapStore(), Add, true);
+            loadComponentSingleFile(new QueueController(), Add, true);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
@@ -1248,7 +1261,7 @@ namespace osu.Game
             Add(new FriendPresenceNotifier());
 
             // side overlays which cancel each other.
-            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay };
+            var singleDisplaySideOverlays = new OverlayContainer[] { Settings, Notifications, FirstRunOverlay, loginOverlay, nowPlayingOverlay };
 
             foreach (var overlay in singleDisplaySideOverlays)
             {
@@ -1292,16 +1305,86 @@ namespace osu.Game
                 if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
 
-            backButtonVisibility.ValueChanged += visible =>
-            {
-                if (visible.NewValue)
-                    BackButton.Show();
-                else
-                    BackButton.Hide();
-            };
-
             // Importantly, this should be run after binding PostNotification to the import handlers so they can present the import after game startup.
             handleStartupImport();
+
+            applyConfigMigrations();
+
+            string lastVersion = LocalConfig.Get<string>(OsuSetting.Version);
+            string version = Version;
+
+            // only show a notification if we've previously saved a version to the config file (ie. not the first run).
+            if (IsDeployedBuild && !string.IsNullOrEmpty(lastVersion) && version != lastVersion)
+                Notifications.Post(new UpdateCompleteNotification(version));
+
+            // finally, update the version stored to the configuration.
+            // this MUST happen after `applyConfigMigrations()` call, as it relies on comparing the previous version.
+            // debug / local compilations will reset to a non-release string.
+            LocalConfig.SetValue(OsuSetting.Version, version);
+        }
+
+        /// <summary>
+        /// Apply any migrations to configuration.
+        /// </summary>
+        /// <remarks>
+        /// For database migrations, see <see cref="RealmAccess.applyMigrationsForVersion"/>.
+        /// </remarks>
+        private void applyConfigMigrations()
+        {
+            // arrives as 2020.123.0-lazer
+            string rawVersion = LocalConfig.Get<string>(OsuSetting.Version);
+
+            if (rawVersion.Length < 6)
+                return;
+
+            string[] pieces = rawVersion.Split('.');
+
+            // on a fresh install or when coming from a non-release build, execution will end here.
+            // we don't want to run migrations in such cases.
+            if (!int.TryParse(pieces[0], out int year)) return;
+            if (!int.TryParse(pieces[1], out int monthDay)) return;
+
+            int combined = year * 10000 + monthDay;
+
+            if (combined < 20250214)
+            {
+                // UI scaling on mobile platforms has been internally adjusted such that 1x UI scale looks correctly zoomed in than before.
+                if (RuntimeInfo.IsMobile)
+                    LocalConfig.GetBindable<float>(OsuSetting.UIScale).SetDefault();
+            }
+
+            if (combined < 20260520)
+            {
+                // Pen tablet sensitivity is now separated from cursor sensitivity.
+                // Most users will want the default to be what they already had set on cursor sensitivity so let's transfer it.
+                var mouseHandler = Host?.AvailableInputHandlers.OfType<MouseHandler>().SingleOrDefault();
+                var penHandler = Host?.AvailableInputHandlers.OfType<PenHandler>().SingleOrDefault();
+
+                if (penHandler != null && mouseHandler != null && penHandler.Sensitivity.IsDefault)
+                    penHandler.Sensitivity.Value = mouseHandler.Sensitivity.Value;
+            }
+
+            if (combined < 20260521 && RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+            {
+                bool wasAlreadyUsing = Audio.UseExperimentalWasapi.Value;
+
+                // see application of FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET in FramedBeatmapClock.
+                // this basically undoes this new offset assuming that users which have been using this setting for a while
+                // already have had things tuned.
+                if (wasAlreadyUsing)
+                    LocalConfig.SetValue(OsuSetting.AudioOffset, LocalConfig.Get<double>(OsuSetting.AudioOffset) - FramedBeatmapClock.WINDOWS_EXPERIMENTAL_AUDIO_OFFSET);
+
+                Audio.UseExperimentalWasapi.Value = true;
+
+                dialogOverlay.Push(new MigrateNewAudioDialog(wasAlreadyUsing));
+            }
+
+            if (combined < 20260728)
+            {
+#pragma warning disable CS0612 // Type or member is obsolete (MenuParallax exists solely to make this migration work, it should not be used anywhere else)
+                LocalConfig.SetValue<float>(OsuSetting.MenuParallaxScale, LocalConfig.Get<bool>(OsuSetting.MenuParallax) ? 1 : 0);
+#pragma warning restore CS0612 // Type or member is obsolete
+            }
         }
 
         private void handleBackButton()
@@ -1354,115 +1437,97 @@ namespace osu.Game
                 overlay.Depth = (float)-Clock.CurrentTime;
         }
 
-        private void forwardGeneralLogsToNotifications()
+        private void forwardGeneralLogToNotifications(LogEntry entry)
         {
-            int recentLogCount = 0;
+            if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
 
-            const double debounce = 60000;
+            if (entry.Exception is SentryOnlyDiagnosticsException)
+                return;
 
-            Logger.NewEntry += entry =>
+            const int short_term_display_limit = 3;
+
+            if (generalLogRecentCount < short_term_display_limit)
             {
-                if (entry.Level < LogLevel.Important || entry.Target > LoggingTarget.Database || entry.Target == null) return;
+                LocalisableString message;
 
-                if (entry.Exception is SentryOnlyDiagnosticsException)
-                    return;
+                if (entry.Exception != null && IsDeployedBuild)
+                    message = LocalisableString.Interpolate($"{entry.Message.Truncate(256)}\n\n{NotificationsStrings.ErrorAutomaticallyReported}");
+                else
+                    message = entry.Message.Truncate(256);
 
-                const int short_term_display_limit = 3;
-
-                if (recentLogCount < short_term_display_limit)
+                Schedule(() => Notifications.Post(new SimpleErrorNotification
                 {
-                    Schedule(() => Notifications.Post(new SimpleErrorNotification
-                    {
-                        Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                        Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
-                    }));
-                }
-                else if (recentLogCount == short_term_display_limit)
+                    Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
+                    Text = message
+                }));
+            }
+            else if (generalLogRecentCount == short_term_display_limit)
+            {
+                string logFile = Logger.GetLogger(entry.Target.Value).Filename;
+
+                Schedule(() => Notifications.Post(new SimpleNotification
                 {
-                    string logFile = Logger.GetLogger(entry.Target.Value).Filename;
-
-                    Schedule(() => Notifications.Post(new SimpleNotification
+                    Icon = FontAwesome.Solid.EllipsisH,
+                    Text = NotificationsStrings.SubsequentMessagesLogged,
+                    Activated = () =>
                     {
-                        Icon = FontAwesome.Solid.EllipsisH,
-                        Text = NotificationsStrings.SubsequentMessagesLogged,
-                        Activated = () =>
-                        {
-                            Logger.Storage.PresentFileExternally(logFile);
-                            return true;
-                        }
-                    }));
-                }
+                        Logger.Storage.PresentFileExternally(logFile);
+                        return true;
+                    }
+                }));
+            }
 
-                Interlocked.Increment(ref recentLogCount);
-                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentLogCount), debounce);
-            };
+            Interlocked.Increment(ref generalLogRecentCount);
+            Scheduler.AddDelayed(() => Interlocked.Decrement(ref generalLogRecentCount), general_log_debounce);
         }
 
-        private void forwardTabletLogsToNotifications()
+        private void forwardTabletLogToNotifications(LogEntry entry)
         {
-            const string tablet_prefix = @"[Tablet] ";
+            if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(tablet_log_prefix, StringComparison.OrdinalIgnoreCase))
+                return;
 
-            bool notifyOnWarning = true;
-            bool notifyOnError = true;
+            string message = entry.Message.Replace(tablet_log_prefix, string.Empty);
 
-            Logger.NewEntry += entry =>
+            if (entry.Level == LogLevel.Error)
             {
-                if (entry.Level < LogLevel.Important || entry.Target != LoggingTarget.Input || !entry.Message.StartsWith(tablet_prefix, StringComparison.OrdinalIgnoreCase))
+                if (!tabletLogNotifyOnError)
                     return;
 
-                string message = entry.Message.Replace(tablet_prefix, string.Empty);
+                tabletLogNotifyOnError = false;
 
-                if (entry.Level == LogLevel.Error)
+                Schedule(() =>
                 {
-                    if (!notifyOnError)
-                        return;
-
-                    notifyOnError = false;
-
-                    Schedule(() =>
+                    Notifications.Post(new SimpleNotification
                     {
-                        Notifications.Post(new SimpleNotification
-                        {
-                            Text = NotificationsStrings.TabletSupportDisabledDueToError(message),
-                            Icon = FontAwesome.Solid.PenSquare,
-                            IconColour = Colours.RedDark,
-                        });
-
-                        // We only have one tablet handler currently.
-                        // The loop here is weakly guarding against a future where more than one is added.
-                        // If this is ever the case, this logic needs adjustment as it should probably only
-                        // disable the relevant tablet handler rather than all.
-                        foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
-                            tabletHandler.Enabled.Value = false;
-                    });
-                }
-                else if (notifyOnWarning)
-                {
-                    Schedule(() => Notifications.Post(new SimpleNotification
-                    {
-                        Text = NotificationsStrings.EncounteredTabletWarning,
+                        Text = NotificationsStrings.TabletSupportDisabledDueToError(message),
                         Icon = FontAwesome.Solid.PenSquare,
-                        IconColour = Colours.YellowDark,
-                        Activated = () =>
-                        {
-                            OpenUrlExternally("https://opentabletdriver.net/Tablets", LinkWarnMode.NeverWarn);
-                            return true;
-                        }
-                    }));
+                        IconColour = Colours.RedDark,
+                    });
 
-                    notifyOnWarning = false;
-                }
-            };
-
-            Schedule(() =>
+                    // We only have one tablet handler currently.
+                    // The loop here is weakly guarding against a future where more than one is added.
+                    // If this is ever the case, this logic needs adjustment as it should probably only
+                    // disable the relevant tablet handler rather than all.
+                    foreach (var tabletHandler in Host.AvailableInputHandlers.OfType<ITabletHandler>())
+                        tabletHandler.Enabled.Value = false;
+                });
+            }
+            else if (tabletLogNotifyOnWarning)
             {
-                ITabletHandler tablet = Host.AvailableInputHandlers.OfType<ITabletHandler>().SingleOrDefault();
-                tablet?.Tablet.BindValueChanged(_ =>
+                Schedule(() => Notifications.Post(new SimpleNotification
                 {
-                    notifyOnWarning = true;
-                    notifyOnError = true;
-                }, true);
-            });
+                    Text = NotificationsStrings.EncounteredTabletWarning,
+                    Icon = FontAwesome.Solid.PenSquare,
+                    IconColour = Colours.YellowDark,
+                    Activated = () =>
+                    {
+                        OpenUrlExternally("https://opentabletdriver.net/Tablets", LinkWarnMode.NeverWarn);
+                        return true;
+                    }
+                }));
+
+                tabletLogNotifyOnWarning = false;
+            }
         }
 
         private Task asyncLoadStream;
@@ -1588,6 +1653,20 @@ namespace osu.Game
 
                     SkinManager.SelectRandomSkin();
                     return true;
+
+                case GlobalAction.NextSkin:
+                    if (skinEditor.State.Value == Visibility.Visible)
+                        return false;
+
+                    SkinManager.SelectNextSkin();
+                    return true;
+
+                case GlobalAction.PreviousSkin:
+                    if (skinEditor.State.Value == Visibility.Visible)
+                        return false;
+
+                    SkinManager.SelectPreviousSkin();
+                    return true;
             }
 
             return false;
@@ -1654,20 +1733,32 @@ namespace osu.Game
             ScreenOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
             overlayOffsetContainer.Padding = new MarginPadding { Top = toolbarOffset };
 
-            float horizontalOffset = 0f;
-
-            // Content.ToLocalSpace() is used instead of this.ToLocalSpace() to correctly calculate the offset with scaling modes active.
-            // Content is a child of a scaling container with ScalingMode.Everything set, while the game itself is never scaled.
-            // this avoids a visible jump in the positioning of the screen offset container.
-            if (Settings.IsLoaded && Settings.IsPresent)
-                horizontalOffset += Content.ToLocalSpace(Settings.ScreenSpaceDrawQuad.TopRight).X * SIDE_OVERLAY_OFFSET_RATIO;
-            if (Notifications.IsLoaded && Notifications.IsPresent)
-                horizontalOffset += (Content.ToLocalSpace(Notifications.ScreenSpaceDrawQuad.TopLeft).X - Content.DrawWidth) * SIDE_OVERLAY_OFFSET_RATIO;
-
-            ScreenOffsetContainer.X = horizontalOffset;
-            overlayContent.X = horizontalOffset * 1.2f;
+            adjustGlobalScreenOffset();
 
             GlobalCursorDisplay.ShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
+        }
+
+        private float horizontalOffsetAdjust;
+
+        /// <summary>
+        /// When a screen-edge overlay is present, we push the game content slightly in its direction to create a sense of depth.
+        /// </summary>
+        private void adjustGlobalScreenOffset()
+        {
+            float adjust = 0f;
+
+            if (Settings.IsLoaded && Settings.State.Value == Visibility.Visible)
+                adjust += SettingsPanel.WIDTH * SIDE_OVERLAY_OFFSET_RATIO;
+            if (Notifications.IsLoaded && Notifications.State.Value == Visibility.Visible)
+                adjust -= NotificationOverlay.WIDTH * SIDE_OVERLAY_OFFSET_RATIO;
+
+            horizontalOffsetAdjust = (float)Interpolation.DampContinuously(horizontalOffsetAdjust, adjust, 100, Time.Elapsed);
+            // Avoid having everything on the screen moving by miniscule amounts (can create overhead on busy screens).
+            if (adjust == 0 && Math.Abs(horizontalOffsetAdjust) < 0.2f)
+                horizontalOffsetAdjust = 0;
+
+            ScreenOffsetContainer.X = horizontalOffsetAdjust;
+            overlayContent.X = horizontalOffsetAdjust * 1.2f;
         }
 
         protected virtual void ScreenChanged([CanBeNull] IOsuScreen current, [CanBeNull] IOsuScreen newScreen)
@@ -1716,13 +1807,12 @@ namespace osu.Game
 
             if (current != null)
             {
-                backButtonVisibility.UnbindFrom(current.BackButtonVisibility);
                 OverlayActivationMode.UnbindFrom(current.OverlayActivationMode);
                 configUserActivity.UnbindFrom(current.Activity);
             }
 
             // Bind to new screen.
-            if (newScreen != null)
+            if (newScreen is OsuScreen newOsuScreen)
             {
                 OverlayActivationMode.BindTo(newScreen.OverlayActivationMode);
                 configUserActivity.BindTo(newScreen.Activity);
@@ -1734,40 +1824,6 @@ namespace osu.Game
                     CloseAllOverlays();
                 else
                     Toolbar.Show();
-
-                var newOsuScreen = (OsuScreen)newScreen;
-
-                if (newScreen.ShowFooter)
-                {
-                    // the legacy back button should never display while the new footer is in use, as it
-                    // contains its own local back button.
-                    ((BindableBool)backButtonVisibility).Value = false;
-
-                    BackButton.Hide();
-                    ScreenFooter.Show();
-
-                    if (newOsuScreen.IsLoaded)
-                        updateFooterButtons();
-                    else
-                        newOsuScreen.OnLoadComplete += _ => updateFooterButtons();
-
-                    void updateFooterButtons()
-                    {
-                        var buttons = newScreen.CreateFooterButtons();
-
-                        newOsuScreen.LoadComponentsAgainstScreenDependencies(buttons);
-
-                        ScreenFooter.SetButtons(buttons);
-                        ScreenFooter.Show();
-                    }
-                }
-                else
-                {
-                    backButtonVisibility.BindTo(newScreen.BackButtonVisibility);
-
-                    ScreenFooter.SetButtons(Array.Empty<ScreenFooterButton>());
-                    ScreenFooter.Hide();
-                }
 
                 skinEditor.SetTarget(newOsuScreen);
             }

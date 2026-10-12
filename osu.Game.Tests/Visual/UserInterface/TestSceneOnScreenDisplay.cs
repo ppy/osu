@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class EmptyToast : Toast
         {
             public EmptyToast()
-                : base("", "", "")
+                : base("", "")
             {
             }
         }
@@ -104,8 +104,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         private partial class LengthyToast : Toast
         {
             public LengthyToast()
-                : base("Toast with a very very very long text", "A very very very very very very long text also", "A very very very very very long shortcut")
+                : base("Toast with a very very very long text", "A very very very very very very long text also")
             {
+                ExtraText = "A very very very very very long shortcut";
             }
         }
 

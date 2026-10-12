@@ -17,6 +17,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets.Mods;
@@ -25,18 +26,19 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
-using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
     public partial class TestSceneSkinEditorNavigation : OsuGameTestScene
     {
-        private TestPlaySongSelect songSelect;
+        private SoloSongSelect songSelect;
+        private ModSelectOverlay modSelect => Game.ChildrenOfType<ModSelectOverlay>().First();
+
         private SkinEditor skinEditor => Game.ChildrenOfType<SkinEditor>().FirstOrDefault();
 
         [Test]
@@ -50,22 +52,22 @@ namespace osu.Game.Tests.Visual.Navigation
 
             switchToGameplayScene();
 
-            BarHitErrorMeter hitErrorMeter = null;
+            ArgonAccuracyCounter accuracyCounter = null;
 
-            AddUntilStep("select bar hit error blueprint", () =>
+            AddUntilStep("select argon accuracy counter blueprint", () =>
             {
-                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().FirstOrDefault(b => b.Item is BarHitErrorMeter);
+                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().FirstOrDefault(b => b.Item is ArgonAccuracyCounter);
 
                 if (blueprint == null)
                     return false;
 
-                hitErrorMeter = (BarHitErrorMeter)blueprint.Item;
+                accuracyCounter = (ArgonAccuracyCounter)blueprint.Item;
                 skinEditor.SelectedComponents.Clear();
                 skinEditor.SelectedComponents.Add(blueprint.Item);
                 return true;
             });
 
-            AddAssert("value is default", () => hitErrorMeter.JudgementLineThickness.IsDefault);
+            AddAssert("value is default", () => accuracyCounter.WireframeOpacity.IsDefault);
 
             AddStep("hover first slider", () =>
             {
@@ -78,7 +80,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("adjust slider via keyboard", () => InputManager.Key(Key.Left));
 
-            AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
+            AddAssert("value is less than default", () => accuracyCounter.WireframeOpacity.Value < accuracyCounter.WireframeOpacity.Default);
         }
 
         [Test]
@@ -123,12 +125,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
             AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
             AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
-            AddStep("undo", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.Z);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("undo", () => InputManager.Keys(PlatformAction.Undo));
             AddUntilStep("only one accuracy meter left",
                 () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
                 () => Is.EqualTo(1));
@@ -160,12 +157,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for accuracy counter", () => Game.ChildrenOfType<ArgonAccuracyCounter>().Any(counter => counter.Position != new Vector2()));
             AddStep("dump state of accuracy meter", () => state = JsonConvert.SerializeObject(Game.ChildrenOfType<ArgonAccuracyCounter>().First().CreateSerialisedInfo()));
             AddStep("add any component", () => Game.ChildrenOfType<SkinComponentToolbox.ToolboxComponentButton>().First().TriggerClick());
-            AddStep("undo", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.Z);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("undo", () => InputManager.Keys(PlatformAction.Undo));
             AddUntilStep("only one accuracy meter left",
                 () => Game.ChildrenOfType<Player>().Single().ChildrenOfType<ArgonAccuracyCounter>().Count(),
                 () => Is.EqualTo(1));
@@ -187,12 +179,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for components", () => skinEditor.ChildrenOfType<SkinBlueprint>().Any());
 
-            AddStep("select all components", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.Key(Key.A);
-                InputManager.ReleaseKey(Key.ControlLeft);
-            });
+            AddStep("select all components", () => InputManager.Keys(PlatformAction.SelectAll));
 
             AddUntilStep("components selected", () => skinEditor.SelectedComponents.Count > 0);
 
@@ -290,6 +277,8 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             advanceToSongSelect();
             openSkinEditor();
+            AddUntilStep("skin editor visible", () => skinEditor.State.Value == Visibility.Visible);
+
             AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
@@ -302,14 +291,15 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
 
             toggleSkinEditor();
+            AddUntilStep("skin editor hidden", () => skinEditor.State.Value == Visibility.Hidden);
 
-            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(1)));
+            AddStep("move cursor slightly", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(2)));
             AddUntilStep("settings visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.GreaterThan(0));
 
             AddStep("move cursor to right of screen too far", () => InputManager.MoveMouseTo(InputManager.ScreenSpaceDrawQuad.TopRight + new Vector2(10240, 0)));
             AddUntilStep("settings not visible", () => getPlayerSettingsOverlay().DrawWidth, () => Is.EqualTo(0));
 
-            PlayerSettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<PlayerSettingsOverlay>().SingleOrDefault();
+            ReplaySettingsOverlay getPlayerSettingsOverlay() => ((Player)Game.ScreenStack.CurrentScreen).ChildrenOfType<ReplaySettingsOverlay>().SingleOrDefault();
         }
 
         [Test]
@@ -331,10 +321,10 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestModOverlayClosesOnOpeningSkinEditor()
         {
             advanceToSongSelect();
-            AddStep("open mod overlay", () => songSelect.ModSelectOverlay.Show());
+            AddStep("open mod overlay", () => modSelect.Show());
 
             openSkinEditor();
-            AddUntilStep("mod overlay closed", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);
+            AddUntilStep("mod overlay closed", () => modSelect.State.Value == Visibility.Hidden);
         }
 
         [Test]
@@ -448,8 +438,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         private void advanceToSongSelect()
         {
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
+            PushAndConfirm(() => songSelect = new SoloSongSelect());
+            AddUntilStep("wait for song select", () => songSelect.CarouselItemsPresented);
         }
 
         private void openSkinEditor()

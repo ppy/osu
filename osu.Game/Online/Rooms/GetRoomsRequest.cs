@@ -15,7 +15,7 @@ namespace osu.Game.Online.Rooms
         private readonly RoomStatusFilter? status;
         private readonly string category;
 
-        public GetRoomsRequest(FilterCriteria filterCriteria)
+        public GetRoomsRequest(LoungeFilterCriteria filterCriteria)
         {
             mode = filterCriteria.Mode;
             category = filterCriteria.Category;

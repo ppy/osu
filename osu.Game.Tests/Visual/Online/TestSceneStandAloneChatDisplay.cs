@@ -3,18 +3,23 @@
 
 #nullable disable
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.Chat;
 using osuTK;
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osuTK.Input;
 
@@ -48,6 +53,9 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         private ChannelManager channelManager;
+        private DialogOverlay dialogOverlay;
+
+        private Container content;
 
         private TestStandAloneChatDisplay chatDisplay;
         private TestStandAloneChatDisplay chatWithTextBox;
@@ -56,27 +64,60 @@ namespace osu.Game.Tests.Visual.Online
 
         private Channel testChannel;
 
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
+
+        protected override Container<Drawable> Content => content;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var api = parent.Get<IAPIProvider>();
-
-            Add(channelManager = new ChannelManager(api));
-
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            var api = dependencies.Get<IAPIProvider>();
+
+            base.Content.AddRange([
+                channelManager = new ChannelManager(api),
+                content = new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                dialogOverlay = new DialogOverlay(),
+            ]);
 
             dependencies.Cache(channelManager);
+            dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
 
             return dependencies;
         }
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            messageIdSequence = 0;
-            channelManager.CurrentChannel.Value = testChannel = new Channel();
+            AddStep("setup request handling", () =>
+            {
+                dummyAPI.HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case JoinChannelRequest joinChannel:
+                            joinChannel.TriggerSuccess();
+                            return true;
 
-            reinitialiseDrawableDisplay();
-        });
+                        case ChatReportRequest chatReport:
+                            chatReport.TriggerSuccess();
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
+            AddStep("reset chat displays", () => Schedule(() =>
+            {
+                messageIdSequence = 0;
+                channelManager.CurrentChannel.Value = testChannel = new Channel();
+
+                reinitialiseDrawableDisplay();
+            }));
+        }
 
         private void reinitialiseDrawableDisplay()
         {
@@ -375,6 +416,34 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("text box 2 contains 'hello'", () => chatWithTextBox2.ChildrenOfType<StandAloneChatDisplay.ChatTextBox>().Single().Text == "hello");
         }
 
+        [Test]
+        public void TestReportConfirmationArrivesInCorrectChannel()
+        {
+            Channel testChannel2 = null!;
+
+            AddStep("join second channel", () => chatWithTextBox2.Channel.Value = testChannel2 = new Channel());
+            AddStep("send message", () => testChannel2.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = redUser,
+                Content = "wangs",
+            }));
+            AddStep("open context menu", () =>
+            {
+                var username = this.ChildrenOfType<DrawableChatUsername>().First().ChildrenOfType<TruncatingSpriteText>().First();
+                InputManager.MoveMouseTo(username);
+                InputManager.Click(MouseButton.Right);
+            });
+            AddStep("select report option", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<Menu.DrawableMenuItem>().First(m => m.Item.Text.ToString() == "Report"));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("send report", () => this.ChildrenOfType<ReportChatDialog.SubmitButton>().Single().TriggerClick());
+
+            AddAssert("first channel has no confirmation", () => testChannel.Messages, () => Is.Empty);
+            AddAssert("second channel has confirmation", () => testChannel2.Messages.Last(), () => Is.InstanceOf(typeof(InfoMessage)));
+        }
+
         private void fillChat(int count = 10)
         {
             AddStep("fill chat", () =>
@@ -471,7 +540,7 @@ namespace osu.Game.Tests.Visual.Online
 
             public DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
 
-            public ChannelScrollContainer ScrollContainer => (ChannelScrollContainer)((Container)DrawableChannel.Child).Child;
+            public ChannelScrollContainer ScrollContainer => DrawableChannel.ChildrenOfType<ChannelScrollContainer>().Single();
 
             public FillFlowContainer FillFlow => (FillFlowContainer)ScrollContainer.Child;
 

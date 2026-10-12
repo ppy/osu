@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         status.Value = FriendStatus.None;
                     }
 
-                    api.UpdateLocalFriends();
+                    api.LocalUserState.UpdateFriends();
                     HideLoadingLayer();
                 };
 
@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.LoadComplete();
 
-            apiFriends.BindTo(api.Friends);
+            apiFriends.BindTo(api.LocalUserState.Friends);
             apiFriends.BindCollectionChanged((_, _) => Schedule(updateStatus));
 
             User.BindValueChanged(u =>

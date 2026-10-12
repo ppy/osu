@@ -1,0 +1,18 @@
+{
+  "Mappings": [{
+    "StartTime": 500.0,
+    "Objects": [{
+      "StartTime": 500.0,
+      "EndTime": 2500,
+      "Column": 2,
+      "PlaySlidingSamples": true,
+      "NodeSamples": [
+        ["Gameplay/soft-hitnormal"],
+        ["Gameplay/soft-hitnormal"],
+        ["Gameplay/soft-hitnormal"],
+        ["Gameplay/soft-hitnormal"]
+      ],
+      "Samples": ["Gameplay/soft-hitnormal"]
+    }]
+  }]
+}

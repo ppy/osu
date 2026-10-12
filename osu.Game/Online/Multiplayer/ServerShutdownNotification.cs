@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Humanizer.Localisation;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 
@@ -53,10 +54,10 @@ namespace osu.Game.Online.Multiplayer
             if (remaining.TotalSeconds <= 5)
             {
                 updateDelegate?.Cancel();
-                Text = "The multiplayer server will be right back...";
+                Text = NotificationsStrings.MultiplayerServerShuttingDownImmediately;
             }
             else
-                Text = $"The multiplayer server is restarting in {HumanizerUtils.Humanize(remaining, precision: 3, minUnit: TimeUnit.Second)}.";
+                Text = NotificationsStrings.MultiplayerServerShuttingDownRemaining(HumanizerUtils.Humanize(remaining, precision: 3, minUnit: TimeUnit.Second));
         }
     }
 }

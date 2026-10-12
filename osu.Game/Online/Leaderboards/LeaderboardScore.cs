@@ -17,12 +17,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Select;
@@ -35,6 +35,7 @@ using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
+using SongSelect = osu.Game.Screens.Select.SongSelect;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Online.Leaderboards
@@ -76,7 +77,7 @@ namespace osu.Game.Online.Leaderboards
         private SongSelect songSelect { get; set; }
 
         [Resolved(canBeNull: true)]
-        private Clipboard clipboard { get; set; }
+        private OsuGame game { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -103,7 +104,7 @@ namespace osu.Game.Online.Leaderboards
         private void load(IAPIProvider api, OsuColour colour)
         {
             var user = Score.User;
-            bool isUserFriend = api.Friends.Any(friend => friend.TargetID == user.OnlineID);
+            bool isUserFriend = api.LocalUserState.Friends.Any(friend => friend.TargetID == user.OnlineID);
 
             statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -429,7 +430,7 @@ namespace osu.Game.Online.Leaderboards
                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold);
             }
 
-            protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
+            protected override LocalisableString Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
         }
 
         public class LeaderboardScoreStatistic
@@ -456,10 +457,10 @@ namespace osu.Game.Online.Leaderboards
                 var copyableMods = Score.Mods.Where(m => m.Type != ModType.System).ToArray();
 
                 if (copyableMods.Length > 0 && songSelect != null)
-                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = copyableMods));
+                    items.Add(new OsuMenuItem(SongSelectStrings.UseTheseMods, MenuItemType.Highlighted, () => songSelect.Mods.Value = copyableMods));
 
                 if (Score.OnlineID > 0)
-                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => clipboard?.SetText($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
+                    items.Add(new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard($@"{api.Endpoints.WebsiteUrl}/scores/{Score.OnlineID}")));
 
                 if (Score.Files.Count > 0)
                 {

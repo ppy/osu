@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Settings
 
         private readonly Bindable<float> current = new Bindable<float>
         {
-            Default = default,
+            Default = 0,
             Value = 1,
         };
 
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Settings
                 foreach (var revertToDefaultButton in this.ChildrenOfType<RevertToDefaultButton<float>>())
                     revertToDefaultButton.Parent!.Scale = new Vector2(scale);
             });
-            AddToggleStep("toggle default state", state => current.Value = state ? default : 1);
+            AddToggleStep("toggle default state", state => current.Value = state ? 0 : 1);
             AddToggleStep("toggle disabled state", state => current.Disabled = state);
         }
     }

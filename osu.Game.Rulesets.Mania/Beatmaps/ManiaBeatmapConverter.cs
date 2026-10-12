@@ -66,6 +66,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             if (IsForCurrentRuleset && TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
             {
+                // If support for odd key counts above 10 (11 / 13 / 15 / 17K) is ever desired, this code needs to go.
+                // For now, it's probably fine, as stable doesn't support them outside of manual .osu edits either.
                 TargetColumns /= 2;
                 Dual = true;
             }
@@ -99,7 +101,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
         }
 
-        public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty, IReadOnlyList<Mod>? mods = null)
+        public static int GetColumnCount(LegacyBeatmapConversionDifficultyInfo difficulty, IReadOnlyCollection<Mod>? mods = null)
         {
             var converter = new ManiaBeatmapConverter(null, difficulty, new ManiaRuleset());
 

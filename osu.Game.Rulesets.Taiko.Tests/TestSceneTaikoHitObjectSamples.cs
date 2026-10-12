@@ -14,26 +14,27 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneTaikoHitObjectSamples)));
 
-        [TestCase("taiko-normal-hitnormal")]
-        [TestCase("hitnormal")]
-        public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
+        [TestCase("taiko-normal-hitnormal2", "taiko-normal-hitnormal")]
+        [TestCase("hitnormal", "hitnormal")]
+        public void TestDefaultCustomSampleFromBeatmap(string beatmapSkinSampleName, string userSkinSampleName)
         {
-            SetupSkins(expectedSample, expectedSample);
+            SetupSkins(beatmapSkinSampleName, userSkinSampleName);
 
             CreateTestWithBeatmap("taiko-hitobject-beatmap-custom-sample-bank.osu");
 
-            AssertBeatmapLookup(expectedSample);
+            AssertBeatmapLookup(beatmapSkinSampleName);
         }
 
-        [TestCase("taiko-normal-hitnormal")]
-        [TestCase("hitnormal")]
-        public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
+        [TestCase("", "taiko-normal-hitnormal")]
+        [TestCase("taiko-normal-hitnormal", "taiko-normal-hitnormal")]
+        [TestCase("", "hitnormal")]
+        public void TestDefaultCustomSampleFromUserSkinFallback(string beatmapSkinSampleName, string userSkinSampleName)
         {
-            SetupSkins(string.Empty, expectedSample);
+            SetupSkins(beatmapSkinSampleName, userSkinSampleName);
 
             CreateTestWithBeatmap("taiko-hitobject-beatmap-custom-sample-bank.osu");
 
-            AssertUserLookup(expectedSample);
+            AssertUserLookup(userSkinSampleName);
         }
 
         [TestCase("taiko-normal-hitnormal2")]

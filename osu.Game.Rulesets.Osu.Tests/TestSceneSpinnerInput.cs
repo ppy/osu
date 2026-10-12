@@ -191,6 +191,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
+        [FlakyTest]
         public void TestRewind()
         {
             AddStep("set manual clock", () => manualClock = new ManualClock

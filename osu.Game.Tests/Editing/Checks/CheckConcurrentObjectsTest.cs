@@ -58,6 +58,16 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestCirclesAlmostConcurrentWarning()
+        {
+            assertAlmostConcurrentSame(new List<HitObject>
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 108 }
+            });
+        }
+
+        [Test]
         public void TestSlidersSeparate()
         {
             assertOk(new List<HitObject>
@@ -98,6 +108,16 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestSliderAndCircleAlmostConcurrent()
+        {
+            assertAlmostConcurrentDifferent(new List<HitObject>
+            {
+                getSliderMock(startTime: 100, endTime: 400.75d).Object,
+                new HitCircle { StartTime = 408 }
+            });
+        }
+
+        [Test]
         public void TestManyObjectsConcurrent()
         {
             var hitobjects = new List<HitObject>
@@ -110,8 +130,14 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(3));
-            Assert.That(issues.Where(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentDifferent).ToList(), Has.Count.EqualTo(2));
-            Assert.That(issues.Any(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentSame));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrent));
+
+            // Should have 1 same-type concurrent (Slider & Slider) and 2 different-type concurrent (Slider & Circle)
+            var sameTypeIssues = issues.Where(issue => issue.ToString().Contains("s are concurrent here")).ToList();
+            var differentTypeIssues = issues.Where(issue => issue.ToString().Contains(" and ") && issue.ToString().Contains("are concurrent here")).ToList();
+
+            Assert.That(sameTypeIssues, Has.Count.EqualTo(1));
+            Assert.That(differentTypeIssues, Has.Count.EqualTo(2));
         }
 
         private Mock<Slider> getSliderMock(double startTime, double endTime, int repeats = 0)
@@ -144,7 +170,8 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentSame));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains("s are concurrent here")));
         }
 
         private void assertConcurrentDifferent(List<HitObject> hitobjects, int count = 1)
@@ -152,7 +179,26 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentDifferent));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains(" and ") && issue.ToString().Contains("are concurrent here")));
+        }
+
+        private void assertAlmostConcurrentSame(List<HitObject> hitobjects)
+        {
+            var issues = check.Run(getContext(hitobjects)).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateAlmostConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains("s are less than 10ms apart")));
+        }
+
+        private void assertAlmostConcurrentDifferent(List<HitObject> hitobjects)
+        {
+            var issues = check.Run(getContext(hitobjects)).ToList();
+
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateAlmostConcurrent));
+            Assert.That(issues.All(issue => issue.ToString().Contains(" and ") && issue.ToString().Contains("are less than 10ms apart")));
         }
 
         private BeatmapVerifierContext getContext(List<HitObject> hitobjects)

@@ -12,7 +12,6 @@ using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Metadata;
@@ -59,8 +58,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set friends", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.Clear();
-                api.Friends.AddRange(getUsers().Select(u => new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.AddRange(getUsers().Select(u => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = u.OnlineID,
@@ -74,7 +73,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("remove one friend", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.RemoveAt(0);
+                api.LocalUserState.Friends.RemoveAt(0);
             });
 
             waitForLoad();
@@ -83,7 +82,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("add one friend", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.AddRange(getUsers().Take(1).Select(u => new APIRelation
+                api.LocalUserState.Friends.AddRange(getUsers().Take(1).Select(u => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = u.OnlineID,
@@ -101,8 +100,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set friends", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.Clear();
-                api.Friends.AddRange(getUsers().Select(u => new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.AddRange(getUsers().Select(u => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = u.OnlineID,
@@ -130,8 +129,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set friends", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.Clear();
-                api.Friends.AddRange(getUsers().Select(u => new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.AddRange(getUsers().Select(u => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = u.OnlineID,
@@ -148,7 +147,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("bring a friend online", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                metadataClient.FriendPresenceUpdated(api.Friends[0].TargetID, new UserPresence { Status = UserStatus.Online });
+                metadataClient.FriendPresenceUpdated(api.LocalUserState.Friends[0].TargetID, new UserPresence { Status = UserStatus.Online });
             });
 
             assertVisiblePanelCount<UserPanel>(1);
@@ -159,7 +158,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("bring a friend online", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                metadataClient.FriendPresenceUpdated(api.Friends[1].TargetID, new UserPresence { Status = UserStatus.Online });
+                metadataClient.FriendPresenceUpdated(api.LocalUserState.Friends[1].TargetID, new UserPresence { Status = UserStatus.Online });
             });
 
             assertVisiblePanelCount<UserPanel>(1);
@@ -170,7 +169,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("take friend offline", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                metadataClient.FriendPresenceUpdated(api.Friends[1].TargetID, null);
+                metadataClient.FriendPresenceUpdated(api.LocalUserState.Friends[1].TargetID, null);
             });
             assertVisiblePanelCount<UserPanel>(1);
 
@@ -184,8 +183,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set friends", () =>
             {
                 DummyAPIAccess api = (DummyAPIAccess)API;
-                api.Friends.Clear();
-                api.Friends.AddRange(getUsers().Select(u => new APIRelation
+                api.LocalUserState.Friends.Clear();
+                api.LocalUserState.Friends.AddRange(getUsers().Select(u => new APIRelation
                 {
                     RelationType = RelationType.Friend,
                     TargetID = u.OnlineID,
@@ -219,13 +218,13 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         private void waitForLoad()
-            => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<LoadingSpinner>().First().State.Value, () => Is.EqualTo(Visibility.Hidden));
+            => AddUntilStep("wait for panels to load", () => this.ChildrenOfType<UserPanel>().Any());
 
         private void assertVisiblePanelCount<T>(int expectedVisible)
             where T : UserPanel
         {
-            AddAssert($"{typeof(T).ReadableName()}s in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().All(p => p is T));
-            AddAssert($"{expectedVisible} panels visible", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<FriendsList.FilterableUserPanel>().Count(p => p.IsPresent),
+            AddUntilStep($"{typeof(T).ReadableName()}s in list", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<UserPanel>().All(p => p is T));
+            AddUntilStep($"{expectedVisible} panels visible", () => this.ChildrenOfType<FriendsList>().Last().ChildrenOfType<FriendsList.FilterableUserPanel>().Count(p => p.IsPresent),
                 () => Is.EqualTo(expectedVisible));
         }
 

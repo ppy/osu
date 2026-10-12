@@ -10,6 +10,7 @@ using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -59,7 +60,7 @@ namespace osu.Game.Screens.Ranking
                                            .AsEnumerable()
                                            .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmapInfo)).Cast<OsuMenuItem>().ToList();
 
-                collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
+                collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, () => manageCollectionsDialog?.Show()));
 
                 return collectionItems.ToArray();
             }

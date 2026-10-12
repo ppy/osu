@@ -19,7 +19,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osuTK;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 

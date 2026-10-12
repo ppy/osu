@@ -3,7 +3,7 @@
 
 using System;
 using System.Linq;
-using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets;
 
@@ -23,11 +23,11 @@ namespace osu.Game.Tests.Beatmaps
         {
             var ruleset = CreateRuleset();
             var mods = ruleset.ConvertFromLegacyMods(legacyMods).ToList();
-            Assert.AreEqual(expectedMods.Length, mods.Count);
+            ClassicAssert.AreEqual(expectedMods.Length, mods.Count);
 
             foreach (var modType in expectedMods)
             {
-                Assert.IsNotNull(mods.SingleOrDefault(mod => mod.GetType() == modType));
+                ClassicAssert.NotNull(mods.SingleOrDefault(mod => mod.GetType() == modType));
             }
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Beatmaps
                                       .Where(mod => providedModTypes.Contains(mod.GetType()))
                                       .ToArray();
             var actualLegacyMods = ruleset.ConvertToLegacyMods(modInstances);
-            Assert.AreEqual(expectedLegacyMods, actualLegacyMods);
+            ClassicAssert.AreEqual(expectedLegacyMods, actualLegacyMods);
         }
     }
 }

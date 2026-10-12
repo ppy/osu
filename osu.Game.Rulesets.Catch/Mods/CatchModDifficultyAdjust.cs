@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             get
             {
-                if (UserAdjustedSettingsCount != 1)
+                if (!IsExactlyOneSettingChanged(CircleSize, ApproachRate, OverallDifficulty, DrainRate))
                     return string.Empty;
 
                 if (!CircleSize.IsDefault) return format("CS", CircleSize);
@@ -51,7 +51,8 @@ namespace osu.Game.Rulesets.Catch.Mods
 
                 return string.Empty;
 
-                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+                string format(string acronym, DifficultyBindable bindable)
+                    => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
             }
         }
 

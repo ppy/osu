@@ -149,6 +149,7 @@ namespace osu.Game.Screens.Edit.Submission
             progress.BindValueChanged(_ => Scheduler.AddOnce(updateProgress), true);
 
             progressSampleChannel = progressSample?.GetChannel();
+            progressSampleChannel?.ManualFree = true;
         }
 
         public void SetNotStarted() => status.Value = StageStatusType.NotStarted;
@@ -181,6 +182,7 @@ namespace osu.Game.Screens.Edit.Submission
             base.Dispose(isDisposing);
 
             progressSampleChannel?.Stop();
+            progressSampleChannel?.Dispose();
         }
 
         private const float transition_duration = 200;
@@ -260,6 +262,7 @@ namespace osu.Game.Screens.Edit.Submission
                     iconContainer.Colour = colours.Red1;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
                     errorSample?.Play();
+                    progressSampleChannel?.Stop();
                     break;
 
                 case StageStatusType.Canceled:
@@ -271,6 +274,7 @@ namespace osu.Game.Screens.Edit.Submission
                     iconContainer.Colour = colours.Gray8;
                     iconContainer.FlashColour(Colour4.White, 1000, Easing.OutQuint);
                     cancelSample?.Play();
+                    progressSampleChannel?.Stop();
                     break;
             }
         }

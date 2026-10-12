@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
@@ -16,6 +18,7 @@ namespace osu.Game.Graphics.UserInterface
         public KeyCombination[]? KeyCombinations { get; init; }
         public GlobalAction? GlobalAction { get; init; }
         public PlatformAction? PlatformAction { get; init; }
+        public (string ruleset, int variant, int action)? RulesetAction { get; init; }
 
         public Hotkey(params KeyCombination[] keyCombinations)
         {
@@ -32,6 +35,11 @@ namespace osu.Game.Graphics.UserInterface
             PlatformAction = platformAction;
         }
 
+        public Hotkey(string ruleset, int variant, int action)
+        {
+            RulesetAction = (ruleset, variant, action);
+        }
+
         public IEnumerable<string> ResolveKeyCombination(ReadableKeyCombinationProvider keyCombinationProvider, RealmKeyBindingStore keyBindingStore, GameHost gameHost)
         {
             var result = new List<string>();
@@ -46,6 +54,12 @@ namespace osu.Game.Graphics.UserInterface
                 result.AddRange(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.Value));
             }
 
+            if (RulesetAction != null)
+            {
+                var (ruleset, variant, action) = RulesetAction.Value;
+                result.AddRange(keyBindingStore.GetReadableKeyCombinationsFor(ruleset, variant, action));
+            }
+
             if (PlatformAction != null)
             {
                 var action = PlatformAction.Value;
@@ -54,6 +68,26 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             return result;
+        }
+
+        public bool Equals(Hotkey other)
+        {
+            if (KeyCombinations == null && other.KeyCombinations != null)
+                return false;
+
+            if (KeyCombinations != null && other.KeyCombinations == null)
+                return false;
+
+            bool result = (KeyCombinations == null && other.KeyCombinations == null) || KeyCombinations!.SequenceEqual(other.KeyCombinations!);
+            result &= GlobalAction == other.GlobalAction;
+            result &= PlatformAction == other.PlatformAction;
+            result &= RulesetAction == other.RulesetAction;
+            return result;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(StructuralComparisons.StructuralEqualityComparer.GetHashCode(KeyCombinations ?? []), GlobalAction, PlatformAction);
         }
     }
 }

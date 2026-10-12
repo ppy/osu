@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Resources
             using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
 
-            Assert.IsTrue(File.Exists(tempPath));
+            ClassicAssert.True(File.Exists(tempPath));
             return tempPath;
         }
 
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Resources
             using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
 
-            Assert.IsTrue(File.Exists(tempPath));
+            ClassicAssert.True(File.Exists(tempPath));
             return tempPath;
         }
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Resources
             {
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
-                Title = $"Some Song (set id {setId:000}) {Guid.NewGuid()}",
+                Title = $"Some Song (set id {setId:000000}) {Guid.NewGuid()}",
                 Author = { Username = "Some Guy " + RNG.Next(0, 9) },
             };
 
@@ -222,12 +222,10 @@ namespace osu.Game.Tests.Resources
 
         private class TestModHardRock : ModHardRock
         {
-            public override double ScoreMultiplier => 1;
         }
 
         private class TestModDoubleTime : ModDoubleTime
         {
-            public override double ScoreMultiplier => 1;
         }
     }
 }

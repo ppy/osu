@@ -3,16 +3,18 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Osu.Edit.Blueprints;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public partial class GridFromPointsTool : CompositionTool
+    public partial class GridFromPointsTool : CompositionTool<OsuAction>
     {
         public GridFromPointsTool()
-            : base("Grid")
+            : base(OsuEditorStrings.GridFromPointsTool)
         {
             TooltipText = """
                           Left click to set the origin.
@@ -20,9 +22,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                           Right click to reset to default.
                           Click and drag to set the origin, spacing and rotation.
                           """;
+            Action = OsuAction.EditorGridFromPointsTool;
         }
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.DraftingCompass };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorGrid };
 
         public override PlacementBlueprint CreatePlacementBlueprint() => new GridPlacementBlueprint();
     }

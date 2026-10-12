@@ -25,15 +25,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private LoadingLayer loadingLayer = null!;
         private IDisposable? selectionOperation;
 
-        public MultiplayerMatchFreestyleSelect(Room room, PlaylistItem item)
-            : base(room, item)
+        public MultiplayerMatchFreestyleSelect(PlaylistItem item)
+            : base(item)
         {
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(loadingLayer = new LoadingLayer(true));
+            AddInternal(loadingLayer = new LoadingLayer(dimBackground: true) { BlockNonPositionalInput = true });
         }
 
         protected override void LoadComplete()
@@ -52,16 +52,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 loadingLayer.Hide();
         }
 
-        protected override bool OnStart()
+        protected override void StartAction()
         {
             if (operationInProgress.Value)
             {
                 Logger.Log($"{nameof(OnStart)} aborted due to {nameof(operationInProgress)}");
-                return false;
+                return;
             }
-
-            if (!base.OnStart())
-                return false;
 
             selectionOperation = operationTracker.BeginOperation();
 
@@ -79,14 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                   }, onError: _ =>
                   {
                       selectionOperation.Dispose();
-
-                      Schedule(() =>
-                      {
-                          Carousel.AllowSelection = true;
-                      });
                   });
-
-            return true;
         }
     }
 }

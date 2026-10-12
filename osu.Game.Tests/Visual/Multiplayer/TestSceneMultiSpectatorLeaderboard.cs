@@ -10,7 +10,7 @@ using osu.Framework.Timing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        ForceExpand = { Value = true }
+                        CollapseDuringGameplay = { Value = false }
                     }
                 });
             });

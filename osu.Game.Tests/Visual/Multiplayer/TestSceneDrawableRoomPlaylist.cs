@@ -8,6 +8,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -37,13 +38,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public partial class TestSceneDrawableRoomPlaylist : MultiplayerTestScene
     {
+        private RulesetStore rulesets = null!;
         private TestPlaylist playlist = null!;
         private BeatmapManager manager = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
@@ -329,7 +331,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 p.RequestResults = _ => resultsRequested = true;
             });
 
-            AddUntilStep("wait for load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any() && playlist.ChildrenOfType<BeatmapCardThumbnail>().First().DrawWidth > 0);
+            AddUntilStep("wait for load", () => playlist.ChildrenOfType<DrawableLinkCompiler>().Any()
+                                                && playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().Any()
+                                                && playlist.ChildrenOfType<BeatmapCardThumbnail>().First().DrawWidth > 0);
 
             AddStep("move mouse to first item title", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<LinkFlowContainer>().First().ChildrenOfType<SpriteText>().First()));
             AddAssert("first item title not hovered", () => playlist.ChildrenOfType<DrawableLinkCompiler>().First().IsHovered, () => Is.False);
@@ -434,6 +438,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
         }
 
         private partial class TestPlaylist : DrawableRoomPlaylist

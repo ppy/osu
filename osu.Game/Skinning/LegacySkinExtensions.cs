@@ -55,7 +55,8 @@ namespace osu.Game.Skinning
             }
         }
 
-        public static Texture[] GetTextures(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, string animationSeparator, Vector2? maxSize, out ISkin? retrievalSource)
+        public static Texture[] GetTextures(this ISkin? source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, string animationSeparator, Vector2? maxSize,
+                                            out ISkin? retrievalSource)
         {
             retrievalSource = null;
 
@@ -140,6 +141,9 @@ namespace osu.Game.Skinning
         {
             switch (font)
             {
+                case LegacyFont.ScoreEntry:
+                    return "scoreentry";
+
                 case LegacyFont.Score:
                     return source.GetConfig<LegacySetting, string>(LegacySetting.ScorePrefix)?.Value ?? "score";
 
@@ -163,6 +167,9 @@ namespace osu.Game.Skinning
         {
             switch (font)
             {
+                case LegacyFont.ScoreEntry:
+                    return 1;
+
                 case LegacyFont.Score:
                     return source.GetConfig<LegacySetting, float>(LegacySetting.ScoreOverlap)?.Value ?? 0f;
 

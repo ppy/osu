@@ -51,6 +51,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             scaleHandles.Add(handle);
         }
 
+        public void ClearScaleHandles()
+        {
+            foreach (var scaleHandle in scaleHandles)
+                unbindDragHandle(scaleHandle);
+            scaleHandles.Clear();
+        }
+
         public void AddRotationHandle(SelectionBoxRotationHandle handle)
         {
             handle.Alpha = 0;
@@ -60,6 +67,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             rotationHandles.Add(handle);
         }
 
+        public void ClearRotationHandles()
+        {
+            foreach (var rotationHandle in rotationHandles)
+                unbindDragHandle(rotationHandle);
+            rotationHandles.Clear();
+        }
+
         private void bindDragHandle(SelectionBoxDragHandle handle)
         {
             handle.HoverGained += updateRotationHandlesVisibility;
@@ -67,6 +81,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             handle.MouseDown += updateRotationHandlesVisibility;
             handle.MouseUp += updateRotationHandlesVisibility;
             allDragHandles.Add(handle);
+        }
+
+        private void unbindDragHandle(SelectionBoxDragHandle handle)
+        {
+            handle.HoverGained -= updateRotationHandlesVisibility;
+            handle.HoverLost -= updateRotationHandlesVisibility;
+            handle.MouseDown -= updateRotationHandlesVisibility;
+            handle.MouseUp -= updateRotationHandlesVisibility;
+            allDragHandles.Remove(handle);
         }
 
         public void FlipScaleHandles(Direction direction)

@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
@@ -19,14 +20,14 @@ namespace osu.Game.Online.API
     {
         public const int DUMMY_USER_ID = 1001;
 
-        public Bindable<APIUser> LocalUser { get; } = new Bindable<APIUser>(new APIUser
-        {
-            Username = @"Local user",
-            Id = DUMMY_USER_ID,
-        });
+        public DummyLocalUserState LocalUserState { get; } = new DummyLocalUserState();
 
-        public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
-        public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
+        public string ScoreProcessingNoticeUrl { get; set; } = string.Empty;
+
+        public Bindable<APIUser> LocalUser => LocalUserState.User;
+
+        ILocalUserState IAPIProvider.LocalUserState => LocalUserState;
+        IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
 
         public DummyNotificationsClient NotificationsClient { get; } = new DummyNotificationsClient();
         INotificationsClient IAPIProvider.NotificationsClient => NotificationsClient;
@@ -62,12 +63,15 @@ namespace osu.Game.Online.API
 
         private bool shouldFailNextLogin;
         private bool stayConnectingNextLogin;
-        private bool requiredSecondFactorAuth = true;
+
+        public SessionVerificationMethod? SessionVerificationMethod { get; set; } = Requests.Responses.SessionVerificationMethod.EmailMessage;
 
         /// <summary>
         /// The current connectivity state of the API.
         /// </summary>
         public IBindable<APIState> State => state;
+
+        public IBindable<string?> UserFacingOutageMessage { get; } = new Bindable<string?>();
 
         public virtual void Queue(APIRequest request)
         {
@@ -130,14 +134,14 @@ namespace osu.Game.Online.API
                 Id = DUMMY_USER_ID,
             };
 
-            if (requiredSecondFactorAuth)
+            if (SessionVerificationMethod != null)
             {
                 state.Value = APIState.RequiresSecondFactorAuth;
             }
             else
             {
                 onSuccessfulLogin();
-                requiredSecondFactorAuth = true;
+                SessionVerificationMethod = null;
             }
         }
 
@@ -147,7 +151,16 @@ namespace osu.Game.Online.API
             request.Failure += e =>
             {
                 state.Value = APIState.RequiresSecondFactorAuth;
-                LastLoginError = e;
+
+                if (request.RequiredVerificationMethod != null)
+                {
+                    SessionVerificationMethod = request.RequiredVerificationMethod;
+                    LastLoginError = new APIException($"Must use {SessionVerificationMethod.GetDescription().ToLowerInvariant()} to complete verification.", e);
+                }
+                else
+                {
+                    LastLoginError = e;
+                }
             };
 
             state.Value = APIState.Connecting;
@@ -185,7 +198,7 @@ namespace osu.Game.Online.API
         {
         }
 
-        public IHubClientConnector? GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
+        public IHubClientConnector? GetHubConnector(string clientName, string endpoint) => null;
 
         public IChatClient GetChatClient() => new TestChatClientConnector(this);
 
@@ -197,14 +210,10 @@ namespace osu.Game.Online.API
 
         public void SetState(APIState newState) => state.Value = newState;
 
-        IBindable<APIUser> IAPIProvider.LocalUser => LocalUser;
-        IBindableList<APIRelation> IAPIProvider.Friends => Friends;
-        IBindableList<APIRelation> IAPIProvider.Blocks => Blocks;
-
         /// <summary>
         /// Skip 2FA requirement for next login.
         /// </summary>
-        public void SkipSecondFactor() => requiredSecondFactorAuth = false;
+        public void SkipSecondFactor() => SessionVerificationMethod = null;
 
         /// <summary>
         /// During the next simulated login, the process will fail immediately.
@@ -222,6 +231,36 @@ namespace osu.Game.Online.API
 
             // Ensure (as much as we can) that any pending tasks are run.
             Scheduler.Update();
+        }
+
+        public class DummyLocalUserState : ILocalUserState
+        {
+            public Bindable<APIUser> User { get; } = new Bindable<APIUser>(new APIUser
+            {
+                Username = @"Local user",
+                Id = DUMMY_USER_ID,
+            });
+
+            public BindableList<APIRelation> Friends { get; } = new BindableList<APIRelation>();
+            public BindableList<APIRelation> Blocks { get; } = new BindableList<APIRelation>();
+            public BindableList<int> FavouriteBeatmapSets { get; } = new BindableList<int>();
+
+            IBindable<APIUser> ILocalUserState.User => User;
+            IBindableList<APIRelation> ILocalUserState.Friends => Friends;
+            IBindableList<APIRelation> ILocalUserState.Blocks => Blocks;
+            IBindableList<int> ILocalUserState.FavouriteBeatmapSets => FavouriteBeatmapSets;
+
+            public void UpdateFriends()
+            {
+            }
+
+            public void UpdateBlocks()
+            {
+            }
+
+            public void UpdateFavouriteBeatmapSets()
+            {
+            }
         }
     }
 }

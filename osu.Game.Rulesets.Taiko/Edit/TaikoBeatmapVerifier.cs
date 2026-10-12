@@ -17,8 +17,14 @@ namespace osu.Game.Rulesets.Taiko.Edit
             // Compose
             new CheckConcurrentObjects(),
 
+            // Spread
+            new CheckTaikoLowestDiffDrainTime(),
+
             // Settings
             new CheckTaikoAbnormalDifficultySettings(),
+
+            // Timing
+            new CheckTaikoInconsistentSkipBarLine(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

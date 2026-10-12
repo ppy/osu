@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
                 string export = LocalStorage.GetFiles("exports").First();
 
                 using (var stream = LocalStorage.GetStream(export))
-                using (var zip = ZipArchive.Open(stream))
+                using (var zip = ZipArchive.OpenArchive(stream))
                 {
                     using (var osuStream = zip.Entries.First().OpenEntryStream())
                     using (var reader = new StreamReader(osuStream))

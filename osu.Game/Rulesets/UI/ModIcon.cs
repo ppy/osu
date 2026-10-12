@@ -8,7 +8,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
@@ -84,7 +83,7 @@ namespace osu.Game.Rulesets.UI
 
         private Drawable adjustmentMarker = null!;
 
-        private Circle cogBackground = null!;
+        private SpriteIcon cogBackground = null!;
         private SpriteIcon cog = null!;
 
         private ModSettingChangeTracker? modSettingsChangeTracker;
@@ -168,7 +167,13 @@ namespace osu.Game.Rulesets.UI
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Size = new Vector2(45),
+                            RelativeSizeAxes = Axes.Both,
+                            // the mod icon assets in `osu-resources` are sized such that they are flush with the hexagonal background with no shadow baked in.
+                            // the `Icons/BeatmapDetails/mod-icon` asset (of size 135x100) has a shadow and some extra transparent pixels baked in.
+                            // the hexagonal background on that asset, excluding its shadow and the transparent pixels, is 131px wide and 92px high.
+                            // height is divided by 135 rather than by 100, because this entire component is square-sized.
+                            Width = 131 / 135f,
+                            Height = 92 / 135f,
                             Icon = FontAwesome.Solid.Question
                         },
                         adjustmentMarker = new Container
@@ -178,11 +183,12 @@ namespace osu.Game.Rulesets.UI
                             Position = new Vector2(64, 14),
                             Children = new Drawable[]
                             {
-                                cogBackground = new Circle
+                                cogBackground = new SpriteIcon
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
+                                    Icon = FontAwesome.Solid.Circle,
                                 },
                                 cog = new SpriteIcon
                                 {

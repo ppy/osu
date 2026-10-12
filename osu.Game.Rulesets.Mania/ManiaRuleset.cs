@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -12,6 +14,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
+using osu.Game.Localisation.Mania;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -38,6 +42,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -77,6 +82,7 @@ namespace osu.Game.Rulesets.Mania
                     return new ManiaArgonSkinTransformer(skin, beatmap);
 
                 case DefaultLegacySkin:
+                case RetroSkin:
                     return new ManiaClassicSkinTransformer(skin, beatmap);
 
                 case LegacySkin:
@@ -161,7 +167,7 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModMirror();
 
             if (mods.HasFlag(LegacyMods.ScoreV2))
-                yield return new ModScoreV2();
+                yield return new ManiaModScoreV2();
         }
 
         public override LegacyMods ConvertToLegacyMods(Mod[] mods)
@@ -296,13 +302,15 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.System:
                     return new Mod[]
                     {
-                        new ModScoreV2(),
+                        new ManiaModScoreV2(),
                     };
 
                 default:
                     return Array.Empty<Mod>();
             }
         }
+
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new ManiaScoreMultiplierCalculator(context);
 
         public override string Description => "osu!mania";
 
@@ -324,7 +332,9 @@ namespace osu.Game.Rulesets.Mania
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
-        public override IEnumerable<int> AvailableVariants
+        public override LocalisableString VariantDescription => ManiaRulesetStrings.VariantDescription;
+
+        public override IEnumerable<int> GameplayVariants
         {
             get
             {
@@ -337,6 +347,15 @@ namespace osu.Game.Rulesets.Mania
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
+            if (variant == EDITOR_VARIANT)
+            {
+                return
+                [
+                    new KeyBinding(InputKey.Number2, ManiaAction.EditorNoteTool),
+                    new KeyBinding(InputKey.Number3, ManiaAction.EditorHoldNoteTool),
+                ];
+            }
+
             switch (getPlayfieldType(variant))
             {
                 case PlayfieldType.Single:
@@ -351,6 +370,9 @@ namespace osu.Game.Rulesets.Mania
 
         public override LocalisableString GetVariantName(int variant)
         {
+            if (variant == EDITOR_VARIANT)
+                return base.GetVariantName(variant);
+
             switch (getPlayfieldType(variant))
             {
                 default:
@@ -380,7 +402,7 @@ namespace osu.Game.Rulesets.Mania
             return (PlayfieldType)Enum.GetValues(typeof(PlayfieldType)).Cast<int>().OrderDescending().First(v => variant >= v);
         }
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
@@ -389,30 +411,121 @@ namespace osu.Game.Rulesets.Mania
                 HitResult.Good,
                 HitResult.Ok,
                 HitResult.Meh,
+                HitResult.Miss,
 
-                // HitResult.SmallBonus is used for awarding perfect bonus score but is not included here as
-                // it would be a bit redundant to show this to the user.
+                HitResult.IgnoreHit,
+                HitResult.ComboBreak,
+                HitResult.IgnoreMiss,
             };
         }
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
-            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             }),
-            new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
+            new StatisticItem("Timing Distribution", () => new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
-                Height = 250
-            }, true),
-            new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
-            {
-                new AverageHitError(score.HitEvents),
-                new UnstableRate(score.HitEvents)
-            }), true)
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(15),
+                Children = new Drawable[]
+                {
+                    new HitEventTimingDistributionGraph(score.HitEvents)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 150
+                    },
+                    new SimpleStatisticTable(1, new SimpleStatisticItem[]
+                    {
+                        new AverageHitError(score.HitEvents),
+                        new UnstableRate(score.HitEvents)
+                    })
+                }
+            }, true)
         };
+
+        /// <seealso cref="ManiaHitWindows"/>
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+
+            // notably, in mania, hit windows are designed to be independent of track playback rate (see `ManiaHitWindows.SpeedMultiplier`).
+            // *however*, to not make matters *too* simple, mania Hard Rock and Easy differ from all other rulesets
+            // in that they apply multipliers *to hit window durations directly* rather than to the Overall Difficulty attribute itself.
+            // because the duration of hit window durations as a function of OD is not a linear function,
+            // this means that multiplying the OD is *not* the same thing as multiplying the hit window duration.
+            // in fact, the second operation is *much* harsher and will produce values much farther outside of normal operating range
+            // (even negative in the case of Easy).
+            // stable handles this wrong on song select and just assumes that it can handle mania EZ / HR the same way as all other rulesets.
+
+            double perfectHitWindow = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.OverallDifficulty, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+
+            if (mods.Any(m => m is ManiaModHardRock))
+                perfectHitWindow /= ManiaModHardRock.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+            else if (mods.Any(m => m is ManiaModEasy))
+                perfectHitWindow /= ManiaModEasy.HIT_WINDOW_DIFFICULTY_MULTIPLIER;
+
+            adjustedDifficulty.OverallDifficulty = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(perfectHitWindow, ManiaHitWindows.PERFECT_WINDOW_RANGE);
+            adjustedDifficulty.CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
+
+            return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            // a special touch-up of key count is required to the original difficulty, since key conversion mods are not `IApplicableToDifficulty`
+            var originalDifficulty = new BeatmapDifficulty(beatmapInfo.Difficulty)
+            {
+                CircleSize = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), [])
+            };
+            var adjustedDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            var colours = new OsuColour();
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
+            {
+                Description = ManiaRulesetStrings.KeyCountDescription
+            };
+
+            var hitWindows = new ManiaHitWindows();
+            hitWindows.SetDifficulty(adjustedDifficulty.OverallDifficulty);
+            hitWindows.IsConvert = !beatmapInfo.Ruleset.Equals(RulesetInfo);
+            hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
+            {
+                Description = ManiaRulesetStrings.AccuracyDescription,
+                AdditionalMetrics = hitWindows.GetAllAvailableWindows()
+                                              .Reverse()
+                                              .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
+                                                  LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##} ms"),
+                                                  colours.ForHitResult(window.result)
+                                              )).ToArray()
+            };
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
+            {
+                Description = SongSelectStrings.HPDrainDescription
+            };
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForRankedPlayCard(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var attributes = GetBeatmapAttributesForDisplay(beatmapInfo, mods).ToList();
+
+            // Key count attribute isn't relevant to ranked play (it's decided by the pool).
+            attributes.RemoveAll(a => a.Acronym == "KC");
+
+            float holdNoteRatio = beatmapInfo.TotalObjectCount == 0 ? 0 : (float)beatmapInfo.EndTimeObjectCount / beatmapInfo.TotalObjectCount;
+            attributes.Insert(0, new RulesetBeatmapAttribute(BeatmapStatisticStrings.HoldNotes, @"HN", holdNoteRatio, holdNoteRatio, 1)
+            {
+                ValueFormat = "P0"
+            });
+
+            return attributes;
+        }
 
         public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
         {
@@ -429,6 +542,9 @@ namespace osu.Game.Rulesets.Mania
 
         public int GetKeyCount(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
             => ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), mods);
+
+        public override int GetVariantForBeatmap(IBeatmapInfo beatmapInfo, IReadOnlyList<Mod>? mods = null)
+            => GetKeyCount(beatmapInfo, mods);
     }
 
     public enum PlayfieldType

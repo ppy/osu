@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using osu.Framework.Logging;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -16,19 +17,26 @@ namespace osu.Game.Screens.Select
     public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>(!?(:|=)|(>|<)(:|=)?))(?<value>("".*""[!]?)|(\S*))",
+            @"\b(?<key>\w+)(?<op>(!?(:|=)|(>|<)(:|=)?))(?<value>("".*?""[!]?)|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
-            foreach (Match match in query_syntax_regex.Matches(query))
+            try
             {
-                string key = match.Groups["key"].Value.ToLowerInvariant();
-                var op = parseOperator(match.Groups["op"].Value);
-                string value = match.Groups["value"].Value;
+                foreach (Match match in query_syntax_regex.Matches(query))
+                {
+                    string key = match.Groups["key"].Value.ToLowerInvariant();
+                    var op = parseOperator(match.Groups["op"].Value);
+                    string value = match.Groups["value"].Value;
 
-                if (tryParseKeywordCriteria(criteria, key, value, op))
-                    query = query.Replace(match.ToString(), "");
+                    if (tryParseKeywordCriteria(criteria, key, value, op))
+                        query = query.Replace(match.ToString(), "");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to parse query ({e.Message})", level: LogLevel.Important);
             }
 
             criteria.SearchText = query;
@@ -41,7 +49,7 @@ namespace osu.Game.Screens.Select
                 case "star":
                 case "stars":
                 case "sr":
-                    return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
+                    return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0);
 
                 case "ar":
                     return TryUpdateCriteriaRange(ref criteria.ApproachRate, op, value);
@@ -57,7 +65,7 @@ namespace osu.Game.Screens.Select
                     return TryUpdateCriteriaRange(ref criteria.OverallDifficulty, op, value);
 
                 case "bpm":
-                    return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);
+                    return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.5f);
 
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
@@ -68,6 +76,7 @@ namespace osu.Game.Screens.Select
                 case "ranked":
                     return tryUpdateRankedDateRange(ref criteria.DateRanked, op, value);
 
+                case "created":
                 case "submitted":
                     return tryUpdateRankedDateRange(ref criteria.DateSubmitted, op, value);
 
@@ -76,6 +85,8 @@ namespace osu.Game.Screens.Select
                         return false;
 
                     // Unplayed beatmaps are filtered on DateTimeOffset.MinValue.
+                    if (op == Operator.NotEqual)
+                        played = !played;
 
                     if (played)
                     {
@@ -115,6 +126,12 @@ namespace osu.Game.Screens.Select
 
                 case "source":
                     return TryUpdateCriteriaText(ref criteria.Source, op, value);
+
+                case "tag":
+                    var tagFilter = new FilterCriteria.OptionalTextFilter();
+                    TryUpdateCriteriaText(ref tagFilter, op, value);
+                    criteria.UserTags.Add(tagFilter);
+                    return true;
 
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
@@ -203,10 +220,16 @@ namespace osu.Game.Screens.Select
 
         private static GroupCollection? tryMatchRegex(string value, string regex)
         {
-            Match matches = Regex.Match(value, regex);
-
-            if (matches.Success)
-                return matches.Groups;
+            try
+            {
+                Match matches = Regex.Match(value, regex);
+                if (matches.Success)
+                    return matches.Groups;
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to parse query ({e.Message})", level: LogLevel.Important);
+            }
 
             return null;
         }
@@ -226,6 +249,10 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
+                case Operator.NotEqual:
+                    textFilter.ExcludeTerm = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     textFilter.SearchTerm = value;
                     return true;
@@ -253,14 +280,22 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
+            range.InvertRange = false;
+
             switch (op)
             {
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
 
                 case Operator.Greater:
@@ -301,14 +336,22 @@ namespace osu.Game.Screens.Select
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
+            range.InvertRange = false;
+
             switch (op)
             {
                 default:
                     return false;
 
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
+
                 case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = range.IsUpperInclusive = true;
                     break;
 
                 case Operator.Greater:
@@ -317,6 +360,8 @@ namespace osu.Game.Screens.Select
 
                 case Operator.GreaterOrEqual:
                     range.Min = value - tolerance;
+                    if (tolerance == 0)
+                        range.IsLowerInclusive = true;
                     break;
 
                 case Operator.Less:
@@ -325,6 +370,8 @@ namespace osu.Game.Screens.Select
 
                 case Operator.LessOrEqual:
                     range.Max = value + tolerance;
+                    if (tolerance == 0)
+                        range.IsUpperInclusive = true;
                     break;
             }
 
@@ -368,17 +415,30 @@ namespace osu.Game.Screens.Select
         {
             var matchingValues = new HashSet<T>();
 
-            if (op == Operator.Equal && filterValue.Contains(','))
+            if (filterValue.Contains(','))
             {
                 string[] splitValues = filterValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                HashSet<T> parsedValues = new HashSet<T>();
 
                 foreach (string splitValue in splitValues)
                 {
                     if (!tryParseEnum<T>(splitValue, out var parsedValue))
                         return false;
 
-                    matchingValues.Add(parsedValue);
+                    parsedValues.Add(parsedValue);
                 }
+
+                if (op == Operator.Equal)
+                {
+                    matchingValues.UnionWith(parsedValues);
+                }
+                else if (op == Operator.NotEqual)
+                {
+                    matchingValues.UnionWith(Enum.GetValues<T>());
+                    matchingValues.ExceptWith(parsedValues);
+                }
+                else
+                    return false;
             }
             else
             {
@@ -413,6 +473,10 @@ namespace osu.Game.Screens.Select
                             if (compareResult > 0) matchingValues.Add(val);
                             break;
 
+                        case Operator.NotEqual:
+                            if (compareResult != 0) matchingValues.Add(val);
+                            break;
+
                         default:
                             return false;
                     }
@@ -430,6 +494,10 @@ namespace osu.Game.Screens.Select
             {
                 default:
                     return false;
+
+                case Operator.NotEqual:
+                    range.InvertRange = true;
+                    goto case Operator.Equal;
 
                 case Operator.Equal:
                     range.IsLowerInclusive = range.IsUpperInclusive = true;
@@ -511,13 +579,15 @@ namespace osu.Game.Screens.Select
         {
             switch (op)
             {
+                case Operator.NotEqual:
                 case Operator.Equal:
-                    // an equality filter is difficult to define for support here.
+                    // an equality or inequality filter is difficult to define for support here.
                     // if "3 months 2 days ago" means a single concrete time instant, such a filter is basically useless.
                     // if it means a range of 24 hours, then that is annoying to write and also comes with its own implications
                     // (does it mean "time instant 3 months 2 days ago, within 12 hours of tolerance either direction"?
                     // does it mean "the full calendar day, from midnight to midnight, 3 months 2 days ago"?)
                     // as such, for simplicity, just refuse to support this.
+                    // same applies to inequality, but instead 24 hours would be need to be left out
                     return false;
 
                 // for the remaining operators, since the value provided to this function is an "ago" type value
@@ -670,6 +740,7 @@ namespace osu.Game.Screens.Select
             try
             {
                 DateTimeOffset dateTimeOffset;
+                dateRange.InvertRange = false;
 
                 switch (op)
                 {
@@ -724,6 +795,11 @@ namespace osu.Game.Screens.Select
 
                         dateTimeOffset = dateTimeOffsetFromDateOnly(year.Value, month.Value, day.Value).AddDays(1);
                         return tryUpdateCriteriaRange(ref dateRange, Operator.GreaterOrEqual, dateTimeOffset);
+
+                    case Operator.NotEqual:
+
+                        dateRange.InvertRange = true;
+                        goto case Operator.Equal;
 
                     case Operator.Equal:
 

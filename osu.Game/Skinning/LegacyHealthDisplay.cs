@@ -184,7 +184,7 @@ namespace osu.Game.Skinning
             public LegacyOldStyleFill(ISkin skin)
                 : base(skin)
             {
-                Position = new Vector2(3, 10) * 1.6f;
+                Position = new Vector2(3, 10) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
             }
         }
 
@@ -193,7 +193,7 @@ namespace osu.Game.Skinning
             public LegacyNewStyleFill(ISkin skin)
                 : base(skin)
             {
-                Position = new Vector2(7.5f, 7.8f) * 1.6f;
+                Position = new Vector2(7.5f, 7.8f) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
             }
 
             protected override void Update()
@@ -233,6 +233,7 @@ namespace osu.Game.Skinning
             public override void Flash(bool isEpic)
             {
                 Bulge();
+                explode.Texture = Main.Texture;
                 explode.Blending = isEpic ? BlendingParameters.Additive : BlendingParameters.Inherit;
                 explode.ScaleTo(1).Then().ScaleTo(isEpic ? 2 : 1.6f, 120, Easing.Out);
                 explode.FadeOutFromOne(120, Easing.Out);

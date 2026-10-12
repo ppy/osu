@@ -149,6 +149,8 @@ namespace osu.Game.Tests.Rulesets
             public IBindable<double> AggregateFrequency => throw new NotImplementedException();
             public IBindable<double> AggregateTempo => throw new NotImplementedException();
 
+            public void Invalidate(string name) => throw new NotImplementedException();
+
             public int PlaybackConcurrency { get; set; }
 
             public void AddExtension(string extension) => throw new NotImplementedException();

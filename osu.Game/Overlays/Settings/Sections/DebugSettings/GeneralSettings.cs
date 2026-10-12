@@ -3,8 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 {
@@ -15,19 +15,17 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
         {
-            Children = new Drawable[]
+            Add(new SettingsItemV2(new FormCheckBox
             {
-                new SettingsCheckbox
-                {
-                    LabelText = @"Show log overlay",
-                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = @"Bypass front-to-back render pass",
-                    Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
-                },
-            };
+                Caption = @"Show log overlay",
+                Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
+            }));
+
+            Add(new SettingsItemV2(new FormCheckBox
+            {
+                Caption = @"Bypass front-to-back render pass",
+                Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+            }));
         }
     }
 }

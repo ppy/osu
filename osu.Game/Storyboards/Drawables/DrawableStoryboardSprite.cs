@@ -74,6 +74,21 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
+        protected override void Update()
+        {
+            base.Update();
+
+            // In stable, alpha transforms exceeding values of 1 would result in sprites disappearing from view.
+            // See https://github.com/peppy/osu-stable-reference/blob/08e3dafd525934cf48880b08e91c24ce4ad8b761/osu!/Graphics/Sprites/pSprite.cs#L413-L414
+            //
+            // Over the years, storyboard(ers) have taken advantage of this to create "flicker" patterns.
+            // This is quite a common technique, so we are reproducing it here for now.
+            //
+            // NOTE TO FUTURE VISITORS: If we do ever update the storyboard spec, we may want to move such flicker effects to their
+            // own transform type, and make this a legacy behaviour. It feels very flimsy.
+            if (Alpha > 1) Alpha %= 1;
+        }
+
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
 
@@ -92,7 +107,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storyboard storyboard)
+        private void load(Storyboard storyboard, StoryboardTriggerController triggerController)
         {
             if (storyboard.UseSkinSprites)
             {
@@ -102,7 +117,7 @@ namespace osu.Game.Storyboards.Drawables
             else
                 Texture = textureStore.Get(Sprite.Path, WrapMode.ClampToEdge, WrapMode.ClampToEdge);
 
-            Sprite.ApplyTransforms(this);
+            Sprite.ApplyTransforms(this, triggerController);
         }
 
         private void skinSourceChanged()

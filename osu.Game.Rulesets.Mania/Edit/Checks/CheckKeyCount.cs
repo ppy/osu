@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var diff = context.Beatmap.Difficulty;
+            var diff = context.CurrentDifficulty.Playable.Difficulty;
 
             if (diff.CircleSize < 4)
             {

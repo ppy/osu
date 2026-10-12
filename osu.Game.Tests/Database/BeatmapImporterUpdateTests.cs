@@ -680,14 +680,14 @@ namespace osu.Game.Tests.Database
             string extractedFolder = $"{path}_extracted";
             Directory.CreateDirectory(extractedFolder);
 
-            using (var zip = ZipArchive.Open(path))
+            using (var zip = ZipArchive.OpenArchive(path))
                 zip.WriteToDirectory(extractedFolder);
 
             applyModifications(new DirectoryInfo(extractedFolder));
 
             File.Delete(path);
 
-            using (var zip = ZipArchive.Create())
+            using (var zip = ZipArchive.CreateArchive())
             {
                 zip.AddAllFromDirectory(extractedFolder);
                 zip.SaveTo(path, new ZipWriterOptions(CompressionType.Deflate));

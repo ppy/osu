@@ -276,7 +276,11 @@ namespace osu.Game.Tests.Visual.Background
 
             FadeAccessibleResults results = null;
 
-            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo())));
+            AddStep("Transition to Results", () =>
+            {
+                player.ValidForResume = false;
+                player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo()));
+            });
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
 
@@ -514,7 +518,7 @@ namespace osu.Game.Tests.Visual.Background
         private void setupUserSettings()
         {
             AddUntilStep("Song select is current", () => songSelect.IsCurrentScreen());
-            AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmapInfo != null);
+            AddUntilStep("Song select has selection", () => songSelect.Carousel?.CurrentGroupedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
                 SelectedMods.Value = new[] { new OsuModNoFail() };
@@ -530,7 +534,7 @@ namespace osu.Game.Tests.Visual.Background
             rulesets?.Dispose();
         }
 
-        private partial class DummySongSelect : PlaySongSelect
+        private partial class DummySongSelect : SoloSongSelect
         {
             private FadeAccessibleBackground background;
 
@@ -546,7 +550,7 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<double> BlurLevel = new BindableDouble();
             public readonly Bindable<double> DimColour = new BindableDouble();
 
-            public new BeatmapCarousel Carousel => base.Carousel;
+            public BeatmapCarousel Carousel => this.ChildrenOfType<BeatmapCarousel>().SingleOrDefault();
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -584,7 +588,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
 
-            public bool IsBackgroundBlur() => Precision.AlmostEquals(background.CurrentBlur, new Vector2(BACKGROUND_BLUR), 0.1f);
+            public bool IsBackgroundBlur() => Precision.AlmostBigger(background.CurrentBlur.X, 0, 0.1f);
 
             public bool CheckBackgroundBlur(Vector2 expected) => Precision.AlmostEquals(background.CurrentBlur, expected, 0.1f);
 

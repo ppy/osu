@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -11,6 +12,8 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
+using osu.Game.Localisation.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Catch.Edit;
@@ -20,11 +23,13 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Catch.Skinning.Argon;
+using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Scoring.Legacy;
@@ -33,6 +38,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch
@@ -53,15 +59,31 @@ namespace osu.Game.Rulesets.Catch
 
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
-            new KeyBinding(InputKey.Z, CatchAction.MoveLeft),
-            new KeyBinding(InputKey.Left, CatchAction.MoveLeft),
-            new KeyBinding(InputKey.X, CatchAction.MoveRight),
-            new KeyBinding(InputKey.Right, CatchAction.MoveRight),
-            new KeyBinding(InputKey.Shift, CatchAction.Dash),
-            new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
-        };
+            switch (variant)
+            {
+                default:
+                    return new[]
+                    {
+                        new KeyBinding(InputKey.Z, CatchAction.MoveLeft),
+                        new KeyBinding(InputKey.Left, CatchAction.MoveLeft),
+                        new KeyBinding(InputKey.X, CatchAction.MoveRight),
+                        new KeyBinding(InputKey.Right, CatchAction.MoveRight),
+                        new KeyBinding(InputKey.Shift, CatchAction.Dash),
+                        new KeyBinding(InputKey.MouseLeft, CatchAction.Dash),
+                    };
+
+                case EDITOR_VARIANT:
+                    return
+                    [
+                        new KeyBinding(InputKey.Number2, CatchAction.EditorFruitTool),
+                        new KeyBinding(InputKey.Number3, CatchAction.EditorJuiceStreamTool),
+                        new KeyBinding(InputKey.Number4, CatchAction.EditorBananaShowerTool),
+                        new KeyBinding(InputKey.T, CatchAction.EditorToggleDistanceSnap),
+                    ];
+            }
+        }
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
@@ -150,6 +172,8 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModFloatingFruits(),
                         new CatchModMuted(),
                         new CatchModNoScope(),
+                        new CatchModMovingFast(),
+                        new CatchModSynesthesia(),
                     };
 
                 case ModType.System:
@@ -163,6 +187,8 @@ namespace osu.Game.Rulesets.Catch
             }
         }
 
+        public override ScoreMultiplierCalculator CreateScoreMultiplierCalculator(ScoreMultiplierContext context) => new CatchScoreMultiplierCalculator(context);
+
         public override string Description => "osu!catch";
 
         public override string ShortName => SHORT_NAME;
@@ -171,15 +197,20 @@ namespace osu.Game.Rulesets.Catch
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 
-        protected override IEnumerable<HitResult> GetValidHitResults()
+        public override IEnumerable<HitResult> GetValidHitResults()
         {
             return new[]
             {
                 HitResult.Great,
+                HitResult.Miss,
 
                 HitResult.LargeTickHit,
+                HitResult.LargeTickMiss,
                 HitResult.SmallTickHit,
+                HitResult.SmallTickMiss,
                 HitResult.LargeBonus,
+                HitResult.IgnoreHit,
+                HitResult.IgnoreMiss,
             };
         }
 
@@ -211,6 +242,9 @@ namespace osu.Game.Rulesets.Catch
 
                 case ArgonSkin:
                     return new CatchArgonSkinTransformer(skin);
+
+                case TrianglesSkin:
+                    return new CatchTrianglesSkinTransformer(skin);
             }
 
             return null;
@@ -256,7 +290,7 @@ namespace osu.Game.Rulesets.Catch
         {
             return new[]
             {
-                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
@@ -265,15 +299,43 @@ namespace osu.Game.Rulesets.Catch
         }
 
         /// <seealso cref="CatchHitObject.ApplyDefaultsToSelf"/>
-        public override BeatmapDifficulty GetRateAdjustedDisplayDifficulty(IBeatmapDifficultyInfo difficulty, double rate)
+        public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
         {
-            BeatmapDifficulty adjustedDifficulty = new BeatmapDifficulty(difficulty);
+            BeatmapDifficulty adjustedDifficulty = base.GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+            double rate = ModUtils.CalculateRateWithMods(mods);
 
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(adjustedDifficulty.ApproachRate, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
             preempt /= rate;
             adjustedDifficulty.ApproachRate = (float)IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, CatchHitObject.PREEMPT_MAX, CatchHitObject.PREEMPT_MID, CatchHitObject.PREEMPT_MIN);
 
             return adjustedDifficulty;
+        }
+
+        public override IEnumerable<RulesetBeatmapAttribute> GetBeatmapAttributesForDisplay(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)
+        {
+            var originalDifficulty = beatmapInfo.Difficulty;
+            var effectiveDifficulty = GetAdjustedDisplayDifficulty(beatmapInfo, mods);
+
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.CircleSize, @"CS", originalDifficulty.CircleSize, effectiveDifficulty.CircleSize, 10)
+            {
+                Description = CatchRulesetStrings.CircleSizeDescription,
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric(CatchRulesetStrings.FruitRadius, (CatchHitObject.OBJECT_RADIUS * LegacyRulesetExtensions.CalculateScaleFromCircleSize(effectiveDifficulty.CircleSize)).ToLocalisableString("0.#"))
+                ]
+            };
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.ApproachRate, @"AR", originalDifficulty.ApproachRate, effectiveDifficulty.ApproachRate, 10)
+            {
+                Description = CatchRulesetStrings.ApproachRateDescription,
+                AdditionalMetrics =
+                [
+                    new RulesetBeatmapAttribute.AdditionalMetric(CatchRulesetStrings.FadeInTime, LocalisableString.Interpolate($@"{IBeatmapDifficultyInfo.DifficultyRangeInt(effectiveDifficulty.ApproachRate, CatchHitObject.PREEMPT_RANGE):#,0.##} ms"))
+                ]
+            };
+            yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, effectiveDifficulty.DrainRate, 10)
+            {
+                Description = SongSelectStrings.HPDrainDescription
+            };
         }
 
         public override bool EditorShowScrollSpeed => false;

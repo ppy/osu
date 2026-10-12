@@ -77,9 +77,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
             base.LoadComplete();
 
             RelativeSizeAxes = Axes.Both;
+        }
 
-            LifetimeStart = smokeStartTime = Time.Current;
-
+        public void StartDrawing(double time)
+        {
+            LifetimeStart = smokeStartTime = time;
+            LifetimeEnd = smokeEndTime = double.MaxValue;
+            SmokePoints.Clear();
+            lastPosition = null;
             totalDistance = pointInterval;
         }
 

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
@@ -13,7 +14,7 @@ namespace osu.Game.Online.Rooms
 {
     [Serializable]
     [MessagePackObject]
-    public class MultiplayerPlaylistItem
+    public class MultiplayerPlaylistItem : IEquatable<MultiplayerPlaylistItem>
     {
         [Key(0)]
         public long ID { get; set; }
@@ -117,6 +118,43 @@ namespace osu.Game.Online.Rooms
             clone.RequiredMods = RequiredMods.ToArray();
             clone.AllowedMods = AllowedMods.ToArray();
             return clone;
+        }
+
+        public bool Equals(MultiplayerPlaylistItem? other)
+            => other != null
+               && ID == other.ID
+               && OwnerID == other.OwnerID
+               && BeatmapID == other.BeatmapID
+               && BeatmapChecksum == other.BeatmapChecksum
+               && RulesetID == other.RulesetID
+               && RequiredMods.SequenceEqual(other.RequiredMods)
+               && AllowedMods.SequenceEqual(other.AllowedMods)
+               && Expired == other.Expired
+               && PlaylistOrder == other.PlaylistOrder
+               && PlayedAt == other.PlayedAt
+               && StarRating == other.StarRating
+               && Freestyle == other.Freestyle;
+
+        public override bool Equals(object? obj)
+            => obj is MultiplayerPlaylistItem other && Equals(other);
+
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(ID);
+            hashCode.Add(OwnerID);
+            hashCode.Add(BeatmapID);
+            hashCode.Add(BeatmapChecksum);
+            hashCode.Add(RulesetID);
+            hashCode.Add(RequiredMods);
+            hashCode.Add(AllowedMods);
+            hashCode.Add(Expired);
+            hashCode.Add(PlaylistOrder);
+            hashCode.Add(PlayedAt);
+            hashCode.Add(StarRating);
+            hashCode.Add(Freestyle);
+            return hashCode.ToHashCode();
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Online
 
             var converted = deserialized?.ToMod(new TestRuleset());
 
-            Assert.NotNull(converted);
+            Assert.That(converted, Is.Not.Null);
             Assert.That(converted, Is.TypeOf(typeof(UnknownMod)));
             Assert.That(converted.Type, Is.EqualTo(ModType.System));
             Assert.That(converted.Acronym, Is.EqualTo("WNG??"));
@@ -157,7 +158,7 @@ namespace osu.Game.Tests.Online
 
             mod.TestSetting.Value = mod.TestSetting.Default;
             JObject serialised = JObject.Parse(JsonConvert.SerializeObject(new APIMod(mod)));
-            Assert.False(serialised.ContainsKey("settings"));
+            ClassicAssert.False(serialised.ContainsKey("settings"));
         }
 
         private class TestRuleset : Ruleset
@@ -184,7 +185,6 @@ namespace osu.Game.Tests.Online
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
             public override LocalisableString Description => "This is a test mod.";
-            public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]
             public BindableNumber<double> TestSetting { get; } = new BindableDouble
@@ -201,7 +201,6 @@ namespace osu.Game.Tests.Online
             public override string Name => "Test Mod";
             public override string Acronym => "TMTR";
             public override LocalisableString Description => "This is a test mod.";
-            public override double ScoreMultiplier => 1;
 
             [SettingSource("Initial rate", "The starting speed of the track")]
             public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1.5)

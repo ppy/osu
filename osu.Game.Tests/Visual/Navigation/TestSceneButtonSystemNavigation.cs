@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.Key(Key.P);
             });
 
-            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect);
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("state is play", () => buttons.State == ButtonSystemState.Play);
 
             AddStep("press P", () => InputManager.Key(Key.P));
-            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddAssert("entered song select", () => Game.ScreenStack.CurrentScreen is SoloSongSelect);
         }
     }
 }

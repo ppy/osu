@@ -6,12 +6,14 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
@@ -21,6 +23,8 @@ namespace osu.Game.Overlays.Mods
     public partial class ModPresetPanel : ModSelectPanel, IHasCustomTooltip<ModPreset>, IHasContextMenu, IHasPopover
     {
         public readonly Live<ModPreset> Preset;
+
+        public int? Index { get; init; }
 
         public override BindableBool Active { get; } = new BindableBool();
 
@@ -32,18 +36,36 @@ namespace osu.Game.Overlays.Mods
 
         private ModSettingChangeTracker? settingChangeTracker;
 
+        private OsuSpriteText? shortcutKeyText;
+
         public ModPresetPanel(Live<ModPreset> preset)
         {
             Preset = preset;
-
             Title = preset.Value.Name;
             Description = preset.Value.Description;
         }
+
+        protected override float IdleSwitchWidth => 24;
+        protected override float ExpandedSwitchWidth => 40;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AccentColour = colours.Orange1;
+
+            if (Index != null)
+            {
+                SwitchContainer.Child = shortcutKeyText = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Shear = -OsuGame.SHEAR,
+                    Text = Index.Value.ToString(),
+                    Font = OsuFont.Style.Heading2,
+                    Alpha = 0,
+                    Margin = new MarginPadding(10),
+                };
+            }
         }
 
         protected override void LoadComplete()
@@ -51,6 +73,19 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             selectedMods.BindValueChanged(_ => selectedModsChanged(), true);
+
+            Active.BindValueChanged(active =>
+            {
+                shortcutKeyText?.FadeTo(active.NewValue ? 1 : 0.4f, TRANSITION_DURATION, Easing.OutQuint);
+            }, true);
+        }
+
+        public void Toggle()
+        {
+            if (!Active.Value)
+                Select();
+            else
+                Deselect();
         }
 
         protected override void Select()

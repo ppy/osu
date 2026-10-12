@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public partial class TestSceneOutOfOrderHits : RateAdjustedBeatmapTestScene
     {
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
+
         [Test]
         public void TestPreviousHitWindowDoesNotExtendPastNextObject()
         {

@@ -64,7 +64,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Scale = new Vector2(1),
                     LowerBound = customStart,
                     UpperBound = customEnd,
-                    TooltipSuffix = "suffix",
                     NubWidth = 32,
                     DefaultStringLowerBound = "0.0",
                     DefaultStringUpperBound = "∞",

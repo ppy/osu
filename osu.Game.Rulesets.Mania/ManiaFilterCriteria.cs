@@ -1,11 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Mods;
@@ -18,13 +18,19 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaFilterCriteria : IRulesetFilterCriteria
     {
-        private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT).ToHashSet();
+        // using `2 * MAX_STAGE_KEYS` here instead of `LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT`,
+        // as the former is higher and achievable by engaging key mods (Dual Stages + 10K)
+        private readonly HashSet<int> includedKeyCounts = Enumerable.Range(1, 2 * ManiaRuleset.MAX_STAGE_KEYS).ToHashSet();
+        private FilterCriteria.OptionalRange<float> longNotePercentage;
 
         public bool Matches(BeatmapInfo beatmapInfo, FilterCriteria criteria)
         {
             int keyCount = ManiaBeatmapConverter.GetColumnCount(LegacyBeatmapConversionDifficultyInfo.FromBeatmapInfo(beatmapInfo), criteria.Mods);
 
-            return includedKeyCounts.Contains(keyCount);
+            bool keyCountMatch = includedKeyCounts.Contains(keyCount);
+            bool longNotePercentageMatch = !longNotePercentage.HasFilter || (!isConvertedBeatmap(beatmapInfo) && longNotePercentage.IsInRange(calculateLongNotePercentage(beatmapInfo)));
+
+            return keyCountMatch && longNotePercentageMatch;
         }
 
         public bool TryParseCustomKeywordCriteria(string key, Operator op, string strValues)
@@ -84,14 +90,18 @@ namespace osu.Game.Rulesets.Mania
                             return false;
                     }
                 }
+
+                case "ln":
+                case "lns":
+                    return FilterQueryParser.TryUpdateCriteriaRange(ref longNotePercentage, op, strValues);
             }
 
             return false;
         }
 
-        public bool FilterMayChangeFromMods(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        public bool FilterMayChangeFromMods(FilterCriteria criteria, ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            if (includedKeyCounts.Count != LegacyBeatmapDecoder.MAX_MANIA_KEY_COUNT)
+            if (includedKeyCounts.Count != 2 * ManiaRuleset.MAX_STAGE_KEYS || criteria.Group == GroupMode.Variant)
             {
                 // Interpreting as the Mod type is required for equality comparison.
                 HashSet<Mod> oldSet = mods.OldValue.OfType<ManiaKeyMod>().AsEnumerable<Mod>().ToHashSet();
@@ -102,6 +112,19 @@ namespace osu.Game.Rulesets.Mania
             }
 
             return false;
+        }
+
+        private static bool isConvertedBeatmap(BeatmapInfo beatmapInfo)
+        {
+            return !beatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
+        }
+
+        private static float calculateLongNotePercentage(BeatmapInfo beatmapInfo)
+        {
+            int holdNotes = beatmapInfo.EndTimeObjectCount;
+            int totalNotes = Math.Max(1, beatmapInfo.TotalObjectCount);
+
+            return holdNotes / (float)totalNotes * 100;
         }
     }
 }

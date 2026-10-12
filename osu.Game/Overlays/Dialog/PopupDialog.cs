@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -40,6 +39,10 @@ namespace osu.Game.Overlays.Dialog
         private readonly SpriteIcon icon;
         private readonly TextFlowContainer header;
         private readonly TextFlowContainer body;
+
+        protected override Container<Drawable> Content => content;
+
+        public Container MainContent { get; private set; }
 
         private bool actionInvoked;
 
@@ -88,21 +91,38 @@ namespace osu.Game.Overlays.Dialog
             {
                 buttonsContainer.ChildrenEnumerable = value;
 
+                // Hide the container if it is empty, so that it doesn't unnecessarily
+                // insert its padding into the parent container.
+                if (buttonsContainer.Children.Any())
+                    buttonsContainer.Show();
+                else
+                    buttonsContainer.Hide();
+
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
                     b.Action = () =>
                     {
-                        if (actionInvoked) return;
-
-                        actionInvoked = true;
-
                         // Hide the dialog before running the action.
                         // This is important as the code which is performed may check for a dialog being present (ie. `OsuGame.PerformFromScreen`)
                         // and we don't want it to see the already dismissed dialog.
-                        Hide();
+                        //
+                        // Can be overriden using `PopupDialogButton.HideDialogOnAction` if a dialog needs to remain
+                        // open after invoking an action (eg. report forms).
+                        if (b.HideDialogOnAction)
+                        {
+                            actionInvoked = true;
+                            Hide();
+                        }
 
                         action?.Invoke();
+
+                        // Delay setting `actionInvoke` for buttons requesting not to hide the dialog before invoke
+                        // until after the action has been invoked, so that the popup hide logic in `PopOut` can fire properly.
+                        //
+                        // This is done assuming the invoked action will handle hiding the dialog itself.
+                        if (!b.HideDialogOnAction)
+                            actionInvoked = true;
                     };
                 }
             }
@@ -116,7 +136,7 @@ namespace osu.Game.Overlays.Dialog
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 content = new Container
                 {
@@ -124,21 +144,21 @@ namespace osu.Game.Overlays.Dialog
                     AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Masking = true,
+                    CornerRadius = 20,
+                    CornerExponent = 2.5f,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.2f),
+                        Radius = 14,
+                    },
                     Alpha = 0f,
                     Children = new Drawable[]
                     {
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.2f),
-                                Radius = 14,
-                            },
                             Children = new Drawable[]
                             {
                                 new Box
@@ -168,7 +188,7 @@ namespace osu.Game.Overlays.Dialog
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
-                            Padding = new MarginPadding { Vertical = 60 },
+                            Padding = new MarginPadding { Top = 60, Bottom = 30 },
                             Children = new Drawable[]
                             {
                                 new Container
@@ -222,6 +242,13 @@ namespace osu.Game.Overlays.Dialog
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = 15 },
                                 },
+                                MainContent = new Container
+                                {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                },
                                 buttonsContainer = new FillFlowContainer<PopupDialogButton>
                                 {
                                     Anchor = Anchor.TopCentre,
@@ -229,6 +256,7 @@ namespace osu.Game.Overlays.Dialog
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(5),
                                     Padding = new MarginPadding { Top = 30 },
                                 },
                             },
@@ -243,7 +271,7 @@ namespace osu.Game.Overlays.Dialog
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio)
         {
             flashSample = audio.Samples.Get(@"UI/default-select-disabled");
         }

@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                 yield break;
 
             var prevObservedTimeDistances = new List<ObservedTimeDistance>();
-            var hitObjects = context.Beatmap.HitObjects;
+            var hitObjects = context.CurrentDifficulty.Playable.HitObjects;
 
             for (int i = 0; i < hitObjects.Count - 1; ++i)
             {

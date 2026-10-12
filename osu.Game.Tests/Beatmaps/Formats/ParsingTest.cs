@@ -6,6 +6,7 @@
 using System;
 using System.Globalization;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -33,9 +34,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [TestCase(-10, 10)]
         public void TestValidRanges(double input, double limit = Parsing.MAX_PARSE_VALUE)
         {
-            Assert.AreEqual(Parsing.ParseInt((input).ToString(CultureInfo.InvariantCulture), (int)limit), (int)input);
-            Assert.AreEqual(Parsing.ParseFloat((input).ToString(CultureInfo.InvariantCulture), (float)limit), (float)input);
-            Assert.AreEqual(Parsing.ParseDouble((input).ToString(CultureInfo.InvariantCulture), limit), input);
+            ClassicAssert.AreEqual(Parsing.ParseInt((input).ToString(CultureInfo.InvariantCulture), (int)limit), (int)input);
+            ClassicAssert.AreEqual(Parsing.ParseFloat((input).ToString(CultureInfo.InvariantCulture), (float)limit), (float)input);
+            ClassicAssert.AreEqual(Parsing.ParseDouble((input).ToString(CultureInfo.InvariantCulture), limit), input);
         }
 
         [TestCase(double.PositiveInfinity)]

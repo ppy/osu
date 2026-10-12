@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
@@ -18,38 +19,40 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double>
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundDim,
+                    Caption = GameplaySettingsStrings.BackgroundDim,
                     Current = config.GetBindable<double>(OsuSetting.DimLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
-                },
-                new SettingsSlider<double>
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundBlur,
+                    Caption = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<double>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
-                },
-                new SettingsSlider<double>
+                }),
+                new SettingsItemV2(new FormSliderBar<double>
                 {
-                    LabelText = GameplaySettingsStrings.BackgroundDimColour,
+                    Caption = GameplaySettingsStrings.BackgroundDimColour,
                     Current = config.GetBindable<double>(OsuSetting.DimColour),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.LightenDuringBreaks,
+                    Caption = GameplaySettingsStrings.LightenDuringBreaks,
                     Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks),
+                })
+                {
                     Keywords = new[] { "dim", "level" }
                 },
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
+                    Caption = GameplaySettingsStrings.FadePlayfieldWhenHealthLow,
                     Current = config.GetBindable<bool>(OsuSetting.FadePlayfieldWhenHealthLow),
-                },
+                }),
             };
         }
     }

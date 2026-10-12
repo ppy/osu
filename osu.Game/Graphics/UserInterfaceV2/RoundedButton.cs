@@ -26,18 +26,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private Color4? triangleGradientSecondColour;
 
-        public override float Height
-        {
-            get => base.Height;
-            set
-            {
-                base.Height = value;
-
-                if (IsLoaded)
-                    updateCornerRadius();
-            }
-        }
-
         public override Color4 BackgroundColour
         {
             get => base.BackgroundColour;
@@ -54,14 +42,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             // Many buttons have local colours, but this provides a sane default for all other cases.
             DefaultBackgroundColour = overlayColourProvider?.Colour3 ?? colours.Blue3;
-            triangleGradientSecondColour ??= overlayColourProvider?.Colour1 ?? colours.Blue3.Lighten(0.2f);
+            triangleGradientSecondColour ??= DefaultBackgroundColour.Lighten(0.2f);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            updateCornerRadius();
+            Content.CornerRadius = 5;
+            Content.CornerExponent = 2.5f;
 
             Add(Triangles = new TrianglesV2
             {
@@ -97,8 +86,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Background.FadeColour(BackgroundColour, 300, Easing.OutQuint);
             base.OnHoverLost(e);
         }
-
-        private void updateCornerRadius() => Content.CornerRadius = DrawHeight / 2;
 
         public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Text };
 

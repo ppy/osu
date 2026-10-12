@@ -19,5 +19,10 @@ namespace osu.Game.Graphics.Carousel
         /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>The post-filtered items.</returns>
         Task<List<CarouselItem>> Run(IEnumerable<CarouselItem> items, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// The total number of beatmap difficulties displayed post filter.
+        /// </summary>
+        int BeatmapItemsCount { get; }
     }
 }

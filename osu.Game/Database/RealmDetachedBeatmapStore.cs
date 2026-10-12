@@ -62,24 +62,69 @@ namespace osu.Game.Database
                 {
                     try
                     {
-                        realm.Run(_ =>
-                        {
-                            var detached = frozenSets.Detach();
+                        // operations purposefully not wrapped in `Realm.Run()`.
+                        // `frozenSets` is, as the name suggests, frozen, and thus documented as safe to access from any thread for reading.
+                        // using `Realm.Run()` would only be misdirection here as it would take out a *second, non-frozen* realm instance.
+                        var detached = frozenSets.Detach();
 
-                            lock (detachedBeatmapSets)
-                            {
-                                detachedBeatmapSets.Clear();
-                                detachedBeatmapSets.AddRange(detached);
-                            }
-                        });
+                        lock (detachedBeatmapSets)
+                        {
+                            detachedBeatmapSets.Clear();
+                            detachedBeatmapSets.AddRange(detached);
+                        }
                     }
                     finally
                     {
                         loaded.Set();
+
+                        // Freezing a collection incurs a full freeze of the realm too,
+                        // which wraps a separate new `SharedRealmHandle` representing the frozen realm:
+                        // https://github.com/realm/realm-dotnet/blob/113c01264fc00f6cedf3c829caa9cfb30b963914/Realm/Realm/DatabaseTypes/RealmCollectionBase.cs#L180-L191
+                        // (note suppressed CA2000 inspection above!)
+                        // https://github.com/realm/realm-dotnet/blob/113c01264fc00f6cedf3c829caa9cfb30b963914/Realm/Realm/Handles/SharedRealmHandle.cs#L650-L655
+                        // https://github.com/realm/realm-core/blob/f8752e180b7f288feadffafdef818068755efe0a/src/realm/object-store/impl/realm_coordinator.cpp#L296-L313
+                        //
+                        // The freezing API on the .NET side does not expose a direct way to eagerly clean up that frozen handle.
+                        // It appears that handle is simply allowed to fall out of scope and eventually get picked up by GC.
+                        // This is a problem when considering interactions with the `BlockAllOperations()` API,
+                        // which is designed to support moving the realm to custom locations.
+                        // Not eagerly disposing the realm associated with the frozen collection as below can cause `BlockAllOperations()` to time out and crash.
+                        //
+                        // If freezing objects and/or collections is going to be more widely used in the repository,
+                        // this should be extracted to an extension method and the direct usage of the freezing APIs banned in kind via `BannedSymbols.txt`.
+                        frozenSets.Realm.Dispose();
                     }
                 }, TaskCreationOptions.LongRunning).FireAndForget();
 
                 return;
+            }
+
+            if (changes.InsertedIndices.Length == 1 && changes.DeletedIndices.Length == 1)
+            {
+                lock (detachedBeatmapSets)
+                {
+                    var deletedSet = detachedBeatmapSets[changes.DeletedIndices[0]];
+                    var insertedSet = sender[changes.InsertedIndices[0]];
+
+                    // this handles beatmap updates using a heuristic that a beatmap update will preserve the online ID.
+                    // it relies on the fact that updates are performed by removing the old set and adding a new one, in a single transaction.
+                    // instead of removing the old set and adding a new one to the collection too, which would trigger consumers' logic related to set removals,
+                    // move the deleted set to the index occupied by the new one and then replace it in-place.
+                    // due to this, the operation can be presented to consumer in a manner that permits them to actually handle this as a replace operation
+                    // and not trigger any set removal logic that may result in selections changing or similar undesirable side effects.
+                    if (deletedSet.OnlineID == insertedSet.OnlineID)
+                    {
+                        pendingOperations.Enqueue(new OperationArgs
+                        {
+                            Type = OperationType.MoveAndReplace,
+                            BeatmapSet = insertedSet.Detach(),
+                            Index = changes.DeletedIndices[0],
+                            NewIndex = changes.InsertedIndices[0],
+                        });
+
+                        return;
+                    }
+                }
             }
 
             foreach (int i in changes.DeletedIndices.OrderDescending())
@@ -138,6 +183,11 @@ namespace osu.Game.Database
                             detachedBeatmapSets.ReplaceRange(op.Index, 1, new[] { op.BeatmapSet! });
                             break;
 
+                        case OperationType.MoveAndReplace:
+                            detachedBeatmapSets.Move(op.Index, op.NewIndex!.Value);
+                            detachedBeatmapSets.ReplaceRange(op.NewIndex!.Value, 1, [op.BeatmapSet!]);
+                            break;
+
                         case OperationType.Remove:
                             detachedBeatmapSets.RemoveAt(op.Index);
                             break;
@@ -160,13 +210,15 @@ namespace osu.Game.Database
             public OperationType Type;
             public BeatmapSetInfo? BeatmapSet;
             public int Index;
+            public int? NewIndex;
         }
 
         private enum OperationType
         {
             Insert,
             Update,
-            Remove
+            Remove,
+            MoveAndReplace,
         }
     }
 }

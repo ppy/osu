@@ -72,12 +72,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Enabled = { Value = true },
                         Text = "Rounded button"
                     },
-                    shearedButton = new ShearedButton(width)
+                    shearedButton = new ShearedButton
                     {
                         Text = "Sheared button",
                         LighterColour = Colour4.FromHex("#FFFFFF"),
                         DarkerColour = Colour4.FromHex("#FFCC22"),
                         TextColour = Colour4.Black,
+                        Width = width,
                         Height = 40,
                         Enabled = { Value = true },
                         Padding = new MarginPadding(0)
@@ -91,7 +92,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("Move cursor to button", () => InputManager.MoveMouseTo(settingsButton));
             AddAssert("Button is hovered", () => settingsButton.IsHovered);
-            AddStep("Move cursor to padded area", () => InputManager.MoveMouseTo(settingsButton.ScreenSpaceDrawQuad.TopLeft + new Vector2(SettingsPanel.CONTENT_MARGINS / 2f, 10)));
+            AddStep("Move cursor to padded area", () => InputManager.MoveMouseTo(settingsButton.ScreenSpaceDrawQuad.TopLeft + new Vector2(SettingsPanel.CONTENT_PADDING.Left / 2f, 10)));
             AddAssert("Cursor within a button", () => settingsButton.ScreenSpaceDrawQuad.Contains(InputManager.CurrentState.Mouse.Position));
             AddAssert("Button is not hovered", () => !settingsButton.IsHovered);
         }

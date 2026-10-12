@@ -232,14 +232,14 @@ namespace osu.Game.Graphics.UserInterface
         private void updateFpsDisplay()
         {
             counterDrawFPS.Colour = getColour(displayedFpsCount / aimDrawFPS);
-            counterDrawFPS.Text = $"{displayedFpsCount:#,0}fps";
+            counterDrawFPS.Text = $"{displayedFpsCount:#,0} fps";
         }
 
         private void updateFrameTimeDisplay()
         {
             counterUpdateFrameTime.Text = displayedFrameTime < 5
-                ? $"{displayedFrameTime:N1}ms"
-                : $"{displayedFrameTime:N0}ms";
+                ? $"{displayedFrameTime:N1} ms"
+                : $"{displayedFrameTime:N0} ms";
 
             counterUpdateFrameTime.Colour = getColour((1000 / displayedFrameTime) / aimUpdateFPS);
         }

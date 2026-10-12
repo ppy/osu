@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,7 +11,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -43,6 +41,12 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public Color4 DisplayedDifficultyColour => background.Colour;
 
+        /// <summary>
+        /// The difficulty text colour currently displayed.
+        /// Can be used to have other components match the spectrum animation.
+        /// </summary>
+        public Color4 DisplayedDifficultyTextColour => starsText.Colour;
+
         private readonly Bindable<double> displayedStars = new BindableDouble();
 
         /// <summary>
@@ -53,9 +57,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -147,7 +148,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 if (animated)
                     // Animation roughly matches `StarCounter`'s implementation.
-                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, 100 + 80 * Math.Abs(c.NewValue.Stars - c.OldValue.Stars), Easing.OutQuint);
+                    this.TransformBindableTo(displayedStars, c.NewValue.Stars, Math.Min(1000, 100 + 80 * Math.Abs(c.NewValue.Stars - c.OldValue.Stars)), Easing.OutQuint);
                 else
                     displayedStars.Value = c.NewValue.Stars;
             });
@@ -160,8 +161,8 @@ namespace osu.Game.Beatmaps.Drawables
 
                 background.Colour = colours.ForStarDifficulty(s.NewValue);
 
-                starIcon.Colour = s.NewValue >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
-                starsText.Colour = s.NewValue >= OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
+                starIcon.Colour = colours.ForStarDifficultyText(s.NewValue);
+                starsText.Colour = colours.ForStarDifficultyText(s.NewValue);
             }, true);
         }
     }

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         private const int ms_threshold = 25;
 
-        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Too short audio files");
+        public CheckMetadata Metadata => new CheckMetadata(CheckCategory.Audio, "Too short audio files", CheckScope.BeatmapSet);
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = context.CurrentDifficulty.Playable.BeatmapInfo.BeatmapSet;
 
             if (beatmapSet != null)
             {
                 foreach (var file in beatmapSet.Files)
                 {
-                    using (Stream data = context.WorkingBeatmap.GetStream(file.File.GetStoragePath()))
+                    using (Stream data = context.CurrentDifficulty.Working.GetStream(file.File.GetStoragePath()))
                     {
                         if (data == null)
                             continue;

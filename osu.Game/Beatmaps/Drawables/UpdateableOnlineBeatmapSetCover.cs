@@ -50,8 +50,7 @@ namespace osu.Game.Beatmaps.Drawables
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
             => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, timeBeforeUnload)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
             };
 
         protected override Drawable CreateDrawable(IBeatmapSetOnlineInfo model)

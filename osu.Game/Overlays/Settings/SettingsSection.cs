@@ -32,12 +32,15 @@ namespace osu.Game.Overlays.Settings
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
 
+        public bool UseSmallerSidebarButton { get; init; }
+
         public virtual IEnumerable<LocalisableString> FilterTerms => new[] { Header };
 
         public const int ITEM_SPACING = 14;
+        public const int ITEM_SPACING_V2 = 4;
 
-        private const int header_size = 24;
-        private const int border_size = 4;
+        private const int header_size = 30;
+        private const int border_size = 2;
 
         private bool matchingFilter = true;
 
@@ -71,9 +74,9 @@ namespace osu.Game.Overlays.Settings
             {
                 Margin = new MarginPadding
                 {
-                    Top = 36
+                    Top = header_size + 6,
                 },
-                Spacing = new Vector2(0, ITEM_SPACING),
+                Spacing = new Vector2(0, ITEM_SPACING_V2),
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
@@ -114,10 +117,7 @@ namespace osu.Game.Overlays.Settings
                                 {
                                     Font = OsuFont.TorusAlternate.With(size: header_size),
                                     Text = Header,
-                                    Margin = new MarginPadding
-                                    {
-                                        Horizontal = SettingsPanel.CONTENT_MARGINS
-                                    }
+                                    Margin = SettingsPanel.CONTENT_PADDING,
                                 },
                                 FlowContent
                             }

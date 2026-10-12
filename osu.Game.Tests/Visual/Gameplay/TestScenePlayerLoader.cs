@@ -19,6 +19,12 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Online.Rooms;
+using osu.Game.Online.Solo;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -64,16 +70,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(BatteryInfo))]
         private readonly LocalBatteryInfo batteryInfo = new LocalBatteryInfo();
 
+        [Cached]
+        private readonly LeaderboardManager leaderboardManager;
+
         private readonly ChangelogOverlay changelogOverlay;
 
         private double savedTrackVolume;
         private double savedMasterVolume;
         private bool savedMutedState;
 
+        private int leaderboardRequestsHandled;
+
         public TestScenePlayerLoader()
         {
             AddRange(new Drawable[]
             {
+                leaderboardManager = new LeaderboardManager(),
                 notificationOverlay = new NotificationOverlay
                 {
                     Anchor = Anchor.TopRight,
@@ -107,6 +119,28 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("set up request handling", () =>
+            {
+                leaderboardRequestsHandled = 0;
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case GetScoresRequest getScores:
+                            leaderboardRequestsHandled++;
+                            getScores.TriggerSuccess(new APIScoresCollection { Scores = [] });
+                            return true;
+
+                        case CreateSoloScoreRequest createSoloScoreRequest:
+                            createSoloScoreRequest.TriggerSuccess(new APIScoreToken { ID = 123456 });
+                            return true;
+
+                        default:
+                            return false;
+                    }
+                };
+            });
 
             AddStep("read all notifications", () =>
             {
@@ -364,6 +398,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             }, () => !volumeOverlay.IsMuted.Value && audioManager.Volume.Value == 0.5 && audioManager.VolumeTrack.Value == 0.5);
         }
 
+        [Test]
+        public void TestLeaderboardForciblyRefetchedOnRestart([Values] bool quickRestart)
+        {
+            AddStep("load player", () => resetPlayer(true));
+
+            AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
+            AddAssert("leaderboard fetched once", () => leaderboardRequestsHandled, () => Is.EqualTo(1));
+
+            AddStep("restart player", () =>
+            {
+                var lastPlayer = player;
+                player = null;
+                lastPlayer.Restart(quickRestart);
+            });
+
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
+
+            if (quickRestart)
+                AddAssert("leaderboard not refetched", () => leaderboardRequestsHandled, () => Is.EqualTo(1));
+            else
+                AddAssert("leaderboard fetched twice", () => leaderboardRequestsHandled, () => Is.EqualTo(2));
+        }
+
         /// <remarks>
         /// Created for avoiding copy pasting code for the same steps.
         /// </remarks>
@@ -374,19 +432,27 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
-            AddStep("load player", () => resetPlayer(false, beforeLoad));
+            AddStep("load player", () =>
+            {
+                resetPlayer(false, beforeLoad);
+
+                // block load to test notifications
+                loader.BlockPlayerLoad = true;
+            });
+
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
             saveVolumes();
 
-            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
+            AddUntilStep("check for notification", () => notificationOverlay.UnreadCount.Value, () => Is.EqualTo(1));
 
             clickNotification();
 
-            AddAssert("check " + volumeName, assert);
+            AddUntilStep("check " + volumeName, assert);
 
             restoreVolumes();
 
+            AddStep("unblock load", () => loader.BlockPlayerLoad = false);
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
@@ -403,7 +469,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
 
-            AddAssert($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Count(), () => Is.EqualTo(warning ? 1 : 0));
+            AddUntilStep($"epilepsy warning {(warning ? "present" : "absent")}", () => this.ChildrenOfType<PlayerLoaderDisclaimer>().Count(), () => Is.EqualTo(warning ? 1 : 0));
 
             restoreVolumes();
         }
@@ -472,11 +538,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).Value = false);
 
             // set charge status and level
-            AddStep("load player", () => resetPlayer(false, () =>
+            AddStep("load player", () =>
             {
-                batteryInfo.SetOnBattery(onBattery);
-                batteryInfo.SetChargeLevel(chargeLevel);
-            }));
+                resetPlayer(false, () =>
+                {
+                    batteryInfo.SetOnBattery(onBattery);
+                    batteryInfo.SetChargeLevel(chargeLevel);
+                });
+
+                // block load to test notifications
+                loader.BlockPlayerLoad = true;
+            });
+
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
 
             if (shouldWarn)
@@ -484,6 +557,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             else
                 AddAssert("notification not triggered", () => notificationOverlay.UnreadCount.Value == 0);
 
+            AddStep("unblock load", () => loader.BlockPlayerLoad = false);
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
@@ -564,6 +638,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new Task DisposalTask => base.DisposalTask;
 
             public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods.Value;
+
+            public bool BlockPlayerLoad { get; set; }
+
+            protected override bool ReadyForGameplay => base.ReadyForGameplay && !BlockPlayerLoad;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)

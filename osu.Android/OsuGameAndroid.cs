@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Android.App;
 using Android.Content.PM;
 using Microsoft.Maui.Devices;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Game;
@@ -21,57 +23,29 @@ namespace osu.Android
         [Cached]
         private readonly OsuGameActivity gameActivity;
 
+        private readonly PackageInfo packageInfo;
+
         public override Vector2 ScalingContainerTargetDrawSize => new Vector2(1024, 1024 * DrawHeight / DrawWidth);
 
         public OsuGameAndroid(OsuGameActivity activity)
             : base(null)
         {
             gameActivity = activity;
+            packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
         }
 
-        public override Version AssemblyVersion
+        public override string Version
         {
             get
             {
-                var packageInfo = Application.Context.ApplicationContext!.PackageManager!.GetPackageInfo(Application.Context.ApplicationContext.PackageName!, 0).AsNonNull();
+                if (!IsDeployedBuild)
+                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
-                try
-                {
-                    // We store the osu! build number in the "VersionCode" field to better support google play releases.
-                    // If we were to use the main build number, it would require a new submission each time (similar to TestFlight).
-                    // In order to do this, we should split it up and pad the numbers to still ensure sequential increase over time.
-                    //
-                    // We also need to be aware that older SDK versions store this as a 32bit int.
-                    //
-                    // Basic conversion format (as done in Fastfile): 2020.606.0 -> 202006060
-
-                    // https://stackoverflow.com/questions/52977079/android-sdk-28-versioncode-in-packageinfo-has-been-deprecated
-                    string versionName;
-
-                    if (OperatingSystem.IsAndroidVersionAtLeast(28))
-                    {
-                        versionName = packageInfo.LongVersionCode.ToString();
-                        // ensure we only read the trailing portion of long (the part we are interested in).
-                        versionName = versionName.Substring(versionName.Length - 9);
-                    }
-                    else
-                    {
-#pragma warning disable CS0618 // Type or member is obsolete
-                        // this is required else older SDKs will report missing method exception.
-                        versionName = packageInfo.VersionCode.ToString();
-#pragma warning restore CS0618 // Type or member is obsolete
-                    }
-
-                    // undo play store version garbling (as mentioned above).
-                    return new Version(int.Parse(versionName.Substring(0, 4)), int.Parse(versionName.Substring(4, 4)), int.Parse(versionName.Substring(8, 1)));
-                }
-                catch
-                {
-                }
-
-                return new Version(packageInfo.VersionName.AsNonNull());
+                return packageInfo.VersionName.AsNonNull();
             }
         }
+
+        public override Version AssemblyVersion => new Version(packageInfo.VersionName.AsNonNull().Split('-').First());
 
         protected override void LoadComplete()
         {

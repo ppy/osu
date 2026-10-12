@@ -56,7 +56,8 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                CornerRadius = 5,
+                CornerRadius = 10,
+                CornerExponent = 2.5f,
                 Masking = true,
                 EdgeEffect = new EdgeEffectParameters
                 {
@@ -91,11 +92,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Colour = dimColour;
-            Enabled.BindValueChanged(_ => this.FadeColour(dimColour, 200, Easing.OutQuint));
+            Enabled.BindValueChanged(_ => content.FadeColour(DimColour, 200, Easing.OutQuint), true);
+            FinishTransforms(true);
         }
 
-        private Color4 dimColour => Enabled.Value ? Color4.White : colours.Gray9;
+        protected virtual Colour4 DimColour => Enabled.Value ? Color4.White : colours.Gray9;
 
         protected override bool OnHover(HoverEvent e)
         {

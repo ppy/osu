@@ -7,7 +7,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -31,7 +33,7 @@ namespace osu.Game.Tests.Visual.Colours
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(5f),
-                    ChildrenEnumerable = Enumerable.Range(0, 10).Select(i => new FillFlowContainer
+                    ChildrenEnumerable = Enumerable.Range(0, 15).Select(i => new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -40,7 +42,9 @@ namespace osu.Game.Tests.Visual.Colours
                         Spacing = new Vector2(10f),
                         ChildrenEnumerable = Enumerable.Range(0, 10).Select(j =>
                         {
-                            var colour = colours.ForStarDifficulty(1f * i + 0.1f * j);
+                            float difficulty = 1f * i + 0.1f * j;
+                            var colour = colours.ForStarDifficulty(difficulty);
+                            var textColour = colours.ForStarDifficultyText(difficulty);
 
                             return new FillFlowContainer
                             {
@@ -48,36 +52,27 @@ namespace osu.Game.Tests.Visual.Colours
                                 Origin = Anchor.Centre,
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0f, 10f),
+                                Spacing = new Vector2(0f, 5f),
                                 Children = new Drawable[]
                                 {
-                                    new CircularContainer
+                                    new OsuSpriteText
                                     {
-                                        Masking = true,
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Size = new Vector2(75f, 25f),
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = colour,
-                                            },
-                                            new OsuSpriteText
-                                            {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Colour = OsuColour.ForegroundTextColourFor(colour),
-                                                Text = colour.ToHex(),
-                                            },
-                                        }
+                                        Font = FontUsage.Default.With(size: 10),
+                                        Text = $"BG: {colour.ToHex()}",
                                     },
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = $"*{(1f * i + 0.1f * j):0.00}",
+                                        Font = FontUsage.Default.With(size: 10),
+                                        Text = $"Text: {textColour.ToHex()}",
+                                    },
+                                    new StarRatingDisplay(new StarDifficulty(difficulty, 0))
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
                                     }
                                 }
                             };

@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
@@ -35,6 +37,8 @@ namespace osu.Game.Online
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
+
         private readonly Dictionary<string, UserStatistics> statisticsCache = new Dictionary<string, UserStatistics>();
 
         /// <summary>
@@ -48,7 +52,8 @@ namespace osu.Game.Online
         {
             base.LoadComplete();
 
-            api.LocalUser.BindValueChanged(_ =>
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(_ =>
             {
                 // queuing up requests directly on user change is unsafe, as the API status may have not been updated yet.
                 // schedule a frame to allow the API to be in its correct state sending requests.

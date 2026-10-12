@@ -1,45 +1,64 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using System;
+using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
+using osu.Game.Screens;
 using osu.Game.Screens.Edit.Submission;
-using osu.Game.Screens.Footer;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public partial class TestSceneBeatmapSubmissionOverlay : OsuTestScene
+    public partial class TestSceneBeatmapSubmissionOverlay : ScreenTestScene
     {
-        private ScreenFooter footer = null!;
+        private TestBeatmapSubmissionOverlayScreen screen = null!;
+
+        [Cached]
+        private readonly BeatmapSubmissionSettings beatmapSubmissionSettings = new BeatmapSubmissionSettings();
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
-            AddStep("add overlay", () =>
-            {
-                var receptor = new ScreenFooter.BackReceptor();
-                footer = new ScreenFooter(receptor);
+            base.SetUpSteps();
 
-                Child = new DependencyProvidingContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    CachedDependencies = new[]
-                    {
-                        (typeof(ScreenFooter), (object)footer),
-                        (typeof(BeatmapSubmissionSettings), new BeatmapSubmissionSettings()),
-                    },
-                    Children = new Drawable[]
-                    {
-                        receptor,
-                        new BeatmapSubmissionOverlay
-                        {
-                            State = { Value = Visibility.Visible, },
-                        },
-                        footer,
-                    }
-                };
-            });
+            AddStep("push screen", () => LoadScreen(screen = new TestBeatmapSubmissionOverlayScreen()));
+            AddUntilStep("wait until screen is loaded", () => screen.IsLoaded, () => Is.True);
+            AddStep("show overlay", () => screen.Overlay.Show());
+        }
+
+        private partial class TestBeatmapSubmissionOverlayScreen : OsuScreen
+        {
+            public override bool ShowFooter => true;
+
+            public BeatmapSubmissionOverlay Overlay = null!;
+
+            private IDisposable? overlayRegistration;
+
+            [Resolved]
+            private IOverlayManager? overlayManager { get; set; }
+
+            [Cached]
+            private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(Overlay = new BeatmapSubmissionOverlay());
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                overlayRegistration?.Dispose();
+            }
         }
     }
 }

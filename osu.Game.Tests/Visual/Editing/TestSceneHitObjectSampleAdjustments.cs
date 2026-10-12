@@ -5,9 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Humanizer;
 using NUnit.Framework;
-using osu.Framework.Input;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -21,7 +19,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osu.Game.Screens.Edit.Timing;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
@@ -83,10 +80,10 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestPopoverHasNoFocus()
+        public void TestPopoverHasFocus()
         {
             clickSamplePiece(0);
-            samplePopoverHasNoFocus();
+            samplePopoverHasFocus();
         }
 
         [Test]
@@ -111,6 +108,77 @@ namespace osu.Game.Tests.Visual.Editing
 
             setBankViaPopover(HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
+        }
+
+        [Test]
+        public void TestAutoAdditionsBankMatchesNormalBankWhenChangedViaPopover()
+        {
+            clickSamplePiece(0);
+            setBankViaPopover(HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+
+            toggleAdditionViaPopover(1);
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+
+            setBankViaPopover(HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+
+            setAdditionBankViaPopover(HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+
+            setAdditionBankViaPopover(HitObjectComposer.HIT_BANK_AUTO);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+        }
+
+        [Test]
+        public void TestAutoAdditionsBankMatchesNormalBankWhenChangedViaHotkeys()
+        {
+            AddStep("select first object", () => EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]));
+            AddStep("set soft normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.E);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+
+            AddStep("toggle finish", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_SOFT);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_SOFT);
+
+            AddStep("set drum normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+
+            AddStep("set normal addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set auto addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
         }
 
         [Test]
@@ -196,11 +264,6 @@ namespace osu.Game.Tests.Visual.Editing
             clickSamplePiece(1);
             samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
 
-            setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, HitSampleInfo.BANK_SOFT);
-            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
-            samplePopoverHasSingleBank(HitSampleInfo.BANK_SOFT);
-
             setBankViaPopover(HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleBank(0, HitSampleInfo.BANK_DRUM);
             hitObjectHasSampleBank(1, HitSampleInfo.BANK_DRUM);
@@ -217,11 +280,6 @@ namespace osu.Game.Tests.Visual.Editing
             dismissPopover();
 
             clickSamplePiece(1);
-            samplePopoverHasIndeterminateBank();
-
-            setBankViaPopover(string.Empty);
-            hitObjectHasSampleBank(0, HitSampleInfo.BANK_NORMAL);
-            hitObjectHasSampleBank(1, HitSampleInfo.BANK_SOFT);
             samplePopoverHasIndeterminateBank();
 
             setBankViaPopover(HitSampleInfo.BANK_NORMAL);
@@ -357,7 +415,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     for (int i = 0; i < h.Samples.Count; i++)
                     {
-                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT);
+                        h.Samples[i] = h.Samples[i].With(newBank: HitSampleInfo.BANK_SOFT, newEditorAutoBank: false);
                     }
                 }
             });
@@ -365,7 +423,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add whistle addition", () =>
             {
                 foreach (var h in EditorBeatmap.HitObjects)
-                    h.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT));
+                    h.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_SOFT, editorAutoBank: false));
             });
 
             AddStep("select both objects", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
@@ -535,6 +593,172 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestNonAutoBankHotkeysDuringPlacementPersistAfterPlacement()
+        {
+            AddStep("Clear all objects", () => EditorBeatmap.Clear());
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move to 3000", () => EditorClock.Seek(3000));
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert($"Placement sample is {HitSampleInfo.BANK_DRUM}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+
+            AddStep("Press normal addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddStep("Press finish sample shortcut", () =>
+            {
+                InputManager.Key(Key.E);
+            });
+
+            AddAssert($"Placement sample addition is {HitSampleInfo.BANK_NORMAL}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_NORMAL));
+
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoNormalBankFlag(0, false);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+
+            clickSamplePiece(0);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleAdditionBank(HitSampleInfo.BANK_NORMAL);
+        }
+
+        [Test]
+        public void TestAutoAdditionBankHotkeyDuringPlacementPersistsAfterPlacement()
+        {
+            AddStep("Clear all objects", () => EditorBeatmap.Clear());
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move to 3000", () => EditorClock.Seek(3000));
+
+            AddStep("Press drum bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert($"Placement sample is {HitSampleInfo.BANK_DRUM}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+
+            AddStep("Press normal addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddStep("Press finish sample shortcut", () =>
+            {
+                InputManager.Key(Key.E);
+            });
+
+            AddStep("Press auto addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddAssert($"Placement sample addition is {HitSampleInfo.BANK_DRUM}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_DRUM));
+
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoNormalBankFlag(0, false);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            clickSamplePiece(0);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
+        }
+
+        [Test]
+        public void TestFullAutoBankHotkeyDuringPlacementPersistsAfterPlacement()
+        {
+            AddStep("Clear all objects", () => EditorBeatmap.Clear());
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+
+            AddStep("Move to 3000", () => EditorClock.Seek(3000));
+
+            AddStep("Press auto normal bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+
+            AddAssert($"Placement sample is {HitSampleInfo.BANK_NORMAL}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name == HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_NORMAL));
+
+            AddStep("Press finish sample shortcut", () =>
+            {
+                InputManager.Key(Key.E);
+            });
+
+            AddStep("Press auto addition bank shortcut", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+
+            AddAssert($"Placement sample addition is {HitSampleInfo.BANK_NORMAL}",
+                () => EditorBeatmap.PlacementObject.Value.Samples.First(s => s.Name != HitSampleInfo.HIT_NORMAL).Bank, () => Is.EqualTo(HitSampleInfo.BANK_NORMAL));
+
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoNormalBankFlag(0, false); // it's the first object - nothing to inherit bank from
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            clickSamplePiece(0);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
+            dismissPopover();
+
+            AddStep("Move to 5000", () => EditorClock.Seek(5000));
+            AddStep("Enter placement mode", () => InputManager.Key(Key.Number2));
+            AddStep("Move mouse to centre", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<HitObjectComposer>().First().ScreenSpaceDrawQuad.Centre));
+            AddStep("Finish placement", () => InputManager.Click(MouseButton.Left));
+
+            hitObjectHasSamples(1, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH); // finish is still implied, continuing from first placement
+            hitObjectHasSampleNormalBank(1, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(1, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoNormalBankFlag(1, true);
+            hitObjectHasAutoAdditionBankFlag(1, true);
+
+            clickSamplePiece(1);
+            samplePopoverIsOpen();
+            samplePopoverHasSingleBank(HitSampleInfo.BANK_NORMAL);
+            samplePopoverHasSingleAdditionBank(HitObjectComposer.HIT_BANK_AUTO);
+        }
+
+        [Test]
         public void PopoverForMultipleSelectionChangesAllSamples()
         {
             AddStep("add slider", () =>
@@ -610,19 +834,19 @@ namespace osu.Game.Tests.Visual.Editing
                     Path = new SliderPath(new[] { new PathControlPoint(Vector2.Zero), new PathControlPoint(new Vector2(250, 0)) }),
                     Samples =
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL)
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, editorAutoBank: false)
                     },
                     NodeSamples = new List<IList<HitSampleInfo>>
                     {
                         new List<HitSampleInfo>
                         {
-                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_DRUM),
-                            new HitSampleInfo(HitSampleInfo.HIT_CLAP, bank: HitSampleInfo.BANK_DRUM),
+                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_DRUM, editorAutoBank: false),
+                            new HitSampleInfo(HitSampleInfo.HIT_CLAP, bank: HitSampleInfo.BANK_DRUM, editorAutoBank: false),
                         },
                         new List<HitSampleInfo>
                         {
-                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT),
-                            new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_SOFT),
+                            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank: HitSampleInfo.BANK_SOFT, editorAutoBank: false),
+                            new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, bank: HitSampleInfo.BANK_SOFT, editorAutoBank: false),
                         },
                     }
                 });
@@ -819,13 +1043,268 @@ namespace osu.Game.Tests.Visual.Editing
             }
         }
 
-        private void clickSamplePiece(int objectIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
+        [Test]
+        public void TestAddSoundBeforeSettingNonAutoAdditionBankOnSelectedObject()
         {
-            var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
 
-            InputManager.MoveMouseTo(samplePiece);
-            InputManager.Click(MouseButton.Left);
-        });
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set drum addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+        }
+
+        [Test]
+        public void TestAddSoundAfterSettingNonAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set drum addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+        }
+
+        [Test]
+        public void TestSwitchSoundAfterSettingNonAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set drum addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+
+            AddStep("remove finish sound", () => InputManager.Key(Key.E));
+            AddStep("add whistle sound", () => InputManager.Key(Key.W));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_WHISTLE);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, false);
+        }
+
+        [Test]
+        public void TestAddSoundBeforeSettingAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set auto addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set drum normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+        }
+
+        [Test]
+        public void TestAddSoundAfterSettingAutoAdditionBankOnSelectedObject()
+        {
+            AddStep("select first object", () =>
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
+                EditorBeatmap.SelectedHitObjects.Add(EditorBeatmap.HitObjects[0]);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("set auto addition bank", () =>
+            {
+                InputManager.PressKey(Key.AltLeft);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.AltLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_NORMAL);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+
+            AddStep("set drum normal bank", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.ShiftLeft);
+            });
+            hitObjectHasSamples(0, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+            hitObjectHasSampleNormalBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasSampleAdditionBank(0, HitSampleInfo.BANK_DRUM);
+            hitObjectHasAutoAdditionBankFlag(0, true);
+        }
+
+        [Test]
+        public void TestPolygonGenerationInheritsSettings()
+        {
+            AddStep("seek to 1000", () => EditorClock.Seek(1000));
+            AddStep("open polygon tool", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.LControl);
+                InputManager.Key(Key.D);
+                InputManager.ReleaseKey(Key.LControl);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("add finish sound", () => InputManager.Key(Key.E));
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasAutoAdditionBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set addition bank to drum", () =>
+            {
+                InputManager.PressKey(Key.LAlt);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LAlt);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleNormalBank(i, HitSampleInfo.BANK_SOFT);
+                hitObjectHasAutoNormalBankFlag(i, true);
+                hitObjectHasSampleAdditionBank(i, HitSampleInfo.BANK_DRUM);
+                hitObjectHasAutoAdditionBankFlag(i, false);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set normal bank to normal", () =>
+            {
+                InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.W);
+                InputManager.ReleaseKey(Key.LShift);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleNormalBank(i, HitSampleInfo.BANK_NORMAL);
+                hitObjectHasAutoNormalBankFlag(i, false);
+                hitObjectHasSampleAdditionBank(i, HitSampleInfo.BANK_DRUM);
+                hitObjectHasAutoAdditionBankFlag(i, false);
+                hitObjectHasSampleVolume(i, 60);
+            }
+
+            AddStep("set addition bank to auto", () =>
+            {
+                InputManager.PressKey(Key.LAlt);
+                InputManager.Key(Key.Q);
+                InputManager.ReleaseKey(Key.LAlt);
+            });
+
+            for (int i = 2; i <= 4; ++i)
+            {
+                hitObjectHasSamples(i, HitSampleInfo.HIT_NORMAL, HitSampleInfo.HIT_FINISH);
+                hitObjectHasSampleBank(i, HitSampleInfo.BANK_NORMAL);
+                hitObjectHasAutoNormalBankFlag(i, false);
+                hitObjectHasAutoAdditionBankFlag(i, true);
+                hitObjectHasSampleVolume(i, 60);
+            }
+        }
+
+        private void clickSamplePiece(int objectIndex)
+        {
+            AddStep("switch tool to select", () => InputManager.Key(Key.Number1));
+            AddStep($"click {objectIndex.ToOrdinalWords()} sample piece", () =>
+            {
+                var samplePiece = this.ChildrenOfType<SamplePointPiece>().Single(piece => piece is not NodeSamplePointPiece && piece.HitObject == EditorBeatmap.HitObjects.ElementAt(objectIndex));
+
+                InputManager.MoveMouseTo(samplePiece);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
 
         private void clickNodeSamplePiece(int objectIndex, int nodeIndex) => AddStep($"click {objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node sample piece", () =>
         {
@@ -850,57 +1329,65 @@ namespace osu.Game.Tests.Visual.Editing
             return popover != null;
         });
 
-        private void samplePopoverHasNoFocus() => AddUntilStep("sample popover textbox not focused", () =>
+        private void samplePopoverHasFocus() => AddUntilStep("sample popover textbox not focused", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
             var textbox = slider?.ChildrenOfType<OsuTextBox>().Single();
 
-            return textbox?.HasFocus == false;
+            return textbox?.HasFocus == true;
         });
 
         private void samplePopoverHasSingleVolume(int volume) => AddUntilStep($"sample popover has volume {volume}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
 
-            return slider?.Current.Value == volume;
+            return slider?.Current.Value == volume && !slider.IsMultipleValues;
         });
 
         private void samplePopoverHasIndeterminateVolume() => AddUntilStep("sample popover has indeterminate volume", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var slider = popover?.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover?.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
 
-            return slider != null && slider.Current.Value == null;
+            return slider != null && slider.IsMultipleValues;
         });
 
         private void samplePopoverHasSingleBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
+            var dropdown = popover?.ChildrenOfType<FormDropdown<string>>().First();
 
-            return textBox?.Current.Value == bank && string.IsNullOrEmpty(textBox.PlaceholderText.ToString());
+            return dropdown?.Current.Value == bank;
         });
 
         private void samplePopoverHasIndeterminateBank() => AddUntilStep("sample popover has indeterminate bank", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
-            var textBox = popover?.ChildrenOfType<OsuTextBox>().First();
+            var dropdown = popover?.ChildrenOfType<FormDropdown<string>>().First();
 
-            return textBox != null && string.IsNullOrEmpty(textBox.Current.Value) && !string.IsNullOrEmpty(textBox.PlaceholderText.ToString());
+            return dropdown?.Current.Value == "(multiple)";
+        });
+
+        private void samplePopoverHasSingleAdditionBank(string bank) => AddUntilStep($"sample popover has bank {bank}", () =>
+        {
+            var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().SingleOrDefault();
+            var dropdown = popover?.ChildrenOfType<FormDropdown<string>>().ElementAt(1);
+
+            return dropdown?.Current.Value == bank;
         });
 
         private void dismissPopover()
         {
-            AddStep("dismiss popover", () => InputManager.Key(Key.Escape));
+            AddRepeatStep("dismiss popover", () => InputManager.Key(Key.Escape), 2);
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Any(popover => popover.IsPresent));
         }
 
         private void setVolumeViaPopover(int volume) => AddStep($"set volume {volume} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var slider = popover.ChildrenOfType<IndeterminateSliderWithTextBoxInput<int>>().Single();
+            var slider = popover.ChildrenOfType<SamplePointPiece.VolumeControl>().Single();
             slider.Current.Value = volume;
         });
 
@@ -920,23 +1407,15 @@ namespace osu.Game.Tests.Visual.Editing
         private void setBankViaPopover(string bank) => AddStep($"set bank {bank} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var textBox = popover.ChildrenOfType<LabelledTextBox>().First();
+            var textBox = popover.ChildrenOfType<FormDropdown<string>>().First();
             textBox.Current.Value = bank;
-            // force a commit via keyboard.
-            // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
-            ((IFocusManager)InputManager).ChangeFocus(textBox);
-            InputManager.Key(Key.Enter);
         });
 
         private void setAdditionBankViaPopover(string bank) => AddStep($"set addition bank {bank} via popover", () =>
         {
             var popover = this.ChildrenOfType<SamplePointPiece.SampleEditPopover>().Single();
-            var textBox = popover.ChildrenOfType<LabelledTextBox>().ToArray()[1];
+            var textBox = popover.ChildrenOfType<FormDropdown<string>>().ToArray()[1];
             textBox.Current.Value = bank;
-            // force a commit via keyboard.
-            // this is needed when testing attempting to set empty bank - which should revert to the previous value, but only on commit.
-            ((IFocusManager)InputManager).ChangeFocus(textBox);
-            InputManager.Key(Key.Enter);
         });
 
         private void toggleAdditionViaPopover(int index) => AddStep($"toggle addition {index} via popover", () =>
@@ -972,6 +1451,18 @@ namespace osu.Game.Tests.Visual.Editing
             return h.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
         });
 
+        private void hitObjectHasAutoNormalBankFlag(int objectIndex, bool autoBank) => AddAssert($"{objectIndex.ToOrdinalWords()} has auto normal bank {(autoBank ? "on" : "off")}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Where(o => o.Name == HitSampleInfo.HIT_NORMAL).All(o => o.EditorAutoBank == autoBank);
+        });
+
+        private void hitObjectHasAutoAdditionBankFlag(int objectIndex, bool autoBank) => AddAssert($"{objectIndex.ToOrdinalWords()} has auto addition bank {(autoBank ? "on" : "off")}", () =>
+        {
+            var h = EditorBeatmap.HitObjects.ElementAt(objectIndex);
+            return h.Samples.Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.EditorAutoBank == autoBank);
+        });
+
         private void hitObjectNodeHasSamples(int objectIndex, int nodeIndex, params string[] samples) => AddAssert(
             $"{objectIndex.ToOrdinalWords()} object {nodeIndex.ToOrdinalWords()} node has samples {string.Join(',', samples)}", () =>
             {
@@ -1000,6 +1491,6 @@ namespace osu.Game.Tests.Visual.Editing
                 return h is not null && h.NodeSamples[nodeIndex].Where(o => o.Name != HitSampleInfo.HIT_NORMAL).All(o => o.Bank == bank);
             });
 
-        private void editorTimeIs(double time) => AddAssert($"editor time is {time}", () => Precision.AlmostEquals(EditorClock.CurrentTimeAccurate, time, 1));
+        private void editorTimeIs(double time) => AddUntilStep($"editor time is {time}", () => EditorClock.CurrentTimeAccurate, () => Is.EqualTo(time).Within(1));
     }
 }

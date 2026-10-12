@@ -3,6 +3,7 @@
 
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
@@ -19,17 +20,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public TestMultiplayerClient MultiplayerClient => OnlinePlayDependencies.MultiplayerClient;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies.SpectatorClient;
+        public QueueController QueueController => OnlinePlayDependencies.QueueController;
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 
         public bool RoomJoined => MultiplayerClient.RoomJoined;
 
-        protected Room CreateDefaultRoom()
+        protected Room CreateDefaultRoom(MatchType type = MatchType.HeadToHead)
         {
             return new Room
             {
                 Name = "test name",
-                Type = MatchType.HeadToHead,
+                Type = type,
                 Playlist =
                 [
                     new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)

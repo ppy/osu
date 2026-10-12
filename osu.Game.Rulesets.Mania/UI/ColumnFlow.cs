@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             float mobileAdjust = 1f;
 
-            if (RuntimeInfo.IsMobile && mobileLayout.Value == ManiaMobileLayout.Landscape)
+            if (RuntimeInfo.IsMobile && mobileLayout.Value == ManiaMobileLayout.LandscapeExpandedColumns)
             {
                 // GridContainer+CellContainer containing this stage (gets split up for dual stages).
                 Vector2? containingCell = this.FindClosestParent<Stage>()?.Parent?.DrawSize;

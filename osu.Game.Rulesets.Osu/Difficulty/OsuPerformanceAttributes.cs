@@ -21,11 +21,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("flashlight")]
         public double Flashlight { get; set; }
 
+        [JsonProperty("reading")]
+        public double Reading { get; set; }
+
         [JsonProperty("effective_miss_count")]
         public double EffectiveMissCount { get; set; }
 
         [JsonProperty("speed_deviation")]
         public double? SpeedDeviation { get; set; }
+
+        [JsonProperty("combo_based_estimated_miss_count")]
+        public double ComboBasedEstimatedMissCount { get; set; }
+
+        [JsonProperty("score_based_estimated_miss_count")]
+        public double? ScoreBasedEstimatedMissCount { get; set; }
+
+        [JsonProperty("aim_estimated_slider_breaks")]
+        public double AimEstimatedSliderBreaks { get; set; }
+
+        [JsonProperty("speed_estimated_slider_breaks")]
+        public double SpeedEstimatedSliderBreaks { get; set; }
 
         public override IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
@@ -36,6 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return new PerformanceDisplayAttribute(nameof(Speed), "Speed", Speed);
             yield return new PerformanceDisplayAttribute(nameof(Accuracy), "Accuracy", Accuracy);
             yield return new PerformanceDisplayAttribute(nameof(Flashlight), "Flashlight Bonus", Flashlight);
+            yield return new PerformanceDisplayAttribute(nameof(Reading), "Reading", Reading);
         }
     }
 }

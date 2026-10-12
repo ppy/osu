@@ -15,7 +15,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
     {
         public PlayCountStatistic(IBeatmapSetOnlineInfo onlineInfo)
         {
-            Icon = FontAwesome.Regular.PlayCircle;
+            Icon = FontAwesome.Solid.PlayCircle;
             Text = onlineInfo.PlayCount.ToMetric(decimals: 1);
             TooltipText = BeatmapsStrings.PanelPlaycount(onlineInfo.PlayCount.ToLocalisableString(@"N0"));
         }

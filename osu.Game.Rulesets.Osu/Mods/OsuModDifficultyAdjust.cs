@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -41,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             get
             {
-                if (UserAdjustedSettingsCount != 1)
+                if (!IsExactlyOneSettingChanged(CircleSize, ApproachRate, OverallDifficulty, DrainRate))
                     return string.Empty;
 
                 if (!CircleSize.IsDefault) return format("CS", CircleSize);
@@ -51,7 +53,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 return string.Empty;
 
-                string format(string acronym, DifficultyBindable bindable) => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
+                string format(string acronym, DifficultyBindable bindable)
+                    => $"{acronym}{bindable.Value!.Value.ToStandardFormattedString(1)}";
             }
         }
 
@@ -69,6 +72,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     yield return ("Approach rate", $"{ApproachRate.Value:N1}");
             }
         }
+
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTargetPractice)).ToArray();
 
         protected override void ApplySettings(BeatmapDifficulty difficulty)
         {

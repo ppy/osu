@@ -80,6 +80,31 @@ namespace osu.Game.Localisation
         public static LocalisableString TimingBasedColouring => new TranslatableString(getKey(@"Timing_based_colouring"), @"Timing-based note colouring");
 
         /// <summary>
+        /// "Rate-adjusted hit animations"
+        /// </summary>
+        public static LocalisableString RateAdjustedHitAnimation => new TranslatableString(getKey(@"rate_adjusted_hit_animation"), @"Rate-adjusted hit animations");
+
+        /// <summary>
+        /// "Hits will fly faster or slower when beatmap rate is adjusted via mods."
+        /// </summary>
+        public static LocalisableString RateAdjustedHitAnimationTooltip => new TranslatableString(getKey(@"rate_adjusted_hit_animation_tooltip"), @"Hits will fly faster or slower when beatmap rate is adjusted via mods.");
+
+        /// <summary>
+        /// "Hit animations"
+        /// </summary>
+        public static LocalisableString HitAnimations => new TranslatableString(getKey(@"hit_animations"), @"Hit animations");
+
+        /// <summary>
+        /// "When enabled, hits will fly off the screen. When disabled, hits will disappear immediately."
+        /// </summary>
+        public static LocalisableString HitAnimationsTaikoTooltip => new TranslatableString(getKey(@"hit_animations_taiko_tooltip"), @"When enabled, hits will fly off the screen. When disabled, hits will disappear immediately.");
+
+        /// <summary>
+        /// "When enabled, hit circles will play an animation when hit. When disabled, they will disappear almost immediately."
+        /// </summary>
+        public static LocalisableString HitAnimationsOsuTooltip => new TranslatableString(getKey(@"hit_animations_osu_tooltip"), @"When enabled, hit circles will play an animation when hit. When disabled, they will disappear almost immediately.");
+
+        /// <summary>
         /// "{0}ms (speed {1:N1})"
         /// </summary>
         public static LocalisableString ScrollSpeedTooltip(int scrollTime, double scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1:N1})", scrollTime, scrollSpeed);
@@ -95,9 +120,14 @@ namespace osu.Game.Localisation
         public static LocalisableString MobileLayout => new TranslatableString(getKey(@"mobile_layout"), @"Mobile layout");
 
         /// <summary>
-        /// "Portrait (expanded columns)"
+        /// "Portrait"
         /// </summary>
-        public static LocalisableString PortraitExpandedColumns => new TranslatableString(getKey(@"portrait_expanded_columns"), @"Portrait (expanded columns)");
+        public static LocalisableString Portrait => new TranslatableString(getKey(@"portrait"), @"Portrait");
+
+        /// <summary>
+        /// "Landscape"
+        /// </summary>
+        public static LocalisableString Landscape => new TranslatableString(getKey(@"landscape"), @"Landscape");
 
         /// <summary>
         /// "Landscape (expanded columns)"
@@ -105,9 +135,9 @@ namespace osu.Game.Localisation
         public static LocalisableString LandscapeExpandedColumns => new TranslatableString(getKey(@"landscape_expanded_columns"), @"Landscape (expanded columns)");
 
         /// <summary>
-        /// "Landscape (touch overlay)"
+        /// "Touch overlay"
         /// </summary>
-        public static LocalisableString LandscapeTouchOverlay => new TranslatableString(getKey(@"landscape_touch_overlay"), @"Landscape (touch overlay)");
+        public static LocalisableString TouchOverlay => new TranslatableString(getKey(@"touch_overlay"), @"Touch overlay");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

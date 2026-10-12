@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
@@ -19,7 +20,20 @@ namespace osu.Game.Tests.NonVisual
         [TestCase(1, "100.00%")]
         public void TestAccuracyFormatting(double input, string expectedOutput)
         {
-            Assert.AreEqual(expectedOutput, input.FormatAccuracy().ToString());
+            ClassicAssert.AreEqual(expectedOutput, input.FormatAccuracy().ToString());
+        }
+
+        [TestCase(3, "3.00")]
+        [TestCase(3.3, "3.30")]
+        [TestCase(3.55, "3.55")]
+        [TestCase(3.553, "3.55")]
+        [TestCase(3.557, "3.55")]
+        [TestCase(3.9999, "3.99")]
+        [TestCase(3.999999, "3.99")]
+        [TestCase(4, "4.00")]
+        public void TestStarRatingFormatting(double input, string expectedOutput)
+        {
+            ClassicAssert.AreEqual(expectedOutput, input.FormatStarRating().ToString());
         }
     }
 }

@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK.Graphics;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Users
             }
 
             [BackgroundDependencyLoader]
-            private void load(LargeTextureStore textures)
+            private void load(OnlineAssetCachingStore textures)
             {
                 if (user == null)
                 {

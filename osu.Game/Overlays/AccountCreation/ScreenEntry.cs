@@ -209,13 +209,11 @@ namespace osu.Game.Overlays.AccountCreation
                                 passwordDescription.AddErrors(errors.User.Password);
                             }
 
-                            if (!string.IsNullOrEmpty(errors.Redirect))
-                            {
-                                if (!string.IsNullOrEmpty(errors.Message))
-                                    passwordDescription.AddErrors(new[] { errors.Message });
+                            if (!string.IsNullOrEmpty(errors.Message))
+                                passwordDescription.AddErrors(new[] { errors.Message });
 
+                            if (!string.IsNullOrEmpty(errors.Redirect))
                                 game?.OpenUrlExternally($"{errors.Redirect}?username={usernameTextBox.Text}&email={emailTextBox.Text}", LinkWarnMode.NeverWarn);
-                            }
                         }
                         else
                         {
@@ -229,7 +227,7 @@ namespace osu.Game.Overlays.AccountCreation
 
                     apiState.BindValueChanged(state =>
                     {
-                        if (state.NewValue == APIState.RequiresSecondFactorAuth)
+                        if (this.IsCurrentScreen() && state.NewValue == APIState.RequiresSecondFactorAuth)
                             this.Push(new ScreenEmailVerification());
                     });
 

@@ -134,8 +134,10 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"ArgonBarPathBackground"));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"SaturationSelectorBackground"));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"HueSelectorBackground"));
+                loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, "Path"));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"ColouredDimmableTexture"));
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_2, @"ColouredDimmableVideo"));
+                loadTargets.Add(manager.Load("PathPrepass", "PathPrepass"));
                 loadTargets.Add(manager.Load(@"LogoAnimation", @"LogoAnimation"));
 
                 // Ruleset local shader usage (should probably move somewhere else).

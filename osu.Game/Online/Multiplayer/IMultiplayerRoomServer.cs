@@ -16,7 +16,6 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Request to leave the currently joined room.
         /// </summary>
-        /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
         Task LeaveRoom();
 
         /// <summary>
@@ -111,6 +110,11 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="playlistItemId">The item to remove.</param>
         Task RemovePlaylistItem(long playlistItemId);
+
+        /// <summary>
+        /// Votes to skip the beatmap intro.
+        /// </summary>
+        Task VoteToSkipIntro();
 
         /// <summary>
         /// Invites a player to the current room.

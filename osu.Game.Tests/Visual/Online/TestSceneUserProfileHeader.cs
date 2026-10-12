@@ -40,6 +40,11 @@ namespace osu.Game.Tests.Visual.Online
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("set processing message", () =>
+            {
+                dummyAPI.ScoreProcessingNoticeUrl = "https://osu.ppy.sh/home/news/2026-07-03-performance-points-star-rating-updates";
+            });
+
             AddStep("create header", () =>
             {
                 Child = new OsuScrollContainer(Direction.Vertical)
@@ -443,7 +448,7 @@ namespace osu.Game.Tests.Visual.Online
                     Task.Run(() =>
                     {
                         requestLock.Wait(3000);
-                        dummyAPI.Friends.Add(apiRelation);
+                        dummyAPI.LocalUserState.Friends.Add(apiRelation);
                         req.TriggerSuccess(new AddFriendResponse
                         {
                             UserRelation = apiRelation
@@ -453,11 +458,11 @@ namespace osu.Game.Tests.Visual.Online
                     return true;
                 };
             });
-            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("clear friend list", () => dummyAPI.LocalUserState.Friends.Clear());
             AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(nonFriend, new OsuRuleset().RulesetInfo));
             AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
             AddStep("Complete request", () => requestLock.Set());
-            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
+            AddUntilStep("Friend added", () => API.LocalUserState.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
         }
 
         [Test]
@@ -486,7 +491,7 @@ namespace osu.Game.Tests.Visual.Online
                     Task.Run(() =>
                     {
                         requestLock.Wait(3000);
-                        dummyAPI.Friends.Add(apiRelation);
+                        dummyAPI.LocalUserState.Friends.Add(apiRelation);
                         req.TriggerSuccess(new AddFriendResponse
                         {
                             UserRelation = apiRelation
@@ -496,11 +501,11 @@ namespace osu.Game.Tests.Visual.Online
                     return true;
                 };
             });
-            AddStep("clear friend list", () => dummyAPI.Friends.Clear());
+            AddStep("clear friend list", () => dummyAPI.LocalUserState.Friends.Clear());
             AddStep("Show non-friend user", () => header.User.Value = new UserProfileData(nonFriend, new OsuRuleset().RulesetInfo));
             AddStep("Click followers button", () => this.ChildrenOfType<FollowersButton>().First().TriggerClick());
             AddStep("Complete request", () => requestLock.Set());
-            AddUntilStep("Friend added", () => API.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
+            AddUntilStep("Friend added", () => API.LocalUserState.Friends.Any(f => f.TargetID == nonFriend.OnlineID));
         }
     }
 }

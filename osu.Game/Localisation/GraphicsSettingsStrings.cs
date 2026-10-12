@@ -130,9 +130,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowCursorInScreenshots => new TranslatableString(getKey(@"show_cursor_in_screenshots"), @"Show menu cursor in screenshots");
 
         /// <summary>
-        /// "Video"
+        /// "Video Playback"
         /// </summary>
-        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"Video");
+        public static LocalisableString VideoHeader => new TranslatableString(getKey(@"video_header"), @"Video Playback");
 
         /// <summary>
         /// "Use hardware acceleration"

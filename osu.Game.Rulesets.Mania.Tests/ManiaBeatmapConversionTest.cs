@@ -27,6 +27,24 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase("100374")]
         [TestCase("1450162")]
         [TestCase("4869637")]
+        [TestCase("1K")]
+        [TestCase("2K")]
+        [TestCase("3K")]
+        [TestCase("4K")]
+        [TestCase("5K")]
+        [TestCase("6K")]
+        [TestCase("7K")]
+        [TestCase("8K")]
+        [TestCase("9K")]
+        [TestCase("10K")]
+        // [TestCase("11K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
+        [TestCase("12K")]
+        // [TestCase("13K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
+        [TestCase("14K")]
+        // [TestCase("15K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
+        [TestCase("16K")]
+        // [TestCase("17K")] <- See comment in `ManiaBeatmapConverter` ctor for disable reason.
+        [TestCase("18K")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)

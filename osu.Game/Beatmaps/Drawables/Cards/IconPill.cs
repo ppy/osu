@@ -20,6 +20,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             set => iconContainer.Size = value;
         }
 
+        public MarginPadding IconPadding
+        {
+            get => iconContainer.Padding;
+            set => iconContainer.Padding = value;
+        }
+
         private readonly Container iconContainer;
 
         protected IconPill(IconUsage icon)

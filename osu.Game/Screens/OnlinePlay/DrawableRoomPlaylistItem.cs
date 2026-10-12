@@ -135,8 +135,7 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (borderContainer != null)
-                borderContainer.BorderColour = colours.Yellow;
+            borderContainer?.BorderColour = colours.Yellow;
 
             ruleset = rulesets.GetRuleset(Item.RulesetID);
             var rulesetInstance = ruleset?.CreateInstance();
@@ -163,8 +162,7 @@ namespace osu.Game.Screens.OnlinePlay
                     return;
                 }
 
-                if (borderContainer != null)
-                    borderContainer.BorderThickness = IsSelectedItem ? border_thickness : 0;
+                borderContainer?.BorderThickness = IsSelectedItem ? border_thickness : 0;
             }, true);
 
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
@@ -180,8 +178,7 @@ namespace osu.Game.Screens.OnlinePlay
                             var foundUser = await userLookupCache.GetUserAsync(Item.OwnerID).ConfigureAwait(false);
                             Schedule(() =>
                             {
-                                if (ownerAvatar != null)
-                                    ownerAvatar.User = foundUser;
+                                ownerAvatar?.User = foundUser;
                             });
                         }
 
@@ -225,8 +222,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 allowDeletion = value;
 
-                if (removeButton != null)
-                    removeButton.Alpha = value ? 1 : 0;
+                removeButton?.Alpha = value ? 1 : 0;
             }
         }
 
@@ -242,8 +238,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 allowShowingResults = value;
 
-                if (showResultsButton != null)
-                    showResultsButton.Alpha = value ? 1 : 0;
+                showResultsButton?.Alpha = value ? 1 : 0;
             }
         }
 
@@ -259,8 +254,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 allowEditing = value;
 
-                if (editButton != null)
-                    editButton.Alpha = value ? 1 : 0;
+                editButton?.Alpha = value ? 1 : 0;
             }
         }
 
@@ -276,8 +270,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 showItemOwner = value;
 
-                if (ownerAvatar != null)
-                    ownerAvatar.Alpha = value ? 1 : 0;
+                ownerAvatar?.Alpha = value ? 1 : 0;
             }
         }
 
@@ -321,8 +314,7 @@ namespace osu.Game.Screens.OnlinePlay
                     difficultyIconContainer.Clear();
             }
 
-            if (panelBackground != null)
-                panelBackground.Beatmap.Value = beatmap;
+            panelBackground?.Beatmap.Value = beatmap;
 
             if (beatmapText != null)
             {
@@ -358,8 +350,7 @@ namespace osu.Game.Screens.OnlinePlay
                 explicitContent.Alpha = hasExplicitContent ? 1 : 0;
             }
 
-            if (modDisplay != null)
-                modDisplay.Current.Value = requiredMods.ToArray();
+            modDisplay?.Current.Value = requiredMods.ToArray();
 
             if (buttonsFlow != null)
             {
@@ -575,8 +566,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (thumbnail != null)
-                thumbnail.Dimmed.Value = true;
+            thumbnail?.Dimmed.Value = true;
 
             panelBackground.FadeColour(OsuColour.Gray(0.7f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             return base.OnHover(e);
@@ -584,8 +574,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (thumbnail != null)
-                thumbnail.Dimmed.Value = false;
+            thumbnail?.Dimmed.Value = false;
 
             panelBackground.FadeColour(OsuColour.Gray(1f), BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             base.OnHoverLost(e);
@@ -605,7 +594,7 @@ namespace osu.Game.Screens.OnlinePlay
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
+                    items.Add(new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
                 if (beatmap != null)
                 {
@@ -617,9 +606,9 @@ namespace osu.Game.Screens.OnlinePlay
                                                    .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
 
                         if (manageCollectionsDialog != null)
-                            collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+                            collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, manageCollectionsDialog.Show));
 
-                        items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                        items.Add(new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems });
                     }
                 }
 

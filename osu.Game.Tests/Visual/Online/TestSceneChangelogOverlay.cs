@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Version = "2018.712.0",
                 DisplayVersion = "2018.712.0",
-                UpdateStream = streams[OsuGameBase.CLIENT_STREAM_NAME],
+                UpdateStream = streams["lazer"],
                 CreatedAt = new DateTime(2018, 7, 12),
                 ChangelogEntries = new List<APIChangelogEntry>
                 {
@@ -198,6 +198,39 @@ namespace osu.Game.Tests.Visual.Online
                             OsuUsername = "Dummy",
                         }
                     },
+                }
+            });
+        }
+
+        [Test]
+        public void TestMarkdown()
+        {
+            showBuild(() => new APIChangelogBuild
+            {
+                Version = "2026.620.0",
+                DisplayVersion = "2026.620.0",
+                CreatedAt = new DateTime(2026, 6, 20),
+                UpdateStream = new APIUpdateStream
+                {
+                    Name = "Test",
+                    DisplayName = "Test"
+                },
+                ChangelogEntries = new List<APIChangelogEntry>
+                {
+                    new APIChangelogEntry
+                    {
+                        Category = "Markdown",
+                        Title = "Testing markdown container in changelog",
+                        Message = @"This paragraph [has a link](https://osu.ppy.sh) to osu! website.
+
+![](https://i.ppy.sh/e8b1f3cafa284aa347dd96b3977ceedd0e42d3c0/68747470733a2f2f6f73752e7070792e73682f77696b692f696d616765732f7368617265642f6e6577732f323032362d30362d30332d6d6f642d6d756c7469706c696572732d7375727665792d726573756c74732f6d6f642d6d756c7469706c696572732e706e673f32)
+
+There is mod multiplayer image above.
+
+<video width=""80%"" controls><source src=""https://github.com/user-attachments/assets/2a511e0d-51f8-4abf-a3ab-de0992618b6b"" type=""video/mp4"" preload=""none""></video>
+
+Paragraph above only contains html video and should not be rendered."
+                    }
                 }
             });
         }

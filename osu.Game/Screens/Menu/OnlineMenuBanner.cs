@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
                 return;
 
             var request = new GetMenuContentRequest();
-            Task.Run(() => request.Perform())
+            Task.Run(request.Perform)
                 .ContinueWith(r =>
                 {
                     if (!FetchOnlineContent)

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -25,12 +26,21 @@ namespace osu.Game.Screens.Footer
 {
     public partial class ScreenFooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
-        public const int Y_OFFSET = 10;
+        public const int CORNER_RADIUS = 10;
 
-        protected const int BUTTON_HEIGHT = 75;
+        public const int HEIGHT = 75;
         protected const int BUTTON_WIDTH = 116;
 
-        public Bindable<Visibility> OverlayState = new Bindable<Visibility>();
+        /// <summary>
+        /// If this footer button controls the visibility of an overlay, it will be bound to this bindable.
+        /// </summary>
+        public readonly Bindable<Visibility> OverlayState = new Bindable<Visibility>();
+
+        /// <summary>
+        /// Used to tell whether this button is currently on screen.
+        /// <see cref="ScreenFooter"/> controls this to convey when buttons are hidden temporarily via <see cref="ScreenFooter.RegisterActiveOverlayContainer"/>.
+        /// </summary>
+        public readonly Bindable<Visibility> State = new Bindable<Visibility>(Visibility.Visible);
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -58,6 +68,23 @@ namespace osu.Game.Screens.Footer
             set => text.Text = value;
         }
 
+        public new Action? Action
+        {
+            set
+            {
+                if (value == null)
+                    base.Action = null;
+                else
+                {
+                    base.Action = () =>
+                    {
+                        if (State.Value != Visibility.Hidden)
+                            value.Invoke();
+                    };
+                }
+            }
+        }
+
         private readonly Container shearedContent;
 
         private readonly SpriteText text;
@@ -75,7 +102,7 @@ namespace osu.Game.Screens.Footer
         {
             Overlay = overlay;
 
-            Size = new Vector2(BUTTON_WIDTH, BUTTON_HEIGHT);
+            Size = new Vector2(BUTTON_WIDTH, HEIGHT);
 
             Children = new Drawable[]
             {
@@ -91,7 +118,7 @@ namespace osu.Game.Screens.Footer
                     },
                     Shear = OsuGame.SHEAR,
                     Masking = true,
-                    CornerRadius = 10,
+                    CornerRadius = CORNER_RADIUS,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -138,7 +165,7 @@ namespace osu.Game.Screens.Footer
                             Shear = -OsuGame.SHEAR,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.Centre,
-                            Y = -Y_OFFSET,
+                            Y = -CORNER_RADIUS,
                             Size = new Vector2(100, 5),
                             Masking = true,
                             CornerRadius = 3,

@@ -56,22 +56,27 @@ namespace osu.Game.Rulesets.Mods
                 {
                     var bindable = (IBindable)property.GetValue(this)!;
 
-                    string valueText;
+                    if (bindable.IsDefault)
+                        continue;
 
-                    switch (bindable)
-                    {
-                        case Bindable<bool> b:
-                            valueText = b.Value ? "On" : "Off";
-                            break;
-
-                        default:
-                            valueText = bindable.ToString() ?? string.Empty;
-                            break;
-                    }
-
-                    if (!bindable.IsDefault)
-                        yield return (attr.Label, valueText);
+                    yield return (attr.Label, GetSettingTooltipText(bindable));
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the tooltip text for a specific mod setting.
+        /// Can be overridden to provide custom formatting for specific settings.
+        /// </summary>
+        protected virtual LocalisableString GetSettingTooltipText(IBindable bindable)
+        {
+            switch (bindable)
+            {
+                case Bindable<bool> b:
+                    return b.Value ? "On" : "Off";
+
+                default:
+                    return bindable.ToString() ?? string.Empty;
             }
         }
 
@@ -79,7 +84,8 @@ namespace osu.Game.Rulesets.Mods
         /// The score multiplier of this mod.
         /// </summary>
         [JsonIgnore]
-        public abstract double ScoreMultiplier { get; }
+        [Obsolete("This property is no longer used to calculate the score multiplier. Use `Ruleset.CreateScoreMultiplierCalculator()` instead.")]
+        public virtual double ScoreMultiplier => 1;
 
         /// <summary>
         /// Returns true if this mod is implemented (and playable).

@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            TimePreempt = (float)IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
+            TimePreempt = IBeatmapDifficultyInfo.DifficultyRangeInt(difficulty.ApproachRate, PREEMPT_RANGE);
 
             Scale = LegacyRulesetExtensions.CalculateScaleFromCircleSize(difficulty.CircleSize);
         }
@@ -172,8 +172,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 index++;
                 indexWithOffsets += ComboOffset + 1;
 
-                if (lastObj != null)
-                    lastObj.LastInCombo = true;
+                lastObj?.LastInCombo = true;
             }
 
             ComboIndex = index;
@@ -202,6 +201,8 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// Maximum preempt time at AR=0.
         /// </summary>
         public const double PREEMPT_MAX = 1800;
+
+        public static readonly DifficultyRange PREEMPT_RANGE = new DifficultyRange(PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
 
         /// <summary>
         /// The Y position of the hit object is not used in the normal osu!catch gameplay.

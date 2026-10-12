@@ -4,9 +4,9 @@
 using osu.Game.Overlays.BeatmapSet;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Tests.Visual.Online
 {

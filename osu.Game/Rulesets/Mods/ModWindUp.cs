@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Wind Up";
         public override string Acronym => "WU";
         public override LocalisableString Description => "Can you keep up?";
-        public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleUp;
+        public override IconUsage? Icon => OsuIcon.ModWindUp;
 
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble(1)
         {

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -115,7 +116,14 @@ namespace osu.Game.Screens.OnlinePlay.Components
             else
             {
                 // When Playlist is not empty (in room) we compute actual range
-                var orderedDifficulties = room.Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
+                IReadOnlyList<PlaylistItem> difficultyRangeSource = room.Playlist.Where(item => !item.Expired).ToList();
+
+                if (difficultyRangeSource.Count == 0)
+                    difficultyRangeSource = room.Playlist;
+
+                var orderedDifficulties = difficultyRangeSource.Select(item => item.Beatmap)
+                                                               .OrderBy(b => b.StarRating)
+                                                               .ToArray();
 
                 minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);
                 maxDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[^1].StarRating : 0, 0);

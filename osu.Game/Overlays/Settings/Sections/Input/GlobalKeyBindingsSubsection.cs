@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             var bindings = realm.All<RealmKeyBinding>()
                                 .Where(b => b.RulesetName == null && b.Variant == null)
-                                .Detach();
+                                .AsEnumerable().Detach();
 
             var actionsInSection = GlobalActionContainer.GetGlobalActionsFor(category).Cast<int>().ToHashSet();
             return bindings.Where(kb => actionsInSection.Contains(kb.ActionInt));

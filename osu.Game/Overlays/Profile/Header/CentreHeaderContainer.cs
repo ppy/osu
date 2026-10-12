@@ -55,6 +55,10 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             User = { BindTarget = User }
                         },
+                        new UserActionsButton
+                        {
+                            User = { BindTarget = User }
+                        }
                     }
                 },
                 new Container

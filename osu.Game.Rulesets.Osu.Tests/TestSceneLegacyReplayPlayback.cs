@@ -17,7 +17,6 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    [Ignore("These tests are expected to fail until an acceptable solution for various replay playback issues concerning rounding of replay frame times & hit windows is found.")]
     public partial class TestSceneLegacyReplayPlayback : LegacyReplayPlaybackTestScene
     {
         protected override Ruleset CreateRuleset() => new OsuRuleset();

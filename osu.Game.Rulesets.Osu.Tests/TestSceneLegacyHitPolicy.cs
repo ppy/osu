@@ -475,7 +475,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_stack_start - 450, Position = new Vector2(55), Actions = { OsuAction.LeftButton } },
-            });
+            }, extraMods: [new OsuModNoFail()]);
 
             addClickActionAssert(0, ClickAction.Ignore);
         }
@@ -792,7 +792,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 AddStep("export beatmap", () =>
                 {
-                    var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null);
+                    var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null, null);
 
                     using (var stream = File.Open(Path.Combine(exportLocation, $"{testCaseName}.osu"), FileMode.Create))
                     {

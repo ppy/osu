@@ -19,6 +19,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString HeaderDescription => new TranslatableString(getKey(@"header_description"), @"change the way osu! behaves");
 
+        /// <summary>
+        /// "Copy version"
+        /// </summary>
+        public static LocalisableString CopyVersion => new TranslatableString(getKey(@"copy_version"), @"Copy version");
+
         private static string getKey(string key) => $"{prefix}:{key}";
     }
 }

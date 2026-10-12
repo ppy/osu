@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         [Resolved]
         private TaikoHitObjectComposer? composer { get; set; }
 
-        protected override bool IsValidForPlacement => Precision.DefinitelyBigger(spanPlacementObject.Duration, 0);
+        protected override bool IsValidForPlacement => base.IsValidForPlacement && (PlacementActive == PlacementState.Waiting || Precision.DefinitelyBigger(spanPlacementObject.Duration, 0));
 
         public TaikoSpanPlacementBlueprint(HitObject hitObject)
             : base(hitObject)
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 headPiece = new HitPiece
                 {

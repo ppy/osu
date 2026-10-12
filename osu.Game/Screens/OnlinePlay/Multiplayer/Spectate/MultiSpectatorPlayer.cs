@@ -1,13 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Ranking;
+using FontWeight = osu.Game.Graphics.FontWeight;
+using OsuFont = osu.Game.Graphics.OsuFont;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -24,6 +31,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly AudioAdjustments clockAdjustmentsFromMods = new AudioAdjustments();
         private readonly SpectatorPlayerClock spectatorPlayerClock;
 
+        // purposefully cached as empty - the multi spectator screen already has one leaderboard, on the left of all the player instances
+        [Cached(typeof(IGameplayLeaderboardProvider))]
+        private readonly EmptyGameplayLeaderboardProvider leaderboardProvider = new EmptyGameplayLeaderboardProvider();
+
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorPlayer"/>.
         /// </summary>
@@ -33,6 +44,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             : base(score, new PlayerConfiguration { AllowUserInteraction = false })
         {
             this.spectatorPlayerClock = spectatorPlayerClock;
+
+            ShowSettingsOverlay = false;
         }
 
         [BackgroundDependencyLoader]
@@ -42,8 +55,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            HUDOverlay.PlayerSettingsOverlay.Expire();
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
+            // also applied in `MultiplayerPlayer.load()`
+            ScoreProcessor.ApplyNewJudgementsWhenFailed = true;
+
             HUDOverlay.HoldToQuit.Expire();
+
+            // Player username display
+            GameplayClockContainer.Add(new OsuTextFlowContainer(cp => cp.Font = OsuFont.Style.Title.With(size: 60, weight: FontWeight.SemiBold))
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Both,
+                Text = Score.ScoreInfo.User.Username,
+                Y = 50,
+            });
         }
 
         protected override void Update()
@@ -76,5 +104,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new MultiSpectatorResultsScreen(score);
+
+        protected override void PerformFail()
+        {
+            // base logic intentionally suppressed - failing in multiplayer only marks the score with F rank
+            // see also: `MultiplayerPlayer.PerformFail()`
+            ScoreProcessor.FailScore(Score.ScoreInfo);
+        }
+
+        protected override void ConcludeFailedScore(Score score)
+            => throw new NotSupportedException($"{nameof(MultiSpectatorPlayer)} should never be calling {nameof(ConcludeFailedScore)}. Failing in multiplayer only marks the score with F rank.");
     }
 }

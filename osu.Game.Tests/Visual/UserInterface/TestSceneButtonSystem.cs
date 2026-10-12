@@ -68,14 +68,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [TestCase(Key.P, Key.P)]
-        [TestCase(Key.M, Key.P)]
-        [TestCase(Key.L, Key.P)]
-        [TestCase(Key.B, Key.E)]
-        [TestCase(Key.S, Key.E)]
-        [TestCase(Key.D, null)]
-        [TestCase(Key.Q, null)]
-        [TestCase(Key.O, null)]
-        public void TestShortcutKeys(Key key, Key? subMenuEnterKey)
+        [TestCase(Key.M, Key.M, Key.L)]
+        [TestCase(Key.M, Key.M, Key.M)]
+        [TestCase(Key.L, Key.L)]
+        [TestCase(Key.B, Key.E, Key.B)]
+        [TestCase(Key.S, Key.E, Key.S)]
+        [TestCase(Key.D)]
+        [TestCase(Key.Q)]
+        [TestCase(Key.O)]
+        public void TestShortcutKeys(params Key[] keys)
         {
             int activationCount = -1;
             AddStep("set up action", () =>
@@ -83,7 +84,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 activationCount = 0;
                 void action() => activationCount++;
 
-                switch (key)
+                switch (keys.First())
                 {
                     case Key.P:
                         buttons.OnSolo = action;
@@ -119,16 +120,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
-            AddStep($"press {key}", () => InputManager.Key(key));
+            // trigger out of idle state
+            AddStep($"press {keys.First()}", () => InputManager.Key(keys.First()));
             AddAssert("state is top level", () => buttons.State == ButtonSystemState.TopLevel);
 
-            if (subMenuEnterKey != null)
+            for (int i = 0; i < keys.Length; i++)
             {
-                AddStep($"press {subMenuEnterKey}", () => InputManager.Key(subMenuEnterKey.Value));
-                AddAssert("state is not top menu", () => buttons.State != ButtonSystemState.TopLevel);
+                var key = keys[i];
+                AddStep($"press {key}", () => InputManager.Key(key));
+
+                if (i > 0)
+                    AddAssert("state is not top menu", () => buttons.State != ButtonSystemState.TopLevel);
             }
 
-            AddStep($"press {key}", () => InputManager.Key(key));
             AddAssert("action triggered", () => activationCount == 1);
         }
 

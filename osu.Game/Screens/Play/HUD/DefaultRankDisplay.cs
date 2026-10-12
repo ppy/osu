@@ -19,20 +19,25 @@ namespace osu.Game.Screens.Play.HUD
 {
     public partial class DefaultRankDisplay : CompositeDrawable, ISerialisableDrawable
     {
+        public bool UsesFixedAnchor { get; set; }
+
         [Resolved]
         private ScoreProcessor scoreProcessor { get; set; } = null!;
 
         [SettingSource(typeof(DefaultRankDisplayStrings), nameof(DefaultRankDisplayStrings.PlaySamplesOnRankChange))]
         public BindableBool PlaySamples { get; set; } = new BindableBool(true);
 
-        public bool UsesFixedAnchor { get; set; }
-
         private UpdateableRank rankDisplay = null!;
 
         private SkinnableSound rankDownSample = null!;
         private SkinnableSound rankUpSample = null!;
 
-        private IBindable<ScoreRank> rank = null!;
+        private Bindable<double?> lastSamplePlayback = null!;
+        private double lastChangeTime;
+
+        private ScoreRank? displayedRank;
+
+        private const int time_between_changes = 1500;
 
         public DefaultRankDisplay()
         {
@@ -40,13 +45,13 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(SkinEditor? skinEditor)
+        private void load(SkinEditor? skinEditor, SessionStatics statics)
         {
             InternalChildren = new Drawable[]
             {
                 rankDownSample = new SkinnableSound(new SampleInfo("Gameplay/rank-down")),
                 rankUpSample = new SkinnableSound(new SampleInfo("Gameplay/rank-up")),
-                rankDisplay = new UpdateableRank(ScoreRank.X)
+                rankDisplay = new UpdateableRank
                 {
                     RelativeSizeAxes = Axes.Both
                 },
@@ -54,26 +59,50 @@ namespace osu.Game.Screens.Play.HUD
 
             if (skinEditor != null)
                 PlaySamples.Value = false;
+
+            lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            rank = scoreProcessor.Rank.GetBoundCopy();
-            rank.BindValueChanged(r =>
-            {
-                // Don't play rank-down sfx on quit/retry
-                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F && PlaySamples.Value)
-                {
-                    if (r.NewValue > rankDisplay.Rank)
-                        rankUpSample.Play();
-                    else
-                        rankDownSample.Play();
-                }
+            updateRank(scoreProcessor.Rank.Value);
+        }
 
-                rankDisplay.Rank = r.NewValue;
-            }, true);
+        protected override void Update()
+        {
+            base.Update();
+
+            var currentRank = scoreProcessor.Rank.Value;
+
+            if (currentRank == displayedRank)
+                return;
+
+            if (Time.Current - lastChangeTime >= time_between_changes || scoreProcessor.HasCompleted.Value || currentRank == ScoreRank.F)
+                updateRank(currentRank);
+        }
+
+        private void updateRank(ScoreRank rank)
+        {
+            rankDisplay.Rank = rank;
+
+            // Check sample time separately to ensure two copies of the rank display don't both play samples on a change.
+            bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            // Also don't play rank-down sfx on quit/retry/initial update.
+            if (displayedRank != null && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed)
+            {
+                if (rank > displayedRank)
+                    rankUpSample.Play();
+                else
+                    rankDownSample.Play();
+
+                lastSamplePlayback.Value = Time.Current;
+            }
+
+            displayedRank = rank;
+            lastChangeTime = Time.Current;
         }
     }
 }

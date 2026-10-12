@@ -11,5 +11,6 @@ namespace osu.Game.Skinning
         Score,
         Combo,
         HitCircle,
+        ScoreEntry,
     }
 }

@@ -3,6 +3,7 @@
 
 #nullable disable
 
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +12,7 @@ using System.Text;
 using Microsoft.Toolkit.HighPerformance;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Readers;
@@ -28,14 +30,25 @@ namespace osu.Game.IO.Archives
         public static readonly ArchiveEncoding DEFAULT_ENCODING;
 
         private readonly Stream archiveStream;
-        private readonly ZipArchive archive;
+        private readonly IWritableArchive archive;
+
+        /// <summary>
+        /// Specifies the maximum permitted size of files (in bytes) in the archive.
+        /// If a ZIP archive specifies a file entry which exceeds this size,
+        /// attempting to access this file via <see cref="GetStream"/> will fail with <see cref="InsufficientMemoryException"/>.
+        /// </summary>
+        public long MaximumEntrySize { get; set; } = 100 * 1024 * 1024; // bytes
 
         static ZipArchiveReader()
         {
             // Required to support rare code pages.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            DEFAULT_ENCODING = new ArchiveEncoding(Encoding.GetEncoding(932), Encoding.GetEncoding(932));
+            DEFAULT_ENCODING = new ArchiveEncoding
+            {
+                Default = Encoding.GetEncoding(932),
+                Password = Encoding.GetEncoding(932),
+            };
         }
 
         public ZipArchiveReader(Stream archiveStream, string name = null)
@@ -43,7 +56,7 @@ namespace osu.Game.IO.Archives
         {
             this.archiveStream = archiveStream;
 
-            archive = ZipArchive.Open(archiveStream, new ReaderOptions
+            archive = ZipArchive.OpenArchive(archiveStream, new ReaderOptions
             {
                 ArchiveEncoding = DEFAULT_ENCODING
             });
@@ -51,12 +64,15 @@ namespace osu.Game.IO.Archives
 
         public override Stream GetStream(string name)
         {
-            ZipArchiveEntry entry = archive.Entries.SingleOrDefault(e => e.Key == name);
+            IArchiveEntry entry = archive.Entries.SingleOrDefault(e => e.Key == name);
             if (entry == null)
                 return null;
 
             using (Stream s = entry.OpenEntryStream())
             {
+                if (entry.Size > MaximumEntrySize)
+                    throw new InsufficientMemoryException($@"Size of file ""{name}"" exceeds allowable limit of {MaximumEntrySize} bytes");
+
                 if (entry.Size > 0)
                 {
                     var owner = MemoryAllocator.Default.Allocate<byte>((int)entry.Size);

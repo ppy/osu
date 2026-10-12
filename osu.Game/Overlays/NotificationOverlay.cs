@@ -162,16 +162,17 @@ namespace osu.Game.Overlays
         private int runningDepth;
 
         private readonly Scheduler postScheduler = new Scheduler();
+        private readonly Scheduler criticalPostScheduler = new Scheduler();
 
         public override bool IsPresent =>
             // Delegate presence as we need to consider the toast tray in addition to the main overlay.
-            State.Value == Visibility.Visible || mainContent.IsPresent || toastTray.IsPresent || postScheduler.HasPendingTasks;
+            State.Value == Visibility.Visible || mainContent.IsPresent || toastTray.IsPresent || postScheduler.HasPendingTasks || criticalPostScheduler.HasPendingTasks;
 
         private bool processingPosts = true;
 
         private double? lastSamplePlayback;
 
-        public void Post(Notification notification) => postScheduler.Add(() =>
+        public void Post(Notification notification) => (notification.IsCritical ? criticalPostScheduler : postScheduler).Add(() =>
         {
             ++runningDepth;
 
@@ -180,7 +181,7 @@ namespace osu.Game.Overlays
             notification.Closed += () => notificationClosed(notification);
 
             if (notification is IHasCompletionTarget hasCompletionTarget)
-                hasCompletionTarget.CompletionTarget = Post;
+                hasCompletionTarget.CompletionTarget ??= Post;
 
             playDebouncedSample(notification.PopInSampleName);
 
@@ -220,6 +221,8 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
+            criticalPostScheduler.Update();
+
             if (processingPosts)
                 postScheduler.Update();
         }
@@ -230,7 +233,7 @@ namespace osu.Game.Overlays
             mainContent.FadeTo(1, TRANSITION_LENGTH / 2, Easing.OutQuint);
             mainContent.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
-            toastTray.FlushAllToasts();
+            toastTray.FlushAllToasts(true);
         }
 
         protected override void PopOut()

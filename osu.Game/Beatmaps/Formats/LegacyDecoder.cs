@@ -16,6 +16,8 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class LegacyDecoder<T> : Decoder<T>
         where T : new()
     {
+        // If this is updated, a new release of `osu-server-beatmap-submission` is required with updated packages.
+        // See usage at https://github.com/ppy/osu-server-beatmap-submission/blob/master/osu.Server.BeatmapSubmission/Services/BeatmapPackageParser.cs#L96-L97.
         public const int LATEST_VERSION = 14;
 
         public const int MAX_COMBO_COLOUR_COUNT = 8;
@@ -33,14 +35,17 @@ namespace osu.Game.Beatmaps.Formats
             FormatVersion = version;
         }
 
-        protected override void ParseStreamInto(LineBufferedReader stream, T output)
+        protected override void ParseStreamInto(LineBufferedReader stream, bool isPrimaryStream, T output)
         {
             Section section = Section.General;
 
             string? line;
+            int lineNumber = 0;
 
             while ((line = stream.ReadLine()) != null)
             {
+                lineNumber++;
+
                 if (ShouldSkipLine(line))
                     continue;
 
@@ -63,11 +68,12 @@ namespace osu.Game.Beatmaps.Formats
 
                 try
                 {
-                    ParseLine(output, section, line);
+                    ParseLine(output, section, line, isPrimaryStream);
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}");
+                    const int line_length_limit = 50;
+                    Logger.Log($"Failed to process line {lineNumber} \"{(line.Length <= line_length_limit ? line : string.Concat(line.AsSpan(0, line_length_limit), "…"))}\" into \"{output}\": {e.Message}");
                 }
             }
         }
@@ -82,7 +88,7 @@ namespace osu.Game.Beatmaps.Formats
         {
         }
 
-        protected virtual void ParseLine(T output, Section section, string line)
+        protected virtual void ParseLine(T output, Section section, string line, bool isPrimaryStream)
         {
             switch (section)
             {

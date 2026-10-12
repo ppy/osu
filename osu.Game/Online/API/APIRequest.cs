@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.IO.Network;
@@ -94,12 +95,13 @@ namespace osu.Game.Online.API
         /// </summary>
         public event APIFailureHandler? Failure;
 
-        private readonly object completionStateLock = new object();
+        private readonly Lock completionStateLock = new Lock();
 
         /// <summary>
         /// The state of this request, from an outside perspective.
         /// This is used to ensure correct notification events are fired.
         /// </summary>
+        [JsonIgnore]
         public APIRequestCompletionState CompletionState { get; private set; }
 
         /// <summary>
@@ -221,7 +223,7 @@ namespace osu.Game.Online.API
                             // attempt to decode a displayable error string.
                             var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
                             if (error != null)
-                                e = new APIException(error.ErrorMessage, e);
+                                e = new APIException(error.ErrorMessage, e, WebRequest?.ResponseStatusCode);
                         }
                         catch
                         {

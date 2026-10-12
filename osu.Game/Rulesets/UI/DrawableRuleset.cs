@@ -102,19 +102,6 @@ namespace osu.Game.Rulesets.UI
         private FrameStabilityContainer frameStabilityContainer;
         private DrawableRulesetDependencies dependencies;
 
-        private bool allowBackwardsSeeks;
-
-        public override bool AllowBackwardsSeeks
-        {
-            get => allowBackwardsSeeks;
-            set
-            {
-                allowBackwardsSeeks = value;
-                if (frameStabilityContainer != null)
-                    frameStabilityContainer.AllowBackwardsSeeks = value;
-            }
-        }
-
         private bool frameStablePlayback = true;
 
         internal override bool FrameStablePlayback
@@ -123,8 +110,7 @@ namespace osu.Game.Rulesets.UI
             set
             {
                 frameStablePlayback = value;
-                if (frameStabilityContainer != null)
-                    frameStabilityContainer.FrameStablePlayback = value;
+                frameStabilityContainer?.FrameStablePlayback = value;
             }
         }
 
@@ -190,7 +176,6 @@ namespace osu.Game.Rulesets.UI
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
-                AllowBackwardsSeeks = AllowBackwardsSeeks,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
@@ -212,7 +197,7 @@ namespace osu.Game.Rulesets.UI
 
             applyRulesetMods(Mods, config);
 
-            loadObjects(cancellationToken ?? default);
+            loadObjects(cancellationToken ?? CancellationToken.None);
         }
 
         /// <summary>
@@ -330,8 +315,7 @@ namespace osu.Game.Rulesets.UI
 
             HasReplayLoaded.Value = replayInputManager.ReplayInputHandler != null;
 
-            if (replayInputManager.ReplayInputHandler != null)
-                replayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
+            replayInputManager.ReplayInputHandler?.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
 
             if (!ProvidingUserCursor)
             {
@@ -480,12 +464,6 @@ namespace osu.Game.Rulesets.UI
         /// Whether to enable frame-stable playback.
         /// </summary>
         internal abstract bool FrameStablePlayback { get; set; }
-
-        /// <summary>
-        /// When a replay is not attached, we usually block any backwards seeks.
-        /// This will bypass the check. Should only be used for tests.
-        /// </summary>
-        public abstract bool AllowBackwardsSeeks { get; set; }
 
         /// <summary>
         /// The mods which are to be applied.

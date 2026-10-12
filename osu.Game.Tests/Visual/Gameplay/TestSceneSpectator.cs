@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
-            AddAssert("time advanced", () => currentFrameStableTime, () => Is.GreaterThan(pausedTime));
+            AddAssert("time advanced", () => currentFrameStableTime, () => Is.GreaterThan(pausedTime!));
         }
 
         [Test]
@@ -275,7 +275,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var completedGameplayState = TestGameplayState.Create(new OsuRuleset());
                 completedGameplayState.HasPassed = true;
-                spectatorClient.EndPlaying(completedGameplayState);
+                spectatorClient.EndPlaying(null, completedGameplayState);
             });
 
             // We can't access API because we're an "online" test.

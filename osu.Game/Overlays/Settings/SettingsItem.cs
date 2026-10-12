@@ -45,7 +45,18 @@ namespace osu.Game.Overlays.Settings
 
         private OsuTextFlowContainer noticeText;
 
-        public bool ShowsDefaultIndicator = true;
+        private bool showsDefaultIndicator = true;
+
+        public bool ShowsDefaultIndicator
+        {
+            get => showsDefaultIndicator;
+            set
+            {
+                showsDefaultIndicator = value;
+                defaultValueIndicatorContainer.Alpha = value ? 1 : 0;
+            }
+        }
+
         private readonly Container defaultValueIndicatorContainer;
 
         public LocalisableString TooltipText { get; set; }
@@ -205,7 +216,7 @@ namespace osu.Game.Overlays.Settings
             // IMPORTANT: all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
             // never loaded, but requires bindable storage.
             if (controlWithCurrent == null)
-                throw new ArgumentException(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<T>)}");
+                throw new ArgumentException(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<>)}");
 
             controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
             controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
@@ -214,17 +225,14 @@ namespace osu.Game.Overlays.Settings
         [BackgroundDependencyLoader]
         private void load()
         {
-            // intentionally done before LoadComplete to avoid overhead.
-            if (ShowsDefaultIndicator)
+            defaultValueIndicatorContainer.Child = new RevertToDefaultButton<T>
             {
-                defaultValueIndicatorContainer.Add(new RevertToDefaultButton<T>
-                {
-                    Current = controlWithCurrent.Current,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                });
-                updateLayout();
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Current = controlWithCurrent.Current,
+            };
+
+            updateLayout();
         }
 
         private void updateLayout()
@@ -238,8 +246,7 @@ namespace osu.Game.Overlays.Settings
 
         private void updateDisabled()
         {
-            if (labelText != null)
-                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
+            labelText?.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
     }
 }
