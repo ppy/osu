@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
@@ -10,7 +11,9 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
@@ -38,11 +41,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
             var drawableOsuRuleset = (DrawableOsuRuleset?)drawableRuleset;
 
-            if (drawableOsuRuleset != null)
-            {
-                var osuPlayfield = drawableOsuRuleset.Playfield;
-                osuPlayfield.AttachResumeOverlayInputBlocker(inputBlocker = new OsuResumeOverlayInputBlocker());
-            }
+            // this relies on execution ordering, particularly on running before `ReplayRecorder` latches onto the `KeyBindingContainer`
+            // (otherwise the press will be recorded to the replay)
+            drawableOsuRuleset?.KeyBindingInputManager.KeyBindingContainer.Add(inputBlocker = new OsuResumeOverlayInputBlocker());
 
             Add(cursorScaleContainer = new Container
             {
@@ -54,9 +55,19 @@ namespace osu.Game.Rulesets.Osu.UI
                         // block that press event from potentially reaching a hit circle that's behind the cursor.
                         // we cannot do this from OsuClickToResumeCursor directly since we're in a different input manager tree than the gameplay one,
                         // so we rely on a dedicated input blocking component that's implanted in there to do that for us.
-                        // note this only matters when the user didn't pause while they were holding the same key that they are resuming with.
-                        if (inputBlocker != null && !drawableOsuRuleset.AsNonNull().KeyBindingInputManager.PressedActions.Contains(action))
-                            inputBlocker.BlockNextPress = true;
+                        // note this only matters when the user is resuming with a key that was not held when they paused.
+                        if (inputBlocker != null)
+                        {
+                            bool resumeKeyWasNotHeldWhenPausing = !drawableOsuRuleset.AsNonNull().KeyBindingInputManager.PressedActions.Contains(action);
+                            // this intentionally ignores slider head circles because it is complicated to make blocking the resume input there
+                            // due to how complex `SliderInputManager` is and the methods it uses to determine whether the slider is being tracked
+                            // (it reads `PressedActions` from the input manager directly, so even if we attempt to block the initial input here, `SliderInputManager` will still see it through that).
+                            bool mouseOverHittableCircle = drawableOsuRuleset!.Playfield.HitObjectContainer.AliveObjects.Any(h =>
+                                h is DrawableHitCircle && h.IsHovered && !h.IsHit && drawableOsuRuleset.Playfield.HitPolicy.CheckHittable(h, Time.Current, HitResult.None) != ClickAction.Ignore);
+
+                            if (resumeKeyWasNotHeldWhenPausing && mouseOverHittableCircle)
+                                inputBlocker.NextPressToBlock = action;
+                        }
 
                         Resume();
                     }
@@ -168,7 +179,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public partial class OsuResumeOverlayInputBlocker : Drawable, IKeyBindingHandler<OsuAction>
         {
-            public bool BlockNextPress;
+            public OsuAction? NextPressToBlock;
 
             public OsuResumeOverlayInputBlocker()
             {
@@ -178,8 +189,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
             {
-                bool block = BlockNextPress;
-                BlockNextPress = false;
+                bool block = NextPressToBlock == e.Action;
+                NextPressToBlock = null;
                 return block;
             }
 
