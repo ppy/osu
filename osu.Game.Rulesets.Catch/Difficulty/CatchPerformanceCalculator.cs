@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchPerformanceCalculator : PerformanceCalculator
     {
+        private const double performance_multiplier = 1.2;
+
         private int num300;
         private int num100;
         private int num50;
@@ -89,7 +91,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
 
-            double performance_multiplier = 1.2;
             value *= performance_multiplier;
 
             return new CatchPerformanceAttributes
