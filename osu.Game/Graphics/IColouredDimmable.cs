@@ -33,17 +33,6 @@ namespace osu.Game.Graphics
 
             OffsetParametersBuffer = renderer.CreateUniformBuffer<DimParameters>();
             ZeroOffsetParametersBuffer = renderer.CreateUniformBuffer<DimParameters>();
-
-            ZeroOffsetParametersBuffer.Data = new DimParameters
-            {
-                DimColour = new UniformVector4
-                {
-                    X = 0.0f,
-                    Y = 0.0f,
-                    Z = 0.0f,
-                    W = 1.0f
-                },
-            };
         }
 
         public void SetDrawColourOffset(Colour4 DrawColourOffset)
@@ -58,6 +47,18 @@ namespace osu.Game.Graphics
                     Y = DrawColourOffset.G,
                     Z = DrawColourOffset.B,
                     W = DrawColourOffset.A
+                },
+            };
+
+            // Has to be set every frame, otherwise crashes with OpenGL(Experimental) renderer
+            ZeroOffsetParametersBuffer!.Data = new DimParameters
+            {
+                DimColour = new UniformVector4
+                {
+                    X = 0.0f,
+                    Y = 0.0f,
+                    Z = 0.0f,
+                    W = 1.0f
                 },
             };
         }
