@@ -281,7 +281,7 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     base.ApplyState();
 
-                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
+                    drawColourOffset = Source.DrawColourOffset;
                 }
 
                 protected override void Draw(IRenderer renderer)

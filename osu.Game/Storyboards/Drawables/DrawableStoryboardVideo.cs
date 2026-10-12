@@ -177,27 +177,6 @@ namespace osu.Game.Storyboards.Drawables
                     TextureShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
                 }
 
-                public Colour4 DrawColourOffset
-                {
-                    get
-                    {
-                        if (DrawColourInfo.Blending == BlendingParameters.Additive)
-                            // Additive Drawables shouldn't have any offset, because things underneath them
-                            // already have it added to them. This does rely on the fact that there is
-                            // something non-additive (but still IColouredDimmable) behind this sprite,
-                            // which seems to be the case with storyboards, as beatmap background is always enabled.
-                            return Colour4.Black;
-
-                        if (!drawColourOffsetSource.IsValid)
-                            drawColourOffsetSource.Value = (this as IColouredDimmable).DrawColourOffsetSource;
-
-                        if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
-                            return drawColourOffsetSource.Value.DrawColourOffset;
-
-                        return Colour4.Black;
-                    }
-                }
-
                 public ColouredDimmableSharedData? ColouredDimmableSharedData
                 {
                     get
@@ -241,6 +220,11 @@ namespace osu.Game.Storyboards.Drawables
 
                         if (colouredDimmableSharedData == null || colouredDimmableSharedData.OffsetParametersBuffer == null || colouredDimmableSharedData.ZeroOffsetParametersBuffer == null)
                         {
+                            // Additive Drawables shouldn't have any offset, because things underneath them
+                            // already have it added to them. This does rely on the fact that there is
+                            // something non-additive (but still IColouredDimmable) behind this sprite,
+                            // which seems to be the case with storyboards, as beatmap background is always enabled.
+
                             dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
                             dimParametersBuffer.Data = new DimParameters
