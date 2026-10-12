@@ -42,9 +42,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // We are heavily relying on aim in catch the beat
             double value = DiffUtils.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
 
-            // Longer maps are worth more. "Longer" means how many notes there are which can contribute to combo
-            int totalCombo = totalComboHits();
-
             value *= DiffUtils.Pow(0.97, numMiss);
 
             // Combo scaling
@@ -64,7 +61,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double approachRateFactor = 1.0;
             if (approachRate >= 9.0)
-                approachRateFactor = 1.0 + Math.Pow((approachRate - 9.0) / 2.0, 2.0) * 0.38; // 38% for AR11
+                approachRateFactor += Math.Pow((approachRate - 9.0) / 2.0, 2.0) * 0.38; // 38% for AR11
             else if (approachRate < 8.0)
                 approachRateFactor += 0.025 * (8.0 - approachRate); // 20% for AR0
 
@@ -79,6 +76,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
             }
 
+            // Longer maps are worth more when FlashLight is applied. "Longer" means how many notes there are which can contribute to combo
+            int totalCombo = totalComboHits();
             double flashLightLengthBonus =
                 1.35 * (0.95 + 0.3 * Math.Min(1.0, totalCombo / 2500.0) +
                 (totalCombo > 2500 ? Math.Log10(totalCombo / 2500.0) * 0.475 : 0.0));
@@ -90,7 +89,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
 
-            value *= 1.2;
+            double performance_multiplier = 1.2;
+            value *= performance_multiplier;
 
             return new CatchPerformanceAttributes
             {

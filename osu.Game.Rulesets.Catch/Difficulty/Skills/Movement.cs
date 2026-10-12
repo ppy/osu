@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
     public class Movement : StrainDecaySkill
     {
-        protected override double SkillMultiplier => 1.6;
+        protected override double SkillMultiplier => 1.0;
         protected override double StrainDecayBase => 0.05;
 
         protected override int SectionLength => 750;
