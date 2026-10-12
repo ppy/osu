@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             private void onStateChanged(ValueChangedEvent<MatchmakingScreenState> e)
             {
-                if (e.OldValue == MatchmakingScreenState.Queueing)
+                if (e.NewValue != MatchmakingScreenState.Queueing)
                 {
                     queueAnimationDelegate?.Cancel();
                     queueAnimationDelegate = null;
@@ -120,11 +120,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                     innerRing.Delay(fade_stagger)
                              .ResizeTo(inner_size).FadeIn(fade_duration);
-
-                    return;
                 }
-
-                if (e.NewValue == MatchmakingScreenState.Queueing)
+                else
                 {
                     innerRing.ResizeTo(inner_size - 20, 500, Easing.OutQuad)
                              .FadeOut(500, Easing.OutQuad);
@@ -189,6 +186,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             protected override void PopIn()
             {
                 background.FadeIn(2000);
+
+                if (currentState.Value == MatchmakingScreenState.Queueing)
+                    return;
 
                 using (BeginDelayedSequence(500))
                 {
