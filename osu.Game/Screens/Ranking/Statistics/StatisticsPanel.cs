@@ -232,15 +232,20 @@ namespace osu.Game.Screens.Ranking.Statistics
             {
                 string? preventTaggingReason = null;
 
+                bool hasConversionMods(ScoreInfo s) => s.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic));
+
                 // We may want to iterate on the following conditions further in the future
 
                 var localUserScore = AchievedScore ?? realm.Run(r =>
-                    r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
-                     .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
-                     .AsEnumerable()
-                     .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
-                     .ThenByDescending(score => score.Rank)
-                     .FirstOrDefault());
+                {
+                    return r.GetAllLocalScoresForUser(api.LocalUser.Value.Id)
+                            .Filter($@"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0", newScore.BeatmapInfo.ID)
+                            .AsEnumerable()
+                            .Where(s => !hasConversionMods(s))
+                            .OrderByDescending(score => score.Ruleset.MatchesOnlineID(newScore.BeatmapInfo.Ruleset))
+                            .ThenByDescending(score => score.Rank)
+                            .FirstOrDefault();
+                });
 
                 if (localUserScore == null)
                     preventTaggingReason = "Play the beatmap to contribute to beatmap tags!";
@@ -248,7 +253,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     preventTaggingReason = "Play the beatmap in its original ruleset to contribute to beatmap tags!";
                 else if (localUserScore.Rank < ScoreRank.C)
                     preventTaggingReason = "Set a better score to contribute to beatmap tags!";
-                else if (localUserScore.Mods.Any(m => (m.Type == ModType.Conversion) && !(m is ModClassic)))
+                else if (hasConversionMods(localUserScore))
                     preventTaggingReason = "Play this beatmap without conversion mods to contribute to beatmap tags!";
 
                 if (preventTaggingReason == null)
