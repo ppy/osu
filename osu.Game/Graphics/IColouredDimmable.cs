@@ -19,7 +19,7 @@ namespace osu.Game.Graphics
     {
         private IRenderer? renderer;
 
-        public bool IsInitialized() => renderer != null;
+        public bool IsInitialised => renderer != null;
 
         public IUniformBuffer<DimParameters>? OffsetParametersBuffer { get; private set; }
         public IUniformBuffer<DimParameters>? ZeroOffsetParametersBuffer { get; private set; }
@@ -27,7 +27,7 @@ namespace osu.Game.Graphics
         public void Initialize(IRenderer renderer)
         {
             // This relies on renderer being constant, need to check if that's the case, TODO
-            if (IsInitialized()) return;
+            if (IsInitialised) return;
 
             this.renderer = renderer;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Graphics
 
         public void SetDrawColourOffset(Colour4 DrawColourOffset)
         {
-            if (!IsInitialized()) return;
+            if (!IsInitialised) return;
 
             OffsetParametersBuffer!.Data = new DimParameters
             {

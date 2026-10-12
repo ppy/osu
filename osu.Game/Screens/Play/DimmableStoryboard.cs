@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Play
             protected override void Draw(IRenderer renderer)
             {
                 // Update shared data before drawing children that rely on it
-                if (!sharedData.IsInitialized())
+                if (!sharedData.IsInitialised)
                 {
                     sharedData.Initialize(renderer);
                 }
