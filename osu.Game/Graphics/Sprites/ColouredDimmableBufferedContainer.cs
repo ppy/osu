@@ -36,8 +36,8 @@ namespace osu.Game.Graphics.Sprites
             return result;
         }
 
-        public ColouredDimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
-            : base(formats, pixelSnapping, cachedFrameBuffer)
+        public ColouredDimmableBufferedContainer(TexturePixelFormat textureFormat = TexturePixelFormat.R8G8B8A8Float, RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+            : base(textureFormat, formats, pixelSnapping, cachedFrameBuffer)
         {
             AddLayout(drawColourOffsetSource);
         }
