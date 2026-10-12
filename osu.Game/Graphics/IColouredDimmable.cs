@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
@@ -65,6 +66,14 @@ namespace osu.Game.Graphics
 
         public void Dispose()
         {
+            renderer?.ScheduleDisposal(static d => d.dispose(), this);
+            GC.SuppressFinalize(this);
+        }
+
+        private void dispose()
+        {
+            Debug.Assert(IsInitialised);
+
             OffsetParametersBuffer?.Dispose();
             ZeroOffsetParametersBuffer?.Dispose();
         }
