@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -65,6 +66,20 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("click score", () =>
             {
                 InputManager.MoveMouseTo(SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Single());
+                InputManager.PressButton(MouseButton.Left);
+                clickTime = InputManager.Time.Current;
+            });
+            AddUntilStep("wait for background preview", () => InputManager.Time.Current, () => Is.GreaterThan((clickTime + 3 * Screens.Select.SongSelect.REVEAL_BACKGROUND_DELAY) ?? double.PositiveInfinity));
+            AddAssert("background preview not triggered", () => this.ChildrenOfType<ScreenFooter>().Single().State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddStep("go back to song select", () => Stack.Exit());
+            AddUntilStep("at song select", () => SongSelect.IsCurrentScreen());
+
+            AddStep("click score", () =>
+            {
+                var score = SongSelect.ChildrenOfType<BeatmapLeaderboardScore>().Single();
+                InputManager.MoveMouseTo(score.ScreenSpaceDrawQuad.TopRight + new Vector2(-1, 1));
                 InputManager.PressButton(MouseButton.Left);
                 clickTime = InputManager.Time.Current;
             });
