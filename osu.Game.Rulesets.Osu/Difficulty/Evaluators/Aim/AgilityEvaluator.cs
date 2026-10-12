@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double agilityDifficulty = (1 + angleSwitchingBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
 
-            agilityDifficulty *= osuCurrObj.SmallCircleBonus;
+            agilityDifficulty += osuCurrObj.SmallCircleBonus * 5.0;
 
             return agilityDifficulty;
         }
