@@ -26,6 +26,7 @@ namespace osu.Game.Graphics
 
         public void Initialize(IRenderer renderer)
         {
+            // This relies on renderer being constant, need to check if that's the case, TODO
             if (IsInitialized()) return;
 
             this.renderer = renderer;

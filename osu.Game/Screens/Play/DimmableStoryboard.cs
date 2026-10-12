@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Rendering;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -62,6 +63,8 @@ namespace osu.Game.Screens.Play
             this.mods = mods;
 
             storyboardMustAlwaysBePresent = new Lazy<bool>(() => storyboard.GetLayer(@"Overlay").Elements.Any() || storyboard.Layers.Any(l => l.Elements.OfType<StoryboardSampleInfo>().Any()));
+
+            sharedData = new ColouredDimmableSharedData();
         }
 
         [BackgroundDependencyLoader]
@@ -95,6 +98,8 @@ namespace osu.Game.Screens.Play
             }, true);
             base.LoadComplete();
         }
+
+        protected override DrawNode CreateDrawNode() => new DimmableStoryboardDrawNode(this, sharedData);
 
         protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboard.Value && (DimLevel < 1 || storyboardMustAlwaysBePresent.Value));
 
@@ -148,15 +153,61 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private ColouredDimmableSharedData sharedData;
+
         public IColouredDimmable DrawColourOffsetSource => this;
 
         public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
+
+        public ColouredDimmableSharedData ColouredDimmableSharedData => sharedData;
 
         protected override void UpdateVisuals()
         {
             base.UpdateVisuals();
 
             this.TransformTo(nameof(ColourOffset), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            sharedData.Dispose();
+        }
+
+        protected class DimmableStoryboardDrawNode : CompositeDrawableDrawNode
+        {
+            public new DimmableStoryboard Source => (DimmableStoryboard)base.Source;
+
+            private ColouredDimmableSharedData sharedData;
+
+            private Colour4 drawColourOffset;
+
+            public DimmableStoryboardDrawNode(DimmableStoryboard source, ColouredDimmableSharedData sharedData)
+                : base(source)
+            {
+                this.sharedData = sharedData;
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
+            }
+
+            protected override void Draw(IRenderer renderer)
+            {
+                // Update shared data before drawing children that rely on it
+                if (!sharedData.IsInitialized())
+                {
+                    sharedData.Initialize(renderer);
+                }
+
+                sharedData.SetDrawColourOffset(drawColourOffset);
+
+                base.Draw(renderer);
+            }
         }
     }
 }
