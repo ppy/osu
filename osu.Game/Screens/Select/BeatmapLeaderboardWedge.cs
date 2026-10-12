@@ -98,12 +98,13 @@ namespace osu.Game.Screens.Select
             if (!scoresContainer.Any())
                 return base.OnMouseDown(e);
 
-            // Block mousedown from the top left of the leaderboard list to the bottom right of the last score
-            var mousePosition = scoresScroll.ToLocalSpace(GetContainingInputManager()!.CurrentState.Mouse.Position);
-            float scrollOffset = (float)scoresScroll.Current;
-            var lastScore = scoresContainer.Last();
-            var bottomRight = new Vector2(lastScore.X + lastScore.DrawWidth + scores_scroll_left_padding,
-                lastScore.Y + lastScore.DrawHeight + scores_scroll_top_padding - scrollOffset);
+            // Block mousedown from the top left of the leaderboard list to the bottom right of the last score.
+            // Note that is important to perform all of these calculations in the scroll's local space.
+            // The scroll has shearing applied to it, and transforming to the scroll's local space undoes the shear.
+            // Trying to do this in screen space would fail because the last score on the list has its bottom right corner shifted left compared to the first one's top right corner,
+            // so inputs to the right of that last score's bottom right corner's X coordinate (in screen space, so excluding shearing effects) would be allowed to fall through.
+            var mousePosition = scoresScroll.ToLocalSpace(e.ScreenSpaceMousePosition);
+            var bottomRight = scoresScroll.ToLocalSpace(scoresContainer.Last().ScreenSpaceDrawQuad.BottomRight);
 
             if (mousePosition.X <= bottomRight.X && mousePosition.Y <= bottomRight.Y)
                 return true;
