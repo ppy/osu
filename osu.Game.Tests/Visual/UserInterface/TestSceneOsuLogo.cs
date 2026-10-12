@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -84,9 +83,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             public ControlPointInfo? ControlPoints { get; } = new ControlPointInfo();
 
             IClock IBeatSyncProvider.Clock { get; } = new StopwatchClock(true);
-
-            [Resolved]
-            private IBeatSyncProvider parentProvider { get; set; } = null!;
 
             public HighBPMContainer()
             {
