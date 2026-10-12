@@ -1,10 +1,73 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Runtime.InteropServices;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders.Types;
 
 namespace osu.Game.Graphics
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public record struct DimParameters
+    {
+        public UniformVector4 DimColour;
+    }
+
+    public class ColouredDimmableSharedData : IDisposable
+    {
+        private IRenderer? renderer;
+
+        public bool IsInitialized() => renderer != null;
+
+        public IUniformBuffer<DimParameters>? OffsetParametersBuffer { get; private set; }
+        public IUniformBuffer<DimParameters>? ZeroOffsetParametersBuffer { get; private set; }
+
+        public void Initialize(IRenderer renderer)
+        {
+            if (IsInitialized()) return;
+
+            this.renderer = renderer;
+
+            OffsetParametersBuffer = renderer.CreateUniformBuffer<DimParameters>();
+            ZeroOffsetParametersBuffer = renderer.CreateUniformBuffer<DimParameters>();
+
+            ZeroOffsetParametersBuffer.Data = new DimParameters
+            {
+                DimColour = new UniformVector4
+                {
+                    X = 0.0f,
+                    Y = 0.0f,
+                    Z = 0.0f,
+                    W = 1.0f
+                },
+            };
+        }
+
+        public void SetDrawColourOffset(Colour4 DrawColourOffset)
+        {
+            if (!IsInitialized()) return;
+
+            OffsetParametersBuffer!.Data = new DimParameters
+            {
+                DimColour = new UniformVector4
+                {
+                    X = DrawColourOffset.R,
+                    Y = DrawColourOffset.G,
+                    Z = DrawColourOffset.B,
+                    W = DrawColourOffset.A
+                },
+            };
+        }
+
+        public void Dispose()
+        {
+            OffsetParametersBuffer?.Dispose();
+            ZeroOffsetParametersBuffer?.Dispose();
+        }
+    }
+
     /// <summary>
     /// An interface for drawable objects whose dim colour can be adjusted.
     /// </summary>
@@ -41,6 +104,19 @@ namespace osu.Game.Graphics
                     return source.DrawColourOffset;
 
                 return Colour4.Black;
+            }
+        }
+
+        ColouredDimmableSharedData? ColouredDimmableSharedData
+        {
+            get
+            {
+                IColouredDimmable source = DrawColourOffsetSource;
+
+                if (source != null && source != this)
+                    return source.ColouredDimmableSharedData;
+
+                return null;
             }
         }
     }

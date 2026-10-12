@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
+// #nullable disable
 
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
@@ -51,6 +51,8 @@ namespace osu.Game.Graphics.Sprites
         // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
         public Colour4 DrawColourOffset => Colour4.Black;
 
+        public ColouredDimmableSharedData? ColouredDimmableSharedData => null;
+
         public Colour4 FrameBufferDrawColourOffset
         {
             get
@@ -72,6 +74,20 @@ namespace osu.Game.Graphics.Sprites
             }
         }
 
+        public ColouredDimmableSharedData? FrameBufferColouredDimmableSharedData
+        {
+            get
+            {
+                if (!drawColourOffsetSource.IsValid)
+                    drawColourOffsetSource.Value = (this as IColouredDimmable).DrawColourOffsetSource;
+
+                if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
+                    return drawColourOffsetSource.Value.ColouredDimmableSharedData;
+
+                return null;
+            }
+        }
+
         protected override DrawNode CreateDrawNode() => new ColouredDimmableBufferedContainerDrawNode(this, SharedData);
 
         protected class ColouredDimmableBufferedContainerDrawNode : BufferedContainerDrawNode
@@ -83,45 +99,46 @@ namespace osu.Game.Graphics.Sprites
             {
             }
 
-            private Colour4 drawColourOffset;
+            private ColouredDimmableSharedData? colouredDimmableSharedData;
+
+            private IUniformBuffer<DimParameters>? dimParametersBuffer;
 
             public override void ApplyState()
             {
                 base.ApplyState();
 
-                drawColourOffset = Source.FrameBufferDrawColourOffset;
+                colouredDimmableSharedData = Source.FrameBufferColouredDimmableSharedData;
             }
-
-            private IUniformBuffer<DimParameters> dimParametersBuffer;
 
             protected override void BindUniformResources(IShader shader, IRenderer renderer)
             {
-                dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
-
-                dimParametersBuffer.Data = new DimParameters
+                if (colouredDimmableSharedData == null || colouredDimmableSharedData.OffsetParametersBuffer == null || DrawColourInfo.Blending == BlendingParameters.Additive)
                 {
-                    DimColour = new UniformVector4
-                    {
-                        X = drawColourOffset.R,
-                        Y = drawColourOffset.G,
-                        Z = drawColourOffset.B,
-                        W = drawColourOffset.A
-                    },
-                };
+                    dimParametersBuffer ??= renderer.CreateUniformBuffer<DimParameters>();
 
-                shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
+                    dimParametersBuffer.Data = new DimParameters
+                    {
+                        DimColour = new UniformVector4
+                        {
+                            X = 0.0f,
+                            Y = 0.0f,
+                            Z = 0.0f,
+                            W = 1.0f
+                        },
+                    };
+
+                    shader.BindUniformBlock("m_DimParameters", dimParametersBuffer);
+                }
+                else
+                {
+                    shader.BindUniformBlock("m_DimParameters", colouredDimmableSharedData.OffsetParametersBuffer);
+                }
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
                 dimParametersBuffer?.Dispose();
-            }
-
-            [StructLayout(LayoutKind.Sequential, Pack = 1)]
-            private record struct DimParameters
-            {
-                public UniformVector4 DimColour;
             }
         }
     }

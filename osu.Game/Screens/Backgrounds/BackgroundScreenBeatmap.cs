@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Play;
 using osuTK;
+using osu.Framework.Graphics.Rendering;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -173,6 +174,12 @@ namespace osu.Game.Screens.Backgrounds
                 ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
                 : new Vector2(BlurAmount.Value);
 
+
+            public DimmableBackground()
+            {
+                sharedData = new ColouredDimmableSharedData();
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
@@ -189,6 +196,8 @@ namespace osu.Game.Screens.Backgrounds
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             }
+
+            protected override DrawNode CreateDrawNode() => new DimmableBackgroundDrawNode(this, sharedData);
 
             protected override float DimLevel
             {
@@ -230,9 +239,13 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
+            private ColouredDimmableSharedData sharedData;
+
             public IColouredDimmable DrawColourOffsetSource => this;
 
             public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
+
+            public ColouredDimmableSharedData ColouredDimmableSharedData => sharedData;
 
             protected override void UpdateVisuals()
             {
@@ -241,6 +254,48 @@ namespace osu.Game.Screens.Backgrounds
                 this.TransformTo(nameof(ColourOffset), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                sharedData.Dispose();
+            }
+
+            protected class DimmableBackgroundDrawNode : CompositeDrawableDrawNode
+            {
+                public new DimmableBackground Source => (DimmableBackground)base.Source;
+
+                private ColouredDimmableSharedData sharedData;
+
+                private Colour4 drawColourOffset;
+
+                public DimmableBackgroundDrawNode(DimmableBackground source, ColouredDimmableSharedData sharedData)
+                    : base(source)
+                {
+                    this.sharedData = sharedData;
+                }
+
+                public override void ApplyState()
+                {
+                    base.ApplyState();
+
+                    drawColourOffset = (Source as IColouredDimmable).DrawColourOffset;
+                }
+
+                protected override void Draw(IRenderer renderer)
+                {
+                    // Update shared data before drawing children that rely on it
+                    if (!sharedData.IsInitialized())
+                    {
+                        sharedData.Initialize(renderer);
+                    }
+
+                    sharedData.SetDrawColourOffset(drawColourOffset);
+
+                    base.Draw(renderer);
+                }
             }
         }
     }
