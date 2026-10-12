@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
     {
         public RingPiece(float thickness = 9)
         {
-            Size = OsuHitObject.OBJECT_DIMENSIONS;
+            Size = OsuHitObject.VISUAL_OBJECT_DIMENSIONS;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
