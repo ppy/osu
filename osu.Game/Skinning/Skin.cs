@@ -379,6 +379,7 @@ namespace osu.Game.Skinning
 
             Textures?.Dispose();
             samples?.Dispose();
+            resourceHitSamples?.Dispose();
             hitSamples?.Dispose();
             FallbackStore?.Dispose();
 
