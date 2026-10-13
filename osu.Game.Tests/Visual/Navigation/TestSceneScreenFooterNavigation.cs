@@ -49,6 +49,35 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestChangeFooterContentOnCurrentScreen()
+        {
+            TestScreen testScreen = null!;
+
+            PushAndConfirm(() => testScreen = new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button One" }]),
+                },
+            });
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            AddStep("change button", () =>
+            {
+                testScreen.FooterContent.Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button Two" }]);
+            });
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+
+            AddStep("show legacy back button", () => testScreen.FooterContent.Value = ScreenFooterContent.Legacy(showBackButton: true));
+            AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("show nothing", () => testScreen.FooterContent.Value = ScreenFooterContent.None);
+            AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("back button hidden", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Hidden));
+        }
+
+        [Test]
         public void TestFooterHidesOldBackButton()
         {
             PushAndConfirm(() => new TestScreen
