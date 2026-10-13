@@ -448,6 +448,27 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Sprite's offset source is BufferedContainer", () => songSelect.IsSpritesOffsetSourceBufferedContainer());
         }
 
+        /// <summary>
+        /// Check if storyboard elements select correct colour offset source.
+        /// </summary>
+        [Test]
+        public void TestStoryboardOffsetSources()
+        {
+            performFullSetup();
+            createFakeStoryboardWithElements();
+
+            AddStep("Enable Storyboard", () =>
+            {
+                player.StoryboardEnabled.Value = true;
+            });
+
+            AddUntilStep("Sprite's source is DimmableStoryboard", () => testStoryboard.IsSpritesOffsetSource(player.DimmableStoryboard));
+            AddUntilStep("Additive sprite's source is DimmableStoryboard", () => testStoryboard.IsAdditiveSpritesOffsetSource(player.DimmableStoryboard));
+            AddUntilStep("Animation's source is DimmableStoryboard", () => testStoryboard.IsAnimationsOffsetSource(player.DimmableStoryboard));
+            AddUntilStep("Video's source is DimmableStoryboard", () => testStoryboard.IsVideosOffsetSource(player.DimmableStoryboard));
+        }
+
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
@@ -888,6 +909,14 @@ namespace osu.Game.Tests.Visual.Background
                 ));
             }
 
+            public bool IsSpritesOffsetSource(IColouredDimmable source) => testStoryboardSprite.IsOffsetSource(source);
+
+            public bool IsAdditiveSpritesOffsetSource(IColouredDimmable source) => testStoryboardAdditiveSprite.IsOffsetSource(source);
+
+            public bool IsAnimationsOffsetSource(IColouredDimmable source) => testStoryboardAnimation.IsOffsetSource(source);
+
+            public bool IsVideosOffsetSource(IColouredDimmable source) => testStoryboardVideo.IsOffsetSource(source);
+
             public override DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null)
             {
                 return new TestDrawableStoryboard(this, mods);
@@ -936,6 +965,8 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
+            public bool IsOffsetSource(IColouredDimmable source) => ReferenceEquals((drawableStoryboardSprite as IColouredDimmable).DrawColourOffsetSource, source);
+
             public override Drawable CreateDrawable() => drawableStoryboardSprite = new DrawableStoryboardSprite(this)
             {
                 Blending = additiveBlending ? BlendingParameters.Additive : BlendingParameters.None
@@ -952,6 +983,8 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
+            public bool IsOffsetSource(IColouredDimmable source) => testDrawableStoryboardAnimation.IsOffsetSource(source);
+
             public override Drawable CreateDrawable() => testDrawableStoryboardAnimation = new TestDrawableStoryboardAnimation(this);
 
             public partial class TestDrawableStoryboardAnimation : DrawableStoryboardAnimation
@@ -962,6 +995,8 @@ namespace osu.Game.Tests.Visual.Background
                     : base(storyboardAnimation)
                 {
                 }
+
+                public bool IsOffsetSource(IColouredDimmable source) => ReferenceEquals((dimmableSprite as IColouredDimmable).DrawColourOffsetSource, source);
 
                 protected override Sprite CreateSprite() => dimmableSprite = new ColouredDimmableSprite
                 {
@@ -982,6 +1017,8 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
+            public bool IsOffsetSource(IColouredDimmable source) => testDrawableStoryboardVideo.IsOffsetSource(source);
+
             public override Drawable CreateDrawable() => testDrawableStoryboardVideo = new TestDrawableStoryboardVideo(this);
 
             public partial class TestDrawableStoryboardVideo : DrawableStoryboardVideo
@@ -992,6 +1029,8 @@ namespace osu.Game.Tests.Visual.Background
                     : base(storyboardVideo)
                 {
                 }
+
+                public bool IsOffsetSource(IColouredDimmable source) => testDrawableVideo.IsOffsetSource(source);
 
                 protected override DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => testDrawableVideo = new TestDrawableVideo(stream, startAtCurrentTime)
                 {
@@ -1010,6 +1049,8 @@ namespace osu.Game.Tests.Visual.Background
                         : base(stream, startAtCurrentTime)
                     {
                     }
+
+                    public bool IsOffsetSource(IColouredDimmable source) => ReferenceEquals((drawableVideoSprite as IColouredDimmable).DrawColourOffsetSource, source);
 
                     protected override VideoSprite CreateSprite() => drawableVideoSprite = new DrawableVideoSprite(this);
                 }
