@@ -364,10 +364,10 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Check if storyboard elements receive correct DrawColourOffset.
+        /// Check if storyboard interacts properly with background.
         /// </summary>
         [Test]
-        public void TestStoryboardElementsDimmedWithColourOffset()
+        public void TestStoryboardEffectOnBackground()
         {
             performFullSetup();
             createFakeStoryboardWithElements();
@@ -378,8 +378,6 @@ namespace osu.Game.Tests.Visual.Background
             });
 
             AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
-            verifyStoryboardColourOffset();
-            verifyAdditiveSpriteIsNotOffset();
 
             AddStep("Replace background", () =>
             {
@@ -387,8 +385,6 @@ namespace osu.Game.Tests.Visual.Background
             });
 
             AddUntilStep("Background is fully dimmed and dim colour adjusted", () => songSelect.IsBackgroundFullyDimmed() && songSelect.IsBackgroundColourOffset());
-            verifyStoryboardColourOffset();
-            verifyAdditiveSpriteIsNotOffset();
 
             AddStep("Ignore user settings", () =>
             {
@@ -397,8 +393,6 @@ namespace osu.Game.Tests.Visual.Background
             });
 
             AddUntilStep("Background is black", () => songSelect.IsBackgroundBlack());
-            verifyStoryboardColourNotOffset();
-            verifyAdditiveSpriteIsNotOffset();
         }
 
         [Test]
@@ -457,51 +451,6 @@ namespace osu.Game.Tests.Visual.Background
 
             player.DimmableStoryboard.Add(drawableStoryboard);
             player.DimmableStoryboard.OverlayLayerContainer.Add(drawableStoryboard.OverlayLayer.CreateProxy());
-        });
-
-        private void verifyStoryboardColourOffset() => AddUntilStep("Storyboard elements colour is offset", () =>
-        {
-            Colour4? spriteColourOffset = testStoryboard?.GetSpriteColourOffset();
-            if (spriteColourOffset == null)
-                return false;
-
-            Colour4? animationColourOffset = testStoryboard?.GetAnimationColourOffset();
-            if (animationColourOffset == null)
-                return false;
-
-            Colour4? videoColourOffset = testStoryboard?.GetVideoColourOffset();
-            if (videoColourOffset == null)
-                return false;
-
-            Colour4 targetColourOffset = player.StoryboardTargetColourOffset();
-
-            return spriteColourOffset == targetColourOffset && animationColourOffset == targetColourOffset && videoColourOffset == targetColourOffset;
-        });
-
-        private void verifyStoryboardColourNotOffset() => AddUntilStep("Storyboard elements colour is not offset", () =>
-        {
-            Colour4? spriteColourOffset = testStoryboard?.GetSpriteColourOffset();
-            if (spriteColourOffset == null)
-                return false;
-
-            Colour4? animationColourOffset = testStoryboard?.GetAnimationColourOffset();
-            if (animationColourOffset == null)
-                return false;
-
-            Colour4? videoColourOffset = testStoryboard?.GetVideoColourOffset();
-            if (videoColourOffset == null)
-                return false;
-
-            return spriteColourOffset == Colour4.Black && animationColourOffset == Colour4.Black && videoColourOffset == Colour4.Black;
-        });
-
-        private void verifyAdditiveSpriteIsNotOffset() => AddUntilStep("Additive sprite is not offset", () =>
-        {
-            Colour4? additiveSpriteColourOffset = testStoryboard?.GetAdditiveSpriteColourOffset();
-            if (additiveSpriteColourOffset == null)
-                return false;
-
-            return additiveSpriteColourOffset == Colour4.Black;
         });
 
         private void performFullSetup(bool allowPause = false)
@@ -697,9 +646,28 @@ namespace osu.Game.Tests.Visual.Background
 
             protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
 
+            // BeatmapBackground shader uses mix function to apply dimming with colour, which can be extended as:
+            // mix(TextureColour, DimColour, DimLevel) = TextureColour * (1 - DimLevel) + DimColour * DimLevel
+            // The result is then multiplied by vertex colour (supplied by DrawColourInfo.Colour),
+            // which can apply some external dimming that shouldn't be affected by DimColour
+            // (for example - opening settings during replay, pausing, etc.):
+            // FinalColour = DrawColourInfo.Colour * mix(TextureColour, DimColour, DimLevel)
+            // FinalColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel) + DrawColourInfo.Colour * DimColour * DimLevel
+            //
+            // These two parts can be split into separate variables:
+            // CurrentColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel)
+            // CurrentColourOffset = DrawColourInfo.Colour * DimColour * DimLevel
+            //
+            // CurrentColour can be used to track how much the texture was dimmed, and
+            // CurrentColourOffset can be used to track how much colour was added as an offset.
+            //
+            // Two separate variables are needed because just one Colour variable would be ambiguous, for example:
+            // if Colour == Colour4.White, that could mean either that
+            // DimLevel == 0.0, or
+            // DimLevel == 1.0 and DimColour == Colour4.White.
             public Colour4 CurrentColour => beatmapBackground.CurrentColour;
 
-            public Colour4 CurrentColourOffset => beatmapBackground.CurrentColourOffset;
+            public Colour4 CurrentColourOffset => dimmable.DrawColourOffset;
 
             public bool IsSpriteDimmed => beatmapBackground.IsSpriteDimmed;
 
@@ -757,28 +725,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             public static bool AllowBlur = true;
 
-            // BeatmapBackground shader uses mix function to apply dimming with colour, which can be extended as:
-            // mix(TextureColour, DimColour, DimLevel) = TextureColour * (1 - DimLevel) + DimColour * DimLevel
-            // The result is then multiplied by vertex colour (supplied by DrawColourInfo.Colour),
-            // which can apply some external dimming that shouldn't be affected by DimColour
-            // (for example - opening settings during replay, pausing, etc.):
-            // FinalColour = DrawColourInfo.Colour * mix(TextureColour, DimColour, DimLevel)
-            // FinalColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel) + DrawColourInfo.Colour * DimColour * DimLevel
-            //
-            // These two parts can be split into separate variables:
-            // CurrentColour = DrawColourInfo.Colour * TextureColour * (1 - DimLevel)
-            // CurrentColourOffset = DrawColourInfo.Colour * DimColour * DimLevel
-            //
-            // CurrentColour can be used to track how much the texture was dimmed, and
-            // CurrentColourOffset can be used to track how much colour was added as an offset.
-            //
-            // Two separate variables are needed because just one Colour variable would be ambiguous, for example:
-            // if Colour == Colour4.White, that could mean either that
-            // DimLevel == 0.0, or
-            // DimLevel == 1.0 and DimColour == Colour4.White.
             public Colour4 CurrentColour => ColouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? ColouredDimmableSprite.DrawColourInfo.Colour;
-
-            public Colour4 CurrentColourOffset => ColouredDimmableBufferedContainer?.FrameBufferDrawColourOffset ?? (ColouredDimmableSprite as IColouredDimmable).DrawColourOffset;
 
             public bool IsSpriteDimmed => ColouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
 
@@ -884,11 +831,6 @@ namespace osu.Game.Tests.Visual.Background
                 ));
             }
 
-            public Colour4? GetSpriteColourOffset() => testStoryboardSprite?.GetDrawColourOffset();
-            public Colour4? GetAdditiveSpriteColourOffset() => testStoryboardAdditiveSprite?.GetDrawColourOffset();
-            public Colour4? GetAnimationColourOffset() => testStoryboardAnimation?.GetDrawColourOffset();
-            public Colour4? GetVideoColourOffset() => testStoryboardVideo?.GetDrawColourOffset();
-
             public override DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null)
             {
                 return new TestDrawableStoryboard(this, mods);
@@ -937,8 +879,6 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
-            public Colour4? GetDrawColourOffset() => (drawableStoryboardSprite as IColouredDimmable)?.DrawColourOffset;
-
             public override Drawable CreateDrawable() => drawableStoryboardSprite = new DrawableStoryboardSprite(this)
             {
                 Blending = additiveBlending ? BlendingParameters.Additive : BlendingParameters.None
@@ -955,8 +895,6 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
-            public Colour4? GetDrawColourOffset() => testDrawableStoryboardAnimation?.GetDrawColourOffset();
-
             public override Drawable CreateDrawable() => testDrawableStoryboardAnimation = new TestDrawableStoryboardAnimation(this);
 
             public partial class TestDrawableStoryboardAnimation : DrawableStoryboardAnimation
@@ -967,8 +905,6 @@ namespace osu.Game.Tests.Visual.Background
                     : base(storyboardAnimation)
                 {
                 }
-
-                public Colour4? GetDrawColourOffset() => (dimmableSprite as IColouredDimmable)?.DrawColourOffset;
 
                 protected override Sprite CreateSprite() => dimmableSprite = new ColouredDimmableSprite
                 {
@@ -989,8 +925,6 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
-            public Colour4? GetDrawColourOffset() => testDrawableStoryboardVideo?.GetDrawColourOffset();
-
             public override Drawable CreateDrawable() => testDrawableStoryboardVideo = new TestDrawableStoryboardVideo(this);
 
             public partial class TestDrawableStoryboardVideo : DrawableStoryboardVideo
@@ -1001,8 +935,6 @@ namespace osu.Game.Tests.Visual.Background
                     : base(storyboardVideo)
                 {
                 }
-
-                public Colour4? GetDrawColourOffset() => testDrawableVideo?.GetDrawColourOffset();
 
                 protected override DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => testDrawableVideo = new TestDrawableVideo(stream, startAtCurrentTime)
                 {
@@ -1021,8 +953,6 @@ namespace osu.Game.Tests.Visual.Background
                         : base(stream, startAtCurrentTime)
                     {
                     }
-
-                    public Colour4? GetDrawColourOffset() => (drawableVideoSprite as IColouredDimmable)?.DrawColourOffset;
 
                     protected override VideoSprite CreateSprite() => drawableVideoSprite = new DrawableVideoSprite(this);
                 }
