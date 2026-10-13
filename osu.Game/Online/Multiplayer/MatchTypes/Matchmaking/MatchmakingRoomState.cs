@@ -101,6 +101,8 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.Matchmaking
 
                     MatchmakingRound mmRound = mmUser.Rounds.GetOrAdd(CurrentRound);
                     mmRound.Placement = placement;
+                    // This uses mod-adjusted total score which may be unexpected if players are able to play with their own mod preference.
+                    // Consider using TotalScoreWithoutMods if Quick Play is revived as a playable game mode.
                     mmRound.TotalScore = score.TotalScore;
                     mmRound.Accuracy = score.Accuracy;
                     mmRound.MaxCombo = score.MaxCombo;

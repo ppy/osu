@@ -409,18 +409,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 {
                     const double score_text_duration = 2000;
 
-                    playerScoreCounter.TransformValueTo(PlayerScore.TotalScore, score_text_duration - 500);
-                    opponentScoreCounter.TransformValueTo(OpponentScore.TotalScore, score_text_duration - 500);
+                    playerScoreCounter.TransformValueTo(PlayerScore.TotalScoreWithoutMods, score_text_duration - 500);
+                    opponentScoreCounter.TransformValueTo(OpponentScore.TotalScoreWithoutMods, score_text_duration - 500);
 
                     damageCounter.TransformValueTo(losingDamageInfo.DirectDamage, score_text_duration - 500);
 
                     long maxAchievableScore = Math.Max(
-                        Math.Max(PlayerScore.TotalScore, OpponentScore.TotalScore),
+                        Math.Max(PlayerScore.TotalScoreWithoutMods, OpponentScore.TotalScoreWithoutMods),
                         1_000_000
                     );
 
-                    float playerScorePercent = (float)PlayerScore.TotalScore / maxAchievableScore;
-                    float opponentScorePercent = (float)OpponentScore.TotalScore / maxAchievableScore;
+                    float playerScorePercent = (float)PlayerScore.TotalScoreWithoutMods / maxAchievableScore;
+                    float opponentScorePercent = (float)OpponentScore.TotalScoreWithoutMods / maxAchievableScore;
                     float maxScorePercent = Math.Max(playerScorePercent, opponentScorePercent);
 
                     playerScoreBar.FadeIn(100);
@@ -443,10 +443,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         if (losingDamageInfo.Damage > 0)
                             pseudoScoreCounterSample.Play();
 
-                        if (PlayerScore.TotalScore > 0)
+                        if (PlayerScore.TotalScoreWithoutMods > 0)
                             playerScoreTickChannel.Play();
 
-                        if (OpponentScore.TotalScore > 0)
+                        if (OpponentScore.TotalScoreWithoutMods > 0)
                             opponentScoreTickChannel.Play();
                     });
 
@@ -571,7 +571,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 if (damageBreakdowns.Count > 0)
                     delay += 600;
 
-                bool playerTookDamage = OpponentScore.TotalScore > PlayerScore.TotalScore;
+                bool playerTookDamage = OpponentScore.TotalScoreWithoutMods > PlayerScore.TotalScoreWithoutMods;
                 double loserPanDirection = playerTookDamage ? -OsuGameBase.SFX_STEREO_STRENGTH : OsuGameBase.SFX_STEREO_STRENGTH;
 
                 using (BeginDelayedSequence(delay))
@@ -579,7 +579,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     Schedule(() =>
                     {
                         RankedPlayUserDisplay userDisplay =
-                            PlayerScore.TotalScore > OpponentScore.TotalScore
+                            PlayerScore.TotalScoreWithoutMods > OpponentScore.TotalScoreWithoutMods
                                 ? opponentUserDisplay
                                 : playerUserDisplay;
 

@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             public Dictionary<int, IReadOnlyList<Mod>> UserMods => UserScores.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ScoreProcessor.Mods);
 
             public TestLeaderboard(MultiplayerRoomUser[] users)
-                : base(users)
+                : base(users, false)
             {
             }
         }
