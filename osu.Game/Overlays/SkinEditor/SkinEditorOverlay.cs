@@ -31,6 +31,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 using osu.Game.Utils;
+using osu.Game.Database;
 
 namespace osu.Game.Overlays.SkinEditor
 {
@@ -71,7 +72,18 @@ namespace osu.Game.Overlays.SkinEditor
         private Bindable<RulesetInfo> ruleset { get; set; } = null!;
 
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+        private Bindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        [Resolved]
+        private DifficultyRecommender? difficultyRecommender { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        private readonly Bindable<bool> showConvertedBeatmaps = new Bindable<bool>();
 
         private OsuScreen? lastTargetScreen;
         private InvokeOnDisposal? nestedInputManagerDisable;
@@ -92,6 +104,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
             config.BindWith(OsuSetting.HUDVisibilityMode, configVisibilityMode);
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConvertedBeatmaps);
         }
 
         protected override void LoadComplete()
@@ -195,8 +208,13 @@ namespace osu.Game.Overlays.SkinEditor
 
                 // the validity of the current game-wide beatmap + ruleset combination is enforced by song select.
                 // if we're anywhere else, the state is unknown and may not make sense, so forcibly set something that does.
-                if (screen is not SoloSongSelect)
-                    ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
+                if (screen is not SoloSongSelect && !beatmap.Value.BeatmapInfo.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value))
+                {
+                    if (getBeatmapForCurrentRuleset() is BeatmapInfo targetMap)
+                        beatmap.Value = beatmapManager.GetWorkingBeatmap(targetMap);
+                    else
+                        ruleset.Value = beatmap.Value.BeatmapInfo.Ruleset;
+                }
                 var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
 
                 IReadOnlyList<Mod> usableMods = mods.Value;
@@ -212,6 +230,29 @@ namespace osu.Game.Overlays.SkinEditor
             }, new[] { typeof(Player), typeof(SoloSongSelect) });
         }
 
+        private BeatmapInfo? getBeatmapForCurrentRuleset()
+        {
+            //first check if the current beatmap set has any other maps that are valid for the current ruleset
+            var activeSet = beatmap.Value.BeatmapSetInfo;
+            var validBeatmaps = activeSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
+
+            if (validBeatmaps.Any())
+                return difficultyRecommender?.GetRecommendedBeatmap(validBeatmaps) ?? validBeatmaps.First();
+
+            //otherwise get a random beatmap set in the current ruleset
+            var allValidBeatmapSets = realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending)
+                .AsEnumerable()
+                .Where(s => s.Beatmaps.Any(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value)));
+
+            if (allValidBeatmapSets.Any())
+            {
+                var randomSet = allValidBeatmapSets.ElementAt(Random.Shared.Next(allValidBeatmapSets.Count()));
+                var randomSetValidMaps = randomSet.Beatmaps.Where(m => m.AllowGameplayWithRuleset(ruleset.Value, showConvertedBeatmaps.Value));
+                return difficultyRecommender?.GetRecommendedBeatmap(randomSetValidMaps) ?? randomSetValidMaps.First();
+            }
+
+            return null;
+        }
         protected override void Update()
         {
             base.Update();
