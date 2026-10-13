@@ -119,32 +119,29 @@ namespace osu.Game.Screens.Edit
                 [1] = new SampleSet(1),
             };
 
-            if (Skin.Samples != null)
+            foreach (string sample in Skin.AllAvailableSamples)
             {
-                foreach (string sample in Skin.Samples.GetAvailableResources())
+                foreach (string possiblePrefix in possiblePrefixes)
                 {
-                    foreach (string possiblePrefix in possiblePrefixes)
-                    {
-                        if (!sample.StartsWith(possiblePrefix, StringComparison.Ordinal))
-                            continue;
+                    if (!sample.StartsWith(possiblePrefix, StringComparison.Ordinal))
+                        continue;
 
-                        string indexString = Path.GetFileNameWithoutExtension(sample)[possiblePrefix.Length..];
-                        int? index = null;
+                    string indexString = Path.GetFileNameWithoutExtension(sample)[possiblePrefix.Length..];
+                    int? index = null;
 
-                        if (string.IsNullOrEmpty(indexString))
-                            index = 1;
-                        if (int.TryParse(indexString, out int parsed) && parsed >= 2)
-                            index = parsed;
+                    if (string.IsNullOrEmpty(indexString))
+                        index = 1;
+                    if (int.TryParse(indexString, out int parsed) && parsed >= 2)
+                        index = parsed;
 
-                        if (!index.HasValue)
-                            continue;
+                    if (!index.HasValue)
+                        continue;
 
-                        SampleSet? sampleSet;
-                        if (!sampleSets.TryGetValue(index.Value, out sampleSet))
-                            sampleSet = sampleSets[index.Value] = new SampleSet(index.Value);
+                    SampleSet? sampleSet;
+                    if (!sampleSets.TryGetValue(index.Value, out sampleSet))
+                        sampleSet = sampleSets[index.Value] = new SampleSet(index.Value);
 
-                        sampleSet.Filenames.Add(sample);
-                    }
+                    sampleSet.Filenames.Add(sample);
                 }
             }
 
