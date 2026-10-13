@@ -49,14 +49,29 @@ namespace osu.Game.Graphics.Sprites
         }
 
         // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
+        public IColouredDimmable DrawColourOffsetSource => this;
         public ColouredDimmableSharedData? ColouredDimmableSharedData => null;
+
+        public IColouredDimmable FrameBufferDrawColourOffsetSource
+        {
+            get
+            {
+                if (Parent is IColouredDimmable colouredDimmableParent)
+                    return colouredDimmableParent.DrawColourOffsetSource;
+                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
+                    // Needed to skip intermediate containers.
+                    return colouredDimmableGrandparent.DrawColourOffsetSource;
+
+                return this;
+            }
+        }
 
         public ColouredDimmableSharedData? FrameBufferColouredDimmableSharedData
         {
             get
             {
                 if (!drawColourOffsetSource.IsValid)
-                    drawColourOffsetSource.Value = (this as IColouredDimmable).DrawColourOffsetSource;
+                    drawColourOffsetSource.Value = FrameBufferDrawColourOffsetSource;
 
                 if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
                     return drawColourOffsetSource.Value.ColouredDimmableSharedData;

@@ -797,7 +797,7 @@ namespace osu.Game.Tests.Visual.Background
             {
             }
 
-            public bool IsBufferedContainersOffsetSource(IColouredDimmable source) => ReferenceEquals((dimmableBufferedContainer as IColouredDimmable).DrawColourOffsetSource, source);
+            public bool IsBufferedContainersOffsetSource(IColouredDimmable source) => ReferenceEquals(dimmableBufferedContainer.FrameBufferDrawColourOffsetSource, source);
 
             public bool IsSpritesOffsetSource(IColouredDimmable source) => ReferenceEquals((ColouredDimmableSprite as IColouredDimmable).DrawColourOffsetSource, source);
 
