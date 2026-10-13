@@ -420,6 +420,34 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Background's colour is offset", () => songSelect.IsBackgroundColourOffset());
         }
 
+        /// <summary>
+        /// Check if both the Sprite and BufferedContainer select correct colour offset source.
+        /// </summary>
+        [Test]
+        public void TestDimmingOffsetSources()
+        {
+            AddStep("Disallow blurring", () => TestBeatmapBackground.AllowBlur = false);
+
+            SetUpSteps();
+
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is not initialized", () => songSelect.IsBufferedContainerNull());
+            AddUntilStep("Sprite's offset source is DimmableBackground", () => songSelect.IsSpritesOffsetSourceDimmableBackground());
+
+            AddStep("Allow blurring", () => TestBeatmapBackground.AllowBlur = true);
+
+            SetUpSteps();
+
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
+            AddUntilStep("BufferedContainer is initialized", () => !songSelect.IsBufferedContainerNull());
+            AddUntilStep("BufferedContainer's offset source is DimmableBackground", () => songSelect.IsBufferedContainersOffsetSourceDimmableBackground());
+            AddUntilStep("Sprite's offset source is BufferedContainer", () => songSelect.IsSpritesOffsetSourceBufferedContainer());
+        }
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
@@ -569,6 +597,12 @@ namespace osu.Game.Tests.Visual.Background
                 get => background.RequiredRedraw;
                 set => background.RequiredRedraw = value;
             }
+
+            public bool IsSpritesOffsetSourceDimmableBackground() => background.IsSpritesOffsetSourceDimmableBackground;
+
+            public bool IsSpritesOffsetSourceBufferedContainer() => background.IsSpritesOffsetSourceBufferedContainer;
+
+            public bool IsBufferedContainersOffsetSourceDimmableBackground() => background.IsBufferedContainersOffsetSourceDimmableBackground;
         }
 
         private partial class FadeAccessibleResults : ResultsScreen
@@ -696,6 +730,12 @@ namespace osu.Game.Tests.Visual.Background
 
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
+            public bool IsSpritesOffsetSourceDimmableBackground => beatmapBackground.IsSpritesOffsetSource(dimmable);
+
+            public bool IsSpritesOffsetSourceBufferedContainer => beatmapBackground.IsSpritesOffsetSourceBufferedContainer;
+
+            public bool IsBufferedContainersOffsetSourceDimmableBackground => beatmapBackground.IsBufferedContainersOffsetSource(dimmable);
+
             public bool RequiredRedraw
             {
                 get => beatmapBackground.RequiredRedraw;
@@ -756,6 +796,12 @@ namespace osu.Game.Tests.Visual.Background
                 : base(beatmap)
             {
             }
+
+            public bool IsBufferedContainersOffsetSource(IColouredDimmable source) => ReferenceEquals((dimmableBufferedContainer as IColouredDimmable).DrawColourOffsetSource, source);
+
+            public bool IsSpritesOffsetSource(IColouredDimmable source) => ReferenceEquals((ColouredDimmableSprite as IColouredDimmable).DrawColourOffsetSource, source);
+
+            public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(dimmableBufferedContainer);
 
             public override void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
             {
