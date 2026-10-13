@@ -825,8 +825,8 @@ namespace osu.Game.Tests.Visual.Background
             // headless testing mode, so an indirect check is used (see RequiresChildrenUpdate).
             public bool RequiredRedraw;
 
-            public TestDimmableBufferedContainer(RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
-                : base(formats, pixelSnapping, cachedFrameBuffer)
+            public TestDimmableBufferedContainer(TexturePixelFormat textureFormat = TexturePixelFormat.R8G8B8A8Float, RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+                : base(textureFormat, formats, pixelSnapping, cachedFrameBuffer)
             {
             }
 
@@ -852,6 +852,7 @@ namespace osu.Game.Tests.Visual.Background
             public TestStoryboard()
             {
                 GetLayer("Foreground").Add(testStoryboardSprite = new TestStoryboardSprite(
+                    source: StoryboardElementSource.Beatmap,
                     path: "Resources/Textures/test-image.png",
                     origin: Anchor.Centre,
                     initialPosition: new Vector2(200, 200),
@@ -859,6 +860,7 @@ namespace osu.Game.Tests.Visual.Background
                 ));
 
                 GetLayer("Foreground").Add(testStoryboardAdditiveSprite = new TestStoryboardSprite(
+                    source: StoryboardElementSource.Beatmap,
                     path: "Resources/Textures/test-image.png",
                     origin: Anchor.Centre,
                     initialPosition: new Vector2(500, 200),
@@ -866,6 +868,7 @@ namespace osu.Game.Tests.Visual.Background
                 ));
 
                 GetLayer("Foreground").Add(testStoryboardAnimation = new TestStoryboardAnimation(
+                    source: StoryboardElementSource.Beatmap,
                     path: "Resources/Textures/test-image.png",
                     origin: Anchor.Centre,
                     initialPosition: new Vector2(0, 0),
@@ -875,6 +878,7 @@ namespace osu.Game.Tests.Visual.Background
                 ));
 
                 GetLayer("Video").Add(testStoryboardVideo = new TestStoryboardVideo(
+                    source: StoryboardElementSource.Beatmap,
                     path: "Resources/Videos/test-video.mp4",
                     offset: 0
                 ));
@@ -926,8 +930,8 @@ namespace osu.Game.Tests.Visual.Background
             private DrawableStoryboardSprite drawableStoryboardSprite;
             private readonly bool additiveBlending;
 
-            public TestStoryboardSprite(string path, Anchor origin, Vector2 initialPosition, bool additiveBlending)
-                : base(path, origin, initialPosition)
+            public TestStoryboardSprite(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition, bool additiveBlending)
+                : base(source, path, origin, initialPosition)
             {
                 this.additiveBlending = additiveBlending;
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
@@ -945,8 +949,8 @@ namespace osu.Game.Tests.Visual.Background
         {
             private TestDrawableStoryboardAnimation testDrawableStoryboardAnimation;
 
-            public TestStoryboardAnimation(string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
-                : base(path, origin, initialPosition, frameCount, frameDelay, loopType)
+            public TestStoryboardAnimation(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
+                : base(source, path, origin, initialPosition, frameCount, frameDelay, loopType)
             {
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
@@ -979,8 +983,8 @@ namespace osu.Game.Tests.Visual.Background
         {
             private TestDrawableStoryboardVideo testDrawableStoryboardVideo;
 
-            public TestStoryboardVideo(string path, double offset)
-                : base(path, offset)
+            public TestStoryboardVideo(StoryboardElementSource source, string path, double offset)
+                : base(source, path, offset)
             {
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
