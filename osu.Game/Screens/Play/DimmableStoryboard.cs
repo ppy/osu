@@ -130,6 +130,8 @@ namespace osu.Game.Screens.Play
         {
             get
             {
+                // This assumes that DimColour shouldn't be affected by DimWhenUserSettingsIgnored
+                // (as it's used to dim things in song select only)
                 if (IgnoreUserSettings.Value)
                     return Colour4.Black;
 

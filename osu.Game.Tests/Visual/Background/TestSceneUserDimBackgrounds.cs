@@ -525,7 +525,18 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundFullyDimmed() => background.CurrentColour == Colour4.Black;
 
-            public bool IsBackgroundUndimmed() => background.CurrentColour == background.ParentDrawColour && background.CurrentColourOffset == Colour4.Black;
+            public bool IsBackgroundUndimmed() => CurrentColourAlmostEqualsParentColour() && background.CurrentColourOffset == Colour4.Black;
+
+            public bool CurrentColourAlmostEqualsParentColour()
+            {
+                float scale = ParentColourScale();
+                return Precision.AlmostEquals(background.CurrentColour.R, background.ParentDrawColour.R * scale, 0.01f) &&
+                       Precision.AlmostEquals(background.CurrentColour.G, background.ParentDrawColour.G * scale, 0.01f) &&
+                       Precision.AlmostEquals(background.CurrentColour.B, background.ParentDrawColour.B * scale, 0.01f) &&
+                       Precision.AlmostEquals(background.CurrentColour.A, background.ParentDrawColour.A, 0.01f);
+            }
+
+            public float ParentColourScale() => background.IgnoreUserSettings.Value ? (1f - background.DimWhenUserSettingsIgnored.Value) : 1f;
 
             public Colour4 BackgroundTargetColourOffset() => background.ParentDrawColour * background.CurrentDimColour;
 
