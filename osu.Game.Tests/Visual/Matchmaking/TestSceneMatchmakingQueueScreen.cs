@@ -3,9 +3,11 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
@@ -84,15 +86,27 @@ namespace osu.Game.Tests.Visual.Matchmaking
         }
 
         [Test]
-        public void TestRoomScreenPushNullHandling()
+        public void TestRoomScreenPushDelayedRoomJoin()
         {
+            long createdRoomId = 0;
+
             AddStep("leave room", () => MultiplayerClient.LeaveRoom());
+            AddUntilStep("wait for room leave", () => !MultiplayerClient.RoomJoined);
 
-            AddWaitStep("wait for room leave", 5);
+            AddStep("create new room", () =>
+            {
+                var room = CreateDefaultRoom(MatchType.Matchmaking);
+                room.Password = "password";
+                MultiplayerClient.AddServerSideRoom(room, new APIUser { Id = 3 });
 
-            AddStep("change state to in room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom));
+                createdRoomId = MultiplayerClient.ServerSideRooms.Last().RoomID!.Value;
+            });
 
-            AddWaitStep("wait a little bit", 10);
+            AddStep("signal room ready", () =>
+            {
+                MultiplayerClient.RoomSetupAction = _ => Thread.Sleep(2500);
+                ((IMatchmakingClient)MultiplayerClient).MatchmakingRoomReady(createdRoomId, "password").FireAndForget();
+            });
         }
 
         private static double generateCount(double x, double mean, double stdDev, double amplitude)
