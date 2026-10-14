@@ -6,12 +6,17 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract partial class SettingsFilterableGroup : CompositeDrawable, IFilterable
+    /// <summary>
+    /// Sometimes we want a group of settings to show together when any of the contained filter terms matches.
+    /// Surrounding drawables with this container will ensure that happens.
+    /// </summary>
+    public sealed partial class SettingsFilterableGroup : FillFlowContainer, IFilterable
     {
-        public IEnumerable<LocalisableString> FilterTerms => InternalChildren.OfType<IFilterable>().SelectMany(f => f.FilterTerms);
+        public IEnumerable<LocalisableString> FilterTerms => Children.OfType<IFilterable>().SelectMany(f => f.FilterTerms);
 
         public bool MatchingFilter
         {
@@ -19,5 +24,13 @@ namespace osu.Game.Overlays.Settings
         }
 
         public bool FilteringActive { get; set; }
+
+        public SettingsFilterableGroup()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
+            Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2);
+        }
     }
 }
