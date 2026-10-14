@@ -70,18 +70,17 @@ namespace osu.Game.Overlays.Settings.Sections
                             Caption = SkinSettingsStrings.CurrentSkin,
                             Current = skins.CurrentSkinInfo,
                         }),
-                        new FillFlowContainer
+                        new SettingsFilterableGroup
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Horizontal,
+                            Spacing = Vector2.Zero,
                             Padding = SettingsPanel.CONTENT_PADDING,
                             Children = new Drawable[]
                             {
                                 // This is all super-temporary until we move skin settings to their own panel / overlay.
-                                new RenameSkinButton { Padding = new MarginPadding { Right = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
-                                new ExportSkinButton { Padding = new MarginPadding { Horizontal = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
-                                new DeleteSkinButton { Padding = new MarginPadding { Left = 2.5f }, RelativeSizeAxes = Axes.X, Width = 1 / 3f },
+                                new RenameSkinButton { RelativeSizeAxes = Axes.X, Width = 1 / 3f, Padding = new MarginPadding { Right = 2.5f } },
+                                new ExportSkinButton { RelativeSizeAxes = Axes.X, Width = 1 / 3f, Padding = new MarginPadding { Horizontal = 2.5f } },
+                                new DeleteSkinButton { RelativeSizeAxes = Axes.X, Width = 1 / 3f, Padding = new MarginPadding { Left = 2.5f } },
                             }
                         },
                     }
