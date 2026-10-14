@@ -131,8 +131,6 @@ namespace osu.Game.Screens.Select
 
         public override bool? ApplyModTrackAdjustments => true;
 
-        public override bool ShowFooter => true;
-
         private Sample? errorSample;
 
         [Resolved]
@@ -170,6 +168,11 @@ namespace osu.Game.Screens.Select
         private Bindable<bool> showConvertedBeatmaps = null!;
 
         private IDisposable? modSelectOverlayRegistration;
+
+        protected SongSelect()
+        {
+            FooterContent.Value = ScreenFooterContent.Argon(leftButtons: CreateFooterButtons);
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
@@ -350,7 +353,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected abstract void OnStart();
 
-        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
+        public virtual IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new ScreenFooterButton[]
         {
             new FooterButtonMods(modSelectOverlay)
             {
