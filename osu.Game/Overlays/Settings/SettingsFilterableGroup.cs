@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings
     /// </summary>
     public sealed partial class SettingsFilterableGroup : FillFlowContainer, IFilterable
     {
-        public IEnumerable<LocalisableString> FilterTerms => Children.OfType<IFilterable>().SelectMany(f => f.FilterTerms);
+        public IEnumerable<LocalisableString> FilterTerms => Children.OfType<IHasFilterTerms>().SelectMany(f => f.FilterTerms);
 
         public bool MatchingFilter
         {
