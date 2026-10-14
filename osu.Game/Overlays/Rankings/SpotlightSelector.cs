@@ -10,14 +10,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
@@ -42,7 +40,7 @@ namespace osu.Game.Overlays.Rankings
         }
 
         private readonly Box background;
-        private readonly SpotlightsDropdown dropdown;
+        private readonly RankingSelectorDropdown<APISpotlight> dropdown;
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
         private readonly InfoColumn mapCountColumn;
@@ -74,10 +72,11 @@ namespace osu.Game.Overlays.Rankings
                             new Container
                             {
                                 Margin = new MarginPadding { Vertical = 20 },
+                                Padding = new MarginPadding { Vertical = 20 },
                                 RelativeSizeAxes = Axes.X,
                                 Height = 40,
                                 Depth = -float.MaxValue,
-                                Child = dropdown = new SpotlightsDropdown
+                                Child = dropdown = new RankingSelectorDropdown<APISpotlight>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Current = Current
@@ -172,44 +171,6 @@ namespace osu.Game.Overlays.Rankings
             private void load(OverlayColourProvider colourProvider)
             {
                 valueText.Colour = colourProvider.Content2;
-            }
-        }
-
-        private partial class SpotlightsDropdown : OsuDropdown<APISpotlight>
-        {
-            private OsuDropdownMenu menu;
-
-            protected override DropdownMenu CreateMenu() => menu = (OsuDropdownMenu)base.CreateMenu().With(m => m.MaxHeight = 400);
-
-            protected override DropdownHeader CreateHeader() => new SpotlightsDropdownHeader();
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                menu.BackgroundColour = colourProvider.Background5;
-                menu.HoverColour = colourProvider.Background4;
-                menu.SelectionColour = colourProvider.Background3;
-                Padding = new MarginPadding { Vertical = 20 };
-            }
-
-            private partial class SpotlightsDropdownHeader : OsuDropdownHeader
-            {
-                public SpotlightsDropdownHeader()
-                {
-                    AutoSizeAxes = Axes.Y;
-                    Text.Font = OsuFont.GetFont(size: 15);
-                    Text.Padding = new MarginPadding { Vertical = 1.5f }; // osu-web line-height difference compensation
-                    Foreground.Padding = new MarginPadding { Horizontal = 10, Vertical = 15 };
-                    Margin = Chevron.Margin = new MarginPadding(0);
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OverlayColourProvider colourProvider)
-                {
-                    BackgroundColour = colourProvider.Background6.Opacity(0.5f);
-                    // osu-web adds a 0.6 opacity container on top of the 0.5 base one when hovering, 0.8 on a single container here matches the resulting colour
-                    BackgroundColourHover = colourProvider.Background6.Opacity(0.8f);
-                }
             }
         }
     }
