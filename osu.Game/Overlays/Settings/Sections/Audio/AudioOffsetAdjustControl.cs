@@ -161,14 +161,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 applySuggestion.Enabled.Value = false;
                 notchContainer.Hide();
                 hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetNote, SettingsNote.Type.Informational);
-                hintNote.MoveToY(0, 200, Easing.OutQuint);
+                hintNote.MoveToY(-SettingsSection.ITEM_SPACING_V2, 200, Easing.OutQuint);
             }
             else if (Math.Abs(SuggestedOffset.Value.Value - current.Value) < 1)
             {
                 applySuggestion.Enabled.Value = false;
                 notchContainer.Show();
                 hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count), SettingsNote.Type.Informational);
-                hintNote.MoveToY(10, 200, Easing.OutQuint);
+                hintNote.MoveToY(notchContainer.Height, 200, Easing.OutQuint);
             }
             else
             {
@@ -177,7 +177,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 hintNote.Current.Value =
                     new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0)),
                         SettingsNote.Type.Informational);
-                hintNote.MoveToY(10, 200, Easing.OutQuint);
+                hintNote.MoveToY(notchContainer.Height, 200, Easing.OutQuint);
             }
         }
     }
