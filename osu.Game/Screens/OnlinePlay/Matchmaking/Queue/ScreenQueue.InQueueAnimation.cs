@@ -115,41 +115,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                     foreach (var ring in ringsInMotion)
                         ring.FadeOut(200).Expire();
-
-                    outerRing.ResizeTo(outer_size).FadeIn(fade_duration);
-
-                    innerRing.Delay(fade_stagger)
-                             .ResizeTo(inner_size).FadeIn(fade_duration);
                 }
                 else
                 {
-                    innerRing.ResizeTo(inner_size - 20, 500, Easing.OutQuad)
-                             .FadeOut(500, Easing.OutQuad);
-
-                    outerRing.Delay(100)
-                             .ResizeTo(inner_size - 20, 500, Easing.OutQuad)
-                             .FadeOut(500, Easing.OutQuad);
-
                     queueAnimationDelegate = new ScheduledDelegate(() =>
                     {
-                        var ring1 = createOuterRing().With(r => r.OnLoadComplete += _ =>
-                        {
-                            r.FadeIn(ping_duration)
-                             .ResizeTo(r.Size + new Vector2(500), 5000 + ping_duration, ring_pulse)
-                             .Delay(ping_duration)
-                             .FadeOut(5000)
-                             .Expire();
-                        });
+                        var ring1 = createAnimationRing(260)
+                            .With(r => r.OnLoadComplete += _ => r.FadeIn(ping_duration)
+                                                                 .ResizeTo(r.Size + new Vector2(500), 5000 + ping_duration, ring_pulse)
+                                                                 .Delay(ping_duration)
+                                                                 .FadeOut(5270)
+                                                                 .Expire());
 
-                        var ring2 = createInnerRing().With(r => r.OnLoadComplete += _ =>
-                        {
-                            r.Delay(ping_stagger)
-                             .FadeIn(ping_duration)
-                             .ResizeTo(r.Size + new Vector2(500), 5000 + ping_duration, ring_pulse)
-                             .Delay(ping_duration)
-                             .FadeOut(5000)
-                             .Expire();
-                        });
+                        var ring2 = createAnimationRing(180)
+                            .With(r => r.OnLoadComplete += _ => r.Delay(ping_stagger)
+                                                                 .FadeIn(ping_duration)
+                                                                 .ResizeTo(r.Size + new Vector2(500), 5000 + ping_duration, ring_pulse)
+                                                                 .Delay(ping_duration)
+                                                                 .FadeOut(5270)
+                                                                 .Expire());
 
                         AddRange([ring1, ring2]);
                         ringsInMotion.AddRange([ring1, ring2]);
@@ -183,12 +167,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Transparent },
             };
 
+            private CircularContainer createAnimationRing(float size) => new CircularContainer
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(size),
+                Alpha = 0,
+                Masking = true,
+                BorderColour = Color4.White.Opacity(0.3f),
+                BorderThickness = 2,
+                Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Transparent },
+            };
+
             protected override void PopIn()
             {
                 background.FadeIn(2000);
-
-                if (currentState.Value == MatchmakingScreenState.Queueing)
-                    return;
 
                 using (BeginDelayedSequence(500))
                 {
