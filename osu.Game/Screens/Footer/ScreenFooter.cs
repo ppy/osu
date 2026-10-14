@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Footer
         /// </summary>
         public Action? BackButtonPressed { private get; init; }
 
+        public bool HasButtons => leftButtonsFlow.Count > 0 || rightButtonsFlow.Count > 0;
+
         public const int HEIGHT = 50;
 
         private const int padding = 60;
@@ -211,7 +213,7 @@ namespace osu.Game.Screens.Footer
                 .FadeOut();
         }
 
-        public void SetButtons(IReadOnlyList<ScreenFooterButton> leftButtons, IReadOnlyList<ShearedButton> rightButtons)
+        public void SetButtons(IReadOnlyList<ScreenFooterButton> leftButtons, IReadOnlyList<ShearedButton> rightButtons, Direction direction)
         {
             overlays.Clear();
 
@@ -228,7 +230,7 @@ namespace osu.Game.Screens.Footer
                 leftButtonsFlow.Remove(oldButton, false);
                 hiddenLeftButtonsContainer.Add(oldButton);
 
-                if (leftButtons.Count > 0)
+                if (direction == Direction.Horizontal)
                     makeButtonDisappearToRight(oldButton, i, oldLeftButtons.Length, true);
                 else
                     makeButtonDisappearToBottom(oldButton, i, oldLeftButtons.Length, true);
@@ -252,7 +254,7 @@ namespace osu.Game.Screens.Footer
                 // ensure transforms are added after LoadComplete to not be aborted by the FinishTransforms call.
                 newButton.OnLoadComplete += _ =>
                 {
-                    if (oldLeftButtons.Length > 0)
+                    if (direction == Direction.Horizontal)
                         makeButtonAppearFromLeft(newButton, index, leftButtons.Count, 240);
                     else
                         makeButtonAppearFromBottom(newButton, index);
@@ -268,7 +270,7 @@ namespace osu.Game.Screens.Footer
                 rightButtonsFlow.Remove(oldButton, false);
                 hiddenRightButtonsContainer.Add(oldButton);
 
-                if (leftButtons.Count > 0)
+                if (direction == Direction.Horizontal)
                     makeButtonDisappearToRight(oldButton, i, oldRightButtons.Length, true);
                 else
                     makeButtonDisappearToBottom(oldButton, i, oldRightButtons.Length, true);
@@ -286,7 +288,7 @@ namespace osu.Game.Screens.Footer
                 // ensure transforms are added after LoadComplete to not be aborted by the FinishTransforms call.
                 newButton.OnLoadComplete += _ =>
                 {
-                    if (oldLeftButtons.Length > 0)
+                    if (direction == Direction.Horizontal)
                         makeButtonAppearFromLeft(newButton, index, leftButtons.Count, 240);
                     else
                         makeButtonAppearFromBottom(newButton, index);
