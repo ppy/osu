@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Footer
             {
                 ((Bindable<ScreenFooterContent>)footerContent).Value = ScreenFooterContent.Legacy(showBackButton: true);
 
-                Footer.SetButtons([]);
+                Footer.SetButtons([], []);
                 Footer.Hide();
                 return;
             }
@@ -99,13 +99,13 @@ namespace osu.Game.Screens.Footer
             switch (footerContent.Value.Mode)
             {
                 case ScreenFooterContent.FooterMode.None:
-                    Footer.SetButtons([]);
+                    Footer.SetButtons([], []);
                     Footer.Hide();
                     BackButton.Hide();
                     break;
 
                 case ScreenFooterContent.FooterMode.Legacy:
-                    Footer.SetButtons([]);
+                    Footer.SetButtons([], []);
                     Footer.Hide();
                     BackButton.State.Value = footerContent.Value.BackButton ? Visibility.Visible : Visibility.Hidden;
                     break;
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Footer
                     else
                     {
                         // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
-                        Footer.SetButtons([]);
+                        Footer.SetButtons([], []);
 
                         osuScreen.OnLoadComplete += _ => updateFooterButtons(osuScreen);
                     }
@@ -132,11 +132,13 @@ namespace osu.Game.Screens.Footer
 
             void updateFooterButtons(OsuScreen osuScreen)
             {
-                var buttons = footerContent.Value.LeftButtons?.Invoke().ToArray() ?? [];
+                var leftButtons = footerContent.Value.LeftButtons?.Invoke().ToArray() ?? [];
+                osuScreen.LoadComponentsAgainstScreenDependencies(leftButtons);
 
-                osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
+                var rightButtons = footerContent.Value.RightButtons?.Invoke().ToArray() ?? [];
+                osuScreen.LoadComponentsAgainstScreenDependencies(rightButtons);
 
-                Footer.SetButtons(buttons);
+                Footer.SetButtons(leftButtons, rightButtons);
                 Footer.Show();
             }
         }
