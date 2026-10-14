@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -31,11 +30,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("push empty screen", () => LoadScreen(new TestScreen()));
             AddStep("push screen", () => LoadScreen(new TestScreen
             {
-                CreateButtons = () => new[]
+                FooterContent =
                 {
-                    new ScreenFooterButton { Text = "Button 1", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 2", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    Value = ScreenFooterContent.Argon(() => new[]
+                    {
+                        new ScreenFooterButton { Text = "Button 1", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 2", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    }),
                 },
             }));
         }
@@ -46,11 +48,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("push empty screen", () => LoadScreen(new TestScreen()));
             AddStep("push screen", () => LoadScreen(new TestScreen
             {
-                CreateButtons = () => new[]
+                FooterContent =
                 {
-                    new ScreenFooterButton { Text = "Button 1", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 2", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    Value = ScreenFooterContent.Argon(() => new[]
+                    {
+                        new ScreenFooterButton { Text = "Button 1", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 2", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    }),
                 },
             }));
             AddStep("exit screen", () => Stack.Exit());
@@ -61,20 +66,26 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("push first screen", () => LoadScreen(new TestScreen
             {
-                CreateButtons = () => new[]
+                FooterContent =
                 {
-                    new ScreenFooterButton { Text = "Button 1", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 2", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    Value = ScreenFooterContent.Argon(() => new[]
+                    {
+                        new ScreenFooterButton { Text = "Button 1", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 2", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    }),
                 },
             }));
             AddStep("push second screen", () => LoadScreen(new TestScreen
             {
-                CreateButtons = () => new[]
+                FooterContent =
                 {
-                    new ScreenFooterButton { Text = "Button 4", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 5", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 6", Action = () => { } },
+                    Value = ScreenFooterContent.Argon(() => new[]
+                    {
+                        new ScreenFooterButton { Text = "Button 4", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 5", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 6", Action = () => { } },
+                    }),
                 },
             }));
         }
@@ -89,17 +100,23 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("push screen", () => LoadScreen(screen = new TestScreen
             {
-                CreateButtons = () => new[]
+                FooterContent =
                 {
-                    new ScreenFooterButton { Text = "Button 1", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 2", Action = () => { } },
-                    new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    Value = ScreenFooterContent.Argon(() => new[]
+                    {
+                        new ScreenFooterButton { Text = "Button 1", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 2", Action = () => { } },
+                        new ScreenFooterButton { Text = "Button 3", Action = () => { } },
+                    }),
                 },
             }));
             AddUntilStep("wait until screen is loaded", () => screen.IsCurrentScreen(), () => Is.True);
             AddAssert("footer shown", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Visible));
 
-            AddStep("push screen with no footer", () => LoadScreen(screenWithoutFooter = new TestScreen(showFooter: false)));
+            AddStep("push screen with no footer", () => LoadScreen(screenWithoutFooter = new TestScreen
+            {
+                FooterContent = { Value = ScreenFooterContent.None }
+            }));
             AddUntilStep("wait until screen is loaded", () => screenWithoutFooter.IsCurrentScreen(), () => Is.True);
             AddAssert("footer hidden", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
 
@@ -120,16 +137,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 LoadScreen(screen = new TestScreen
                 {
                     Overlay = overlay,
-                    CreateButtons = () => new[]
+                    FooterContent =
                     {
-                        new ScreenFooterButton(overlay)
+                        Value = ScreenFooterContent.Argon(() => new[]
                         {
-                            AccentColour = Dependencies.Get<OsuColour>().Orange1,
-                            Icon = FontAwesome.Solid.Toolbox,
-                            Text = "One",
-                        },
-                        new ScreenFooterButton { Text = "Two", Action = () => { } },
-                        new ScreenFooterButton { Text = "Three", Action = () => { } },
+                            new ScreenFooterButton(overlay)
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new ScreenFooterButton { Text = "Two", Action = () => { } },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        }),
                     },
                 });
             });
@@ -157,16 +177,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 LoadScreen(screen = new TestScreen
                 {
                     Overlay = overlay,
-                    CreateButtons = () => new[]
+                    FooterContent =
                     {
-                        new ScreenFooterButton(overlay)
+                        Value = ScreenFooterContent.Argon(() => new[]
                         {
-                            AccentColour = Dependencies.Get<OsuColour>().Orange1,
-                            Icon = FontAwesome.Solid.Toolbox,
-                            Text = "One",
-                        },
-                        new ScreenFooterButton { Text = "Two", Hotkey = GlobalAction.Select, Action = () => buttonTriggered = true },
-                        new ScreenFooterButton { Text = "Three", Action = () => { } },
+                            new ScreenFooterButton(overlay)
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new ScreenFooterButton { Text = "Two", Hotkey = GlobalAction.Select, Action = () => buttonTriggered = true },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        }),
                     },
                 });
             });
@@ -187,7 +210,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             TestScreen screen = null!;
 
-            AddStep("push screen", () => LoadScreen(screen = new TestScreen(showFooter: false)));
+            AddStep("push screen", () => LoadScreen(screen = new TestScreen
+            {
+                FooterContent = { Value = ScreenFooterContent.None },
+            }));
             AddUntilStep("wait until screen is loaded", () => screen.IsCurrentScreen(), () => Is.True);
             AddAssert("footer hidden", () => ScreenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
 
@@ -214,17 +240,20 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Overlay = overlay,
                     SecondOverlay = secondOverlay,
-                    CreateButtons = () => new[]
+                    FooterContent =
                     {
-                        new ScreenFooterButton(overlay)
+                        Value = ScreenFooterContent.Argon(() => new[]
                         {
-                            AccentColour = Dependencies.Get<OsuColour>().Orange1,
-                            Icon = FontAwesome.Solid.Toolbox,
-                            Text = "One",
-                        },
-                        new FooterButtonMods(secondOverlay),
-                        new ScreenFooterButton { Text = "Two", Action = () => { } },
-                        new ScreenFooterButton { Text = "Three", Action = () => { } },
+                            new ScreenFooterButton(overlay)
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new FooterButtonMods(secondOverlay),
+                            new ScreenFooterButton { Text = "Two", Action = () => { } },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        }),
                     },
                 });
             });
@@ -261,16 +290,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 LoadScreen(screen = new TestScreen
                 {
                     Overlay = overlay,
-                    CreateButtons = () => new[]
+                    FooterContent =
                     {
-                        new ScreenFooterButton(overlay)
+                        Value = ScreenFooterContent.Argon(() => new[]
                         {
-                            AccentColour = Dependencies.Get<OsuColour>().Orange1,
-                            Icon = FontAwesome.Solid.Toolbox,
-                            Text = "One",
-                        },
-                        new ScreenFooterButton { Text = "Two", Action = () => { } },
-                        new ScreenFooterButton { Text = "Three", Action = () => { } },
+                            new ScreenFooterButton(overlay)
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new ScreenFooterButton { Text = "Two", Action = () => { } },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        }),
                     },
                 });
             });
@@ -309,10 +341,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestScreen : OsuScreen
         {
-            public override bool ShowFooter { get; }
-
-            public Func<IReadOnlyList<ScreenFooterButton>> CreateButtons = Array.Empty<ScreenFooterButton>;
-
             public ShearedOverlayContainer Overlay = new TestShearedOverlayContainer();
             public ShearedOverlayContainer SecondOverlay = new TestShearedOverlayContainer();
 
@@ -325,9 +353,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             [Resolved]
             private IOverlayManager? overlayManager { get; set; }
 
-            public TestScreen(bool showFooter = true)
+            public TestScreen()
             {
-                ShowFooter = showFooter;
+                FooterContent.Value = ScreenFooterContent.Argon();
             }
 
             [BackgroundDependencyLoader]
@@ -343,8 +371,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
                 secondOverlayRegistration = overlayManager?.RegisterBlockingOverlay(SecondOverlay);
             }
-
-            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => CreateButtons.Invoke();
 
             protected override void Dispose(bool isDisposing)
             {

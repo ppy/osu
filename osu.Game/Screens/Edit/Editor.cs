@@ -56,6 +56,7 @@ using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Submission;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Users;
 using osuTK.Input;
@@ -198,8 +199,6 @@ namespace osu.Game.Screens.Edit
             return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
         }
 
-        protected override bool InitialBackButtonVisibility => false;
-
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -240,6 +239,8 @@ namespace osu.Game.Screens.Edit
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
+
+            FooterContent.Value = ScreenFooterContent.None;
         }
 
         [BackgroundDependencyLoader]

@@ -18,6 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -180,11 +181,10 @@ namespace osu.Game.Screens.Select
 
         private partial class PlayerLoader : Play.PlayerLoader
         {
-            public override bool ShowFooter => !QuickRestart;
-
             public PlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
             {
+                FooterContent.Value = ScreenFooterContent.Argon();
             }
         }
     }
