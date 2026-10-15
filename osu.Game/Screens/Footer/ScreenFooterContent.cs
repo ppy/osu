@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Footer
 {
@@ -22,13 +23,18 @@ namespace osu.Game.Screens.Footer
         public bool BackButton { get; init; }
 
         /// <summary>
-        /// The <see cref="ScreenFooterButton"/>s - if any - to show on the global <see cref="ScreenFooter"/>.
+        /// The <see cref="ScreenFooterButton"/>s - if any - to show on the left side of the global <see cref="ScreenFooter"/>.
         /// Can pass <see langword="null"/> for no buttons.
         /// </summary>
         /// <remarks>
-        /// Ignored if <see cref="Mode"/> is <see cref="FooterMode.Legacy"/>.
+        /// Ignored if <see cref="Mode"/> is not <see cref="FooterMode.Argon"/>.
         /// </remarks>
         public Func<IEnumerable<ScreenFooterButton>>? LeftButtons { get; private init; }
+
+        /// <summary>
+        /// The <see cref="ShearedButton"/>s - if any - to show on the right side of the global <see cref="ScreenFooter"/>.
+        /// </summary>
+        public Func<IEnumerable<ShearedButton>>? RightButtons { get; private init; }
 
         private ScreenFooterContent()
         {
@@ -60,7 +66,10 @@ namespace osu.Game.Screens.Footer
         /// Not skinnable. Uses the argon UI aesthetic.
         /// </summary>
         /// <param name="leftButtons">The screen-specific buttons to show on the left side of the footer.</param>
-        public static ScreenFooterContent Argon(Func<IEnumerable<ScreenFooterButton>>? leftButtons = null)
+        /// <param name="rightButtons">The screen-specific buttons to show on the right side of the footer.</param>
+        public static ScreenFooterContent Argon(
+            Func<IEnumerable<ScreenFooterButton>>? leftButtons = null,
+            Func<IEnumerable<ShearedButton>>? rightButtons = null)
         {
             return new ScreenFooterContent
             {
@@ -68,7 +77,8 @@ namespace osu.Game.Screens.Footer
                 // TODO: The argon global screen footer does not currently support hiding the back button, so it is forced on.
                 // Make this work when required.
                 BackButton = true,
-                LeftButtons = leftButtons
+                LeftButtons = leftButtons,
+                RightButtons = rightButtons,
             };
         }
 

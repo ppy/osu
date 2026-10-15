@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Footer
             {
                 ((Bindable<ScreenFooterContent>)footerContent).Value = ScreenFooterContent.Legacy(showBackButton: true);
 
-                Footer.SetButtons([]);
+                Footer.SetButtons([], [], Direction.Vertical);
                 Footer.Hide();
                 return;
             }
@@ -99,13 +99,13 @@ namespace osu.Game.Screens.Footer
             switch (footerContent.Value.Mode)
             {
                 case ScreenFooterContent.FooterMode.None:
-                    Footer.SetButtons([]);
+                    Footer.SetButtons([], [], Direction.Vertical);
                     Footer.Hide();
                     BackButton.Hide();
                     break;
 
                 case ScreenFooterContent.FooterMode.Legacy:
-                    Footer.SetButtons([]);
+                    Footer.SetButtons([], [], Direction.Vertical);
                     Footer.Hide();
                     BackButton.State.Value = footerContent.Value.BackButton ? Visibility.Visible : Visibility.Hidden;
                     break;
@@ -117,26 +117,39 @@ namespace osu.Game.Screens.Footer
                     var osuScreen = screenTracker.LeadingScreen as OsuScreen;
                     Debug.Assert(osuScreen != null);
 
+                    bool anyOldButtons = Footer.HasButtons;
+                    // the condition below is slightly indirect.
+                    // the point is to check if there are any new buttons to show.
+                    // checking if the actions to create the buttons are present isn't the same thing - they could return empty enumerables after all.
+                    // however, the buttons cannot be reliably constructed at this time because the screen is possibly not loaded yet,
+                    // and so buttons created at this time may not be hooked up to screen contents properly.
+                    // therefore settle for the next best thing. consumers who set the actions to return empty arrays have only themselves to blame.
+                    bool anyNewButtons = footerContent.Value.LeftButtons != null || footerContent.Value.RightButtons != null;
+
+                    var direction = anyOldButtons && anyNewButtons ? Direction.Horizontal : Direction.Vertical;
+
                     if (osuScreen.IsLoaded)
-                        updateFooterButtons(osuScreen);
+                        updateFooterButtons(osuScreen, direction);
                     else
                     {
                         // ensure the current buttons are immediately disabled on screen change (so they can't be pressed).
-                        Footer.SetButtons([]);
+                        Footer.SetButtons([], [], direction);
 
-                        osuScreen.OnLoadComplete += _ => updateFooterButtons(osuScreen);
+                        osuScreen.OnLoadComplete += _ => updateFooterButtons(osuScreen, direction);
                     }
 
                     break;
             }
 
-            void updateFooterButtons(OsuScreen osuScreen)
+            void updateFooterButtons(OsuScreen osuScreen, Direction direction)
             {
-                var buttons = footerContent.Value.LeftButtons?.Invoke().ToArray() ?? [];
+                var leftButtons = footerContent.Value.LeftButtons?.Invoke().ToArray() ?? [];
+                var rightButtons = footerContent.Value.RightButtons?.Invoke().ToArray() ?? [];
 
-                osuScreen.LoadComponentsAgainstScreenDependencies(buttons);
+                osuScreen.LoadComponentsAgainstScreenDependencies(leftButtons);
+                osuScreen.LoadComponentsAgainstScreenDependencies(rightButtons);
 
-                Footer.SetButtons(buttons);
+                Footer.SetButtons(leftButtons, rightButtons, direction);
                 Footer.Show();
             }
         }
