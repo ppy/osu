@@ -128,16 +128,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double hiddenDifficulty = (preemptFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
 
-            // Apply a soft cap to general HD reading to account for partial memorization
-            hiddenDifficulty = DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
-
             var previousObj = (OsuDifficultyHitObject)currObj.Previous();
 
             // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
             if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
-                hiddenDifficulty += hidden_multiplier * 2500 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
+                hiddenDifficulty += 1000000 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 2); // Perfect stacks are harder the less time between notes
 
-            return hiddenDifficulty;
+            // Apply a soft cap to general HD reading to account for partial memorization
+            return DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
         }
 
         private static double getPastObjectDifficultyInfluence(OsuDifficultyHitObject currObj)
