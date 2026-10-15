@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
             if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
-                hiddenDifficulty += 55000 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
+                hiddenDifficulty += 1000000 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 2); // Perfect stacks are harder the less time between notes
 
             // Apply a soft cap to general HD reading to account for partial memorization
             hiddenDifficulty = DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
