@@ -803,7 +803,7 @@ namespace osu.Game.Overlays.SkinEditor
                     if (item == null)
                         return base.GenerateItemText(item);
 
-                    return item.GetLocalisableDescription();
+                    return item.GetWorkingLayerString();
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
         }
 
-        public LocalisableString GetLocalisableDescription()
+        public LocalisableString GetWorkingLayerString()
         {
             if (Ruleset == null) return Lookup.GetLocalisableDescription();
 
