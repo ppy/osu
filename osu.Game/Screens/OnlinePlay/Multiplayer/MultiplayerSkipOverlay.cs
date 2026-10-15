@@ -80,8 +80,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null || client.Room.Settings.AutoSkip)
                 return;
 
-            int countTotal = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing);
-            int countSkipped = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing && u.VotedToSkipIntro);
+            int localBeatmapId = client.LocalUser?.BeatmapId ?? client.Room.CurrentPlaylistItem.BeatmapID;
+
+            bool isSameDifficulty(MultiplayerRoomUser u)
+            {
+                return (u.BeatmapId ?? client.Room.CurrentPlaylistItem.BeatmapID) == localBeatmapId;
+            }
+
+            int countTotal = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing && isSameDifficulty(u));
+            int countSkipped = client.Room.Users.Count(u => u.State == MultiplayerUserState.Playing && u.VotedToSkipIntro && isSameDifficulty(u));
             int countRequired = countTotal / 2 + 1;
 
             skipButton.SkippedCount.Value = Math.Min(countRequired, countSkipped);
