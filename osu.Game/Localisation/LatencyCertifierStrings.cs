@@ -64,10 +64,10 @@ Round {1} of {2}", difficultyLevel, currentRound, totalRounds);
         public static LocalisableString CertificationRequirements(int roundsCount) => new TranslatableString(getKey(@"certification_requirements"), @"To complete certification, the difficulty level will now decrease until you can get {0} rounds correct in a row!", roundsCount);
 
         /// <summary>
-        /// "Polling: {0} Hz | Monitor: {1} Hz | Exclusive: {2}
+        /// "Polling: {0} Hz | Monitor: {1:NO} Hz | Exclusive: {2}
         /// Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz"
         /// </summary>
-        public static LocalisableString RefreshRatesInfo(int pollingRate, int refreshRate, LocalisableString exclusiveStatus, int inputRate, int updateRate, int drawRate) => new TranslatableString(getKey(@"refresh_rates_info"), @"Polling: {0} Hz | Monitor: {1} Hz | Exclusive: {2}
+        public static LocalisableString RefreshRatesInfo(int pollingRate, float refreshRate, LocalisableString exclusiveStatus, double inputRate, double updateRate, double drawRate) => new TranslatableString(getKey(@"refresh_rates_info"), @"Polling: {0} Hz | Monitor: {1:NO} Hz | Exclusive: {2}
 Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclusiveStatus, inputRate, updateRate, drawRate);
 
         /// <summary>

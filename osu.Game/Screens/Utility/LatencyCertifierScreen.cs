@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -71,7 +72,7 @@ namespace osu.Game.Screens.Utility
         [Resolved]
         private LocalisationManager localisation { get; set; } = null!;
 
-        private IBindable<string> latencyCertifierMethodologyText = new Bindable<string>();
+        private IBindable<string> latencyCertifierMethodologyText = null!;
 
         public readonly Bindable<LatencyVisualMode> VisualMode = new Bindable<LatencyVisualMode>();
 
@@ -276,7 +277,7 @@ namespace osu.Game.Screens.Utility
 
             var displayMode = host.Window?.CurrentDisplayMode.Value;
 
-            LocalisableString exclusive = (host.Renderer as IWindowsRenderer)?.FullscreenCapability.ToString()
+            LocalisableString exclusive = (host.Renderer as IWindowsRenderer)?.FullscreenCapability.GetLocalisableDescription()
                                           ?? LatencyCertifierStrings.ExclusiveFullscreenCapabilityUnknown;
 
             statusText.Clear();
@@ -284,47 +285,27 @@ namespace osu.Game.Screens.Utility
             float successRate = (float)correctAtCurrentDifficulty / attemptsAtCurrentDifficulty;
             bool isPass = successRate == 1;
 
-            statusText.AddParagraph(
-                LatencyCertifierStrings.ScoreInfo(
-                    correctAtCurrentDifficulty,
-                    attemptsAtCurrentDifficulty,
-                    successRate
-                ),
-                cp => cp.Colour = isPass ? colours.Green : colours.Red
-            );
-            statusText.AddParagraph(
-                LatencyCertifierStrings.LevelInfo(
-                    DifficultyLevel,
-                    mapDifficultyToTargetFrameRate(DifficultyLevel)
-                ),
-                cp => cp.Font = OsuFont.Default.With(size: 24)
-            );
+            statusText.AddParagraph(LatencyCertifierStrings.ScoreInfo(correctAtCurrentDifficulty, attemptsAtCurrentDifficulty, successRate),
+                cp => cp.Colour = isPass ? colours.Green : colours.Red);
+            statusText.AddParagraph(LatencyCertifierStrings.LevelInfo(DifficultyLevel, mapDifficultyToTargetFrameRate(DifficultyLevel)),
+                cp => cp.Font = OsuFont.Default.With(size: 24));
 
             statusText.AddParagraph(string.Empty);
             statusText.AddParagraph(string.Empty);
-            statusText.AddIcon(isPass ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.TimesCircle, cp => cp.Colour = isPass ? colours.Green : colours.Red);
+            statusText.AddIcon(isPass ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.TimesCircle,
+                cp => cp.Colour = isPass ? colours.Green : colours.Red);
             statusText.AddParagraph(string.Empty);
 
             if (!isPass && DifficultyLevel > 1)
             {
-                statusText.AddParagraph(
-                    LatencyCertifierStrings.CertificationRequirements(rounds_to_complete_certified),
-                    cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold)
-                );
+                statusText.AddParagraph(LatencyCertifierStrings.CertificationRequirements(rounds_to_complete_certified),
+                    cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold));
                 statusText.AddParagraph(string.Empty);
             }
 
-            statusText.AddParagraph(
-                LatencyCertifierStrings.RefreshRatesInfo(
-                    pollingMax,
-                    (int)(displayMode?.RefreshRate ?? 0),
-                    exclusive,
-                    (int)host.InputThread.Clock.FramesPerSecond,
-                    (int)host.UpdateThread.Clock.FramesPerSecond,
-                    (int)host.DrawThread.Clock.FramesPerSecond
-                ),
-                cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold)
-            );
+            statusText.AddParagraph(LatencyCertifierStrings.RefreshRatesInfo(pollingMax, displayMode?.RefreshRate ?? 0, exclusive,
+                    host.InputThread.Clock.FramesPerSecond, host.UpdateThread.Clock.FramesPerSecond, host.DrawThread.Clock.FramesPerSecond),
+                cp => cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.SemiBold));
 
             if (isCertifying && isPass)
             {
@@ -332,7 +313,7 @@ namespace osu.Game.Screens.Utility
                 return;
             }
 
-            LocalisableString? cannotIncreaseReason = null;
+            LocalisableString cannotIncreaseReason = string.Empty;
 
             if (mapDifficultyToTargetFrameRate(DifficultyLevel + 1) > target_host_update_frames)
                 cannotIncreaseReason = LatencyCertifierStrings.MaximumLevelReached;
@@ -353,17 +334,16 @@ namespace osu.Game.Screens.Utility
 
             if (isPass)
             {
-                var button = new ButtonWithKeyBind(Key.Enter);
-                button.Text = LatencyCertifierStrings.ContinueToNextLevel;
-                button.BackgroundColour = colours.Green;
-                button.Anchor = Anchor.Centre;
-                button.Origin = Anchor.Centre;
-                button.Action = () => changeDifficulty(DifficultyLevel + 1);
-                button.Enabled.Value = !cannotIncreaseReason.HasValue;
-                if (cannotIncreaseReason.HasValue)
-                    button.TooltipText = cannotIncreaseReason.Value;
-
-                buttonFlow.Add(button);
+                buttonFlow.Add(new ButtonWithKeyBind(Key.Enter)
+                {
+                    Text = LatencyCertifierStrings.ContinueToNextLevel,
+                    BackgroundColour = colours.Green,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Action = () => changeDifficulty(DifficultyLevel + 1),
+                    Enabled = { Value = LocalisableString.IsNullOrEmpty(cannotIncreaseReason) },
+                    TooltipText = cannotIncreaseReason
+                });
             }
             else
             {
