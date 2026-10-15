@@ -7,8 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Matchmaking;
@@ -22,38 +24,42 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
     public partial class PoolSelector : CompositeDrawable
     {
-        private const float icon_size = 34;
+        private static readonly IEasingFunction strip_resize = new CubicBezierEasingFunction(0.7, 0, 0.3, 1);
 
         public readonly Bindable<MatchmakingPool[]?> AvailablePools = new Bindable<MatchmakingPool[]?>([]);
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
-        private FillFlowContainer<SelectorButton> poolFlow = null!;
-        private LoadingSpinner loading = null!;
+        public readonly IBindable<bool> Enabled = new Bindable<bool>();
+
+        private readonly Circle strip;
+        private readonly SimpleHorizontalFlowContainer<SelectorButton> poolFlow;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         public PoolSelector()
         {
             AutoSizeAxes = Axes.X;
-            Height = SelectorButton.SIZE.Y + 10;
-        }
+            Height = SelectorButton.SIZE.Y + 6;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             InternalChildren = new Drawable[]
             {
-                poolFlow = new FillFlowContainer<SelectorButton>
+                strip = new Circle
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopCentre,
+                    Height = 4,
+                    Colour = Color4.White,
+                    Alpha = 0,
+                },
+                poolFlow = new SimpleHorizontalFlowContainer<SelectorButton>
                 {
                     AutoSizeAxes = Axes.X,
-                    RelativeSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5),
+                    Height = SelectorButton.SIZE.Y,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Spacing = 8,
                 },
-                loading = new LoadingSpinner(withBox: true)
-                {
-                    Size = new Vector2(50),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
             };
         }
 
@@ -61,28 +67,50 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.LoadComplete();
 
-            AvailablePools.BindValueChanged(pools =>
+            AvailablePools.BindValueChanged(onPoolsChanged, true);
+            SelectedPool.BindValueChanged(_ => onSelectedPoolChanged(), true);
+            Enabled.BindValueChanged(_ => strip.FadeColour(Enabled.Value ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
+        }
+
+        private void onPoolsChanged(ValueChangedEvent<MatchmakingPool[]?> e)
+        {
+            poolFlow.Clear();
+
+            if (e.NewValue == null)
+                return;
+
+            foreach ((var p, int i) in e.NewValue.Select((p, i) => (p, i)))
             {
-                poolFlow.Clear();
-
-                if (pools.NewValue == null)
+                poolFlow.Add(new SelectorButton(p)
                 {
-                    loading.Show();
-                    return;
-                }
+                    Enabled = { BindTarget = Enabled },
+                    SelectedPool = { BindTarget = SelectedPool },
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Alpha = 0,
+                    AlwaysPresent = true,
+                }.With(b => b.OnLoadComplete += _ => b.Appear(i * 40)));
+            }
 
-                loading.Hide();
+            onSelectedPoolChanged();
+        }
 
-                foreach (var p in pools.NewValue)
-                {
-                    poolFlow.Add(new SelectorButton(p)
-                    {
-                        SelectedPool = { BindTarget = SelectedPool },
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    });
-                }
-            }, true);
+        private void onSelectedPoolChanged()
+        {
+            var selected = poolFlow.FirstOrDefault(b => b.IsSelected);
+
+            if (selected == null)
+            {
+                strip.ResizeWidthTo(0).FadeOut();
+                return;
+            }
+
+            Scheduler.AddDelayed(() =>
+            {
+                strip.MoveToX(selected.ToSpaceOfOtherDrawable(SelectorButton.SIZE / 2, this).X, strip.IsPresent ? 800 : 0, Easing.OutElasticHalf)
+                     .FadeIn()
+                     .ResizeWidthTo(32, 400, strip_resize);
+            }, strip.IsPresent ? 0 : 100);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -111,7 +139,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private partial class SelectorButton : OsuAnimatedButton
         {
-            public static readonly Vector2 SIZE = new Vector2(84, 78);
+            public static readonly Vector2 SIZE = new Vector2(100, 70);
+
+            private const float icon_size = 34;
+            private static readonly IEasingFunction appear_move = new CubicBezierEasingFunction(0, 0, 0, 1);
+            private static readonly IEasingFunction icon_colour = new CubicBezierEasingFunction(0.5, 0, 0.5, 1);
 
             public bool IsSelected => SelectedPool.Value?.Equals(pool) == true;
 
@@ -120,25 +152,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             [Resolved]
             private RulesetStore rulesetStore { get; set; } = null!;
 
-            private readonly MatchmakingPool pool;
-            private Drawable iconSprite = null!;
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
-            private Box flashLayer = null!;
+            private readonly MatchmakingPool pool;
+
+            private Drawable iconSprite = null!;
+            private OsuSpriteText name = null!;
 
             public SelectorButton(MatchmakingPool pool)
-                : base(HoverSampleSet.ButtonSidebar)
             {
                 this.pool = pool;
-
                 Size = SIZE;
+                ScaleOnMouseDown = 1;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 Content.Masking = true;
-                Content.CornerRadius = 16;
-                Content.CornerExponent = 10;
+                Content.CornerRadius = 10;
+                Content.EdgeEffect = default;
 
                 Ruleset? rulesetInstance = rulesetStore.GetRuleset(pool.RulesetId)?.CreateInstance();
 
@@ -146,64 +180,31 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 if (pool.Variant != 0)
                     rulesetName += $" {pool.Variant}K";
 
-                Children = new Drawable[]
+                Add(new FillFlowContainer
                 {
-                    new Box
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(4),
+                    Children = new Drawable[]
                     {
-                        Colour = colourProvider.Background2,
-                        Alpha = 0.4f,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    flashLayer = new Box
-                    {
-                        Colour = Color4.White,
-                        Blending = BlendingParameters.Additive,
-                        Alpha = 0,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding(5) { Top = 8 },
-                        Children = new Drawable[]
+                        new Container
                         {
-                            new Container
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Size = new Vector2(icon_size),
-                                Padding = new MarginPadding(2),
-                                Children = new[]
-                                {
-                                    iconSprite = createIcon(),
-                                }
-                            },
-                            new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Font = OsuFont.Style.Caption1.With(weight: FontWeight.Bold),
-                                        Text = rulesetName,
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Font = OsuFont.Style.Caption2,
-                                        Text = pool.Name
-                                    }
-                                }
-                            }
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Size = new Vector2(icon_size),
+                            Child = iconSprite = createIcon(),
+                        },
+                        name = new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Font = OsuFont.Torus.With(size: 18, weight: FontWeight.SemiBold),
+                            Text = rulesetName,
                         }
                     },
-                };
+                });
 
                 Action = () => SelectedPool.Value = pool;
             }
@@ -213,37 +214,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 base.LoadComplete();
 
                 SelectedPool.BindValueChanged(onSelectionChanged, true);
-                FinishTransforms(true);
             }
 
-            protected override bool OnHover(HoverEvent e)
-            {
-                if (!IsSelected)
-                    flashLayer.FadeTo(0.05f, 200, Easing.OutQuint);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                if (!IsSelected)
-                    flashLayer.FadeTo(0f, 200, Easing.OutQuint);
-                base.OnHoverLost(e);
-            }
-
-            private void onSelectionChanged(ValueChangedEvent<MatchmakingPool?> selection)
+            private void onSelectionChanged(ValueChangedEvent<MatchmakingPool?> _)
             {
                 if (IsSelected)
                 {
-                    this.ScaleTo(1.2f, 200, Easing.OutQuint);
-                    iconSprite.FadeColour(Color4.Gold, 100, Easing.OutQuint);
-                    flashLayer.FadeTo(0.1f, 200, Easing.OutQuint);
+                    iconSprite.FadeColour(colourProvider.Highlight1, 100, icon_colour);
+                    name.FadeColour(colourProvider.Highlight1, 100, icon_colour);
                 }
                 else
                 {
-                    this.ScaleTo(1f, 200, Easing.OutQuint);
-                    iconSprite.FadeColour(OsuColour.Gray(0.5f), 100);
-                    flashLayer.FadeOut(200, Easing.OutQuint);
+                    iconSprite.FadeColour(Color4.White, 100, icon_colour);
+                    name.FadeColour(Color4.White, 100, icon_colour);
                 }
+            }
+
+            public void Appear(int delay)
+            {
+                this.Delay(delay)
+                    .MoveToY(-50)
+                    .FadeOut()
+                    .MoveToY(0, 400, appear_move)
+                    .FadeIn(400, Easing.Out);
             }
 
             private Drawable createIcon()
