@@ -64,10 +64,10 @@ Round {1} of {2}", difficultyLevel, currentRound, totalRounds);
         public static LocalisableString CertificationRequirements(int roundsCount) => new TranslatableString(getKey(@"certification_requirements"), @"To complete certification, the difficulty level will now decrease until you can get {0} rounds correct in a row!", roundsCount);
 
         /// <summary>
-        /// "Polling: {0} Hz | Monitor: {1:NO} Hz | Exclusive: {2}
+        /// "Polling: {0} Hz | Monitor: {1:N0} Hz | Exclusive: {2}
         /// Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz"
         /// </summary>
-        public static LocalisableString RefreshRatesInfo(int pollingRate, float refreshRate, LocalisableString exclusiveStatus, double inputRate, double updateRate, double drawRate) => new TranslatableString(getKey(@"refresh_rates_info"), @"Polling: {0} Hz | Monitor: {1:NO} Hz | Exclusive: {2}
+        public static LocalisableString RefreshRatesInfo(int pollingRate, float refreshRate, LocalisableString exclusiveStatus, double inputRate, double updateRate, double drawRate) => new TranslatableString(getKey(@"refresh_rates_info"), @"Polling: {0} Hz | Monitor: {1:N0} Hz | Exclusive: {2}
 Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclusiveStatus, inputRate, updateRate, drawRate);
 
         /// <summary>
@@ -91,9 +91,9 @@ Input: {3} Hz | Update: {4} Hz | Draw: {5} Hz", pollingRate, refreshRate, exclus
         public static LocalisableString Retry => new TranslatableString(getKey(@"retry"), @"Retry");
 
         /// <summary>
-        /// "Are you even trying..?"
+        /// "Are you even trying?"
         /// </summary>
-        public static LocalisableString AreYouEvenTrying => new TranslatableString(getKey(@"are_you_even_trying"), @"Are you even trying..?");
+        public static LocalisableString AreYouEvenTrying => new TranslatableString(getKey(@"are_you_even_trying"), @"Are you even trying?");
 
         /// <summary>
         /// "Begin certification at last level"
