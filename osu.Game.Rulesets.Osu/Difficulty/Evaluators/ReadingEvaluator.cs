@@ -135,9 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 hiddenDifficulty += 1000000 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 2); // Perfect stacks are harder the less time between notes
 
             // Apply a soft cap to general HD reading to account for partial memorization
-            hiddenDifficulty = DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
-
-            return hiddenDifficulty;
+            return DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
         }
 
         private static double getPastObjectDifficultyInfluence(OsuDifficultyHitObject currObj)
