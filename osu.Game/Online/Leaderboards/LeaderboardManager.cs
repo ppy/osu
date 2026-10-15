@@ -11,6 +11,7 @@ using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
@@ -46,14 +47,19 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
+        [Resolved(CanBeNull = true)]
+        private OsuConfigManager? config { get; set; }
+
         /// <summary>
         /// Fetch leaderboard content with the new criteria specified in the background.
         /// On completion, <see cref="Scores"/> will be updated with the results from this call (unless a more recent call with a different criteria has completed).
         /// </summary>
-        public void FetchWithCriteria(LeaderboardCriteria newCriteria, bool forceRefresh = false)
+        public void FetchWithCriteria(LeaderboardCriteria newCriteria, bool forceRefresh = false, bool allowUnavailableFallback = true)
         {
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(FetchWithCriteria)} must be called from the update thread.");
+
+            newCriteria = getEffectiveCriteria(newCriteria, allowUnavailableFallback);
 
             if (!forceRefresh && CurrentCriteria?.Equals(newCriteria) == true && scores.Value?.FailState == null)
                 return;
@@ -87,33 +93,11 @@ namespace osu.Game.Online.Leaderboards
                     if (newCriteria.Sorting != LeaderboardSortMode.Score)
                         throw new NotSupportedException($@"Requesting online scores with a {nameof(LeaderboardSortMode)} other than {nameof(LeaderboardSortMode.Score)} is not supported");
 
-                    if (!api.IsLoggedIn)
-                    {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotLoggedIn);
-                        return;
-                    }
+                    var failureState = getFailureStateForOnlineCriteria(newCriteria);
 
-                    if (!newCriteria.Ruleset.IsLegacyRuleset())
+                    if (failureState != null)
                     {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.RulesetUnavailable);
-                        return;
-                    }
-
-                    if (newCriteria.Beatmap.OnlineID <= 0 || newCriteria.Beatmap.Status <= BeatmapOnlineStatus.Pending)
-                    {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.BeatmapUnavailable);
-                        return;
-                    }
-
-                    if ((newCriteria.Scope.RequiresSupporter(newCriteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
-                    {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NotSupporter);
-                        return;
-                    }
-
-                    if (newCriteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
-                    {
-                        scores.Value = LeaderboardScores.Failure(LeaderboardFailState.NoTeam);
+                        scores.Value = LeaderboardScores.Failure(failureState.Value);
                         return;
                     }
 
@@ -162,6 +146,51 @@ namespace osu.Game.Online.Leaderboards
                     break;
                 }
             }
+        }
+
+        private LeaderboardCriteria getEffectiveCriteria(LeaderboardCriteria criteria, bool allowUnavailableFallback)
+        {
+            if (criteria.Scope == BeatmapLeaderboardScope.Local)
+                return criteria;
+
+            if (!allowUnavailableFallback)
+                return criteria;
+
+            if (config?.Get<bool>(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable) != true)
+                return criteria;
+
+            switch (getFailureStateForOnlineCriteria(criteria))
+            {
+                case LeaderboardFailState.BeatmapUnavailable:
+                case LeaderboardFailState.RulesetUnavailable:
+                    return criteria with { Scope = BeatmapLeaderboardScope.Local };
+
+                default:
+                    return criteria;
+            }
+        }
+
+        private LeaderboardFailState? getFailureStateForOnlineCriteria(LeaderboardCriteria criteria)
+        {
+            if (criteria.Beatmap == null || criteria.Ruleset == null)
+                return LeaderboardFailState.NoneSelected;
+
+            if (!api.IsLoggedIn)
+                return LeaderboardFailState.NotLoggedIn;
+
+            if ((criteria.Scope.RequiresSupporter(criteria.ExactMods != null)) && !api.LocalUser.Value.IsSupporter)
+                return LeaderboardFailState.NotSupporter;
+
+            if (criteria.Scope == BeatmapLeaderboardScope.Team && api.LocalUser.Value.Team == null)
+                return LeaderboardFailState.NoTeam;
+
+            if (!criteria.Ruleset.IsLegacyRuleset())
+                return LeaderboardFailState.RulesetUnavailable;
+
+            if (criteria.Beatmap.OnlineID <= 0 || criteria.Beatmap.Status <= BeatmapOnlineStatus.Pending)
+                return LeaderboardFailState.BeatmapUnavailable;
+
+            return null;
         }
 
         private void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet? changes)

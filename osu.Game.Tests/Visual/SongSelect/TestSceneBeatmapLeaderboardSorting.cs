@@ -12,11 +12,14 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -24,6 +27,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
@@ -43,6 +47,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         private DialogOverlay dialogOverlay = null!;
 
         private LeaderboardManager leaderboardManager = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         private readonly IBindable<Screens.Select.SongSelect.BeatmapSetLookupResult?> onlineLookupResult = new Bindable<Screens.Select.SongSelect.BeatmapSetLookupResult?>();
 
@@ -103,6 +110,19 @@ namespace osu.Game.Tests.Visual.SongSelect
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("reset leaderboard fallback state", () =>
+            {
+                config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, false);
+                config.SetValue(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Local);
+                ((DummyAPIAccess)API).SetState(APIState.Online);
+                ((DummyAPIAccess)API).LocalUser.Value = new APIUser
+                {
+                    Id = DummyAPIAccess.DUMMY_USER_ID,
+                    Username = @"Local user",
+                    IsSupporter = true,
+                };
+            });
         }
 
         [Test]
@@ -126,6 +146,41 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Clear all scores", () => scoreManager.Delete());
         }
+
+        [Test]
+        public void TestFallbackScopeDisplayedWithoutSaving()
+        {
+            BeatmapInfo beatmapInfo = null!;
+
+            AddUntilStep("wait for scope dropdown", () => beatmapDetailsArea.ChildrenOfType<Dropdown<BeatmapLeaderboardScope>>().Any());
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            AddStep("select global scope", () => scopeDropdown.Current.Value = BeatmapLeaderboardScope.Global);
+
+            AddStep(@"Set beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+            });
+
+            AddUntilStep("criteria switched to local", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Local));
+            AddUntilStep("scope dropdown shows local", () => scopeDropdown.Current.Value, () => Is.EqualTo(BeatmapLeaderboardScope.Local));
+            AddAssert("saved scope remains global", () => config.Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab), () => Is.EqualTo(BeatmapDetailTab.Global));
+
+            AddStep("manually select global scope", () => scopeDropdown.Current.Value = BeatmapLeaderboardScope.Global);
+            AddUntilStep("criteria remains global after manual selection", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Global));
+            AddAssert("scope dropdown shows global", () => scopeDropdown.Current.Value, () => Is.EqualTo(BeatmapLeaderboardScope.Global));
+            AddAssert("manual global scope change is saved", () => config.Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab), () => Is.EqualTo(BeatmapDetailTab.Global));
+
+            AddStep("manually select friend scope", () => scopeDropdown.Current.Value = BeatmapLeaderboardScope.Friend);
+            AddUntilStep("criteria remains friend after manual selection", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Friend));
+            AddAssert("scope dropdown shows friend", () => scopeDropdown.Current.Value, () => Is.EqualTo(BeatmapLeaderboardScope.Friend));
+            AddAssert("manual friend scope change is saved", () => config.Get<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab), () => Is.EqualTo(BeatmapDetailTab.Friends));
+        }
+
+        private Dropdown<BeatmapLeaderboardScope> scopeDropdown => beatmapDetailsArea.ChildrenOfType<Dropdown<BeatmapLeaderboardScope>>().Single();
 
         private void importRandomScore(BeatmapInfo beatmapInfo)
         {
