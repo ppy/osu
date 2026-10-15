@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.Containers
     ///
     /// This container will also trigger beat events when the beat matching clock is paused at <see cref="TimingControlPoint.DEFAULT"/>'s BPM.
     /// </remarks>
-    public partial class BeatSyncedContainer : Container
+    public abstract partial class BeatSyncedContainer : Container
     {
         private int lastBeat;
 
@@ -64,9 +64,12 @@ namespace osu.Game.Graphics.Containers
         public int Divisor { get; set; } = 1;
 
         /// <summary>
-        /// An optional minimum beat length. Any beat length below this will be multiplied by two until valid.
+        /// The minimum beat length to sync to.
+        /// If the current beat length is below this, it will be multiplied by two until falling into the valid range.
+        ///
+        /// Defaults to 50 ms as a sane minimum.
         /// </summary>
-        public double MinimumBeatLength { get; set; }
+        public double MinimumBeatLength { get; set; } = 50;
 
         /// <summary>
         /// Whether this container is currently tracking a beat sync provider.

@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -34,6 +35,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                             {
                                 var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
 
                                 if (leaderboard != null)
                                 {
@@ -52,6 +55,20 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                                     spectatorList.Position = new Vector2(320, -280);
                                 }
 
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.CentreLeft;
+                                    hitError.Origin = Anchor.CentreLeft;
+                                }
+
+                                if (hitError2 != null)
+                                {
+                                    hitError2.Anchor = Anchor.CentreRight;
+                                    hitError2.Scale = new Vector2(-1, 1);
+                                    // origin flipped to match scale above.
+                                    hitError2.Origin = Anchor.CentreLeft;
+                                }
+
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
                                     d.UsesFixedAnchor = true;
                             })
@@ -64,7 +81,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                                     {
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
-                                    }
+                                    },
+                                    new BarHitErrorMeter(),
+                                    new BarHitErrorMeter(),
                                 },
                             };
                     }

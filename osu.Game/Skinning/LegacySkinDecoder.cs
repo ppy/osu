@@ -39,7 +39,10 @@ namespace osu.Game.Skinning
                                     skin.IsLatestVersion = true;
                                 }
                                 else if (decimal.TryParse(pair.Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal version))
+                                {
                                     skin.LegacyVersion = version;
+                                    skin.IsLatestVersion = false;
+                                }
 
                                 return;
                         }
@@ -64,6 +67,7 @@ namespace osu.Game.Skinning
         {
             var config = base.CreateTemplateObject();
             config.LegacyVersion = 1.0m;
+            config.IsLatestVersion = false;
             return config;
         }
     }

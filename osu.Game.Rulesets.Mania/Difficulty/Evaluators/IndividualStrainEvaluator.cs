@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 {
-    public class IndividualStrainEvaluator
+    public static class IndividualStrainEvaluator
     {
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {

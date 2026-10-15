@@ -23,12 +23,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public partial class FormDropdown<T> : OsuDropdown<T>, IFormControl
     {
         /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
+        /// Caption describing this control, displayed on top of the controls.
         /// </summary>
         public LocalisableString Caption { get; init; }
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Hint text containing an extended description of this control, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText
         {
@@ -66,6 +66,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             get
             {
                 yield return Caption;
+                yield return HintText;
 
                 foreach (var item in MenuItems)
                     yield return item.Text.Value;
@@ -110,7 +111,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     captionText = value;
 
                     if (caption.IsNotNull())
+                    {
                         caption.Caption = value;
+                        updateState();
+                    }
                 }
             }
 
@@ -230,6 +234,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
             private void updateState()
             {
                 caption.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content2;
+                caption.Alpha = Caption == default ? 0 : 1;
+
                 label.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 chevron.Colour = Dropdown.Current.Disabled ? colourProvider.Background1 : colourProvider.Content1;
                 DisabledColour = Colour4.White;

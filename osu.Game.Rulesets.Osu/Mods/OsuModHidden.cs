@@ -41,7 +41,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             static void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+                // Sliders retain their default TimeFadeIn to match Stable
+                if (osuObject is not Slider)
+                    osuObject.TimeFadeIn = osuObject.TimePreempt * FADE_IN_DURATION_MULTIPLIER;
+
                 foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
                     applyFadeInAdjustment(nested);
             }

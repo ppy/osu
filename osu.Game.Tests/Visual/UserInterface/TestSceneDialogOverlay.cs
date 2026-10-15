@@ -151,6 +151,34 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestPushWhileOverlayActivationUserTriggered()
+        {
+            PopupDialog dialog = null;
+
+            AddStep("set activation mode user triggered", () => overlayActivationMode.Value = OverlayActivation.UserTriggered);
+
+            AddUntilStep("overlay not visible", () => overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
+
+            AddStep("push dialog", () =>
+            {
+                overlay.Push(dialog = new TestPopupDialog
+                {
+                    Buttons = new PopupDialogButton[]
+                    {
+                        new PopupDialogOkButton { Text = @"OK" },
+                    },
+                });
+            });
+
+            AddUntilStep("overlay visible", () => overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddUntilStep("dialog displayed", () => dialog.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("set activation mode disabled", () => overlayActivationMode.Value = OverlayActivation.Disabled);
+            AddUntilStep("dialog hidden", () => dialog.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("dialog dismissed", () => overlay.CurrentDialog, () => Is.Null);
+        }
+
+        [Test]
         public void TestPushBeforeLoad()
         {
             PopupDialog dialog = null;

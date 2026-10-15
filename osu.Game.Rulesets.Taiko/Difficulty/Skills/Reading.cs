@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             var taikoObject = (TaikoDifficultyHitObject)current;
             int index = taikoObject.ColourData.MonoStreak?.HitObjects.IndexOf(taikoObject) ?? 0;
 
-            currentStrain *= DifficultyCalculationUtils.Logistic(index, 4, -1 / 25.0, 0.5) + 0.5;
+            currentStrain *= DiffUtils.Logistic(index, 4, -1 / 25.0, 0.5) + 0.5;
 
             currentStrain *= StrainDecayBase;
             currentStrain += ReadingEvaluator.EvaluateDifficultyOf(taikoObject) * SkillMultiplier;

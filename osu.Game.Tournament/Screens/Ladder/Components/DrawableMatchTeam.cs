@@ -46,8 +46,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             if (ladderInfo == null) return;
 
             //todo: tournamentgamebase?
-            if (ladderInfo.CurrentMatch.Value != null)
-                ladderInfo.CurrentMatch.Value.Current.Value = false;
+            ladderInfo.CurrentMatch.Value?.Current.Value = false;
 
             ladderInfo.CurrentMatch.Value = match;
             ladderInfo.CurrentMatch.Value.Current.Value = true;

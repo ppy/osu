@@ -66,7 +66,8 @@ namespace osu.Game.Overlays.Settings.Sections
             if (!handlerEnabled.Value)
             {
                 FlowContent.AutoSizeAxes = Axes.None;
-                FlowContent.ResizeHeightTo(0, 300, Easing.OutQuint);
+                FlowContent.ResizeHeightTo(0, 300, Easing.OutQuint)
+                           .FadeOut(300, Easing.OutQuint);
             }
             else
             {
@@ -76,6 +77,8 @@ namespace osu.Game.Overlays.Settings.Sections
                 FlowContent.AutoSizeDuration = state.NewValue == state.OldValue ? 0 : 300;
                 FlowContent.AutoSizeEasing = Easing.OutQuint;
                 FlowContent.AutoSizeAxes = Axes.Y;
+
+                FlowContent.FadeIn(300, Easing.OutQuint);
 
                 ScheduleAfterChildren(() => FlowContent.AutoSizeDuration = 0);
             }

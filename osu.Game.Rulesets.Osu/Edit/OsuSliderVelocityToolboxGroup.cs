@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,13 +8,16 @@ using osu.Framework.Caching;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Timing;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -24,16 +26,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// The slider velocity to be used for new object placements.
         /// </summary>
-        public IBindable<double> SliderVelocity => sliderVelocity;
+        public IBindable<double> SliderVelocity => sliderControl.Current;
 
-        private readonly BindableDouble sliderVelocity = new BindableDouble(1)
-        {
-            Precision = 0.01,
-            MinValue = 0.1,
-            MaxValue = 10,
-        };
-
-        private ExpandableSliderVelocityControl sliderControl = null!;
+        private ExpandableSliderVelocityAdjustmentControl sliderControl = null!;
         private ExpandableButton useLastSliderButton = null!;
 
         private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
@@ -45,8 +40,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         private EditorClock editorClock { get; set; } = null!;
 
         private double lastClockPosition = double.NegativeInfinity;
-
-        private bool syncingBindables;
 
         /// <summary>
         /// This <see cref="Cached"/> is used to track whether the "source" of slider velocity is valid.
@@ -83,21 +76,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            Spacing = new osuTK.Vector2(5);
+            Spacing = new Vector2(5);
             Children = new Drawable[]
             {
-                sliderControl = new ExpandableSliderVelocityControl
-                {
-                    ExpandedLabelText = "Slider velocity",
-                    Current = new BindableDouble(1)
-                    {
-                        Precision = 0.01,
-                        MinValue = 0.1,
-                        MaxValue = 10,
-                    },
-                    KeyboardStep = 0.1f,
-                    TransferValueOnCommit = true,
-                },
+                sliderControl = new ExpandableSliderVelocityAdjustmentControl(),
                 useLastSliderButton = new ExpandableButton
                 {
                     RelativeSizeAxes = Axes.X,
@@ -114,13 +96,19 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            sliderVelocity.BindValueChanged(_ => updateSliderControlFromVelocity(), true);
             sliderControl.Current.BindValueChanged(_ =>
             {
-                updateVelocityFromSliderControl();
                 updateContractedText();
-            });
-            updateContractedText();
+
+                // if the slider velocity source is valid,
+                // then this change to `sliderControl.Current` did not originate from the giant revalidation block in `Update()`,
+                // meaning it was user-inflicted, meaning that the user is now overriding the velocity source.
+                if (sliderVelocitySource.IsValid)
+                {
+                    overridingSliderVelocitySource = true;
+                    sliderVelocitySource.Invalidate();
+                }
+            }, true);
             useLastSliderButton.Expanded.BindValueChanged(_ => sliderVelocitySource.Invalidate());
 
             editorBeatmap.HitObjectAdded += invalidateSliderVelocitySourceObject;
@@ -133,63 +121,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void updateContractedText()
         {
             sliderControl.ContractedLabelText = LocalisableString.Interpolate($@"SV: {sliderControl.Current.Value.ToLocalisableString("N2")}x");
-        }
-
-        /// <summary>
-        /// Updates the displayed value of this toolbox's <see cref="sliderControl"/> from a change to <see cref="SliderVelocity"/>
-        /// (which is the source-of-truth used for new object placements).
-        /// This is only relevant when <see cref="overridingSliderVelocitySource"/> is false,
-        /// in which case this code is responsible for propagating the velocity from <see cref="sliderVelocitySource"/> to the slider.
-        /// </summary>
-        private void updateSliderControlFromVelocity()
-        {
-            if (syncingBindables)
-                return;
-
-            if (overridingSliderVelocitySource)
-                return;
-
-            syncingBindables = true;
-            sliderControl.Current.Value = sliderVelocity.Value;
-            syncingBindables = false;
-        }
-
-        /// <summary>
-        /// Updates the value of <see cref="SliderVelocity"/> from a user-provoked change to the <see cref="sliderControl"/>'s state.
-        /// </summary>
-        private void updateVelocityFromSliderControl()
-        {
-            if (syncingBindables)
-                return;
-
-            syncingBindables = true;
-
-            var selectedSliders = selectedHitObjects.OfType<Slider>().ToList();
-
-            if (selectedSliders.Any())
-            {
-                Debug.Assert(!overridingSliderVelocitySource);
-
-                editorBeatmap.BeginChange();
-
-                foreach (var selectedSlider in selectedSliders)
-                {
-                    selectedSlider.SliderVelocityMultiplier = sliderControl.Current.Value;
-                    editorBeatmap.Update(selectedSlider);
-                }
-
-                editorBeatmap.EndChange();
-
-                sliderControl.IsMultipleValues = false;
-            }
-            else
-            {
-                overridingSliderVelocitySource = true;
-                sliderVelocity.Value = sliderControl.Current.Value;
-            }
-
-            syncingBindables = false;
-            sliderVelocitySource.Invalidate();
         }
 
         private void invalidateSliderVelocitySourceObject(HitObject _) => sliderVelocitySource.Invalidate();
@@ -226,11 +157,13 @@ namespace osu.Game.Rulesets.Osu.Edit
                     useLastSliderButton.ExpandedLabelText = "Adjusting velocity of selection";
                     useLastSliderButton.ContractedLabelText = default;
 
-                    sliderControl.IsMultipleValues = selectedSliderVelocities.Count > 1;
-                    sliderVelocity.Value = selectedSliderVelocities.Count == 1 ? selectedSliderVelocities[0] : 1;
+                    sliderControl.ObjectsToAdjust.Clear();
+                    sliderControl.ObjectsToAdjust.AddRange(selectedHitObjects.OfType<Slider>());
                 }
                 else
                 {
+                    sliderControl.ObjectsToAdjust.Clear();
+
                     var lastSlider = editorBeatmap
                                      .HitObjects
                                      .OfType<Slider>()
@@ -249,8 +182,9 @@ namespace osu.Game.Rulesets.Osu.Edit
                             ? LocalisableString.Interpolate($@"Use last slider's velocity ({lastSlider.SliderVelocityMultiplier.ToLocalisableString("N2")}x)")
                             : "Using last slider's velocity";
                         useLastSliderButton.ContractedLabelText = $@"current {lastSlider.SliderVelocityMultiplier.ToLocalisableString("N2")}x";
+
                         if (!overridingSliderVelocitySource)
-                            sliderVelocity.Value = lastSlider.SliderVelocityMultiplier;
+                            sliderControl.Current.Value = lastSlider.SliderVelocityMultiplier;
                     }
                 }
 
@@ -270,56 +204,70 @@ namespace osu.Game.Rulesets.Osu.Edit
             base.Dispose(isDisposing);
         }
 
-        internal partial class ExpandableSliderVelocityControl : ExpandableSlider<double, SliderVelocityControl>
+        internal partial class ExpandableSliderVelocityAdjustmentControl : CompositeDrawable, IExpandable
         {
-            public bool IsMultipleValues
-            {
-                set => Slider.IsMultipleValues = value;
-            }
-
-            public bool TransferValueOnCommit
-            {
-                get => Slider.TransferValueOnCommit;
-                set => Slider.TransferValueOnCommit = value;
-            }
-        }
-
-        internal partial class SliderVelocityControl : FormSliderBar<double>
-        {
-            private bool isMultipleValues;
+            private readonly OsuSpriteText contractedLabel;
+            private readonly SliderVelocityAdjustmentControl adjustmentControl;
 
             /// <summary>
-            /// This is a hack to allow the text box to show an indication that multiple slider velocity values are active
-            /// when the selection contains multiple objects with different velocities.
+            /// The label text to display when this slider is in a contracted state.
             /// </summary>
-            public bool IsMultipleValues
+            public LocalisableString ContractedLabelText
             {
-                get => isMultipleValues;
-                set
+                get => contractedLabel.Text;
+                set => contractedLabel.Text = value;
+            }
+
+            public Bindable<double> Current => adjustmentControl.Current;
+            public bool IsMultipleValues => adjustmentControl.IsMultipleValues;
+            public BindableList<HitObject> ObjectsToAdjust => adjustmentControl.ObjectsToAdjust;
+
+            public BindableBool Expanded { get; } = new BindableBool();
+
+            public override bool HandlePositionalInput => true;
+
+            public ExpandableSliderVelocityAdjustmentControl()
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+
+                InternalChild = new FillFlowContainer
                 {
-                    if (isMultipleValues == value)
-                        return;
-
-                    isMultipleValues = value;
-                    updateLabelFormat();
-                }
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0f, 10f),
+                    Children = new Drawable[]
+                    {
+                        contractedLabel = new OsuSpriteText(),
+                        adjustmentControl = new SliderVelocityAdjustmentControl(),
+                    }
+                };
             }
 
-            private void updateLabelFormat()
-            {
-                LabelFormat = isMultipleValues
-                    ? static _ => "(multiple)"
-                    : v => LocalisableString.Interpolate($"{v:0.00}x");
-            }
+            [Resolved]
+            private IExpandingContainer? expandingContainer { get; set; }
 
-            public SliderVelocityControl()
+            protected override void LoadComplete()
             {
-                updateLabelFormat();
+                base.LoadComplete();
 
-                // The `IsMultipleValues` / `updateLabelFormat()` hack above to jam an indicator of multiple active values does not work for tooltip
-                // because the tooltip machinery framework-side is too smart for it (the tooltip text is only regenerated on direct changes to `Current`).
-                // Just disable it to hide the skeleton. It's of little use anyhow.
-                TooltipFormat = _ => default;
+                expandingContainer?.Expanded.BindValueChanged(containerExpanded =>
+                {
+                    Expanded.Value = containerExpanded.NewValue;
+                }, true);
+
+                Expanded.BindValueChanged(v =>
+                {
+                    contractedLabel.FadeTo(v.NewValue ? 0 : 1);
+
+                    adjustmentControl.FadeTo(v.NewValue ? Current.Disabled ? 0.3f : 1f : 0f, 500, Easing.OutQuint);
+                    adjustmentControl.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
+                }, true);
+
+                Current.BindDisabledChanged(disabled =>
+                {
+                    adjustmentControl.Alpha = Expanded.Value ? disabled ? 0.3f : 1 : 0f;
+                });
             }
         }
     }

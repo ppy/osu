@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -69,9 +70,13 @@ namespace osu.Game.Screens.Play
             this.targetUser = targetUser;
         }
 
+        private Bindable<bool> preferNoVideo = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
+
             InternalChild = new Container
             {
                 Masking = true,
@@ -100,7 +105,7 @@ namespace osu.Game.Screens.Play
                         {
                             new OsuSpriteText
                             {
-                                Text = "Spectator Mode",
+                                Text = SoloSpectatorScreenStrings.SpectatorMode,
                                 Font = OsuFont.Default.With(size: 30),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -145,7 +150,7 @@ namespace osu.Game.Screens.Play
                             },
                             watchButton = new PurpleRoundedButton
                             {
-                                Text = "Start Watching",
+                                Text = SoloSpectatorScreenStrings.StartWatching,
                                 Width = 250,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -266,7 +271,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(beatmap))
                 return;
 
-            beatmapDownloader.Download(beatmap.BeatmapSet);
+            beatmapDownloader.Download(beatmap.BeatmapSet, preferNoVideo.Value);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
