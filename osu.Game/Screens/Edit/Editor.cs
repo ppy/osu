@@ -1206,6 +1206,17 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public void ReloadComposeScreen()
         {
+            // Can be requested mid-update. Disposing the compose screen synchronously crashes that update.
+            if (scheduledComposeReload != null)
+                return;
+
+            scheduledComposeReload = Schedule(reloadComposeScreen);
+        }
+
+        private void reloadComposeScreen()
+        {
+            scheduledComposeReload = null;
+
             screenContainer.SingleOrDefault(s => s.Type == EditorScreenMode.Compose)?.RemoveAndDisposeImmediately();
 
             // If not currently on compose screen, the reload will happen on next mode change.
@@ -1213,6 +1224,9 @@ namespace osu.Game.Screens.Edit
             if (Mode.Value == EditorScreenMode.Compose)
                 Mode.TriggerChange();
         }
+
+        [CanBeNull]
+        private ScheduledDelegate scheduledComposeReload;
 
         [CanBeNull]
         private ScheduledDelegate playbackDisabledDebounce;
