@@ -120,12 +120,12 @@ namespace osu.Game.Users
         /// <summary>
         /// Panel background container. Can be null if a panel doesn't want a background under it's layout
         /// </summary>
-        protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
+        protected virtual Drawable? CreateBackground() => Background = new CoverBackground
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            User = User
+            Model = User
         };
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
@@ -199,7 +199,7 @@ namespace osu.Game.Users
 
                     if (canDuelUser())
                     {
-                        items.Add(new OsuMenuItem("Duel", MenuItemType.Standard, () =>
+                        items.Add(new OsuMenuItem(ContextMenuStrings.DuelPlayer, MenuItemType.Standard, () =>
                         {
                             if (canDuelUser())
                                 queueController?.IssueDuel(queueController.SelectedPool.Value!, User.Id);

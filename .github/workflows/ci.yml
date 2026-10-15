@@ -16,10 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install .NET 8.0.x
+      - name: Install .NET 10.0.x
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Restore Tools
         run: dotnet tool restore
@@ -55,6 +55,7 @@ jobs:
           # this is WTF tier but if you don't specify *both* of these the defaults assume `build: true`
           build: false
           no-build: true
+          tool-version: '2026.2.1'
           solution: ./osu.Desktop.slnf
           caches-home: inspectcode
           verbosity: WARN
@@ -78,27 +79,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install .NET 8.0.x
+      - name: Install .NET 10.0.x
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: >
-          dotnet test
-          osu.Game.Tests/bin/Debug/**/osu.Game.Tests.dll
-          osu.Game.Rulesets.Osu.Tests/bin/Debug/**/osu.Game.Rulesets.Osu.Tests.dll
-          osu.Game.Rulesets.Taiko.Tests/bin/Debug/**/osu.Game.Rulesets.Taiko.Tests.dll
-          osu.Game.Rulesets.Catch.Tests/bin/Debug/**/osu.Game.Rulesets.Catch.Tests.dll
-          osu.Game.Rulesets.Mania.Tests/bin/Debug/**/osu.Game.Rulesets.Mania.Tests.dll
-          osu.Game.Tournament.Tests/bin/Debug/**/osu.Game.Tournament.Tests.dll
-          Templates/**/*.Tests/bin/Debug/**/*.Tests.dll
-          --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
-          --
-          NUnit.ConsoleOut=0
+        run: dotnet test osu.Desktop.slnf --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx" -- NUnit.ConsoleOut=0
 
       # Attempt to upload results even if test fails.
       # https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#cancelled
@@ -107,7 +97,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
-          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+          path: ${{github.workspace}}/**/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
 
   test-results:
     name: Test results
@@ -131,7 +121,7 @@ jobs:
         uses: dorny/test-reporter@v3.0.0
         with:
           name: Results
-          path: "*.trx"
+          path: "**/*.trx"
           reporter: dotnet-trx
           list-suites: 'failed'
           list-tests: 'failed'
@@ -151,10 +141,10 @@ jobs:
           distribution: microsoft
           java-version: 11
 
-      - name: Install .NET 8.0.x
+      - name: Install .NET 10.0.x
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Install .NET workloads
         run: dotnet workload install android
@@ -164,24 +154,19 @@ jobs:
 
   build-only-ios:
     name: Build only (iOS)
-    runs-on: macos-15
+    runs-on: xcode-27
     timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install .NET 8.0.x
+      - name: Install .NET 10.0.x
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Install .NET Workloads
         run: dotnet workload install ios
-
-      # https://github.com/dotnet/macios/issues/19157
-      # https://github.com/actions/runner-images/issues/12758
-      - name: Use Xcode 16.4
-        run: sudo xcode-select -switch /Applications/Xcode_16.4.app
 
       - name: Build
         run: dotnet build -c Debug osu.iOS.slnf

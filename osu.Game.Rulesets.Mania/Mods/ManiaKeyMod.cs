@@ -14,7 +14,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => Name;
         public abstract int KeyCount { get; }
         public override ModType Type => ModType.Conversion;
-        public override double ScoreMultiplier => 0.9;
         public override bool Ranked => UsesDefaultConfiguration;
 
         public void ApplyToBeatmapConverter(IBeatmapConverter beatmapConverter)

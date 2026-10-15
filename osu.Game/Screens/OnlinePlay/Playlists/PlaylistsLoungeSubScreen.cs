@@ -5,16 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -23,19 +24,24 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
-        private Dropdown<PlaylistsCategory> categoryDropdown = null!;
+        private FormEnumDropdown<PlaylistsCategory> categoryDropdown = null!;
 
         protected override IEnumerable<Drawable> CreateFilterControls()
         {
-            categoryDropdown = new SlimEnumDropdown<PlaylistsCategory>
+            foreach (var control in base.CreateFilterControls())
+                yield return control;
+
+            yield return new Container
             {
-                RelativeSizeAxes = Axes.None,
                 Width = 160,
+                AutoSizeAxes = Axes.Y,
+                Child = categoryDropdown = new FormEnumDropdown<PlaylistsCategory>
+                {
+                    Caption = LoungeSubScreenStrings.PlaylistFilterCategory,
+                }
             };
 
             categoryDropdown.Current.BindValueChanged(_ => UpdateFilter());
-
-            return base.CreateFilterControls().Append(categoryDropdown);
         }
 
         protected override LoungeFilterCriteria CreateFilterCriteria()

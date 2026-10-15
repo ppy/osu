@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
         private void load()
         {
             // from #10339 maybe this is a better visual effect
-            Add(new Container
+            FooterContent.Add(new Container
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,

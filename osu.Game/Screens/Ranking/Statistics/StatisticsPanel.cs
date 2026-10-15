@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 {
     public partial class StatisticsPanel : VisibilityContainer
     {
-        public const float SIDE_PADDING = 30;
+        public const float SIDE_PADDING = 20;
 
         public readonly Bindable<ScoreInfo?> Score = new Bindable<ScoreInfo?>();
 
@@ -70,8 +71,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 2,
                     Right = SIDE_PADDING,
-                    Top = ScorePanel.EXPANDED_TOP_LAYER_HEIGHT,
-                    Bottom = 15 // Approximate padding to the bottom of the score panel.
                 },
                 Children = new Drawable[]
                 {
@@ -142,24 +141,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                 else
                 {
                     FillFlowContainer flow;
-                    container = new OsuScrollContainer(Direction.Vertical)
+                    container = flow = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Masking = false,
-                        ScrollbarOverlapsContent = false,
-                        Alpha = 0,
-                        Children = new[]
-                        {
-                            flow = new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(30, 10),
-                                Direction = FillDirection.Full,
-                            }
-                        }
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Full,
                     };
 
                     bool anyRequiredHitEvents = false;
@@ -264,7 +253,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 if (preventTaggingReason == null)
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new UserTagControl(newScore.BeatmapInfo)
+                    yield return new StatisticItem("Beatmap tags", () => new UserTagControl(newScore.BeatmapInfo)
                     {
                         Writable = true,
                         RelativeSizeAxes = Axes.X,
@@ -274,31 +263,42 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
                 else
                 {
-                    yield return new StatisticItem("Tag the beatmap!", () => new FillFlowContainer<CompositeDrawable>
+                    yield return new StatisticItem("Beatmap tags", () => new Container
                     {
-                        Children = new CompositeDrawable[]
+                        Children = new Drawable[]
                         {
-                            new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                TextAnchor = Anchor.Centre,
-                                Text = preventTaggingReason,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
                             new UserTagControl(newScore.BeatmapInfo)
                             {
                                 Writable = false,
                                 RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            new Container
+                            {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                            }
+                                AutoSizeAxes = Axes.Both,
+                                Masking = true,
+                                EdgeEffect = new EdgeEffectParameters
+                                {
+                                    Radius = 60,
+                                    Roundness = 8,
+                                    Colour = OsuColour.Gray(0.18f),
+                                    Type = EdgeEffectType.Shadow,
+                                },
+                                Children = new Drawable[]
+                                {
+                                    new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold))
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Text = preventTaggingReason,
+                                    },
+                                }
+                            },
                         },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(4),
                     });
                 }
             }

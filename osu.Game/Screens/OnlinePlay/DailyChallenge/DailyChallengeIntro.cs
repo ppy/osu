@@ -23,6 +23,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -338,7 +339,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
 
             if (config.Get<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps))
             {
-                if (!beatmapManager.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmap.BeatmapSet!.OnlineID }))
+                if (!beatmapManager.IsAvailableLocally(beatmap))
                     beatmapDownloader.Download(beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
             }
 

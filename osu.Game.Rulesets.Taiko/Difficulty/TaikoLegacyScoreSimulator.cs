@@ -66,12 +66,21 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 drainLength = ((int)Math.Round(baseBeatmap.HitObjects[^1].StartTime) - (int)Math.Round(baseBeatmap.HitObjects[0].StartTime) - breakLength) / 1000;
             }
 
-            difficultyPeppyStars = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(baseBeatmap.Difficulty, objectCount, drainLength);
+            var alteredDifficulty = baseBeatmap.Difficulty.Clone();
+            // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManagerTaiko.cs#L78
+            alteredDifficulty.CircleSize = 2;
+
+            difficultyPeppyStars = LegacyRulesetExtensions.CalculateDifficultyPeppyStars(alteredDifficulty, objectCount, drainLength);
 
             LegacyScoreAttributes attributes = new LegacyScoreAttributes();
 
-            foreach (var obj in playableBeatmap.HitObjects)
-                simulateHit(obj, ref attributes);
+            for (int i = 0; i < playableBeatmap.HitObjects.Count; ++i)
+            {
+                simulateHit(
+                    playableBeatmap.HitObjects[i],
+                    i < playableBeatmap.HitObjects.Count - 1 ? playableBeatmap.HitObjects[i + 1] : null,
+                    ref attributes);
+            }
 
             attributes.BonusScoreRatio = legacyBonusScore == 0 ? 0 : (double)standardisedBonusScore / legacyBonusScore;
             attributes.BonusScore = legacyBonusScore;
@@ -80,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return attributes;
         }
 
-        private void simulateHit(HitObject hitObject, ref LegacyScoreAttributes attributes)
+        private void simulateHit(HitObject hitObject, HitObject? nextHitObject, ref LegacyScoreAttributes attributes)
         {
             bool increaseCombo = true;
             bool addScoreComboMultiplier = false;
@@ -126,7 +135,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     halfSpinsRequiredForCompletion = Math.Max(1, (int)(halfSpinsRequiredForCompletion * 1.5f));
 
                     for (int i = 0; i <= halfSpinsRequiredForCompletion; i++)
-                        simulateHit(new SwellTick(), ref attributes);
+                        simulateHit(new SwellTick(), null, ref attributes);
 
                     scoreIncrease = 300;
                     addScoreComboMultiplier = true;
@@ -140,9 +149,19 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     addScoreComboMultiplier = true;
                     break;
 
-                case DrumRoll:
-                    foreach (var nested in hitObject.NestedHitObjects)
-                        simulateHit(nested, ref attributes);
+                case DrumRoll drumRoll:
+                    double minHitDelay = getSliderTaikoMinHitDelay(drumRoll);
+
+                    // source for `HittableEndTime`:
+                    // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjects/Taiko/SliderTaiko.cs#L157
+                    // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjects/Taiko/SliderTaiko.cs#L225-L228
+                    double? nextObjectHittableStartTime = nextHitObject is DrumRoll nextDrumRoll ? nextDrumRoll.StartTime - getSliderTaikoMinHitDelay(nextDrumRoll) : nextHitObject?.StartTime;
+                    bool endpointHittable = nextObjectHittableStartTime == null || nextObjectHittableStartTime - (drumRoll.EndTime + (int)minHitDelay) > (int)minHitDelay;
+                    double hittableEndTime = endpointHittable ? drumRoll.EndTime + (int)minHitDelay : drumRoll.EndTime;
+
+                    // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjects/Taiko/SliderTaiko.cs#L288
+                    for (double i = drumRoll.StartTime; i < hittableEndTime; i += minHitDelay)
+                        simulateHit(new DrumRollTick(drumRoll) { IsStrong = drumRoll.IsStrong }, null, ref attributes);
                     return;
 
                 case StrongNestedHitObject:
@@ -206,6 +225,31 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             if (increaseCombo)
                 combo++;
+        }
+
+        // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjects/Taiko/SliderTaiko.cs#L74-L92
+        private double getSliderTaikoMinHitDelay(DrumRoll drumRoll)
+        {
+            double maxRate;
+            double beatLength = playableBeatmap.ControlPointInfo.TimingPointAt(drumRoll.StartTime).BeatLength;
+
+            if (playableBeatmap.BeatmapVersion >= 8)
+            {
+                double sliderTickRate = playableBeatmap.Difficulty.SliderTickRate;
+                if (sliderTickRate == 3 || sliderTickRate == 6 || sliderTickRate == 1.5d)
+                    maxRate = beatLength / 6;
+                else
+                    maxRate = beatLength / 8;
+            }
+            else
+                maxRate = beatLength / 8;
+
+            while (maxRate < 60)
+                maxRate *= 2;
+            while (maxRate > 120)
+                maxRate /= 2;
+
+            return maxRate;
         }
 
         public double GetLegacyScoreMultiplier(IReadOnlyList<Mod> mods, LegacyBeatmapConversionDifficultyInfo difficulty)

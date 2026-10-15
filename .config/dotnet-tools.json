@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "jetbrains.resharper.globaltools": {
-      "version": "2025.2.3",
+      "version": "2026.2.1",
       "commands": [
         "jb"
       ],
@@ -17,7 +17,7 @@
       "rollForward": false
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2025.1208.0",
+      "version": "2026.611.0",
       "commands": [
         "localisation"
       ],

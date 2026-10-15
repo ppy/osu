@@ -15,6 +15,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -36,6 +37,7 @@ namespace osu.Game.Screens.Select
         protected virtual bool ShowManageCollectionsItem => true;
 
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
+        private readonly Bindable<string> configCollectionFilter = new Bindable<string>();
 
         [Resolved]
         private ManageCollectionsDialog? manageCollectionsDialog { get; set; }
@@ -56,6 +58,12 @@ namespace osu.Game.Screens.Select
             AlwaysShowSearchBar = true;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager configManager)
+        {
+            configManager.BindWith(OsuSetting.SongSelectCollectionFilter, configCollectionFilter);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -74,6 +82,8 @@ namespace osu.Game.Screens.Select
                 filters.AddRange(collections.Select(c => new CollectionFilterMenuItem(c.ToLive(realm))));
                 if (ShowManageCollectionsItem)
                     filters.Add(new ManageCollectionsFilterMenuItem());
+
+                Current.Value = filters.SingleOrDefault(item => item.Collection?.PerformRead(c => c.ID.ToString()) == configCollectionFilter.Value) ?? allBeatmapsItem;
             }
             else
             {
@@ -121,12 +131,22 @@ namespace osu.Game.Screens.Select
             if (filter.NewValue.IsNull())
                 return;
 
-            // Never select the manage collection filter - rollback to the previous filter.
-            // This is done after the above since it is important that bindable is unbound from OldValue, which is lost after forcing it back to the old value.
-            if (filter.NewValue is ManageCollectionsFilterMenuItem)
+            switch (filter.NewValue)
             {
-                Current.Value = filter.OldValue;
-                manageCollectionsDialog?.Show();
+                case ManageCollectionsFilterMenuItem:
+                    // Never select the manage collection filter - rollback to the previous filter.
+                    // This is done after the above since it is important that bindable is unbound from OldValue, which is lost after forcing it back to the old value.
+                    Current.Value = filter.OldValue;
+                    manageCollectionsDialog?.Show();
+                    break;
+
+                case CollectionFilterMenuItem collectionMenuItem when collectionMenuItem.Collection != null:
+                    configCollectionFilter.Value = collectionMenuItem.Collection.PerformRead(c => c.ID.ToString());
+                    break;
+
+                case AllBeatmapsCollectionFilterMenuItem:
+                    configCollectionFilter.Value = string.Empty;
+                    break;
             }
         }
 

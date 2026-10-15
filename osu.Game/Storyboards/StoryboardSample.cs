@@ -18,6 +18,8 @@ namespace osu.Game.Storyboards
 
         public int Volume { get; }
 
+        public bool IsHitsound => false;
+
         public IEnumerable<string> LookupNames => new[]
         {
             // Try first with the full name, then attempt with no path

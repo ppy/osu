@@ -12,7 +12,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => string.Empty;
         public override string Acronym => string.Empty;
         public override LocalisableString Description => string.Empty;
-        public override double ScoreMultiplier => 0;
 
         public Mod[] Mods { get; }
 
