@@ -35,13 +35,18 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (ObjectDifficulties.Count == 0)
                 return 0;
 
-            (double difficulty, _) = HarmonicSeries.Aggregate(peaks, harmonicScale: 15, decayExponent: 0.7);
+            // Difficulty reduction based on time: the earlier strain is, the easier it is to catch
+            const double reduced_difficulty_sections = 60.0; // a total of 60 sections (equivalently: first 45 seconds) are affected
+            const double reduced_difficulty_base_line = 0.6;
+            const double reduced_difficulty_power = 0.45;
 
-            // The shortest maps are believed to be valued too much
-            // lengthBonus decreases the value of maps with less than 600x combo at quadratic pace
-            // 600x combo is chosen as it is around the standard amount of combo for "TV size" maps at Overdose level
-            double lengthBonus = 0.75 + 0.25 * (1.0 - Math.Pow((Math.Min(ObjectDifficulties.Count + 1, 600.0) / 600.0) - 1.0, 2.0));
-            difficulty *= lengthBonus;
+            for (int sectionCount = 0; sectionCount < Math.Min(reduced_difficulty_sections, peaks.Count); sectionCount++)
+            {
+                double scale = Math.Pow(Math.Min(1.0, sectionCount / reduced_difficulty_sections), reduced_difficulty_power);
+                peaks[sectionCount] *= reduced_difficulty_base_line + (1.0 - reduced_difficulty_base_line) * scale;
+            }
+
+            (double difficulty, _) = HarmonicSeries.Aggregate(peaks, harmonicScale: 15, decayExponent: 0.7);
 
             return difficulty;
         }
