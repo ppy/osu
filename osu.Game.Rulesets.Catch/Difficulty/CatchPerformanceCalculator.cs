@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchPerformanceCalculator : PerformanceCalculator
     {
-        private const double performance_multiplier = 1.2;
+        private const double performance_multiplier = 1.23;
 
         private int num300;
         private int num100;
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double approachRateFactor = 1.0;
             if (approachRate >= 9.0)
-                approachRateFactor += Math.Pow((approachRate - 9.0) / 2.0, 2.0) * 0.38; // 38% for AR11
+                approachRateFactor += Math.Pow((approachRate - 9.0) / 2.0, 2.5) * 0.38; // 38% for AR11
             else if (approachRate < 8.0)
                 approachRateFactor += 0.025 * (8.0 - approachRate); // 20% for AR0
 
