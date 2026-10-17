@@ -54,8 +54,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     /// </summary>
     public partial class ScreenQueue : OsuScreen
     {
-        public override bool ShowFooter => true;
-
         public override bool? ApplyModTrackAdjustments => false;
 
         private Container mainContent = null!;
@@ -109,6 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public ScreenQueue(MatchmakingPoolType poolType)
         {
             this.poolType = poolType;
+            FooterContent.Value = ScreenFooterContent.Argon();
         }
 
         [BackgroundDependencyLoader]
@@ -125,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Children = new Drawable[]
                 {
                     waitingLoop = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop")),
-                    new GlobalScrollAdjustsVolume(),
+                    new ScrollAdjustsVolume(),
                     mainGrid = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -389,7 +388,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             currentState.BindValueChanged(s => SetState(s.NewValue));
 
             selectedPool.BindTo(queue.SelectedPool);
-            selectedPool.BindValueChanged(e => refreshLobbyData());
+            selectedPool.BindValueChanged(_ => refreshLobbyData());
 
             isConnected = client.IsConnected.GetBoundCopy();
             isConnected.BindValueChanged(connected => Schedule(() =>

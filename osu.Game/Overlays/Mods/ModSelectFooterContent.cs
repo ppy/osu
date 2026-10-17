@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Mods
             }, true);
 
             Ruleset.BindValueChanged(_ => updateInformation());
-            ActiveMods.BindValueChanged(m =>
+            ActiveMods.BindValueChanged(_ =>
             {
                 updateInformation();
 

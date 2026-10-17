@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
@@ -316,7 +317,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!score.Mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
-            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty);
+            Debug.Assert(attributes.FlashlightDifficulty != null);
+
+            double flashlightValue = Flashlight.DifficultyToPerformance(attributes.FlashlightDifficulty.Value);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)

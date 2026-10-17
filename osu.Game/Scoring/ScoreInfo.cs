@@ -209,9 +209,16 @@ namespace osu.Game.Scoring
         [MapTo(nameof(Rank))]
         public int RankInt { get; set; }
 
+        #region IScoreInfo
+
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
+        IEnumerable<IConfiguredMod> IScoreInfo.Mods => APIMods;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.Statistics => Statistics;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.MaximumStatistics => MaximumStatistics;
+
+        #endregion
 
         #region Properties required to make things work with existing usages
 
@@ -359,36 +366,6 @@ namespace osu.Game.Scoring
             ModsJson = APIMods.Length > 0
                 ? JsonConvert.SerializeObject(APIMods)
                 : string.Empty;
-        }
-
-        public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
-        {
-            foreach (var r in Ruleset.CreateInstance().GetHitResultsForDisplay())
-            {
-                int value = Statistics.GetValueOrDefault(r.result);
-
-                switch (r.result)
-                {
-                    case HitResult.SmallTickHit:
-                    case HitResult.LargeTickHit:
-                    case HitResult.SliderTailHit:
-                    case HitResult.LargeBonus:
-                    case HitResult.SmallBonus:
-                        if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, count, r.displayName);
-
-                        break;
-
-                    case HitResult.SmallTickMiss:
-                    case HitResult.LargeTickMiss:
-                        break;
-
-                    default:
-                        yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
-
-                        break;
-                }
-            }
         }
 
         #endregion

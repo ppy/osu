@@ -23,6 +23,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.Play.HUD;
 using osuTK;

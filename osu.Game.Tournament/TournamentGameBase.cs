@@ -178,7 +178,7 @@ namespace osu.Game.Tournament
 
                 ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
 
-                ladder.Ruleset.BindValueChanged(r =>
+                ladder.Ruleset.BindValueChanged(_ =>
                 {
                     // Refetch player rank data on next startup as the ruleset has changed.
                     foreach (var team in ladder.Teams)
