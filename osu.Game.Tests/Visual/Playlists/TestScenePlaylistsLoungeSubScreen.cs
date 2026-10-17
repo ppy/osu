@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -63,7 +65,7 @@ namespace osu.Game.Tests.Visual.Playlists
         }
 
         [Test]
-        public void TestCloseButtonHiddenWhenCreatingCopy()
+        public void TestCloseButtonStatesWhenCreatingCopy()
         {
             createRooms(GenerateRooms(30));
 
@@ -74,6 +76,27 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("click create copy", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("wait for footer to load", () => this.ChildrenOfType<PlaylistsRoomFooter>().SingleOrDefault()?.IsLoaded == true);
             AddAssert("close button hidden", () => !this.ChildrenOfType<PlaylistsRoomFooter>().Single().ChildrenOfType<DangerousRoundedButton>().Any());
+
+            AddStep("register request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case CreateRoomRequest request:
+                        var room = new APICreatedRoom();
+                        room.CopyFrom(request.Room);
+                        room.RoomID = 1;
+                        room.StartDate = DateTimeOffset.Now;
+                        room.Host = API.LocalUser.Value;
+
+                        request.TriggerSuccess(room);
+                        return true;
+                }
+
+                return false;
+            });
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            AddAssert("close button visible", () => this.ChildrenOfType<PlaylistsRoomFooter>().Single().ChildrenOfType<DangerousRoundedButton>().Any());
             AddStep("press esc", () => InputManager.Key(Key.Escape));
             AddStep("confirm exit", () => InputManager.Key(Key.Enter));
         }
