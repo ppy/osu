@@ -327,6 +327,16 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString OnlineFunctionalityIsNotAvailable => new TranslatableString(getKey(@"online_functionality_is_not_available"), @"Online functionality is not available.");
 
+        /// <summary>
+        /// "Server outage in progress"
+        /// </summary>
+        public static LocalisableString ServerOutageInProgress => new TranslatableString(getKey(@"server_outage_in_progress"), @"Server outage in progress");
+
+        /// <summary>
+        /// "Online functionality is not available due to an outage. Sorry for the inconvenience."
+        /// </summary>
+        public static LocalisableString ServerOutageExplanation => new TranslatableString(getKey(@"server_outage_explanation"), @"Online functionality is not available due to an outage. Sorry for the inconvenience.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
