@@ -337,6 +337,11 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString ServerOutageExplanation => new TranslatableString(getKey(@"server_outage_explanation"), @"Online functionality is not available due to an outage. Sorry for the inconvenience.");
 
+        /// <summary>
+        /// "{0} challenged you to a duel ({1}). Click to accept."
+        /// </summary>
+        public static LocalisableString UserChallengedYouToDuel(string username, string poolName) => new TranslatableString(getKey(@"user_challenged_you_to_duel"), @"{0} challenged you to a duel ({1}). Click to accept.", username, poolName);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
