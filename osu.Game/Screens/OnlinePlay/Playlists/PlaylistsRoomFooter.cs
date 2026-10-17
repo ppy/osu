@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void hideCloseButton()
         {
             closeButton.ResizeWidthTo(0, 100, Easing.OutQuint)
-                       .Then().FadeOut().Expire();
+                       .Then().FadeOut();
         }
 
         private void onRoomChanged(object? sender, PropertyChangedEventArgs e)
@@ -87,6 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 case nameof(Room.Status):
                 case nameof(Room.Host):
                 case nameof(Room.StartDate):
+                case nameof(Room.EndDate):
                     updateState();
                     break;
             }
