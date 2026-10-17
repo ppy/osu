@@ -688,8 +688,8 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("push screen", () => LoadScreen(roomScreen = new PlaylistsRoomSubScreen(room)));
             AddUntilStep("wait for screen load", () => roomScreen.IsCurrentScreen());
-            AddAssert("close button present", () => roomScreen.ChildrenOfType<DangerousRoundedButton>().Any());
-            AddUntilStep("wait for close button to disappear", () => !roomScreen.ChildrenOfType<DangerousRoundedButton>().Any());
+            AddAssert("close button present", () => roomScreen.ChildrenOfType<DangerousRoundedButton>().Single().IsPresent);
+            AddUntilStep("wait for close button to disappear", () => !roomScreen.ChildrenOfType<DangerousRoundedButton>().Single().IsPresent);
         }
 
         [Test]
@@ -714,7 +714,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("push screen", () => LoadScreen(roomScreen = new PlaylistsRoomSubScreen(room)));
             AddUntilStep("wait for screen load", () => roomScreen.IsCurrentScreen());
-            AddAssert("close button present", () => roomScreen.ChildrenOfType<DangerousRoundedButton>().Any());
+            AddAssert("close button present", () => roomScreen.ChildrenOfType<DangerousRoundedButton>().Single().IsPresent);
             AddStep("click close button", () => roomScreen.ChildrenOfType<DangerousRoundedButton>().Single().TriggerClick());
 
             AddStep("register request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
@@ -730,7 +730,7 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddStep("confirm dialog", () => InputManager.Key(Key.Enter));
-            AddAssert("close button hidden", () => !roomScreen.ChildrenOfType<DangerousRoundedButton>().Any());
+            AddAssert("close button hidden", () => !roomScreen.ChildrenOfType<DangerousRoundedButton>().Single().IsPresent);
         }
 
         protected override void Dispose(bool isDisposing)

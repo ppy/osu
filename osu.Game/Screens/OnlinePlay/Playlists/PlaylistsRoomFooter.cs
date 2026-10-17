@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void hideCloseButton()
         {
             closeButton.ResizeWidthTo(0, 100, Easing.OutQuint)
-                       .Then().FadeOut().Expire();
+                       .Then().FadeOut();
         }
 
         private void onRoomChanged(object? sender, PropertyChangedEventArgs e)
@@ -108,8 +108,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 else if (closeButton.Alpha > 0)
                     hideCloseButton();
             }
-            else
-                closeButton.Expire();
         }
 
         protected override void Dispose(bool isDisposing)

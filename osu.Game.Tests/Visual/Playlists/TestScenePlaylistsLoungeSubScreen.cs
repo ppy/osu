@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 () => InputManager.MoveMouseTo(this.ChildrenOfType<OsuContextMenu>().Single().ChildrenOfType<DrawableOsuMenuItem>().Single(i => i.Item.Text.ToString() == "Create copy")));
             AddStep("click create copy", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("wait for footer to load", () => this.ChildrenOfType<PlaylistsRoomFooter>().SingleOrDefault()?.IsLoaded == true);
-            AddAssert("close button hidden", () => !this.ChildrenOfType<PlaylistsRoomFooter>().Single().ChildrenOfType<DangerousRoundedButton>().Any());
+            AddAssert("close button hidden", () => !this.ChildrenOfType<PlaylistsRoomFooter>().Single().ChildrenOfType<DangerousRoundedButton>().Single().IsPresent);
 
             AddStep("register request handling", () => ((DummyAPIAccess)API).HandleRequest = req =>
             {
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
-            AddAssert("close button visible", () => this.ChildrenOfType<PlaylistsRoomFooter>().Single().ChildrenOfType<DangerousRoundedButton>().Any());
+            AddAssert("close button present", () => this.ChildrenOfType<PlaylistsRoomFooter>().Single().ChildrenOfType<DangerousRoundedButton>().Single().IsPresent);
             AddStep("press esc", () => InputManager.Key(Key.Escape));
             AddStep("confirm exit", () => InputManager.Key(Key.Enter));
         }
