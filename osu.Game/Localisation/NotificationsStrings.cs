@@ -292,6 +292,41 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString CollectionBeatmapsAdded(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_beatmaps_added"), @"Added {0} beatmaps to collection ""{1}"".", beatmapsCount, name);
 
+        /// <summary>
+        /// "Cannot start play"
+        /// </summary>
+        public static LocalisableString CannotStartPlay => new TranslatableString(getKey(@"cannot_start_play"), @"Cannot start play");
+
+        /// <summary>
+        /// "Score will not be submitted"
+        /// </summary>
+        public static LocalisableString ScoreWillNotBeSubmitted => new TranslatableString(getKey(@"score_will_not_be_submitted"), @"Score will not be submitted");
+
+        /// <summary>
+        /// "Failed to retrieve a score submission token."
+        /// </summary>
+        public static LocalisableString FailedToRetrieveScoreSubmissionToken => new TranslatableString(getKey(@"failed_to_retrieve_score_submission_token"), @"Failed to retrieve a score submission token.");
+
+        /// <summary>
+        /// "Please ensure that you are using the latest version of the official game releases."
+        /// </summary>
+        public static LocalisableString PreventSubmittingWithOutdatedClient => new TranslatableString(getKey(@"prevent_submitting_with_outdated_client"), @"Please ensure that you are using the latest version of the official game releases.");
+
+        /// <summary>
+        /// "This beatmap does not match the online version. Please update or redownload it."
+        /// </summary>
+        public static LocalisableString PreventSubmittingWithInvalidBeatmapHash => new TranslatableString(getKey(@"prevent_submitting_with_invalid_beatmap_hash"), @"This beatmap does not match the online version. Please update or redownload it.");
+
+        /// <summary>
+        /// "Your system clock is set incorrectly. Please check your system time, date and timezone."
+        /// </summary>
+        public static LocalisableString PreventSubmittingWithExpiredToken => new TranslatableString(getKey(@"prevent_submitting_with_expired_token"), @"Your system clock is set incorrectly. Please check your system time, date and timezone.");
+
+        /// <summary>
+        /// "Online functionality is not available."
+        /// </summary>
+        public static LocalisableString OnlineFunctionalityIsNotAvailable => new TranslatableString(getKey(@"online_functionality_is_not_available"), @"Online functionality is not available.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

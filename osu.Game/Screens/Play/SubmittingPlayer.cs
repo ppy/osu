@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -144,12 +146,12 @@ namespace osu.Game.Screens.Play
 
                 if (displayNotification || shouldExit)
                 {
-                    string whatWillHappen = shouldExit
-                        ? "Cannot start play"
-                        : "Score will not be submitted";
+                    LocalisableString whatWillHappen = shouldExit
+                        ? NotificationsStrings.CannotStartPlay
+                        : NotificationsStrings.ScoreWillNotBeSubmitted;
 
                     if (string.IsNullOrEmpty(exception.Message))
-                        notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, "Failed to retrieve a score submission token."));
+                        notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, NotificationsStrings.FailedToRetrieveScoreSubmissionToken));
                     else
                         notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, getUserFacingAPIError(exception)));
                 }
@@ -339,7 +341,7 @@ namespace osu.Game.Screens.Play
             return scoreSubmissionSource.Task;
         }
 
-        private static string getUserFacingAPIError(Exception exception)
+        private static LocalisableString getUserFacingAPIError(Exception exception)
         {
             switch (exception.Message)
             {
@@ -348,13 +350,16 @@ namespace osu.Game.Screens.Play
                 case @"invalid verification hash":
                 case @"invalid token":
                 case @"outdated client":
-                    return "Please ensure that you are using the latest version of the official game releases.";
+                    return NotificationsStrings.PreventSubmittingWithOutdatedClient;
 
                 case @"invalid or missing beatmap_hash":
-                    return "This beatmap does not match the online version. Please update or redownload it.";
+                    return NotificationsStrings.PreventSubmittingWithInvalidBeatmapHash;
 
                 case @"expired token":
-                    return "Your system clock is set incorrectly. Please check your system time, date and timezone.";
+                    return NotificationsStrings.PreventSubmittingWithExpiredToken;
+
+                case @"Online functionality is not available.":
+                    return NotificationsStrings.OnlineFunctionalityIsNotAvailable;
 
                 default:
                     return exception.Message;
