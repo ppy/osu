@@ -27,6 +27,11 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsItemV2(new FormCheckBox
                 {
+                    Caption = OnlineSettingsStrings.ChatTicker,
+                    Current = config.GetBindable<bool>(OsuSetting.ChatTicker)
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
                     Caption = OnlineSettingsStrings.NotifyOnMentioned,
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnUsernameMentioned)
                 }),
