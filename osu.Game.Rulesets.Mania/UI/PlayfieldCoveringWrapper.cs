@@ -54,7 +54,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    content,
+                    content.With(c =>
+                    {
+                        c.Blending = BlendingParameters.None; // avoid double alpha blending for textures with transparency
+                    }),
                     cover = new Container
                     {
                         Anchor = Anchor.Centre,
