@@ -184,13 +184,22 @@ namespace osu.Desktop
             // or is running with pending imports via file association or otherwise.
             //
             // In both these scenarios, we'd hope the game does not attempt to update.
+            // However, in the case for pending imports, we still need to initialize Velopack if this is the first launch of the game.
             //
             // Special consideration for velopack startup arguments, which must be handled during update.
             // See https://docs.velopack.io/integrating/hooks#command-line-hooks.
             if (args.Length > 0 && !args[0].StartsWith("--velo", StringComparison.Ordinal))
             {
-                Logger.Log("Handling arguments, skipping velopack setup.");
-                return;
+                using (var namedPipeIpcProvider = new NamedPipeIpcProvider(OsuGame.IPC_PIPE_NAME))
+                {
+                    bool createdNew = namedPipeIpcProvider.Bind();
+
+                    if (!createdNew)
+                    {
+                        Logger.Log("Handling arguments, not running as primary instance, skipping velopack setup.");
+                        return;
+                    }
+                }
             }
 
             if (OsuGameDesktop.IsPackageManaged)
