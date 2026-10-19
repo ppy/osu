@@ -38,9 +38,7 @@ namespace osu.Game.Tests.Visual.RankingV2
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("set score", () => setScore(new OsuRuleset().RulesetInfo, s =>
-            {
-            }));
+            AddStep("set score", () => setScore(new OsuRuleset().RulesetInfo));
 
             AddStep("create component", () => Child = new Container
             {
