@@ -199,7 +199,7 @@ namespace osu.Game.Skinning.Components
             }
         }
 
-        private LocalisableString formatMods(IEnumerable<IConfiguredMod> mods, Ruleset ruleset)
+        private static LocalisableString formatMods(IEnumerable<IConfiguredMod> mods, Ruleset ruleset)
         {
             var parts = new List<LocalisableString>();
 
