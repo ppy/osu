@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
     {
         protected override IEnumerable<(DifficultyRating rating, double thresholdMs, string name)> GetThresholds()
         {
-            // See lowest difficulty requirements in https://osu.ppy.sh/wiki/en/Ranking_criteria/osu%21catch#general
+            // See lowest difficulty requirements in https://osu.ppy.sh/wiki/en/Ranking_criteria/osu%21catch#spread
             yield return (DifficultyRating.Hard, new TimeSpan(0, 2, 30).TotalMilliseconds, "Platter");
             yield return (DifficultyRating.Insane, new TimeSpan(0, 3, 15).TotalMilliseconds, "Rain");
             yield return (DifficultyRating.Expert, new TimeSpan(0, 4, 0).TotalMilliseconds, "Overdose");

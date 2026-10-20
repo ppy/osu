@@ -8,7 +8,7 @@ using File = TagLib.File;
 
 namespace osu.Game.Utils
 {
-    public class TagLibUtils
+    public static class TagLibUtils
     {
         /// <summary>
         /// Creates a <see cref="TagLib.File"/> with culture-invariant MIME type detection, based on stream data.

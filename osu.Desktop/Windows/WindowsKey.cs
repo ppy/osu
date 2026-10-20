@@ -3,16 +3,25 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
+using osu.Framework;
+using SDL;
 
 // ReSharper disable IdentifierTypo
 
 namespace osu.Desktop.Windows
 {
-    internal class WindowsKey
+    internal static class WindowsKey
     {
-        private delegate int LowLevelKeyboardProcDelegate(int nCode, int wParam, ref KdDllHookStruct lParam);
+        /// <summary>
+        /// Whether raw keyboard is enabled by default in SDL3. This is specified in <see href="https://wiki.libsdl.org/SDL3/SDL_HINT_WINDOWS_RAW_KEYBOARD"/>.
+        /// </summary>
+        private const bool sdl_default_raw_keyboard = false;
 
-        private static bool isBlocked;
+        private static readonly Lazy<bool> block_using_sdl3_hint =
+            new Lazy<bool>(() => FrameworkEnvironment.UseSDL3 && SDL3.SDL_GetHintBoolean(SDL3.SDL_HINT_WINDOWS_RAW_KEYBOARD, sdl_default_raw_keyboard), LazyThreadSafetyMode.None);
+
+        private delegate int LowLevelKeyboardProcDelegate(int nCode, int wParam, ref KdDllHookStruct lParam);
 
         private const int wh_keyboard_ll = 13;
         private const int wm_keydown = 256;
@@ -49,25 +58,34 @@ namespace osu.Desktop.Windows
 
         internal static void Disable()
         {
-            if (keyHook != IntPtr.Zero || isBlocked)
+            if (block_using_sdl3_hint.Value)
+            {
+                SDL3.SDL_SetHint(SDL3.SDL_HINT_WINDOWS_RAW_KEYBOARD_EXCLUDE_HOTKEYS, "1");
+                return;
+            }
+
+            // already blocked, no need to update.
+            if (keyHook != IntPtr.Zero)
                 return;
 
             keyHook = setWindowsHookEx(wh_keyboard_ll, (keyboardHookDelegate = lowLevelKeyboardProc), Marshal.GetHINSTANCE(System.Reflection.Assembly.GetExecutingAssembly().GetModules()[0]), 0);
-
-            isBlocked = true;
         }
 
         internal static void Enable()
         {
-            if (keyHook == IntPtr.Zero || !isBlocked)
+            if (block_using_sdl3_hint.Value)
+            {
+                SDL3.SDL_SetHint(SDL3.SDL_HINT_WINDOWS_RAW_KEYBOARD_EXCLUDE_HOTKEYS, "0");
+                return;
+            }
+
+            // already released, no need to update.
+            if (keyHook == IntPtr.Zero)
                 return;
 
             keyHook = unhookWindowsHookEx(keyHook);
             keyboardHookDelegate = null;
-
             keyHook = IntPtr.Zero;
-
-            isBlocked = false;
         }
 
         [DllImport(@"user32.dll", EntryPoint = @"SetWindowsHookExA")]

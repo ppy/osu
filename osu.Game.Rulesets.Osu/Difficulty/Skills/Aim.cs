@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecay(double ms) => DiffUtils.Pow(0.2, ms / 1000);
 
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
-            currentStrain * strainDecay(time - current.Previous(0).StartTime);
+            currentStrain * strainDecay(time - current.Previous().StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
@@ -58,9 +58,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
-            const double skill_multiplier_snap = 70.9;
-            const double skill_multiplier_agility = 2.35;
-            const double skill_multiplier_flow = 242.0;
+            const double skill_multiplier_snap = 78.3;
+            const double skill_multiplier_agility = 32.5;
+            const double skill_multiplier_flow = 251.0;
+            const double skill_multiplier_spinner = 22.0;
+
+            if (current.BaseObject is Spinner)
+                return SpinnerEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_spinner;
 
             double snapDifficulty = SnapAimEvaluator.EvaluateDifficultyOf(current, IncludeSliders) * skill_multiplier_snap;
             double agilityDifficulty = AgilityEvaluator.EvaluateDifficultyOf(current) * skill_multiplier_agility;
@@ -82,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double calculateTotalValue(double snapDifficulty, double agilityDifficulty, double flowDifficulty)
         {
             const double skill_multiplier_total = 1.12;
-            const double combined_snap_norm_exponent = 1.2;
+            const double combined_snap_norm_exponent = 1.5;
 
             // We compare flow to combined snap and agility because snap by itself doesn't have enough difficulty to be above flow on streams
             // Agility on the other hand is supposed to measure the rate of cursor velocity changes while snapping
@@ -94,8 +98,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Mods.Any(m => m is OsuModTouchDevice))
             {
-                // we don't adjust agility here since agility represents TD difficulty in a decent enough way
-                snapDifficulty = DiffUtils.Pow(snapDifficulty, 0.89);
+                agilityDifficulty = DiffUtils.Pow(agilityDifficulty, 0.89);
+                snapDifficulty = DiffUtils.Pow(snapDifficulty, 0.93);
                 combinedSnapDifficulty = DiffUtils.Norm(combined_snap_norm_exponent, snapDifficulty, agilityDifficulty);
             }
 

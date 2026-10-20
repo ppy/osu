@@ -70,6 +70,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TakeScreenshot => new TranslatableString(getKey(@"take_screenshot"), @"Take screenshot");
 
         /// <summary>
+        /// "Take and upload screenshot"
+        /// </summary>
+        public static LocalisableString TakeAndUploadScreenshot => new TranslatableString(getKey(@"take_and_upload_screenshot"), @"Take and upload screenshot");
+
+        /// <summary>
         /// "Toggle gameplay mouse buttons"
         /// </summary>
         public static LocalisableString ToggleGameplayMouseButtons => new TranslatableString(getKey(@"toggle_gameplay_mouse_buttons"), @"Toggle gameplay mouse buttons");
@@ -490,9 +495,9 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorToggleMoveControl => new TranslatableString(getKey(@"editor_toggle_move_control"), @"Toggle movement control");
 
         /// <summary>
-        /// "Discard unsaved changes"
+        /// "Discard unsaved changes..."
         /// </summary>
-        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes");
+        public static LocalisableString EditorDiscardUnsavedChanges => new TranslatableString(getKey(@"editor_discard_unsaved_changes"), @"Discard unsaved changes...");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

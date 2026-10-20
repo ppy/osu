@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
@@ -9,6 +12,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -37,5 +41,17 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             return base.AdjustDistanceSpacing(action, amount);
         }
+
+        public override IEnumerable<DrawableTernaryButton> CreateTernaryButtons() => new[]
+        {
+            new DrawableTernaryButton<OsuAction>
+            {
+                Current = DistanceSnapToggle,
+                Description = "Distance Snap",
+                CreateIcon = () => new SpriteIcon { Icon = OsuIcon.EditorDistanceSnap },
+                Action = OsuAction.EditorToggleDistanceSnap,
+                Hotkey = new Hotkey(OsuRuleset.SHORT_NAME, Ruleset.EDITOR_VARIANT, (int)OsuAction.EditorToggleDistanceSnap),
+            }
+        };
     }
 }
