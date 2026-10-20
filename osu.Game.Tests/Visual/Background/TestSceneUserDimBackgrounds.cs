@@ -24,6 +24,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -469,6 +470,47 @@ namespace osu.Game.Tests.Visual.Background
         }
 
 
+        /// <summary>
+        /// CurrentColour and CurrentColourOffset are interpolated in linear, then converted to sRGB
+        /// They're then added together, which can cause total brightness to go above or below 1.0
+        /// </summary>
+        [Test]
+        public void TestBrightnessStabilityDuringDimTransition()
+        {
+            ManualClock manualClock = new ManualClock();
+            double startTime = 0;
+
+            performFullSetup();
+
+            AddStep("Undim the screen and set DimColour", () =>
+            {
+                songSelect.DimLevel.Value = 0.0;
+                songSelect.DimColour.Value = 1.0;
+            });
+            AddUntilStep("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+
+            AddStep("Prepare clock", () =>
+            {
+                manualClock.CurrentTime = songSelect.GetCurrentBackgroundTime();
+                songSelect.SetBackgroundClock(new FramedClock(manualClock));
+            });
+
+            AddStep("Dim the screen", () =>
+            {
+                startTime = manualClock.CurrentTime;
+                songSelect.DimLevel.Value = 1.0;
+            });
+
+            for (int i = 1; i < 8; i++)
+            {
+                double offset = i * UserDimContainer.BACKGROUND_FADE_DURATION / 8;
+                AddStep("Set time", () => manualClock.CurrentTime = startTime + offset);
+                AddAssert("Transition is in progress", () => !songSelect.IsBackgroundDimmed() && !songSelect.IsBackgroundUndimmed());
+                AddAssert("Brightness is one", () => songSelect.IsBrightnessOne());
+            }
+        }
+
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
@@ -624,6 +666,12 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsSpritesOffsetSourceBufferedContainer() => background.IsSpritesOffsetSourceBufferedContainer;
 
             public bool IsBufferedContainersOffsetSourceDimmableBackground() => background.IsBufferedContainersOffsetSourceDimmableBackground;
+
+            public bool IsBrightnessOne() => Precision.AlmostEquals(background.CurrentColour.R + background.CurrentColourOffset.R, 1f, 0.01f);
+
+            public double GetCurrentBackgroundTime() => background.Time.Current;
+
+            public void SetBackgroundClock(IFrameBasedClock newClock) => background.Clock = newClock;
         }
 
         private partial class FadeAccessibleResults : ResultsScreen
