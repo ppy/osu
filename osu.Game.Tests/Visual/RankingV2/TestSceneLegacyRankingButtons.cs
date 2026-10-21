@@ -25,5 +25,9 @@ namespace osu.Game.Tests.Visual.RankingV2
         [Test]
         public void TestWatchReplayButton()
             => AddStep("create button", () => SetContents(_ => new LegacyRankingWatchReplayButton { Action = () => { } }));
+
+        [Test]
+        public void TestOnlineRankingButton()
+            => AddStep("create button", () => SetContents(_ => new LegacyOnlineRankingButton()));
     }
 }
