@@ -15,8 +15,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -46,6 +48,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         private DialogOverlay dialogOverlay = null!;
 
         private LeaderboardManager leaderboardManager = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -104,6 +109,21 @@ namespace osu.Game.Tests.Visual.SongSelect
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
+            AddStep("reset leaderboard fallback state", () =>
+            {
+                config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, false);
+                ((DummyAPIAccess)API).SetState(APIState.Online);
+                ((DummyAPIAccess)API).LocalUser.Value = new APIUser
+                {
+                    Id = DummyAPIAccess.DUMMY_USER_ID,
+                    Username = @"Local user",
+                    IsSupporter = true,
+                };
+                Ruleset.Value = new OsuRuleset().RulesetInfo;
+                SelectedMods.Value = Array.Empty<Mod>();
+                scoreManager.Delete();
+            });
         }
 
         [Test]
@@ -228,6 +248,182 @@ namespace osu.Game.Tests.Visual.SongSelect
             clearScores();
             importMoreScores(() => beatmapInfo);
             checkDisplayedCount(10);
+        }
+
+        [Test]
+        public void TestUnavailableOnlineLeaderboardFallsBackToLocalWhenEnabled()
+        {
+            BeatmapInfo beatmapInfo = null!;
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            setScope(BeatmapLeaderboardScope.Global);
+
+            AddStep(@"Import beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+            });
+
+            clearScores();
+            importMoreScores(() => beatmapInfo);
+
+            AddUntilStep("criteria switched to local", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Local));
+            checkDisplayedCount(10);
+        }
+
+        [Test]
+        public void TestUnavailableOnlineLeaderboardScopesFallBackToLocalWhenEnabled([Values(
+            BeatmapLeaderboardScope.Global,
+            BeatmapLeaderboardScope.Friend,
+            BeatmapLeaderboardScope.Country,
+            BeatmapLeaderboardScope.Team)] BeatmapLeaderboardScope scope)
+        {
+            var beatmapInfo = new BeatmapInfo(new OsuRuleset().RulesetInfo)
+            {
+                OnlineID = 0,
+                Status = BeatmapOnlineStatus.Pending,
+            };
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            AddStep("satisfy supporter and team requirements", () =>
+            {
+                var user = ((DummyAPIAccess)API).LocalUser.Value;
+                user.IsSupporter = true;
+                user.Team = new APITeam();
+            });
+            AddAssert("user is supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter);
+            AddAssert("user has team", () => ((DummyAPIAccess)API).LocalUser.Value.Team != null);
+            AddStep($"fetch {scope} leaderboard", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(
+                beatmapInfo,
+                beatmapInfo.Ruleset,
+                scope,
+                null)));
+
+            AddUntilStep("criteria switched to local", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Local));
+            AddUntilStep("scores fetched successfully", () => leaderboardManager.Scores.Value?.FailState == null);
+        }
+
+        [Test]
+        public void TestUnavailableOnlineLeaderboardDoesNotFallbackWhenDisabled()
+        {
+            BeatmapInfo beatmapInfo = null!;
+
+            setScope(BeatmapLeaderboardScope.Global);
+
+            AddStep(@"Import beatmap", () =>
+            {
+                beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                beatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(beatmapInfo);
+            });
+
+            clearScores();
+
+            AddUntilStep("criteria remains global", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Global));
+            AddUntilStep("beatmap unavailable", () => leaderboardManager.Scores.Value?.FailState, () => Is.EqualTo(LeaderboardFailState.BeatmapUnavailable));
+            checkDisplayedCount(0);
+        }
+
+        [Test]
+        public void TestRulesetUnavailableFallsBackToLocalWhenEnabled()
+        {
+            var unsupportedRuleset = new RulesetInfo("custom", "Custom", string.Empty, 4);
+            var beatmapInfo = new BeatmapInfo(unsupportedRuleset)
+            {
+                OnlineID = 1,
+                Status = BeatmapOnlineStatus.Ranked,
+            };
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            AddStep("fetch unsupported ruleset", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(beatmapInfo, unsupportedRuleset, BeatmapLeaderboardScope.Global, null)));
+
+            AddUntilStep("criteria switched to local", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Local));
+            AddUntilStep("scores fetched successfully", () => leaderboardManager.Scores.Value?.FailState == null);
+        }
+
+        [Test]
+        public void TestSupporterRestrictedLeaderboardDoesNotFallback()
+        {
+            var beatmapInfo = new BeatmapInfo(new OsuRuleset().RulesetInfo)
+            {
+                OnlineID = 1,
+                Status = BeatmapOnlineStatus.Ranked,
+            };
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            AddStep("set non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
+            AddStep("fetch mod-filtered global leaderboard", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(
+                beatmapInfo,
+                beatmapInfo.Ruleset,
+                BeatmapLeaderboardScope.Global,
+                new Mod[] { new OsuModHidden() })));
+
+            AddUntilStep("criteria remains global", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Global));
+            AddUntilStep("supporter required", () => leaderboardManager.Scores.Value?.FailState, () => Is.EqualTo(LeaderboardFailState.NotSupporter));
+        }
+
+        [Test]
+        public void TestSupporterRestrictedLeaderboardDoesNotFallbackWhenUnavailable([Values(BeatmapLeaderboardScope.Country, BeatmapLeaderboardScope.Friend)] BeatmapLeaderboardScope scope)
+        {
+            var beatmapInfo = new BeatmapInfo(new OsuRuleset().RulesetInfo)
+            {
+                OnlineID = 0,
+                Status = BeatmapOnlineStatus.Pending,
+            };
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            AddStep("set non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
+            AddStep($"fetch {scope} leaderboard", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(
+                beatmapInfo,
+                beatmapInfo.Ruleset,
+                scope,
+                null)));
+
+            AddUntilStep($"criteria remains {scope}", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(scope));
+            AddUntilStep("supporter required", () => leaderboardManager.Scores.Value?.FailState, () => Is.EqualTo(LeaderboardFailState.NotSupporter));
+        }
+
+        [Test]
+        public void TestTeamLeaderboardDoesNotFallbackWithoutTeam()
+        {
+            var beatmapInfo = new BeatmapInfo(new OsuRuleset().RulesetInfo)
+            {
+                OnlineID = 1,
+                Status = BeatmapOnlineStatus.Ranked,
+            };
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            AddStep("fetch team leaderboard", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(
+                beatmapInfo,
+                beatmapInfo.Ruleset,
+                BeatmapLeaderboardScope.Team,
+                null)));
+
+            AddUntilStep("criteria remains team", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Team));
+            AddUntilStep("team required", () => leaderboardManager.Scores.Value?.FailState, () => Is.EqualTo(LeaderboardFailState.NoTeam));
+        }
+
+        [Test]
+        public void TestTeamLeaderboardDoesNotFallbackWithoutTeamWhenUnavailable()
+        {
+            var beatmapInfo = new BeatmapInfo(new OsuRuleset().RulesetInfo)
+            {
+                OnlineID = 0,
+                Status = BeatmapOnlineStatus.Pending,
+            };
+
+            AddStep("enable fallback", () => config.SetValue(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable, true));
+            AddStep("fetch team leaderboard", () => leaderboardManager.FetchWithCriteria(new LeaderboardCriteria(
+                beatmapInfo,
+                beatmapInfo.Ruleset,
+                BeatmapLeaderboardScope.Team,
+                null)));
+
+            AddUntilStep("criteria remains team", () => leaderboardManager.CurrentCriteria?.Scope, () => Is.EqualTo(BeatmapLeaderboardScope.Team));
+            AddUntilStep("team required", () => leaderboardManager.Scores.Value?.FailState, () => Is.EqualTo(LeaderboardFailState.NoTeam));
         }
 
         [Test]

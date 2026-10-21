@@ -59,6 +59,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     Keywords = new[] { "color" },
                 },
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = GameplaySettingsStrings.AutoSwitchToLocalLeaderboardWhenUnavailable,
+                    Current = config.GetBindable<bool>(OsuSetting.AutoSwitchToLocalLeaderboardWhenUnavailable)
+                }),
             };
         }
     }
