@@ -16,6 +16,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Intro;
+using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Tests.Visual.Multiplayer;
 
@@ -76,6 +77,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             AddStep("change state to waiting for room", () => setState(ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom));
 
             AddStep("change state to in room", () => setState(ScreenQueue.MatchmakingScreenState.InRoom));
+            waitForMatchScreenLoad();
         }
 
         [Test]
@@ -102,6 +104,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 MultiplayerClient.RoomSetupAction = _ => Thread.Sleep(2500);
                 setState(ScreenQueue.MatchmakingScreenState.InRoom);
             });
+            waitForMatchScreenLoad();
         }
 
         [Test]
@@ -144,6 +147,8 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             QueueController.CurrentState.Value = state;
         }
+
+        private void waitForMatchScreenLoad() => AddUntilStep("wait for match screen load", () => Stack.CurrentScreen is ScreenMatchmaking && ((ScreenMatchmaking)Stack.CurrentScreen).IsLoaded);
 
         private static double generateCount(double x, double mean, double stdDev, double amplitude)
         {
