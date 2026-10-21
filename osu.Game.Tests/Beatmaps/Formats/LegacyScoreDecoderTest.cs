@@ -74,6 +74,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.That(score.Replay.Frames, Has.One.Matches<ManiaReplayFrame>(frame =>
                     frame.Time == 414 && frame.Actions.SequenceEqual(new[] { ManiaAction.Key1, ManiaAction.Key18 })));
+
+                Assert.That(score.ScoreInfo.HealthGraph, Has.Count.EqualTo(2));
+                Assert.That(score.ScoreInfo.HealthGraph[0], Is.EqualTo(new HealthValue(10972, 1)));
+                Assert.That(score.ScoreInfo.HealthGraph[1], Is.EqualTo(new HealthValue(18098, 1)));
             }
         }
 
@@ -92,6 +96,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 ClassicAssert.AreEqual(4, score.ScoreInfo.MaxCombo);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
+
+                Assert.That(score.ScoreInfo.HealthGraph, Has.Count.EqualTo(2));
+                Assert.That(score.ScoreInfo.HealthGraph[0], Is.EqualTo(new HealthValue(2133, 0.33f)));
+                Assert.That(score.ScoreInfo.HealthGraph[1], Is.EqualTo(new HealthValue(5104, 1)));
             }
         }
 
