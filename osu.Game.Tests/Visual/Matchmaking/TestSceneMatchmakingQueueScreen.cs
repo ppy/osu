@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
@@ -12,6 +13,8 @@ using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Intro;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -21,6 +24,15 @@ namespace osu.Game.Tests.Visual.Matchmaking
     public partial class TestSceneMatchmakingQueueScreen : MultiplayerTestScene
     {
         private ScreenQueue? queueScreen => Stack.CurrentScreen as ScreenQueue;
+
+        [Cached(typeof(INotificationOverlay))]
+        private NotificationOverlay notificationOverlay = new NotificationOverlay();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            base.Content.Add(notificationOverlay);
+        }
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -90,6 +102,23 @@ namespace osu.Game.Tests.Visual.Matchmaking
                 MultiplayerClient.RoomSetupAction = _ => Thread.Sleep(2500);
                 setState(ScreenQueue.MatchmakingScreenState.InRoom);
             });
+        }
+
+        [Test]
+        public void TestRoomJoinError()
+        {
+            AddStep("signal room ready", () =>
+            {
+                MultiplayerClient.RoomSetupAction = _ =>
+                {
+                    Thread.Sleep(1000);
+                    throw new InvalidOperationException();
+                };
+                setState(ScreenQueue.MatchmakingScreenState.InRoom);
+            });
+
+            AddUntilStep("state reverted to idle", () => QueueController.CurrentState.Value, () => Is.EqualTo(ScreenQueue.MatchmakingScreenState.Idle));
+            AddAssert("notification posted", () => notificationOverlay.AllNotifications.OfType<SimpleErrorNotification>().Any());
         }
 
         private void setState(ScreenQueue.MatchmakingScreenState state)
