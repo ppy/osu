@@ -723,19 +723,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         }
                     };
 
-                    pushScreenDelegate = Scheduler.AddDelayed(() =>
-                    {
-                        switch (poolType)
-                        {
-                            case MatchmakingPoolType.QuickPlay:
-                                this.Push(new ScreenMatchmaking(client.Room!));
-                                break;
-
-                            case MatchmakingPoolType.RankedPlay:
-                                this.Push(new RankedPlayScreen(client.Room!));
-                                break;
-                        }
-                    }, 2000);
+                    pushScreenDelegate = Scheduler.AddDelayed(attemptJoinRoom, 2000);
 
                     break;
 
@@ -783,6 +771,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             waitingLoopChannel?.Stop();
             waitingLoopChannel?.Dispose();
+        }
+
+        private void attemptJoinRoom()
+        {
+            if (currentState.Value != MatchmakingScreenState.InRoom)
+                return;
+
+            if (client.Room == null)
+            {
+                pushScreenDelegate = Scheduler.Add(attemptJoinRoom);
+                return;
+            }
+
+            switch (poolType)
+            {
+                case MatchmakingPoolType.QuickPlay:
+                    this.Push(new ScreenMatchmaking(client.Room));
+                    break;
+
+                case MatchmakingPoolType.RankedPlay:
+                    this.Push(new RankedPlayScreen(client.Room));
+                    break;
+            }
         }
 
         public partial class PanelBackground : CompositeDrawable
