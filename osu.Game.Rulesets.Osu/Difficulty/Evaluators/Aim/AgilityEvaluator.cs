@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
@@ -16,28 +17,54 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
+            const double previous_delta_influence = 0.5;
+
             if (current.BaseObject is Spinner)
                 return 0;
 
-            const double distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.2; // 1.2 circles distance between centers
-
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuPrevObj = current.Index > 0 ? (OsuDifficultyHitObject)current.Previous(0) : null;
+            var osuPrevObj = (OsuDifficultyHitObject?)current.Previous();
 
-            double travelDistance = osuPrevObj?.LazyTravelDistance ?? 0;
-            double distance = travelDistance + osuCurrObj.LazyJumpDistance;
+            // Assume that the player always uses at least the full great hitwindow for the movement
+            double currentDelta = Math.Max(osuCurrObj.AdjustedDeltaTime, osuCurrObj.HitWindowGreat);
 
-            double distanceScaled = Math.Min(distance, distance_cap) / distance_cap;
+            // For objects that are stacked we want to reduce the agility difficulty slightly by combining delta times of both objects together
+            // Because we can assume that they likely would be done in one movement.
+            double previousDelta = 0;
 
-            double agilityDifficulty = distanceScaled * 1000 / osuCurrObj.AdjustedDeltaTime;
+            if (osuPrevObj != null)
+            {
+                previousDelta = osuPrevObj.AdjustedDeltaTime *
+                                DiffUtils.ReverseLerp(osuPrevObj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_RADIUS, 0);
+            }
 
-            agilityDifficulty *= DiffUtils.Pow(osuCurrObj.SmallCircleBonus, 1.5);
+            double combinedDelta = currentDelta + previousDelta * previous_delta_influence;
 
-            agilityDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
+            double angleSwitchingBonus = calculateAngleSwitchingBonus(osuCurrObj, osuPrevObj);
+
+            double agilityDifficulty = (1 + angleSwitchingBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
+
+            agilityDifficulty *= osuCurrObj.SmallCircleBonus;
 
             return agilityDifficulty;
         }
 
-        private static double highBpmBonus(double ms) => 1 / (1 - DiffUtils.Pow(0.2, ms / 1000));
+        private static double calculateAngleSwitchingBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject? osuPrevObj)
+        {
+            const double angle_switching_bonus = 0.8;
+
+            if (osuCurrObj.Angle == null || osuPrevObj?.Angle == null)
+                return 0;
+
+            double acutenessDifference = 1 - Math.Min(AngleUtils.CalculateAcuteness(osuCurrObj.Angle.Value), DiffUtils.Pow(AngleUtils.CalculateAcuteness(osuPrevObj.Angle.Value), 3));
+
+            double rhythmDifferencePenalty = DiffUtils.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuPrevObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuPrevObj.AdjustedDeltaTime),
+                3);
+
+            return acutenessDifference *
+                   rhythmDifferencePenalty *
+                   DiffUtils.ReverseLerp(osuPrevObj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_RADIUS, OsuDifficultyHitObject.NORMALISED_DIAMETER) *
+                   angle_switching_bonus;
+        }
     }
 }

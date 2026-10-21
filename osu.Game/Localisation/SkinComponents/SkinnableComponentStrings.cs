@@ -70,6 +70,16 @@ namespace osu.Game.Localisation.SkinComponents
         public static LocalisableString CollapseDuringGameplayDescription =>
             new TranslatableString(getKey(@"if_enabled_the_leaderboard_will"), @"If enabled, the leaderboard will become more compact during active gameplay.");
 
+        /// <summary>
+        /// "Opacity"
+        /// </summary>
+        public static LocalisableString Opacity => new TranslatableString(getKey(@"opacity"), @"Opacity");
+
+        /// <summary>
+        /// "Animation sequence"
+        /// </summary>
+        public static LocalisableString AnimationSequence => new TranslatableString(getKey(@"animation_sequence"), @"Animation sequence");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

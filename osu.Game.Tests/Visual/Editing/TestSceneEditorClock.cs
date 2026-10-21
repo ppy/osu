@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("track has 0.25x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(0.25));
 
             AddStep("dispose playback control", () => Clear(disposeChildren: true));
-            AddAssert("track has 1x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
+            AddUntilStep("track has 1x tempo", () => Beatmap.Value.Track.AggregateTempo.Value, () => Is.EqualTo(1));
         }
 
         protected override void Dispose(bool isDisposing)

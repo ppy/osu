@@ -199,8 +199,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 index++;
                 indexWithOffsets += ComboOffset + 1;
 
-                if (lastObj != null)
-                    lastObj.LastInCombo = true;
+                lastObj?.LastInCombo = true;
             }
 
             ComboIndex = index;

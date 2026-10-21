@@ -334,8 +334,8 @@ namespace osu.Game.Database
 
                 case 3:
                     convertedTotalScoreWithoutMods = (long)Math.Round(
-                        850000 * comboProportion
-                        + 150000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
+                        150000 * comboProportion
+                        + 850000 * Math.Pow(score.Accuracy, 2 + 2 * score.Accuracy)
                         + bonusProportion);
                     break;
 

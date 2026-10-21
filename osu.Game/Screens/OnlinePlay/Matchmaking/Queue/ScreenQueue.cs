@@ -21,6 +21,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
@@ -124,7 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Children = new Drawable[]
                 {
                     waitingLoop = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop")),
-                    new GlobalScrollAdjustsVolume(),
+                    new ScrollAdjustsVolume(),
                     mainGrid = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -388,7 +389,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             currentState.BindValueChanged(s => SetState(s.NewValue));
 
             selectedPool.BindTo(queue.SelectedPool);
-            selectedPool.BindValueChanged(e => refreshLobbyData());
+            selectedPool.BindValueChanged(_ => refreshLobbyData());
 
             isConnected = client.IsConnected.GetBoundCopy();
             isConnected.BindValueChanged(connected => Schedule(() =>
@@ -728,14 +729,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     {
                         pushScreenDelegate = Schedule(() =>
                         {
+                            if (client.Room == null)
+                            {
+                                Logger.Log("Room became null, returning to idle");
+                                SetState(MatchmakingScreenState.Idle);
+                                return;
+                            }
+
                             switch (poolType)
                             {
                                 case MatchmakingPoolType.QuickPlay:
-                                    this.Push(new ScreenMatchmaking(client.Room!));
+                                    this.Push(new ScreenMatchmaking(client.Room));
                                     break;
 
                                 case MatchmakingPoolType.RankedPlay:
-                                    this.Push(new RankedPlayScreen(client.Room!));
+                                    this.Push(new RankedPlayScreen(client.Room));
                                     break;
                             }
                         });

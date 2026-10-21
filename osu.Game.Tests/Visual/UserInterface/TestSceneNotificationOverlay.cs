@@ -594,8 +594,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
 
-                if (p != null)
-                    p.State = ProgressNotificationState.Active;
+                p?.State = ProgressNotificationState.Active;
             }
 
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))

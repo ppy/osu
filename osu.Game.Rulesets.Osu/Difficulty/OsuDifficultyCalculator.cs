@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = calculateDifficultyRating(speedDifficultyValue);
             double readingRating = calculateDifficultyRating(readingDifficultyValue);
 
-            double flashlightRating = 0.0;
+            double? flashlightRating = null;
 
             if (flashlight is not null)
                 flashlightRating = calculateDifficultyRating(flashlight.DifficultyValue());
@@ -90,7 +90,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double baseAimPerformance = OsuPerformanceCalculator.DifficultyToPerformance(aimRating);
             double baseSpeedPerformance = OsuPerformanceCalculator.DifficultyToPerformance(speedRating);
             double baseReadingPerformance = OsuPerformanceCalculator.DifficultyToPerformance(readingRating);
-            double baseFlashlightPerformance = Flashlight.DifficultyToPerformance(flashlightRating);
+            double baseFlashlightPerformance = flashlightRating != null
+                ? Flashlight.DifficultyToPerformance(flashlightRating.Value)
+                : 0.0;
+
             double baseCognitionPerformance = SumCognitionDifficulty(baseReadingPerformance, baseFlashlightPerformance);
 
             double basePerformance = DiffUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, baseAimPerformance, baseSpeedPerformance, baseCognitionPerformance);

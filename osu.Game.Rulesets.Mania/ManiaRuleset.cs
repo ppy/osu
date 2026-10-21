@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
@@ -14,6 +15,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Localisation.Mania;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -40,6 +42,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -329,9 +332,9 @@ namespace osu.Game.Rulesets.Mania
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
-        public override LocalisableString VariantDescription => "Keys";
+        public override LocalisableString VariantDescription => ManiaRulesetStrings.VariantDescription;
 
-        public override IEnumerable<int> AvailableVariants
+        public override IEnumerable<int> GameplayVariants
         {
             get
             {
@@ -344,6 +347,15 @@ namespace osu.Game.Rulesets.Mania
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0)
         {
+            if (variant == EDITOR_VARIANT)
+            {
+                return
+                [
+                    new KeyBinding(InputKey.Number2, ManiaAction.EditorNoteTool),
+                    new KeyBinding(InputKey.Number3, ManiaAction.EditorHoldNoteTool),
+                ];
+            }
+
             switch (getPlayfieldType(variant))
             {
                 case PlayfieldType.Single:
@@ -358,6 +370,9 @@ namespace osu.Game.Rulesets.Mania
 
         public override LocalisableString GetVariantName(int variant)
         {
+            if (variant == EDITOR_VARIANT)
+                return base.GetVariantName(variant);
+
             switch (getPlayfieldType(variant))
             {
                 default:
@@ -406,21 +421,30 @@ namespace osu.Game.Rulesets.Mania
 
         public override StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => new[]
         {
-            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+            new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             }),
-            new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
+            new StatisticItem("Timing Distribution", () => new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
-                Height = 250
-            }, true),
-            new StatisticItem("Statistics", () => new SimpleStatisticTable(2, new SimpleStatisticItem[]
-            {
-                new AverageHitError(score.HitEvents),
-                new UnstableRate(score.HitEvents)
-            }), true)
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(15),
+                Children = new Drawable[]
+                {
+                    new HitEventTimingDistributionGraph(score.HitEvents)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 150
+                    },
+                    new SimpleStatisticTable(1, new SimpleStatisticItem[]
+                    {
+                        new AverageHitError(score.HitEvents),
+                        new UnstableRate(score.HitEvents)
+                    })
+                }
+            }, true)
         };
 
         /// <seealso cref="ManiaHitWindows"/>
@@ -462,7 +486,7 @@ namespace osu.Game.Rulesets.Mania
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.KeyCount, @"KC", originalDifficulty.CircleSize, adjustedDifficulty.CircleSize, 18)
             {
-                Description = "Affects the number of key columns on the playfield."
+                Description = ManiaRulesetStrings.KeyCountDescription
             };
 
             var hitWindows = new ManiaHitWindows();
@@ -471,11 +495,11 @@ namespace osu.Game.Rulesets.Mania
             hitWindows.ClassicModActive = mods.Any(m => m is ManiaModClassic);
             yield return new RulesetBeatmapAttribute(SongSelectStrings.Accuracy, @"OD", originalDifficulty.OverallDifficulty, adjustedDifficulty.OverallDifficulty, 10)
             {
-                Description = "Affects timing requirements for notes.",
+                Description = ManiaRulesetStrings.AccuracyDescription,
                 AdditionalMetrics = hitWindows.GetAllAvailableWindows()
                                               .Reverse()
                                               .Select(window => new RulesetBeatmapAttribute.AdditionalMetric(
-                                                  $"{window.result.GetDescription().ToUpperInvariant()} hit window",
+                                                  SongSelectStrings.HitResultWindow(window.result.GetDescription().ToUpperInvariant()),
                                                   LocalisableString.Interpolate($@"±{hitWindows.WindowFor(window.result):0.##} ms"),
                                                   colours.ForHitResult(window.result)
                                               )).ToArray()
@@ -483,7 +507,7 @@ namespace osu.Game.Rulesets.Mania
 
             yield return new RulesetBeatmapAttribute(SongSelectStrings.HPDrain, @"HP", originalDifficulty.DrainRate, adjustedDifficulty.DrainRate, 10)
             {
-                Description = "Affects the harshness of health drain and the health penalties for missing."
+                Description = SongSelectStrings.HPDrainDescription
             };
         }
 
@@ -495,7 +519,7 @@ namespace osu.Game.Rulesets.Mania
             attributes.RemoveAll(a => a.Acronym == "KC");
 
             float holdNoteRatio = beatmapInfo.TotalObjectCount == 0 ? 0 : (float)beatmapInfo.EndTimeObjectCount / beatmapInfo.TotalObjectCount;
-            attributes.Insert(0, new RulesetBeatmapAttribute("Hold notes", @"HN", holdNoteRatio, holdNoteRatio, 1)
+            attributes.Insert(0, new RulesetBeatmapAttribute(BeatmapStatisticStrings.HoldNotes, @"HN", holdNoteRatio, holdNoteRatio, 1)
             {
                 ValueFormat = "P0"
             });

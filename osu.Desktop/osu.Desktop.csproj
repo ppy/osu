@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>A free-to-win rhythm game. Rhythm is just a *click* away!</Description>
@@ -12,27 +12,34 @@
     <Version>0.0.0</Version>
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
+
+  <!-- Required for deployment. -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <StartupHookSupport>false</StartupHookSupport>
+    <CETCompat>false</CETCompat>
+  </PropertyGroup>
+
   <PropertyGroup>
     <StartupObject>osu.Desktop.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu.Game.Tournament\osu.Game.Tournament.csproj" />
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
-    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
-    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
-    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
+    <ProjectReference Include="..\osu.Game.Tournament\osu.Game.Tournament.csproj"/>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj"/>
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj"/>
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj"/>
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj"/>
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj"/>
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="System.IO.Packaging" Version="10.0.9" />
+    <PackageReference Include="System.IO.Packaging" Version="10.0.12"/>
     <!-- Held back due to invite bug in newer versions. See https://github.com/Lachee/discord-rpc-csharp/issues/286 -->
-    <PackageReference Include="DiscordRichPresence" Version="1.5.0.51" />
-    <PackageReference Include="Velopack" Version="0.0.1298" />
+    <PackageReference Include="DiscordRichPresence" Version="1.5.0.51"/>
+    <PackageReference Include="Velopack" Version="1.2.0"/>
   </ItemGroup>
   <ItemGroup Label="Resources">
-    <EmbeddedResource Include="lazer.ico" />
+    <EmbeddedResource Include="lazer.ico"/>
   </ItemGroup>
   <ItemGroup Label="Windows Icons">
-    <Content Include="*.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="*.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
   </ItemGroup>
 </Project>

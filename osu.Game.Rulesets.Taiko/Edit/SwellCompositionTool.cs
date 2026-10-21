@@ -4,18 +4,19 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Localisation.Taiko;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Taiko.Edit.Blueprints;
-using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Edit
 {
-    public class SwellCompositionTool : CompositionTool
+    public class SwellCompositionTool : CompositionTool<TaikoAction>
     {
         public SwellCompositionTool()
-            : base(nameof(Swell))
+            : base(TaikoEditorStrings.SwellTool)
         {
+            Action = TaikoAction.EditorSwellTool;
         }
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorSwell };

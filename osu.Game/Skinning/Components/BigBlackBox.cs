@@ -10,6 +10,8 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.SkinComponents;
+using osu.Game.Overlays.Settings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,10 +28,10 @@ namespace osu.Game.Skinning.Components
         [SettingSource("Spinning text", "Whether the big text should spin")]
         public Bindable<bool> TextSpin { get; } = new BindableBool();
 
-        [SettingSource("Alpha", "The alpha value of this box")]
-        public BindableNumber<float> BoxAlpha { get; } = new BindableNumber<float>(1)
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.Opacity), SettingControlType = typeof(SettingsPercentageSlider<float>))]
+        public BindableNumber<float> Opacity { get; } = new BindableNumber<float>(1)
         {
-            MinValue = 0,
+            MinValue = 0.01f,
             MaxValue = 1,
             Precision = 0.01f,
         };
@@ -77,7 +79,7 @@ namespace osu.Game.Skinning.Components
         {
             base.LoadComplete();
 
-            BoxAlpha.BindValueChanged(alpha => box.Alpha = alpha.NewValue, true);
+            Opacity.BindValueChanged(opacity => box.Alpha = opacity.NewValue, true);
             TextSpin.BindValueChanged(spin =>
             {
                 if (spin.NewValue)

@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             // Ensure no division by zero
             if (consistentRatioCount > 0)
-                return 1 - totalRatioCount / (consistentRatioCount + 1) * 0.80;
+                return Math.Max(1 - totalRatioCount / (consistentRatioCount + 1) * 0.80, 0);
 
             if (recentRatios.Count <= 1) return 1.0;
 

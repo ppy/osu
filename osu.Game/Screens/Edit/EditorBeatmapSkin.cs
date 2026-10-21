@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Screens.Edit
     /// <summary>
     /// A beatmap skin which is being edited.
     /// </summary>
-    public class EditorBeatmapSkin : ISkin, IDisposable
+    public class EditorBeatmapSkin : ISkin, IDisposable, IHasComboColours, IHasCustomColours
     {
         /// <summary>
         /// Invoked when the beatmap skin changes.
@@ -169,6 +170,14 @@ namespace osu.Game.Screens.Edit
             where TLookup : notnull
             where TValue : notnull
             => Skin.GetConfig<TLookup, TValue>(lookup);
+
+        #endregion
+
+        #region Delegated colour access
+
+        IReadOnlyList<Color4>? IHasComboColours.ComboColours => Skin.Configuration.ComboColours;
+        List<Color4> IHasComboColours.CustomComboColours => Skin.Configuration.CustomComboColours;
+        Dictionary<string, Color4> IHasCustomColours.CustomColours => Skin.Configuration.CustomColours;
 
         #endregion
     }

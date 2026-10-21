@@ -60,7 +60,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public override bool Remove(T drawable, bool disposeImmediately)
-            => throw new NotSupportedException($"Cannot remove drawables from {nameof(SelectionCycleFillFlowContainer<T>)}");
+            => throw new NotSupportedException($"Cannot remove drawables from {nameof(SelectionCycleFillFlowContainer<>)}");
 
         private void setSelected(int? value)
         {

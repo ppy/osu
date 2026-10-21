@@ -646,8 +646,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     foreach (var user in ServerRoom.Users)
                     {
-                        if (headToHeadRoomState.Slots != null)
-                            headToHeadRoomState.Slots[i++] = user.UserID;
+                        headToHeadRoomState.Slots?[i++] = user.UserID;
 
                         user.MatchState = null;
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);
@@ -662,8 +661,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     foreach (var user in ServerRoom.Users)
                     {
-                        if (teamVersusRoomState.Slots != null)
-                            teamVersusRoomState.Slots[i++] = user.UserID;
+                        teamVersusRoomState.Slots?[i++] = user.UserID;
 
                         user.MatchState = new TeamVersusUserState();
                         await ((IMultiplayerClient)this).MatchUserStateChanged(clone(user.UserID), clone(user.MatchState)).ConfigureAwait(false);

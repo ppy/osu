@@ -110,12 +110,12 @@ namespace osu.Desktop
         protected override UpdateManager CreateUpdateManager()
         {
             // If this is the first time we've run the game, ie it is being installed,
-            // reset the user's release stream to "lazer".
+            // reset the user's release stream specified by the installation target.
             //
-            // This ensures that if a user is trying to recover from a failed startup on an unstable release stream,
-            // the game doesn't immediately try and update them back to the release stream after starting up.
+            // This ensures that if a user is trying to recover from a failed startup, it will keep them
+            // on the stream which is imminently being reinstalled.
             if (IsFirstRun)
-                LocalConfig.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
+                LocalConfig.SetValue(OsuSetting.ReleaseStream, Version.Contains("-tachyon") ? ReleaseStream.Tachyon : ReleaseStream.Lazer);
 
             if (IsPackageManaged)
                 return new NoActionUpdateManager();
@@ -125,12 +125,23 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
+            if (IsPackageManaged || !IsDeployedBuild)
+                return false;
+
             RestartOnExitAction = () => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId);
             return true;
         }
 
         protected override void LoadComplete()
         {
+            // this is done before `base.LoadComplete` so that the game can immediately register data sources.
+            if (EnableWebSocketServer)
+            {
+                var provider = new OsuWebSocketProvider();
+                Add(provider);
+                Dependencies.CacheAs<IWebSocketProvider>(provider);
+            }
+
             base.LoadComplete();
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
@@ -151,9 +162,6 @@ namespace osu.Desktop
 
             osuSchemeLinkIPCChannel = new OsuSchemeLinkIPCChannel(Host, this);
             archiveImportIPCChannel = new ArchiveImportIPCChannel(Host, this);
-
-            if (EnableWebSocketServer)
-                Add(new OsuWebSocketProvider());
         }
 
         public override void SetHost(GameHost host)
