@@ -27,9 +27,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             base.SetUpSteps();
 
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
-            WaitForJoined();
-
             AddStep("load screen", () => LoadScreen(new ScreenIntro(MatchmakingPoolType.QuickPlay)));
             AddUntilStep("wait for queue screen", () => queueScreen?.IsLoaded == true);
 
@@ -58,15 +55,15 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestBasic()
         {
-            AddStep("change state to idle", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.Idle));
+            AddStep("change state to idle", () => setState(ScreenQueue.MatchmakingScreenState.Idle));
 
-            AddStep("change state to queueing", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.Queueing));
+            AddStep("change state to queueing", () => setState(ScreenQueue.MatchmakingScreenState.Queueing));
 
-            AddStep("change state to found match", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.PendingAccept));
+            AddStep("change state to found match", () => setState(ScreenQueue.MatchmakingScreenState.PendingAccept));
 
-            AddStep("change state to waiting for room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom));
+            AddStep("change state to waiting for room", () => setState(ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom));
 
-            AddStep("change state to in room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom));
+            AddStep("change state to in room", () => setState(ScreenQueue.MatchmakingScreenState.InRoom));
         }
 
         [Test]
@@ -74,7 +71,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddStep("change state to in room then immediately leave room", () =>
             {
-                queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom);
+                setState(ScreenQueue.MatchmakingScreenState.InRoom);
                 MultiplayerClient.LeaveRoom();
             });
 
@@ -88,25 +85,35 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestRoomScreenPushDelayedRoomJoin()
         {
-            long createdRoomId = 0;
-
-            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
-            AddUntilStep("wait for room leave", () => !MultiplayerClient.RoomJoined);
-
-            AddStep("create new room", () =>
-            {
-                var room = CreateDefaultRoom(MatchType.Matchmaking);
-                room.Password = "password";
-                MultiplayerClient.AddServerSideRoom(room, new APIUser { Id = 3 });
-
-                createdRoomId = MultiplayerClient.ServerSideRooms.Last().RoomID!.Value;
-            });
-
             AddStep("signal room ready", () =>
             {
                 MultiplayerClient.RoomSetupAction = _ => Thread.Sleep(2500);
-                ((IMatchmakingClient)MultiplayerClient).MatchmakingRoomReady(createdRoomId, "password").FireAndForget();
+                setState(ScreenQueue.MatchmakingScreenState.InRoom);
             });
+        }
+
+        private void setState(ScreenQueue.MatchmakingScreenState state)
+        {
+            if (QueueController.CurrentState.Value == state)
+                return;
+
+            switch (state)
+            {
+                case ScreenQueue.MatchmakingScreenState.InRoom:
+                    // ensure we're not currently in a room
+                    MultiplayerClient.LeaveRoom();
+
+                    var room = CreateDefaultRoom(MatchType.Matchmaking);
+                    room.Password = "password";
+                    MultiplayerClient.AddServerSideRoom(room, new APIUser { Id = 3 });
+
+                    long createdRoomId = MultiplayerClient.ServerSideRooms.Last().RoomID!.Value;
+
+                    ((IMatchmakingClient)MultiplayerClient).MatchmakingRoomReady(createdRoomId, "password").FireAndForget();
+                    break;
+            }
+
+            QueueController.CurrentState.Value = state;
         }
 
         private static double generateCount(double x, double mean, double stdDev, double amplitude)
