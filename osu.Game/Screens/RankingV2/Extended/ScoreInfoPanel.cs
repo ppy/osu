@@ -198,6 +198,58 @@ namespace osu.Game.Screens.RankingV2.Extended
                                 },
                             },
                         },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            CornerRadius = 20,
+                            Masking = true,
+                            Children =
+                            [
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background5,
+                                },
+                                new GridContainer
+                                {
+                                    Padding = new MarginPadding(15),
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    ColumnDimensions =
+                                    [
+                                        new Dimension(GridSizeMode.Absolute, 350),
+                                        new Dimension(GridSizeMode.Absolute, 10),
+                                        new Dimension(),
+                                    ],
+                                    RowDimensions = [new Dimension(GridSizeMode.AutoSize)],
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Spacing = new Vector2(10),
+                                                Direction = FillDirection.Vertical,
+                                                Children =
+                                                [
+                                                    new GlobalStatisticsUpdatePanel(),
+                                                ]
+                                            },
+                                            new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Spacing = new Vector2(10),
+                                                Direction = FillDirection.Full,
+                                            },
+                                        },
+                                    }
+                                }
+                            ]
+                        }
                     ],
                 },
             ];
