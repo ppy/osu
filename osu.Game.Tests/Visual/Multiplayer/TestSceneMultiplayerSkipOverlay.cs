@@ -124,6 +124,47 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("user 0 leaves", () => MultiplayerClient.RemoveUser(new APIUser { Id = 0 }));
         }
 
+        [Test]
+        public void TestVoteDifferentDifficulties()
+        {
+            const int beatmapid1 = 0;
+            const int beatmapid2 = 1;
+
+            for (int i = 0; i < 2; i++)
+            {
+                int userId = i;
+
+                AddStep($"join user {userId}", () =>
+                {
+                    MultiplayerClient.AddUser(new APIUser
+                    {
+                        Id = userId,
+                        Username = $"User {userId}"
+                    });
+
+                    MultiplayerClient.ChangeUserState(userId, MultiplayerUserState.Playing);
+                    MultiplayerClient.ChangeUserStyle(userId, beatmapid1, 0);
+                });
+            }
+
+            AddStep("join user 2", () =>
+            {
+                MultiplayerClient.AddUser(new APIUser
+                {
+                    Id = 2,
+                    Username = "User 2"
+                });
+
+                MultiplayerClient.ChangeUserState(2, MultiplayerUserState.Playing);
+                MultiplayerClient.ChangeUserStyle(2, beatmapid2, 0);
+            });
+            AddStep("change local user beatmap id same as user 0 and 1", () =>
+            {
+                MultiplayerClient.ChangeUserStyle(beatmapid1, 0);
+            });
+            AddStep("local user votes", () => this.ChildrenOfType<MultiplayerSkipOverlay.Button>().Single().TriggerClick());
+        }
+
         public partial class TestMultiplayerSkipOverlay : MultiplayerSkipOverlay
         {
             public TestMultiplayerSkipOverlay()
