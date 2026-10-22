@@ -13,7 +13,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Achieved on {0:g}"
         /// </summary>
-        public static LocalisableString AchievedOnDate(DateTimeOffset date) => new TranslatableString(getKey(@"achieved_on_date"), @"Achieved on {0:g}", date);
+        public static LocalisableString AchievedOnDate(DateTimeOffset? date) => new TranslatableString(getKey(@"achieved_on_date"), @"Achieved on {0:g}", date);
 
         /// <summary>
         /// "Performance points are not granted for this score because the beatmap is not ranked."
