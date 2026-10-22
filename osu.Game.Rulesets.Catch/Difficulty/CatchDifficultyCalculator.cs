@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             CatchHitObject? lastObject = null;
 
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>(beatmap.HitObjects.Count);
+            List<Flow> flows = new List<Flow>();
 
             double clockRate = ModUtils.CalculateRateWithMods(mods);
 
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, objects.Count));
+                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, objects.Count, flows));
 
                 lastObject = hitObject;
             }
