@@ -59,6 +59,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         /// </summary>
         public readonly double StrainTime;
 
+        /// <summary>
+        /// The sign of the <see cref="DistanceMoved"/>: negative is left and positive is right.
+        /// </summary>
+        public int Direction;
+
         public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
@@ -92,6 +97,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             // After a hyperdash we ARE in the correct position. Always!
             if (LastObject.HyperDash)
                 PlayerPosition = NormalizedPosition;
+
+            Direction = Math.Sign(DistanceMoved);
         }
     }
 }
