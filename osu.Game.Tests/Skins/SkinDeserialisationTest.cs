@@ -85,6 +85,8 @@ namespace osu.Game.Tests.Skins
             "Archives/modified-argon-20250308.osk",
             // Covers legacy bar hit error meter
             "Archives/modified-classic-20260806.osk",
+            // Covers flow key counter display
+            "Archives/modified-argon-20260904.osk",
         };
 
         /// <summary>
