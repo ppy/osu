@@ -271,13 +271,23 @@ namespace osu.Game.Online.Spectator
         {
             // This method is most commonly called via Dispose(), which is can be asynchronous (via the AsyncDisposalQueue).
             // We probably need to find a better way to handle this...
-            Schedule(() =>
+            Schedule(handleEndPlaying);
+            return;
+
+            void handleEndPlaying()
             {
                 if (!isPlaying)
                     return;
 
                 if (pendingFrames.Count > 0)
                     purgePendingFrames();
+
+                if (pendingFrameBundles.Count > 0)
+                {
+                    // ensure all replay frames are sent before ending playing
+                    Schedule(handleEndPlaying);
+                    return;
+                }
 
                 clearScoreState();
 
@@ -291,7 +301,7 @@ namespace osu.Game.Online.Spectator
                     finalState = SpectatedUserState.Quit;
 
                 EndPlayingInternal(scoreToken, finalState).FireAndForget();
-            });
+            }
         }
 
         private void setStateForScore(long? scoreToken, GameplayState state, Score score)

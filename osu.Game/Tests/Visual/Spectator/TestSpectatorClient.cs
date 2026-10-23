@@ -35,6 +35,12 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public int FrameSendAttempts { get; private set; }
 
+        /// <summary>
+        /// If not null, delays frame send until this source completes. Helps simulate the send completion callback
+        /// lagging behind the send itself.
+        /// </summary>
+        public TaskCompletionSource<bool>? FrameSendCompletion { get; set; }
+
         public override IBindable<bool> IsConnected => isConnected;
         private readonly BindableBool isConnected = new BindableBool(true);
 
@@ -177,7 +183,9 @@ namespace osu.Game.Tests.Visual.Spectator
             if (ShouldFailSendingFrames)
                 return Task.FromException(new InvalidOperationException($"Intentional fail via {nameof(ShouldFailSendingFrames)}"));
 
-            return ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, bundle);
+            var send = ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, bundle);
+
+            return FrameSendCompletion == null ? send : Task.WhenAll(send, FrameSendCompletion.Task);
         }
 
         protected override Task EndPlayingInternal(long? scoreToken, SpectatedUserState finalState) => ((ISpectatorClient)this).UserFinishedPlaying(api.LocalUser.Value.Id, new SpectatorState
