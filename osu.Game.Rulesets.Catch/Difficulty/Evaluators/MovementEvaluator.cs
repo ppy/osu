@@ -46,6 +46,37 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                                     / (CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 6) / sqrtStrain;
             }
 
+            // Repetitive spacing nerf: it is harder to catch irregular distances, especially in case of non-hyperdashes which require one to "miss the rhythm on purpose".
+            // Penalty is given based on the ratio between the current (incoming) normalised spacing and the previous normalised spacing.
+            double repetitiveSpacingWeight = 0;
+
+            var currentFlow = catchCurrent.Flow;
+
+            // Penalty is applied only to the direction changes.
+            if (currentFlow != null && currentFlow.IsEnd(catchCurrent))
+            {
+                for (int i = 0; i < Math.Min(currentFlow.Index, 4); i++)
+                {
+                    var prevFlow = currentFlow.Previous(i);
+
+                    if (prevFlow != null && prevFlow.DistanceMoved != 0)
+                    {
+                        double currentSpacing = Math.Abs(currentFlow.DistanceMoved / currentFlow.StrainTime);
+                        double prevSpacing = Math.Abs(prevFlow.DistanceMoved / prevFlow.StrainTime);
+
+                        double relativeDifference = Math.Abs(currentSpacing / prevSpacing - 1);
+                        relativeDifference = Math.Max(0, relativeDifference - 0.05); // Handle inaccuracies in repetitive patterns.
+
+                        if (relativeDifference <= 0.15)
+                            repetitiveSpacingWeight += DiffUtils.Pow(1.0 - relativeDifference / 0.15, 1.2) * DiffUtils.Pow(0.8, i);
+                    }
+                }
+            }
+
+            double repetitiveSpacingPenalty = catchCurrent.BaseObject.HyperDash ? DiffUtils.Pow(0.93, repetitiveSpacingWeight) : DiffUtils.Pow(0.9, repetitiveSpacingWeight);
+
+            distanceAddition *= repetitiveSpacingPenalty;
+
             // Linear spacing nerf.
             int linearSpacingCount = 0;
 

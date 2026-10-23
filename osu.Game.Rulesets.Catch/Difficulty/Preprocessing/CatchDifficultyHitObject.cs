@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         /// <summary>
         /// Subsequence of consecutive objects facing the same direction that the current <see cref="CatchDifficultyHitObject"/> is part of.
         /// </summary>
-        public readonly Flow Flow;
+        public Flow Flow;
 
         public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, int index, List<Flow> flows)
             : base(hitObject, lastObject, clockRate, objects, index)
@@ -80,6 +80,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
             // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
             StrainTime = Math.Max(40, DeltaTime);
+
+            setMovementState();
 
             // Divide all hit objects into flows, i.e. series of consecutive notes facing the same direction
             var prev = (CatchDifficultyHitObject)Previous(0);
@@ -94,8 +96,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
                 Flow = new Flow(new List<CatchDifficultyHitObject> { this }, flows, flows.Count);
                 flows.Add(Flow);
             }
-
-            setMovementState();
         }
 
         private void setMovementState()
