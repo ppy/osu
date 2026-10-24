@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play
             1f
         );
 
-        private Colour4 animatedInvertedDimLevel;
+        private Colour4 animatedInvertedDimLevel = Colour4.White;
 
         protected Colour4 AnimatedInvertedDimLevel
         {
