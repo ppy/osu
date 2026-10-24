@@ -245,9 +245,9 @@ This is a line after the fenced code block!
             {
                 public Action<LinkInline> UrlAdded;
 
-                protected override void AddLinkText(string text, LinkInline linkInline)
+                protected override void AddLinkText(LinkInline linkInline)
                 {
-                    base.AddLinkText(text, linkInline);
+                    base.AddLinkText(linkInline);
 
                     UrlAdded?.Invoke(linkInline);
                 }
