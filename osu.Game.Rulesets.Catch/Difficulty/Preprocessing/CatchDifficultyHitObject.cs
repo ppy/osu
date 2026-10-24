@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public readonly double StrainTime;
 
         /// <summary>
-        /// The sign of the <see cref="DistanceMoved"/>: negative is left and positive is right.
+        /// The sign of the <see cref="ExactDistanceMoved"/>: negative is left and positive is right (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
         /// </summary>
         public int Direction;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
                 prev.Flow.Add(this);
                 Flow = prev.Flow;
             }
-            else
+            else // Previous object is a direction change (or null).
             {
                 Flow = new Flow(new List<CatchDifficultyHitObject> { this }, flows, flows.Count);
                 flows.Add(Flow);
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             if (LastObject.HyperDash)
                 PlayerPosition = NormalizedPosition;
 
-            Direction = Math.Sign(DistanceMoved);
+            Direction = Math.Sign(ExactDistanceMoved);
         }
     }
 }
