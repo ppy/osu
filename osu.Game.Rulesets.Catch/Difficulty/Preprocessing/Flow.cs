@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public readonly int Direction;
 
         public float DistanceMoved { get; private set; }
-        public int Length { get; private set; }
         public double StrainTime { get; private set; }
 
         public Flow(List<CatchDifficultyHitObject> hitObjects, List<Flow> flows, int index)
@@ -29,7 +28,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             Index = index;
             Direction = hitObjects.First().Direction;
             DistanceMoved = hitObjects.Aggregate(0.0f, (acc, h) => acc + h.DistanceMoved);
-            Length = hitObjects.Count;
             StrainTime = Math.Max(hitObjects.Aggregate(0.0, (acc, h) => acc + h.DeltaTime), 40);
         }
 
@@ -40,21 +38,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
             hitObjects.Add(hitObject);
             DistanceMoved += hitObject.DistanceMoved;
-            Length++;
             StrainTime = Math.Max(hitObjects.Aggregate(0.0, (acc, h) => acc + h.DeltaTime), 40);
         }
 
+        // Object is a direction change if and only if it is a first object of its flow.
+        // We treat the first object of the map as a direction change.
         public bool IsDirectionChange(CatchDifficultyHitObject hitObject) => hitObject.Index == hitObjects.First().Index;
 
         public Flow? Previous(int backwardsIndex)
         {
             int index = Index - (backwardsIndex + 1);
-            return index >= 0 && index < flows.Count ? flows[index] : null;
-        }
-
-        public Flow? Next(int forwardsIndex)
-        {
-            int index = Index + (forwardsIndex + 1);
             return index >= 0 && index < flows.Count ? flows[index] : null;
         }
     }

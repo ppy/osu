@@ -66,6 +66,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
         /// <summary>
         /// Subsequence of consecutive objects facing the same direction that the current <see cref="CatchDifficultyHitObject"/> is part of.
+        /// The first <see cref="CatchDifficultyHitObject"/> of each flow is a direction change.
         /// </summary>
         public Flow Flow;
 
@@ -91,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
                 prev.Flow.Add(this);
                 Flow = prev.Flow;
             }
-            else // New flow starts even if Direction is equal to 0.
+            else
             {
                 Flow = new Flow(new List<CatchDifficultyHitObject> { this }, flows, flows.Count);
                 flows.Add(Flow);
