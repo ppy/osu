@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
         /// <summary>
         /// Subsequence of consecutive objects facing the same direction that the current <see cref="CatchDifficultyHitObject"/> is part of.
-        /// The first <see cref="CatchDifficultyHitObject"/> of each flow is a direction change.
+        /// The last <see cref="CatchDifficultyHitObject"/> of each flow is a direction change.
         /// </summary>
         public Flow Flow;
 
