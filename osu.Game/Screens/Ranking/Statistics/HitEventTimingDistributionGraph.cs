@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
@@ -119,7 +120,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             else
             {
                 for (int i = 0; i < barDrawables.Length; i++)
-                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value));
+                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value), !Precision.AlmostEquals(hitOffset, 0));
             }
         }
 
@@ -219,6 +220,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             private Circle? boxAdjustment;
 
             private float? lastDrawHeight;
+            private bool hasHitOffset;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
@@ -290,28 +292,25 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return base.OnInvalidate(invalidation, source);
             }
 
-            public void UpdateOffset(float adjustment)
+            public void UpdateOffset(float adjustment, bool hasHitOffset)
             {
-                bool hasAdjustment = adjustment != totalValue;
-
                 if (boxAdjustment == null)
                 {
-                    if (!hasAdjustment)
-                        return;
-
                     AddInternal(boxAdjustment = new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = Color4.Yellow,
+                        Colour = Color4.Red,
                         Blending = BlendingParameters.Additive,
                         Alpha = 0.6f,
+                        Depth = float.MinValue,
                         Height = 0,
                     });
                 }
 
                 offsetAdjustment = adjustment;
+                this.hasHitOffset = hasHitOffset;
 
                 Scheduler.AddOnce(updateMetrics, true);
             }
@@ -342,10 +341,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             private void drawAdjustmentBar()
             {
-                bool hasAdjustment = offsetAdjustment != totalValue;
-
                 boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment), duration, Easing.OutQuint);
-                boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
+                boxAdjustment.FadeTo(hasHitOffset ? 1 : 0, duration, Easing.OutQuint);
             }
 
             private float offsetForValue(float value) => maxValue == 0 ? 0 : (1 - minimum_height) * value / maxValue;
