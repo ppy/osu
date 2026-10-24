@@ -469,13 +469,12 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Video's source is DimmableStoryboard", () => testStoryboard.IsVideosOffsetSource(player.DimmableStoryboard));
         }
 
-
         /// <summary>
         /// CurrentColour and CurrentColourOffset are interpolated in linear, then converted to sRGB
         /// They're then added together, which can cause total brightness to go above or below 1.0
         /// </summary>
         [Test]
-        public void TestBrightnessStabilityDuringDimTransition()
+        public void TestBrightnessStabilityDuringTransition()
         {
             ManualClock manualClock = new ManualClock();
             double startTime = 0;
@@ -510,6 +509,47 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
+        [Test]
+        public void TestStoryboardBrightnessStabilityDuringTransition()
+        {
+            ManualClock manualClock = new ManualClock();
+            double startTime = 0;
+
+            performFullSetup();
+            createFakeStoryboardWithElements();
+
+            AddStep("Enable Storyboard", () =>
+            {
+                player.StoryboardEnabled.Value = true;
+            });
+
+            AddStep("Undim the screen and set DimColour", () =>
+            {
+                songSelect.DimLevel.Value = 0.0;
+                songSelect.DimColour.Value = 1.0;
+            });
+            AddUntilStep("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+
+            AddStep("Prepare clock", () =>
+            {
+                manualClock.CurrentTime = player.DimmableStoryboard.Time.Current;
+                player.DimmableStoryboard.Clock = new FramedClock(manualClock);
+            });
+
+            AddStep("Dim the screen", () =>
+            {
+                startTime = manualClock.CurrentTime;
+                songSelect.DimLevel.Value = 1.0;
+            });
+
+            for (int i = 1; i < 8; i++)
+            {
+                double offset = i * UserDimContainer.BACKGROUND_FADE_DURATION / 8;
+                AddStep("Set time", () => manualClock.CurrentTime = startTime + offset);
+                AddAssert("Brightness is one", () => player.IsStoryboardBrightnessOne());
+            }
+        }
+
 
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
@@ -538,10 +578,10 @@ namespace osu.Game.Tests.Visual.Background
 
             testStoryboard = new TestStoryboard();
 
-            DrawableStoryboard drawableStoryboard = testStoryboard.CreateDrawable();
+            player.DrawableStoryboard = testStoryboard.CreateDrawable();
 
-            player.DimmableStoryboard.Add(drawableStoryboard);
-            player.DimmableStoryboard.OverlayLayerContainer.Add(drawableStoryboard.OverlayLayer.CreateProxy());
+            player.DimmableStoryboard.Add(player.DrawableStoryboard);
+            player.DimmableStoryboard.OverlayLayerContainer.Add(player.DrawableStoryboard.OverlayLayer.CreateProxy());
         });
 
         private void performFullSetup(bool allowPause = false)
@@ -703,6 +743,8 @@ namespace osu.Game.Tests.Visual.Background
 
             private TestDimmableStoryboard testDimmableStoryboard;
 
+            public DrawableStoryboard DrawableStoryboard;
+
             protected override DimmableStoryboard CreateDimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods) => testDimmableStoryboard = new TestDimmableStoryboard(storyboard, mods) { RelativeSizeAxes = Axes.Both };
 
             // Whether the player should be allowed to load.
@@ -720,6 +762,8 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsStoryboardVisible => DimmableStoryboard.ContentDisplayed;
 
             public Colour4 StoryboardTargetColourOffset() => testDimmableStoryboard.TargetColourOffset();
+
+            public bool IsStoryboardBrightnessOne() => Precision.AlmostEquals(((Colour4)DrawableStoryboard.DrawColourInfo.Colour).R + DimmableStoryboard.DrawColourOffset.R, 1f, 0.01f);
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, CancellationToken token)
