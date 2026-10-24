@@ -109,12 +109,13 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 {
                     RoomID = currentRoomId++,
                     Name = $@"Room {currentRoomId}",
-                    Host = new APIUser { Username = @"Host" },
+                    Host = new APIUser { Username = @"Host", Id = API.LocalUser.Value.Id },
                     Duration = TimeSpan.FromSeconds(10),
                     Password = withPassword ? @"password" : null,
                     PlaylistItemStats = new Room.RoomPlaylistItemStats { RulesetIDs = [ruleset.OnlineID] },
                     Playlist = [new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() }) { RulesetID = ruleset.OnlineID }],
                     Pinned = withPinnedRooms && i % 2 == 0,
+                    StartDate = DateTimeOffset.Now,
                 };
             }
 
