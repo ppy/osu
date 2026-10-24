@@ -11,11 +11,9 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Play;
 using osuTK;
-using osu.Framework.Graphics.Rendering;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -128,7 +126,7 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        public partial class DimmableBackground : UserDimContainer, IColouredDimmable
+        public partial class DimmableBackground : ColouredUserDimContainer
         {
             /// <summary>
             /// The amount of blur to be applied to the background in addition to user-specified blur.
@@ -153,7 +151,6 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             private Bindable<double> userBlurLevel { get; set; }
-            private Bindable<double> userDimColour { get; set; }
 
             private BeatmapBackground background;
 
@@ -174,17 +171,10 @@ namespace osu.Game.Screens.Backgrounds
                 ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
                 : new Vector2(BlurAmount.Value);
 
-
-            public DimmableBackground()
-            {
-                sharedData = new ColouredDimmableSharedData();
-            }
-
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
                 userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
-                userDimColour = config.GetBindable<double>(OsuSetting.DimColour);
             }
 
             protected override void LoadComplete()
@@ -192,12 +182,9 @@ namespace osu.Game.Screens.Backgrounds
                 base.LoadComplete();
 
                 userBlurLevel.ValueChanged += _ => UpdateVisuals();
-                userDimColour.ValueChanged += _ => UpdateVisuals();
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
                 StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
             }
-
-            protected override DrawNode CreateDrawNode() => new DimmableBackgroundDrawNode(this, sharedData);
 
             protected override float DimLevel
             {
@@ -210,134 +197,22 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
 
-            protected virtual Colour4 DimColour
-            {
-                get
-                {
-                    // This assumes that DimColour shouldn't be affected by DimWhenUserSettingsIgnored
-                    // (as it's used to dim things in song select only)
-                    if (IgnoreUserSettings.Value)
-                        return Colour4.Black;
-
-                    float grayscaleDimColour = (float)userDimColour.Value;
-                    return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
-                }
-            }
-
-            // The atrocity below is necessary because FadeColour and TransformTo interpolate
-            // colours in linear space, then convert them back to sRGB.
-            // Which means that animating ColourOffset directly will NOT make it a perfect
-            // complement to DrawColour, so adding them won't necessary give 1.0 (assuming
-            // no external sources of dimming).
-            // And using dimContent's DrawColour directly may include external sources of dimming
-            // and dimming caused by storyboard.
-            // So this roundabout way is used instead, where AnimatedInvertedDimLevel approximates
-            // dimContent's DrawColour, but this will only be precise if there are
-            // no external sources of dimming :(
-
             // Needed to ensure that DimColour is not affected by the storyboard replacing
-            // the background, only by user settings, also used in tests.
+            // the background, only by user settings; also used in tests.
             protected float DimLevelNoStoryboard => base.DimLevel;
 
-            private Colour4 invertedDimLevel => new Colour4(
+            protected override Colour4 InvertedDimLevel => new Colour4(
                 1f - DimLevelNoStoryboard,
                 1f - DimLevelNoStoryboard,
                 1f - DimLevelNoStoryboard,
                 1f
             );
-
-            private Colour4 animatedInvertedDimLevel = Colour4.White;
-
-            protected Colour4 AnimatedInvertedDimLevel
-            {
-                get => animatedInvertedDimLevel;
-                set
-                {
-                    if (value.Equals(animatedInvertedDimLevel))
-                        return;
-
-                    animatedInvertedDimLevel = value;
-                    Invalidate(Invalidation.Colour);
-                }
-            }
-
-            private Colour4 animatedDimColour;
-
-            protected Colour4 AnimatedDimColour
-            {
-                get => animatedDimColour;
-                set
-                {
-                    if (value.Equals(animatedDimColour))
-                        return;
-
-                    animatedDimColour = value;
-                    Invalidate(Invalidation.Colour);
-                }
-            }
-
-            protected Colour4 AnimatedDimLevel => new Colour4(
-                1f - AnimatedInvertedDimLevel.R,
-                1f - AnimatedInvertedDimLevel.G,
-                1f - AnimatedInvertedDimLevel.B,
-                1f
-            );
-
-            protected Colour4 ColourOffset => AnimatedDimColour * AnimatedDimLevel;
-
-            private ColouredDimmableSharedData sharedData;
-
-            public IColouredDimmable DrawColourOffsetSource => this;
-
-            public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
-
-            public ColouredDimmableSharedData ColouredDimmableSharedData => sharedData;
 
             protected override void UpdateVisuals()
             {
                 base.UpdateVisuals();
 
-                this.TransformTo(nameof(AnimatedInvertedDimLevel), invertedDimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-                this.TransformTo(nameof(AnimatedDimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-
-                sharedData.Dispose();
-            }
-
-            protected class DimmableBackgroundDrawNode : CompositeDrawableDrawNode
-            {
-                public new DimmableBackground Source => (DimmableBackground)base.Source;
-
-                private ColouredDimmableSharedData sharedData;
-
-                private Colour4 drawColourOffset;
-
-                public DimmableBackgroundDrawNode(DimmableBackground source, ColouredDimmableSharedData sharedData)
-                    : base(source)
-                {
-                    this.sharedData = sharedData;
-                }
-
-                public override void ApplyState()
-                {
-                    base.ApplyState();
-
-                    drawColourOffset = Source.DrawColourOffset;
-                }
-
-                protected override void Draw(IRenderer renderer)
-                {
-                    // Update shared data before drawing children that rely on it
-                    sharedData.SetDrawColourOffset(drawColourOffset);
-
-                    base.Draw(renderer);
-                }
             }
         }
     }
