@@ -21,7 +21,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
@@ -724,29 +723,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         }
                     };
 
-                    using (BeginDelayedSequence(2000))
-                    {
-                        pushScreenDelegate = Schedule(() =>
-                        {
-                            if (client.Room == null)
-                            {
-                                Logger.Log("Room became null, returning to idle");
-                                SetState(MatchmakingScreenState.Idle);
-                                return;
-                            }
-
-                            switch (poolType)
-                            {
-                                case MatchmakingPoolType.QuickPlay:
-                                    this.Push(new ScreenMatchmaking(client.Room));
-                                    break;
-
-                                case MatchmakingPoolType.RankedPlay:
-                                    this.Push(new RankedPlayScreen(client.Room));
-                                    break;
-                            }
-                        });
-                    }
+                    pushScreenDelegate = Scheduler.AddDelayed(attemptJoinRoom, 2000);
 
                     break;
 
@@ -794,6 +771,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             waitingLoopChannel?.Stop();
             waitingLoopChannel?.Dispose();
+        }
+
+        private void attemptJoinRoom()
+        {
+            if (currentState.Value != MatchmakingScreenState.InRoom)
+                return;
+
+            if (client.Room == null)
+            {
+                pushScreenDelegate = Scheduler.Add(attemptJoinRoom);
+                return;
+            }
+
+            switch (poolType)
+            {
+                case MatchmakingPoolType.QuickPlay:
+                    this.Push(new ScreenMatchmaking(client.Room));
+                    break;
+
+                case MatchmakingPoolType.RankedPlay:
+                    this.Push(new RankedPlayScreen(client.Room));
+                    break;
+            }
         }
 
         public partial class PanelBackground : CompositeDrawable
