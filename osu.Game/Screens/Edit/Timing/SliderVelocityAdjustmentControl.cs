@@ -26,6 +26,7 @@ using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
+    // TODO: Possibly rename to something more generic as this is also used for scroll speed changes
     public partial class SliderVelocityAdjustmentControl : CompositeDrawable
     {
         public Bindable<double> Current { get; } = new BindableNumber<double>(1)
@@ -40,6 +41,8 @@ namespace osu.Game.Screens.Edit.Timing
         public bool IsMultipleValues { get; private set; }
 
         private bool applyingState;
+
+        public LocalisableString Caption { get; init; } = "Slider velocity";
 
         private FormDiscreteAdjustmentControl<double> control = null!;
         private FillFlowContainer presetsFlow = null!;
@@ -66,7 +69,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     control = new FormDiscreteAdjustmentControl<double>(0.05)
                     {
-                        Caption = "Slider velocity",
+                        Caption = Caption,
                         Current = Current,
                     },
                     presetsFlow = new FillFlowContainer
