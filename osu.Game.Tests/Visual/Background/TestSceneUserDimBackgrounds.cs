@@ -795,7 +795,12 @@ namespace osu.Game.Tests.Visual.Background
 
             public float CurrentDim => dimmable.DimLevel;
 
-            public Colour4 CurrentDimColour => dimmable.DimColour;
+            public Colour4 CurrentDimColour => new Colour4(
+                dimmable.DimColour.R * dimmable.DimLevelNoStoryboard,
+                dimmable.DimColour.G * dimmable.DimLevelNoStoryboard,
+                dimmable.DimColour.B * dimmable.DimLevelNoStoryboard,
+                dimmable.DimColour.A
+            );
 
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
@@ -837,6 +842,8 @@ namespace osu.Game.Tests.Visual.Background
             public float CurrentAlpha => Content.Alpha;
 
             public new float DimLevel => base.DimLevel;
+
+            public new float DimLevelNoStoryboard => base.DimLevelNoStoryboard;
 
             public new Colour4 DimColour => base.DimColour;
         }

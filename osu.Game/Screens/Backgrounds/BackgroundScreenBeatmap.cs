@@ -219,27 +219,71 @@ namespace osu.Game.Screens.Backgrounds
                     if (IgnoreUserSettings.Value)
                         return Colour4.Black;
 
-                    // Using base.DimLevel instead of DimLevel here to ensure that DimColour is not affected by
-                    // the storyboard replacing the background, only by user settings.
-                    float grayscaleDimColour = (float)userDimColour.Value * base.DimLevel;
+                    float grayscaleDimColour = (float)userDimColour.Value;
                     return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
                 }
             }
 
-            private Colour4 colourOffset;
+            // The atrocity below is necessary because FadeColour and TransformTo interpolate
+            // colours in linear space, then convert them back to sRGB.
+            // Which means that animating ColourOffset directly will NOT make it a perfect
+            // complement to DrawColour, so adding them won't necessary give 1.0 (assuming
+            // no external sources of dimming).
+            // And using dimContent's DrawColour directly may include external sources of dimming
+            // and dimming caused by storyboard.
+            // So this roundabout way is used instead, where AnimatedInvertedDimLevel approximates
+            // dimContent's DrawColour, but this will only be precise if there are
+            // no external sources of dimming :(
 
-            protected Colour4 ColourOffset
+            // Needed to ensure that DimColour is not affected by the storyboard replacing
+            // the background, only by user settings, also used in tests.
+            protected float DimLevelNoStoryboard => base.DimLevel;
+
+            private Colour4 invertedDimLevel => new Colour4(
+                1f - DimLevelNoStoryboard,
+                1f - DimLevelNoStoryboard,
+                1f - DimLevelNoStoryboard,
+                1f
+            );
+
+            private Colour4 animatedInvertedDimLevel;
+
+            protected Colour4 AnimatedInvertedDimLevel
             {
-                get => colourOffset;
+                get => animatedInvertedDimLevel;
                 set
                 {
-                    if (value.Equals(colourOffset))
+                    if (value.Equals(animatedInvertedDimLevel))
                         return;
 
-                    colourOffset = value;
+                    animatedInvertedDimLevel = value;
                     Invalidate(Invalidation.Colour);
                 }
             }
+
+            private Colour4 animatedDimColour;
+
+            protected Colour4 AnimatedDimColour
+            {
+                get => animatedDimColour;
+                set
+                {
+                    if (value.Equals(animatedDimColour))
+                        return;
+
+                    animatedDimColour = value;
+                    Invalidate(Invalidation.Colour);
+                }
+            }
+
+            protected Colour4 AnimatedDimLevel => new Colour4(
+                1f - AnimatedInvertedDimLevel.R,
+                1f - AnimatedInvertedDimLevel.G,
+                1f - AnimatedInvertedDimLevel.B,
+                1f
+            );
+
+            protected Colour4 ColourOffset => AnimatedDimColour * AnimatedDimLevel;
 
             private ColouredDimmableSharedData sharedData;
 
@@ -253,7 +297,8 @@ namespace osu.Game.Screens.Backgrounds
             {
                 base.UpdateVisuals();
 
-                this.TransformTo(nameof(ColourOffset), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                this.TransformTo(nameof(AnimatedInvertedDimLevel), invertedDimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                this.TransformTo(nameof(AnimatedDimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
                 Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
