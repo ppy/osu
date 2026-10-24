@@ -58,10 +58,11 @@ namespace osu.Game.Screens.RankingV2.Legacy
         private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
 
         // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L294-L302
-        private const float textx1 = 80;
-        private const float imgx1 = 40;
-        private const float textx2 = 280;
-        private const float imgx2 = 240;
+        private const float text_x1 = 80;
+        private const float text_x2 = 280;
+
+        private const float img_x1 = 40;
+        private const float img_x2 = 240;
 
         private const float row1 = 160;
         private const float row2 = 220;
@@ -103,8 +104,8 @@ namespace osu.Game.Screens.RankingV2.Legacy
                 {
                     ElementName = @"ranking-maxcombo",
                     Origin = Anchor.TopLeft,
-                    Position = (new Vector2(imgx1 - 35, row4 - row4Offset) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
-                    ScoreTextPosition = (new Vector2(textx1 - 65, row4 + 10) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                    Position = (new Vector2(img_x1 - 35, row4 - row4Offset) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                    ScoreTextPosition = (new Vector2(text_x1 - 65, row4 + 10) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                     InitialElementScale = Vector2.One,
                     FinalElementScale = Vector2.One,
                 },
@@ -113,8 +114,8 @@ namespace osu.Game.Screens.RankingV2.Legacy
                 {
                     ElementName = @"ranking-accuracy",
                     Origin = Anchor.TopLeft,
-                    Position = (new Vector2(imgx2 - 58, row4 - row4Offset) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
-                    ScoreTextPosition = (new Vector2(textx2 - 86, row4 + 10) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                    Position = (new Vector2(img_x2 - 58, row4 - row4Offset) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                    ScoreTextPosition = (new Vector2(text_x2 - 86, row4 + 10) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                     InitialElementScale = Vector2.One,
                     FinalElementScale = Vector2.One,
                 },
@@ -152,19 +153,19 @@ namespace osu.Game.Screens.RankingV2.Legacy
                         {
                             ElementName = @"hit300",
                             ScoreText = $@"{score.Value.GetCount300()}x",
-                            Position = (new Vector2(imgx1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"hit100",
                             ScoreText = $@"{score.Value.GetCount100()}x",
-                            Position = (new Vector2(imgx1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"hit50",
                             ScoreText = $@"{score.Value.GetCount50()}x",
-                            Position = (new Vector2(imgx1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         // Geki count is not available.
                         // Katu count is not available.
@@ -172,7 +173,7 @@ namespace osu.Game.Screens.RankingV2.Legacy
                         {
                             ElementName = @"hit0",
                             ScoreText = $@"{score.Value.GetCountMiss()}x",
-                            Position = (new Vector2(imgx2, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                     ]);
                     break;
@@ -184,25 +185,25 @@ namespace osu.Game.Screens.RankingV2.Legacy
                         {
                             ElementName = @"taiko-hit300",
                             ScoreText = $@"{score.Value.GetCount300()}x",
-                            Position = (new Vector2(imgx1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"taiko-hit100",
                             ScoreText = $@"{score.Value.GetCount100()}x",
-                            Position = (new Vector2(imgx1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"taiko-hit0",
                             ScoreText = $@"{score.Value.GetCountMiss()}x",
-                            Position = (new Vector2(imgx1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"taiko-hit300g",
                             ScoreText = $@"{score.Value.GetCountGeki()}x",
-                            Position = (new Vector2(imgx2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         // Katu count is not available. lazer merges geki and katu into `LargeBonus` (second hit on strong notes).
                     ]);
@@ -214,7 +215,7 @@ namespace osu.Game.Screens.RankingV2.Legacy
                         new LegacyRankingElement
                         {
                             ElementName = @"fruit-orange-overlay",
-                            Position = (new Vector2(imgx1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                             IsOverlay = true,
                         },
                         new LegacyRankingElement
@@ -222,7 +223,7 @@ namespace osu.Game.Screens.RankingV2.Legacy
                             ElementName = @"fruit-orange",
                             ElementColour = Colour4.Orange,
                             ScoreText = $@"{score.Value.GetCount300()}x",
-                            Position = (new Vector2(imgx1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
@@ -231,7 +232,7 @@ namespace osu.Game.Screens.RankingV2.Legacy
                             InitialElementScale = new Vector2(1),
                             FinalElementScale = new Vector2(0.6f),
                             ScoreText = $@"{score.Value.GetCount100()}x",
-                            Position = (new Vector2(imgx1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
@@ -241,19 +242,19 @@ namespace osu.Game.Screens.RankingV2.Legacy
                             FinalElementScale = new Vector2(0.4f),
                             ElementRotation = 4f,
                             ScoreText = $@"{score.Value.GetCount50()}x",
-                            Position = (new Vector2(imgx1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"fruit-orange-overlay",
                             ElementRotation = 0.8f,
-                            Position = (new Vector2(imgx2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                             IsOverlay = true,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"hit0",
-                            Position = (new Vector2(imgx2, row1) - new Vector2(20) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row1) - new Vector2(20) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                             InitialElementScale = new Vector2(0.7f),
                             FinalElementScale = new Vector2(0.2f),
                             IsOverlay = true,
@@ -264,7 +265,7 @@ namespace osu.Game.Screens.RankingV2.Legacy
                             ElementColour = Colour4.LightGray,
                             ElementRotation = 0.8f,
                             ScoreText = $@"{score.Value.GetCountMiss()}x",
-                            Position = (new Vector2(imgx2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                     ]);
                     break;
@@ -275,38 +276,38 @@ namespace osu.Game.Screens.RankingV2.Legacy
                         {
                             ElementName = @"mania-hit300",
                             ScoreText = $@"{score.Value.GetCount300()}x",
-                            Position = (new Vector2(imgx1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"mania-hit200",
                             ScoreText = $@"{score.Value.GetCountKatu()}x",
-                            Position = (new Vector2(imgx1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"mania-hit50",
                             ElementColour = Colour4.LightBlue,
                             ScoreText = $@"{score.Value.GetCount50()}x",
-                            Position = (new Vector2(imgx1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x1, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"mania-hit300g",
                             ScoreText = $@"{score.Value.GetCountGeki()}x",
-                            Position = (new Vector2(imgx2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row1) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"mania-hit100",
                             ScoreText = $@"{score.Value.GetCount100()}x",
-                            Position = (new Vector2(imgx2, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row2) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                         new LegacyRankingElement
                         {
                             ElementName = @"mania-hit0",
                             ScoreText = $@"{score.Value.GetCountMiss()}x",
-                            Position = (new Vector2(imgx2, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
+                            Position = (new Vector2(img_x2, row3) - baselinePosition) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR,
                         },
                     ]);
                     break;
@@ -317,12 +318,12 @@ namespace osu.Game.Screens.RankingV2.Legacy
 
                     Vector2[] positions =
                     [
-                        new Vector2(imgx1, row1),
-                        new Vector2(imgx2, row1),
-                        new Vector2(imgx1, row2),
-                        new Vector2(imgx2, row2),
-                        new Vector2(imgx1, row3),
-                        new Vector2(imgx2, row3),
+                        new Vector2(img_x1, row1),
+                        new Vector2(img_x2, row1),
+                        new Vector2(img_x1, row2),
+                        new Vector2(img_x2, row2),
+                        new Vector2(img_x1, row3),
+                        new Vector2(img_x2, row3),
                     ];
 
                     for (int i = 0; i < basicResults.Length; ++i)
