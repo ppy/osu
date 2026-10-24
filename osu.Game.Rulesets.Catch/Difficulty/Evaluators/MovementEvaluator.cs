@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             var currentFlow = catchCurrent.Flow;
 
             // Penalty is applied only to the direction changes.
-            if (currentFlow != null && currentFlow.IsDirectionChange(catchCurrent))
+            if (currentFlow != null && currentFlow.IsFirst(catchCurrent))
             {
                 for (int i = 0; i < Math.Min(currentFlow.Index, 8); i++)
                 {

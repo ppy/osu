@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
         public Flow(List<CatchDifficultyHitObject> hitObjects, List<Flow> flows, int index)
         {
-            if (hitObjects.Select(h => h.Direction).Distinct().Count() != 1)
-                throw new ArgumentException("hitObjects are not of the same MovementType", nameof(hitObjects));
+            // if (hitObjects.Select(h => h.Direction).Distinct().Count() != 1)
+            //     throw new ArgumentException("hitObjects are not of the same Direction", nameof(hitObjects));
 
             this.flows = flows;
             this.hitObjects = hitObjects;
@@ -33,9 +33,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
         public void Add(CatchDifficultyHitObject hitObject)
         {
-            if (hitObject.Direction != Direction)
-                throw new ArgumentException($"Expected {Direction}, found {hitObject.Direction}");
-
             hitObjects.Add(hitObject);
             DistanceMoved += hitObject.DistanceMoved;
             StrainTime = Math.Max(hitObjects.Aggregate(0.0, (acc, h) => acc + h.DeltaTime), 40);
