@@ -741,11 +741,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
-            private TestDimmableStoryboard testDimmableStoryboard;
-
             public DrawableStoryboard DrawableStoryboard;
-
-            protected override DimmableStoryboard CreateDimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods) => testDimmableStoryboard = new TestDimmableStoryboard(storyboard, mods) { RelativeSizeAxes = Axes.Both };
 
             // Whether the player should be allowed to load.
             public bool BlockLoad;
@@ -760,8 +756,6 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             public bool IsStoryboardVisible => DimmableStoryboard.ContentDisplayed;
-
-            public Colour4 StoryboardTargetColourOffset() => testDimmableStoryboard.TargetColourOffset();
 
             public bool IsStoryboardBrightnessOne() => Precision.AlmostEquals(((Colour4)DrawableStoryboard.DrawColourInfo.Colour).R + DimmableStoryboard.DrawColourOffset.R, 1f, 0.01f);
 
@@ -1154,16 +1148,6 @@ namespace osu.Game.Tests.Visual.Background
                     protected override VideoSprite CreateSprite() => drawableVideoSprite = new DrawableVideoSprite(this);
                 }
             }
-        }
-
-        private partial class TestDimmableStoryboard : DimmableStoryboard
-        {
-            public TestDimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods)
-                : base(storyboard, mods)
-            {
-            }
-
-            public Colour4 TargetColourOffset() => DimColour * DrawColourInfo.Colour;
         }
     }
 }

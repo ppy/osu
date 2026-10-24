@@ -4,7 +4,6 @@
 #nullable disable
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -37,7 +36,6 @@ using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
-using osu.Game.Storyboards;
 using osu.Game.Users;
 using osu.Game.Utils;
 using osuTK.Graphics;
@@ -444,7 +442,10 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    DimmableStoryboard = CreateDimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods),
+                    DimmableStoryboard = new DimmableStoryboard(GameplayState.Storyboard, GameplayState.Mods)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
                     letterboxOverlay = new LetterboxOverlay
                     {
                         BreakTracker = breakTracker,
@@ -456,8 +457,6 @@ namespace osu.Game.Screens.Play
 
             return container;
         }
-
-        protected virtual DimmableStoryboard CreateDimmableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods) => new DimmableStoryboard(storyboard, mods) { RelativeSizeAxes = Axes.Both };
 
         private Drawable createGameplayComponents() => new ScalingContainer(ScalingMode.Gameplay)
         {
