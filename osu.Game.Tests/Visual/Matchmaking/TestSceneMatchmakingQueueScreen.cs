@@ -56,15 +56,15 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestBasic()
         {
-            AddStep("change state to idle", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.Idle));
+            AddStep("change state to idle", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.Idle);
 
-            AddStep("change state to queueing", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.Queueing));
+            AddStep("change state to queueing", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.Queueing);
 
-            AddStep("change state to found match", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.PendingAccept));
+            AddStep("change state to found match", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept);
 
-            AddStep("change state to waiting for room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom));
+            AddStep("change state to waiting for room", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom);
 
-            AddStep("change state to in room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom));
+            AddStep("change state to in room", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddStep("change state to in room then immediately leave room", () =>
             {
-                queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom);
+                QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom;
                 MultiplayerClient.LeaveRoom();
             });
 
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
 
             AddWaitStep("wait for room leave", 5);
 
-            AddStep("change state to in room", () => queueScreen!.SetState(ScreenQueue.MatchmakingScreenState.InRoom));
+            AddStep("change state to in room", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom);
 
             AddWaitStep("wait a little bit", 10);
         }
