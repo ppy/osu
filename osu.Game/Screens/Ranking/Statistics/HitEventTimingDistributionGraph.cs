@@ -171,6 +171,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "0",
+                Colour = Color4.Pink,
+                Y = 2,
                 Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold)
             });
 
@@ -209,7 +211,6 @@ namespace osu.Game.Screens.Ranking.Statistics
             private readonly IReadOnlyList<KeyValuePair<HitResult, int>> values;
             private readonly float maxValue;
             private readonly bool isCentre;
-            private readonly float totalValue;
 
             private const float minimum_height = 0.02f;
 
@@ -232,11 +233,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 this.values = values.OrderBy(v => v.Key.GetIndexForOrderedDisplay()).ToList();
                 this.maxValue = maxValue;
                 this.isCentre = isCentre;
-                totalValue = values.Sum(v => v.Value);
-                offsetAdjustment = totalValue;
+                offsetAdjustment = values.Sum(v => v.Value);
 
                 RelativeSizeAxes = Axes.Both;
-                Masking = true;
             }
 
             [BackgroundDependencyLoader]
@@ -272,6 +271,32 @@ namespace osu.Game.Screens.Ranking.Statistics
                         }
                     };
                 }
+
+                if (isCentre)
+                {
+                    AddInternal(new Circle
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = Color4.Pink,
+                        Depth = float.MinValue,
+                        Width = 1,
+                        Y = -1,
+                        Height = 4,
+                    });
+
+                    AddInternal(new Circle
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.TopCentre,
+                        Colour = Color4.Pink,
+                        Depth = float.MinValue,
+                        Width = 1,
+                        Height = 4,
+                    });
+                }
             }
 
             protected override void LoadComplete()
@@ -304,7 +329,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Colour = Color4.Red,
                         Blending = BlendingParameters.Additive,
                         Alpha = 0.6f,
-                        Depth = float.MinValue,
                         Height = 0,
                     });
                 }
