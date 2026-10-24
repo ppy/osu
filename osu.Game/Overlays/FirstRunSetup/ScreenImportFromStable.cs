@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     ? FirstRunOverlayImportFromStableScreenStrings.SecondCopyWillBeMadeWindows
                     : FirstRunOverlayImportFromStableScreenStrings.SecondCopyWillBeMadeOtherPlatforms;
                 copyInformation.AddText(@" "); // just to ensure correct spacing
-                copyInformation.AddLink(GeneralSettingsStrings.ChangeFolderLocation, () =>
+                copyInformation.AddLink(LocalisableString.Interpolate($@"{GeneralSettingsStrings.ChangeFolderLocation}..."), () =>
                 {
                     game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()));
                 });

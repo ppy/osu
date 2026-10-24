@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 deleteAllButton = new DangerousSettingsButtonV2
                 {
-                    Text = MaintenanceSettingsStrings.DeleteAllModPresets,
+                    Text = LocalisableString.Interpolate($@"{MaintenanceSettingsStrings.DeleteAllModPresets}..."),
                     Action = () =>
                     {
                         dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
