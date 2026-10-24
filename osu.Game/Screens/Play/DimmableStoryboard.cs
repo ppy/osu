@@ -135,25 +135,58 @@ namespace osu.Game.Screens.Play
                 if (IgnoreUserSettings.Value)
                     return Colour4.Black;
 
-                float grayscaleDimColour = (float)userDimColour.Value * DimLevel;
+                float grayscaleDimColour = (float)userDimColour.Value;
                 return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
             }
         }
 
-        private Colour4 colourOffset;
 
-        protected Colour4 ColourOffset
+        // See `DimmableBackground` class for explanation of this atrocity.
+        private Colour4 invertedDimLevel => new Colour4(
+            1f - DimLevel,
+            1f - DimLevel,
+            1f - DimLevel,
+            1f
+        );
+
+        private Colour4 animatedInvertedDimLevel;
+
+        protected Colour4 AnimatedInvertedDimLevel
         {
-            get => colourOffset;
+            get => animatedInvertedDimLevel;
             set
             {
-                if (value.Equals(colourOffset))
+                if (value.Equals(animatedInvertedDimLevel))
                     return;
 
-                colourOffset = value;
+                animatedInvertedDimLevel = value;
                 Invalidate(Invalidation.Colour);
             }
         }
+
+        private Colour4 animatedDimColour;
+
+        protected Colour4 AnimatedDimColour
+        {
+            get => animatedDimColour;
+            set
+            {
+                if (value.Equals(animatedDimColour))
+                    return;
+
+                animatedDimColour = value;
+                Invalidate(Invalidation.Colour);
+            }
+        }
+
+        protected Colour4 AnimatedDimLevel => new Colour4(
+            1f - AnimatedInvertedDimLevel.R,
+            1f - AnimatedInvertedDimLevel.G,
+            1f - AnimatedInvertedDimLevel.B,
+            1f
+        );
+
+        protected Colour4 ColourOffset => AnimatedDimColour * AnimatedDimLevel;
 
         private ColouredDimmableSharedData sharedData;
 
@@ -167,7 +200,8 @@ namespace osu.Game.Screens.Play
         {
             base.UpdateVisuals();
 
-            this.TransformTo(nameof(ColourOffset), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            this.TransformTo(nameof(AnimatedInvertedDimLevel), invertedDimLevel, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            this.TransformTo(nameof(AnimatedDimColour), DimColour, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         protected override void Dispose(bool isDisposing)
