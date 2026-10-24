@@ -129,7 +129,7 @@ namespace osu.Game.Graphics.Sprites
 
                 if (colouredDimmableSharedData != null)
                 {
-                    shader.BindUniformBlock("m_DimParameters", colouredDimmableSharedData.OffsetParametersBuffer!);
+                    shader.BindUniformBlock("m_DimParameters", colouredDimmableSharedData.GetBuffer(renderer));
                 }
             }
         }

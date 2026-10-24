@@ -22,25 +22,15 @@ namespace osu.Game.Graphics
 
         public bool IsInitialised => renderer != null;
 
-        public IUniformBuffer<DimParameters>? OffsetParametersBuffer { get; private set; }
-        public IUniformBuffer<DimParameters>? ZeroOffsetParametersBuffer { get; private set; }
+        private IUniformBuffer<DimParameters>? buffer;
 
-        public void Initialize(IRenderer renderer)
-        {
-            // This relies on renderer being constant, need to check if that's the case, TODO
-            if (IsInitialised) return;
+        private DimParameters dimParameters;
 
-            this.renderer = renderer;
-
-            OffsetParametersBuffer = renderer.CreateUniformBuffer<DimParameters>();
-            ZeroOffsetParametersBuffer = renderer.CreateUniformBuffer<DimParameters>();
-        }
+        private ulong lastWrittenFrame = ulong.MaxValue;
 
         public void SetDrawColourOffset(Colour4 DrawColourOffset)
         {
-            if (!IsInitialised) return;
-
-            OffsetParametersBuffer!.Data = new DimParameters
+            dimParameters = new DimParameters
             {
                 DimColour = new UniformVector4
                 {
@@ -51,17 +41,25 @@ namespace osu.Game.Graphics
                 },
             };
 
-            // Has to be set every frame, otherwise crashes with OpenGL(Experimental) renderer
-            ZeroOffsetParametersBuffer!.Data = new DimParameters
+            lastWrittenFrame = ulong.MaxValue;
+        }
+
+        public IUniformBuffer<DimParameters> GetBuffer(IRenderer renderer)
+        {
+            if (this.renderer == null || buffer == null)
             {
-                DimColour = new UniformVector4
-                {
-                    X = 0.0f,
-                    Y = 0.0f,
-                    Z = 0.0f,
-                    W = 1.0f
-                },
-            };
+                // Assumes that renderer cannot change during runtime.
+                this.renderer = renderer;
+                buffer = renderer.CreateUniformBuffer<DimParameters>();
+            }
+
+            if (lastWrittenFrame != renderer.FrameIndex)
+            {
+                buffer.Data = dimParameters;
+                lastWrittenFrame = renderer.FrameIndex;
+            }
+
+            return buffer;
         }
 
         public void Dispose()
@@ -74,8 +72,7 @@ namespace osu.Game.Graphics
         {
             Debug.Assert(IsInitialised);
 
-            OffsetParametersBuffer?.Dispose();
-            ZeroOffsetParametersBuffer?.Dispose();
+            buffer?.Dispose();
         }
     }
 

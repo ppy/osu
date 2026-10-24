@@ -334,11 +334,6 @@ namespace osu.Game.Screens.Backgrounds
                 protected override void Draw(IRenderer renderer)
                 {
                     // Update shared data before drawing children that rely on it
-                    if (!sharedData.IsInitialised)
-                    {
-                        sharedData.Initialize(renderer);
-                    }
-
                     sharedData.SetDrawColourOffset(drawColourOffset);
 
                     base.Draw(renderer);
