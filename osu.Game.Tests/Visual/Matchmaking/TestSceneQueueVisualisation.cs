@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
@@ -17,34 +16,27 @@ namespace osu.Game.Tests.Visual.Matchmaking
 {
     public partial class TestSceneQueueVisualisation : OsuTestScene
     {
-        private Container container = null!;
         private QueueVisualisation visualisation = null!;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Child = container = new Container
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new Drawable[]
+                new Circle
                 {
-                    new Circle
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(300),
-                        Colour = Color4.Red,
-                    },
-                    visualisation = new QueueVisualisation
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(768),
-                        SafeRadius = 170,
-                    },
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(300),
+                    Colour = Color4.Red,
+                },
+                visualisation = new QueueVisualisation
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(768),
+                    SafeRadius = 170,
                 },
             };
         }
