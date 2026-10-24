@@ -624,11 +624,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         {
                             SampleChannel dmgHitChannel;
 
-                            if ((OpponentDamageInfo.OldLife != 0 && OpponentDamageInfo.NewLife == 0) || (PlayerDamageInfo.OldLife != 0 && PlayerDamageInfo.NewLife == 0))
+                            if ((OpponentDamageInfo.OldLife != 0 && OpponentDamageInfo.NewLife == 0) ||
+                                (PlayerDamageInfo.OldLife != 0 && PlayerDamageInfo.NewLife == 0))
                             {
                                 dmgHitChannel = dmgLastHitSample.GetChannel();
                             }
-                            else if ((OpponentDamageInfo.OldLife != 1 && OpponentDamageInfo.NewLife == 1) || (PlayerDamageInfo.OldLife != 1 && PlayerDamageInfo.NewLife == 1))
+                            else if ((OpponentDamageInfo.OldLife != 1 && OpponentDamageInfo.NewLife == 1) ||
+                                     (PlayerDamageInfo.OldLife != 1 && PlayerDamageInfo.NewLife == 1))
                             {
                                 dmgHitChannel = dmgLastStandSample.GetChannel();
                             }
