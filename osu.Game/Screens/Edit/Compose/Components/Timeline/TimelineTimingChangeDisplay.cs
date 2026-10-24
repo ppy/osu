@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 RelativeSizeAxes = Axes.Y;
                 Width = WIDTH;
 
-                Origin = Anchor.TopRight;
+                Origin = Anchor.TopLeft;
 
                 Point = timingPoint;
 
