@@ -16,11 +16,10 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Screens.Play.PlayerSettings;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public partial class AudioOffsetAdjustControl : CompositeDrawable
+    public partial class AudioOffsetAdjustControl : FillFlowContainer
     {
         public Bindable<double> Current
         {
@@ -48,12 +47,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer
+            Child = new SettingsFilterableGroup
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2),
                 Children = new Drawable[]
                 {
                     new SettingsItemV2(new FormSliderBar<double>
