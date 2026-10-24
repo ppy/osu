@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
             QueueController.CurrentState.Value = state;
         }
 
-        private void waitForMatchScreenLoad() => AddUntilStep("wait for match screen load", () => Stack.CurrentScreen is ScreenMatchmaking && ((ScreenMatchmaking)Stack.CurrentScreen).IsLoaded);
+        private void waitForMatchScreenLoad() => AddUntilStep("wait for match screen load", () => Stack.CurrentScreen is ScreenMatchmaking matchmaking && matchmaking.IsLoaded);
 
         private static double generateCount(double x, double mean, double stdDev, double amplitude)
         {
