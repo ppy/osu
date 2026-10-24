@@ -53,9 +53,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             var currentFlow = catchCurrent.Flow;
 
             // Penalty is applied only to the direction changes.
-            if (currentFlow != null && currentFlow.IsEnd(catchCurrent))
+            if (currentFlow != null && currentFlow.IsDirectionChange(catchCurrent))
             {
-                for (int i = 0; i < Math.Min(currentFlow.Index, 4); i++)
+                for (int i = 0; i < Math.Min(currentFlow.Index, 8); i++)
                 {
                     var prevFlow = currentFlow.Previous(i);
 
@@ -68,12 +68,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                         relativeDifference = Math.Max(0, relativeDifference - 0.05); // Handle inaccuracies in repetitive patterns.
 
                         if (relativeDifference <= 0.15)
-                            repetitiveSpacingWeight += (1.0 - relativeDifference / 0.15) * DiffUtils.Pow(0.8, i);
+                            repetitiveSpacingWeight += (1.0 - relativeDifference / 0.15) * DiffUtils.Pow(0.9, i);
                     }
                 }
             }
 
-            double repetitiveSpacingPenalty = catchCurrent.BaseObject.HyperDash ? DiffUtils.Pow(0.93, repetitiveSpacingWeight) : DiffUtils.Pow(0.9, repetitiveSpacingWeight);
+            double repetitiveSpacingPenalty = catchCurrent.BaseObject.HyperDash ? DiffUtils.Pow(0.97, repetitiveSpacingWeight) : DiffUtils.Pow(0.94, repetitiveSpacingWeight);
 
             distanceAddition *= repetitiveSpacingPenalty;
 

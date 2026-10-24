@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             StrainTime = Math.Max(hitObjects.Aggregate(0.0, (acc, h) => acc + h.DeltaTime), 40);
         }
 
-        public bool IsEnd(CatchDifficultyHitObject hitObject) => hitObject.Index == hitObjects.Last().Index;
+        public bool IsDirectionChange(CatchDifficultyHitObject hitObject) => hitObject.Index == hitObjects.First().Index;
 
         public Flow? Previous(int backwardsIndex)
         {
