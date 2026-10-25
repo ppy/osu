@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Backgrounds
 
             b.Depth = newDepth;
             b.FadeInFromZero(500, Easing.OutQuint);
-            Background = dimmable.Background = b;
+            dimmable.Background = Background = b;
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Backgrounds
 
             public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-            public BeatmapBackground Background
+            public Background Background
             {
                 get => background;
                 set
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Backgrounds
 
             private Bindable<double> userBlurLevel { get; set; }
 
-            private BeatmapBackground background;
+            private Background background;
 
             public override void Add(Drawable drawable)
             {
