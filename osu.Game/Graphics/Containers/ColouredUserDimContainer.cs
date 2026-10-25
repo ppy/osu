@@ -107,8 +107,6 @@ namespace osu.Game.Graphics.Containers
 
         protected Colour4 ColourOffset => AnimatedDimColour * AnimatedDimLevel;
 
-        public IColouredDimmable DrawColourOffsetSource => this;
-
         public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
 
         public ColouredDimmableSharedData ColouredDimmableSharedData => sharedData;

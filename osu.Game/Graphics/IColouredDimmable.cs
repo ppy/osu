@@ -81,31 +81,6 @@ namespace osu.Game.Graphics
     /// </summary>
     public interface IColouredDimmable : IDrawable
     {
-        IColouredDimmable DrawColourOffsetSource
-        {
-            get
-            {
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffsetSource;
-                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
-                    // Needed to skip intermediate containers.
-                    return colouredDimmableGrandparent.DrawColourOffsetSource;
-
-                return this;
-            }
-        }
-
-        ColouredDimmableSharedData? ColouredDimmableSharedData
-        {
-            get
-            {
-                IColouredDimmable source = DrawColourOffsetSource;
-
-                if (source != null && source != this)
-                    return source.ColouredDimmableSharedData;
-
-                return null;
-            }
-        }
+        ColouredDimmableSharedData? ColouredDimmableSharedData { get; }
     }
 }

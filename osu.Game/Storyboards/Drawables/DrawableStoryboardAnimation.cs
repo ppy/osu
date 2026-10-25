@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable, IColouredDimmable
+    public partial class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
         public StoryboardAnimation Animation { get; }
 

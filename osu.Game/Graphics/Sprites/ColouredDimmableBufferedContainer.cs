@@ -1,15 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-// #nullable disable
+#nullable disable
 
-using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Sprites
@@ -18,9 +16,9 @@ namespace osu.Game.Graphics.Sprites
     {
         private readonly LayoutValue<IColouredDimmable> drawColourOffsetSource = new LayoutValue<IColouredDimmable>(Invalidation.Parent);
 
-        private IShader? originalShader;
+        private IShader originalShader;
 
-        private IShader? colouredShader;
+        private IShader colouredShader;
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
@@ -54,31 +52,29 @@ namespace osu.Game.Graphics.Sprites
         }
 
         // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
-        public IColouredDimmable DrawColourOffsetSource => this;
-        public ColouredDimmableSharedData? ColouredDimmableSharedData => null;
+        public ColouredDimmableSharedData ColouredDimmableSharedData => null;
 
-        public IColouredDimmable FrameBufferDrawColourOffsetSource
+        public IColouredDimmable DrawColourOffsetSource
         {
             get
             {
-                if (Parent is IColouredDimmable colouredDimmableParent)
-                    return colouredDimmableParent.DrawColourOffsetSource;
-                else if (Parent?.Parent is IColouredDimmable colouredDimmableGrandparent)
-                    // Needed to skip intermediate containers.
-                    return colouredDimmableGrandparent.DrawColourOffsetSource;
+                IDrawable currentParent = Parent;
 
-                return this;
+                while (currentParent != null && currentParent is not IColouredDimmable)
+                    currentParent = currentParent.Parent;
+
+                return currentParent as IColouredDimmable;
             }
         }
 
-        public ColouredDimmableSharedData? FrameBufferColouredDimmableSharedData
+        public ColouredDimmableSharedData FrameBufferColouredDimmableSharedData
         {
             get
             {
                 if (!drawColourOffsetSource.IsValid)
-                    drawColourOffsetSource.Value = FrameBufferDrawColourOffsetSource;
+                    drawColourOffsetSource.Value = DrawColourOffsetSource;
 
-                if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
+                if (drawColourOffsetSource.Value != null)
                     return drawColourOffsetSource.Value.ColouredDimmableSharedData;
 
                 return null;
@@ -114,7 +110,7 @@ namespace osu.Game.Graphics.Sprites
             {
             }
 
-            private ColouredDimmableSharedData? colouredDimmableSharedData;
+            private ColouredDimmableSharedData colouredDimmableSharedData;
 
             public override void ApplyState()
             {

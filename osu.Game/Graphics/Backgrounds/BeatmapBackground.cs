@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Backgrounds
     /// <summary>
     /// A background which offers dimming using a custom shader with ability to change dim colour.
     /// </summary>
-    public partial class BeatmapBackground : Background, IColouredDimmable
+    public partial class BeatmapBackground : Background
     {
         public readonly WorkingBeatmap Beatmap;
 

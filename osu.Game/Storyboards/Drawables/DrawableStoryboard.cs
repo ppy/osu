@@ -22,7 +22,7 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>, IColouredDimmable
+    public partial class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
         [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }

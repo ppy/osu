@@ -1,16 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable disable
+
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Shaders.Types;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Layout;
@@ -20,11 +20,11 @@ using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardVideo : CompositeDrawable, IColouredDimmable
+    public partial class DrawableStoryboardVideo : CompositeDrawable
     {
         public readonly StoryboardVideo Video;
 
-        private DrawableVideo? drawableVideo;
+        private DrawableVideo drawableVideo;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Storyboards.Drawables
             Alpha = 0,
         };
 
-        protected partial class DrawableVideo : Video, IFlippable, IVectorScalable, IColouredDimmable
+        protected partial class DrawableVideo : Video, IFlippable, IVectorScalable
         {
             private bool flipH;
 
@@ -145,13 +145,13 @@ namespace osu.Game.Storyboards.Drawables
             {
             }
 
-            protected partial class DrawableVideoSprite : VideoSprite, IColouredDimmable
+            protected partial class DrawableVideoSprite : VideoSprite
             {
                 private readonly LayoutValue<IColouredDimmable> drawColourOffsetSource = new LayoutValue<IColouredDimmable>(Invalidation.Parent);
 
-                private IShader? originalShader;
+                private IShader originalShader;
 
-                private IShader? colouredShader;
+                private IShader colouredShader;
 
                 private readonly Video video;
 
@@ -182,14 +182,27 @@ namespace osu.Game.Storyboards.Drawables
                     colouredShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
                 }
 
-                public ColouredDimmableSharedData? ColouredDimmableSharedData
+                public IColouredDimmable DrawColourOffsetSource
+                {
+                    get
+                    {
+                        IDrawable currentParent = Parent;
+
+                        while (currentParent != null && currentParent is not IColouredDimmable)
+                            currentParent = currentParent.Parent;
+
+                        return currentParent as IColouredDimmable;
+                    }
+                }
+
+                public ColouredDimmableSharedData ColouredDimmableSharedData
                 {
                     get
                     {
                         if (!drawColourOffsetSource.IsValid)
-                            drawColourOffsetSource.Value = (this as IColouredDimmable).DrawColourOffsetSource;
+                            drawColourOffsetSource.Value = DrawColourOffsetSource;
 
-                        if (drawColourOffsetSource.Value != null && drawColourOffsetSource.Value != this)
+                        if (drawColourOffsetSource.Value != null)
                             return drawColourOffsetSource.Value.ColouredDimmableSharedData;
 
                         return null;
@@ -226,13 +239,13 @@ namespace osu.Game.Storyboards.Drawables
                         Source = source;
                     }
 
-                    private ColouredDimmableSharedData? colouredDimmableSharedData;
+                    private ColouredDimmableSharedData colouredDimmableSharedData;
 
                     public override void ApplyState()
                     {
                         base.ApplyState();
 
-                        colouredDimmableSharedData = (Source as IColouredDimmable).ColouredDimmableSharedData;
+                        colouredDimmableSharedData = Source.ColouredDimmableSharedData;
                     }
 
                     protected override void BindUniformResources(IShader shader, IRenderer renderer)
