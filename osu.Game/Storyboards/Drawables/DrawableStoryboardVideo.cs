@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System;
 using System.IO;
 using System.Linq;
@@ -24,7 +22,7 @@ namespace osu.Game.Storyboards.Drawables
     {
         public readonly StoryboardVideo Video;
 
-        private DrawableVideo drawableVideo;
+        private DrawableVideo? drawableVideo;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -147,11 +145,7 @@ namespace osu.Game.Storyboards.Drawables
 
             protected partial class DrawableVideoSprite : VideoSprite
             {
-                private readonly LayoutValue<IColouredDimmableSource> drawColourOffsetSource = new LayoutValue<IColouredDimmableSource>(Invalidation.Parent);
-
-                private IShader originalShader;
-
-                private IShader colouredShader;
+                public readonly ColouredDimmableHelper ColouredDimmableHelper;
 
                 private readonly Video video;
 
@@ -172,46 +166,24 @@ namespace osu.Game.Storyboards.Drawables
                     : base(video)
                 {
                     this.video = video;
-                    AddLayout(drawColourOffsetSource);
+                    ColouredDimmableHelper = new ColouredDimmableHelper(this);
+                    AddLayout(ColouredDimmableHelper.SourceLayout);
                 }
 
                 [BackgroundDependencyLoader]
                 private void load(ShaderManager shaders)
                 {
-                    originalShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.VIDEO);
-                    colouredShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
-                }
-
-                public ColouredDimmableSharedData ColouredDimmableSharedData
-                {
-                    get
-                    {
-                        if (!drawColourOffsetSource.IsValid)
-                            drawColourOffsetSource.Value = this.FindClosestParent<IColouredDimmableSource>();
-
-                        if (drawColourOffsetSource.Value != null)
-                            return drawColourOffsetSource.Value.ColouredDimmableSharedData;
-
-                        return null;
-                    }
+                    ColouredDimmableHelper.SetShaders(
+                        shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.VIDEO),
+                        shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo")
+                    );
                 }
 
                 protected override void Update()
                 {
                     base.Update();
 
-                    if (DrawColourInfo.Blending == BlendingParameters.Additive || ColouredDimmableSharedData == null)
-                    {
-                        // Additive Drawables shouldn't have any offset, because things underneath them
-                        // already have it added to them. This does rely on the fact that there is
-                        // something non-additive (but still IColouredDimmable) behind this sprite,
-                        // which seems to be the case with storyboards, as beatmap background is always enabled.
-                        TextureShader = originalShader;
-                    }
-                    else
-                    {
-                        TextureShader = colouredShader;
-                    }
+                    TextureShader = ColouredDimmableHelper.GetShader(DrawColourInfo.Blending);
                 }
 
                 protected override DrawNode CreateDrawNode() => new DrawableVideoSpriteDrawNode(this, video);
@@ -226,13 +198,13 @@ namespace osu.Game.Storyboards.Drawables
                         Source = source;
                     }
 
-                    private ColouredDimmableSharedData colouredDimmableSharedData;
+                    private ColouredDimmableSharedData? colouredDimmableSharedData;
 
                     public override void ApplyState()
                     {
                         base.ApplyState();
 
-                        colouredDimmableSharedData = Source.ColouredDimmableSharedData;
+                        colouredDimmableSharedData = Source.ColouredDimmableHelper.SharedData;
                     }
 
                     protected override void BindUniformResources(IShader shader, IRenderer renderer)

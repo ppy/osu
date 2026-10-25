@@ -14,11 +14,7 @@ namespace osu.Game.Graphics.Sprites
 {
     public partial class ColouredDimmableBufferedContainer : BufferedContainer, IColouredDimmableSource
     {
-        private readonly LayoutValue<IColouredDimmableSource> drawColourOffsetSource = new LayoutValue<IColouredDimmableSource>(Invalidation.Parent);
-
-        private IShader originalShader;
-
-        private IShader colouredShader;
+        public readonly ColouredDimmableHelper ColouredDimmableHelper;
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
@@ -41,49 +37,27 @@ namespace osu.Game.Graphics.Sprites
         public ColouredDimmableBufferedContainer(TexturePixelFormat textureFormat = TexturePixelFormat.R8G8B8A8Float, RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
             : base(textureFormat, formats, pixelSnapping, cachedFrameBuffer)
         {
-            AddLayout(drawColourOffsetSource);
+            ColouredDimmableHelper = new ColouredDimmableHelper(this);
+            AddLayout(ColouredDimmableHelper.SourceLayout);
         }
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            originalShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
-            colouredShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
+            ColouredDimmableHelper.SetShaders(
+                shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE),
+                shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture")
+            );
         }
 
         // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
         public ColouredDimmableSharedData ColouredDimmableSharedData => null;
 
-        public ColouredDimmableSharedData FrameBufferColouredDimmableSharedData
-        {
-            get
-            {
-                if (!drawColourOffsetSource.IsValid)
-                    drawColourOffsetSource.Value = this.FindClosestParent<IColouredDimmableSource>();
-
-                if (drawColourOffsetSource.Value != null)
-                    return drawColourOffsetSource.Value.ColouredDimmableSharedData;
-
-                return null;
-            }
-        }
-
         protected override void Update()
         {
             base.Update();
 
-            if (DrawColourInfo.Blending == BlendingParameters.Additive || FrameBufferColouredDimmableSharedData == null)
-            {
-                // Additive Drawables shouldn't have any offset, because things underneath them
-                // already have it added to them. This does rely on the fact that there is
-                // something non-additive (but still IColouredDimmable) behind this sprite,
-                // which seems to be the case with storyboards, as beatmap background is always enabled.
-                TextureShader = originalShader;
-            }
-            else
-            {
-                TextureShader = colouredShader;
-            }
+            TextureShader = ColouredDimmableHelper.GetShader(DrawColourInfo.Blending);
         }
 
         protected override DrawNode CreateDrawNode() => new ColouredDimmableBufferedContainerDrawNode(this, SharedData);
@@ -103,7 +77,7 @@ namespace osu.Game.Graphics.Sprites
             {
                 base.ApplyState();
 
-                colouredDimmableSharedData = Source.FrameBufferColouredDimmableSharedData;
+                colouredDimmableSharedData = Source.ColouredDimmableHelper.SharedData;
             }
 
             protected override void BindUniformResources(IShader shader, IRenderer renderer)
