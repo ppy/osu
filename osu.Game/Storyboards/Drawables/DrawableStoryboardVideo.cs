@@ -182,25 +182,12 @@ namespace osu.Game.Storyboards.Drawables
                     colouredShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
                 }
 
-                public IColouredDimmableSource ColouredDimmableSource
-                {
-                    get
-                    {
-                        IDrawable currentParent = Parent;
-
-                        while (currentParent != null && currentParent is not IColouredDimmableSource)
-                            currentParent = currentParent.Parent;
-
-                        return currentParent as IColouredDimmableSource;
-                    }
-                }
-
                 public ColouredDimmableSharedData ColouredDimmableSharedData
                 {
                     get
                     {
                         if (!drawColourOffsetSource.IsValid)
-                            drawColourOffsetSource.Value = ColouredDimmableSource;
+                            drawColourOffsetSource.Value = this.FindClosestParent<IColouredDimmableSource>();
 
                         if (drawColourOffsetSource.Value != null)
                             return drawColourOffsetSource.Value.ColouredDimmableSharedData;

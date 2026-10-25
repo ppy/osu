@@ -911,9 +911,9 @@ namespace osu.Game.Tests.Visual.Background
             {
             }
 
-            public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableBufferedContainer.ColouredDimmableSource, source);
+            public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableBufferedContainer.FindClosestParent<IColouredDimmableSource>(), source);
 
-            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(ColouredDimmableSprite.ColouredDimmableSource, source);
+            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(ColouredDimmableSprite.FindClosestParent<IColouredDimmableSource>(), source);
 
             public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(dimmableBufferedContainer);
 
@@ -1058,7 +1058,7 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
-            public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableStoryboardSprite.ColouredDimmableSource, source);
+            public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableStoryboardSprite.FindClosestParent<IColouredDimmableSource>(), source);
 
             public override Drawable CreateDrawable() => drawableStoryboardSprite = new DrawableStoryboardSprite(this)
             {
@@ -1089,7 +1089,7 @@ namespace osu.Game.Tests.Visual.Background
                 {
                 }
 
-                public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableSprite.ColouredDimmableSource, source);
+                public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableSprite.FindClosestParent<IColouredDimmableSource>(), source);
 
                 protected override Sprite CreateSprite() => dimmableSprite = new ColouredDimmableSprite
                 {
@@ -1143,7 +1143,7 @@ namespace osu.Game.Tests.Visual.Background
                     {
                     }
 
-                    public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableVideoSprite.ColouredDimmableSource, source);
+                    public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableVideoSprite.FindClosestParent<IColouredDimmableSource>(), source);
 
                     protected override VideoSprite CreateSprite() => drawableVideoSprite = new DrawableVideoSprite(this);
                 }
