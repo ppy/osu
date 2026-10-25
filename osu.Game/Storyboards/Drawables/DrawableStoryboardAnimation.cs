@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;

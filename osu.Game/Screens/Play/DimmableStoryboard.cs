@@ -9,7 +9,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards;
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             Add(OverlayLayerContainer = new Container());
 

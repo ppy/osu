@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osuTK;
