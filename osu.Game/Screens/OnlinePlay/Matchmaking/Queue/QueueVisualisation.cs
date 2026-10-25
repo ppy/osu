@@ -32,12 +32,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private readonly Bindable<double?> lastSamplePlayback = new Bindable<double?>();
 
         /// <summary>
-        /// Radius (in pixels) of an area originating in the centre of the visualisation
-        /// which is going to be avoided by the displayed avatars.
+        /// Relative radius from the centre which avatars should not be displayed inside.
         /// </summary>
-        public float SafeRadius { get; init; }
-
-        private float safeRadiusRelative;
+        public float SafeRadius { get; init; } = 0.25f;
 
         public APIUser[] Users
         {
@@ -55,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             foreach (var u in usersContainer)
                 u.Delay(RNG.Next(0, 1000)).FadeOut(500).Expire();
 
-            LoadComponentsAsync(users.Select(u => new MovingAvatar(u, safeRadiusRelative)
+            LoadComponentsAsync(users.Select(u => new MovingAvatar(u, SafeRadius)
             {
                 LastSamplePlayback = { BindTarget = lastSamplePlayback },
             }), avatars =>
@@ -86,8 +83,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            safeRadiusRelative = (SafeRadius + MatchmakingAvatar.SIZE.Y * max_scale / 2) / DrawHeight;
 
             refresh();
         }

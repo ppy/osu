@@ -36,7 +36,6 @@ namespace osu.Game.Tests.Visual.Matchmaking
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(768),
-                    SafeRadius = 170,
                 },
             };
         }
