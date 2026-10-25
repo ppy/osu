@@ -12,9 +12,9 @@ using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Sprites
 {
-    public partial class ColouredDimmableBufferedContainer : BufferedContainer, IColouredDimmable
+    public partial class ColouredDimmableBufferedContainer : BufferedContainer, IColouredDimmableSource
     {
-        private readonly LayoutValue<IColouredDimmable> drawColourOffsetSource = new LayoutValue<IColouredDimmable>(Invalidation.Parent);
+        private readonly LayoutValue<IColouredDimmableSource> drawColourOffsetSource = new LayoutValue<IColouredDimmableSource>(Invalidation.Parent);
 
         private IShader originalShader;
 
@@ -54,16 +54,16 @@ namespace osu.Game.Graphics.Sprites
         // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
         public ColouredDimmableSharedData ColouredDimmableSharedData => null;
 
-        public IColouredDimmable DrawColourOffsetSource
+        public IColouredDimmableSource ColouredDimmableSource
         {
             get
             {
                 IDrawable currentParent = Parent;
 
-                while (currentParent != null && currentParent is not IColouredDimmable)
+                while (currentParent != null && currentParent is not IColouredDimmableSource)
                     currentParent = currentParent.Parent;
 
-                return currentParent as IColouredDimmable;
+                return currentParent as IColouredDimmableSource;
             }
         }
 
@@ -72,7 +72,7 @@ namespace osu.Game.Graphics.Sprites
             get
             {
                 if (!drawColourOffsetSource.IsValid)
-                    drawColourOffsetSource.Value = DrawColourOffsetSource;
+                    drawColourOffsetSource.Value = ColouredDimmableSource;
 
                 if (drawColourOffsetSource.Value != null)
                     return drawColourOffsetSource.Value.ColouredDimmableSharedData;

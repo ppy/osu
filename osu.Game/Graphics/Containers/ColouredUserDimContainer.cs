@@ -11,7 +11,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
-    public partial class ColouredUserDimContainer : UserDimContainer, IColouredDimmable
+    public partial class ColouredUserDimContainer : UserDimContainer, IColouredDimmableSource
     {
         private ColouredDimmableSharedData sharedData;
 

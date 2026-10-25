@@ -147,7 +147,7 @@ namespace osu.Game.Storyboards.Drawables
 
             protected partial class DrawableVideoSprite : VideoSprite
             {
-                private readonly LayoutValue<IColouredDimmable> drawColourOffsetSource = new LayoutValue<IColouredDimmable>(Invalidation.Parent);
+                private readonly LayoutValue<IColouredDimmableSource> drawColourOffsetSource = new LayoutValue<IColouredDimmableSource>(Invalidation.Parent);
 
                 private IShader originalShader;
 
@@ -182,16 +182,16 @@ namespace osu.Game.Storyboards.Drawables
                     colouredShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo");
                 }
 
-                public IColouredDimmable DrawColourOffsetSource
+                public IColouredDimmableSource ColouredDimmableSource
                 {
                     get
                     {
                         IDrawable currentParent = Parent;
 
-                        while (currentParent != null && currentParent is not IColouredDimmable)
+                        while (currentParent != null && currentParent is not IColouredDimmableSource)
                             currentParent = currentParent.Parent;
 
-                        return currentParent as IColouredDimmable;
+                        return currentParent as IColouredDimmableSource;
                     }
                 }
 
@@ -200,7 +200,7 @@ namespace osu.Game.Storyboards.Drawables
                     get
                     {
                         if (!drawColourOffsetSource.IsValid)
-                            drawColourOffsetSource.Value = DrawColourOffsetSource;
+                            drawColourOffsetSource.Value = ColouredDimmableSource;
 
                         if (drawColourOffsetSource.Value != null)
                             return drawColourOffsetSource.Value.ColouredDimmableSharedData;

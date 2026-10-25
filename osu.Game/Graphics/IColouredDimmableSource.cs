@@ -77,9 +77,9 @@ namespace osu.Game.Graphics
     }
 
     /// <summary>
-    /// An interface for drawable objects whose dim colour can be adjusted.
+    /// An interface for objects that provide colour offset to drawables.
     /// </summary>
-    public interface IColouredDimmable : IDrawable
+    public interface IColouredDimmableSource : IDrawable
     {
         ColouredDimmableSharedData? ColouredDimmableSharedData { get; }
     }
