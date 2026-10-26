@@ -90,6 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            QueueTimer.Stop();
 
             client.MatchmakingLeaveQueue().FireAndForget();
         }
@@ -179,6 +180,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
+            QueueTimer.Stop();
 
             postNotification();
             backgroundNotification?.Complete(invitation);
