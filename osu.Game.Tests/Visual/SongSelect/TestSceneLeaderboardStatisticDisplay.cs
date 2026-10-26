@@ -69,15 +69,35 @@ namespace osu.Game.Tests.Visual.SongSelect
                     new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
                 });
             });
-            AddStep("change to vertical", () =>
+            AddStep("vertical container, vertical stats", () =>
             {
                 container.Direction = FillDirection.Vertical;
                 container.ScaleTo(0.8f, 200, Easing.OutQuint);
+
+                setStatisticsDirection(Direction.Vertical);
             });
-            AddStep("change to horizontal", () =>
+            AddStep("vertical container, horizontal stats", () =>
+            {
+                container.Direction = FillDirection.Vertical;
+                container.ScaleTo(0.8f, 200, Easing.OutQuint);
+
+                setStatisticsDirection(Direction.Horizontal);
+            });
+            AddStep("horizontal container, vertical stats", () =>
+            {
+                // This one is not really intended to be used anywhere, as it's not really utilising
+                // the vertical space available. Included here for the sake of completeness.
+                container.Direction = FillDirection.Horizontal;
+                container.ScaleTo(1, 200, Easing.OutQuint);
+
+                setStatisticsDirection(Direction.Vertical);
+            });
+            AddStep("horizontal container, horizontal stats", () =>
             {
                 container.Direction = FillDirection.Horizontal;
                 container.ScaleTo(1, 200, Easing.OutQuint);
+
+                setStatisticsDirection(Direction.Horizontal);
             });
         }
 
@@ -88,27 +108,54 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 container.AddRange(statistics = new[]
                 {
-                    new BeatmapLeaderboardScore.StatisticDisplay("COMBO", "123x", false),
                     new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
-                    new BeatmapLeaderboardScore.StatisticDisplay("TEST", "12345", false),
+                    new BeatmapLeaderboardScore.StatisticDisplay("ATTEMPTS", "32", false),
+                    new BeatmapLeaderboardScore.StatisticDisplay("COMPLETED", "9", false),
                 });
             });
-            AddStep("change to vertical", () =>
+            AddStep("vertical container, vertical stats", () =>
             {
                 container.Direction = FillDirection.Vertical;
                 container.ScaleTo(0.8f, 200, Easing.OutQuint);
 
-                foreach (var statistic in statistics)
-                    statistic.Direction = Direction.Vertical;
+                setStatisticsDirection(Direction.Vertical);
             });
-            AddStep("change to horizontal", () =>
+            AddStep("vertical container, horizontal stats", () =>
+            {
+                // This doesn't really make sense to be used anywhere either, as it requires
+                // the scale to be reduced to the point where the statistics are barely readable.
+                container.Direction = FillDirection.Vertical;
+                container.ScaleTo(0.6f, 200, Easing.OutQuint);
+
+                setStatisticsDirection(Direction.Horizontal);
+            });
+            AddStep("horizontal container, horizontal stats", () =>
             {
                 container.Direction = FillDirection.Horizontal;
                 container.ScaleTo(1, 200, Easing.OutQuint);
 
-                foreach (var statistic in statistics)
-                    statistic.Direction = Direction.Horizontal;
+                setStatisticsDirection(Direction.Horizontal);
             });
+            AddStep("horizontal container, vertical stats", () =>
+            {
+                // Same as its vertical counterpart, this doesn't really make sense to be used
+                // anywhere, as it doesn't utilise the vertical space available.
+                container.Direction = FillDirection.Horizontal;
+                container.ScaleTo(1, 200, Easing.OutQuint);
+
+                setStatisticsDirection(Direction.Vertical);
+            });
+        }
+
+        private void setStatisticsDirection(Direction direction)
+        {
+            foreach (var statistic in statistics)
+            {
+                statistic.Direction = direction;
+                statistic.Anchor = statistic.Origin = direction == Direction.Horizontal
+                    ? Anchor.TopLeft
+                    : Anchor.TopRight;
+            }
         }
     }
 }
