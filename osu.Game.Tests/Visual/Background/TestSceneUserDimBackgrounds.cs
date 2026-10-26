@@ -550,6 +550,19 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
+        [Test]
+        public void TestParentDimming()
+        {
+            performFullSetup();
+
+            AddUntilStep("Screen is dimmed and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsBackgroundColourOffset());
+
+            AddStep("Dim the background directly", () => songSelect.SetBackgroundColour(new Colour4(0.5f, 0.5f, 0.5f, 1f)));
+
+            AddUntilStep("Background is dimmed", () => songSelect.GetBackgroundColour() == new Colour4(0.5f, 0.5f, 0.5f, 1f));
+
+            AddAssert("Parent colour is applied correctly", () => songSelect.IsBackgroundFinalColourCorrect());
+        }
 
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
@@ -669,9 +682,38 @@ namespace osu.Game.Tests.Visual.Background
 
             public float ParentColourScale() => background.IgnoreUserSettings.Value ? (1f - background.DimWhenUserSettingsIgnored.Value) : 1f;
 
-            public Colour4 BackgroundTargetColourOffset() => background.ParentDrawColour * background.CurrentDimColour;
+            public Colour4 BackgroundTargetColourOffset() => (background.ParentDrawColour.ToLinear() * background.CurrentDimColour.ToLinear()).ToSRGB();
 
             public bool IsBackgroundColourOffset() => background.CurrentColourOffset == BackgroundTargetColourOffset();
+
+            public void SetBackgroundColour(Colour4 colour)
+            {
+                background.Colour = colour;
+            }
+
+            public Colour4 GetBackgroundColour() => background.Colour;
+
+            public bool IsBackgroundFinalColourCorrect()
+            {
+                // See ColouredUserDimContainer for more info
+                Colour4 colour = new Colour4(
+                    1f - background.CurrentDim,
+                    1f - background.CurrentDim,
+                    1f - background.CurrentDim,
+                    1f
+                );
+
+                Colour4 targetColour = colour + background.CurrentDimColour;
+                targetColour = new Colour4(targetColour.R, targetColour.G, targetColour.B, 1f);
+
+                Colour4 finalColour = (background.ParentDrawColour.ToLinear() * targetColour.ToLinear()).ToSRGB();
+
+                Colour4 actualColour = background.CurrentColour + background.CurrentColourOffset;
+
+                return Precision.AlmostEquals(finalColour.R, actualColour.R, 0.001f) &&
+                       Precision.AlmostEquals(finalColour.G, actualColour.G, 0.001f) &&
+                       Precision.AlmostEquals(finalColour.B, actualColour.B, 0.001f);
+            }
 
             public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
