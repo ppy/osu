@@ -11,7 +11,6 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
@@ -26,7 +25,7 @@ namespace osu.Game.Tests.Beatmaps
         private BeatmapSetInfo importedSet = null!;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, AudioManager audio, RulesetStore rulesets)
+        private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, null, audio, Resources, host, Beatmap.Default));
         }

@@ -29,6 +29,8 @@ using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
 
+// ReSharper disable AccessToDisposedClosure
+
 namespace osu.Game.Tests.Beatmaps.Formats
 {
     [TestFixture]

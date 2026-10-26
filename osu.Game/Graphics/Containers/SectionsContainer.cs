@@ -164,7 +164,7 @@ namespace osu.Game.Graphics.Containers
         {
             Logger.Log($"Scrolling to {target}..");
 
-            lastKnownScroll = null;
+            InvalidateScrollPosition();
 
             float scrollTarget = getScrollTargetForDrawable(target);
 

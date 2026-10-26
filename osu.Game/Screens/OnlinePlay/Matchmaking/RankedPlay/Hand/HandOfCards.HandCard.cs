@@ -72,14 +72,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
 
             public RankedPlayCardWithPlaylistItem Item => Card.Item;
 
-            public HandCard(RankedPlayCard card)
+            public HandCard(RankedPlayCard card, bool flipped)
             {
                 Size = card.DrawSize;
 
                 card.Anchor = Anchor.Centre;
                 card.Origin = Anchor.Centre;
                 card.Position = Vector2.Zero;
-                card.Rotation = 0;
+                card.Rotation = flipped ? 180 : 0;
                 card.Scale = Vector2.One;
 
                 AddInternal(Card = card);

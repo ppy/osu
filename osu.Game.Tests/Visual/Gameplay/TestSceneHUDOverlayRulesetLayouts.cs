@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -101,6 +102,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     (typeof(IGameplayClock), gameplayClock = new GameplayClockContainer(new TrackVirtual(60000), false, false)),
                     (typeof(SpectatorClient), spectatorClient),
                     (typeof(IGameplayLeaderboardProvider), new TestGameplayLeaderboardProvider()),
+                    (typeof(DrawableRuleset), ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(ruleset.RulesetInfo).GetPlayableBeatmap(ruleset.RulesetInfo)))
                 ];
 
                 if (drawableRuleset is IDrawableScrollingRuleset scrolling)

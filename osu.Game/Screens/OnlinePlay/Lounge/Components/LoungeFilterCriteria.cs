@@ -13,5 +13,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         public string Category = string.Empty;
         public RulesetInfo? Ruleset;
         public RoomPermissionsFilter Permissions;
+        public bool Full;
     }
 }

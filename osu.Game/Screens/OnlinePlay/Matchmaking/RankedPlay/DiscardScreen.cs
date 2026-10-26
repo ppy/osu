@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -71,10 +70,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            var matchState = Client.Room?.MatchState as RankedPlayRoomState;
-
-            Debug.Assert(matchState != null);
-
             Children =
             [
                 CenterRow = new CardFlow

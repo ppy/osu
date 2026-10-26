@@ -71,12 +71,12 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 
         private partial class TestTaikoModFlashlight : TaikoModFlashlight
         {
-            protected override Flashlight CreateFlashlight() => new TestTaikoFlashlight(this, Playfield);
+            protected override Flashlight CreateFlashlight() => new TestTaikoFlashlight(this, DrawableRuleset);
 
             public partial class TestTaikoFlashlight : TaikoFlashlight
             {
-                public TestTaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
-                    : base(modFlashlight, taikoPlayfield)
+                public TestTaikoFlashlight(TaikoModFlashlight modFlashlight, DrawableTaikoRuleset drawableRuleset)
+                    : base(modFlashlight, drawableRuleset)
                 {
                 }
 

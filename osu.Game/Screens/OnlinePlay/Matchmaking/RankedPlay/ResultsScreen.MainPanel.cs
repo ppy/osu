@@ -76,7 +76,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             private AudioContainer sampleContainer = null!;
             private DrawableSample resultsAppearSample = null!;
             private DrawableSample dmgFlySample = null!;
-            private DrawableSample dmgHitSample = null!;
+
+            private DrawableSample dmgHitLowSample = null!;
+            private DrawableSample dmgHitMediumSample = null!;
+            private DrawableSample dmgHitHighSample = null!;
+
+            private DrawableSample dmgLastHitSample = null!;
+            private DrawableSample dmg1HpHitSample = null!;
+            private DrawableSample dmgLastStandSample = null!;
+
+            private DrawableSample damageMultiplierSample = null!;
+            private DrawableSample damageMultiplierUpSample = null!;
+            private DrawableSample damageMultiplierDownSample = null!;
             private DrawableSample hpDownSample = null!;
             private DrawableSample playerAppearSample = null!;
             private DrawableSample pseudoScoreCounterSample = null!;
@@ -196,7 +207,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                                 },
                                             ],
                                             [
-                                                playerScoreCounter = new RankedPlayScoreCounter(numDigits(PlayerScore.TotalScore))
+                                                playerScoreCounter = new RankedPlayScoreCounter
                                                 {
                                                     Font = OsuFont.GetFont(size: 60, fixedWidth: true),
                                                     Anchor = Anchor.Centre,
@@ -245,7 +256,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                                 },
                                             ],
                                             [
-                                                opponentScoreCounter = new RankedPlayScoreCounter(numDigits(OpponentScore.TotalScore))
+                                                opponentScoreCounter = new RankedPlayScoreCounter
                                                 {
                                                     Font = OsuFont.GetFont(size: 60, fixedWidth: true),
                                                     Anchor = Anchor.Centre,
@@ -278,7 +289,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 Origin = Anchor.Centre,
                                 Children =
                                 [
-                                    damageCounter = new RankedPlayScoreCounter(numDigits(losingDamageInfo.Damage))
+                                    damageCounter = new RankedPlayScoreCounter
                                     {
                                         Font = OsuFont.GetFont(size: 36, weight: FontWeight.SemiBold, fixedWidth: true),
                                         Spacing = new Vector2(-2),
@@ -336,7 +347,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     {
                         resultsAppearSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/results-appear")),
                         dmgFlySample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-fly")),
-                        dmgHitSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit")),
+
+                        dmgHitLowSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit-low")),
+                        dmgHitMediumSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit-medium")),
+                        dmgHitHighSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit-high")),
+
+                        dmgLastHitSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit-final")),
+                        dmg1HpHitSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit-1hp")),
+                        dmgLastStandSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-hit-laststand")),
+
+                        damageMultiplierSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-multiplier")),
+                        damageMultiplierUpSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-multiplier-up")),
+                        damageMultiplierDownSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/dmg-multiplier-down")),
                         hpDownSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/hp-down")),
                         playerAppearSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/players-appear")),
                         pseudoScoreCounterSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/Results/pseudo-score-counter")),
@@ -451,11 +473,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     // safety timeout to ensure scoreTicks don't play forever
                     Scheduler.AddDelayed(() =>
                     {
-                        if (playerScoreTickChannel != null)
-                            playerScoreTickChannel.Looping = false;
+                        playerScoreTickChannel?.Looping = false;
 
-                        if (opponentScoreTickChannel != null)
-                            opponentScoreTickChannel.Looping = false;
+                        opponentScoreTickChannel?.Looping = false;
                     }, score_text_duration + 500);
 
                     scoreBarProgress.BindValueChanged(e =>
@@ -515,14 +535,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     ));
                 }
 
+                int pitchChangeAmount = 0;
+
                 foreach (var breakdown in damageBreakdowns)
                 {
                     using (BeginDelayedSequence(delay))
                     {
+                        int pitch = pitchChangeAmount;
+
                         Schedule(() =>
                         {
                             damageBreakdownValueText.Text = breakdown.displayValue;
                             damageBreakdownSourceText.Text = breakdown.source;
+
+                            SampleChannel damageBreakdownChannel = damageMultiplierSample.GetChannel();
+                            damageBreakdownChannel.Frequency.Value = 1f + (pitch * .1f);
+                            damageBreakdownChannel.Play();
                         });
 
                         damageBreakdownContainer.MoveToX(120)
@@ -540,7 +568,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                     .ScaleTo(new Vector2(1.25f), 200, Easing.OutQuint)
                                     .Then()
                                     .ScaleTo(Vector2.One, 200);
+
+                                SampleChannel scoreChangeChannel = breakdown.rawDamage > 0 ? damageMultiplierUpSample.GetChannel() : damageMultiplierDownSample.GetChannel();
+                                scoreChangeChannel.Frequency.Value = 1f + (pitch * .1f);
+                                scoreChangeChannel.Play();
                             });
+
+                            if (breakdown.rawDamage > 0)
+                                pitchChangeAmount++;
+                            else if (breakdown.rawDamage < 0)
+                                pitchChangeAmount--;
                         }
                     }
 
@@ -585,7 +622,40 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                         Scheduler.AddDelayed(() =>
                         {
-                            var dmgHitChannel = dmgHitSample.GetChannel();
+                            SampleChannel dmgHitChannel;
+
+                            if ((OpponentDamageInfo.OldLife != 0 && OpponentDamageInfo.NewLife == 0) ||
+                                (PlayerDamageInfo.OldLife != 0 && PlayerDamageInfo.NewLife == 0))
+                            {
+                                dmgHitChannel = dmgLastHitSample.GetChannel();
+                            }
+                            else if ((OpponentDamageInfo.OldLife != 1 && OpponentDamageInfo.NewLife == 1) ||
+                                     (PlayerDamageInfo.OldLife != 1 && PlayerDamageInfo.NewLife == 1))
+                            {
+                                dmgHitChannel = dmgLastStandSample.GetChannel();
+                            }
+                            else
+                            {
+                                switch (losingDamageInfo.Damage)
+                                {
+                                    case >= 500_000:
+                                        dmgHitChannel = dmgHitHighSample.GetChannel();
+                                        break;
+
+                                    case >= 100_000:
+                                        dmgHitChannel = dmgHitMediumSample.GetChannel();
+                                        break;
+
+                                    case <= 1:
+                                        dmgHitChannel = dmg1HpHitSample.GetChannel();
+                                        break;
+
+                                    default:
+                                        dmgHitChannel = dmgHitLowSample.GetChannel();
+                                        break;
+                                }
+                            }
+
                             dmgHitChannel.Balance.Value = loserPanDirection;
                             dmgHitChannel.Play();
 
@@ -623,12 +693,15 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         playerUserDisplay.Health.Value = PlayerDamageInfo.NewLife;
                         opponentUserDisplay.Health.Value = OpponentDamageInfo.NewLife;
 
-                        Scheduler.AddDelayed(() =>
+                        if (losingDamageInfo.Damage > 1 && PlayerDamageInfo.NewLife != 0 && OpponentDamageInfo.NewLife != 0)
                         {
-                            var hpDecreaseChannel = hpDownSample.GetChannel();
-                            hpDecreaseChannel.Balance.Value = loserPanDirection;
-                            hpDecreaseChannel.Play();
-                        }, 900);
+                            Scheduler.AddDelayed(() =>
+                            {
+                                var hpDecreaseChannel = hpDownSample.GetChannel();
+                                hpDecreaseChannel.Balance.Value = loserPanDirection;
+                                hpDecreaseChannel.Play();
+                            }, 900);
+                        }
                     });
                 }
             }

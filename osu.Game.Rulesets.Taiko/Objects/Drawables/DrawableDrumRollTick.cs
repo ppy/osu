@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.OnKilled();
 
-            if (Time.Current > HitObject.GetEndTime() && !Judged)
+            if ((Time.Current > HitObject.GetEndTime() || Time.Current > ParentHitObject?.HitObject.GetEndTime()) && !Judged)
                 ApplyMinResult();
         }
 

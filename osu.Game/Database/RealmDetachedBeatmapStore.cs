@@ -62,20 +62,37 @@ namespace osu.Game.Database
                 {
                     try
                     {
-                        realm.Run(_ =>
-                        {
-                            var detached = frozenSets.Detach();
+                        // operations purposefully not wrapped in `Realm.Run()`.
+                        // `frozenSets` is, as the name suggests, frozen, and thus documented as safe to access from any thread for reading.
+                        // using `Realm.Run()` would only be misdirection here as it would take out a *second, non-frozen* realm instance.
+                        var detached = frozenSets.Detach();
 
-                            lock (detachedBeatmapSets)
-                            {
-                                detachedBeatmapSets.Clear();
-                                detachedBeatmapSets.AddRange(detached);
-                            }
-                        });
+                        lock (detachedBeatmapSets)
+                        {
+                            detachedBeatmapSets.Clear();
+                            detachedBeatmapSets.AddRange(detached);
+                        }
                     }
                     finally
                     {
                         loaded.Set();
+
+                        // Freezing a collection incurs a full freeze of the realm too,
+                        // which wraps a separate new `SharedRealmHandle` representing the frozen realm:
+                        // https://github.com/realm/realm-dotnet/blob/113c01264fc00f6cedf3c829caa9cfb30b963914/Realm/Realm/DatabaseTypes/RealmCollectionBase.cs#L180-L191
+                        // (note suppressed CA2000 inspection above!)
+                        // https://github.com/realm/realm-dotnet/blob/113c01264fc00f6cedf3c829caa9cfb30b963914/Realm/Realm/Handles/SharedRealmHandle.cs#L650-L655
+                        // https://github.com/realm/realm-core/blob/f8752e180b7f288feadffafdef818068755efe0a/src/realm/object-store/impl/realm_coordinator.cpp#L296-L313
+                        //
+                        // The freezing API on the .NET side does not expose a direct way to eagerly clean up that frozen handle.
+                        // It appears that handle is simply allowed to fall out of scope and eventually get picked up by GC.
+                        // This is a problem when considering interactions with the `BlockAllOperations()` API,
+                        // which is designed to support moving the realm to custom locations.
+                        // Not eagerly disposing the realm associated with the frozen collection as below can cause `BlockAllOperations()` to time out and crash.
+                        //
+                        // If freezing objects and/or collections is going to be more widely used in the repository,
+                        // this should be extracted to an extension method and the direct usage of the freezing APIs banned in kind via `BannedSymbols.txt`.
+                        frozenSets.Realm.Dispose();
                     }
                 }, TaskCreationOptions.LongRunning).FireAndForget();
 

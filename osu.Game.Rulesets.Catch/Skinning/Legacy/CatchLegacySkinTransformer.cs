@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -50,13 +51,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                 var keyCounter = container.OfType<LegacyKeyCounterDisplay>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
                                 var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
                                 if (keyCounter != null)
                                 {
                                     // set the anchor to top right so that it won't squash to the return button to the top
                                     keyCounter.Anchor = Anchor.CentreRight;
                                     keyCounter.Origin = Anchor.TopRight;
-                                    keyCounter.Position = new Vector2(0, -40) * 1.6f;
+                                    keyCounter.Position = new Vector2(0, -40) * LegacySkin.STABLE_MAGIC_SCALE_FACTOR;
                                 }
 
                                 if (spectatorList != null)
@@ -73,6 +75,17 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                     leaderboard.X = 10;
                                 }
 
+                                if (hitError is ColourHitErrorMeter colourHitError)
+                                {
+                                    colourHitError.Anchor = Anchor.BottomCentre;
+                                    colourHitError.Origin = Anchor.CentreLeft;
+                                    colourHitError.Rotation = -90;
+                                    colourHitError.Scale = new Vector2(1.7f, 1.7f);
+                                    colourHitError.JudgementCount.Value = 28;
+                                    colourHitError.JudgementSpacing.Value = 1.25f;
+                                    colourHitError.JudgementShape.Value = ColourHitErrorMeter.ShapeStyle.Square;
+                                }
+
                                 foreach (var d in container.OfType<ISerialisableDrawable>())
                                     d.UsesFixedAnchor = true;
                             })
@@ -82,6 +95,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                                     new LegacyKeyCounterDisplay(),
                                     new SpectatorList(),
                                     new DrawableGameplayLeaderboard(),
+                                    new ColourHitErrorMeter(),
                                 }
                             };
                     }

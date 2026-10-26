@@ -351,12 +351,12 @@ namespace osu.Game.Screens.Select
             creator.Data = (metadata.Author.Username, () => linkHandler?.HandleLink(new LinkDetails(LinkAction.OpenUserProfile, metadata.Author)));
 
             if (!string.IsNullOrEmpty(metadata.Source))
-                source.Data = (metadata.Source, () => songSelect?.Search(metadata.Source));
+                source.Data = (metadata.Source, () => songSelect?.AddToSearch(metadata.Source));
             else
                 source.Data = ("-", null);
 
             if (!string.IsNullOrEmpty(metadata.Tags))
-                mapperTags.Tags = (metadata.Tags.Split(' '), t => songSelect?.Search(t));
+                mapperTags.Tags = (metadata.Tags.Split(' '), t => songSelect?.AddToSearch(t));
             else
                 mapperTags.Tags = (Array.Empty<string>(), _ => { });
 
@@ -388,8 +388,8 @@ namespace osu.Game.Screens.Select
                 var onlineBeatmapSet = onlineLookupResult.Value.Result;
                 var onlineBeatmap = onlineBeatmapSet.Beatmaps.SingleOrDefault(b => b.OnlineID == beatmapInfo.OnlineID);
 
-                genre.Data = (onlineBeatmapSet.Genre.Name, () => songSelect?.Search(onlineBeatmapSet.Genre.Name));
-                language.Data = (onlineBeatmapSet.Language.Name, () => songSelect?.Search(onlineBeatmapSet.Language.Name));
+                genre.Data = (onlineBeatmapSet.Genre.Name, () => songSelect?.AddToSearch(onlineBeatmapSet.Genre.Name));
+                language.Data = (onlineBeatmapSet.Language.Name, () => songSelect?.AddToSearch(onlineBeatmapSet.Language.Name));
 
                 if (onlineBeatmap != null)
                 {
@@ -434,7 +434,7 @@ namespace osu.Game.Screens.Select
                     }
 
                     userTags.FadeIn(transition_duration, Easing.OutQuint);
-                    userTags.Tags = (tags, tag => songSelect?.Search($@"tag=""{tag}""!"));
+                    userTags.Tags = (tags, tag => songSelect?.AddToSearch($@"tag=""{tag}""!"));
                 });
             }, token);
         }

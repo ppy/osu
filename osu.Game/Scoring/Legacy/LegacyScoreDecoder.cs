@@ -58,9 +58,7 @@ namespace osu.Game.Scoring.Legacy
                 // TotalScoreVersion gets initialised to LATEST_VERSION.
                 // In the case where the incoming score has either an osu!stable or old lazer version, we need
                 // to mark it with the correct version increment to trigger reprocessing to new standardised scoring.
-                //
-                // See StandardisedScoreMigrationTools.ShouldMigrateToNewStandardised().
-                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : LegacyScoreEncoder.LATEST_VERSION;
+                scoreInfo.TotalScoreVersion = version < 30000002 ? 30000001 : version;
 
                 string beatmapHash = sr.ReadString();
 
@@ -154,7 +152,7 @@ namespace osu.Game.Scoring.Legacy
             if (score.ScoreInfo.IsLegacyScore)
                 score.ScoreInfo.LegacyTotalScore = score.ScoreInfo.TotalScore;
 
-            StandardisedScoreMigrationTools.UpdateFromLegacy(score.ScoreInfo, workingBeatmap);
+            StandardisedScoreMigrationTools.UpdateToLatestScoring(score.ScoreInfo, workingBeatmap);
 
             if (decodedRank != null)
                 score.ScoreInfo.Rank = decodedRank.Value;
@@ -258,10 +256,11 @@ namespace osu.Game.Scoring.Legacy
 
         public static void PopulateTotalScoreWithoutMods(ScoreInfo score)
         {
-            double modMultiplier = 1;
+            Debug.Assert(score.BeatmapInfo != null);
 
-            foreach (var mod in score.Mods)
-                modMultiplier *= mod.ScoreMultiplier;
+            var ruleset = score.Ruleset.CreateInstance();
+            var scoreMultiplierCalculator = ruleset.CreateScoreMultiplierCalculator(new ScoreMultiplierContext(score.BeatmapInfo.Difficulty, score));
+            double modMultiplier = scoreMultiplierCalculator.CalculateFor(score.Mods);
 
             score.TotalScoreWithoutMods = (long)Math.Round(score.TotalScore / modMultiplier);
         }

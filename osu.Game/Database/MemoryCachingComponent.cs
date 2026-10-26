@@ -27,7 +27,7 @@ namespace osu.Game.Database
 
         protected MemoryCachingComponent()
         {
-            statistics = GlobalStatistics.Get<MemoryCachingStatistics>(nameof(MemoryCachingComponent<TLookup, TValue>), GetType().ReadableName());
+            statistics = GlobalStatistics.Get<MemoryCachingStatistics>(nameof(MemoryCachingComponent<,>), GetType().ReadableName());
             statistics.Value = new MemoryCachingStatistics();
         }
 

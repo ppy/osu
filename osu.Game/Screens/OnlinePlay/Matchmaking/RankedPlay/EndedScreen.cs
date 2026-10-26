@@ -5,8 +5,8 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
@@ -15,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
+using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osuTK;
 using osuTK.Graphics;
 
@@ -32,14 +33,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         [Resolved]
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
 
+        [Resolved]
+        private BackgroundMusicManager backgroundMusic { get; set; } = null!;
+
         private OsuSpriteText titleText = null!;
         private Drawable titleSeparator = null!;
         private OsuTextFlowContainer localRatingText = null!;
         private OsuTextFlowContainer opponentRatingText = null!;
 
-        private Sample winSample = null!;
-        private Sample loseSample = null!;
-        private Sample drawSample = null!;
+        private DrawableSample winSample = null!;
+        private DrawableSample loseSample = null!;
+
+        private ShearedButton quitButton = null!;
+        private ShearedButton playAgainButton = null!;
+
+        private Container localRatingContainer = null!;
+        private Container opponentRatingContainer = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
@@ -78,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         Spacing = new Vector2(2),
                         Children = new Drawable[]
                         {
-                            new Container
+                            localRatingContainer = new Container
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -112,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                     }
                                 }
                             },
-                            new Container
+                            opponentRatingContainer = new Container
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
@@ -156,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         Direction = FillDirection.Horizontal,
                         Children = new Drawable[]
                         {
-                            new ShearedButton
+                            quitButton = new ShearedButton
                             {
                                 Width = 100,
                                 Text = "Quit",
@@ -164,7 +173,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                                 DarkerColour = colours.Red3,
                                 LighterColour = colours.Red4,
                             },
-                            new ShearedButton
+                            playAgainButton = new ShearedButton
                             {
                                 Width = 200,
                                 Text = "Play Again",
@@ -177,9 +186,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                 }
             };
 
-            winSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/win");
-            loseSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/lose");
-            drawSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/draw");
+            AddRangeInternal(new[]
+            {
+                winSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/final-result-win.ogg")),
+                loseSample = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/final-result-lose.ogg"))
+            });
 
             RankedPlayUserInfo localUser = matchInfo.RoomState.Users[Client.LocalUser!.UserID];
             RankedPlayUserInfo otherUser = matchInfo.RoomState.Users.Values.Single(u => u != localUser);
@@ -188,19 +199,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 titleText.Text = "DRAW";
                 titleText.Colour = titleSeparator.Colour = colours.Orange1;
-                drawSample.Play();
             }
             else if (matchInfo.RoomState.WinningUserId == Client.LocalUser!.UserID)
             {
                 titleText.Text = "VICTORY";
                 titleText.Colour = titleSeparator.Colour = colours.Green1;
-                winSample.Play();
             }
             else
             {
                 titleText.Text = "DEFEAT";
                 titleText.Colour = titleSeparator.Colour = colours.Red1;
-                loseSample.Play();
             }
 
             localRatingText.AddText("Your Rating: ", s => s.Font = OsuFont.Style.Heading1.With(weight: FontWeight.Regular));
@@ -217,6 +225,84 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             {
                 s.Font = OsuFont.Style.Caption1;
                 s.Colour = otherUser.RatingAfter >= otherUser.Rating ? colours.GreenDark : colours.RedDark;
+            });
+        }
+
+        public override void OnEntering(RankedPlaySubScreen? previous)
+        {
+            base.OnEntering(previous);
+
+            backgroundMusic.Mute();
+            Scheduler.AddDelayed(() =>
+            {
+                backgroundMusic.Duck();
+                backgroundMusic.Unmute(5000);
+            }, 9000);
+
+            Drawable[] pieces =
+            [
+                titleText,
+                titleSeparator,
+                localRatingContainer,
+                opponentRatingContainer,
+                playAgainButton,
+                quitButton,
+            ];
+
+            foreach (var p in pieces)
+                p.Hide();
+
+            // schedule required due to FinishTransforms call in ShearedButton.
+            ScheduleAfterChildren(() =>
+            {
+                bool localUserWon = matchInfo.RoomState.WinningUserId == Client.LocalUser!.UserID;
+
+                const double bpm = 60000 / 142.0;
+
+                if (localUserWon)
+                {
+                    winSample.Play();
+
+                    using (BeginDelayedSequence(400))
+                    {
+                        pieces[0].FadeIn();
+                        pieces[1].FadeIn();
+
+                        using (BeginDelayedSequence(bpm * 1))
+                        {
+                            pieces[2].FadeIn();
+                            pieces[3].FadeIn();
+                        }
+
+                        using (BeginDelayedSequence(bpm * 2))
+                        {
+                            pieces[4].FadeIn();
+                            pieces[5].FadeIn();
+                        }
+                    }
+                }
+                else
+                {
+                    loseSample.Play();
+
+                    using (BeginDelayedSequence(400))
+                    {
+                        using (BeginDelayedSequence(bpm * 0))
+                            pieces[0].FadeIn();
+                        using (BeginDelayedSequence(bpm * 0.5))
+                            pieces[1].FadeIn();
+                        using (BeginDelayedSequence(bpm * 1))
+                            pieces[2].FadeIn();
+                        using (BeginDelayedSequence(bpm * 1.5))
+                            pieces[3].FadeIn();
+
+                        using (BeginDelayedSequence(bpm * 2))
+                        {
+                            pieces[4].FadeIn();
+                            pieces[5].FadeIn();
+                        }
+                    }
+                }
             });
         }
     }
