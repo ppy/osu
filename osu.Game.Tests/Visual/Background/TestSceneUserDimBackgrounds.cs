@@ -640,7 +640,7 @@ namespace osu.Game.Tests.Visual.Background
             {
                 SelectedMods.Value = new[] { new OsuModNoFail() };
                 songSelect.DimLevel.Value = 0.7f;
-                songSelect.BlurLevel.Value = 0.4f;
+                songSelect.BlurLevel.Value = songSelect.AllowBlur ? 0.4f : 0f;
                 songSelect.DimColour.Value = 0.5f;
             });
         }
@@ -653,12 +653,12 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class DummySongSelect : SoloSongSelect
         {
-            private bool allowBlur;
+            public readonly bool AllowBlur;
             private FadeAccessibleBackground background;
 
             protected override BackgroundScreen CreateBackground()
             {
-                background = new FadeAccessibleBackground(Beatmap.Value, allowBlur);
+                background = new FadeAccessibleBackground(Beatmap.Value, AllowBlur);
                 IgnoreUserSettings.BindTo(background.IgnoreUserSettings);
                 return background;
             }
@@ -672,7 +672,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public DummySongSelect(bool allowBlur = true)
             {
-                this.allowBlur = allowBlur;
+                AllowBlur = allowBlur;
             }
 
             [BackgroundDependencyLoader]
@@ -868,7 +868,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
-            protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap, allowBlur);
+            protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
 
             // CurrentColour can be used to track how much the texture was dimmed, and
             // CurrentColourOffset can be used to track how much colour was added as an offset.
@@ -918,12 +918,14 @@ namespace osu.Game.Tests.Visual.Background
 
             private TestBeatmapBackground beatmapBackground;
 
-            private bool allowBlur;
-
             public FadeAccessibleBackground(WorkingBeatmap beatmap, bool allowBlur = true)
                 : base(beatmap)
             {
-                this.allowBlur = allowBlur;
+                if (!allowBlur)
+                {
+                    dimmable.BlurAmount.UnbindAll();
+                    dimmable.BlurAmount.Value = 0f;
+                }
             }
         }
 
@@ -951,8 +953,6 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestBeatmapBackground : BeatmapBackground
         {
-            private bool allowBlur;
-
             public Colour4 CurrentColour => ColouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? ColouredDimmableSprite.DrawColourInfo.Colour;
 
             public bool IsSpriteDimmed => ColouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
@@ -969,10 +969,10 @@ namespace osu.Game.Tests.Visual.Background
 
             private TestDimmableBufferedContainer dimmableBufferedContainer;
 
-            public TestBeatmapBackground(WorkingBeatmap beatmap, bool allowBlur = true)
+            public TestBeatmapBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
             {
-                this.allowBlur = allowBlur;
+
             }
 
             public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableBufferedContainer.ColouredDimmableHelper.Source, source);
@@ -980,14 +980,6 @@ namespace osu.Game.Tests.Visual.Background
             public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(ColouredDimmableSprite.ColouredDimmableHelper.Source, source);
 
             public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(dimmableBufferedContainer);
-
-            public override void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
-            {
-                if (allowBlur)
-                {
-                    base.BlurTo(newBlurSigma, duration, easing);
-                }
-            }
 
             protected override BufferedContainer CreateBufferedContainer()
             {
