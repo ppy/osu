@@ -16,6 +16,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Input.Events;
@@ -60,9 +61,12 @@ namespace osu.Game.Tests.Visual.Background
         private RulesetStore rulesets;
         private TestStoryboard testStoryboard;
         private UpdateCounter storyboardUpdateCounter;
+        private TestColouredDimmableSprite orphanedSprite = new TestColouredDimmableSprite();
+        private IShader originalShader;
+        private IShader colouredShader;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, AudioManager audio)
+        private void load(GameHost host, AudioManager audio, ShaderManager shaders)
         {
             BeatmapStore beatmapStore;
 
@@ -77,6 +81,11 @@ namespace osu.Game.Tests.Visual.Background
             Add(beatmapStore);
 
             Beatmap.SetDefault();
+
+            originalShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE);
+            colouredShader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableTexture");
+
+            Add(orphanedSprite);
         }
 
         public override void SetUpSteps()
@@ -564,6 +573,24 @@ namespace osu.Game.Tests.Visual.Background
             AddAssert("Parent colour is applied correctly", () => songSelect.IsBackgroundFinalColourCorrect());
         }
 
+        [Test]
+        public void TestSpriteShaders()
+        {
+            performFullSetup();
+            createFakeStoryboardWithElements();
+
+            AddStep("Enable Storyboard", () =>
+            {
+                player.StoryboardEnabled.Value = true;
+            });
+
+            AddUntilStep("Opaque sprite is using coloured shader", () => testStoryboard.IsSpriteUsingShader(colouredShader));
+            AddUntilStep("Additive sprite is using original shader", () => testStoryboard.IsAdditiveSpriteUsingShader(originalShader));
+
+            AddAssert("No source on orphaned sprite", () => orphanedSprite.ColouredDimmableHelper.Source == null);
+            AddUntilStep("Orphaned sprite is using original shader", () => orphanedSprite.IsUsingShader(originalShader));
+        }
+
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
         {
             player.StoryboardEnabled.Value = false;
@@ -990,6 +1017,11 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
+        public partial class TestColouredDimmableSprite : ColouredDimmableSprite
+        {
+            public bool IsUsingShader(IShader shader) => shader != null && ReferenceEquals(shader, TextureShader);
+        }
+
         private partial class TestStoryboard : Storyboard
         {
             private readonly TestStoryboardSprite testStoryboardSprite;
@@ -1040,6 +1072,10 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsVideosOffsetSource(IColouredDimmableSource source) => testStoryboardVideo.IsOffsetSource(source);
 
+            public bool IsSpriteUsingShader(IShader shader) => testStoryboardSprite.IsUsingShader(shader);
+
+            public bool IsAdditiveSpriteUsingShader(IShader shader) => testStoryboardAdditiveSprite.IsUsingShader(shader);
+
             public override DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null)
             {
                 return new TestDrawableStoryboard(this, mods);
@@ -1076,9 +1112,21 @@ namespace osu.Game.Tests.Visual.Background
             }
         }
 
+        public partial class TestDrawableStoryboardSprite : DrawableStoryboardSprite
+        {
+
+            public TestDrawableStoryboardSprite(StoryboardSprite sprite)
+            : base(sprite)
+            {
+
+            }
+
+            public bool IsUsingShader(IShader shader) => shader != null && ReferenceEquals(shader, TextureShader);
+        }
+
         private partial class TestStoryboardSprite : StoryboardSprite
         {
-            private DrawableStoryboardSprite drawableStoryboardSprite;
+            private TestDrawableStoryboardSprite drawableStoryboardSprite;
             private readonly bool additiveBlending;
 
             public TestStoryboardSprite(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition, bool additiveBlending)
@@ -1088,9 +1136,11 @@ namespace osu.Game.Tests.Visual.Background
                 Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
+            public bool IsUsingShader(IShader shader) => drawableStoryboardSprite.IsUsingShader(shader);
+
             public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableStoryboardSprite.ColouredDimmableHelper.Source, source);
 
-            public override Drawable CreateDrawable() => drawableStoryboardSprite = new DrawableStoryboardSprite(this)
+            public override Drawable CreateDrawable() => drawableStoryboardSprite = new TestDrawableStoryboardSprite(this)
             {
                 Blending = additiveBlending ? BlendingParameters.Additive : BlendingParameters.None
             };
