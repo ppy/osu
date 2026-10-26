@@ -14,7 +14,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
@@ -68,16 +67,16 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 foreach (var scoreInfo in getTestScores())
                 {
-                    LeaderboardRankDisplay.HighlightType? highlightType = null;
+                    BeatmapLeaderboardScore.HighlightType? highlightType = null;
 
                     switch (scoreInfo.User.Id)
                     {
                         case 2:
-                            highlightType = LeaderboardRankDisplay.HighlightType.Own;
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
                             break;
 
                         case 1541390:
-                            highlightType = LeaderboardRankDisplay.HighlightType.Friend;
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
                             break;
                     }
 
@@ -119,16 +118,16 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 foreach (var scoreInfo in getTestScores())
                 {
-                    LeaderboardRankDisplay.HighlightType? highlightType = null;
+                    BeatmapLeaderboardScore.HighlightType? highlightType = null;
 
                     switch (scoreInfo.User.Id)
                     {
                         case 2:
-                            highlightType = LeaderboardRankDisplay.HighlightType.Own;
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
                             break;
 
                         case 1541390:
-                            highlightType = LeaderboardRankDisplay.HighlightType.Friend;
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
                             break;
                     }
 

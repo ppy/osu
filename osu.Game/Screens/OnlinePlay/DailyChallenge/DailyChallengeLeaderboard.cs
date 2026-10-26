@@ -13,7 +13,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -161,12 +160,12 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                 {
                     LoadComponentsAsync(best.Select((s, index) =>
                     {
-                        LeaderboardRankDisplay.HighlightType? highlightType = null;
+                        BeatmapLeaderboardScore.HighlightType? highlightType = null;
 
                         if (s.UserID == api.LocalUser.Value.Id)
-                            highlightType = LeaderboardRankDisplay.HighlightType.Own;
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Own;
                         else if (api.LocalUserState.Friends.Any(r => r.TargetID == s.UserID))
-                            highlightType = LeaderboardRankDisplay.HighlightType.Friend;
+                            highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
 
                         return new BeatmapLeaderboardScore(s, sheared: false)
                         {
@@ -192,7 +191,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
                     userBestContainer.Add(new BeatmapLeaderboardScore(userBest, sheared: false)
                     {
                         Rank = userBest.Position,
-                        Highlight = LeaderboardRankDisplay.HighlightType.Own,
+                        Highlight = BeatmapLeaderboardScore.HighlightType.Own,
                         Action = () => PresentScore?.Invoke(userBest.OnlineID),
                         SelectedMods = { BindTarget = SelectedMods },
                         IsValidMod = IsValidMod,

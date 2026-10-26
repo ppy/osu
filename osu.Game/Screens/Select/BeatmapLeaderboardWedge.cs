@@ -298,12 +298,12 @@ namespace osu.Game.Screens.Select
 
             LoadComponentsAsync(scores.Select((s, i) =>
             {
-                LeaderboardRankDisplay.HighlightType? highlightType = null;
+                BeatmapLeaderboardScore.HighlightType? highlightType = null;
 
                 if (s.OnlineID == userScore?.OnlineID)
-                    highlightType = LeaderboardRankDisplay.HighlightType.Own;
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Own;
                 else if (api.LocalUserState.Friends.Any(r => r.TargetID == s.UserID) && Scope.Value != BeatmapLeaderboardScope.Friend)
-                    highlightType = LeaderboardRankDisplay.HighlightType.Friend;
+                    highlightType = BeatmapLeaderboardScore.HighlightType.Friend;
 
                 return new BeatmapLeaderboardScore(s)
                 {
@@ -366,7 +366,7 @@ namespace osu.Game.Screens.Select
                 personalBestDisplay.FadeIn(600, Easing.OutQuint);
                 personalBestScoreContainer.Child = new BeatmapLeaderboardScore(userScore)
                 {
-                    Highlight = LeaderboardRankDisplay.HighlightType.Own,
+                    Highlight = BeatmapLeaderboardScore.HighlightType.Own,
                     Rank = userScore.Position,
                     SelectedMods = { BindTarget = mods },
                     Action = () => onLeaderboardScoreClicked(userScore),

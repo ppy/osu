@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Select
         public Func<Mod, bool> IsValidMod { get; set; } = _ => true;
 
         public int? Rank { get; init; }
-        public LeaderboardRankDisplay.HighlightType? Highlight { get; init; }
+        public HighlightType? Highlight { get; init; }
         public Action<ScoreInfo>? ShowReplay { get; init; }
 
         [Resolved]
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select
         private Box totalScoreBackground = null!;
 
         private FillFlowContainer statisticsContainer = null!;
-        private LeaderboardRankDisplay rankDisplay = null!;
+        private RankDisplay rankDisplay = null!;
         private Container rankOverlay = null!;
 
         private readonly bool sheared;
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.Both,
                         Colour = backgroundColour
                     },
-                    rankDisplay = new LeaderboardRankDisplay(Rank, sheared, Highlight),
+                    rankDisplay = new RankDisplay(Rank, sheared, Highlight),
                     centreContent = new Container
                     {
                         Name = @"Centre container",
@@ -220,7 +220,7 @@ namespace osu.Game.Screens.Select
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Colour = Colour4.Black.Opacity(0.5f),
                                                             },
-                                                            new LeaderboardRankLabel(Rank, sheared, false)
+                                                            new RankLabel(Rank, sheared, false)
                                                             {
                                                                 AutoSizeAxes = Axes.Both,
                                                                 Anchor = Anchor.Centre,
@@ -553,7 +553,7 @@ namespace osu.Game.Screens.Select
 
         private DisplayMode getCurrentDisplayMode()
         {
-            if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width + LeaderboardRankDisplay.WIDTH)
+            if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width + RankDisplay.WIDTH)
                 return DisplayMode.Full;
 
             if (DrawWidth >= username_min_width + statistics_regular_min_width + expanded_right_content_width)
@@ -664,6 +664,12 @@ namespace osu.Game.Screens.Select
                     }
                 };
             }
+        }
+
+        public enum HighlightType
+        {
+            Own,
+            Friend,
         }
     }
 }
