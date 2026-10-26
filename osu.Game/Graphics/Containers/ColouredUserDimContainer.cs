@@ -54,13 +54,11 @@ namespace osu.Game.Graphics.Containers
         // The atrocity below is necessary because FadeColour and TransformTo interpolate
         // colours in linear space, then convert them back to sRGB.
         // Which means that animating ColourOffset directly will NOT make it a perfect
-        // complement to DrawColour, so adding them won't necessary give 1.0 (assuming
+        // complement to Colour, so adding them won't necessary give 1.0 (assuming
         // no external sources of dimming).
-        // And using dimContent's DrawColour directly may include external sources of dimming
-        // and dimming caused by storyboard.
-        // So this roundabout way is used instead, where AnimatedInvertedDimLevel approximates
-        // dimContent's DrawColour, but this will only be precise if there are
-        // no external sources of dimming :(
+        // And using dimContent's Colour directly may include dimming caused by storyboard.
+        // So this roundabout way is used instead, where AnimatedInvertedDimLevel emulates
+        // dimContent's Colour
         protected virtual Colour4 InvertedDimLevel => new Colour4(
             1f - DimLevel,
             1f - DimLevel,
@@ -107,7 +105,50 @@ namespace osu.Game.Graphics.Containers
 
         protected Colour4 ColourOffset => AnimatedDimColour * AnimatedDimLevel;
 
-        public Colour4 DrawColourOffset => ColourOffset * DrawColourInfo.Colour;
+        // What coloured dimmable shader technically does is it interpolates
+        // dimmable's colour toward DimColour using DimLevel:
+        // TargetColour = mix(TextureColour, DimColour, DimLevel) = TextureColour * (1 - DimLevel) + DimColour * DimLevel
+        // (interpolation happens in sRGB, as current dimming also happens in sRGB)
+        //
+        // This can be split into two parts:
+        // Colour = TextureColour * (1 - DimLevel)
+        // ColourOffset = DimColour * DimLevel
+        // TargetColour = Colour + ColourOffset
+        //
+        // This target colour can be affected by parent's colour, and multiplication
+        // happens in linear, before being converted back to sRGB:
+        // FinalColour = (ParentColour.ToLinear() * TargetColour.ToLinear()).ToSRGB()
+        //
+        // However, shader just adds two values (Colour and ColourOffset), and
+        // Colour is already properly multiplied by parent's colour by framework (DrawColour),
+        // so what we need is:
+        // DrawColour + DrawColourOffset = FinalColour
+        // DrawColourOffset = FinalColour - DrawColour
+        //
+        // And DrawColour can be emulated through AnimatedInvertedDimLevel:
+        // DrawColour = (ParentColour.ToLinear() * AnimatedInvertedDimLevel.ToLinear()).ToSRGB()
+        public Colour4 DrawColourOffset
+        {
+            get
+            {
+                Colour4 parentColour = (Colour4)DrawColourInfo.Colour;
+                if (parentColour == Colour4.White)
+                    return ColourOffset;
+
+                Colour4 emulatedColour = AnimatedInvertedDimLevel;
+
+                Colour4 emulatedDrawColour = (parentColour.ToLinear() * emulatedColour.ToLinear()).ToSRGB();
+
+                Colour4 targetColour = emulatedColour + ColourOffset;
+                targetColour = new Colour4(targetColour.R, targetColour.G, targetColour.B, 1f);
+
+                Colour4 finalColour = (parentColour.ToLinear() * targetColour.ToLinear()).ToSRGB();
+
+                Colour4 drawColourOffset = finalColour - emulatedDrawColour;
+
+                return new Colour4(drawColourOffset.R, drawColourOffset.G, drawColourOffset.B, 1f);
+            }
+        }
 
         public ColouredDimmableSharedData ColouredDimmableSharedData => sharedData;
 
