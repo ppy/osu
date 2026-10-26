@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public partial class AudioOffsetAdjustControl : CompositeDrawable
     {
+        private const int notch_container_height = 10;
+
         public Bindable<double> Current
         {
             get => current.Current;
@@ -76,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.5f,
-                                Height = 10,
+                                Height = notch_container_height,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 Padding = new MarginPadding
@@ -168,7 +170,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 applySuggestion.Enabled.Value = false;
                 notchContainer.Show();
                 hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count), SettingsNote.Type.Informational);
-                hintNote.MoveToY(notchContainer.Height, 200, Easing.OutQuint);
+                hintNote.MoveToY(notch_container_height, 200, Easing.OutQuint);
             }
             else
             {
@@ -177,7 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 hintNote.Current.Value =
                     new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0)),
                         SettingsNote.Type.Informational);
-                hintNote.MoveToY(notchContainer.Height, 200, Easing.OutQuint);
+                hintNote.MoveToY(notch_container_height, 200, Easing.OutQuint);
             }
         }
     }
