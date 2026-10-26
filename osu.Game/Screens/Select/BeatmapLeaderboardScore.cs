@@ -324,9 +324,9 @@ namespace osu.Game.Screens.Select
                                                     Direction = FillDirection.Horizontal,
                                                     Children = new Drawable[]
                                                     {
-                                                        new LeaderboardStatistic(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
+                                                        new StatisticDisplay(BeatmapsetsStrings.ShowScoreboardHeadersCombo.ToUpper(), $"{Score.MaxCombo.ToString()}x",
                                                             Score.IsPerfect(), 60),
-                                                        new LeaderboardStatistic(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
+                                                        new StatisticDisplay(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy.ToUpper(), Score.DisplayAccuracy, Score.Accuracy == 1,
                                                             55),
                                                     },
                                                     Alpha = 0,

@@ -8,13 +8,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
+using osu.Game.Screens.Select;
 using osuTK;
 
-namespace osu.Game.Tests.Visual.Online
+namespace osu.Game.Tests.Visual.SongSelect
 {
-    public partial class TestSceneLeaderboardStatistic : OsuTestScene
+    public partial class TestSceneLeaderboardStatisticDisplay : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
         private OsuColour colours = new OsuColour();
 
         private FillFlowContainer container = null!;
-        private LeaderboardStatistic[] statistics = [];
+        private BeatmapLeaderboardScore.StatisticDisplay[] statistics = [];
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -65,8 +65,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 container.AddRange(statistics = new[]
                 {
-                    new LeaderboardStatistic("COMBO", "123x", false),
-                    new LeaderboardStatistic("ACCURACY", "100.00%", true),
+                    new BeatmapLeaderboardScore.StatisticDisplay("COMBO", "123x", false),
+                    new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
                 });
             });
             AddStep("change to vertical", () =>
@@ -88,9 +88,9 @@ namespace osu.Game.Tests.Visual.Online
             {
                 container.AddRange(statistics = new[]
                 {
-                    new LeaderboardStatistic("COMBO", "123x", false),
-                    new LeaderboardStatistic("ACCURACY", "100.00%", true),
-                    new LeaderboardStatistic("TEST", "12345", false),
+                    new BeatmapLeaderboardScore.StatisticDisplay("COMBO", "123x", false),
+                    new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
+                    new BeatmapLeaderboardScore.StatisticDisplay("TEST", "12345", false),
                 });
             });
             AddStep("change to vertical", () =>
