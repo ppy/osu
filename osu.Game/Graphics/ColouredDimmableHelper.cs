@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Layout;
@@ -13,11 +11,11 @@ namespace osu.Game.Graphics
     {
         private Drawable owner;
 
-        public readonly LayoutValue<IColouredDimmableSource> SourceLayout = new LayoutValue<IColouredDimmableSource>(Invalidation.Parent);
+        public readonly LayoutValue<IColouredDimmableSource?> SourceLayout = new LayoutValue<IColouredDimmableSource?>(Invalidation.Parent);
 
-        private IShader originalShader;
+        private IShader? originalShader;
 
-        private IShader colouredShader;
+        private IShader? colouredShader;
 
         public ColouredDimmableHelper(Drawable owner)
         {
@@ -30,7 +28,7 @@ namespace osu.Game.Graphics
             this.colouredShader = colouredShader;
         }
 
-        public IColouredDimmableSource Source
+        public IColouredDimmableSource? Source
         {
             get
             {
@@ -41,9 +39,9 @@ namespace osu.Game.Graphics
             }
         }
 
-        public ColouredDimmableSharedData SharedData => Source?.ColouredDimmableSharedData;
+        public ColouredDimmableSharedData? SharedData => Source?.ColouredDimmableSharedData;
 
-        public IShader GetShader(BlendingParameters blending)
+        public IShader? GetShader(BlendingParameters blending)
         {
             // Additive Drawables shouldn't have any offset, because things underneath them
             // already have it added to them. This does rely on the fact that there is

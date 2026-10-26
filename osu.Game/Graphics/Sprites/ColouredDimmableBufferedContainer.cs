@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -15,7 +13,7 @@ namespace osu.Game.Graphics.Sprites
     {
         public readonly ColouredDimmableHelper ColouredDimmableHelper;
 
-        public ColouredDimmableBufferedContainer(TexturePixelFormat textureFormat = TexturePixelFormat.R8G8B8A8Float, RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+        public ColouredDimmableBufferedContainer(TexturePixelFormat textureFormat = TexturePixelFormat.R8G8B8A8Float, RenderBufferFormat[]? formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
             : base(textureFormat, formats, pixelSnapping, cachedFrameBuffer)
         {
             ColouredDimmableHelper = new ColouredDimmableHelper(this);
@@ -32,7 +30,7 @@ namespace osu.Game.Graphics.Sprites
         }
 
         // Children should not receive the true colour to avoid colour doubling when the frame-buffers are rendered to the back-buffer.
-        public ColouredDimmableSharedData ColouredDimmableSharedData => null;
+        public ColouredDimmableSharedData? ColouredDimmableSharedData => null;
 
         protected override void Update()
         {
@@ -52,7 +50,7 @@ namespace osu.Game.Graphics.Sprites
             {
             }
 
-            private ColouredDimmableSharedData colouredDimmableSharedData;
+            private ColouredDimmableSharedData? colouredDimmableSharedData;
 
             public override void ApplyState()
             {

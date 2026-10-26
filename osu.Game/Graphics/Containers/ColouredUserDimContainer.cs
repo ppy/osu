@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
@@ -15,7 +13,7 @@ namespace osu.Game.Graphics.Containers
     {
         private ColouredDimmableSharedData sharedData;
 
-        private Bindable<double> userDimColour { get; set; }
+        private Bindable<double>? userDimColour { get; set; }
 
         protected ColouredUserDimContainer()
         {
@@ -32,7 +30,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.LoadComplete();
 
-            userDimColour.ValueChanged += _ => UpdateVisuals();
+            userDimColour!.ValueChanged += _ => UpdateVisuals();
         }
 
         protected override DrawNode CreateDrawNode() => new ColouredUserDimContainerDrawNode(this, sharedData);
@@ -46,7 +44,7 @@ namespace osu.Game.Graphics.Containers
                 if (IgnoreUserSettings.Value)
                     return Colour4.Black;
 
-                float grayscaleDimColour = (float)userDimColour.Value;
+                float grayscaleDimColour = (float)(userDimColour?.Value ?? 0.0d);
                 return new Colour4(grayscaleDimColour, grayscaleDimColour, grayscaleDimColour, 1.0f);
             }
         }
