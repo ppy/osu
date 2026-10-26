@@ -10,12 +10,6 @@ using osu.Framework.Graphics.Shaders.Types;
 
 namespace osu.Game.Graphics
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public record struct DimParameters
-    {
-        public UniformVector4 DimColour;
-    }
-
     public class ColouredDimmableSharedData : IDisposable
     {
         private IRenderer? renderer;
@@ -73,6 +67,12 @@ namespace osu.Game.Graphics
             Debug.Assert(IsInitialised);
 
             buffer?.Dispose();
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public record struct DimParameters
+        {
+            public UniformVector4 DimColour;
         }
     }
 }
