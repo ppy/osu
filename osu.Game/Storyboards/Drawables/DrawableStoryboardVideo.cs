@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
-using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osuTK;
@@ -148,19 +147,6 @@ namespace osu.Game.Storyboards.Drawables
                 public readonly ColouredDimmableHelper ColouredDimmableHelper;
 
                 private readonly Video video;
-
-                protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-                {
-                    bool result = base.OnInvalidate(invalidation, source);
-
-                    // Needed because DrawColourOffset is handled by the DrawNode
-                    if ((invalidation & Invalidation.Colour) > 0)
-                    {
-                        result |= Invalidate(Invalidation.DrawNode);
-                    }
-
-                    return result;
-                }
 
                 public DrawableVideoSprite(Video video)
                     : base(video)

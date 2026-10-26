@@ -8,31 +8,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Sprites
 {
     public partial class ColouredDimmableBufferedContainer : BufferedContainer, IColouredDimmableSource
     {
         public readonly ColouredDimmableHelper ColouredDimmableHelper;
-
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            bool result = false;
-
-            // Needed because DrawColourOffset is handled by the DrawNode
-            if ((invalidation & Invalidation.Colour) > 0)
-            {
-                result |= Invalidate(Invalidation.DrawNode);
-            }
-
-            // Colour is handled by ColouredDimmableBufferedContainer, no need to propagate it to children
-            invalidation &= ~Invalidation.Colour;
-
-            result |= base.OnInvalidate(invalidation, source);
-
-            return result;
-        }
 
         public ColouredDimmableBufferedContainer(TexturePixelFormat textureFormat = TexturePixelFormat.R8G8B8A8Float, RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
             : base(textureFormat, formats, pixelSnapping, cachedFrameBuffer)

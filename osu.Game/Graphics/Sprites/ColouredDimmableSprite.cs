@@ -8,26 +8,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Layout;
 
 namespace osu.Game.Graphics.Sprites
 {
     public partial class ColouredDimmableSprite : Sprite
     {
         public readonly ColouredDimmableHelper ColouredDimmableHelper;
-
-        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-        {
-            bool result = base.OnInvalidate(invalidation, source);
-
-            // Needed because DrawColourOffset is handled by the DrawNode
-            if ((invalidation & Invalidation.Colour) > 0)
-            {
-                result |= Invalidate(Invalidation.DrawNode);
-            }
-
-            return result;
-        }
 
         public ColouredDimmableSprite()
         {

@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.Containers
                     return;
 
                 animatedInvertedDimLevel = value;
-                Invalidate(Invalidation.Colour);
+                Invalidate(Invalidation.DrawNode);
             }
         }
 
@@ -92,7 +92,7 @@ namespace osu.Game.Graphics.Containers
                     return;
 
                 animatedDimColour = value;
-                Invalidate(Invalidation.Colour);
+                Invalidate(Invalidation.DrawNode);
             }
         }
 
