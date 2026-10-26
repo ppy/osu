@@ -218,7 +218,7 @@ namespace osu.Game.Online.Chat
             {
                 TextFlow.AddText(Localisation.NotificationsStrings.Mention.ToUpper(), s => s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
                 TextFlow.NewLine();
-                TextFlow.AddText($"{message.Sender.Username} in {channel.Name}", s =>
+                TextFlow.AddText(Localisation.NotificationsStrings.MentionDetails(message.Sender.Username, channel.Name), s =>
                 {
                     s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.SemiBold);
                     s.Colour = colourProvider.Content2;

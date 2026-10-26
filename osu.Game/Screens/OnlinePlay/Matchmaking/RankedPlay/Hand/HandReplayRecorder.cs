@@ -20,7 +20,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// <summary>
         /// Minimum interval between individual replay frames
         /// </summary>
-        public double RecordInterval { get; init; } = 25;
+        public double RecordInterval { get; init; } = 50;
 
         /// <summary>
         /// Max amount of frames to collect per <see cref="FlushInterval"/>

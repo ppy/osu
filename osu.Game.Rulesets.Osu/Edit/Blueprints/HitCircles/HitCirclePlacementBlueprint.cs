@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
         public HitCirclePlacementBlueprint()
             : base(new HitCircle())
         {
-            InternalChild = circlePiece = new HitCirclePiece();
+            Child = circlePiece = new HitCirclePiece();
         }
 
         [BackgroundDependencyLoader]

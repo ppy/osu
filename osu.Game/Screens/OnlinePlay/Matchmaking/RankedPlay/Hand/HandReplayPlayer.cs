@@ -14,7 +14,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand
         /// <summary>
         /// Maximum amount of frames that can get queued up at the same time
         /// </summary>
-        public int MaxQueuedFrames { get; set; } = 20;
+        public int MaxQueuedFrames { get; set; } = 30;
 
         private readonly int userId;
         private readonly OpponentHandOfCards handOfCards;

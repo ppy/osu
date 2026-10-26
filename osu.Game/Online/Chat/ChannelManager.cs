@@ -6,7 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
@@ -15,13 +17,19 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.Listing;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Online.Chat
 {
@@ -76,6 +84,14 @@ namespace osu.Game.Online.Chat
         [Resolved(CanBeNull = true)]
         [CanBeNull]
         private MultiplayerClient multiplayerClient { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
+        private Storage storage { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        [CanBeNull]
+        private INotificationOverlay notifications { get; set; }
 
         private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
@@ -229,7 +245,7 @@ namespace osu.Game.Online.Chat
 
                 var req = new PostMessageRequest(message);
 
-                req.Success += m => dequeueAndRun();
+                req.Success += _ => dequeueAndRun();
                 req.Failure += exception =>
                 {
                     handlePostException(exception);
@@ -273,6 +289,16 @@ namespace osu.Game.Online.Chat
             {
                 case @"np":
                     AddInternal(new NowPlayingCommand(target));
+                    break;
+
+                case @"watch":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /watch [user]"));
+                        break;
+                    }
+
+                    AddInternal(new WatchCommand(target, content));
                     break;
 
                 case @"me":
@@ -358,8 +384,56 @@ namespace osu.Game.Online.Chat
                     });
                     break;
 
+                case @"savelog":
+                    ProgressNotification notification = new ProgressNotification
+                    {
+                        State = ProgressNotificationState.Active,
+                        Text = NotificationsStrings.LogsExportOngoing,
+                    };
+                    notifications?.Post(notification);
+
+                    exportChannelLog(target).ContinueWith(t =>
+                    {
+                        if (t.Exception != null)
+                        {
+                            Logger.Log($@"Failed to export channel log: {t.Exception}");
+                            notification.State = ProgressNotificationState.Cancelled;
+                            return;
+                        }
+
+                        string result = t.GetResultSafely();
+
+                        if (result == null)
+                        {
+                            Logger.Log("Failed to export channel log due to missing storage.");
+                            notification.State = ProgressNotificationState.Cancelled;
+                            return;
+                        }
+
+                        notification.CompletionText = NotificationsStrings.FileExportFinished(result);
+                        notification.CompletionClickAction = () =>
+                        {
+                            (storage as OsuStorage)?.GetExportStorage().PresentFileExternally(result);
+                            return true;
+                        };
+                        notification.State = ProgressNotificationState.Completed;
+                    });
+                    break;
+
                 case @"help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel], /chat [user], /np, /roll [2-100] (multiplayer only)"));
+                    target.AddNewMessages(new InfoMessage(
+                        """
+                        Supported commands:
+                        /help            - Displays all available commands.
+                        /me [action]     - Perform a third-person action.
+                        /join [channel]  - Joins the specified channel.
+                        /chat [user]     - Opens a new chat tab with the specified user.
+                        /watch [user]    - Spectates the specified user.
+                        /np              - Print to chat the current song you are listening to or playing.
+                        /savelog         - Saves the current chat tab to a text file.
+                        /roll [2-100]    - Rolls a random number (multiplayer only).
+                        """
+                    ));
                     break;
 
                 default:
@@ -712,6 +786,26 @@ namespace osu.Game.Online.Chat
                 foreach (var channel in joinedChannels)
                     channel.RemoveMessagesFromUser(newBlock.TargetID);
             }
+        }
+
+        [ItemCanBeNull]
+        private async Task<string> exportChannelLog(Channel channel)
+        {
+            if (storage is not OsuStorage osuStorage)
+                return null;
+
+            string filename = string.Format($@"chat-{channel.Name}-{DateTimeOffset.Now:yyyyMMdd-hhmmss}.txt").GetValidFilename();
+            var exportStorage = osuStorage.GetExportStorage();
+
+            using (var file = exportStorage.CreateFileSafely(filename))
+            {
+                using var textWriter = new StreamWriter(file);
+
+                foreach (var message in channel.Messages)
+                    await textWriter.WriteLineAsync($@"{message.Timestamp:yyyy-MM-dd HH:mm} {message.Sender.Username}: {message.Content}").ConfigureAwait(false);
+            }
+
+            return filename;
         }
 
         protected override void Dispose(bool isDisposing)

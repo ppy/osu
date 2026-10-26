@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuSpriteText sort;
             OsuSpriteText displayStyle;
 
-            Add(toolbar = new UserListToolbar(true)
+            Add(toolbar = new UserListToolbar
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

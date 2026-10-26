@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions;
+using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -55,6 +56,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                             Damage = 123_456,
                             OldLife = 500_000,
                             NewLife = 500_000 - 123_456,
+                            DirectDamage = 123_456,
                         };
 
                         userInfo.Life = 500_000 - 123_456;
@@ -80,30 +82,36 @@ namespace osu.Game.Tests.Visual.RankedPlay
             {
                 int losingPlayer = state.Users.Keys.First();
 
-                state.DamageMultiplier = 2;
+                state.DamageMultiplier = 1.5;
 
                 foreach (var (id, userInfo) in state.Users)
                 {
                     if (id == losingPlayer)
                     {
+                        userInfo.DamageMultiplier = 0.5;
                         userInfo.DamageInfo = new RankedPlayDamageInfo
                         {
                             RawDamage = 123_456,
                             Damage = 123_456 * 2,
                             OldLife = 1_000_000,
                             NewLife = 1_000_000 - 123_456 * 2,
+                            Multiplier = 2,
+                            DirectDamage = 123_456,
                         };
 
                         userInfo.Life = 1_000_000 - 123_456 * 2;
                     }
                     else
                     {
+                        userInfo.DamageMultiplier = 0.5;
                         userInfo.DamageInfo = new RankedPlayDamageInfo
                         {
                             RawDamage = 0,
                             Damage = 0,
                             OldLife = 1_000_000,
                             NewLife = 1_000_000,
+                            Multiplier = 2,
+                            DirectDamage = 0,
                         };
                     }
                 }
@@ -133,9 +141,28 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
             AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
             {
-                int losingPlayer = state.Users.Keys.First();
-
                 state.DamageMultiplier = 2;
+
+                foreach (var (_, userInfo) in state.Users)
+                {
+                    userInfo.DamageInfo = new RankedPlayDamageInfo
+                    {
+                        RawDamage = 0,
+                        Damage = 0,
+                        OldLife = 1_000_000,
+                        NewLife = 1_000_000,
+                    };
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        [Explicit("Test exercises correct stopping of audio playback. Has no assertions, only useful when checked manually by a human.")]
+        public void TestAllSamplesStopOnExit()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
 
                 foreach (var (id, userInfo) in state.Users)
                 {
@@ -144,10 +171,90 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         userInfo.DamageInfo = new RankedPlayDamageInfo
                         {
                             RawDamage = 123_456,
-                            Damage = 123_456 * 2,
-                            OldLife = 1_000_000,
-                            NewLife = 1_000_000 - 123_456 * 2,
+                            Damage = 123_456,
+                            OldLife = 500_000,
+                            NewLife = 500_000 - 123_456,
                         };
+
+                        userInfo.Life = 500_000 - 123_456;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+            AddWaitStep("wait for samples to start playing", 5);
+            AddRepeatStep("exit", () => screen.Exit(), 2);
+        }
+
+        [Test]
+        public void TestDamageBreakdown()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 600_000,
+                            Damage = 1_100_000,
+                            OldLife = 1_000_000,
+                            NewLife = 1,
+                            DirectDamage = 500_000,
+                            Multiplier = 2,
+                            BonusDamage = 100_000
+                        };
+
+                        userInfo.Life = 653_088;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void TestDamageBreakdownWithNegativeValues()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 500_000,
+                            Damage = 200_000,
+                            OldLife = 1_000_000,
+                            NewLife = 800_000,
+                            DirectDamage = 600_000,
+                            Multiplier = 0.5,
+                            BonusDamage = -100_000
+                        };
+
+                        userInfo.Life = 653_088;
                     }
                     else
                     {
@@ -226,6 +333,186 @@ namespace osu.Game.Tests.Visual.RankedPlay
                     }
                 };
             });
+        }
+
+        [Test]
+        public void TestLowDamage()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 10_000,
+                            Damage = 10_000,
+                            OldLife = 500_000,
+                            NewLife = 500_000 - 10_000,
+                            DirectDamage = 10_000,
+                        };
+
+                        userInfo.Life = 600_000 - 10_000;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void TestMediumDamage()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 260_000,
+                            Damage = 260_000,
+                            OldLife = 500_000,
+                            NewLife = 500_000 - 260_000,
+                            DirectDamage = 260_000,
+                        };
+
+                        userInfo.Life = 600_000 - 260_000;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void TestHighDamage()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 500_000,
+                            Damage = 500_000,
+                            OldLife = 600_000,
+                            NewLife = 600_000 - 500_000,
+                            DirectDamage = 500_000,
+                        };
+
+                        userInfo.Life = 600_000 - 500_000;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void Test1Damage()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 1,
+                            Damage = 1,
+                            OldLife = 500_000,
+                            NewLife = 500_000 - 1,
+                            DirectDamage = 1,
+                        };
+
+                        userInfo.Life = 500_000 - 1;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
+        }
+
+        [Test]
+        public void TestKnockOut()
+        {
+            AddStep("set results state", () => MultiplayerClient.RankedPlayChangeStage(RankedPlayStage.Results, state =>
+            {
+                int losingPlayer = state.Users.Keys.First();
+
+                foreach (var (id, userInfo) in state.Users)
+                {
+                    if (id == losingPlayer)
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 500_000,
+                            Damage = 500_000,
+                            OldLife = 500_000,
+                            NewLife = 500_000 - 500_000,
+                            DirectDamage = 500_000,
+                        };
+
+                        userInfo.Life = 500_000 - 500_000;
+                    }
+                    else
+                    {
+                        userInfo.DamageInfo = new RankedPlayDamageInfo
+                        {
+                            RawDamage = 0,
+                            Damage = 0,
+                            OldLife = 1_000_000,
+                            NewLife = 1_000_000,
+                        };
+                    }
+                }
+            }).WaitSafely());
         }
     }
 }

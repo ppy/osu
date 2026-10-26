@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Users;
@@ -21,6 +22,10 @@ namespace osu.Game.Screens.OnlinePlay
     {
         [Cached]
         protected readonly OverlayColourProvider ColourProvider = new OverlayColourProvider(OverlayColourScheme.Plum);
+
+        // Without this, the beatmap / menu background will be displayed behind the online play overlays.
+        // This adds needless load, and in some cases is visible when everything in front is transparent momentarily (song select).
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack(WaveContainer.APPEAR_DURATION);
 
         public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 

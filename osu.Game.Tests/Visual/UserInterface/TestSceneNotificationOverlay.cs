@@ -64,6 +64,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"simple #2", sendAmazingNotification);
             AddStep(@"progress #1", sendUploadProgress);
             AddStep(@"progress #2", sendDownloadProgress);
+            AddStep("outage", () => notificationOverlay.Post(new OutageNotification("Things are on fire. Investigating...")));
+            AddStep("failed submission", () => notificationOverlay.Post(new ScoreSubmissionFailureNotification("Score will not be submitted", "This beatmap does not match the online version. Please update or redownload it.")));
 
             checkProgressingCount(2);
 
@@ -336,6 +338,50 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestProgressSilentDismissal()
+        {
+            ProgressNotification notification = null!;
+
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddStep("silently dismiss", () => notification.CompleteSilently());
+            AddAssert("completed", () => notification.State == ProgressNotificationState.Completed);
+            AddAssert("Completion toast not shown", () => notificationOverlay.ToastCount == 0);
+        }
+
+        [Test]
+        public void TestProgressSilentDismissalImmediate()
+        {
+            ProgressNotification notification = null!;
+
+            AddStep("add progress notification", () =>
+            {
+                notification = new ProgressNotification
+                {
+                    Text = @"Uploading to BSS...",
+                    CompletionText = "Uploaded to BSS!",
+                };
+
+                notification.CompleteSilently();
+
+                notificationOverlay.Post(notification);
+                progressingNotifications.Add(notification);
+            });
+
+            AddAssert("completed", () => notification.State == ProgressNotificationState.Completed);
+            AddAssert("Completion toast not shown", () => notificationOverlay.ToastCount == 0);
+        }
+
+        [Test]
         public void TestProgressClick()
         {
             ProgressNotification notification = null!;
@@ -548,8 +594,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
 
-                if (p != null)
-                    p.State = ProgressNotificationState.Active;
+                p?.State = ProgressNotificationState.Active;
             }
 
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))

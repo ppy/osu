@@ -387,6 +387,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public Vector2 ContentRelativeToAbsoluteFactor => Content.RelativeToAbsoluteFactor;
 
+            [Resolved]
+            private EditorBeatmap editorBeatmap { get; set; }
+
             public TimelineSelectionBlueprintContainer()
             {
                 AddInternal(new TimelinePart<SelectionBlueprint<HitObject>>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
@@ -400,8 +403,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // it is possible for `Content`'s children to become unsorted when the user moves the placement around,
                 // which can culminate in a critical failure when attempting to binary-search children here
                 // using `HitObjectOrderedSelectionContainer`'s custom comparer.
-                // thus, always force a re-sort of objects before attempting to change child depth to avoid this scenario.
-                Content.Sort();
+                // thus, always force a re-sort of objects before attempting to change child depth when a placement is active
+                // to avoid this scenario.
+                if (editorBeatmap.PlacementObject.Value != null)
+                    Content.Sort();
                 base.ChangeChildDepth(child, newDepth);
             }
         }

@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Gameplay
                     AccuracyJudgementCount = 1,
                     ComboPortion = 0,
                     BonusPortion = 0
-                }, DateTimeOffset.Now)
+                }, DateTimeOffset.Now, [], 0, [])
             });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.Zero);
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Gameplay
                     AccuracyJudgementCount = 0,
                     ComboPortion = 0,
                     BonusPortion = 0
-                }, DateTimeOffset.Now)
+                }, DateTimeOffset.Now, [], 0, [])
             });
 
             Assert.That(scoreProcessor.TotalScore.Value, Is.Zero);

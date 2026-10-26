@@ -41,7 +41,7 @@ namespace osu.Game.Beatmaps
 
         private CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
 
-        private readonly object beatmapFetchLock = new object();
+        private readonly Lock beatmapFetchLock = new Lock();
 
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
@@ -134,7 +134,7 @@ namespace osu.Game.Beatmaps
             if (Track.RestartPoint < 0 || Track.RestartPoint > Track.Length)
                 Track.RestartPoint = 0.4f * Track.Length;
 
-            offsetFromPreviewPoint ??= -MusicController.TRACK_FADE_IN_TIME;
+            offsetFromPreviewPoint ??= -MusicController.DELAY_BEFORE_FADE;
 
             Track.RestartPoint = Math.Clamp(Track.RestartPoint + offsetFromPreviewPoint.Value, 0, Track.Length);
         }

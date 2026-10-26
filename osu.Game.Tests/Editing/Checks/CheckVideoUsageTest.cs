@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Editing.Checks
             };
 
             var storyboard = new Storyboard();
-            storyboard.GetLayer("Video").Add(new StoryboardVideo(path, startTime));
+            storyboard.GetLayer("Video").Add(new StoryboardVideo(StoryboardElementSource.Beatmap, path, startTime));
 
             var working = new TestWorkingBeatmap(beatmap, storyboard);
             return new BeatmapVerifierContext.VerifiedBeatmap(working, beatmap);

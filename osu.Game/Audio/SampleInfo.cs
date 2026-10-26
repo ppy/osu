@@ -4,7 +4,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Audio
 {
@@ -14,6 +13,8 @@ namespace osu.Game.Audio
     public class SampleInfo : ISampleInfo, IEquatable<SampleInfo>
     {
         private readonly string[] sampleNames;
+
+        public bool IsHitsound => false;
 
         public SampleInfo(params string[] sampleNames)
         {

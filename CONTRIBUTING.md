@@ -2,6 +2,10 @@
 
 Thank you for showing interest in the development of osu!. We aim to provide a good collaborating environment for everyone involved, and as such have decided to list some of the most important things to keep in mind in the process. The guidelines below have been chosen based on past experience.
 
+## Foreword on AI usage
+
+Our team believes in **human contributions**. Any contribution – be it an issue report or a pull request – which is created by, documented by, or aided by AI/LLM usage will typically be **closed and locked without further discussion**.
+
 ## Table of contents
 
 1. [Reporting bugs](#reporting-bugs)

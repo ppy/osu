@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public partial class FreehandSliderToolboxGroup : EditorToolboxGroup
     {
         public FreehandSliderToolboxGroup()
-            : base("slider")
+            : base("freehand")
         {
         }
 

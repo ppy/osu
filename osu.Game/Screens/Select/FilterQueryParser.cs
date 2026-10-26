@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using osu.Framework.Logging;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -21,14 +22,21 @@ namespace osu.Game.Screens.Select
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
         {
-            foreach (Match match in query_syntax_regex.Matches(query))
+            try
             {
-                string key = match.Groups["key"].Value.ToLowerInvariant();
-                var op = parseOperator(match.Groups["op"].Value);
-                string value = match.Groups["value"].Value;
+                foreach (Match match in query_syntax_regex.Matches(query))
+                {
+                    string key = match.Groups["key"].Value.ToLowerInvariant();
+                    var op = parseOperator(match.Groups["op"].Value);
+                    string value = match.Groups["value"].Value;
 
-                if (tryParseKeywordCriteria(criteria, key, value, op))
-                    query = query.Replace(match.ToString(), "");
+                    if (tryParseKeywordCriteria(criteria, key, value, op))
+                        query = query.Replace(match.ToString(), "");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to parse query ({e.Message})", level: LogLevel.Important);
             }
 
             criteria.SearchText = query;
@@ -212,10 +220,16 @@ namespace osu.Game.Screens.Select
 
         private static GroupCollection? tryMatchRegex(string value, string regex)
         {
-            Match matches = Regex.Match(value, regex);
-
-            if (matches.Success)
-                return matches.Groups;
+            try
+            {
+                Match matches = Regex.Match(value, regex);
+                if (matches.Success)
+                    return matches.Groups;
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to parse query ({e.Message})", level: LogLevel.Important);
+            }
 
             return null;
         }

@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         public HitPlacementBlueprint()
             : base(new Hit())
         {
-            InternalChild = piece = new HitPiece
+            Child = piece = new HitPiece
             {
                 Size = new Vector2(TaikoHitObject.DEFAULT_SIZE * TaikoPlayfield.BASE_HEIGHT)
             };

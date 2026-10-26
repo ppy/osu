@@ -27,6 +27,8 @@ namespace osu.Desktop.Security
 
             if (Environment.IsPrivilegedProcess)
                 notifications.Post(new ElevatedPrivilegesNotification());
+
+            Expire();
         }
 
         private partial class ElevatedPrivilegesNotification : SimpleNotification

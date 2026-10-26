@@ -265,9 +265,6 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// </remarks>
         public static RectangleF CalculatePossibleMovementBounds(Slider slider)
         {
-            var pathPositions = new List<Vector2>();
-            slider.Path.GetPathToProgress(pathPositions, 0, 1);
-
             float minX = float.PositiveInfinity;
             float maxX = float.NegativeInfinity;
 
@@ -275,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             float maxY = float.NegativeInfinity;
 
             // Compute the bounding box of the slider.
-            foreach (var pos in pathPositions)
+            foreach (var pos in slider.Path.CalculatedPath)
             {
                 minX = MathF.Min(minX, pos.X);
                 maxX = MathF.Max(maxX, pos.X);

@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                 });
         }
 
-        protected virtual bool PerformMigration() => game?.Migrate(destination.FullName) != false;
+        protected virtual bool PerformMigration() => game?.MigrateUserData(destination.FullName) != false;
 
         public override void OnEntering(ScreenTransitionEvent e)
         {

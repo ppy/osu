@@ -75,14 +75,14 @@ namespace osu.Game.Tests.Visual.RankedPlay
         }
 
         private double flushInterval = 1000;
-        private double recordInterval = 25;
+        private double recordInterval = 50;
         private double fixedLatency;
         private double maxLatency;
 
         [Test]
         public void TestCardHandReplay()
         {
-            AddSliderStep("record interval", 0.0, 1000.0, 25.0, value =>
+            AddSliderStep("record interval", 0.0, 1000.0, 50.0, value =>
             {
                 recordInterval = value;
                 recreateRecorder();

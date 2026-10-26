@@ -107,7 +107,9 @@ namespace osu.Game.Screens.Select
             {
                 if (ScopedBeatmapSet.Value != null)
                 {
+                    this.TransformTo(nameof(Margin), new MarginPadding { Top = 5 }, transition_duration, Easing.OutQuint);
                     content.BypassAutoSizeAxes = Axes.None;
+
                     text.Clear();
                     text.AddText(SongSelectStrings.TemporarilyShowingAllBeatmapsIn);
                     text.AddText(@" ");
@@ -115,6 +117,7 @@ namespace osu.Game.Screens.Select
                 }
                 else
                 {
+                    this.TransformTo(nameof(Margin), new MarginPadding(0), transition_duration, Easing.OutQuint);
                     flashLayer.FadeOutFromOne(transition_duration, Easing.OutQuint);
                     content.BypassAutoSizeAxes = Axes.Y;
                 }

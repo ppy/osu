@@ -25,7 +25,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             base.LoadComplete();
 
-            User.BindValueChanged(_ => Alpha = User.Value?.User.OnlineID == api.LocalUser.Value.OnlineID ? 0 : 1, true);
+            User.BindValueChanged(_ =>
+            {
+                Alpha = User.Value?.User.OnlineID == api.LocalUser.Value.OnlineID ? 0 : 1;
+            }, true);
         }
 
         public override Popover GetPopover() => new UserActionPopover(User.Value!.User);
@@ -53,7 +56,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             dialogOverlay?.Push(userBlocked ? ConfirmBlockActionDialog.Unblock(user) : ConfirmBlockActionDialog.Block(user));
                             this.HidePopover();
                         }
-                    }
+                    },
+                    new ProfilePopoverAction(FontAwesome.Solid.ExclamationTriangle, ReportStrings.UserButton)
+                    {
+                        Action = () =>
+                        {
+                            dialogOverlay?.Push(new ReportUserDialog(user));
+                            this.HidePopover();
+                        }
+                    },
                 };
             }
         }

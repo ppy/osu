@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card
                                 },
                                 new TruncatingSpriteText
                                 {
-                                    Text = FormattableString.Invariant($"{beatmap.StarRating:F2}"),
+                                    Text = beatmap.StarRating.FormatStarRating(),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Font = OsuFont.GetFont(size: 9, weight: FontWeight.Bold),

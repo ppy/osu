@@ -58,22 +58,21 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateTernaryStates()
         {
-            var usingClosestAnchor = GetStateFromSelection(SelectedBlueprints, c => !c.Item.UsesFixedAnchor);
+            var usingClosestAnchor = SelectedBlueprints.GetTernaryState(c => !c.Item.UsesFixedAnchor);
 
-            if (closestAnchor != null)
-                closestAnchor.State.Value = usingClosestAnchor;
+            closestAnchor?.State.Value = usingClosestAnchor;
 
             if (fixedAnchors != null)
             {
                 foreach (var fixedAnchor in fixedAnchors)
-                    fixedAnchor.State.Value = GetStateFromSelection(SelectedBlueprints, c => c.Item.UsesFixedAnchor && ((Drawable)c.Item).Anchor == fixedAnchor.Anchor);
+                    fixedAnchor.State.Value = SelectedBlueprints.GetTernaryState(c => c.Item.UsesFixedAnchor && ((Drawable)c.Item).Anchor == fixedAnchor.Anchor);
             }
 
             if (originMenu != null)
             {
                 foreach (var origin in originMenu.Items.OfType<AnchorMenuItem>())
                 {
-                    origin.State.Value = GetStateFromSelection(SelectedBlueprints, c => ((Drawable)c.Item).Origin == origin.Anchor);
+                    origin.State.Value = SelectedBlueprints.GetTernaryState(c => ((Drawable)c.Item).Origin == origin.Anchor);
                     origin.Action.Disabled = usingClosestAnchor == TernaryState.True;
                 }
             }
@@ -120,7 +119,7 @@ namespace osu.Game.Overlays.SkinEditor
             var closest = getClosestAnchor(drawable);
 
             applyAnchor(drawable, closest);
-            applyOrigin(drawable, closest);
+            applyScreenSpaceOrigin(drawable, closest);
         }
 
         protected override void OnSelectionChanged()
@@ -236,10 +235,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawable = (Drawable)item;
 
-                applyOrigin(drawable, origin);
-
-                if (!item.UsesFixedAnchor)
-                    ApplyClosestAnchorOrigin(drawable);
+                applyLocalSpaceOrigin(drawable, origin);
             }
 
             OnOperationEnded();
@@ -320,7 +316,17 @@ namespace osu.Game.Overlays.SkinEditor
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
         }
 
-        private static void applyOrigin(Drawable drawable, Anchor screenSpaceOrigin)
+        private static void applyLocalSpaceOrigin(Drawable drawable, Anchor localSpaceOrigin)
+        {
+            if (localSpaceOrigin == drawable.Origin)
+                return;
+
+            Vector2 offset = drawable.ToParentSpace(localSpaceOrigin.PositionOnQuad(drawable.DrawRectangle)) - drawable.ToParentSpace(drawable.Origin.PositionOnQuad(drawable.DrawRectangle));
+            drawable.Origin = localSpaceOrigin;
+            drawable.Position += offset;
+        }
+
+        private static void applyScreenSpaceOrigin(Drawable drawable, Anchor screenSpaceOrigin)
         {
             var boundingBox = drawable.ScreenSpaceDrawQuad.AABBFloat;
 

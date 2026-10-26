@@ -44,6 +44,7 @@ namespace osu.Game.Tests.Visual.DailyChallenge
             var room = new Room
             {
                 Name = "Daily Challenge: June 4, 2024",
+                Description = "Highlights of May 2024",
                 Playlist =
                 [
                     new PlaylistItem(TestResources.CreateTestBeatmapSetInfo().Beatmaps.First())

@@ -19,26 +19,6 @@ namespace osu.Game.Rulesets.Mods
         private BindableBool? adjustPitch;
 
         /// <summary>
-        /// The score multiplier for the current <see cref="SpeedChange"/>.
-        /// </summary>
-        public double ScoreMultiplier
-        {
-            get
-            {
-                // Round to the nearest multiple of 0.1.
-                double value = (int)(SpeedChange.Value * 10) / 10.0;
-
-                // Offset back to 0.
-                value -= 1;
-
-                if (SpeedChange.Value >= 1)
-                    return 1 + value / 5;
-                else
-                    return 0.6 + value;
-            }
-        }
-
-        /// <summary>
         /// Construct a new <see cref="RateAdjustModHelper"/>.
         /// </summary>
         /// <param name="speedChange">The main speed adjust parameter which is exposed to the user.</param>

@@ -6,6 +6,7 @@ using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay;
@@ -33,25 +34,36 @@ namespace osu.Game.Tests.Visual.RankedPlay
             };
         }
 
+        [SetUpSteps]
+        public void SetupSteps()
+        {
+            AddStep("reset card hand", () => Child = handOfCards = new PlayerHandOfCards
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                RelativeSizeAxes = Axes.Both,
+                Height = 0.5f,
+            });
+        }
+
         [Test]
         public void TestSingleSelectionMode()
         {
             AddStep("add cards", () =>
             {
-                handOfCards.Clear();
                 for (int i = 0; i < 5; i++)
                     handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
             });
             AddStep("single selection mode", () => handOfCards.SelectionMode = HandSelectionMode.Single);
 
-            AddStep("click first card", () => handOfCards.Cards.First().TriggerClick());
-            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.First().Item]));
+            AddStep("click first card", () => handOfCards.GetCardsInDisplayOrder()[0].TriggerClick());
+            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[0].Item]));
 
-            AddStep("click second card", () => handOfCards.Cards.ElementAt(1).TriggerClick());
-            AddAssert("second card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(1).Item]));
+            AddStep("click second card", () => handOfCards.GetCardsInDisplayOrder()[1].TriggerClick());
+            AddAssert("second card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[1].Item]));
 
-            AddStep("click second card again", () => handOfCards.Cards.ElementAt(1).TriggerClick());
-            AddAssert("second card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(1).Item]));
+            AddStep("click second card again", () => handOfCards.GetCardsInDisplayOrder()[1].TriggerClick());
+            AddAssert("second card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[1].Item]));
         }
 
         [Test]
@@ -59,20 +71,19 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             AddStep("add cards", () =>
             {
-                handOfCards.Clear();
                 for (int i = 0; i < 5; i++)
                     handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
             });
             AddStep("multi selection mode", () => handOfCards.SelectionMode = HandSelectionMode.Multiple);
 
-            AddStep("click first card", () => handOfCards.Cards.First().TriggerClick());
-            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.First().Item]));
+            AddStep("click first card", () => handOfCards.GetCardsInDisplayOrder().First().TriggerClick());
+            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder().First().Item]));
 
-            AddStep("click second card", () => handOfCards.Cards.ElementAt(1).TriggerClick());
-            AddAssert("both cards selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(0).Item, handOfCards.Cards.ElementAt(1).Item]));
+            AddStep("click second card", () => handOfCards.GetCardsInDisplayOrder()[1].TriggerClick());
+            AddAssert("both cards selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[0].Item, handOfCards.GetCardsInDisplayOrder()[1].Item]));
 
-            AddStep("click second card again", () => handOfCards.Cards.ElementAt(1).TriggerClick());
-            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(0).Item]));
+            AddStep("click second card again", () => handOfCards.GetCardsInDisplayOrder()[1].TriggerClick());
+            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[0].Item]));
         }
 
         [Test]
@@ -84,7 +95,13 @@ namespace osu.Game.Tests.Visual.RankedPlay
 
                 AddStep($"{i} {"cards".Pluralize(i == 1)}", () =>
                 {
-                    handOfCards.Clear();
+                    Child = handOfCards = new PlayerHandOfCards
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        Height = 0.5f,
+                    };
 
                     for (int j = 0; j < numCards; j++)
                         handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
@@ -114,20 +131,20 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 Key key = Key.Number1 + i;
 
                 AddStep($"key {i + 1}", () => InputManager.Key(key));
-                AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(i1).Item]));
+                AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[i1].Item]));
             }
 
             AddStep("right arrow", () => InputManager.Key(Key.Right));
-            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(0).Item]));
+            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[0].Item]));
 
             AddStep("right arrow", () => InputManager.Key(Key.Right));
-            AddAssert("second card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(1).Item]));
+            AddAssert("second card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[1].Item]));
 
             AddStep("left arrow", () => InputManager.Key(Key.Left));
-            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(0).Item]));
+            AddAssert("first card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[0].Item]));
 
             AddStep("left arrow", () => InputManager.Key(Key.Left));
-            AddAssert("last card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.Cards.ElementAt(^1).Item]));
+            AddAssert("last card selected", () => handOfCards.Selection.SequenceEqual([handOfCards.GetCardsInDisplayOrder()[^1].Item]));
 
             AddStep("space", () => InputManager.Key(Key.Space));
             AddAssert("play action triggered", () => playActionTriggered);
@@ -138,7 +155,6 @@ namespace osu.Game.Tests.Visual.RankedPlay
         {
             AddStep("add cards", () =>
             {
-                handOfCards.Clear();
                 for (int i = 0; i < 5; i++)
                     handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
             });
@@ -150,12 +166,58 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 Key key = Key.Number1 + i;
 
                 AddStep($"key {i + 1}", () => InputManager.Key(key));
-                AddAssert("card hovered", () => handOfCards.Cards.ElementAt(i1).CardHovered);
+                AddAssert("card hovered", () => handOfCards.GetCardsInDisplayOrder()[i1].CardHovered);
 
-                AddAssert("card not selected", () => !handOfCards.Selection.Contains(handOfCards.Cards.ElementAt(i1).Card.Item));
+                AddAssert("card not selected", () => !handOfCards.Selection.Contains(handOfCards.GetCardsInDisplayOrder()[i1].Card.Item));
                 AddStep("space", () => InputManager.Key(Key.Space));
-                AddAssert("card selected", () => handOfCards.Selection.Contains(handOfCards.Cards.ElementAt(i1).Card.Item));
+                AddAssert("card selected", () => handOfCards.Selection.Contains(handOfCards.GetCardsInDisplayOrder()[i1].Card.Item));
             }
+        }
+
+        [Test]
+        public void TestContract()
+        {
+            AddStep("add cards", () =>
+            {
+                for (int i = 0; i < 5; i++)
+                    handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
+            });
+            AddWaitStep("wait", 5);
+            AddStep("contract", () => handOfCards.Contract());
+            AddWaitStep("wait", 5);
+            AddAssert(
+                "all cards outside bounds", () =>
+                    handOfCards
+                        .ChildrenOfType<HandOfCards.HandCard>()
+                        .All(card => !card.ScreenSpaceDrawQuad.AABBFloat.IntersectsWith(handOfCards.ScreenSpaceDrawQuad.AABBFloat))
+            );
+        }
+
+        [Test]
+        public void TestRemoveCardsWhileDragging()
+        {
+            AddStep("add cards", () =>
+            {
+                for (int i = 0; i < 5; i++)
+                    handOfCards.AddCard(new RankedPlayCardWithPlaylistItem(new RankedPlayCardItem()));
+            });
+            AddStep("hover card", () => InputManager.MoveMouseTo(handOfCards.GetCardsInDisplayOrder()[0]));
+            AddStep("start drag", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("move card", () => InputManager.MoveMouseTo(handOfCards.GetCardsInDisplayOrder()[3]));
+            AddStep("remove cards", () =>
+            {
+                foreach (var card in handOfCards.Cards.ToArray())
+                    handOfCards.RemoveCard(card.Item);
+            });
+            AddStep("release mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+        }
+
+        [Test]
+        public void TestKeyboardSelectionWithoutCards()
+        {
+            AddAssert("no cards", () => !handOfCards.Cards.Any());
+            AddStep("right arrow", () => InputManager.Key(Key.Right));
+            AddStep("left arrow", () => InputManager.Key(Key.Left));
         }
     }
 }

@@ -136,6 +136,11 @@ Click to see what's new!", version);
         public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
 
         /// <summary>
+        /// "{0} in {1}"
+        /// </summary>
+        public static LocalisableString MentionDetails(string user, string channelName) => new TranslatableString(getKey(@"mention_details"), @"{0} in {1}", user, channelName);
+
+        /// <summary>
         /// "Online: {0}"
         /// </summary>
         public static LocalisableString FriendOnline(string info) => new TranslatableString(getKey(@"friend_online"), @"Online: {0}", info);
@@ -236,11 +241,36 @@ Click to see what's new!", version);
         public static LocalisableString ElevatedPrivileges(LocalisableString user) => new TranslatableString(getKey(@"elevated_privileges"), @"Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.", user);
 
         /// <summary>
+        /// "On macOS, installing osu! to a directory other than /Applications or {0}/Applications can cause issues with updating the game. Please move your game installation to one of these locations."
+        /// </summary>
+        public static LocalisableString MacOSAppLocation(LocalisableString userProfile) => new TranslatableString(getKey(@"macos_app_location"), @"On macOS, installing osu! to a directory other than /Applications or {0}/Applications can cause issues with updating the game. Please move your game installation to one of these locations.", userProfile);
+
+        /// <summary>
         /// "Screenshot saved! Click to view.
         /// {0}"
         /// </summary>
         public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot saved! Click to view.
 {0}", filename);
+
+        /// <summary>
+        /// "Uploading screenshot..."
+        /// </summary>
+        public static LocalisableString UploadingScreenshot => new TranslatableString(getKey(@"uploading_screenshot"), @"Uploading screenshot...");
+
+        /// <summary>
+        /// "Screenshot uploaded! The link has been copied to the clipboard."
+        /// </summary>
+        public static LocalisableString ScreenshotUploadSuccess => new TranslatableString(getKey(@"screenshot_upload_success"), @"Screenshot uploaded! The link has been copied to the clipboard.");
+
+        /// <summary>
+        /// "Failed to upload screenshot."
+        /// </summary>
+        public static LocalisableString ScreenshotUploadFailure => new TranslatableString(getKey(@"screenshot_upload_failure"), @"Failed to upload screenshot.");
+
+        /// <summary>
+        /// "You are trying to upload screenshots too fast!"
+        /// </summary>
+        public static LocalisableString ScreenshotTooManyUploads => new TranslatableString(getKey(@"screenshot_too_many_uploads"), @"You are trying to upload screenshots too fast!");
 
         /// <summary>
         /// "The multiplayer server will be right back..."

@@ -40,14 +40,39 @@ namespace osu.Game.Localisation
         public static LocalisableString FooterButtonFreestyle => new TranslatableString(getKey(@"footer_button_freestyle"), @"Freestyle");
 
         /// <summary>
-        /// "{0} item(s)"
-        /// </summary>
-        public static LocalisableString PlaylistTrayItems(int count) => new TranslatableString(getKey(@"playlist_tray_items"), @"{0} item(s)", count);
-
-        /// <summary>
         /// "Manage items on previous screen"
         /// </summary>
         public static LocalisableString PlaylistTrayDescription => new TranslatableString(getKey(@"playlist_tray_description"), @"Manage items on previous screen");
+
+        /// <summary>
+        /// "Beatmap queue"
+        /// </summary>
+        public static LocalisableString MultiplayerBeatmapQueue => new TranslatableString(getKey(@"multiplayer_beatmap_queue"), @"Beatmap queue");
+
+        /// <summary>
+        /// "Progress"
+        /// </summary>
+        public static LocalisableString PlaylistProgress => new TranslatableString(getKey(@"playlist_progress"), @"Progress");
+
+        /// <summary>
+        /// "Leaderboard"
+        /// </summary>
+        public static LocalisableString PlaylistLeaderboard => new TranslatableString(getKey(@"playlist_leaderboard"), @"Leaderboard");
+
+        /// <summary>
+        /// "Difficulty"
+        /// </summary>
+        public static LocalisableString Difficulty => new TranslatableString(getKey(@"difficulty"), @"Difficulty");
+
+        /// <summary>
+        /// "Chat"
+        /// </summary>
+        public static LocalisableString Chat => new TranslatableString(getKey(@"chat"), @"Chat");
+
+        /// <summary>
+        /// "Close playlist"
+        /// </summary>
+        public static LocalisableString ClosePlaylist => new TranslatableString(getKey(@"close_playlist"), @"Close playlist");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

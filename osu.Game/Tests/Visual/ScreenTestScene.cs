@@ -10,7 +10,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
@@ -40,38 +42,50 @@ namespace osu.Game.Tests.Visual
             ScreenStackFooter screenStackFooter;
             ScreenFooter.BackReceptor backReceptor;
 
-            base.Content.AddRange(new Drawable[]
+            base.Content.Add(new ScalingContainer(ScalingMode.Everything)
             {
-                backReceptor = new ScreenFooter.BackReceptor(),
-                new PopoverContainer
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    backReceptor = new ScreenFooter.BackReceptor(),
+                    new PopoverContainer
                     {
-                        Stack = new OsuScreenStack
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            Name = nameof(ScreenTestScene),
-                            RelativeSizeAxes = Axes.Both
-                        },
-                        // TODO: is this ever used? it probably shouldn't be.
-                        content = new Container { RelativeSizeAxes = Axes.Both },
-                        overlayContent = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = DialogOverlay = new DialogOverlay()
-                        },
-                        screenStackFooter = new ScreenStackFooter(Stack, backReceptor)
-                        {
-                            BackButtonPressed = BackButtonPressed,
+                            Stack = new OsuScreenStack
+                            {
+                                Name = nameof(ScreenTestScene),
+                                RelativeSizeAxes = Axes.Both
+                            },
+                            // TODO: is this ever used? it probably shouldn't be.
+                            content = new Container { RelativeSizeAxes = Axes.Both },
+                            overlayContent = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = DialogOverlay = new DialogOverlay()
+                            },
+                            screenStackFooter = new ScreenStackFooter(Stack, backReceptor)
+                            {
+                                BackButtonPressed = BackButtonPressed,
+                            }
                         }
                     }
-                },
+                }
             });
 
             ScreenFooter = screenStackFooter.Footer;
-
             Stack.ScreenPushed += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");
             Stack.ScreenExited += (_, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed ← {newScreen}");
+        }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddSliderStep("ui scale", 0.8f, 1.6f, 1f, scale => config.SetValue(OsuSetting.UIScale, scale));
         }
 
         protected virtual void BackButtonPressed() => Stack.Exit();

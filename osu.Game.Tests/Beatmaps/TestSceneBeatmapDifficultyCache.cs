@@ -65,6 +65,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         [Test]
+        [FlakyTest] // one fix attempted in https://github.com/ppy/osu/pull/37178, didn't work
         public void TestInvalidationFlow()
         {
             BeatmapInfo postEditBeatmapInfo = null;

@@ -94,6 +94,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CurrentWorkingLayer => new TranslatableString(getKey(@"current_working_layer"), @"Current working layer");
 
+        /// <summary>
+        /// "Please navigate to a skinnable screen using the scene library"
+        /// </summary>
+        public static LocalisableString NavigateToSkinnableScreen => new TranslatableString(getKey(@"navigate_to_skinnable_screen"), @"Please navigate to a skinnable screen using the scene library");
+
+        /// <summary>
+        /// "Return to game"
+        /// </summary>
+        public static LocalisableString ReturnToGame => new TranslatableString(getKey(@"return_to_game"), @"Return to game");
+
+        /// <summary>
+        /// "Skin is mounted externally"
+        /// </summary>
+        public static LocalisableString SkinMountedExternally => new TranslatableString(getKey(@"skin_mounted_externally"), @"Skin is mounted externally");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

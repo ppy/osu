@@ -160,8 +160,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private partial class TestFreeModSelectOverlayScreen : OsuScreen
         {
-            public override bool ShowFooter => true;
-
             public FreeModSelectOverlay Overlay = null!;
             private IDisposable? overlayRegistration;
 
@@ -173,12 +171,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             [Cached]
             private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+            public TestFreeModSelectOverlayScreen()
+            {
+                FooterContent.Value = ScreenFooterContent.Argon(createFooterButtons);
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 LoadComponent(Overlay = new FreeModSelectOverlay
                 {
-                    SelectedMods = { BindTarget = FreeMods }
+                    SelectedMods = { BindTarget = FreeMods },
+                    Ruleset = { BindTarget = Ruleset }
                 });
             }
 
@@ -188,7 +192,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
             }
 
-            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() =>
+            private IReadOnlyList<ScreenFooterButton> createFooterButtons() =>
             [
                 new FooterButtonFreeMods(Overlay)
                 {

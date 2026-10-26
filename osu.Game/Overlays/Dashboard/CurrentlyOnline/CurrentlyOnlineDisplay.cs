@@ -18,6 +18,9 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
 {
     public partial class CurrentlyOnlineDisplay : CompositeDrawable
     {
+        public IBindable<bool> Loading => loading;
+        private readonly BindableBool loading = new BindableBool();
+
         /// <summary>
         /// The current state of the <see cref="DashboardOverlay"/>.
         /// Presence is only updated when this value is <see cref="Visibility.Visible"/>.
@@ -32,7 +35,6 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
         private Box background = null!;
         private UserListToolbar userListToolbar = null!;
         private Container<RealtimeUserList> listContainer = null!;
-        private LoadingLayer loading = null!;
         private BasicSearchTextBox searchTextBox = null!;
 
         private CancellationTokenSource? listLoadCancellation;
@@ -95,7 +97,7 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                                         PlaceholderText = HomeStrings.SearchPlaceholder,
                                     },
                                     Empty(),
-                                    userListToolbar = new UserListToolbar(false)
+                                    userListToolbar = new UserListToolbar(supportsBrickMode: false)
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
@@ -115,7 +117,6 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING }
                                 },
-                                loading = new LoadingLayer(true)
                             }
                         }
                     }
@@ -149,12 +150,12 @@ namespace osu.Game.Overlays.Dashboard.CurrentlyOnline
                 SearchText = { BindTarget = searchTextBox.Current }
             };
 
-            loading.Show();
+            loading.Value = true;
             LoadComponentAsync(newList, finishLoad, cancellationSource.Token);
 
             void finishLoad(RealtimeUserList list)
             {
-                loading.Hide();
+                loading.Value = false;
 
                 if (currentList != null)
                 {

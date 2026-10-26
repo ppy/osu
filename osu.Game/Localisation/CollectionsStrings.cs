@@ -5,7 +5,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Localisation
 {
-    public class CollectionsStrings
+    public static class CollectionsStrings
     {
         private const string prefix = @"osu.Game.Resources.Localisation.Collections";
 

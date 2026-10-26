@@ -23,18 +23,19 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly Box successRateBackground;
         private readonly Box background;
-        private readonly MetadataSection<string[]?> userTags;
+        private readonly MetadataSectionUserTags userTags;
 
         public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
         public readonly Bindable<APIBeatmap> Beatmap = new Bindable<APIBeatmap>();
 
         public Info()
         {
-            SuccessRate successRate;
             MetadataSectionNominators nominators;
-            MetadataSection source, mapperTags;
+            MetadataSectionSource source;
             MetadataSectionGenre genre;
             MetadataSectionLanguage language;
+            MetadataSectionMapperTags mapperTags;
+            SuccessRate successRate;
 
             RelativeSizeAxes = Axes.X;
             Height = base_height;
@@ -115,21 +116,21 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 nominators.Metadata = (b.NewValue?.CurrentNominations ?? Array.Empty<BeatmapSetOnlineNomination>(), b.NewValue?.RelatedUsers ?? Array.Empty<APIUser>());
                 source.Metadata = b.NewValue?.Source ?? string.Empty;
-                mapperTags.Metadata = b.NewValue?.Tags ?? string.Empty;
-                updateUserTags();
                 genre.Metadata = b.NewValue?.Genre ?? new BeatmapSetOnlineGenre { Id = (int)SearchGenre.Unspecified };
                 language.Metadata = b.NewValue?.Language ?? new BeatmapSetOnlineLanguage { Id = (int)SearchLanguage.Unspecified };
+                updateUserTags();
+                mapperTags.Metadata = b.NewValue?.Tags ?? string.Empty;
             });
             Beatmap.BindValueChanged(b =>
             {
-                successRate.Beatmap = b.NewValue;
                 updateUserTags();
+                successRate.Beatmap = b.NewValue;
             });
         }
 
         private void updateUserTags()
         {
-            userTags.Metadata = Beatmap.Value?.GetTopUserTags().Select(t => t.Tag.Name).ToArray();
+            userTags.Metadata = Beatmap.Value?.GetTopUserTags().Select(t => t.Tag.Name).ToArray() ?? Array.Empty<string>();
         }
 
         [BackgroundDependencyLoader]

@@ -8,7 +8,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// Contains information about the number of nominations required for a beatmap set.
     /// </summary>
-    public class BeatmapSetNominationRequiredMeta
+    public class BeatmapSetNominationStatusRequiredMeta
     {
         /// <summary>
         /// The number of nominations required for difficulties of the main ruleset.

@@ -33,14 +33,14 @@ namespace osu.Game.Graphics.Containers
         [Resolved]
         private GameHost host { get; set; }
 
-        public void AddLinks(string text, List<Link> links)
+        public void AddLinks(string text, List<Link> links, Action<SpriteText> creationParameters = null)
         {
             if (string.IsNullOrEmpty(text) || links == null)
                 return;
 
             if (links.Count == 0)
             {
-                AddText(text);
+                AddText(text, creationParameters);
                 return;
             }
 
@@ -56,16 +56,16 @@ namespace osu.Game.Graphics.Containers
                     continue;
                 }
 
-                AddText(text[previousLinkEnd..link.Index]);
+                AddText(text[previousLinkEnd..link.Index], creationParameters);
 
                 object linkArgument = link.Argument;
                 string tooltip = displayText == link.Url ? null : link.Url;
 
-                AddLink(displayText, link.Action, linkArgument, tooltip);
+                AddLink(displayText, link.Action, linkArgument, tooltip, creationParameters);
                 previousLinkEnd = link.Index + link.Length;
             }
 
-            AddText(text.Substring(previousLinkEnd));
+            AddText(text.Substring(previousLinkEnd), creationParameters);
         }
 
         public void AddLink(LocalisableString text, string url, Action<SpriteText> creationParameters = null) =>

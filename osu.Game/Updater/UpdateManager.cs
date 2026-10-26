@@ -56,15 +56,8 @@ namespace osu.Game.Updater
         {
             base.LoadComplete();
 
-            string version = game.Version;
-            string lastVersion = config.Get<string>(OsuSetting.Version);
-
             if (game.IsDeployedBuild)
             {
-                // only show a notification if we've previously saved a version to the config file (ie. not the first run).
-                if (!string.IsNullOrEmpty(lastVersion) && version != lastVersion)
-                    Notifications.Post(new UpdateCompleteNotification(version));
-
                 // make sure the release stream setting matches the build which was just run.
                 if (FixedReleaseStream != null)
                     config.SetValue(OsuSetting.ReleaseStream, FixedReleaseStream.Value);
@@ -79,10 +72,6 @@ namespace osu.Game.Updater
                 // this is only logged because a notification would be too spammy in local test builds.
                 Logger.Log(NotificationsStrings.NotOfficialBuild.ToString());
             }
-
-            // debug / local compilations will reset to a non-release string.
-            // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
-            config.SetValue(OsuSetting.Version, version);
 
             config.BindWith(OsuSetting.ReleaseStream, releaseStream);
             releaseStream.BindValueChanged(_ => CheckForUpdate());
@@ -139,31 +128,6 @@ namespace osu.Game.Updater
 
             updateCancellationSource.Cancel();
             updateCancellationSource.Dispose();
-        }
-
-        private partial class UpdateCompleteNotification : SimpleNotification
-        {
-            private readonly string version;
-
-            public UpdateCompleteNotification(string version)
-            {
-                this.version = version;
-                Text = NotificationsStrings.GameVersionAfterUpdate(version);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
-            {
-                Icon = FontAwesome.Solid.CheckSquare;
-                IconContent.Colour = colours.BlueDark;
-
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    changelog.ShowBuild(version);
-                    return true;
-                };
-            }
         }
 
         public partial class UpdateDownloadProgressNotification : ProgressNotification
@@ -261,6 +225,31 @@ namespace osu.Game.Updater
                 if (cancellationToken.IsCancellationRequested)
                     Close(false);
             }
+        }
+    }
+
+    public partial class UpdateCompleteNotification : SimpleNotification
+    {
+        private readonly string version;
+
+        public UpdateCompleteNotification(string version)
+        {
+            this.version = version;
+            Text = NotificationsStrings.GameVersionAfterUpdate(version);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, ChangelogOverlay changelog, INotificationOverlay notificationOverlay)
+        {
+            Icon = FontAwesome.Solid.CheckSquare;
+            IconContent.Colour = colours.BlueDark;
+
+            Activated = delegate
+            {
+                notificationOverlay.Hide();
+                changelog.ShowBuild(version);
+                return true;
+            };
         }
     }
 }

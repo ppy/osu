@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
             // As a fallback, calculate the maximum deviation from the average of the recent ratios to ensure slightly off-snapped objects don't bypass the penalty.
             double maxRatioDeviation = recentRatios.Max(r => Math.Abs(r - recentRatios.Average()));
 
-            double consistentRatioPenalty = 0.7 + 0.3 * DifficultyCalculationUtils.Smootherstep(maxRatioDeviation, 0.0, 1.0);
+            double consistentRatioPenalty = 0.7 + 0.3 * DiffUtils.Smootherstep(maxRatioDeviation, 0.0, 1.0);
 
             return consistentRatioPenalty;
         }
@@ -91,12 +91,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
         }
 
         private static double evaluateMonoStreakDifficulty(MonoStreak monoStreak) =>
-            DifficultyCalculationUtils.Logistic(exponent: Math.E * monoStreak.Index - 2 * Math.E) * evaluateAlternatingMonoPatternDifficulty(monoStreak.Parent) * 0.5;
+            DiffUtils.Logistic(exponent: Math.E * monoStreak.Index - 2 * Math.E) * evaluateAlternatingMonoPatternDifficulty(monoStreak.Parent) * 0.5;
 
         private static double evaluateAlternatingMonoPatternDifficulty(AlternatingMonoPattern alternatingMonoPattern) =>
-            DifficultyCalculationUtils.Logistic(exponent: Math.E * alternatingMonoPattern.Index - 2 * Math.E) * evaluateRepeatingHitPatternsDifficulty(alternatingMonoPattern.Parent);
+            DiffUtils.Logistic(exponent: Math.E * alternatingMonoPattern.Index - 2 * Math.E) * evaluateRepeatingHitPatternsDifficulty(alternatingMonoPattern.Parent);
 
         private static double evaluateRepeatingHitPatternsDifficulty(RepeatingHitPatterns repeatingHitPattern) =>
-            2 * (1 - DifficultyCalculationUtils.Logistic(exponent: Math.E * repeatingHitPattern.RepetitionInterval - 2 * Math.E));
+            2 * (1 - DiffUtils.Logistic(exponent: Math.E * repeatingHitPattern.RepetitionInterval - 2 * Math.E));
     }
 }

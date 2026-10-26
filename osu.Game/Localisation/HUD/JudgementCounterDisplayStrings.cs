@@ -12,38 +12,43 @@ namespace osu.Game.Localisation.HUD
         /// <summary>
         /// "Display mode"
         /// </summary>
-        public static LocalisableString JudgementDisplayMode => new TranslatableString(getKey(@"judgement_display_mode"), "Display mode");
+        public static LocalisableString JudgementDisplayMode => new TranslatableString(getKey(@"judgement_display_mode"), @"Display mode");
 
         /// <summary>
         /// "Counter direction"
         /// </summary>
-        public static LocalisableString FlowDirection => new TranslatableString(getKey(@"flow_direction"), "Counter direction");
+        public static LocalisableString FlowDirection => new TranslatableString(getKey(@"flow_direction"), @"Counter direction");
 
         /// <summary>
         /// "Show judgement names"
         /// </summary>
-        public static LocalisableString ShowJudgementNames => new TranslatableString(getKey(@"show_judgement_names"), "Show judgement names");
+        public static LocalisableString ShowJudgementNames => new TranslatableString(getKey(@"show_judgement_names"), @"Show judgement names");
 
         /// <summary>
         /// "Show max judgement"
         /// </summary>
-        public static LocalisableString ShowMaxJudgement => new TranslatableString(getKey(@"show_max_judgement"), "Show max judgement");
+        public static LocalisableString ShowMaxJudgement => new TranslatableString(getKey(@"show_max_judgement"), @"Show max judgement");
 
         /// <summary>
         /// "Simple"
         /// </summary>
-        public static LocalisableString JudgementDisplayModeSimple => new TranslatableString(getKey(@"judgement_display_mode_simple"), "Simple");
+        public static LocalisableString JudgementDisplayModeSimple => new TranslatableString(getKey(@"judgement_display_mode_simple"), @"Simple");
+
+        /// <summary>
+        /// "Misses only"
+        /// </summary>
+        public static LocalisableString JudgementDisplayModeMissesOnly => new TranslatableString(getKey(@"judgement_display_mode_misses_only"), @"Misses only");
 
         /// <summary>
         /// "Normal"
         /// </summary>
-        public static LocalisableString JudgementDisplayModeNormal => new TranslatableString(getKey(@"judgement_display_mode_normal"), "Normal");
+        public static LocalisableString JudgementDisplayModeNormal => new TranslatableString(getKey(@"judgement_display_mode_normal"), @"Normal");
 
         /// <summary>
         /// "All"
         /// </summary>
-        public static LocalisableString JudgementDisplayModeAll => new TranslatableString(getKey(@"judgement_display_mode_all"), "All");
+        public static LocalisableString JudgementDisplayModeAll => new TranslatableString(getKey(@"judgement_display_mode_all"), @"All");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

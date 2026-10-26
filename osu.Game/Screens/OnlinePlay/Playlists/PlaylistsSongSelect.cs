@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             ShowOsuLogo = false;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
-            LeftPadding = new MarginPadding { Top = CORNER_RADIUS_HIDE_OFFSET + Header.HEIGHT };
+            TopPadding = Header.HEIGHT - 10;
 
             addToPlaylistFooterButton = new AddToPlaylistFooterButton
             {
@@ -201,6 +201,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 return true;
 
             addToPlaylistFooterButton.Disappear().Expire();
+            freeModSelect.Hide();
             return false;
         }
 
@@ -228,7 +229,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override ModSelectOverlay CreateModSelectOverlay() => modSelect = new UserModSelectOverlay(OverlayColourScheme.Plum)
         {
-            IsValidMod = isValidRequiredMod
+            IsValidMod = isValidRequiredMod,
         };
 
         private PlaylistItem createItem() => new PlaylistItem(Beatmap.Value.BeatmapInfo)

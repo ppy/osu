@@ -6,7 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using osu.Desktop.Performance;
+using osu.Desktop.IPC;
 using osu.Desktop.Security;
 using osu.Framework.Platform;
 using osu.Game;
@@ -14,6 +14,7 @@ using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
 using osu.Game.Updater;
+using osu.Desktop.MacOS;
 using osu.Desktop.Windows;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
@@ -33,6 +34,8 @@ namespace osu.Desktop
         private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
 
         public bool IsFirstRun { get; init; }
+
+        public bool EnableWebSocketServer { get; init; }
 
         public OsuGameDesktop(string[]? args = null)
             : base(args)
@@ -106,12 +109,12 @@ namespace osu.Desktop
         protected override UpdateManager CreateUpdateManager()
         {
             // If this is the first time we've run the game, ie it is being installed,
-            // reset the user's release stream to "lazer".
+            // reset the user's release stream specified by the installation target.
             //
-            // This ensures that if a user is trying to recover from a failed startup on an unstable release stream,
-            // the game doesn't immediately try and update them back to the release stream after starting up.
+            // This ensures that if a user is trying to recover from a failed startup, it will keep them
+            // on the stream which is imminently being reinstalled.
             if (IsFirstRun)
-                LocalConfig.SetValue(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
+                LocalConfig.SetValue(OsuSetting.ReleaseStream, Version.Contains("-tachyon") ? ReleaseStream.Tachyon : ReleaseStream.Lazer);
 
             if (IsPackageManaged)
                 return new NoActionUpdateManager();
@@ -121,18 +124,38 @@ namespace osu.Desktop
 
         public override bool RestartAppWhenExited()
         {
+            if (IsPackageManaged || !IsDeployedBuild)
+                return false;
+
             RestartOnExitAction = () => Velopack.UpdateExe.Start(waitPid: (uint)Environment.ProcessId);
             return true;
         }
 
         protected override void LoadComplete()
         {
+            // this is done before `base.LoadComplete` so that the game can immediately register data sources.
+            if (EnableWebSocketServer)
+            {
+                var provider = new OsuWebSocketProvider();
+                Add(provider);
+                Dependencies.CacheAs<IWebSocketProvider>(provider);
+            }
+
             base.LoadComplete();
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
-            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                    LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+                    break;
+
+                case RuntimeInfo.Platform.macOS when !IsPackageManaged && IsDeployedBuild:
+                    if (!IsPackageManaged && IsDeployedBuild)
+                        LoadComponentAsync(new MacOSAppLocationChecker(), Add);
+                    break;
+            }
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 
