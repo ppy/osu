@@ -50,9 +50,9 @@ namespace osu.Game.Localisation
         public static LocalisableString BackgroundBlur => new TranslatableString(getKey(@"blur"), @"Background blur");
 
         /// <summary>
-        /// "Background scale mode"
+        /// "Background scaling mode"
         /// </summary>
-        public static LocalisableString BackgroundScaleMode => new TranslatableString(getKey(@"fill_mode"), @"Background scale mode");
+        public static LocalisableString BackgroundScalingMode => new TranslatableString(getKey(@"scaling_mode"), @"Background scaling mode");
 
         /// <summary>
         /// "Fill screen"

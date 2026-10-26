@@ -34,13 +34,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 }),
-                new SettingsItemV2(new FormEnumDropdown<BackgroundScaleMode>
+                new SettingsItemV2(new FormEnumDropdown<BackgroundScalingMode>
                 {
-                    Caption = GameplaySettingsStrings.BackgroundScaleMode,
-                    Current = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode),
+                    Caption = GameplaySettingsStrings.BackgroundScalingMode,
+                    Current = config.GetBindable<BackgroundScalingMode>(OsuSetting.BackgroundScalingMode),
                 })
                 {
-                    ApplyClassicDefault = c => ((IHasCurrentValue<BackgroundScaleMode>)c).Current.Value = BackgroundScaleMode.ScaleToFit,
+                    ApplyClassicDefault = c => ((IHasCurrentValue<BackgroundScalingMode>)c).Current.Value = BackgroundScalingMode.ScaleToFit,
                 },
                 new SettingsItemV2(new FormCheckBox
                 {

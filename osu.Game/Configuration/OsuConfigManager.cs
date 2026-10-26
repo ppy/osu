@@ -68,8 +68,6 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.SongSelectBackgroundBlur, false);
 
-            SetDefault(OsuSetting.BackgroundScaleMode, BackgroundScaleMode.ScaleToFill);
-
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
@@ -149,6 +147,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1, 0.01f);
             SetDefault(OsuSetting.DimLevel, 0.7, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
+            SetDefault(OsuSetting.BackgroundScalingMode, BackgroundScalingMode.ScaleToFill);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
 
             SetDefault(OsuSetting.HitLighting, true);
@@ -344,6 +343,7 @@ namespace osu.Game.Configuration
         GameplayCursorDuringTouch,
         DimLevel,
         BlurLevel,
+        BackgroundScalingMode,
         EditorDim,
         LightenDuringBreaks,
         ShowStoryboard,
@@ -400,7 +400,6 @@ namespace osu.Game.Configuration
         BeatmapListingCardSize,
         ToolbarClockDisplayMode,
         SongSelectBackgroundBlur,
-        BackgroundScaleMode,
         Version,
         ShowFirstRunSetup,
         ShowConvertedBeatmaps,

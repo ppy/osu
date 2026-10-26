@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -22,117 +21,120 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
-        private Bindable<BackgroundScaleMode> scaleMode { get; set; }
+        private readonly Container letterboxContainer;
 
-        private readonly Bindable<float> letterboxWidth = new Bindable<float>();
+        private readonly Box topLetterbox;
+        private readonly Box rightLetterbox;
+        private readonly Box bottomLetterbox;
+        private readonly Box leftLetterbox;
 
-        private readonly Bindable<float> letterboxHeight = new Bindable<float>();
+        private IBindable<BackgroundScalingMode> scalingMode = null!;
 
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
 
-            Box leftLetterbox;
-            Box rightLetterbox;
-            Box topLetterbox;
-            Box bottomLetterbox;
-
-            AddInternal(new Container
+            AddInternal(letterboxContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Alpha = 0,
                 Children = new Drawable[]
                 {
-                    leftLetterbox = new Box
+                    topLetterbox = new Box
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                     },
                     rightLetterbox = new Box
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
-                    topLetterbox = new Box
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                     },
                     bottomLetterbox = new Box
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    }
+                        Colour = Colour4.Black,
+                    },
+                    leftLetterbox = new Box
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Black,
+                    },
                 }
             });
-
-            letterboxWidth.BindValueChanged(margin =>
-            {
-                leftLetterbox.ResizeWidthTo(margin.NewValue);
-                rightLetterbox.ResizeWidthTo(margin.NewValue);
-            }, true);
-
-            letterboxHeight.BindValueChanged(margin =>
-            {
-                topLetterbox.ResizeHeightTo(margin.NewValue);
-                bottomLetterbox.ResizeHeightTo(margin.NewValue);
-            }, true);
         }
 
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures, OsuConfigManager config)
         {
-            scaleMode = config.GetBindable<BackgroundScaleMode>(OsuSetting.BackgroundScaleMode);
-
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
+            scalingMode = config.GetBindable<BackgroundScalingMode>(OsuSetting.BackgroundScalingMode);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            scaleMode.BindValueChanged(_ => updateBackgroundScaleMode(), true);
+            scalingMode.BindValueChanged(_ => updateDisplay(), true);
         }
 
-        private void updateBackgroundScaleMode()
+        protected override void Update()
         {
-            switch (scaleMode.Value)
+            base.Update();
+
+            if (scalingMode.Value == BackgroundScalingMode.ScaleToFit)
+                updateLetterboxDimensions();
+        }
+
+        private void updateDisplay()
+        {
+            switch (scalingMode.Value)
             {
-                case BackgroundScaleMode.ScaleToFill:
+                case BackgroundScalingMode.ScaleToFill:
                     Sprite.FillMode = FillMode.Fill;
 
-                    letterboxWidth.Value = 0f;
-                    letterboxHeight.Value = 0f;
+                    letterboxContainer.Hide();
+                    updateLetterboxDimensions(reset: true);
                     break;
 
-                case BackgroundScaleMode.ScaleToFit:
+                case BackgroundScalingMode.ScaleToFit:
                     Sprite.FillMode = FillMode.Fit;
 
-                    if (DrawWidth > Sprite.DrawWidth)
-                        letterboxWidth.Value = (DrawWidth - Sprite.DrawWidth) / DrawWidth / 2f;
-                    else
-                        letterboxWidth.Value = 0f;
-
-                    if (DrawHeight > Sprite.DrawHeight)
-                        letterboxHeight.Value = (DrawHeight - Sprite.DrawHeight) / DrawHeight / 2f;
-                    else
-                        letterboxHeight.Value = 0f;
-
+                    letterboxContainer.Show();
+                    updateLetterboxDimensions();
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(scaleMode), scaleMode, null);
+                    throw new ArgumentOutOfRangeException();
             }
 
             BufferedContainer?.ForceRedraw();
+        }
+
+        private void updateLetterboxDimensions(bool reset = false)
+        {
+            float letterboxWidth = 0f;
+            float letterboxHeight = 0f;
+
+            if (!reset)
+            {
+                letterboxWidth = Math.Max(0f, (DrawWidth - Sprite.DrawWidth) / DrawWidth) / 2;
+                letterboxHeight = Math.Max(0f, (DrawHeight - Sprite.DrawHeight) / DrawHeight) / 2;
+            }
+
+            topLetterbox.Height = letterboxHeight;
+            rightLetterbox.Width = letterboxWidth;
+            bottomLetterbox.Height = letterboxHeight;
+            leftLetterbox.Width = letterboxWidth;
         }
 
         public override bool Equals(Background other)
