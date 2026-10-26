@@ -90,9 +90,14 @@ namespace osu.Game.Tests.Visual.Background
 
         public override void SetUpSteps()
         {
+            SetUpStepsWithBlur();
+        }
+
+        public void SetUpStepsWithBlur(bool allowBlur = true)
+        {
             base.SetUpSteps();
 
-            AddStep("push song select", () => Stack.Push(songSelect = new DummySongSelect()));
+            AddStep("push song select", () => Stack.Push(songSelect = new DummySongSelect(allowBlur)));
         }
 
         /// <summary>
@@ -321,9 +326,7 @@ namespace osu.Game.Tests.Visual.Background
         [Test]
         public void TestDimmingHandlers()
         {
-            AddStep("Disallow blurring", () => TestBeatmapBackground.AllowBlur = false);
-
-            SetUpSteps();
+            SetUpStepsWithBlur(false);
 
             performFullSetup();
 
@@ -331,9 +334,7 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("BufferedContainer is not initialized", () => songSelect.IsBufferedContainerNull());
             AddUntilStep("Sprite is dimmed", () => songSelect.IsSpriteDimmed());
 
-            AddStep("Allow blurring", () => TestBeatmapBackground.AllowBlur = true);
-
-            SetUpSteps();
+            SetUpStepsWithBlur(true);
 
             performFullSetup();
 
@@ -436,9 +437,7 @@ namespace osu.Game.Tests.Visual.Background
         [Test]
         public void TestDimmingOffsetSources()
         {
-            AddStep("Disallow blurring", () => TestBeatmapBackground.AllowBlur = false);
-
-            SetUpSteps();
+            SetUpStepsWithBlur(false);
 
             performFullSetup();
 
@@ -446,9 +445,7 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("BufferedContainer is not initialized", () => songSelect.IsBufferedContainerNull());
             AddUntilStep("Sprite's offset source is DimmableBackground", () => songSelect.IsSpritesOffsetSourceDimmableBackground());
 
-            AddStep("Allow blurring", () => TestBeatmapBackground.AllowBlur = true);
-
-            SetUpSteps();
+            SetUpStepsWithBlur(true);
 
             performFullSetup();
 
@@ -656,11 +653,12 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class DummySongSelect : SoloSongSelect
         {
+            private bool allowBlur;
             private FadeAccessibleBackground background;
 
             protected override BackgroundScreen CreateBackground()
             {
-                background = new FadeAccessibleBackground(Beatmap.Value);
+                background = new FadeAccessibleBackground(Beatmap.Value, allowBlur);
                 IgnoreUserSettings.BindTo(background.IgnoreUserSettings);
                 return background;
             }
@@ -671,6 +669,11 @@ namespace osu.Game.Tests.Visual.Background
             public readonly Bindable<double> DimColour = new BindableDouble();
 
             public BeatmapCarousel Carousel => this.ChildrenOfType<BeatmapCarousel>().SingleOrDefault();
+
+            public DummySongSelect(bool allowBlur = true)
+            {
+                this.allowBlur = allowBlur;
+            }
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -865,7 +868,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
-            protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
+            protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap, allowBlur);
 
             // CurrentColour can be used to track how much the texture was dimmed, and
             // CurrentColourOffset can be used to track how much colour was added as an offset.
@@ -915,9 +918,12 @@ namespace osu.Game.Tests.Visual.Background
 
             private TestBeatmapBackground beatmapBackground;
 
-            public FadeAccessibleBackground(WorkingBeatmap beatmap)
+            private bool allowBlur;
+
+            public FadeAccessibleBackground(WorkingBeatmap beatmap, bool allowBlur = true)
                 : base(beatmap)
             {
+                this.allowBlur = allowBlur;
             }
         }
 
@@ -945,7 +951,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestBeatmapBackground : BeatmapBackground
         {
-            public static bool AllowBlur = true;
+            private bool allowBlur;
 
             public Colour4 CurrentColour => ColouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? ColouredDimmableSprite.DrawColourInfo.Colour;
 
@@ -963,9 +969,10 @@ namespace osu.Game.Tests.Visual.Background
 
             private TestDimmableBufferedContainer dimmableBufferedContainer;
 
-            public TestBeatmapBackground(WorkingBeatmap beatmap)
+            public TestBeatmapBackground(WorkingBeatmap beatmap, bool allowBlur = true)
                 : base(beatmap)
             {
+                this.allowBlur = allowBlur;
             }
 
             public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableBufferedContainer.ColouredDimmableHelper.Source, source);
@@ -976,7 +983,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public override void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
             {
-                if (AllowBlur)
+                if (allowBlur)
                 {
                     base.BlurTo(newBlurSigma, duration, easing);
                 }
