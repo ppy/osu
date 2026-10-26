@@ -14,7 +14,6 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Screens.Footer;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface

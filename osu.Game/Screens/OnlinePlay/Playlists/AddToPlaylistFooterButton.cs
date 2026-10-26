@@ -5,8 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Screens.Footer;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
