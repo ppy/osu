@@ -245,6 +245,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             if (client.IsNotNull())
             {
+                client.MatchmakingQueueStatusChanged -= onMatchmakingQueueStatusChanged;
                 client.RoomUpdated -= onRoomUpdated;
                 client.MatchmakingQueueJoined -= onMatchmakingQueueJoined;
                 client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;
