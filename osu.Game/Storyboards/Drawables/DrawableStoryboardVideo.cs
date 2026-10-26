@@ -136,7 +136,7 @@ namespace osu.Game.Storyboards.Drawables
 
             public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
 
-            protected override VideoSprite CreateSprite() => new DrawableVideoSprite(this);
+            protected override VideoSprite CreateSprite() => new DrawableVideoSprite(this) { RelativeSizeAxes = Axes.Both };
 
             public DrawableVideo(Stream stream, bool startAtCurrentTime = true)
                 : base(stream, startAtCurrentTime)
