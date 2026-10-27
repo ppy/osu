@@ -7,7 +7,7 @@ using osu.Framework.Layout;
 
 namespace osu.Game.Graphics
 {
-    public partial class ColouredDimmableHelper
+    public class ColouredDimmableHelper
     {
         private Drawable owner;
 
