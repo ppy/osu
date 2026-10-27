@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("open create screen", () =>
             {
-                InputManager.MoveMouseTo(playlistScreen.ChildrenOfType<CreatePlaylistsRoomButton>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<CreatePlaylistsRoomButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
