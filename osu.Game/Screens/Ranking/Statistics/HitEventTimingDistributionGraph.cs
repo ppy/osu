@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
@@ -119,7 +120,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             else
             {
                 for (int i = 0; i < barDrawables.Length; i++)
-                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value));
+                    barDrawables[i].UpdateOffset(bins[i].Sum(b => b.Value), !Precision.AlmostEquals(hitOffset, 0));
             }
         }
 
@@ -170,6 +171,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "0",
+                Colour = Color4.Pink,
+                Y = 2,
                 Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold)
             });
 
@@ -208,7 +211,6 @@ namespace osu.Game.Screens.Ranking.Statistics
             private readonly IReadOnlyList<KeyValuePair<HitResult, int>> values;
             private readonly float maxValue;
             private readonly bool isCentre;
-            private readonly float totalValue;
 
             private const float minimum_height = 0.02f;
 
@@ -219,6 +221,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             private Circle? boxAdjustment;
 
             private float? lastDrawHeight;
+            private bool hasHitOffset;
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
@@ -230,11 +233,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 this.values = values.OrderBy(v => v.Key.GetIndexForOrderedDisplay()).ToList();
                 this.maxValue = maxValue;
                 this.isCentre = isCentre;
-                totalValue = values.Sum(v => v.Value);
-                offsetAdjustment = totalValue;
+                offsetAdjustment = values.Sum(v => v.Value);
 
                 RelativeSizeAxes = Axes.Both;
-                Masking = true;
             }
 
             [BackgroundDependencyLoader]
@@ -270,6 +271,32 @@ namespace osu.Game.Screens.Ranking.Statistics
                         }
                     };
                 }
+
+                if (isCentre)
+                {
+                    AddInternal(new Circle
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = Color4.Pink,
+                        Depth = float.MinValue,
+                        Width = 1,
+                        Y = -1,
+                        Height = 4,
+                    });
+
+                    AddInternal(new Circle
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.TopCentre,
+                        Colour = Color4.Pink,
+                        Depth = float.MinValue,
+                        Width = 1,
+                        Height = 4,
+                    });
+                }
             }
 
             protected override void LoadComplete()
@@ -290,21 +317,16 @@ namespace osu.Game.Screens.Ranking.Statistics
                 return base.OnInvalidate(invalidation, source);
             }
 
-            public void UpdateOffset(float adjustment)
+            public void UpdateOffset(float adjustment, bool hasHitOffset)
             {
-                bool hasAdjustment = adjustment != totalValue;
-
                 if (boxAdjustment == null)
                 {
-                    if (!hasAdjustment)
-                        return;
-
                     AddInternal(boxAdjustment = new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Colour = Color4.Yellow,
+                        Colour = Color4.Red,
                         Blending = BlendingParameters.Additive,
                         Alpha = 0.6f,
                         Height = 0,
@@ -312,6 +334,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
 
                 offsetAdjustment = adjustment;
+                this.hasHitOffset = hasHitOffset;
 
                 Scheduler.AddOnce(updateMetrics, true);
             }
@@ -342,10 +365,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             private void drawAdjustmentBar()
             {
-                bool hasAdjustment = offsetAdjustment != totalValue;
-
                 boxAdjustment.ResizeHeightTo(heightForValue(offsetAdjustment), duration, Easing.OutQuint);
-                boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
+                boxAdjustment.FadeTo(hasHitOffset ? 1 : 0, duration, Easing.OutQuint);
             }
 
             private float offsetForValue(float value) => maxValue == 0 ? 0 : (1 - minimum_height) * value / maxValue;

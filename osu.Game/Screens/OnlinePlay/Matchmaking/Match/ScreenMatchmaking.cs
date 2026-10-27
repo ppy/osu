@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -55,8 +54,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
         public override bool? ApplyModTrackAdjustments => true;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
-
-        public override bool ShowFooter => true;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
@@ -122,6 +119,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                 },
                 Alpha = 0
             };
+
+            FooterContent.Value = ScreenFooterContent.Argon(() =>
+            [
+                new HistoryFooterButton(this.room)
+            ]);
         }
 
         [BackgroundDependencyLoader]
@@ -335,11 +337,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
 
             return false;
         }
-
-        public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() =>
-        [
-            new HistoryFooterButton(room)
-        ];
 
         public override void OnEntering(ScreenTransitionEvent e)
         {

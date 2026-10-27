@@ -44,6 +44,11 @@ namespace osu.Game.Scoring
         long LegacyOnlineID { get; }
 
         /// <summary>
+        /// Whether this score is a legacy (stable) score.
+        /// </summary>
+        bool IsLegacyScore => LegacyOnlineID > 0;
+
+        /// <summary>
         /// The date on which this score was set.
         /// </summary>
         DateTimeOffset Date { get; }
