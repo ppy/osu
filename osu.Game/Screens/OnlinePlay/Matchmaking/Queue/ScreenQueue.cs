@@ -385,7 +385,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
 
             currentState.BindTo(queue.CurrentState);
-            currentState.BindValueChanged(s => SetState(s.NewValue));
+            currentState.BindValueChanged(_ => onStateChanged());
 
             selectedPool.BindTo(queue.SelectedPool);
             selectedPool.BindValueChanged(_ => refreshLobbyData());
@@ -505,7 +505,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             queue.SearchInForeground();
 
             using (BeginDelayedSequence(800))
-                Schedule(() => SetState(currentState.Value));
+                Schedule(onStateChanged);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -549,7 +549,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             }
         }
 
-        public void SetState(MatchmakingScreenState newState)
+        private void onStateChanged()
         {
             mainContent.FadeInFromZero(500, Easing.OutQuint);
             mainContent.Clear();
@@ -560,7 +560,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             pushScreenDelegate?.Cancel();
             pushScreenDelegate = null;
 
-            switch (newState)
+            switch (currentState.Value)
             {
                 case MatchmakingScreenState.Idle:
                     LinkFlowContainer duelHint;
@@ -670,7 +670,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 case MatchmakingScreenState.PendingAccept:
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
 
                     matchFoundSample?.Play();
                     music.DuckMomentarily(1250);
@@ -731,7 +730,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             if (client.Room == null)
                             {
                                 Logger.Log("Room became null, returning to idle");
-                                SetState(MatchmakingScreenState.Idle);
+                                queue.CurrentState.Value = MatchmakingScreenState.Idle;
                                 return;
                             }
 
@@ -751,7 +750,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
+                    throw new ArgumentOutOfRangeException(nameof(currentState), currentState.Value, null);
             }
         }
 
