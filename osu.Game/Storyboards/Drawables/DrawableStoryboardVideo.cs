@@ -48,12 +48,14 @@ namespace osu.Game.Storyboards.Drawables
             if (stream == null)
                 return;
 
-            InternalChild = drawableVideo = CreateDrawableVideo(stream, false);
-            drawableVideo.RelativeSizeAxes = RelativeSizeAxes;
-            drawableVideo.FillMode = FillMode.Fill;
-            drawableVideo.Anchor = Anchor.Centre;
-            drawableVideo.Origin = Anchor.Centre;
-            drawableVideo.Alpha = 0;
+            InternalChild = drawableVideo = new DrawableVideo(stream, false)
+            {
+                RelativeSizeAxes = RelativeSizeAxes,
+                FillMode = FillMode.Fill,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Alpha = 0,
+            };
 
             Video.ApplyTransforms(drawableVideo, triggerController);
         }
@@ -75,9 +77,7 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        protected virtual DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => new DrawableVideo(stream, startAtCurrentTime);
-
-        protected partial class DrawableVideo : Video, IFlippable, IVectorScalable
+        private partial class DrawableVideo : Video, IFlippable, IVectorScalable
         {
             private bool flipH;
 
