@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Utils;
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.RankingV2.Extended
         private IBindable<ScoreBasedUserStatisticsUpdate?> statisticsUpdate { get; set; } = null!;
 
         public GlobalStatisticsUpdatePanel()
-            : base("Overall Ranking")
+            : base(ResultsScreenStrings.GlobalStatisticsUpdatePanelHeader)
         {
         }
 

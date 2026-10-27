@@ -84,6 +84,16 @@ Unstable Rate: {2:0.00}", earlyAverage, lateAverage, unstableRate);
         /// </summary>
         public static LocalisableString ModScoreMultiplierCaption => new TranslatableString(getKey(@"mod_score_multiplier_caption"), @"Multiplier");
 
+        /// <summary>
+        /// "Overall Ranking"
+        /// </summary>
+        public static LocalisableString GlobalStatisticsUpdatePanelHeader => new TranslatableString(getKey(@"global_statistics_update_panel_header"), @"Overall Ranking");
+
+        /// <summary>
+        /// "Timing"
+        /// </summary>
+        public static LocalisableString TimingStatisticsPanelHeader => new TranslatableString(getKey(@"timing_statistics_panel_header"), @"Timing");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
