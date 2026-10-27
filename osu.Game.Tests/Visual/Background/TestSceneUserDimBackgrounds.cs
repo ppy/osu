@@ -1018,30 +1018,39 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestStoryboard : Storyboard
         {
-            private readonly TestStoryboardSprite testStoryboardSprite;
-            private readonly TestStoryboardSprite testStoryboardAdditiveSprite;
-            private readonly TestStoryboardAnimation testStoryboardAnimation;
-            private readonly TestStoryboardVideo testStoryboardVideo;
+            private readonly StoryboardSprite testStoryboardSprite;
+            private readonly StoryboardSprite testStoryboardAdditiveSprite;
+            private readonly StoryboardAnimation testStoryboardAnimation;
+            private readonly StoryboardVideo testStoryboardVideo;
+
+            private TestDrawableStoryboard testDrawableStoryboard;
 
             public TestStoryboard()
             {
-                GetLayer("Foreground").Add(testStoryboardSprite = new TestStoryboardSprite(
+                GetLayer("Foreground").Add(testStoryboardSprite = new StoryboardSprite(
                     source: StoryboardElementSource.Beatmap,
                     path: "Resources/Textures/test-image.png",
                     origin: Anchor.Centre,
-                    initialPosition: new Vector2(200, 200),
-                    additiveBlending: false
+                    initialPosition: new Vector2(200, 200)
                 ));
+                testStoryboardSprite.Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
 
-                GetLayer("Foreground").Add(testStoryboardAdditiveSprite = new TestStoryboardSprite(
+                GetLayer("Foreground").Add(testStoryboardAdditiveSprite = new StoryboardSprite(
                     source: StoryboardElementSource.Beatmap,
                     path: "Resources/Textures/test-image.png",
                     origin: Anchor.Centre,
-                    initialPosition: new Vector2(500, 200),
-                    additiveBlending: true
+                    initialPosition: new Vector2(500, 200)
                 ));
+                testStoryboardAdditiveSprite.Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
+                testStoryboardAdditiveSprite.Commands.AddBlendingParameters(
+                    Easing.None,
+                    -3000,
+                    -3000,
+                    BlendingParameters.Additive,
+                    BlendingParameters.Additive
+                );
 
-                GetLayer("Foreground").Add(testStoryboardAnimation = new TestStoryboardAnimation(
+                GetLayer("Foreground").Add(testStoryboardAnimation = new StoryboardAnimation(
                     source: StoryboardElementSource.Beatmap,
                     path: "Resources/Textures/test-image.png",
                     origin: Anchor.Centre,
@@ -1050,29 +1059,41 @@ namespace osu.Game.Tests.Visual.Background
                     frameDelay: 1000 / 60f,
                     loopType: AnimationLoopType.LoopForever
                 ));
+                testStoryboardAnimation.Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
 
-                GetLayer("Video").Add(testStoryboardVideo = new TestStoryboardVideo(
+                GetLayer("Video").Add(testStoryboardVideo = new StoryboardVideo(
                     source: StoryboardElementSource.Beatmap,
                     path: "Resources/Videos/test-video.mp4",
                     offset: 0
                 ));
+                testStoryboardVideo.Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
             }
 
-            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => testStoryboardSprite.IsOffsetSource(source);
+            private DrawableStoryboardSprite drawableSprite => testDrawableStoryboard.ChildrenOfType<DrawableStoryboardSprite>().Single(d => d.Sprite == testStoryboardSprite);
 
-            public bool IsAdditiveSpritesOffsetSource(IColouredDimmableSource source) => testStoryboardAdditiveSprite.IsOffsetSource(source);
+            private DrawableStoryboardSprite drawableAdditiveSprite => testDrawableStoryboard.ChildrenOfType<DrawableStoryboardSprite>().Single(d => d.Sprite == testStoryboardAdditiveSprite);
 
-            public bool IsAnimationsOffsetSource(IColouredDimmableSource source) => testStoryboardAnimation.IsOffsetSource(source);
+            private DrawableStoryboardAnimation drawableAnimation => testDrawableStoryboard.ChildrenOfType<DrawableStoryboardAnimation>().Single(d => d.Animation == testStoryboardAnimation);
 
-            public bool IsVideosOffsetSource(IColouredDimmableSource source) => testStoryboardVideo.IsOffsetSource(source);
+            private ColouredDimmableSprite drawableAnimationSprite => drawableAnimation.ChildrenOfType<ColouredDimmableSprite>().Single();
 
-            public bool IsSpriteUsingShader(IShader shader) => testStoryboardSprite.IsUsingShader(shader);
+            private ColouredDimmableVideoSprite drawableVideoSprite => testDrawableStoryboard.ChildrenOfType<ColouredDimmableVideoSprite>().Single();
 
-            public bool IsAdditiveSpriteUsingShader(IShader shader) => testStoryboardAdditiveSprite.IsUsingShader(shader);
+            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableSprite.ColouredDimmableHelper.Source, source);
+
+            public bool IsAdditiveSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableAdditiveSprite.ColouredDimmableHelper.Source, source);
+
+            public bool IsAnimationsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableAnimationSprite.ColouredDimmableHelper.Source, source);
+
+            public bool IsVideosOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableVideoSprite.ColouredDimmableHelper.Source, source);
+
+            public bool IsSpriteUsingShader(IShader shader) => shader != null && ReferenceEquals(shader, drawableSprite.TextureShader);
+
+            public bool IsAdditiveSpriteUsingShader(IShader shader) => shader != null && ReferenceEquals(shader, drawableAdditiveSprite.TextureShader);
 
             public override DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null)
             {
-                return new TestDrawableStoryboard(this, mods);
+                return testDrawableStoryboard = new TestDrawableStoryboard(this, mods);
             }
 
             private partial class TestDrawableStoryboard : DrawableStoryboard
@@ -1102,112 +1123,6 @@ namespace osu.Game.Tests.Visual.Background
                     public Stream GetStream(string name) => store.GetStream(name);
 
                     public IEnumerable<string> GetAvailableResources() => store.GetAvailableResources();
-                }
-            }
-        }
-
-        public partial class TestDrawableStoryboardSprite : DrawableStoryboardSprite
-        {
-
-            public TestDrawableStoryboardSprite(StoryboardSprite sprite)
-            : base(sprite)
-            {
-
-            }
-
-            public bool IsUsingShader(IShader shader) => shader != null && ReferenceEquals(shader, TextureShader);
-        }
-
-        private partial class TestStoryboardSprite : StoryboardSprite
-        {
-            private TestDrawableStoryboardSprite drawableStoryboardSprite;
-            private readonly bool additiveBlending;
-
-            public TestStoryboardSprite(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition, bool additiveBlending)
-                : base(source, path, origin, initialPosition)
-            {
-                this.additiveBlending = additiveBlending;
-                Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
-            }
-
-            public bool IsUsingShader(IShader shader) => drawableStoryboardSprite.IsUsingShader(shader);
-
-            public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableStoryboardSprite.ColouredDimmableHelper.Source, source);
-
-            public override Drawable CreateDrawable() => drawableStoryboardSprite = new TestDrawableStoryboardSprite(this)
-            {
-                Blending = additiveBlending ? BlendingParameters.Additive : BlendingParameters.None
-            };
-        }
-
-        private partial class TestStoryboardAnimation : StoryboardAnimation
-        {
-            private TestDrawableStoryboardAnimation testDrawableStoryboardAnimation;
-
-            public TestStoryboardAnimation(StoryboardElementSource source, string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
-                : base(source, path, origin, initialPosition, frameCount, frameDelay, loopType)
-            {
-                Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
-            }
-
-            public bool IsOffsetSource(IColouredDimmableSource source) => testDrawableStoryboardAnimation.IsOffsetSource(source);
-
-            public override Drawable CreateDrawable() => testDrawableStoryboardAnimation = new TestDrawableStoryboardAnimation(this);
-
-            public partial class TestDrawableStoryboardAnimation : DrawableStoryboardAnimation
-            {
-                private ColouredDimmableSprite dimmableSprite;
-
-                public TestDrawableStoryboardAnimation(StoryboardAnimation storyboardAnimation)
-                    : base(storyboardAnimation)
-                {
-                }
-
-                public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableSprite.ColouredDimmableHelper.Source, source);
-
-                protected override Sprite CreateSprite() => dimmableSprite = new ColouredDimmableSprite();
-            }
-        }
-
-        private partial class TestStoryboardVideo : StoryboardVideo
-        {
-            private TestDrawableStoryboardVideo testDrawableStoryboardVideo;
-
-            public TestStoryboardVideo(StoryboardElementSource source, string path, double offset)
-                : base(source, path, offset)
-            {
-                Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
-            }
-
-            public bool IsOffsetSource(IColouredDimmableSource source) => testDrawableStoryboardVideo.IsOffsetSource(source);
-
-            public override Drawable CreateDrawable() => testDrawableStoryboardVideo = new TestDrawableStoryboardVideo(this);
-
-            public partial class TestDrawableStoryboardVideo : DrawableStoryboardVideo
-            {
-                private TestDrawableVideo testDrawableVideo;
-
-                public TestDrawableStoryboardVideo(StoryboardVideo storyboardVideo)
-                    : base(storyboardVideo)
-                {
-                }
-
-                public bool IsOffsetSource(IColouredDimmableSource source) => testDrawableVideo.IsOffsetSource(source);
-
-                protected override DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => testDrawableVideo = new TestDrawableVideo(stream, startAtCurrentTime);
-
-                protected partial class TestDrawableVideo : DrawableVideo
-                {
-                    private ColouredDimmableVideoSprite colouredDimmableVideoSprite;
-
-                    public TestDrawableVideo(Stream stream, bool startAtCurrentTime)
-                        : base(stream, startAtCurrentTime)
-                    {
-                    }
-
-                    public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableVideoSprite.ColouredDimmableHelper.Source, source);
-
-                    protected override VideoSprite CreateSprite() => colouredDimmableVideoSprite = new ColouredDimmableVideoSprite(this);
                 }
             }
         }
