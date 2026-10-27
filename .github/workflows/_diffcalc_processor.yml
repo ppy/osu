@@ -210,9 +210,7 @@ jobs:
 
           cd "${{ env.GENERATOR_DIR }}"
 
-          docker compose up --build --detach --abort-on-container-failure
-          docker compose logs --follow &
-          docker compose wait generator
+          docker compose up --build --abort-on-container-failure --exit-code-from generator
 
           link=$(docker compose logs --tail 10 generator | grep 'http' | sed -E 's/^.*(http.*)$/\1/')
           target=$(cat "${{ env.GENERATOR_ENV }}" | grep -E '^OSU_B=' | cut -d '=' -f2-)
