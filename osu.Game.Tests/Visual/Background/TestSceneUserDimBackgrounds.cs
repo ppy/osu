@@ -866,7 +866,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
+            protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground();
 
             protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
 
@@ -983,12 +983,7 @@ namespace osu.Game.Tests.Visual.Background
 
             protected override BufferedContainer CreateBufferedContainer()
             {
-                return ColouredDimmableBufferedContainer = dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RedrawOnScale = false,
-                    Child = Sprite,
-                };
+                return ColouredDimmableBufferedContainer = dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: true);
             }
         }
 
@@ -1170,12 +1165,7 @@ namespace osu.Game.Tests.Visual.Background
 
                 public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableSprite.ColouredDimmableHelper.Source, source);
 
-                protected override Sprite CreateSprite() => dimmableSprite = new ColouredDimmableSprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                };
+                protected override Sprite CreateSprite() => dimmableSprite = new ColouredDimmableSprite();
             }
         }
 
@@ -1204,14 +1194,7 @@ namespace osu.Game.Tests.Visual.Background
 
                 public bool IsOffsetSource(IColouredDimmableSource source) => testDrawableVideo.IsOffsetSource(source);
 
-                protected override DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => testDrawableVideo = new TestDrawableVideo(stream, startAtCurrentTime)
-                {
-                    RelativeSizeAxes = RelativeSizeAxes,
-                    FillMode = FillMode.Fill,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0,
-                };
+                protected override DrawableVideo CreateDrawableVideo(Stream stream, bool startAtCurrentTime) => testDrawableVideo = new TestDrawableVideo(stream, startAtCurrentTime);
 
                 protected partial class TestDrawableVideo : DrawableVideo
                 {

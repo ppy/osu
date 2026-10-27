@@ -69,12 +69,7 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
-        protected override Sprite CreateSprite() => new ColouredDimmableSprite
-        {
-            RelativeSizeAxes = Axes.Both,
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-        };
+        protected override Sprite CreateSprite() => new ColouredDimmableSprite();
 
         public override bool RemoveWhenNotAlive => false;
 

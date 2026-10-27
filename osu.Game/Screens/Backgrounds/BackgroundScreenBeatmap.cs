@@ -55,13 +55,14 @@ namespace osu.Game.Screens.Backgrounds
 
         private readonly DimmableBackground dimmable;
 
-        protected virtual DimmableBackground CreateFadeContainer() => new DimmableBackground { RelativeSizeAxes = Axes.Both };
+        protected virtual DimmableBackground CreateFadeContainer() => new DimmableBackground();
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
 
             InternalChild = dimmable = CreateFadeContainer();
+            dimmable.RelativeSizeAxes = Axes.Both;
 
             dimmable.StoryboardReplacesBackground.BindTo(StoryboardReplacesBackground);
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);

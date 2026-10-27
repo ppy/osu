@@ -4,7 +4,6 @@
 #nullable disable
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -38,22 +37,11 @@ namespace osu.Game.Graphics.Backgrounds
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
 
-        protected override Sprite CreateSprite() => ColouredDimmableSprite = new ColouredDimmableSprite
-        {
-            RelativeSizeAxes = Axes.Both,
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            FillMode = FillMode.Fill,
-        };
+        protected override Sprite CreateSprite() => ColouredDimmableSprite = new ColouredDimmableSprite();
 
         protected override BufferedContainer CreateBufferedContainer()
         {
-            return ColouredDimmableBufferedContainer = new ColouredDimmableBufferedContainer(cachedFrameBuffer: true)
-            {
-                RelativeSizeAxes = Axes.Both,
-                RedrawOnScale = false,
-                Child = Sprite,
-            };
+            return ColouredDimmableBufferedContainer = new ColouredDimmableBufferedContainer(cachedFrameBuffer: true);
         }
 
         public override bool Equals(Background other)
