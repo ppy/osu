@@ -11,12 +11,12 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
-using osu.Game.Localisation.Ranking;
 
 namespace osu.Game.Screens.RankingV2.Legacy
 {
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.RankingV2.Legacy
             double lateAverage = lateCount > 0 ? lateSum / lateCount : 0;
 
             var unstableRate = hasReplayData.HitEvents.CalculateUnstableRate();
-            TooltipText = LegacyRankingHealthGraphStrings.TooltipText(earlyAverage, lateAverage, unstableRate?.Result ?? 0);
+            TooltipText = ResultsScreenStrings.LegacyHealthGraphTooltipText(earlyAverage, lateAverage, unstableRate?.Result ?? 0);
         }
 
         #region ISerialisableDrawable
