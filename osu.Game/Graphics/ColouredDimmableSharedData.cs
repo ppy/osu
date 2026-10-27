@@ -26,7 +26,7 @@ namespace osu.Game.Graphics
         {
             dimParameters = new DimParameters
             {
-                DimColour = new UniformVector4
+                ColourOffset = new UniformVector4
                 {
                     X = DrawColourOffset.R,
                     Y = DrawColourOffset.G,
@@ -72,7 +72,7 @@ namespace osu.Game.Graphics
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public record struct DimParameters
         {
-            public UniformVector4 DimColour;
+            public UniformVector4 ColourOffset;
         }
     }
 }
