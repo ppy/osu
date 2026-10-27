@@ -49,12 +49,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableSlider s)
-                s.OnUpdate += _ => flashlight.OnSliderTrackingChange(s);
+                s.OnUpdate += _ => flashlight.OnSliderUpdate(s);
         }
 
         private partial class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             private readonly double followDelay;
+
+            private DrawableSlider? activeSlider;
 
             public OsuFlashlight(OsuModFlashlight modFlashlight)
                 : base(modFlashlight)
@@ -65,10 +67,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                 FlashlightSmoothness = 1.4f;
             }
 
-            public void OnSliderTrackingChange(DrawableSlider e)
+            public void OnSliderUpdate(DrawableSlider e)
             {
                 // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield.
-                FlashlightDim = Time.Current >= e.HitObject.StartTime && e.Tracking.Value ? 0.8f : 0.0f;
+                // A few things are required here:
+                // - For the purposes of dimming during slider tracking, only one slider is considered "active".
+                //   This more or less matches stable: https://github.com/peppy/osu-stable-reference/blob/4a8545de2f93f4586bb78f2f941084e4a6385ef2/osu!/GameModes/Play/Player.cs#L3951
+                // - The active slider should stop dimming the playfield as soon as it is fully judged.
+                //   This is taken care of by `activeSlider.Tracking.Value` which will become false after the slider's end time once it's fully hit:
+                //   https://github.com/ppy/osu/blob/876b80642357996f90e8469cc25eb1e490f1f224/osu.Game.Rulesets.Osu/Objects/Drawables/SliderInputManager.cs#L266
+                // - However, in the case of multiple sliders one after another (visible simultaneously on the playfield),
+                //   the first slider ending and relinquishing dim shouldn't suppress the dimming once the *second* slider starts tracking.
+                //   A naive implementation here would run into this issue, as this runs as an update hook for all visible sliders on the playfield until their lifetime ends
+                //   (which necessarily happens *after* the slider is fully judged).
+                if (e.Tracking.Value)
+                    activeSlider = e;
+
+                FlashlightDim = activeSlider != null && activeSlider.IsInUse && Time.Current >= activeSlider.HitObject.StartTime && activeSlider.Tracking.Value ? 0.8f : 0.0f;
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)

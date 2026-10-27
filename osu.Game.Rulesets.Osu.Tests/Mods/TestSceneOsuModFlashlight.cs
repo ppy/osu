@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -148,6 +149,59 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     new OsuReplayFrame(1100, new Vector2(), OsuAction.LeftButton),
                     new OsuReplayFrame(2000, new Vector2(100), OsuAction.LeftButton),
                     new OsuReplayFrame(2001, new Vector2(100)),
+                },
+                Autoplay = false,
+            });
+        }
+
+        [Test]
+        public void TestSliderDimsImmediatelyEvenIfPreviousUnhitSliderPresent()
+        {
+            double firstDimFrame = double.MaxValue;
+
+            AddStep("reset first dim frame", () => firstDimFrame = double.MaxValue);
+            CreateModTest(new ModTestData
+            {
+                Mod = new OsuModFlashlight(),
+                PassCondition = () =>
+                {
+                    bool isDimmed = Player.ChildrenOfType<ModFlashlight<OsuHitObject>.Flashlight>().Single().FlashlightDim > 0;
+
+                    if (isDimmed)
+                        firstDimFrame = Math.Min(firstDimFrame, Player.GameplayClockContainer.CurrentTime);
+
+                    // The playfield should dim relatively soon after the second slider's start time and eventually undim at the end of play.
+                    return Player.GameplayState.HasPassed && firstDimFrame < 2200 && !isDimmed;
+                },
+                CreateBeatmap = () => new OsuBeatmap
+                {
+                    HitObjects = new List<OsuHitObject>
+                    {
+                        new Slider
+                        {
+                            StartTime = 1000,
+                            Path = new SliderPath(new[]
+                            {
+                                new PathControlPoint(),
+                                new PathControlPoint(new Vector2(95))
+                            }),
+                        },
+                        new Slider
+                        {
+                            StartTime = 2000,
+                            Path = new SliderPath(new[]
+                            {
+                                new PathControlPoint(),
+                                new PathControlPoint(new Vector2(95))
+                            }),
+                        },
+                    },
+                },
+                ReplayFrames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame(1100, new Vector2()),
+                    new OsuReplayFrame(2000, new Vector2(), OsuAction.LeftButton),
+                    new OsuReplayFrame(3000, new Vector2(95)),
                 },
                 Autoplay = false,
             });
