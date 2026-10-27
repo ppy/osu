@@ -7,12 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Utils;
-using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
@@ -133,74 +131,11 @@ namespace osu.Game.Storyboards.Drawables
 
             public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
 
-            protected override VideoSprite CreateSprite() => new DrawableVideoSprite(this);
+            protected override VideoSprite CreateSprite() => new ColouredDimmableVideoSprite(this);
 
             public DrawableVideo(Stream stream, bool startAtCurrentTime = true)
                 : base(stream, startAtCurrentTime)
             {
-            }
-
-            protected partial class DrawableVideoSprite : VideoSprite
-            {
-                public readonly ColouredDimmableHelper ColouredDimmableHelper;
-
-                private readonly Video video;
-
-                public DrawableVideoSprite(Video video)
-                    : base(video)
-                {
-                    this.video = video;
-                    ColouredDimmableHelper = new ColouredDimmableHelper(this);
-                    AddLayout(ColouredDimmableHelper.SourceLayout);
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(ShaderManager shaders)
-                {
-                    ColouredDimmableHelper.SetShaders(
-                        shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.VIDEO),
-                        shaders.Load(VertexShaderDescriptor.TEXTURE_2, "ColouredDimmableVideo")
-                    );
-                }
-
-                protected override void Update()
-                {
-                    base.Update();
-
-                    TextureShader = ColouredDimmableHelper.GetShader(DrawColourInfo.Blending);
-                }
-
-                protected override DrawNode CreateDrawNode() => new DrawableVideoSpriteDrawNode(this, video);
-
-                public class DrawableVideoSpriteDrawNode : VideoSpriteDrawNode
-                {
-                    public new readonly DrawableVideoSprite Source;
-
-                    public DrawableVideoSpriteDrawNode(DrawableVideoSprite source, Video video)
-                        : base(video)
-                    {
-                        Source = source;
-                    }
-
-                    private ColouredDimmableSharedData? colouredDimmableSharedData;
-
-                    public override void ApplyState()
-                    {
-                        base.ApplyState();
-
-                        colouredDimmableSharedData = Source.ColouredDimmableHelper.SharedData;
-                    }
-
-                    protected override void BindUniformResources(IShader shader, IRenderer renderer)
-                    {
-                        base.BindUniformResources(shader, renderer);
-
-                        if (colouredDimmableSharedData != null)
-                        {
-                            shader.BindUniformBlock("m_DimParameters", colouredDimmableSharedData.GetBuffer(renderer));
-                        }
-                    }
-                }
             }
         }
     }

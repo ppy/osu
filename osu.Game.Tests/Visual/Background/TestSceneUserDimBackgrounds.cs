@@ -1198,16 +1198,16 @@ namespace osu.Game.Tests.Visual.Background
 
                 protected partial class TestDrawableVideo : DrawableVideo
                 {
-                    private DrawableVideoSprite drawableVideoSprite;
+                    private ColouredDimmableVideoSprite colouredDimmableVideoSprite;
 
                     public TestDrawableVideo(Stream stream, bool startAtCurrentTime)
                         : base(stream, startAtCurrentTime)
                     {
                     }
 
-                    public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(drawableVideoSprite.ColouredDimmableHelper.Source, source);
+                    public bool IsOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableVideoSprite.ColouredDimmableHelper.Source, source);
 
-                    protected override VideoSprite CreateSprite() => drawableVideoSprite = new DrawableVideoSprite(this);
+                    protected override VideoSprite CreateSprite() => colouredDimmableVideoSprite = new ColouredDimmableVideoSprite(this);
                 }
             }
         }
