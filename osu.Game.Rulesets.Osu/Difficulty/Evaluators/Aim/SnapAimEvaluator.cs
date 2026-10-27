@@ -23,11 +23,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool withSliderTravelDistance)
         {
-            if (current.Index <= 1 || current.BaseObject is Spinner)
-                return 0;
-
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)current.Previous();
+            var osuLastObj = (OsuDifficultyHitObject?)current.Previous();
+
+            if (current.BaseObject is Spinner || osuLastObj == null)
+                return 0;
 
             double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
             double currVelocity = calculateCurrentVelocity(osuCurrObj, osuLastObj, currDistance, withSliderTravelDistance);
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             wideAngleBonus *= Math.Min(currRescaledVelocity, prevRescaledVelocity);
 
-            var osuLast2Obj = (OsuDifficultyHitObject)osuCurrObj.Previous(2);
+            var osuLast2Obj = (OsuDifficultyHitObject?)osuCurrObj.Previous(2);
 
             if (osuLast2Obj != null)
             {
@@ -161,11 +161,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
         private static double vectorAngleRepetition(OsuDifficultyHitObject current, OsuDifficultyHitObject previous)
         {
-            if (
-                current.Angle == null ||
+            if (current.Angle == null ||
                 previous.Angle == null ||
                 previous.BaseObject is Spinner ||
-                previous.Previous(0).BaseObject is Spinner)
+                previous.Previous()?.BaseObject is Spinner)
                 return 1;
 
             const double note_limit = 6;
@@ -176,7 +175,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             for (int index = 0; index < note_limit; index++)
             {
-                OsuDifficultyHitObject? prevObj = (OsuDifficultyHitObject)current.Previous(index);
+                var prevObj = (OsuDifficultyHitObject?)current.Previous(index);
 
                 if (prevObj == null || prevObj.BaseObject is Spinner)
                     break;
