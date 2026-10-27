@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double monoAccScalingExponent = 2 + attributes.MonoStaminaFactor;
             double monoAccScalingShift = 500 - 100 * (attributes.MonoStaminaFactor * 3);
 
-            return difficultyValue * DiffUtils.Pow(DiffUtils.Erf(monoAccScalingShift / (DiffUtils.SQRT2 * estimatedUnstableRate.Value)), monoAccScalingExponent);
+            return difficultyValue * DiffUtils.Pow(DiffUtils.ProbabilityNormal(monoAccScalingShift, estimatedUnstableRate.Value), monoAccScalingExponent);
         }
 
         private double computeAccuracyValue(ScoreInfo score, TaikoDifficultyAttributes attributes, bool isConvert)
