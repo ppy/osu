@@ -210,7 +210,7 @@ jobs:
 
           cd "${{ env.GENERATOR_DIR }}"
 
-          docker compose up --build --detach
+          docker compose up --build --detach --abort-on-container-failure
           docker compose logs --follow &
           docker compose wait generator
 
