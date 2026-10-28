@@ -869,8 +869,6 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground();
 
-            protected override BeatmapBackground CreateBeatmapBackground(WorkingBeatmap beatmap) => beatmapBackground = new TestBeatmapBackground(beatmap);
-
             // CurrentColour can be used to track how much the texture was dimmed, and
             // CurrentColourOffset can be used to track how much colour was added as an offset.
             //
@@ -878,15 +876,15 @@ namespace osu.Game.Tests.Visual.Background
             // if Colour == Colour4.White, that could mean either that
             // DimLevel == 0.0, or
             // DimLevel == 1.0 and DimColour == Colour4.White.
-            public Colour4 CurrentColour => beatmapBackground.CurrentColour;
+            public Colour4 CurrentColour => colouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? colouredDimmableSprite.DrawColourInfo.Colour;
 
             public Colour4 CurrentColourOffset => dimmable.DrawColourOffset;
 
-            public bool IsSpriteDimmed => beatmapBackground.IsSpriteDimmed;
+            public bool IsSpriteDimmed => colouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
 
-            public bool IsBufferedContainerDimmed => beatmapBackground.IsBufferedContainerDimmed;
+            public bool IsBufferedContainerDimmed => colouredDimmableBufferedContainer != null && colouredDimmableBufferedContainer.FrameBufferDrawColour?.Colour != Colour4.White;
 
-            public bool IsBufferedContainerNull => beatmapBackground.IsBufferedContainerNull;
+            public bool IsBufferedContainerNull => colouredDimmableBufferedContainer == null;
 
             public Colour4 ParentDrawColour => DrawColourInfo.Colour;
 
@@ -903,17 +901,21 @@ namespace osu.Game.Tests.Visual.Background
 
             public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
-            public bool IsSpritesOffsetSourceDimmableBackground => beatmapBackground.IsSpritesOffsetSource(dimmable);
+            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableSprite.ColouredDimmableHelper.Source, source);
 
-            public bool IsSpritesOffsetSourceBufferedContainer => beatmapBackground.IsSpritesOffsetSourceBufferedContainer;
+            public bool IsSpritesOffsetSourceDimmableBackground => IsSpritesOffsetSource(dimmable);
 
-            public bool IsBufferedContainersOffsetSourceDimmableBackground => beatmapBackground.IsBufferedContainersOffsetSource(dimmable);
+            public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(colouredDimmableBufferedContainer);
 
-            public void AddToBufferedContainer(Drawable drawable) => beatmapBackground.AddToBufferedContainer(drawable);
+            public bool IsBufferedContainersOffsetSourceDimmableBackground => ReferenceEquals(colouredDimmableBufferedContainer.ColouredDimmableHelper.Source, dimmable);
+
+            public void AddToBufferedContainer(Drawable drawable) => colouredDimmableBufferedContainer.Add(drawable);
+
+            private ColouredDimmableSprite colouredDimmableSprite => dimmable.ChildrenOfType<ColouredDimmableSprite>().Single();
+
+            private ColouredDimmableBufferedContainer colouredDimmableBufferedContainer => dimmable.ChildrenOfType<ColouredDimmableBufferedContainer>().SingleOrDefault();
 
             private TestDimmableBackground dimmable;
-
-            private TestBeatmapBackground beatmapBackground;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap, bool allowBlur = true)
                 : base(beatmap)
@@ -946,39 +948,6 @@ namespace osu.Game.Tests.Visual.Background
             public new float DimLevelNoStoryboard => base.DimLevelNoStoryboard;
 
             public new Colour4 DimColour => base.DimColour;
-        }
-
-        private partial class TestBeatmapBackground : BeatmapBackground
-        {
-            public Colour4 CurrentColour => colouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? colouredDimmableSprite.DrawColourInfo.Colour;
-
-            public bool IsSpriteDimmed => colouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
-
-            public bool IsBufferedContainerDimmed => colouredDimmableBufferedContainer != null && colouredDimmableBufferedContainer.FrameBufferDrawColour?.Colour != Colour4.White;
-
-            public bool IsBufferedContainerNull => colouredDimmableBufferedContainer == null;
-
-            public void AddToBufferedContainer(Drawable drawable) => colouredDimmableBufferedContainer.Add(drawable);
-
-            private ColouredDimmableBufferedContainer colouredDimmableBufferedContainer;
-
-            private ColouredDimmableSprite colouredDimmableSprite;
-
-            public TestBeatmapBackground(WorkingBeatmap beatmap)
-                : base(beatmap)
-            {
-
-            }
-
-            public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableBufferedContainer.ColouredDimmableHelper.Source, source);
-
-            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableSprite.ColouredDimmableHelper.Source, source);
-
-            public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(colouredDimmableBufferedContainer);
-
-            protected override BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => colouredDimmableBufferedContainer = new ColouredDimmableBufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
-
-            protected override Sprite CreateSprite() => colouredDimmableSprite = (ColouredDimmableSprite)base.CreateSprite();
         }
 
         public partial class TestColouredDimmableSprite : ColouredDimmableSprite
