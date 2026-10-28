@@ -10,14 +10,14 @@ using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Screens.RankingV2.Extended
 {
-    public abstract partial class StatisticItemPanel : Container
+    public partial class StatisticItemPanel : Container
     {
         public LocalisableString HeaderText { get; }
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        protected StatisticItemPanel(LocalisableString headerText)
+        public StatisticItemPanel(LocalisableString headerText)
         {
             HeaderText = headerText;
             content = new Container

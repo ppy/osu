@@ -14,6 +14,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private BufferedContainer bufferedGrid = null!;
         private GridContainer pointGrid = null!;
 
-        private readonly ScoreInfo score;
+        private readonly IScoreWithReplayData score;
         private readonly IBeatmap playableBeatmap;
 
         private const float line_thickness = 2;
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         /// </summary>
         protected float PeakValue { get; private set; }
 
-        public AccuracyHeatmap(ScoreInfo score, IBeatmap playableBeatmap)
+        public AccuracyHeatmap(IScoreWithReplayData score, IBeatmap playableBeatmap)
         {
             this.score = score;
             this.playableBeatmap = playableBeatmap;
@@ -122,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = "Overshoot",
+                                            Text = OsuResultsScreenStrings.AccuracyHeatmapOvershoot,
                                             Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.BottomLeft,
@@ -133,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = "Undershoot",
+                                            Text = OsuResultsScreenStrings.AccuracyHeatmapUndershoot,
                                             Font = OsuFont.GetFont(size: 12),
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.TopRight,

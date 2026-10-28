@@ -37,6 +37,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Screens.RankingV2.Extended;
 using osu.Game.Skinning;
 using osu.Game.Utils;
 using osuTK;
@@ -296,6 +297,19 @@ namespace osu.Game.Rulesets.Catch
                     AutoSizeAxes = Axes.Y
                 }),
             };
+        }
+
+        public override ExtendedRankingRulesetContent CreateStatisticsForResults(IScoreInfo score, IBeatmap playableBeatmap)
+        {
+            return new ExtendedRankingRulesetContent(
+                LeftColumn: () =>
+                [
+                    // TODO: performance breakdown
+                ],
+                RightColumn: () =>
+                [
+                    // TODO: health graph
+                ]);
         }
 
         /// <seealso cref="CatchHitObject.ApplyDefaultsToSelf"/>

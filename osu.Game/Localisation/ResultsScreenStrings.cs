@@ -85,6 +85,11 @@ Unstable Rate: {2:0.00}", earlyAverage, lateAverage, unstableRate);
         public static LocalisableString ModScoreMultiplierCaption => new TranslatableString(getKey(@"mod_score_multiplier_caption"), @"Multiplier");
 
         /// <summary>
+        /// "Extended statistics are only available after watching a replay!"
+        /// </summary>
+        public static LocalisableString NoReplayDataPlaceholder => new TranslatableString(getKey(@"no_replay_data_placeholder"), @"Extended statistics are only available after watching a replay!");
+
+        /// <summary>
         /// "Overall Ranking"
         /// </summary>
         public static LocalisableString GlobalStatisticsUpdatePanelHeader => new TranslatableString(getKey(@"global_statistics_update_panel_header"), @"Overall Ranking");
@@ -93,6 +98,11 @@ Unstable Rate: {2:0.00}", earlyAverage, lateAverage, unstableRate);
         /// "Timing"
         /// </summary>
         public static LocalisableString TimingStatisticsPanelHeader => new TranslatableString(getKey(@"timing_statistics_panel_header"), @"Timing");
+
+        /// <summary>
+        /// "Timing Distribution"
+        /// </summary>
+        public static LocalisableString TimingDistributionGraphPanelHeader => new TranslatableString(getKey(@"timing_distribution_graph_panel_header"), @"Timing Distribution");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
