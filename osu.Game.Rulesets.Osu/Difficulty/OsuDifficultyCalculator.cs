@@ -146,7 +146,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateStarRating(double basePerformance)
         {
-            return Math.Cbrt(basePerformance * OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER);
+            // We scale down star rating slightly to better match what players expect. This doesn't affect pp in any way and is purely visual.
+            const double star_rating_visual_adjustment_multiplier = 0.975;
+
+            return Math.Cbrt(basePerformance * OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * star_rating_visual_adjustment_multiplier;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
@@ -167,16 +170,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
         {
+            int objectCount = beatmap.HitObjects.Count;
+
             var skills = new List<Skill>
             {
-                new Aim(mods, true),
-                new Aim(mods, false),
+                new Aim(mods, true, objectCount),
+                new Aim(mods, false, objectCount),
                 new Speed(mods),
                 new Reading(mods)
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
-                skills.Add(new Flashlight(mods, beatmap.HitObjects.Count));
+                skills.Add(new Flashlight(mods, objectCount));
 
             return skills.ToArray();
         }

@@ -23,10 +23,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         public readonly bool IncludeSliders;
 
-        public Aim(Mod[] mods, bool includeSliders)
+        private readonly int totalObjects;
+
+        public Aim(Mod[] mods, bool includeSliders, int totalObjects)
             : base(mods)
         {
             IncludeSliders = includeSliders;
+            this.totalObjects = totalObjects;
         }
 
         private double currentStrain;
@@ -196,7 +199,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 time = endTime;
             }
 
-            return difficulty / (1 - DecayWeight);
+            double sum = difficulty / (1 - DecayWeight);
+
+            // Legacy length bonus. This should eventually be replaced by summation improvements.
+            sum *= 0.975 + 0.185 * Math.Min(1.0, totalObjects / 2000.0) + (totalObjects > 2000 ? Math.Log10(totalObjects / 2000.0) * 0.2 : 0.0);
+
+            return sum;
         }
 
         /// <summary>
