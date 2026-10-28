@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double sum = difficulty / (1 - DecayWeight);
 
             // Legacy length bonus. This should eventually be replaced by summation improvements.
-            sum *= 0.975 + 0.185 * Math.Min(1.0, totalObjects / 2000.0) + (totalObjects > 2000 ? Math.Log10(totalObjects / 2000.0) * 0.2 : 0.0);
+            sum *= 0.975 + 0.18 * Math.Min(1.0, totalObjects / 2000.0) + (totalObjects > 2000 ? Math.Log10(totalObjects / 2000.0) * 0.2 : 0.0);
 
             return sum;
         }
