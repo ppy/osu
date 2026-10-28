@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Containers
             userDimColour!.ValueChanged += _ => UpdateVisuals();
         }
 
-        protected override DrawNode CreateDrawNode() => new ColouredUserDimContainerDrawNode(this, sharedData);
+        protected override DrawNode CreateDrawNode() => new ColouredUserDimContainerDrawNode(this);
 
         protected virtual Colour4 DimColour
         {
@@ -164,14 +164,12 @@ namespace osu.Game.Graphics.Containers
         {
             public new ColouredUserDimContainer Source => (ColouredUserDimContainer)base.Source;
 
-            private ColouredDimmableSharedData sharedData;
-
             private Colour4 drawColourOffset;
 
-            public ColouredUserDimContainerDrawNode(ColouredUserDimContainer source, ColouredDimmableSharedData sharedData)
+            public ColouredUserDimContainerDrawNode(ColouredUserDimContainer source)
                 : base(source)
             {
-                this.sharedData = sharedData;
+
             }
 
             public override void ApplyState()
@@ -184,7 +182,7 @@ namespace osu.Game.Graphics.Containers
             protected override void Draw(IRenderer renderer)
             {
                 // Update shared data before drawing children that rely on it
-                sharedData.SetDrawColourOffset(drawColourOffset);
+                Source.ColouredDimmableSharedData.SetDrawColourOffset(drawColourOffset);
 
                 base.Draw(renderer);
             }
