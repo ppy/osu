@@ -350,12 +350,17 @@ namespace osu.Game.Tests.Visual.Background
         [Test]
         public void TestNoBufferRedrawOnDimChange()
         {
+            UpdateCounter updateCounter = new UpdateCounter();
+            double lastUpdate = 0d;
+
             performFullSetup();
+
+            AddStep("Add update counter to BufferedContainer", () => songSelect.AddToBufferedContainer(updateCounter));
 
             AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
             AddUntilStep("BufferedContainer is initialized", () => !songSelect.IsBufferedContainerNull());
 
-            AddStep("Start tracking redraws", () => songSelect.RequiredRedraw = false);
+            AddStep("Start tracking redraws", () => lastUpdate = updateCounter.StoryboardContentLastUpdated);
 
             AddStep("Undim the screen", () =>
             {
@@ -363,7 +368,7 @@ namespace osu.Game.Tests.Visual.Background
                 songSelect.DimColour.Value = 0.0;
             });
             AddUntilStep("Screen is undimmed and blur applied", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurApplied());
-            AddUntilStep("Redraw wasn't required", () => !songSelect.RequiredRedraw);
+            AddUntilStep("Redraw wasn't required", () => lastUpdate == updateCounter.StoryboardContentLastUpdated);
 
             AddStep("Dim the screen", () =>
             {
@@ -371,7 +376,7 @@ namespace osu.Game.Tests.Visual.Background
                 songSelect.DimColour.Value = 0.5;
             });
             AddUntilStep("Screen is dimmed, blur applied and dim colour adjusted", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied() && songSelect.IsBackgroundColourOffset());
-            AddUntilStep("Redraw wasn't required", () => !songSelect.RequiredRedraw);
+            AddUntilStep("Redraw wasn't required", () => lastUpdate == updateCounter.StoryboardContentLastUpdated);
         }
 
         /// <summary>
@@ -767,11 +772,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBufferedContainerNull() => background.IsBufferedContainerNull;
 
-            public bool RequiredRedraw
-            {
-                get => background.RequiredRedraw;
-                set => background.RequiredRedraw = value;
-            }
+            public void AddToBufferedContainer(Drawable drawable) => background.AddToBufferedContainer(drawable);
 
             public bool IsSpritesOffsetSourceDimmableBackground() => background.IsSpritesOffsetSourceDimmableBackground;
 
@@ -908,11 +909,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBufferedContainersOffsetSourceDimmableBackground => beatmapBackground.IsBufferedContainersOffsetSource(dimmable);
 
-            public bool RequiredRedraw
-            {
-                get => beatmapBackground.RequiredRedraw;
-                set => beatmapBackground.RequiredRedraw = value;
-            }
+            public void AddToBufferedContainer(Drawable drawable) => beatmapBackground.AddToBufferedContainer(drawable);
 
             private TestDimmableBackground dimmable;
 
@@ -953,21 +950,17 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestBeatmapBackground : BeatmapBackground
         {
-            public Colour4 CurrentColour => dimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? colouredDimmableSprite.DrawColourInfo.Colour;
+            public Colour4 CurrentColour => colouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? colouredDimmableSprite.DrawColourInfo.Colour;
 
             public bool IsSpriteDimmed => colouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
 
-            public bool IsBufferedContainerDimmed => dimmableBufferedContainer != null && dimmableBufferedContainer.FrameBufferDrawColour?.Colour != Colour4.White;
+            public bool IsBufferedContainerDimmed => colouredDimmableBufferedContainer != null && colouredDimmableBufferedContainer.FrameBufferDrawColour?.Colour != Colour4.White;
 
-            public bool IsBufferedContainerNull => dimmableBufferedContainer == null;
+            public bool IsBufferedContainerNull => colouredDimmableBufferedContainer == null;
 
-            public bool RequiredRedraw
-            {
-                get => dimmableBufferedContainer.RequiredRedraw;
-                set => dimmableBufferedContainer.RequiredRedraw = value;
-            }
+            public void AddToBufferedContainer(Drawable drawable) => colouredDimmableBufferedContainer.Add(drawable);
 
-            private TestDimmableBufferedContainer dimmableBufferedContainer;
+            private ColouredDimmableBufferedContainer colouredDimmableBufferedContainer;
 
             private ColouredDimmableSprite colouredDimmableSprite;
 
@@ -977,39 +970,15 @@ namespace osu.Game.Tests.Visual.Background
 
             }
 
-            public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableBufferedContainer.ColouredDimmableHelper.Source, source);
+            public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableBufferedContainer.ColouredDimmableHelper.Source, source);
 
             public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableSprite.ColouredDimmableHelper.Source, source);
 
-            public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(dimmableBufferedContainer);
+            public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(colouredDimmableBufferedContainer);
 
-            protected override BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
+            protected override BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => colouredDimmableBufferedContainer = new ColouredDimmableBufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
 
             protected override Sprite CreateSprite() => colouredDimmableSprite = (ColouredDimmableSprite)base.CreateSprite();
-        }
-
-        private partial class TestDimmableBufferedContainer : ColouredDimmableBufferedContainer
-        {
-            // Ideally this one would be tracked inside of the DrawNode and set to true
-            // when framebuffer is redrawn, but DrawNode's are a bit broken in the
-            // headless testing mode, so an indirect check is used (see RequiresChildrenUpdate).
-            public bool RequiredRedraw;
-
-            public TestDimmableBufferedContainer(TexturePixelFormat textureFormat = TexturePixelFormat.R8G8B8A8Float, RenderBufferFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
-                : base(textureFormat, formats, pixelSnapping, cachedFrameBuffer)
-            {
-            }
-
-            protected override bool RequiresChildrenUpdate
-            {
-                get
-                {
-                    // A bit hacky, but at least it doesn't require exposing BufferedContainer.updateVersion
-                    bool requiresChildrenUpdate = base.RequiresChildrenUpdate;
-                    RequiredRedraw |= requiresChildrenUpdate;
-                    return requiresChildrenUpdate;
-                }
-            }
         }
 
         public partial class TestColouredDimmableSprite : ColouredDimmableSprite
