@@ -49,6 +49,11 @@ namespace osu.Game.Localisation
 Error: {0:0.00}ms - {1:0.00}ms avg
 Unstable Rate: {2:0.00}", earlyAverage, lateAverage, unstableRate);
 
+        /// <summary>
+        /// "▼ Online Ranking ▼"
+        /// </summary>
+        public static LocalisableString LegacyOnlineRankingButtonText => new TranslatableString(getKey(@"legacy_online_ranking_button_text"), @"▼ Online Ranking ▼");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
