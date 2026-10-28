@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.Containers
 {
     public partial class ColouredUserDimContainer : UserDimContainer, IColouredDimmableSource
     {
-        private readonly ColouredDimmableSharedData sharedData = new ColouredDimmableSharedData();
+        public ColouredDimmableSharedData ColouredDimmableSharedData { get; } = new ColouredDimmableSharedData();
 
         private Bindable<double>? userDimColour { get; set; }
 
@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.Containers
         {
             get
             {
-                Colour4 parentColour = (Colour4)DrawColourInfo.Colour;
+                Colour4 parentColour = DrawColourInfo.Colour;
                 if (parentColour == Colour4.White)
                     return ColourOffset;
 
@@ -143,8 +143,6 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        public ColouredDimmableSharedData ColouredDimmableSharedData => sharedData;
-
         protected override void UpdateVisuals()
         {
             base.UpdateVisuals();
@@ -157,7 +155,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.Dispose(isDisposing);
 
-            sharedData.Dispose();
+            ColouredDimmableSharedData.Dispose();
         }
 
         private class ColouredUserDimContainerDrawNode : CompositeDrawableDrawNode
@@ -169,7 +167,6 @@ namespace osu.Game.Graphics.Containers
             public ColouredUserDimContainerDrawNode(ColouredUserDimContainer source)
                 : base(source)
             {
-
             }
 
             public override void ApplyState()

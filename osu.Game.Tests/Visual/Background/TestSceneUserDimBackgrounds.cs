@@ -14,11 +14,8 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Video;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.IO.Stores;
@@ -31,7 +28,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -61,7 +57,7 @@ namespace osu.Game.Tests.Visual.Background
         private RulesetStore rulesets;
         private TestStoryboard testStoryboard;
         private UpdateCounter storyboardUpdateCounter;
-        private TestColouredDimmableSprite orphanedSprite = new TestColouredDimmableSprite();
+        private readonly TestColouredDimmableSprite orphanedSprite = new TestColouredDimmableSprite();
         private IShader originalShader;
         private IShader colouredShader;
 
@@ -923,6 +919,9 @@ namespace osu.Game.Tests.Visual.Background
             {
                 if (!allowBlur)
                 {
+                    // `dimmable` is assigned in `CreateFadeContainer`, which is called in
+                    // base constructor, but ReSharper cannot see it
+                    // ReSharper disable once PossibleNullReferenceException
                     dimmable.BlurAmount.UnbindAll();
                     dimmable.BlurAmount.Value = 0f;
                 }
@@ -961,7 +960,6 @@ namespace osu.Game.Tests.Visual.Background
             private readonly StoryboardSprite testStoryboardSprite;
             private readonly StoryboardSprite testStoryboardAdditiveSprite;
             private readonly StoryboardAnimation testStoryboardAnimation;
-            private readonly StoryboardVideo testStoryboardVideo;
 
             private TestDrawableStoryboard testDrawableStoryboard;
 
@@ -1001,6 +999,7 @@ namespace osu.Game.Tests.Visual.Background
                 ));
                 testStoryboardAnimation.Commands.AddAlpha(Easing.InBounce, -3000, 1000, 0, 1);
 
+                StoryboardVideo testStoryboardVideo;
                 GetLayer("Video").Add(testStoryboardVideo = new StoryboardVideo(
                     source: StoryboardElementSource.Beatmap,
                     path: "Resources/Videos/test-video.mp4",

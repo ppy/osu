@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -22,16 +22,16 @@ namespace osu.Game.Graphics
 
         private ulong lastWrittenFrame = ulong.MaxValue;
 
-        public void SetDrawColourOffset(Colour4 DrawColourOffset)
+        public void SetDrawColourOffset(Colour4 drawColourOffset)
         {
             dimParameters = new DimParameters
             {
                 ColourOffset = new UniformVector4
                 {
-                    X = DrawColourOffset.R,
-                    Y = DrawColourOffset.G,
-                    Z = DrawColourOffset.B,
-                    W = DrawColourOffset.A
+                    X = drawColourOffset.R,
+                    Y = drawColourOffset.G,
+                    Z = drawColourOffset.B,
+                    W = drawColourOffset.A
                 },
             };
 

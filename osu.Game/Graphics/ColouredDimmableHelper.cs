@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -9,7 +9,7 @@ namespace osu.Game.Graphics
 {
     public class ColouredDimmableHelper
     {
-        private Drawable owner;
+        private readonly Drawable owner;
 
         public readonly LayoutValue<IColouredDimmableSource?> SourceLayout = new LayoutValue<IColouredDimmableSource?>(Invalidation.Parent);
 
