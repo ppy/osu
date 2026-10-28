@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.Sprites
 
         protected override DrawNode CreateDrawNode() => new ColouredDimmableSpriteDrawNode(this);
 
-        public class ColouredDimmableSpriteDrawNode : SpriteDrawNode
+        private class ColouredDimmableSpriteDrawNode : SpriteDrawNode
         {
             public new ColouredDimmableSprite Source => (ColouredDimmableSprite)base.Source;
 

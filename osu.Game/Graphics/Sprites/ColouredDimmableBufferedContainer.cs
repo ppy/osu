@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.Sprites
 
         protected override DrawNode CreateDrawNode() => new ColouredDimmableBufferedContainerDrawNode(this, SharedData);
 
-        protected class ColouredDimmableBufferedContainerDrawNode : BufferedContainerDrawNode
+        private class ColouredDimmableBufferedContainerDrawNode : BufferedContainerDrawNode
         {
             public new ColouredDimmableBufferedContainer Source => (ColouredDimmableBufferedContainer)base.Source;
 

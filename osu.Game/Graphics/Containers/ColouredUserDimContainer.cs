@@ -165,7 +165,7 @@ namespace osu.Game.Graphics.Containers
             sharedData.Dispose();
         }
 
-        protected class ColouredUserDimContainerDrawNode : CompositeDrawableDrawNode
+        private class ColouredUserDimContainerDrawNode : CompositeDrawableDrawNode
         {
             public new ColouredUserDimContainer Source => (ColouredUserDimContainer)base.Source;
 

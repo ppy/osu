@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.Sprites
 
         protected override DrawNode CreateDrawNode() => new ColouredDimmableVideoSpriteDrawNode(this, video);
 
-        public class ColouredDimmableVideoSpriteDrawNode : VideoSpriteDrawNode
+        private class ColouredDimmableVideoSpriteDrawNode : VideoSpriteDrawNode
         {
             public new readonly ColouredDimmableVideoSprite Source;
 
