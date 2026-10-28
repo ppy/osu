@@ -717,7 +717,8 @@ namespace osu.Game.Tests.Visual.Background
 
             public float ParentColourScale() => background.IgnoreUserSettings.Value ? (1f - background.DimWhenUserSettingsIgnored.Value) : 1f;
 
-            public Colour4 BackgroundTargetColourOffset() => (background.ParentDrawColour.ToLinear() * background.CurrentDimColour.ToLinear()).ToSRGB();
+            public Colour4 BackgroundTargetColourOffset() =>
+                background.ParentDrawColour == Colour4.White ? background.CurrentDimColour : (background.ParentDrawColour.ToLinear() * background.CurrentDimColour.ToLinear()).ToSRGB();
 
             public bool IsBackgroundColourOffset() => background.CurrentColourOffset == BackgroundTargetColourOffset();
 
