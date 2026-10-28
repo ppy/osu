@@ -953,13 +953,13 @@ namespace osu.Game.Tests.Visual.Background
 
         private partial class TestBeatmapBackground : BeatmapBackground
         {
-            public Colour4 CurrentColour => ColouredDimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? ColouredDimmableSprite.DrawColourInfo.Colour;
+            public Colour4 CurrentColour => dimmableBufferedContainer?.FrameBufferDrawColour?.Colour ?? colouredDimmableSprite.DrawColourInfo.Colour;
 
-            public bool IsSpriteDimmed => ColouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
+            public bool IsSpriteDimmed => colouredDimmableSprite.DrawColourInfo.Colour != Colour4.White;
 
-            public bool IsBufferedContainerDimmed => ColouredDimmableBufferedContainer != null && ColouredDimmableBufferedContainer.FrameBufferDrawColour?.Colour != Colour4.White;
+            public bool IsBufferedContainerDimmed => dimmableBufferedContainer != null && dimmableBufferedContainer.FrameBufferDrawColour?.Colour != Colour4.White;
 
-            public bool IsBufferedContainerNull => ColouredDimmableBufferedContainer == null;
+            public bool IsBufferedContainerNull => dimmableBufferedContainer == null;
 
             public bool RequiredRedraw
             {
@@ -969,6 +969,8 @@ namespace osu.Game.Tests.Visual.Background
 
             private TestDimmableBufferedContainer dimmableBufferedContainer;
 
+            private ColouredDimmableSprite colouredDimmableSprite;
+
             public TestBeatmapBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
             {
@@ -977,14 +979,13 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBufferedContainersOffsetSource(IColouredDimmableSource source) => ReferenceEquals(dimmableBufferedContainer.ColouredDimmableHelper.Source, source);
 
-            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(ColouredDimmableSprite.ColouredDimmableHelper.Source, source);
+            public bool IsSpritesOffsetSource(IColouredDimmableSource source) => ReferenceEquals(colouredDimmableSprite.ColouredDimmableHelper.Source, source);
 
             public bool IsSpritesOffsetSourceBufferedContainer => IsSpritesOffsetSource(dimmableBufferedContainer);
 
-            protected override BufferedContainer CreateBufferedContainer()
-            {
-                return ColouredDimmableBufferedContainer = dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: true);
-            }
+            protected override BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => dimmableBufferedContainer = new TestDimmableBufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
+
+            protected override Sprite CreateSprite() => colouredDimmableSprite = (ColouredDimmableSprite)base.CreateSprite();
         }
 
         private partial class TestDimmableBufferedContainer : ColouredDimmableBufferedContainer

@@ -21,10 +21,6 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
-        protected ColouredDimmableSprite ColouredDimmableSprite { get; private set; }
-
-        protected ColouredDimmableBufferedContainer ColouredDimmableBufferedContainer;
-
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
             Beatmap = beatmap;
@@ -37,12 +33,9 @@ namespace osu.Game.Graphics.Backgrounds
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
 
-        protected override Sprite CreateSprite() => ColouredDimmableSprite = new ColouredDimmableSprite();
+        protected override Sprite CreateSprite() => new ColouredDimmableSprite();
 
-        protected override BufferedContainer CreateBufferedContainer()
-        {
-            return ColouredDimmableBufferedContainer = new ColouredDimmableBufferedContainer(cachedFrameBuffer: true);
-        }
+        protected override BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => new ColouredDimmableBufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
 
         public override bool Equals(Background other)
         {

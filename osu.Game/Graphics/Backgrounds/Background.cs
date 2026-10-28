@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected virtual Sprite CreateSprite() => new Sprite();
 
-        protected virtual BufferedContainer CreateBufferedContainer() => new BufferedContainer(cachedFrameBuffer: true);
+        protected virtual BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => new BufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
 
         public Vector2 BlurSigma => Vector2.Divide(bufferedContainer?.BlurSigma ?? Vector2.Zero, blurScale);
 
@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 RemoveInternal(Sprite, false);
 
-                AddInternal(bufferedContainer = CreateBufferedContainer());
+                AddInternal(bufferedContainer = CreateBufferedContainer(cachedFrameBuffer: true));
                 bufferedContainer.RelativeSizeAxes = Axes.Both;
                 bufferedContainer.RedrawOnScale = false;
                 bufferedContainer.Child = Sprite;
