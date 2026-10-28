@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int totalHits = beatmap.HitObjects.Count;
 
-            double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
-            double aimNoSlidersRating = calculateAimDifficultyRating(aimNoSlidersDifficultyValue);
+            double aimRating = calculateAimDifficultyRating(aimDifficultyValue, totalHits);
+            double aimNoSlidersRating = calculateAimDifficultyRating(aimNoSlidersDifficultyValue, totalHits);
 
             double sliderFactor = aimDifficultyValue > 0
                 ? aimNoSlidersRating / aimRating
@@ -140,7 +140,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return DiffUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
         }
 
-        private double calculateAimDifficultyRating(double difficultyValue) => DiffUtils.Pow(difficultyValue, 0.63) * 0.02275;
+        private double calculateAimDifficultyRating(double difficultyValue, int totalHits)
+        {
+            // Legacy length bonus. This should eventually be replaced by summation improvements.
+            // It's intentionally put here instead of the Aim skill to make sure difficult strain count (and miss penalty by extension) doesn't get affected by the length bonus.
+            difficultyValue *= 0.975 + 0.18 * Math.Min(1.0, totalHits / 2000.0) + (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.2 : 0.0);
+
+            return DiffUtils.Pow(difficultyValue, 0.63) * 0.02275;
+        }
 
         private double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * 0.0675;
 
@@ -170,18 +177,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
         {
-            int objectCount = beatmap.HitObjects.Count;
-
             var skills = new List<Skill>
             {
-                new Aim(mods, true, objectCount),
-                new Aim(mods, false, objectCount),
+                new Aim(mods, true),
+                new Aim(mods, false),
                 new Speed(mods),
                 new Reading(mods)
             };
 
             if (mods.Any(h => h is OsuModFlashlight))
-                skills.Add(new Flashlight(mods, objectCount));
+                skills.Add(new Flashlight(mods, beatmap.HitObjects.Count));
 
             return skills.ToArray();
         }
