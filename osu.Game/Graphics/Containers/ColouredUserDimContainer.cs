@@ -11,14 +11,9 @@ namespace osu.Game.Graphics.Containers
 {
     public partial class ColouredUserDimContainer : UserDimContainer, IColouredDimmableSource
     {
-        private ColouredDimmableSharedData sharedData;
+        private readonly ColouredDimmableSharedData sharedData = new ColouredDimmableSharedData();
 
         private Bindable<double>? userDimColour { get; set; }
-
-        protected ColouredUserDimContainer()
-        {
-            sharedData = new ColouredDimmableSharedData();
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
