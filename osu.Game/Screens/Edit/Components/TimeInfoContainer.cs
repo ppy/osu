@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -77,11 +80,14 @@ namespace osu.Game.Screens.Edit.Components
             }
         }
 
-        private partial class TimestampControl : OsuClickableContainer
+        private partial class TimestampControl : OsuClickableContainer, IHasContextMenu
         {
             private Container hoverLayer = null!;
             private OsuSpriteText trackTimer = null!;
             private OsuTextBox inputTextBox = null!;
+
+            [Resolved]
+            private OsuGame? game { get; set; }
 
             [Resolved]
             private Editor? editor { get; set; }
@@ -181,6 +187,12 @@ namespace osu.Game.Screens.Edit.Components
                     showingHoverLayer = shouldShowHoverLayer;
                 }
             }
+
+            private string getMillisecondTimestamp() => ((long)Math.Round(editorClock.CurrentTime)).ToString();
+
+            public MenuItem[] ContextMenuItems => [
+                new OsuMenuItem("Copy timestamp (ms)", MenuItemType.Standard, () => game?.CopyToClipboard(getMillisecondTimestamp()))
+            ];
 
             private partial class TimestampTextBox : OsuTextBox
             {
