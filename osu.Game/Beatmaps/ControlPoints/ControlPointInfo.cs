@@ -31,9 +31,10 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// All control points grouped by time.
         /// </summary>
-        [JsonProperty]
+        [JsonIgnore]
         public IBindableList<ControlPointGroup> Groups => groups;
 
+        [JsonProperty]
         private readonly BindableList<ControlPointGroup> groups = new BindableList<ControlPointGroup>();
 
         /// <summary>
