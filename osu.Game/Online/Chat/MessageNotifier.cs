@@ -37,6 +37,9 @@ namespace osu.Game.Online.Chat
         private ChatOverlay chatOverlay { get; set; }
 
         [Resolved]
+        private ChatTicker chatTicker { get; set; }
+
+        [Resolved]
         private ChannelManager channelManager { get; set; }
 
         [Resolved]
@@ -99,11 +102,16 @@ namespace osu.Game.Online.Chat
             if (channel == null)
                 return;
 
+            var sortedMessages = messages.OrderByDescending(m => m.Id);
+
+            if (!chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel)
+                chatTicker.PostMessage(sortedMessages.First());
+
             // Only send notifications if ChatOverlay or the target channel aren't visible, or if the window is unfocused
             if (chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel && host.IsActive.Value)
                 return;
 
-            foreach (var message in messages.OrderByDescending(m => m.Id))
+            foreach (var message in sortedMessages)
             {
                 // ignore messages that already have been read
                 if (message.Id <= channel.LastReadId)
