@@ -27,6 +27,8 @@ namespace osu.Game.Users
         private const int padding = 10;
         private const int main_content_height = 80;
 
+        protected override RulesetInfo Ruleset => ruleset.Value;
+
         private GlobalRankDisplay globalRankDisplay = null!;
         private ProfileValueDisplay countryRankDisplay = null!;
         private LoadingLayer loadingLayer = null!;
