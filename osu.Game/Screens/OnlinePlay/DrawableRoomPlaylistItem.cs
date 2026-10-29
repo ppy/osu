@@ -38,6 +38,7 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.OnlinePlay
 {

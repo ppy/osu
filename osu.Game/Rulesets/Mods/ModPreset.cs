@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Scoring;
 using Realms;
 
 namespace osu.Game.Rulesets.Mods

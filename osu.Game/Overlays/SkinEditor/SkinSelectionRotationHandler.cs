@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.LoadComplete();
 
-            selectedItems.CollectionChanged += (_, __) => updateState();
+            selectedItems.CollectionChanged += (_, _) => updateState();
             updateState();
         }
 

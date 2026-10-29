@@ -88,12 +88,29 @@ namespace osu.Game.Screens.Select
 
         private const float personal_best_height = 112;
 
-        // Blocking mouse down is required to avoid song select's background reveal logic happening while hovering scores.
-        // Our horizontal alignment doesn't really align with the rest of the sheared components (protrudes a touch to the right) which makes
-        // it complicated to handle this at a higher level.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => scoresScroll.ReceivePositionalInputAt(screenSpacePos);
+        private const float scores_scroll_left_padding = 80f;
 
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
+        private const float scores_scroll_top_padding = 5f;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            // No scores, allow background preview
+            if (!scoresContainer.Any())
+                return base.OnMouseDown(e);
+
+            // Block mousedown from the top left of the leaderboard list to the bottom right of the last score.
+            // Note that is important to perform all of these calculations in the scroll's local space.
+            // The scroll has shearing applied to it, and transforming to the scroll's local space undoes the shear.
+            // Trying to do this in screen space would fail because the last score on the list has its bottom right corner shifted left compared to the first one's top right corner,
+            // so inputs to the right of that last score's bottom right corner's X coordinate (in screen space, so excluding shearing effects) would be allowed to fall through.
+            var mousePosition = scoresScroll.ToLocalSpace(e.ScreenSpaceMousePosition);
+            var bottomRight = scoresScroll.ToLocalSpace(scoresContainer.Last().ScreenSpaceDrawQuad.BottomRight);
+
+            if (mousePosition.X <= bottomRight.X && mousePosition.Y <= bottomRight.Y)
+                return true;
+
+            return base.OnMouseDown(e);
+        }
 
         private Sample? swishSample;
 
@@ -120,9 +137,9 @@ namespace osu.Game.Screens.Select
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding
                             {
-                                Top = 5,
+                                Top = scores_scroll_top_padding,
                                 // Left padding offsets the shear to create a visually appealing list display.
-                                Left = 80f,
+                                Left = scores_scroll_left_padding,
                                 // Bottom padding ensures the last entry's full width is displayed
                                 // (ie it is fully on screen after shear is considered).
                                 Bottom = BeatmapLeaderboardScore.HEIGHT * 3

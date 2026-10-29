@@ -1,16 +1,21 @@
 ﻿<Project>
   <PropertyGroup>
-    <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
-    <RuntimeIdentifiers>android-x86;android-arm;android-arm64</RuntimeIdentifiers>
+    <SupportedOSPlatformVersion>24.0</SupportedOSPlatformVersion>
+    <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <MandroidI18n>CJK;Mideast;Rare;West;Other;</MandroidI18n>
-    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidMessageHandler</AndroidHttpClientHandlerType>
     <!-- NullabilityInfoContextSupport is disabled by default for Android -->
     <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <!-- Can be removed in .NET 11 (CoreCLR is the default) -->
+    <UseMonoRuntime>false</UseMonoRuntime>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <!-- CoreCLR on Android is an experimental feature in .NET 10.
+         This suppression can be removed after .NET 11, as the use of CoreCLR becomes the default in .NET 11 and above. -->
+    <NoWarn>$(NoWarn);XA1040</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2026.921.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2026.1019.0" />
   </ItemGroup>
   <PropertyGroup>
     <!-- Fody does not handle Android build well, and warns when unchanged.

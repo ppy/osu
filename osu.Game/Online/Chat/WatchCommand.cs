@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
@@ -31,6 +32,13 @@ namespace osu.Game.Online.Chat
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (username.Equals(api.LocalUser.Value.Username, StringComparison.OrdinalIgnoreCase))
+            {
+                target?.AddNewMessages(new ErrorMessage("You cannot spectate yourself."));
+                Expire();
+                return;
+            }
 
             var request = new GetUserRequest(username);
             request.Success += user =>
