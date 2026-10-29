@@ -49,10 +49,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected abstract void CreateContent();
 
+        /// <summary>
+        /// Computes the line thickness of this <see cref="PositionSnapGrid"/> which will result in 1px screen-space thickness independent of display resolution.
+        /// </summary>
+        /// <remarks>
+        /// Unless resolution is high enough, in which case thickness will be 2px.
+        /// </remarks>
+        protected float GetLineWidth()
+        {
+            float fixedWidth = DrawWidth / ScreenSpaceDrawQuad.Width; // the width at which screen-space thickness will be 1px
+
+            // At 4k the grid (with 512px draw width) will be around 2167 pixels wide, let's use 2000px as a nice round value to increase thickness at.
+            if (ScreenSpaceDrawQuad.Width < 2000)
+                return fixedWidth;
+
+            return fixedWidth * 2f;
+        }
+
         protected void GenerateOutline(Vector2 drawSize)
         {
-            // Make lines the same width independent of display resolution.
-            float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
+            float lineWidth = GetLineWidth();
 
             AddRangeInternal(new[]
             {
