@@ -121,13 +121,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 private TextureUpload upscale(TextureUpload textureUpload)
                 {
-                    var image = Image.LoadPixelData(textureUpload.Data, textureUpload.Width, textureUpload.Height);
+                    var image = Image.LoadPixelData(textureUpload.PremultipliedData, textureUpload.Width, textureUpload.Height);
 
                     // The original texture upload will no longer be returned or used.
                     textureUpload.Dispose();
 
                     image.Mutate(i => i.Resize(new Size(textureUpload.Width, textureUpload.Height) * scale_factor));
-                    return new TextureUpload(image);
+                    return new TextureUpload(PremultipliedImage.FromStraight(image));
                 }
 
                 public Stream? GetStream(string name) => textureStore?.GetStream(name);
