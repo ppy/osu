@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.Containers
         // colours in linear space, then convert them back to sRGB.
         // Which means that animating ColourOffset directly will NOT make it a perfect
         // complement to Colour, so adding them won't necessary give 1.0 (assuming
-        // no external sources of dimming).
+        // no external sources of dimming and that DimColour is white).
         // And using dimContent's Colour directly may include dimming caused by storyboard.
         // So this roundabout way is used instead, where AnimatedInvertedDimLevel emulates
         // dimContent's Colour
@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        private Colour4 animatedDimColour;
+        private Colour4 animatedDimColour = Colour4.Black;
 
         protected Colour4 AnimatedDimColour
         {

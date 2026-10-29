@@ -347,7 +347,7 @@ namespace osu.Game.Tests.Visual.Background
         public void TestNoBufferRedrawOnDimChange()
         {
             UpdateCounter updateCounter = new UpdateCounter();
-            double lastUpdate = 0d;
+            double lastUpdate = 0.0;
 
             performFullSetup();
 
@@ -484,7 +484,7 @@ namespace osu.Game.Tests.Visual.Background
         public void TestBrightnessStabilityDuringTransition()
         {
             ManualClock manualClock = new ManualClock();
-            double startTime = 0;
+            double startTime = 0.0;
 
             performFullSetup();
 
@@ -520,7 +520,7 @@ namespace osu.Game.Tests.Visual.Background
         public void TestStoryboardBrightnessStabilityDuringTransition()
         {
             ManualClock manualClock = new ManualClock();
-            double startTime = 0;
+            double startTime = 0.0;
 
             performFullSetup();
             createFakeStoryboardWithElements();
@@ -714,7 +714,7 @@ namespace osu.Game.Tests.Visual.Background
             public float ParentColourScale() => background.IgnoreUserSettings.Value ? (1f - background.DimWhenUserSettingsIgnored.Value) : 1f;
 
             public Colour4 BackgroundTargetColourOffset() =>
-                background.ParentDrawColour == Colour4.White ? background.CurrentDimColour : (background.ParentDrawColour.ToLinear() * background.CurrentDimColour.ToLinear()).ToSRGB();
+                background.ParentDrawColour == Colour4.White ? background.TargetColourOffset : (background.ParentDrawColour.ToLinear() * background.TargetColourOffset.ToLinear()).ToSRGB();
 
             public bool IsBackgroundColourOffset() => background.CurrentColourOffset == BackgroundTargetColourOffset();
 
@@ -735,7 +735,7 @@ namespace osu.Game.Tests.Visual.Background
                     1f
                 );
 
-                Colour4 targetColour = colour + background.CurrentDimColour;
+                Colour4 targetColour = colour + background.TargetColourOffset;
                 targetColour = new Colour4(targetColour.R, targetColour.G, targetColour.B, 1f);
 
                 Colour4 finalColour = (background.ParentDrawColour.ToLinear() * targetColour.ToLinear()).ToSRGB();
@@ -889,7 +889,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public float CurrentDim => dimmable.DimLevel;
 
-            public Colour4 CurrentDimColour => new Colour4(
+            public Colour4 TargetColourOffset => new Colour4(
                 dimmable.DimColour.R * dimmable.DimLevelNoStoryboard,
                 dimmable.DimColour.G * dimmable.DimLevelNoStoryboard,
                 dimmable.DimColour.B * dimmable.DimLevelNoStoryboard,

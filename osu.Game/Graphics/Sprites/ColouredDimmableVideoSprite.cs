@@ -19,6 +19,7 @@ namespace osu.Game.Graphics.Sprites
             : base(video)
         {
             this.video = video;
+
             ColouredDimmableHelper = new ColouredDimmableHelper(this);
             AddLayout(ColouredDimmableHelper.SourceLayout);
         }

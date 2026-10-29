@@ -7,6 +7,7 @@ namespace osu.Game.Graphics
 {
     /// <summary>
     /// An interface for objects that provide colour offset to drawables.
+    /// `null` should be treated as no offset.
     /// </summary>
     public interface IColouredDimmableSource : IDrawable
     {

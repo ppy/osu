@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             // Needed to ensure that DimColour is not affected by the storyboard replacing
-            // the background, only by user settings; also used in tests.
+            // the background, only by user settings. Also used in tests.
             protected float DimLevelNoStoryboard => base.DimLevel;
 
             protected override Colour4 InvertedDimLevel => new Colour4(

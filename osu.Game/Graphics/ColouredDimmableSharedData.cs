@@ -42,7 +42,6 @@ namespace osu.Game.Graphics
         {
             if (this.renderer == null || buffer == null)
             {
-                // Assumes that renderer cannot change during runtime.
                 this.renderer = renderer;
                 buffer = renderer.CreateUniformBuffer<DimParameters>();
             }
