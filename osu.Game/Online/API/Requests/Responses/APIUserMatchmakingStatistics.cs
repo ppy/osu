@@ -7,6 +7,9 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIUserMatchmakingStatistics
     {
+        [JsonProperty("user")]
+        public APIUser User = new APIUser();
+
         [JsonProperty("user_id")]
         public int UserId;
 

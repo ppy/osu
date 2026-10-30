@@ -20,6 +20,9 @@ namespace osu.Game.Overlays.Rankings
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypePlaylists))]
         Playlists,
 
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeMatchmaking))]
+        Matchmaking,
+
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeKudosu))]
         Kudosu,
     }
