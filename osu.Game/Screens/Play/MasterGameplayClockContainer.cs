@@ -109,6 +109,11 @@ namespace osu.Game.Screens.Play
         protected override void StartGameplayClock()
         {
             addAdjustmentsToTrack();
+
+            // Seek to the current time to avoid the flushed track position causing a jump on resume.
+            if (!track.IsRunning)
+                GameplayClock.Seek(GameplayClock.CurrentTime);
+
             base.StartGameplayClock();
         }
 
