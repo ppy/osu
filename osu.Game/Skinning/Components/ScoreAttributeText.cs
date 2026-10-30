@@ -54,10 +54,6 @@ namespace osu.Game.Skinning.Components
             };
         }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the legacy skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager configManager)
         {

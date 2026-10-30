@@ -207,10 +207,6 @@ namespace osu.Game.Screens.RankingV2.Argon
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the argon skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
 
         #region IAnimatableSkinnable
@@ -239,10 +235,13 @@ namespace osu.Game.Screens.RankingV2.Argon
             {
                 scoreContainer.FadeIn(transition_duration, Easing.OutQuint)
                               .MoveToOffset(new Vector2(50, 0), transition_duration, Easing.OutQuint);
-
                 totalScoreText.ResetCount();
-                totalScoreText.Current.Value = score.Value.GetDisplayScore(scoringMode.Value);
-                latestTransformEndTime = totalScoreText.LatestTransformEndTime;
+
+                using (BeginDelayedSequence(ArgonScoreRankDisplay.SWOOSH_PRE_DELAY))
+                {
+                    totalScoreText.Current.Value = score.Value.GetDisplayScore(scoringMode.Value);
+                    latestTransformEndTime = totalScoreText.LatestTransformEndTime;
+                }
             }
 
             if (score.Value.MaxCombo == score.Value.GetMaximumAchievableCombo())
