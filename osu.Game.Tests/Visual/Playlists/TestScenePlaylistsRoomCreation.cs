@@ -14,17 +14,20 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
@@ -78,7 +81,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddUntilStep("Leaderboard shows two aggregate scores", () => match.ChildrenOfType<MatchLeaderboardScore>().Count(s => s.ScoreText.Text != "0") == 2);
 
-            ClickButtonWhenEnabled<PlaylistsReadyButton>();
+            ClickButtonWhenEnabled<PlaylistsPlayButton>();
             AddUntilStep("player loader loaded", () => Stack.CurrentScreen is PlayerLoader);
         }
 
@@ -197,6 +200,49 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddUntilStep("match has correct beatmap", () => realHash == match.Beatmap.Value.BeatmapInfo.MD5Hash);
+        }
+
+        [Test]
+        public void TestCloseButtonPresentOnCreate()
+        {
+            setupAndCreateRoom(room =>
+            {
+                room.Name = "my awesome room";
+                room.Host = API.LocalUser.Value;
+                room.RecentParticipants = [room.Host];
+                room.EndDate = DateTimeOffset.Now.AddMinutes(30);
+                room.Playlist =
+                [
+                    new PlaylistItem(importedBeatmap.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        AllowedMods = [new APIMod(new OsuModDoubleTime())],
+                    }
+                ];
+            });
+
+            AddUntilStep("close button present", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Any(), () => Is.True);
+        }
+
+        [Test]
+        public void TestModsButtonNotVisibleOnSettingsOverlay()
+        {
+            AddAssert("mods button is not visible", () => ScreenFooter.ChildrenOfType<FooterButtonMods>().Any(), () => Is.False);
+            setupAndCreateRoom(room =>
+            {
+                room.Name = "my awesome room";
+                room.Host = API.LocalUser.Value;
+                room.RecentParticipants = [room.Host];
+                room.EndDate = DateTimeOffset.Now.AddMinutes(30);
+                room.Playlist =
+                [
+                    new PlaylistItem(importedBeatmap.Beatmaps.First())
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    }
+                ];
+            });
+            AddUntilStep("mods button is visible", () => ScreenFooter.ChildrenOfType<FooterButtonMods>().Single().Y, () => Is.EqualTo(0));
         }
 
         private void setupAndCreateRoom(Action<Room> setupFunc)

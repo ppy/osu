@@ -51,6 +51,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     // Passwords are explicitly not copied between rooms.
                     apiRoom.Password = createRoomRequest.Room.Password;
 
+                    apiRoom.StartDate ??= DateTimeOffset.Now;
+
                     AddServerSideRoom(apiRoom, localUser);
 
                     var responseRoom = new APICreatedRoom();
@@ -234,6 +236,10 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     });
                     return true;
                 }
+
+                case ClosePlaylistRequest closePlaylistRequest:
+                    closePlaylistRequest.TriggerSuccess();
+                    return true;
             }
 
             List<APIBeatmap> createResponseBeatmaps(params int[] beatmapIds)
