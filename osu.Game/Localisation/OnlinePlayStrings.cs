@@ -47,12 +47,12 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "No time left!"
         /// </summary>
-        public static LocalisableString FooterButtonPlaylistPlayNoTime => new TranslatableString(@"footer_button_playlist_play_no_time", @"No time left!");
+        public static LocalisableString FooterButtonPlaylistPlayNoTime => new TranslatableString(getKey(@"footer_button_playlist_play_no_time"), @"No time left!");
 
         /// <summary>
         /// "Attempts exhausted!"
         /// </summary>
-        public static LocalisableString FooterButtonPlaylistPlayNoAttempts => new TranslatableString(@"footer_button_playlist_play_no_attempts", @"Attempts exhausted!");
+        public static LocalisableString FooterButtonPlaylistPlayNoAttempts => new TranslatableString(getKey(@"footer_button_playlist_play_no_attempts"), @"Attempts exhausted!");
 
         /// <summary>
         /// "Freemods"
