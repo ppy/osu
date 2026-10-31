@@ -11,16 +11,18 @@ namespace osu.Game.Graphics.UserInterface
     {
         public BasicSearchTextBox()
         {
-            Add(new SpriteIcon
-            {
-                Icon = FontAwesome.Solid.Search,
-                Origin = Anchor.CentreRight,
-                Anchor = Anchor.CentreRight,
-                Margin = new MarginPadding { Right = 10 },
-                Size = new Vector2(20),
-            });
+            Add(CreateIcon());
 
             TextFlow.Padding = new MarginPadding { Right = 35 };
         }
+
+        protected virtual SpriteIcon CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.Search,
+            Origin = Anchor.CentreRight,
+            Anchor = Anchor.CentreRight,
+            Margin = new MarginPadding { Right = 10 },
+            Size = new Vector2(20),
+        };
     }
 }
