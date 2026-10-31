@@ -7,7 +7,6 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
-using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.Footer;
 
@@ -18,9 +17,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private readonly Room room;
 
         private ScheduledDelegate? hideDelegate;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
 
         public PlaylistsCloseButton(Room room)
         {
