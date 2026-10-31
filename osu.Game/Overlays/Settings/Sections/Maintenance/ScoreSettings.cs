@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             Add(deleteScoresButton = new DangerousSettingsButtonV2
             {
-                Text = MaintenanceSettingsStrings.DeleteAllScores,
+                Text = LocalisableString.Interpolate($@"{MaintenanceSettingsStrings.DeleteAllScores}..."),
                 Action = () =>
                 {
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>

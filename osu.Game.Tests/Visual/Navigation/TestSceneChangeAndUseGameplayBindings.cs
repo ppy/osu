@@ -8,10 +8,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
@@ -83,7 +85,7 @@ namespace osu.Game.Tests.Visual.Navigation
         private OsuButton configureBindingsButton => Game.Settings
                                                          .ChildrenOfType<BindingSettings>().SingleOrDefault()?
                                                          .ChildrenOfType<OsuButton>()
-                                                         .First(b => b.Text.ToString() == "Configure");
+                                                         .First(b => b.Text == LocalisableString.Interpolate($@"{BindingSettingsStrings.Configure}..."));
 
         private KeyBindingPanel keyBindingPanel => Game.Settings
                                                        .ChildrenOfType<KeyBindingPanel>().SingleOrDefault();
