@@ -15,6 +15,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AverageHitErrorTitle => new TranslatableString(getKey(@"average_hit_error_title"), @"Average Hit Error");
 
         /// <summary>
+        /// "Median Hit Error"
+        /// </summary>
+        public static LocalisableString MedianHitErrorTitle => new TranslatableString(getKey(@"median_hit_error_title"), @"Median Hit Error");
+
+        /// <summary>
         /// "Unstable Rate"
         /// </summary>
         public static LocalisableString UnstableRateTitle => new TranslatableString(getKey(@"unstable_rate_title"), @"Unstable Rate");
