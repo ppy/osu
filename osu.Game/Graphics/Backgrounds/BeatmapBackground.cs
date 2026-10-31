@@ -4,8 +4,11 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -26,6 +29,10 @@ namespace osu.Game.Graphics.Backgrounds
         {
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
+
+        protected override Sprite CreateSprite() => new ColouredDimmableSprite();
+
+        protected override BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => new ColouredDimmableBufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
 
         public override bool Equals(Background other)
         {

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
@@ -129,6 +130,8 @@ namespace osu.Game.Storyboards.Drawables
                 => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
 
             public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
+
+            protected override VideoSprite CreateSprite() => new ColouredDimmableVideoSprite(this);
 
             public DrawableVideo(Stream stream, bool startAtCurrentTime = true)
                 : base(stream, startAtCurrentTime)
