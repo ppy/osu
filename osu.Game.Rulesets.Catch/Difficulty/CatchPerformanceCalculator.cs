@@ -62,10 +62,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double approachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0;
 
             double approachRateFactor = 1.0;
-            if (approachRate >= 9.0)
-                approachRateFactor += Math.Pow((approachRate - 9.0) / 2.0, 2.5) * 0.38; // 38% for AR11
+            if (approachRate > 9.0)
+                approachRateFactor += 0.1 * (approachRate - 9.0); // 10% for each AR above 9
+            if (approachRate > 10.0)
+                approachRateFactor += 0.1 * (approachRate - 10.0); // Additional 10% at AR 11, 30% total
             else if (approachRate < 8.0)
-                approachRateFactor += 0.025 * (8.0 - approachRate); // 20% for AR0
+                approachRateFactor += 0.025 * (8.0 - approachRate); // 2.5% for each AR below 8
 
             value *= approachRateFactor;
 

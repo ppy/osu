@@ -21,9 +21,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
 
             // In catch, clockrate adjustments do not only affect the timings of hitobjects,
             // but also the speed of the player's catcher, which has an impact on difficulty
-            double catcherSpeedMultiplier = current.ClockRate;
+            double clockRate = current.ClockRate;
 
-            double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catcherSpeedMultiplier);
+            double weightedStrainTime = catchCurrent.StrainTime + 16 / clockRate;
 
             double distanceAddition = (DiffUtils.Pow(Math.Abs(catchCurrent.DistanceMoved), 1.3) / 510);
             double sqrtStrain = Math.Sqrt(weightedStrainTime);
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                     double bonusFactor = Math.Min(50, Math.Abs(catchCurrent.DistanceMoved)) / 50;
                     double antiflowFactor = Math.Max(Math.Min(70, Math.Abs(catchLast.DistanceMoved)) / 70, 0.38);
 
-                    distanceAddition += direction_change_bonus / Math.Sqrt(catchLast.StrainTime + 16) * bonusFactor * antiflowFactor * Math.Max(1 - DiffUtils.Pow(weightedStrainTime / 1000, 3), 0);
+                    distanceAddition += direction_change_bonus / Math.Sqrt(catchLast.StrainTime + 16 / clockRate) * bonusFactor * antiflowFactor * Math.Max(1 - DiffUtils.Pow(weightedStrainTime / 1000, 3), 0);
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                     edgeDashBonus += 5.7;
 
                 distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20)
-                                                        * DiffUtils.Pow((Math.Min(catchCurrent.StrainTime * catcherSpeedMultiplier, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
+                                                        * DiffUtils.Pow((Math.Min(catchCurrent.StrainTime * clockRate, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
             }
 
             // There is an edge case where horizontal back and forth sliders create "buzz" patterns which are repeated "movements" with a distance lower than
