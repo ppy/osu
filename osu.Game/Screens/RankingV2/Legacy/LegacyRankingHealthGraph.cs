@@ -149,7 +149,7 @@ namespace osu.Game.Screens.RankingV2.Legacy
             {
                 var point = hpGraph[i];
                 double x = (point.Time - startTime) / timeRange;
-                double y = point.Health;
+                double y = 1 - point.Health;
                 result.Add(new Vector2((float)x, (float)y) * pathSize);
             }
 
@@ -197,10 +197,6 @@ namespace osu.Game.Screens.RankingV2.Legacy
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the legacy skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
 
         #region IAnimatableSkinnable
@@ -228,7 +224,8 @@ namespace osu.Game.Screens.RankingV2.Legacy
                             .Then()
                             .ResizeWidthTo(1, graph_reveal_duration);
 
-            return passingContainer.LatestTransformEndTime;
+            // do not delay any further animations in the sequence with this element's animation
+            return startTime;
         }
 
         public void FinishAnimating()

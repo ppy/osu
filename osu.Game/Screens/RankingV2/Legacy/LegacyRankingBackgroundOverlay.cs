@@ -49,10 +49,6 @@ namespace osu.Game.Screens.RankingV2.Legacy
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the legacy skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
     }
 }

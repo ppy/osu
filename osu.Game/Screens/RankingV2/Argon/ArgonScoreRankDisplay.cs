@@ -33,6 +33,8 @@ namespace osu.Game.Screens.RankingV2.Argon
         /// </summary>
         public const double VIRTUAL_SS_PERCENTAGE = 0.01;
 
+        public const double SWOOSH_PRE_DELAY = 443f;
+
         /// <summary>
         /// Delay before the accuracy circle starts filling.
         /// </summary>
@@ -192,10 +194,6 @@ namespace osu.Game.Screens.RankingV2.Argon
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the argon skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
 
         #region IAnimatableSkinnable
@@ -239,10 +237,9 @@ namespace osu.Game.Screens.RankingV2.Argon
 
             using (BeginAbsoluteSequence(startTime))
             {
-                const double swoosh_pre_delay = 443f;
                 const double swoosh_volume = 0.4f;
 
-                this.Delay(swoosh_pre_delay).Schedule(() =>
+                this.Delay(SWOOSH_PRE_DELAY).Schedule(() =>
                 {
                     swooshUpSound.VolumeTo(swoosh_volume);
                     swooshUpSound.Play();
