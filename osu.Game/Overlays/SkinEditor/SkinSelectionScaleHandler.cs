@@ -47,10 +47,10 @@ namespace osu.Game.Overlays.SkinEditor
         {
             CanScaleX.Value = allSelectedSupportManualSizing(Axes.X);
             CanScaleY.Value = allSelectedSupportManualSizing(Axes.Y);
-            CanScaleDiagonally.Value = true;
+            CanScaleDiagonally.Value = selectedItems.All(b => b.CanBeScaled);
         }
 
-        private bool allSelectedSupportManualSizing(Axes axis) => selectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes.HasFlag(axis) == false);
+        private bool allSelectedSupportManualSizing(Axes axis) => selectedItems.All(b => (b as CompositeDrawable)?.AutoSizeAxes.HasFlag(axis) == false && b.CanBeScaled);
 
         private Dictionary<Drawable, OriginalDrawableState>? objectsInScale;
         private Vector2? defaultOrigin;

@@ -80,6 +80,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
+            if (SelectedBlueprints.Any(b => !b.Item.CanBeScaled))
+                return false;
+
             var selectionQuad = getSelectionQuad();
             Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
 
@@ -100,6 +103,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         public override bool HandleMovement(MoveSelectionEvent<ISerialisableDrawable> moveEvent)
         {
+            if (SelectedBlueprints.Any(b => !b.Item.CanBeMoved))
+                return false;
+
             foreach (var c in SelectedBlueprints)
             {
                 var item = c.Item;
@@ -126,8 +132,7 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanFlipX = true;
-            SelectionBox.CanFlipY = true;
+            SelectionBox.CanFlipX = SelectionBox.CanFlipY = SelectedItems.All(i => i.CanBeScaled);
             SelectionBox.CanReverse = false;
         }
 
