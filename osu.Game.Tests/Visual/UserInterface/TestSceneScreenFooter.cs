@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     var rightContent = ScreenFooter.ChildrenOfType<TestShearedOverlayContainer.TestRightOverlayContent>().Single();
                     return rightContent.ToSpaceOfOtherDrawable(new Vector2(rightContent.DrawWidth, 0), ScreenFooter).X;
                 },
-                () => Is.EqualTo(ScreenFooter.DrawWidth).Within(0.5f)
+                () => Is.EqualTo(ScreenFooter.DrawWidth - OsuGame.SCREEN_EDGE_MARGIN).Within(0.5f)
             );
 
             AddStep("hide overlay", () => screen.Overlay.Hide());
