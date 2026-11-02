@@ -55,8 +55,8 @@ namespace osu.Game.Screens.Footer
         private FillFlowContainer<ScreenFooterButton> leftButtonsFlow = null!;
         private FillFlowContainer<ShearedButton> rightButtonsFlow = null!;
         private Container overlayContentContainer = null!;
-        private Container<ScreenFooterButton> hiddenLeftButtonsContainer = null!;
-        private Container<ShearedButton> hiddenRightButtonsContainer = null!;
+        private FillFlowContainer<ScreenFooterButton> hiddenLeftButtonsContainer = null!;
+        private FillFlowContainer<ShearedButton> hiddenRightButtonsContainer = null!;
 
         private LogoTrackingContainer logoTrackingContainer = null!;
         private IDisposable? logoTracking;
@@ -146,21 +146,25 @@ namespace osu.Game.Screens.Footer
                     Origin = Anchor.BottomLeft,
                     Action = onBackPressed,
                 },
-                hiddenLeftButtonsContainer = new Container<ScreenFooterButton>
+                hiddenLeftButtonsContainer = new FillFlowContainer<ScreenFooterButton>
                 {
                     Name = "Hidden left footer buttons",
                     Margin = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
                     Y = ScreenFooterButton.CORNER_RADIUS,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(7, 0),
                     AutoSizeAxes = Axes.Both,
                 },
-                hiddenRightButtonsContainer = new Container<ShearedButton>
+                hiddenRightButtonsContainer = new FillFlowContainer<ShearedButton>
                 {
                     Name = "Hidden right footer buttons",
                     Margin = new MarginPadding { Bottom = OsuGame.SCREEN_EDGE_MARGIN, Right = OsuGame.SCREEN_EDGE_MARGIN },
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(7, 0),
                     AutoSizeAxes = Axes.Both,
                 },
                 (logoTrackingContainer = new LogoTrackingContainer
@@ -302,6 +306,8 @@ namespace osu.Game.Screens.Footer
 
         private readonly List<ScreenFooterButton> temporarilyHiddenLeftButtons = new List<ScreenFooterButton>();
 
+        private ScheduledDelegate? autosizeRestoreDelegate;
+
         public IDisposable RegisterActiveOverlayContainer(ShearedOverlayContainer overlay, out VisibilityContainer? overlayContent)
         {
             if (ActiveOverlay != null)
@@ -311,6 +317,17 @@ namespace osu.Game.Screens.Footer
             }
 
             ActiveOverlay = overlay;
+
+            // On a screen with two overlays, if the user were to hide the first, and then
+            // appear the second one before the transforms for reappearing the buttons were
+            // to finish, the register overlay handler for the second overlay would run before
+            // the clear handler for the second one. This could cause some buttons having
+            // `BypassAutoSizeAxes` enabled while they shouldn't.
+            //
+            // To avoid that, we immediately fire the autosize restore delegate if it happens
+            // to exist at this point in time.
+            if (autosizeRestoreDelegate?.Completed == false)
+                autosizeRestoreDelegate.RunTask();
 
             Debug.Assert(temporarilyHiddenLeftButtons.Count == 0);
 
@@ -324,8 +341,13 @@ namespace osu.Game.Screens.Footer
             {
                 var button = temporarilyHiddenLeftButtons[i];
                 button.State.Value = Visibility.Hidden;
-                leftButtonsFlow.Remove(button, false);
-                hiddenLeftButtonsContainer.Add(button);
+
+                // Temporarily bypass autosize on the X axis to prevent the buttons taking
+                // up space in the flow while they are replaced by the overlay content.
+                //
+                // Without this, there would be a bunch of empty space between
+                // the overlay content and the buttons that remain visible.
+                button.BypassAutoSizeAxes = Axes.X;
 
                 makeButtonDisappearToBottom(button, 0, 0, false);
             }
@@ -369,14 +391,6 @@ namespace osu.Game.Screens.Footer
             {
                 var button = temporarilyHiddenLeftButtons[i];
                 button.State.Value = Visibility.Visible;
-                hiddenLeftButtonsContainer.Remove(button, false);
-
-                // temporarily bypass autosize on the X axis to prevent the buttons taking space
-                // immediately upon being moved back to the flow.
-                // this prevents the overlay content jumping to the right during its fade-out.
-                button.BypassAutoSizeAxes = Axes.X;
-                leftButtonsFlow.Add(button);
-
                 makeButtonAppearFromBottom(button, 0);
             }
 
@@ -390,7 +404,7 @@ namespace osu.Game.Screens.Footer
 
             updateColourScheme(OverlayColourScheme.Aquamarine.GetHue());
 
-            Scheduler.AddDelayed(() =>
+            autosizeRestoreDelegate = Scheduler.AddDelayed(() =>
             {
                 // overlay content is done displaying, re-enable autosize on all active buttons
                 foreach (var button in leftButtonsFlow)
