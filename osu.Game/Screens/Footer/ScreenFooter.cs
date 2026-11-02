@@ -95,7 +95,11 @@ namespace osu.Game.Screens.Footer
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding },
+                    Padding = new MarginPadding
+                    {
+                        Left = OsuGame.SCREEN_EDGE_MARGIN + ScreenBackButton.BUTTON_WIDTH + padding,
+                        Right = OsuGame.SCREEN_EDGE_MARGIN,
+                    },
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
