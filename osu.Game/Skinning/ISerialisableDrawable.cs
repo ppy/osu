@@ -23,9 +23,33 @@ namespace osu.Game.Skinning
     public interface ISerialisableDrawable : IDrawable
     {
         /// <summary>
-        /// Whether this component should be editable by an end user.
+        /// Whether this component can be placed in the given <paramref name="skinnableContainer"/>.
         /// </summary>
-        bool IsEditable => true;
+        /// <remarks>
+        /// This method allows to implement e.g. skinnable components which can only be placed iff another component isn't already present in the container,
+        /// skinnable components which are singletons (only one instance can exist in the container), etc.
+        /// </remarks>
+        bool CanBePlaced(SkinnableContainer skinnableContainer) => true;
+
+        /// <summary>
+        /// Whether this component can be selected in the skin editor.
+        /// </summary>
+        bool CanBeSelected => true;
+
+        /// <summary>
+        /// Whether this component can be moved from its default position.
+        /// </summary>
+        bool CanBeMoved => CanBeSelected;
+
+        /// <summary>
+        /// Whether this component can be scaled from its default size.
+        /// </summary>
+        bool CanBeScaled => CanBeSelected;
+
+        /// <summary>
+        /// Whether this component can be rotated from its default rotation.
+        /// </summary>
+        bool CanBeRotated => CanBeSelected;
 
         /// <summary>
         /// In the context of the skin layout editor, whether this <see cref="ISerialisableDrawable"/> has a permanent anchor defined.
