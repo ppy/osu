@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
@@ -27,7 +28,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 Origin = Anchor.Centre,
                 Texture = textures.Get("Gameplay/osu/ring-glow"),
                 Blending = BlendingParameters.Additive,
-                Alpha = 0.5f
+                Alpha = 0.5f,
+                Scale = new Vector2(118f / 128f)
             };
         }
     }

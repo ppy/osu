@@ -24,11 +24,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 {
     public partial class ArgonMainCirclePiece : CompositeDrawable
     {
-        public const float BORDER_THICKNESS = (OsuHitObject.OBJECT_RADIUS * 2) * (2f / 58);
+        public const float BORDER_THICKNESS = (OsuHitObject.VISUAL_OBJECT_RADIUS * 2) * (2f / 58);
 
         public const float GRADIENT_THICKNESS = BORDER_THICKNESS * 2.5f;
 
-        public const float OUTER_GRADIENT_SIZE = (OsuHitObject.OBJECT_RADIUS * 2) - BORDER_THICKNESS * 4;
+        public const float OUTER_GRADIENT_SIZE = (OsuHitObject.VISUAL_OBJECT_RADIUS * 2) - BORDER_THICKNESS * 4;
 
         public const float INNER_GRADIENT_SIZE = OUTER_GRADIENT_SIZE - GRADIENT_THICKNESS * 2;
         public const float INNER_FILL_SIZE = INNER_GRADIENT_SIZE - GRADIENT_THICKNESS * 2;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
         private Bindable<bool> configHitLighting = null!;
 
-        private static readonly Vector2 circle_size = OsuHitObject.OBJECT_DIMENSIONS;
+        private static readonly Vector2 circle_size = OsuHitObject.VISUAL_OBJECT_DIMENSIONS;
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; } = null!;
