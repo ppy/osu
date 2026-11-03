@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
-                if (!((ISerialisableDrawable)instance).CanBePlaced(target)) return;
+                if (!((ISerialisableDrawable)instance).CanBePlaced(target.Components)) return;
 
                 fill.Add(new ToolboxComponentButton(instance, target)
                 {

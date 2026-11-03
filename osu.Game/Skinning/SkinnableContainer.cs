@@ -69,8 +69,15 @@ namespace osu.Game.Skinning
 
             LoadComponentAsync(content, wrapper =>
             {
+                foreach (var component in wrapper.Children.OfType<ISerialisableDrawable>().ToArray())
+                {
+                    if (component.CanBePlaced(components))
+                        components.Add(component);
+                    else
+                        wrapper.Remove((Drawable)component, true);
+                }
+
                 AddInternal(wrapper);
-                components.AddRange(wrapper.Children.OfType<ISerialisableDrawable>());
                 ComponentsLoaded = true;
                 OnComponentsLoaded?.Invoke(this);
             }, (cancellationSource = new CancellationTokenSource()).Token);

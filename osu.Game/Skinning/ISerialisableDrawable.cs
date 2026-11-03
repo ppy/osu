@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
@@ -23,13 +24,13 @@ namespace osu.Game.Skinning
     public interface ISerialisableDrawable : IDrawable
     {
         /// <summary>
-        /// Whether this component can be placed in the given <paramref name="skinnableContainer"/>.
+        /// Whether this component can be placed alongside <paramref name="otherComponents"/>.
         /// </summary>
         /// <remarks>
         /// This method allows to implement e.g. skinnable components which can only be placed iff another component isn't already present in the container,
         /// skinnable components which are singletons (only one instance can exist in the container), etc.
         /// </remarks>
-        bool CanBePlaced(SkinnableContainer skinnableContainer) => true;
+        bool CanBePlaced(IEnumerable<ISerialisableDrawable> otherComponents) => true;
 
         /// <summary>
         /// Whether this component can be selected in the skin editor.
