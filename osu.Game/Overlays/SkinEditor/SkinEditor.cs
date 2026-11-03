@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -616,7 +617,11 @@ namespace osu.Game.Overlays.SkinEditor
 
         void IEditorChangeHandler.RestoreState(int direction) => changeHandler?.RestoreState(direction);
 
-        public void Save(bool userTriggered = true) => save(currentSkin.Value, userTriggered);
+        public void Save(bool userTriggered = true)
+        {
+            if (currentSkin.IsNotNull())
+                save(currentSkin.Value, userTriggered);
+        }
 
         private void save(Skin skin, bool userTriggered = true)
         {

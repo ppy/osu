@@ -15,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -23,6 +24,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
@@ -530,6 +532,62 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             Menu.DrawableMenuItem getMenuItemByText(string text)
                 => this.ChildrenOfType<Menu.DrawableMenuItem>().First(m => m.Item.Text.ToString() == text);
+        }
+
+        [Test]
+        public void TestFlip()
+        {
+            BigBlackBox box1 = null!;
+
+            AddStep("add big black box to top left", () =>
+            {
+                var target = Player.ChildrenOfType<SkinnableContainer>().First();
+                target.Add(box1 = new BigBlackBox
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                });
+            });
+
+            AddAssert("big black box position is 0,0", () => Precision.AlmostEquals(box1.Position, new Vector2()));
+
+            AddStep("click big black box", () =>
+            {
+                InputManager.MoveMouseTo(box1);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("flip horizontally", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(2));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 250,0", () => Precision.AlmostEquals(box1.Position, new Vector2(250, 0)));
+
+            AddStep("flip horizontally", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(2));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 0,0", () => Precision.AlmostEquals(box1.Position, new Vector2()));
+
+            AddStep("flip vertically", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(3));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 0,250", () => Precision.AlmostEquals(box1.Position, new Vector2(0, 250)));
+
+            AddStep("flip vertically", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(3));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 0,0", () => Precision.AlmostEquals(box1.Position, new Vector2()));
         }
 
         private Skin importSkinFromArchives(string filename)
