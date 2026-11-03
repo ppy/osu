@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override DrawNode CreateDrawNode() => new ColouredUserDimContainerDrawNode(this);
 
-        protected virtual Colour4 DimColour
+        protected Colour4 DimColour
         {
             get
             {
