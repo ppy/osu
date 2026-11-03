@@ -299,7 +299,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 ContentContainer.Masking = true;
                 ContentContainer.RelativeSizeAxes = Axes.X;
-                ContentContainer.Margin = new MarginPadding { Top = FormControlBackground.BORDER_THICKNESS * 2.0f };
+                ContentContainer.Margin = new MarginPadding { Top = FormControlBackground.BORDER_THICKNESS };
             }
 
             protected override void AnimateOpen()
@@ -320,7 +320,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override void UpdateSize(Vector2 newSize)
             {
-                ContentContainer.Height = newSize.Y - FormControlBackground.BORDER_THICKNESS * 4.0f;
+                newSize.Y = Math.Min(newSize.Y + FormControlBackground.BORDER_THICKNESS * 2.0f, MaxHeight);
+                ContentContainer.Height = newSize.Y - FormControlBackground.BORDER_THICKNESS * 2.0f;
 
                 base.UpdateSize(newSize);
             }
