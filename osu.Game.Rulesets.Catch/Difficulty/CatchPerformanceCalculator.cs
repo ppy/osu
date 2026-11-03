@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchPerformanceCalculator : PerformanceCalculator
     {
-        private const double performance_multiplier = 1.23;
+        private const double performance_multiplier = 1.01;
 
         private int num300;
         private int num100;
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double scoreMaxCombo = Math.Clamp(score.MaxCombo, 0, catchAttributes.MaxCombo);
 
             // We are heavily relying on aim in catch the beat
-            double value = DiffUtils.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
+            double value = DiffUtils.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.1) / 210000.0;
 
             value *= DiffUtils.Pow(0.97, numMiss);
 
