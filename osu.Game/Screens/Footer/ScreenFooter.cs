@@ -56,6 +56,10 @@ namespace osu.Game.Screens.Footer
         private FillFlowContainer<ScreenFooterButton> leftButtonsFlow = null!;
         private FillFlowContainer<ShearedButton> rightButtonsFlow = null!;
         private Container overlayContentContainer = null!;
+
+        // Note: because these are fill flows, they will relayout the buttons moved to them
+        // if handled in a wrong way (for example, by inserting them into the container
+        // in a different order than they were placed in the original container).
         private FillFlowContainer<ScreenFooterButton> hiddenLeftButtonsContainer = null!;
         private FillFlowContainer<ShearedButton> hiddenRightButtonsContainer = null!;
 
@@ -322,11 +326,18 @@ namespace osu.Game.Screens.Footer
             // On a screen with two overlays, if the user were to hide the first, and then
             // appear the second one before the transforms for reappearing the buttons were
             // to finish, the register overlay handler for the second overlay would run before
-            // the clear handler for the second one. This could cause some buttons having
-            // `BypassAutoSizeAxes` enabled while they shouldn't.
+            // the clear handler for the second one.
+            // Specifically, this would mean that the autosize restore delegate for overlay #1
+            // could potentially run after the content for the overlay #2 has been displayed,
+            // resetting the autosize bypass for all buttons, and especially those that should
+            // be currently hidden.
             //
             // To avoid that, we immediately fire the autosize restore delegate if it happens
-            // to exist at this point in time.
+            // to exist at this point in time. It has to be forced to run instead of being cancelled,
+            // as the set of the buttons whose autosize will be restored by it is not necessarily
+            // a subset of the set of buttons whose autosize will be bypassed below (i.e. a visible
+            // button would have its autosize bypassed when it shouldn't be, causing the overlay
+            // content to overlap it).
             if (autosizeRestoreDelegate?.Completed == false)
                 autosizeRestoreDelegate.RunTask();
 
