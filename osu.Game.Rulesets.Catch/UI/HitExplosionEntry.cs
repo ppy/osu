@@ -4,11 +4,12 @@
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
+
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class HitExplosionEntry : LifetimeEntry
+    public class HitExplosionEntry : LifetimeEntryBase<HitExplosionEntry>
     {
         /// <summary>
         /// The judgement result that triggered this explosion.
