@@ -682,7 +682,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.MoveMouseTo(nonrotatable);
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("no rotation handles present", () => this.ChildrenOfType<SelectionBoxRotationHandle>(), () => Is.Empty);
+            AddAssert("no rotation handles present", this.ChildrenOfType<SelectionBoxRotationHandle>, () => Is.Empty);
             AddStep("attempt rotate", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
