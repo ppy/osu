@@ -197,7 +197,7 @@ namespace osu.Game.Screens.RankingV2.Argon
 
         #region ISerialisableDrawable
 
-        public bool UsesFixedAnchor { get; set; }
+        public bool UsesFixedAnchor { get; set; } = true;
 
         #endregion
 

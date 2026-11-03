@@ -53,10 +53,10 @@ namespace osu.Game.Overlays.SkinEditor
                 Spacing = new Vector2(EditorSidebar.PADDING)
             };
 
-            reloadComponents();
+            ReloadComponents();
         }
 
-        private void reloadComponents()
+        public void ReloadComponents()
         {
             fill.Clear();
 
