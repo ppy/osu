@@ -3,11 +3,11 @@
 
 using Newtonsoft.Json;
 
-namespace osu.Desktop.IPC.Messages
+namespace osu.Game.Online.API.Requests.Responses
 {
-    public class HitCountMessage : OsuWebSocketMessage
+    public class APIScreenshot
     {
-        [JsonProperty("new_hits")]
-        public long NewHits { get; init; }
+        [JsonProperty("url")]
+        public string Url { get; set; } = string.Empty;
     }
 }

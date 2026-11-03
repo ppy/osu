@@ -14,6 +14,8 @@ namespace osu.Game.Audio
     {
         private readonly string[] sampleNames;
 
+        public bool IsHitsound => false;
+
         public SampleInfo(params string[] sampleNames)
         {
             this.sampleNames = sampleNames;

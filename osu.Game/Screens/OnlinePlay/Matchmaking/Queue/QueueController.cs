@@ -62,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.LoadComplete();
 
+            client.MatchmakingQueueStatusChanged += onMatchmakingQueueStatusChanged;
             client.RoomUpdated += onRoomUpdated;
             client.MatchmakingQueueJoined += onMatchmakingQueueJoined;
             client.MatchmakingQueueLeft += onMatchmakingQueueLeft;
@@ -90,6 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            QueueTimer.Stop();
 
             client.MatchmakingLeaveQueue().FireAndForget();
         }
@@ -156,6 +158,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             closeNotification();
         }
 
+        private void onMatchmakingQueueStatusChanged(MatchmakingQueueStatus status) => Scheduler.Add(() =>
+        {
+            if (status is MatchmakingQueueStatus.JoiningMatch)
+                CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+        });
+
         private void onRoomUpdated() => Scheduler.Add(() =>
         {
             if (client.Room == null)
@@ -179,6 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
+            QueueTimer.Stop();
 
             postNotification();
             backgroundNotification?.Complete(invitation);
@@ -238,6 +247,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             if (client.IsNotNull())
             {
+                client.MatchmakingQueueStatusChanged -= onMatchmakingQueueStatusChanged;
                 client.RoomUpdated -= onRoomUpdated;
                 client.MatchmakingQueueJoined -= onMatchmakingQueueJoined;
                 client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;

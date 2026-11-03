@@ -90,15 +90,6 @@ namespace osu.Game.Graphics.Containers
             base.OnMouseUp(e);
         }
 
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            // allow for controlling volume when alt is held.
-            // mostly for compatibility with osu-stable.
-            if (e.AltPressed) return false;
-
-            return true;
-        }
-
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             if (e.Repeat)

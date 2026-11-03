@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            selectedItems.CollectionChanged += (_, __) => updateState();
+            selectedItems.CollectionChanged += (_, _) => updateState();
             editorBeatmap.HitObjectUpdated += hitObjectUpdated;
             updateState();
         }
@@ -297,6 +297,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Computes the bounds for the magnitude of the scaled point p with respect to the bounds lowerBounds and upperBounds
             (float, float) computeBounds(Vector2 lowerBounds, Vector2 upperBounds, Vector2 p)
             {
+                // These divisions can be interpreted as calculating the scale factors that need to be applied to p
+                // to hit all four edges of the axis-aligned rectangle defined by lowerBounds and upperBounds.
                 var sLowerBounds = Vector2.Divide(lowerBounds, p);
                 var sUpperBounds = Vector2.Divide(upperBounds, p);
 
@@ -313,7 +315,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (Precision.AlmostEquals(p.Y, 0))
                     (sLowerBounds.Y, sUpperBounds.Y) = (float.NegativeInfinity, float.PositiveInfinity);
 
-                return (MathF.Max(sLowerBounds.X, sLowerBounds.Y), MathF.Min(sUpperBounds.X, sUpperBounds.Y));
+                float min = MathF.Max(sLowerBounds.X, sLowerBounds.Y);
+                float max = MathF.Min(sUpperBounds.X, sUpperBounds.Y);
+
+                if (min > max)
+                {
+                    // This condition can occur if no scaling factor exists that will bring p
+                    // inside the axis-aligned rectangle defined by lowerBounds and upperBounds.
+                    // Geometrically, this can be interpreted via a ray which starts at the origin of the coordinate space and passes through p.
+                    // If such ray never enters the aforementioned axis-aligned rectangle, this condition occurs.
+                    // In such a case there is nothing to be done other than prevent scaling altogether.
+                    return (1, 1);
+                }
+
+                return (min, max);
             }
         }
 

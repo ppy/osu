@@ -15,6 +15,10 @@ namespace osu.Game.Beatmaps
         public override ArchiveDownloadRequest<IBeatmapSetInfo>? GetExistingDownload(IBeatmapSetInfo model)
             => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
 
+        public bool Download(IBeatmapSetInfo model, bool withoutVideo) => Download(model, withoutVideo, null);
+
+        public void DownloadAsUpdate(BeatmapSetInfo originalModel, bool withoutVideo) => Download(originalModel, withoutVideo, originalModel);
+
         public BeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api)
             : base(beatmapImporter, api)
         {

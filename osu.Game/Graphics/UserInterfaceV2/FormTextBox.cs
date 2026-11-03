@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

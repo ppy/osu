@@ -30,6 +30,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
 using osuTK;
 
@@ -40,8 +41,6 @@ namespace osu.Game.Screens.Edit.Submission
         private BeatmapSubmissionOverlay overlay = null!;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
-
-        protected override bool InitialBackButtonVisibility => false;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -84,6 +83,11 @@ namespace osu.Game.Screens.Edit.Submission
         private Live<BeatmapSetInfo>? importedSet;
 
         private Sample completedSample = null!;
+
+        public BeatmapSubmissionScreen()
+        {
+            FooterContent.Value = ScreenFooterContent.None;
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -437,7 +441,7 @@ namespace osu.Game.Screens.Edit.Submission
 
         private void allowExit()
         {
-            BackButtonVisibility.Value = true;
+            FooterContent.Value = ScreenFooterContent.Argon();
         }
 
         protected override void Update()
@@ -454,7 +458,7 @@ namespace osu.Game.Screens.Edit.Submission
         public override bool OnExiting(ScreenExitEvent e)
         {
             // We probably want a method of cancelling in the future…
-            if (!BackButtonVisibility.Value)
+            if (!FooterContent.Value.BackButton)
                 return true;
 
             if (importedSet != null)

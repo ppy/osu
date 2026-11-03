@@ -306,6 +306,7 @@ namespace osu.Game.Tests.Visual.Online
                 GlobalRank = 2148,
                 CountryRank = 1,
                 PP = 4567.89m,
+                PlayTime = 2173671,
                 Level = new UserStatistics.LevelInfo
                 {
                     Current = 727,

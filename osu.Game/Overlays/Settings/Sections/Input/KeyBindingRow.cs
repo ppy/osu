@@ -22,6 +22,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Rulesets;
@@ -31,7 +32,7 @@ using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public partial class KeyBindingRow : Container, IFilterable
+    public partial class KeyBindingRow : Container, IFilterable, IBlockGlobalAltScrollVolume
     {
         /// <summary>
         /// Invoked when the binding of this row is updated with a change being written.
