@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Footer
 
         public const int HEIGHT = 50;
 
+        private static readonly Vector2 spacing = new Vector2(7, 0);
         private const int padding = 60;
         private const float delay_per_button = 30;
         private const double transition_duration = 500;
@@ -117,7 +118,7 @@ namespace osu.Game.Screens.Footer
                                 Origin = Anchor.BottomLeft,
                                 Y = ScreenFooterButton.CORNER_RADIUS,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(7, 0),
+                                Spacing = spacing,
                                 AutoSizeAxes = Axes.Both,
                             },
                             overlayContentContainer = new Container
@@ -133,7 +134,7 @@ namespace osu.Game.Screens.Footer
                                 Origin = Anchor.BottomRight,
                                 Y = -OsuGame.SCREEN_EDGE_MARGIN,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(7, 0),
+                                Spacing = spacing,
                                 AutoSizeAxes = Axes.Both,
                             }
                         },
@@ -154,7 +155,7 @@ namespace osu.Game.Screens.Footer
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(7, 0),
+                    Spacing = spacing,
                     AutoSizeAxes = Axes.Both,
                 },
                 hiddenRightButtonsContainer = new FillFlowContainer<ShearedButton>
@@ -164,7 +165,7 @@ namespace osu.Game.Screens.Footer
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(7, 0),
+                    Spacing = spacing,
                     AutoSizeAxes = Axes.Both,
                 },
                 (logoTrackingContainer = new LogoTrackingContainer
