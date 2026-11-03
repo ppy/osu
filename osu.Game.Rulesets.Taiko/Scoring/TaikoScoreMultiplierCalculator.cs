@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             Single<ModWindDown>(hasMultiplier: 0.5);
             // Muted
             Single<ModAdaptiveSpeed>(hasMultiplier: 0.5);
+            // Pitch Adjust
 
             #endregion
 
