@@ -239,7 +239,7 @@ namespace osu.Game.Screens.RankingV2.Argon
 
         #region IAnimatableSkinnable
 
-        [SettingSource(nameof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
         public BindableInt GroupNumber { get; } = new BindableInt(3)
         {
             MinValue = 0,
