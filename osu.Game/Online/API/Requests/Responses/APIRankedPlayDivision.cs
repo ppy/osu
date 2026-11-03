@@ -10,9 +10,6 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIRankedPlayDivision
     {
-        [JsonProperty(@"key")]
-        public string Key = string.Empty;
-
         [JsonProperty(@"tier")]
         [JsonConverter(typeof(StringEnumConverter))]
         public RankingTier Tier;
@@ -20,14 +17,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"division")]
         public RankedPlayDivision Division;
 
-        [JsonProperty(@"display_name")]
-        public string DisplayName = string.Empty;
-
         [JsonProperty(@"start_rating")]
         public int StartRating;
 
         [JsonProperty(@"end_rating")]
         public int EndRating;
+
+        public string Key => Tier == RankingTier.Lustrous
+            ? Tier.ToString()
+            : $"{Tier}-{Division}";
+
+        public string DisplayName => Tier == RankingTier.Lustrous
+            ? Tier.ToString()
+            : $"{Tier} {Division}";
 
         public int Width => EndRating - StartRating + 1;
     }
