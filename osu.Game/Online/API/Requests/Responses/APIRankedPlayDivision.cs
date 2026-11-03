@@ -26,7 +26,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"start_rating")]
         public int StartRating;
 
-        [JsonProperty("@end_rating")]
+        [JsonProperty(@"end_rating")]
         public int EndRating;
 
         public int Width => EndRating - StartRating + 1;
