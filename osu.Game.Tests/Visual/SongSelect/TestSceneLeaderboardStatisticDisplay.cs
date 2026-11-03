@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 container.AddRange(statistics = new[]
                 {
-                    new BeatmapLeaderboardScore.StatisticDisplay("COMBO", "123x", false),
+                    new BeatmapLeaderboardScore.StatisticDisplay("MAX COMBO", "123x", false),
                     new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
                 });
             });
