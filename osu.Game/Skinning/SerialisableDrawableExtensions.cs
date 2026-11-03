@@ -24,14 +24,14 @@ namespace osu.Game.Skinning
             if (serialisableDrawable?.CanBeRotated != false)
                 component.Rotation = drawableInfo.Rotation;
 
-            if (serialisableDrawable?.CanBeScaled != false)
-            {
-                if (drawableInfo.Width is float width && width != 0 && (component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.X) != true)
-                    component.Width = width;
-                if (drawableInfo.Height is float height && height != 0 && (component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.Y) != true)
-                    component.Height = height;
+            if (drawableInfo.Width is float width && width != 0 && (component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.X) != true && serialisableDrawable?.CanBeScaled(Axes.X) != false)
+                component.Width = width;
+
+            if (drawableInfo.Height is float height && height != 0 && (component as CompositeDrawable)?.AutoSizeAxes.HasFlag(Axes.Y) != true && serialisableDrawable?.CanBeScaled(Axes.Y) != false)
+                component.Height = height;
+
+            if (serialisableDrawable?.CanBeScaled(Axes.Both) != false)
                 component.Scale = drawableInfo.Scale;
-            }
 
             component.Anchor = drawableInfo.Anchor;
             component.Origin = drawableInfo.Origin;

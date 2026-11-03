@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.SkinEditor
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
-            if (SelectedBlueprints.Any(b => !b.Item.CanBeScaled))
+            if (SelectedBlueprints.Any(b => !b.Item.CanBeScaled(direction == Direction.Horizontal ? Axes.X : Axes.Y)))
                 return false;
 
             var selectionQuad = getSelectionQuad();
@@ -132,7 +132,8 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanFlipX = SelectionBox.CanFlipY = SelectedItems.All(i => i.CanBeScaled);
+            SelectionBox.CanFlipX = SelectedItems.All(i => i.CanBeScaled(Axes.X));
+            SelectionBox.CanFlipY = SelectedItems.All(i => i.CanBeScaled(Axes.Y));
             SelectionBox.CanReverse = false;
         }
 

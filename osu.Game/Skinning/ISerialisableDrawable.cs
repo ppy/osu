@@ -45,7 +45,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Whether this component can be scaled from its default size.
         /// </summary>
-        bool CanBeScaled => CanBeSelected;
+        bool CanBeScaled(Axes axes) => CanBeSelected;
 
         /// <summary>
         /// Whether this component can be rotated from its default rotation.

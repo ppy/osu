@@ -727,6 +727,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public bool CanBeSelected { get; init; } = true;
             public bool CanBeMoved { get; init; } = true;
             public bool CanBeScaled { get; init; } = true;
+            bool ISerialisableDrawable.CanBeScaled(Axes axes) => CanBeScaled;
             public bool CanBeRotated { get; init; } = true;
 
             [BackgroundDependencyLoader]

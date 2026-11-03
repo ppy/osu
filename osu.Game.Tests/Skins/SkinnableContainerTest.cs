@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Skins
         private partial class UnscaleableSkinnable : Drawable, ISerialisableDrawable
         {
             public bool UsesFixedAnchor { get; set; }
-            public bool CanBeScaled => false;
+            public bool CanBeScaled(Axes _) => false;
         }
 
         private partial class NonrotatableSkinnable : Drawable, ISerialisableDrawable
