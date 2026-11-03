@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Select
                     Child = textFlow = new OsuTextFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
-                        ParagraphSpacing = 0.1f,
+                        ParagraphSpacing = 0f,
                     },
                 };
 
