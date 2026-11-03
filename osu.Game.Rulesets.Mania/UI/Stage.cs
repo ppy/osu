@@ -175,11 +175,24 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             float paddingTop = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.StagePaddingTop))?.Value ?? 0;
             float paddingBottom = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.StagePaddingBottom))?.Value ?? 0;
+            float? columnStart = currentSkin.GetConfig<ManiaSkinConfigurationLookup, float>(new ManiaSkinConfigurationLookup(LegacyManiaSkinConfigurationLookups.ColumnStart))?.Value;
 
+            if (columnStart is null)
+            {
+                // make the field centered instead
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+            else
+            {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+            }
             Padding = new MarginPadding
             {
                 Top = paddingTop,
                 Bottom = paddingBottom,
+                Left = columnStart ?? 0
             };
         }
 
