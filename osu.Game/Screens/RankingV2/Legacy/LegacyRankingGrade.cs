@@ -75,15 +75,11 @@ namespace osu.Game.Screens.RankingV2.Legacy
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the legacy skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
 
         #region IAnimatableSkinnable
 
-        [SettingSource(nameof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
         public BindableInt GroupNumber { get; } = new BindableInt(1)
         {
             MinValue = 0,

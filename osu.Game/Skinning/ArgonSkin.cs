@@ -11,10 +11,12 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.RankingV2.Argon;
 using osu.Game.Skinning.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -277,6 +279,30 @@ namespace osu.Game.Skinning
                             };
 
                             return mainHUDComponents;
+
+                        case GlobalSkinnableContainers.Results:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var beatmapInfoWedge = container.OfType<ArgonBeatmapInfoPanel>().FirstOrDefault();
+                                var userInfoWedge = container.OfType<ArgonPlayerInfoPanel>().FirstOrDefault();
+                                var totalScoreWedge = container.OfType<ArgonTotalScorePanel>().FirstOrDefault();
+                                var statisticsGrid = container.OfType<ArgonScoreStatisticsGrid>().FirstOrDefault();
+
+                                var leftWedgeBasePosition = new Vector2(-ShearedButton.CORNER_RADIUS);
+                                static Vector2 leftWedgeOffset(float y) => new Vector2(-y * OsuGame.SHEAR.X, y);
+
+                                beatmapInfoWedge?.Position = leftWedgeBasePosition;
+                                userInfoWedge?.Position = leftWedgeBasePosition + leftWedgeOffset(161);
+                                totalScoreWedge?.Position = leftWedgeBasePosition + leftWedgeOffset(233);
+                                statisticsGrid?.Position = new Vector2(20, 354);
+                            })
+                            {
+                                new ArgonScoreRankDisplay(),
+                                new ArgonBeatmapInfoPanel(),
+                                new ArgonPlayerInfoPanel(),
+                                new ArgonTotalScorePanel(),
+                                new ArgonScoreStatisticsGrid(),
+                            };
                     }
 
                     return null;

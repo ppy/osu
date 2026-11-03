@@ -18,6 +18,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Select;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -259,6 +260,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             contentDisplayed();
             AddAssert("left buttons hidden", () => ScreenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.Child.Parent!.Y > 0));
             AddAssert("right buttons hidden", () => ScreenFooter.ChildrenOfType<ShearedButton>().Any(b => b.ChildrenOfType<Container>().ElementAt(1).Y > 0));
+            AddAssert(
+                "right overlay content is at edge of footer",
+                () =>
+                {
+                    var rightContent = ScreenFooter.ChildrenOfType<TestShearedOverlayContainer.TestRightOverlayContent>().Single();
+                    return rightContent.ToSpaceOfOtherDrawable(new Vector2(rightContent.DrawWidth, 0), ScreenFooter).X;
+                },
+                () => Is.EqualTo(ScreenFooter.DrawWidth - OsuGame.SCREEN_EDGE_MARGIN).Within(0.5f)
+            );
 
             AddStep("hide overlay", () => screen.Overlay.Hide());
             contentHidden();
@@ -553,16 +563,31 @@ namespace osu.Game.Tests.Visual.UserInterface
                 [BackgroundDependencyLoader]
                 private void load()
                 {
-                    AutoSizeAxes = Axes.Both;
+                    RelativeSizeAxes = Axes.Both;
 
-                    InternalChild = new FillFlowContainer
+                    InternalChildren = new Drawable[]
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Children = new[]
+                        new FillFlowContainer
                         {
-                            new ShearedButton { Width = 200, Text = "Action #1", Action = () => { } },
-                            new ShearedButton { Width = 140, Text = "Action #2", Action = () => { } },
-                        }
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Children = new[]
+                            {
+                                new ShearedButton { Width = 200, Text = "Action #1", Action = () => { } },
+                                new ShearedButton { Width = 140, Text = "Action #2", Action = () => { } },
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Children = new Drawable[]
+                            {
+                                new TestRightOverlayContent(),
+                            },
+                        },
                     };
                 }
 
@@ -576,6 +601,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     this.MoveToY(-20f, 200, Easing.OutQuint)
                         .FadeOut(200, Easing.OutQuint);
+                }
+            }
+
+            public partial class TestRightOverlayContent : ShearedButton
+            {
+                public TestRightOverlayContent()
+                {
+                    Width = 150;
+                    Text = "Right content";
                 }
             }
         }
