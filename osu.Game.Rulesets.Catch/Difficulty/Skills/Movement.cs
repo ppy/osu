@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Aggregation;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             for (int sectionCount = 0; sectionCount < Math.Min(reduced_difficulty_sections, peaks.Count); sectionCount++)
             {
-                double scale = Math.Pow(Math.Min(1.0, sectionCount / reduced_difficulty_sections), reduced_difficulty_power);
+                double scale = DiffUtils.Pow(Math.Min(1.0, sectionCount / reduced_difficulty_sections), reduced_difficulty_power);
                 peaks[sectionCount] *= reduced_difficulty_base_line + (1.0 - reduced_difficulty_base_line) * scale;
             }
 
