@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             int totalCombo = totalComboHits();
             double flashLightLengthBonus =
                 1.35 * (0.95 + 0.3 * Math.Min(1.0, totalCombo / 2500.0) +
-                (totalCombo > 2500 ? Math.Log10(totalCombo / 2500.0) * 0.475 : 0.0));
+                        (totalCombo > 2500 ? Math.Log10(totalCombo / 2500.0) * 0.475 : 0.0));
             if (score.Mods.Any(m => m is ModFlashlight))
                 value *= flashLightLengthBonus;
 
