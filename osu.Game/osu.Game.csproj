@@ -30,7 +30,6 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="10.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="10.0.13" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.13" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="ppy.LocalisationAnalyser" Version="2026.611.0">
@@ -44,7 +43,6 @@
     <PackageReference Include="SharpCompress" Version="0.50.4" />
     <PackageReference Include="NUnit" Version="4.6.1" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 </Project>

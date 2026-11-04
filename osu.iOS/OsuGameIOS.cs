@@ -20,9 +20,9 @@ namespace osu.iOS
     {
         private readonly AppDelegate appDelegate;
 
-        public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
+        public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary!["CFBundleVersion"]!.ToString()!);
 
-        public override string Version => NSBundle.MainBundle.InfoDictionary["OsuVersion"].ToString();
+        public override string Version => NSBundle.MainBundle.InfoDictionary!["OsuVersion"]!.ToString()!;
 
         public override bool HideUnlicensedContent => true;
 
