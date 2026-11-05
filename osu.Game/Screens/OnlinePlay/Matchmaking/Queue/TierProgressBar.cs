@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private static readonly IEasingFunction rating_change = new CubicBezierEasingFunction(0, 0, 0, 1);
 
         private static readonly IEasingFunction flow_move = new CubicBezierEasingFunction(0.15, 0.6, 0, 1);
-        private static readonly IEasingFunction flow_move_entering = new CubicBezierEasingFunction(0, 0,0, 1);
+        private static readonly IEasingFunction flow_move_entering = new CubicBezierEasingFunction(0, 0, 0, 1);
 
         private static readonly IEasingFunction next_div_display_fade = new CubicBezierEasingFunction(0.5, 0, 0.5, 1);
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly Bindable<APIRankedPlayDivision> currentDivision = new Bindable<APIRankedPlayDivision>();
 
-        public required IEnumerable<APIRankedPlayDivision> Divisions
+        public required IReadOnlyList<APIRankedPlayDivision> Divisions
         {
             private get;
             set
@@ -158,53 +158,51 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             updateSegmentSizes();
         }
 
-        public void SetRating(int? value = null, bool entering = false)
+        public void SetRating(int newValue, bool entering = false)
         {
-            int rating = value ?? lowerBound;
-
-            if (currentRating.Value == rating)
-                return;
-
-            if (rating < lowerBound || rating > upperBound)
+            if (newValue < lowerBound || newValue > upperBound)
                 throw new ArgumentException("Rating is outside the division bounds.");
+
+            if (currentRating.Value == newValue)
+                return;
 
             if (entering)
             {
-                int initialRating = Math.Max(rating - 300, lowerBound);
+                int initialRating = Math.Max(newValue - 300, lowerBound);
                 currentRatingInstantaneous.Value = initialRating;
-                segmentFlow.MoveToX(calculateContainerOffset(initialRating));
+                segmentFlow.X = calculateContainerOffset(initialRating);
             }
 
-            currentRating.Value = rating;
+            currentRating.Value = newValue;
 
             // TODO: This is currently a bindable only so that `RatingToNextDivisionDisplay` has
             //       an up to date source of the division for the current rating. It should be
             //       refactored to fetch that data from some centralized source of division data,
             //       once it exists.
-            currentDivision.Value = Divisions.First(d => d.StartRating <= rating && d.EndRating >= rating);
+            currentDivision.Value = Divisions.First(d => d.StartRating <= currentRating.Value && d.EndRating >= currentRating.Value);
 
             int duration = entering ? 1500 : 1600;
             IEasingFunction flowEasing = entering
                 ? flow_move_entering
                 : flow_move;
 
-            this.TransformBindableTo(currentRatingInstantaneous, rating, duration, rating_change);
-            segmentFlow.MoveToX(calculateContainerOffset(rating), duration, flowEasing);
+            this.TransformBindableTo(currentRatingInstantaneous, currentRating.Value, duration, rating_change);
+            segmentFlow.MoveToX(calculateContainerOffset(currentRating.Value), duration, flowEasing);
 
-            var nextDivDisplayTransform = nextDivDisplay.FadeOut(entering ? 0 : 100, next_div_display_fade);
+            var nextDivDisplayTransform = nextDivDisplay.FadeOut(100, next_div_display_fade);
 
-            if (currentDivision.Value?.Tier != RankingTier.Lustrous)
-            {
-                nextDivDisplayTransform
-                    .Then()
-                    .Schedule(() =>
-                    {
-                        updateToNextDivPosition();
-                        nextDivDisplay.UpdateLabel();
-                    })
-                    .Delay(duration - 600)
-                    .FadeIn(200, next_div_display_fade);
-            }
+            if (currentDivision.Value?.Tier == RankingTier.Lustrous)
+                return;
+
+            nextDivDisplayTransform
+                .Then()
+                .Schedule(() =>
+                {
+                    updateToNextDivPosition();
+                    nextDivDisplay.UpdateLabel();
+                })
+                .Delay(duration - 600)
+                .FadeIn(200, next_div_display_fade);
         }
 
         private void updateSegmentSizes()
