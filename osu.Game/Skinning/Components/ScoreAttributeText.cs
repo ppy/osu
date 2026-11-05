@@ -24,7 +24,7 @@ using osu.Game.Utils;
 namespace osu.Game.Skinning.Components
 {
     [UsedImplicitly]
-    public partial class ScoreAttributeText : FontAdjustableSkinComponent, ISerialisableDrawable
+    public partial class ScoreAttributeText : FontAdjustableSkinComponent
     {
         public const float DEFAULT_TEXT_SIZE = 40;
 

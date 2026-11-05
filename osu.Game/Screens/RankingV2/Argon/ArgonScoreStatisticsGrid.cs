@@ -496,7 +496,7 @@ namespace osu.Game.Screens.RankingV2.Argon
                             [
                                 new OsuSpriteText
                                 {
-                                    Text = @"Mods".ToUpperInvariant(),
+                                    Text = BeatmapsetsStrings.ShowScoreboardHeadersMods.ToUpper(),
                                     Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
                                 },
                                 ModDisplay = new ModDisplay
