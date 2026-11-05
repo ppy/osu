@@ -21,13 +21,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
     public partial class TierProgressBar : Container
     {
-        private static readonly IEasingFunction rating_change = new CubicBezierEasingFunction(0, 0, 0, 1);
-
-        private static readonly IEasingFunction flow_move = new CubicBezierEasingFunction(0.15, 0.6, 0, 1);
-        private static readonly IEasingFunction flow_move_entering = new CubicBezierEasingFunction(0, 0, 0, 1);
-
-        private static readonly IEasingFunction next_div_display_fade = new CubicBezierEasingFunction(0.5, 0, 0.5, 1);
-
         private readonly BindableInt currentRating = new BindableInt();
         private readonly BindableFloat currentRatingInstantaneous = new BindableFloat();
 
@@ -57,6 +50,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 updateSegmentSizes();
             }
         }
+
+        /// <summary>
+        /// The initial rating value that should be displayed upon load.
+        /// </summary>
+        /// <remarks>
+        /// This can be used when the progress bar needs to start at a certain
+        /// rating, for instance on a results screen, when it should animate
+        /// from the old rating to the new one after a completed match.
+        /// </remarks>
+        public int? InitialRating { private get; init; }
 
         private const int displayed_rating_range = 800;
 
@@ -155,10 +158,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.LoadComplete();
 
+            if (InitialRating != null)
+                currentRatingInstantaneous.Value = currentRating.Value = InitialRating.Value;
+
             updateSegmentSizes();
         }
 
-        public void SetRating(int newValue, bool entering = false)
+        private const int rating_change_duration = 1600;
+        private static readonly IEasingFunction rating_change_easing = new CubicBezierEasingFunction(0, 0, 0, 1);
+
+        private static readonly IEasingFunction flow_easing = new CubicBezierEasingFunction(0.15, 0.6, 0, 1);
+        private static readonly IEasingFunction flow_easing_small_change = new CubicBezierEasingFunction(0, 0, 0, 1);
+
+        private static readonly IEasingFunction next_div_display_fade = new CubicBezierEasingFunction(0.5, 0, 0.5, 1);
+
+        public void SetRating(int newValue)
         {
             if (newValue < lowerBound || newValue > upperBound)
                 throw new ArgumentException("Rating is outside the division bounds.");
@@ -166,12 +180,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             if (currentRating.Value == newValue)
                 return;
 
-            if (entering)
-            {
-                int initialRating = Math.Max(newValue - 300, lowerBound);
-                currentRatingInstantaneous.Value = initialRating;
-                segmentFlow.X = calculateContainerOffset(initialRating);
-            }
+            // Use a different, less 'jerky' easing function for small rating changes.
+            IEasingFunction flowEasing = Math.Abs(currentRating.Value - newValue) <= 300
+                ? flow_easing_small_change
+                : flow_easing;
 
             currentRating.Value = newValue;
 
@@ -181,13 +193,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             //       once it exists.
             currentDivision.Value = Divisions.First(d => d.StartRating <= currentRating.Value && d.EndRating >= currentRating.Value);
 
-            int duration = entering ? 1500 : 1600;
-            IEasingFunction flowEasing = entering
-                ? flow_move_entering
-                : flow_move;
-
-            this.TransformBindableTo(currentRatingInstantaneous, currentRating.Value, duration, rating_change);
-            segmentFlow.MoveToX(calculateContainerOffset(currentRating.Value), duration, flowEasing);
+            this.TransformBindableTo(currentRatingInstantaneous, currentRating.Value, rating_change_duration, rating_change_easing);
+            segmentFlow.MoveToX(calculateContainerOffset(currentRating.Value), rating_change_duration, flowEasing);
 
             var nextDivDisplayTransform = nextDivDisplay.FadeOut(100, next_div_display_fade);
 
@@ -201,7 +208,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     updateToNextDivPosition();
                     nextDivDisplay.UpdateLabel();
                 })
-                .Delay(duration - 600)
+                .Delay(1000)
                 .FadeIn(200, next_div_display_fade);
         }
 

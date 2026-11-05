@@ -68,7 +68,8 @@ namespace osu.Game.Tests.Visual.RankedPlay
         [Test]
         public void TestEntering()
         {
-            AddStep("set to 1250", () => progressBar.SetRating(1250, true));
+            AddStep("create with 950", () => Child = createProgressBar(950));
+            AddStep("set to 1250", () => progressBar.SetRating(1250));
         }
 
         [Test]
@@ -92,7 +93,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             float getLastDivisionLength() => this.ChildrenOfType<TierProgressBar.DivisionSegment>().Last().DrawWidth;
         }
 
-        private TierProgressBar createProgressBar() => progressBar = new TierProgressBar
+        private TierProgressBar createProgressBar(int? initialRating = null) => progressBar = new TierProgressBar
         {
             RelativeSizeAxes = Axes.X,
             Width = width,
@@ -100,6 +101,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             Origin = Anchor.Centre,
             Padding = new MarginPadding { Horizontal = 20 },
             Divisions = DIVISIONS,
+            InitialRating = initialRating,
         };
 
         public static readonly APIRankedPlayDivision[] DIVISIONS =
