@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
 
         private TextureUpload limitTextureUploadSize(TextureUpload textureUpload)
         {
-            var image = Image.LoadPixelData(textureUpload.Data, textureUpload.Width, textureUpload.Height);
+            var image = Image.LoadPixelData(textureUpload.PremultipliedData, textureUpload.Width, textureUpload.Height);
 
             // The original texture upload will no longer be returned or used.
             textureUpload.Dispose();
@@ -85,7 +85,7 @@ namespace osu.Game.Beatmaps
 
             image.Mutate(i => i.Crop(cropRectangle));
 
-            return new TextureUpload(image);
+            return new TextureUpload(PremultipliedImage.FromStraight(image));
         }
 
         public Stream? GetStream(string name) => textureStore?.GetStream(name);
