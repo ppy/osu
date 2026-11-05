@@ -1,0 +1,7 @@
+[Events]
+//Storyboard Layer 0 (Background)
+// Regression for ppy/osu#27753: StartValue must be considered when determining visibility.
+Sprite,Background,Centre,"Textures/test-image.png",320,240
+ F,0,1000,2000,1,0
+ F,0,5000,6000,0.8,0
+ S,0,6000,15000,1,2
