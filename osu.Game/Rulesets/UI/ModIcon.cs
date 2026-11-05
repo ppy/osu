@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -41,6 +42,8 @@ namespace osu.Game.Rulesets.UI
         private readonly bool showTooltip;
 
         private bool showExtendedInformation;
+        private bool useSkinIcon;
+        private bool canShowExtendedInformation = true;
 
         public bool ShowExtendedInformation
         {
@@ -49,6 +52,16 @@ namespace osu.Game.Rulesets.UI
             {
                 showExtendedInformation = value;
                 updateExtendedInformation();
+            }
+        }
+
+        public bool UseSkinIcon
+        {
+            get => useSkinIcon;
+            set
+            {
+                useSkinIcon = value;
+                updateMod(mod);
             }
         }
 
@@ -86,6 +99,9 @@ namespace osu.Game.Rulesets.UI
         private SpriteIcon cogBackground = null!;
         private SpriteIcon cog = null!;
 
+        private readonly Bindable<Skin> skin = new Bindable<Skin>();
+        private Sprite skinIcon = null!;
+
         private ModSettingChangeTracker? modSettingsChangeTracker;
 
         /// <summary>
@@ -94,7 +110,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="mod">The mod to be displayed</param>
         /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
         /// <param name="showExtendedInformation">Whether to display a mod's extended information, if available.</param>
-        public ModIcon(IMod mod, bool showTooltip = true, bool showExtendedInformation = true)
+        /// <param name="useSkinIcon">Whether the icon should be skin-sourced, if available.</param>
+        public ModIcon(IMod mod, bool showTooltip = true, bool showExtendedInformation = true, bool useSkinIcon = false)
         {
             // May expand due to expanded content, so autosize here.
             AutoSizeAxes = Axes.X;
@@ -103,10 +120,11 @@ namespace osu.Game.Rulesets.UI
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
             this.showTooltip = showTooltip;
             this.showExtendedInformation = showExtendedInformation;
+            this.useSkinIcon = useSkinIcon;
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, SkinManager skinManager)
         {
             Children = new Drawable[]
             {
@@ -176,6 +194,12 @@ namespace osu.Game.Rulesets.UI
                             Height = 92 / 135f,
                             Icon = FontAwesome.Solid.Question
                         },
+                        skinIcon = new Sprite
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both
+                        },
                         adjustmentMarker = new Container
                         {
                             Size = new Vector2(20),
@@ -203,6 +227,8 @@ namespace osu.Game.Rulesets.UI
                     }
                 },
             };
+
+            skin.BindTarget = skinManager.CurrentSkin;
         }
 
         protected override void LoadComplete()
@@ -210,6 +236,9 @@ namespace osu.Game.Rulesets.UI
             base.LoadComplete();
 
             Selected.BindValueChanged(_ => updateColour());
+
+            if (useSkinIcon)
+                skin.BindValueChanged(_ => updateMod(mod));
 
             updateMod(mod);
         }
@@ -224,20 +253,49 @@ namespace osu.Game.Rulesets.UI
                 modSettingsChangeTracker.SettingChanged = _ => updateExtendedInformation();
             }
 
-            modAcronym.Text = value.Acronym;
-            modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
-            TooltipContent = showTooltip ? value as Mod : null;
+            Texture? skinIconTexture = null;
 
-            if (value.Icon == null)
+            if (useSkinIcon)
             {
+                string textureName = getModIconSpriteName(mod);
+                skinIconTexture = skin.Value.GetTexture(textureName);
+            }
+
+            if (skinIconTexture != null)
+            {
+                skinIcon.Texture = skinIconTexture;
+                skinIcon.FadeIn();
+
+                modAcronym.FadeOut();
                 modIcon.FadeOut();
-                modAcronym.FadeIn();
+                background.FadeOut();
+
+                // we want to hide the extended information for skin icons because the extended background clashes with custom icons
+                canShowExtendedInformation = false;
             }
             else
             {
-                modIcon.FadeIn();
-                modAcronym.FadeOut();
+                skinIcon.FadeOut();
+                background.FadeIn();
+
+                modAcronym.Text = value.Acronym;
+                modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
+
+                if (value.Icon == null)
+                {
+                    modIcon.FadeOut();
+                    modAcronym.FadeIn();
+                }
+                else
+                {
+                    modIcon.FadeIn();
+                    modAcronym.FadeOut();
+                }
+
+                canShowExtendedInformation = true;
             }
+
+            TooltipContent = showTooltip ? value as Mod : null;
 
             backgroundColour = colours.ForModType(value.Type);
             updateColour();
@@ -247,7 +305,7 @@ namespace osu.Game.Rulesets.UI
 
         private void updateExtendedInformation()
         {
-            bool showExtended = showExtendedInformation && !string.IsNullOrEmpty(mod.ExtendedIconInformation);
+            bool showExtended = showExtendedInformation && canShowExtendedInformation && !string.IsNullOrEmpty(mod.ExtendedIconInformation);
 
             extendedContent.Alpha = showExtended ? 1 : 0;
             extendedText.Text = mod.ExtendedIconInformation;
@@ -266,6 +324,16 @@ namespace osu.Game.Rulesets.UI
 
             extendedText.Colour = background.Colour = Selected.Value ? backgroundColour.Lighten(0.2f) : backgroundColour;
             extendedBackground.Colour = Selected.Value ? backgroundColour.Darken(2.4f) : backgroundColour.Darken(2.8f);
+        }
+
+        private string getModIconSpriteName(IMod mod)
+        {
+            // autopilot has a special legacy name
+            string modName = mod.Name == "Autopilot"
+                ? "relax2"
+                : mod.Name.Replace(" ", "").Trim().ToLowerInvariant();
+
+            return $"selection-mod-{modName}";
         }
 
         protected override void Dispose(bool isDisposing)
