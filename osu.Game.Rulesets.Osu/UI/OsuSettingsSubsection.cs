@@ -41,6 +41,11 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsItemV2(new FormCheckBox
                 {
+                    Caption = RulesetSettingsStrings.SliderTickMissMarkers,
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.ShowSliderTickMissMarkers)
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
                     Caption = RulesetSettingsStrings.HitAnimations,
                     HintText = RulesetSettingsStrings.HitAnimationsOsuTooltip,
                     Current = config.GetBindable<bool>(OsuRulesetSetting.HitAnimations)
