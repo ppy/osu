@@ -15,6 +15,8 @@ namespace osu.Game.Screens.RankingV2.Legacy
 {
     public partial class LegacyOnlineRankingButton : CompositeDrawable, ISerialisableDrawable
     {
+        public bool CanBeScaled(Axes _) => false;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]

@@ -18,6 +18,8 @@ namespace osu.Game.Screens.RankingV2.Legacy
     /// <seealso href="https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L570-L608"/>
     public partial class LegacyRankingGrade : CompositeDrawable, ISerialisableDrawable, IAnimatableSkinnable
     {
+        public bool CanBeScaled(Axes axes) => axes == Axes.Both;
+
         private Sprite gradeSprite = null!;
         private Sprite gradeAdditiveSprite = null!;
 
