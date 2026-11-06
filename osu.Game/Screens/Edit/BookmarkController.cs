@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -63,7 +64,7 @@ namespace osu.Game.Screens.Edit
                     {
                         Hotkey = new Hotkey(GlobalAction.EditorSeekToNextBookmark)
                     },
-                    resetBookmarkMenuItem = new EditorMenuItem(EditorStrings.ResetBookmarks, MenuItemType.Destructive, () => dialogOverlay?.Push(new BookmarkResetDialog(editorBeatmap)))
+                    resetBookmarkMenuItem = new EditorMenuItem(LocalisableString.Interpolate($@"{EditorStrings.ResetBookmarks}..."), MenuItemType.Destructive, () => dialogOverlay?.Push(new BookmarkResetDialog(editorBeatmap)))
                 }
             };
         }

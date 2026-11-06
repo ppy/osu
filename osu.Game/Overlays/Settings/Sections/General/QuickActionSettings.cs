@@ -38,21 +38,21 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 new SettingsButtonV2
                 {
-                    Text = GeneralSettingsStrings.RunSetupWizard,
+                    Text = LocalisableString.Interpolate($@"{GeneralSettingsStrings.RunSetupWizard}..."),
                     Keywords = new[] { @"first run", @"initial", @"getting started", @"import", @"tutorial", @"recommended beatmaps" },
                     TooltipText = FirstRunSetupOverlayStrings.FirstRunSetupDescription,
                     Action = () => firstRunSetupOverlay?.Show(),
                 },
                 new SettingsButtonV2
                 {
-                    Text = GeneralSettingsStrings.LearnMoreAboutLazer,
+                    Text = LocalisableString.Interpolate($@"{GeneralSettingsStrings.LearnMoreAboutLazer}..."),
                     TooltipText = GeneralSettingsStrings.LearnMoreAboutLazerTooltip,
                     BackgroundColour = colours.YellowDark,
                     Action = () => game?.ShowWiki(@"Help_centre/Upgrading_to_lazer")
                 },
                 new SettingsButtonV2
                 {
-                    Text = GeneralSettingsStrings.ReportIssue,
+                    Text = LocalisableString.Interpolate($@"{GeneralSettingsStrings.ReportIssue}..."),
                     TooltipText = GeneralSettingsStrings.ReportIssueTooltip,
                     BackgroundColour = colours.YellowDarker,
                     Action = () => game?.OpenUrlExternally(@"https://osu.ppy.sh/community/forums/topics/create?forum_id=5", LinkWarnMode.NeverWarn)
