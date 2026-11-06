@@ -94,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return criteria;
         }
 
-        protected override OsuButton CreateNewRoomButton() => new CreateMultiplayerMatchButton();
+        protected override ShearedButton CreateNewRoomButton() => new CreateMultiplayerMatchButton();
 
         protected override Room CreateNewRoom() => new Room
         {
