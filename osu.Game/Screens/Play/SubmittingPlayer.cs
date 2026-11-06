@@ -358,6 +358,8 @@ namespace osu.Game.Screens.Play
                 case @"expired token":
                     return NotificationsStrings.PreventSubmittingWithExpiredToken;
 
+                // Exception message, may be actually displayed to user.
+                // See https://github.com/ppy/osu/blob/fcd13a194242dc92a1aa6d9a9689c9da183ae669/osu.Game/Screens/Play/SubmittingPlayer.cs#L113
                 case @"Online functionality is not available.":
                     return NotificationsStrings.OnlineFunctionalityIsNotAvailable;
 
