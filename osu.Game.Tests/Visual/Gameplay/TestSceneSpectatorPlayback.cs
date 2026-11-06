@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -191,6 +192,45 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("wait for all frames received", () => playbackReplay.Frames.Count == recorder.SentFrames.Count);
             AddAssert("ensure frames were received in the correct sequence", () => playbackReplay.Frames.Select(f => f.Time).SequenceEqual(recorder.SentFrames.Select(f => f.Time)));
+        }
+
+        [Test]
+        public void TestEndPlayWaitsForQueuedFrames()
+        {
+            AddUntilStep("received frames", () => playbackReplay.Frames.Count > 50);
+
+            int frameSendAttemptsSoFar = 0;
+            int framesSentSoFar = 0;
+            int framesReceivedAtEndPlay = -1;
+
+            AddStep("listen for end play", () => spectatorClient.OnUserFinishedPlaying += (_, _) => framesReceivedAtEndPlay = playbackReplay.Frames.Count);
+
+            // frames from a held send still arrive, but any bundle purged after it stays queued behind it.
+            AddStep("start holding sends", () =>
+            {
+                spectatorClient.FrameSendCompletion = new TaskCompletionSource<bool>();
+                frameSendAttemptsSoFar = spectatorClient.FrameSendAttempts;
+            });
+
+            AddUntilStep("wait for next send attempt", () =>
+            {
+                framesSentSoFar = recorder.SentFrames.Count;
+                return spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar;
+            });
+
+            AddUntilStep("wait for more frames", () => recorder.SentFrames.Count > framesSentSoFar);
+
+            AddStep("stop sending frames", () => recorder.Expire());
+            AddStep("end play", () => spectatorClient.EndPlaying(0, TestGameplayState.Create(new OsuRuleset())));
+
+            AddWaitStep("wait some", 5);
+            AddAssert("end play not received", () => framesReceivedAtEndPlay == -1);
+            AddAssert("not all frames received", () => playbackReplay.Frames.Count < recorder.SentFrames.Count);
+
+            AddStep("stop holding sends", () => spectatorClient.FrameSendCompletion!.SetResult(true));
+
+            AddUntilStep("wait for end play", () => framesReceivedAtEndPlay >= 0);
+            AddAssert("ensure all frames were received before end play", () => framesReceivedAtEndPlay == recorder.SentFrames.Count);
         }
 
         private void onNewFrames(int userId, FrameDataBundle frames)
