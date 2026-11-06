@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.UI
     {
         protected override bool AllowRightClickFromLongTouch => false;
 
+        public override bool HandleHoverEvents => true;
+
         public readonly KeyBindingContainer<T> KeyBindingContainer;
 
         [Resolved]
