@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public BindableNumber<double> SliderVelocityMultiplierBindable { get; } = new BindableDouble(1)
         {
-            MinValue = 0.1,
+            MinValue = 0.01,
             MaxValue = 10
         };
 

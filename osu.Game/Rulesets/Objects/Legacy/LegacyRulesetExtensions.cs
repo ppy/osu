@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 case "osu":
                 case "fruits":
-                    bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
+                    bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 10000) / 100.0 : 1;
                     break;
 
                 default:
