@@ -30,6 +30,31 @@ namespace osu.Game.Localisation
         public static LocalisableString FooterButtonPlaylistAdd => new TranslatableString(getKey(@"footer_button_playlist_add"), @"Add to playlist");
 
         /// <summary>
+        /// "Close"
+        /// </summary>
+        public static LocalisableString FooterButtonPlaylistClose => new TranslatableString(getKey(@"footer_button_playlist_close"), @"Close");
+
+        /// <summary>
+        /// "Play!"
+        /// </summary>
+        public static LocalisableString FooterButtonPlaylistPlay => new TranslatableString(getKey(@"footer_button_playlist_play"), @"Play!");
+
+        /// <summary>
+        /// "Beatmap not downloaded"
+        /// </summary>
+        public static LocalisableString FooterButtonBeatmapNotDownloaded => new TranslatableString(getKey(@"footer_button_beatmap_not_downloaded"), @"Beatmap not downloaded");
+
+        /// <summary>
+        /// "No time left!"
+        /// </summary>
+        public static LocalisableString FooterButtonPlaylistPlayNoTime => new TranslatableString(getKey(@"footer_button_playlist_play_no_time"), @"No time left!");
+
+        /// <summary>
+        /// "Attempts exhausted!"
+        /// </summary>
+        public static LocalisableString FooterButtonPlaylistPlayNoAttempts => new TranslatableString(getKey(@"footer_button_playlist_play_no_attempts"), @"Attempts exhausted!");
+
+        /// <summary>
         /// "Freemods"
         /// </summary>
         public static LocalisableString FooterButtonFreemods => new TranslatableString(getKey(@"footer_button_freemods"), @"Freemods");

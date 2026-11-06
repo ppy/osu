@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
@@ -277,6 +278,20 @@ namespace osu.Game.Online.Rooms
             get => pinned;
             set => SetField(ref pinned, value);
         }
+
+        public TimeSpan? DeletionGracePeriodRemaining
+        {
+            get
+            {
+                if (Type != MatchType.Playlists)
+                    return null;
+
+                return startDate?.AddMinutes(5) - DateTimeOffset.Now;
+            }
+        }
+
+        [MemberNotNullWhen(true, nameof(DeletionGracePeriodRemaining))]
+        public bool InDeletionGracePeriod => DeletionGracePeriodRemaining > TimeSpan.Zero && !HasEnded;
 
         [JsonProperty("id")]
         private long? roomId;
