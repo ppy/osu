@@ -318,10 +318,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 this.TransformTo(nameof(Margin), new MarginPadding(), 300, Easing.OutQuint);
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                ContentContainer.Height = Math.Max(DrawHeight - FormControlBackground.BORDER_THICKNESS * 2.0f, 0.0f);
+            }
+
             protected override void UpdateSize(Vector2 newSize)
             {
                 newSize.Y = Math.Min(newSize.Y + FormControlBackground.BORDER_THICKNESS * 2.0f, MaxHeight);
-                ContentContainer.Height = newSize.Y - FormControlBackground.BORDER_THICKNESS * 2.0f;
 
                 base.UpdateSize(newSize);
             }
