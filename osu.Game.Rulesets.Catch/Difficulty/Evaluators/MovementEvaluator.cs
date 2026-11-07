@@ -62,10 +62,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                     {
                         var prevFlow = lastFlow.Previous(i);
 
-                        if (prevFlow != null && prevFlow.DistanceMoved != 0)
+                        if (prevFlow != null && prevFlow.Distance != 0)
                         {
-                            double lastSpacing = Math.Abs(lastFlow.DistanceMoved / lastFlow.StrainTime);
-                            double prevSpacing = Math.Abs(prevFlow.DistanceMoved / prevFlow.StrainTime);
+                            double lastSpacing = Math.Abs(lastFlow.Distance / lastFlow.StrainTime);
+                            double prevSpacing = Math.Abs(prevFlow.Distance / prevFlow.StrainTime);
 
                             double relativeDifference = Math.Abs(lastSpacing / prevSpacing - 1);
                             relativeDifference = Math.Max(0, relativeDifference - 0.05); // Handle inaccuracies in repetitive patterns.
@@ -87,11 +87,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                 var catchPrevObj = (CatchDifficultyHitObject)catchCurrent.Previous(i);
 
                 // Only same direction movements matter as they do not take any additional inputs.
-                if (catchCurrent.Direction != catchPrevObj.Direction || catchCurrent.DistanceMoved == 0 || catchPrevObj.DistanceMoved == 0)
+                if (catchCurrent.Direction != catchPrevObj.Direction || catchCurrent.Distance == 0 || catchPrevObj.Distance == 0)
                     break;
 
-                double currentSpacing = Math.Abs(catchCurrent.DistanceMoved / catchCurrent.StrainTime);
-                double prevSpacing = Math.Abs(catchPrevObj.DistanceMoved / catchPrevObj.StrainTime);
+                double currentSpacing = Math.Abs(catchCurrent.Distance / catchCurrent.StrainTime);
+                double prevSpacing = Math.Abs(catchPrevObj.Distance / catchPrevObj.StrainTime);
 
                 double relativeDifference = Math.Abs(currentSpacing / prevSpacing - 1);
 
@@ -117,9 +117,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             // the platter's width but high enough to be considered a movement due to the absolute_player_positioning_error and NORMALIZED_HALF_CATCHER_WIDTH offsets
             // We are detecting this exact scenario. The first back and forth is counted but all subsequent ones are nullified.
             // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and NORMALIZED_HALF_CATCHER_WIDTH)
-            if (current.Index >= 2 && Math.Abs(catchCurrent.ExactDistanceMoved) <= CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2
-                                   && Precision.AlmostEquals(catchCurrent.ExactDistanceMoved, -catchLast.ExactDistanceMoved)
-                                   && Precision.AlmostEquals(catchLast.ExactDistanceMoved, -catchLastLast.ExactDistanceMoved)
+            if (current.Index >= 2 && Math.Abs(catchCurrent.Distance) <= CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2
+                                   && Precision.AlmostEquals(catchCurrent.Distance, -catchLast.Distance)
+                                   && Precision.AlmostEquals(catchLast.Distance, -catchLastLast.Distance)
                                    && Precision.AlmostEquals(catchCurrent.StrainTime, catchLast.StrainTime)
                                    && Precision.AlmostEquals(catchLast.StrainTime, catchLastLast.StrainTime))
                 distanceAddition = 0;

@@ -47,12 +47,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public float DistanceMoved { get; private set; }
 
         /// <summary>
-        /// Normalized distance the player has to move from <see cref="LastPlayerPosition"/> in order to catch <see cref="BaseObject"/> at its <see cref="NormalizedPosition"/>.
+        /// Normalized distance between <see cref="LastNormalizedPosition"/> at its <see cref="NormalizedPosition"/>.
         /// </summary>
-        /// <remarks>
-        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
-        /// </remarks>
-        public float ExactDistanceMoved { get; private set; }
+        public float Distance { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 40ms.
@@ -60,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public readonly double StrainTime;
 
         /// <summary>
-        /// The sign of the <see cref="ExactDistanceMoved"/>: negative is left and positive is right (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
+        /// The sign of the <see cref="DistanceMoved"/>: negative is left and positive is right (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
         /// </summary>
         public int Direction;
 
@@ -110,9 +107,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             );
 
             DistanceMoved = PlayerPosition - LastPlayerPosition;
-
-            // For the exact position we consider that the catcher is in the correct position for both objects
-            ExactDistanceMoved = NormalizedPosition - LastPlayerPosition;
+            Distance = NormalizedPosition - LastNormalizedPosition;
 
             // After a hyperdash we ARE in the correct position. Always!
             if (LastObject.HyperDash)
