@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             if (LastObject.HyperDash)
                 PlayerPosition = NormalizedPosition;
 
-            Direction = Math.Sign(ExactDistanceMoved);
+            Direction = Math.Sign(DistanceMoved);
         }
     }
 }
