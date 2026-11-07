@@ -85,6 +85,8 @@ namespace osu.Game.Screens.Ranking
 
         private Sample? popInSample;
 
+        private OfflineUsernameInput? offlineUsernameInput;
+
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
 
@@ -137,6 +139,14 @@ namespace osu.Game.Screens.Ranking
                                         {
                                             RelativeSizeAxes = Axes.Both
                                         },
+                                        offlineUsernameInput = new OfflineUsernameInput
+                                        {
+                                            Score = { BindTarget = SelectedScore },
+                                            AchievedScore = IsLocalPlay && Score != null ? Score : null,
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Margin = new MarginPadding { Top = 20, Right = 20 },
+                                        },
                                     }
                                 }
                             },
@@ -183,6 +193,15 @@ namespace osu.Game.Screens.Ranking
                 bool shouldFlair = player != null && !Score.User.IsBot;
 
                 ScorePanelList.AddScore(Score, shouldFlair);
+                offlineUsernameInput?.Username.BindValueChanged(v =>
+                {
+                    if (Score == null) return;
+
+                    Score.User.Username = v.NewValue;
+                    Score.RealmUser.Username = v.NewValue;
+                    ScorePanel panel = ScorePanelList.GetPanelForScore(Score);
+                    panel.Refresh();
+                });
                 // this is mostly for medal display.
                 // we don't want the medal animation to trample on the results screen animation, so we (ab)use `OverlayActivationMode`
                 // to give the results screen enough time to play the animation out before the medals can be shown.
