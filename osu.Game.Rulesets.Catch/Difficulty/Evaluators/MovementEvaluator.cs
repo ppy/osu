@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             // There is an edge case where horizontal back and forth sliders create "buzz" patterns which are repeated "movements" with a distance lower than
             // the platter's width but high enough to be considered a movement due to the absolute_player_positioning_error and NORMALIZED_HALF_CATCHER_WIDTH offsets
             // We are detecting this exact scenario. The first back and forth is counted but all subsequent ones are nullified.
-            // To achieve that, we need to store the exact distances (distance ignoring absolute_player_positioning_error and NORMALIZED_HALF_CATCHER_WIDTH)
+            // To achieve that, we need to store the exact distances between consecutive objects.
             if (current.Index >= 2 && Math.Abs(catchCurrent.Distance) <= CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 2
                                    && Precision.AlmostEquals(catchCurrent.Distance, -catchLast.Distance)
                                    && Precision.AlmostEquals(catchLast.Distance, -catchLastLast.Distance)
