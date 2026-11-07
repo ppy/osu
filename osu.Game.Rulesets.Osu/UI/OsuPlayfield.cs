@@ -208,15 +208,6 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
 
-        private OsuResumeOverlay.OsuResumeOverlayInputBlocker? resumeInputBlocker;
-
-        public void AttachResumeOverlayInputBlocker(OsuResumeOverlay.OsuResumeOverlayInputBlocker resumeInputBlocker)
-        {
-            Debug.Assert(this.resumeInputBlocker == null);
-            this.resumeInputBlocker = resumeInputBlocker;
-            AddInternal(resumeInputBlocker);
-        }
-
         private partial class ProxyContainer : LifetimeManagementContainer
         {
             public void Add(Drawable proxy) => AddInternal(proxy);
