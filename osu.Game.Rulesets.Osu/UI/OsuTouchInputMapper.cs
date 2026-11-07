@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.StateChanges;
 using osu.Game.Configuration;
 using osuTK;
 
@@ -135,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!osuInputManager.AllowUserCursorMovement)
                 return;
 
-            new MousePositionAbsoluteInput { Position = touchEvent.ScreenSpaceTouch.Position }.Apply(osuInputManager.CurrentState, osuInputManager);
+            osuInputManager.TrySetCursorPositionFromTouch(touchEvent.ScreenSpaceTouch.Position);
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
