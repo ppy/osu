@@ -38,6 +38,14 @@ namespace osu.Game.Screens.RankingV2.Argon
     {
         public static readonly ColourInfo TEXT_GRADIENT = ColourInfo.GradientVertical(Colour4.White, Colour4.FromHex(@"B2E5FE"));
 
+        public static readonly ColourInfo PERFECT_GRADIENT = new ColourInfo
+        {
+            TopLeft = Colour4.FromHex(@"00FFAA"),
+            TopRight = Colour4.FromHex(@"7CF6FF"),
+            BottomLeft = Colour4.FromHex(@"7CF6FF"),
+            BottomRight = Colour4.FromHex(@"FF9AD7"),
+        };
+
         private Container scoreContainer = null!;
         private Drawable perfectIndicator = null!;
         private Container personalBestIndicator = null!;
@@ -309,13 +317,7 @@ namespace osu.Game.Screens.RankingV2.Argon
 
                 Size = new Vector2(75);
 
-                Colour = new ColourInfo
-                {
-                    TopLeft = Colour4.FromHex(@"00FFAA"),
-                    TopRight = Colour4.FromHex(@"7CF6FF"),
-                    BottomLeft = Colour4.FromHex(@"7CF6FF"),
-                    BottomRight = Colour4.FromHex(@"FF9AD7"),
-                };
+                Colour = PERFECT_GRADIENT;
 
                 InternalChildren = new Drawable[]
                 {
