@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {
-            const double skill_multiplier = 0.058;
+            const double skill_multiplier = 0.061;
 
             if (!Mods.Any(m => m is OsuModFlashlight))
                 return 0;
