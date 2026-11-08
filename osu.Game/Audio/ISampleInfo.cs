@@ -13,5 +13,7 @@ namespace osu.Game.Audio
         IEnumerable<string> LookupNames { get; }
 
         int Volume { get; }
+
+        bool IsHitsound { get; }
     }
 }
