@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    if (!LocalisableString.IsNullOrEmpty(api.UserFacingOutageMessage.Value))
+                    if (api.UserFacingOutageMessage.Value is LocalisableString userFacingMessage && !LocalisableString.IsNullOrEmpty(userFacingMessage))
                     {
                         linkFlow.AddText(NotificationsStrings.ServerOutageInProgress.ToUpper(), s =>
                         {
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Login
                             s.Colour = Colour4.Orange;
                         });
 
-                        linkFlow.AddParagraph(api.UserFacingOutageMessage.Value.Value, s => s.Font = OsuFont.Style.Caption1);
+                        linkFlow.AddParagraph(userFacingMessage, s => s.Font = OsuFont.Style.Caption1);
                     }
                     else if (state.NewValue == APIState.Failing)
                     {
