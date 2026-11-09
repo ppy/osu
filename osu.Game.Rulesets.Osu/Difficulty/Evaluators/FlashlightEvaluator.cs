@@ -67,7 +67,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (currentObj.Angle != null && osuCurrent.Angle != null)
                 {
-                    angleRepeatCount += DiffUtils.ReverseLerp(Math.Abs(currentObj.Angle.Value - osuCurrent.Angle.Value), double.DegreesToRadians(2), 0) *
+                    double angleDifference = Math.Abs(currentObj.Angle.Value - osuCurrent.Angle.Value);
+
+                    angleRepeatCount += DiffUtils.ReverseLerp(angleDifference, double.DegreesToRadians(2), 0) *
                                         Math.Max(1.0 - 0.1 * i, 0.0); // Objects further back in time should count less for the nerf.
                 }
 
