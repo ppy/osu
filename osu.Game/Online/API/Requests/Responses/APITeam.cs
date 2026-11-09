@@ -55,19 +55,4 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public int OnlineID => Id;
     }
-
-    public class APITeamStatistics
-    {
-        [JsonProperty(@"play_count")]
-        public int PlayCount;
-
-        [JsonProperty(@"ranked_score")]
-        public long RankedScore;
-
-        [JsonProperty(@"performance")]
-        public int Performance;
-
-        [JsonProperty(@"rank")]
-        public int? Rank;
-    }
 }
