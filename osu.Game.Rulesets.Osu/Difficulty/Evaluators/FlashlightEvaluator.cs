@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 if (currentObj.Angle != null && osuCurrent.Angle != null)
                 {
                     // Objects further back in time should count less for the nerf.
-                    if (Math.Abs(currentObj.Angle.Value - osuCurrent.Angle.Value) < double.DegreesToRadians(2))
+                    if (Math.Abs(currentObj.Angle.Value - osuCurrent.Angle.Value) < double.DegreesToRadians(1.25))
                         angleRepeatCount += Math.Max(1.0 - 0.1 * i, 0.0);
                 }
 
