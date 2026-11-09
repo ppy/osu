@@ -17,7 +17,7 @@ namespace osu.iOS
         /// <summary>
         /// The current orientation the game is displayed in.
         /// </summary>
-        public UIInterfaceOrientation CurrentOrientation => Host.Window.UIWindow.WindowScene!.InterfaceOrientation;
+        public UIInterfaceOrientation CurrentOrientation => Host.Window.UIWindow.WindowScene!.EffectiveGeometry.InterfaceOrientation;
 
         /// <summary>
         /// Controls the orientations allowed for the device to rotate to, overriding the default allowed orientations.
