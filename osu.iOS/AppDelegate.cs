@@ -41,7 +41,14 @@ namespace osu.iOS
 
         protected override Framework.Game CreateGame() => new OsuGameIOS(this);
 
-        public UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
+        /// <summary>
+        /// TODO: This is no longer working as expected and needs a refactor. It changed in iOS 16 and newer SDKs
+        /// See https://developer.apple.com/documentation/uikit/uiapplicationdelegate/application(_:supportedinterfaceorientationsfor:).
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="forWindow"></param>
+        /// <returns></returns>
+        public UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow? forWindow)
         {
             if (orientations != null)
                 return orientations.Value;
@@ -49,10 +56,10 @@ namespace osu.iOS
             if (defaultOrientationsMask == null)
             {
                 defaultOrientationsMask = 0;
-                var defaultOrientations = (NSArray)NSBundle.MainBundle.ObjectForInfoDictionary("UISupportedInterfaceOrientations");
+                var defaultOrientations = (NSArray)NSBundle.MainBundle.ObjectForInfoDictionary("UISupportedInterfaceOrientations")!;
 
                 foreach (var value in defaultOrientations.ToArray<NSString>())
-                    defaultOrientationsMask |= Enum.Parse<UIInterfaceOrientationMask>(value.ToString().Replace("UIInterfaceOrientation", string.Empty));
+                    defaultOrientationsMask |= Enum.Parse<UIInterfaceOrientationMask>(value!.ToString().Replace("UIInterfaceOrientation", string.Empty));
             }
 
             return defaultOrientationsMask.Value;
