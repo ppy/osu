@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Skins
             // Covers legacy bar hit error meter
             "Archives/modified-classic-20260806.osk",
             // Covers results screen components
-            "Archives/modified-argon-20261028.osk",
+            "Archives/modified-argon-20261109.osk",
             "Archives/modified-classic-20261028.osk",
         };
 

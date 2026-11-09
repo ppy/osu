@@ -7,12 +7,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Scoring;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.RankingV2
 {
-    public partial class SoloResultsScreenV2 : ScreenWithBeatmapBackground
+    public partial class SoloResultsScreenV2 : ScreenWithBeatmapBackground, IResultsScreenV2
     {
         [Cached(typeof(IBindable<IScoreInfo>))]
         private Bindable<IScoreInfo> score = new Bindable<IScoreInfo>();
@@ -57,5 +58,11 @@ namespace osu.Game.Screens.RankingV2
             var ruleset = score.Value.Ruleset.CreateInstance();
             Mods.Value = score.Value.Mods.Select(m => m.ToMod(ruleset)).ToArray();
         }
+
+        #region IResultsScreenV2
+
+        Bindable<ScreenFooterContent?> IResultsScreenV2.FooterContent => FooterContent;
+
+        #endregion
     }
 }
