@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
             const double max_opacity_bonus = 0.4;
-            const double min_angle_multiplier = 0.2;
 
             var osuCurrent = (OsuDifficultyHitObject)current;
             var osuHitObject = (OsuHitObject)osuCurrent.BaseObject;
@@ -48,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
                 var currentObj = (OsuDifficultyHitObject)current.Previous(i);
-                var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
+                var currentHitObject = (OsuHitObject)currentObj.BaseObject;
 
                 cumulativeStrainTime += lastObj.AdjustedDeltaTime;
 
@@ -68,9 +67,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (currentObj.Angle != null && osuCurrent.Angle != null)
                 {
-                    // Objects further back in time should count less for the nerf.
-                    if (Math.Abs(currentObj.Angle.Value - osuCurrent.Angle.Value) < double.DegreesToRadians(1.25))
-                        angleRepeatCount += Math.Max(1.0 - 0.1 * i, 0.0);
+                    angleRepeatCount += DiffUtils.ReverseLerp(Math.Abs(currentObj.Angle.Value - osuCurrent.Angle.Value), double.DegreesToRadians(2), 0) *
+                                        Math.Max(1.0 - 0.1 * i, 0.0); // Objects further back in time should count less for the nerf.
                 }
 
                 lastObj = currentObj;
@@ -79,13 +77,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flashlightDifficulty = DiffUtils.Pow(smallDistNerf * flashlightDifficulty, 2);
 
             flashlightDifficulty *= calculateHiddenBonus(mods);
-
-            // Nerf patterns with repeated angles.
-            flashlightDifficulty *= min_angle_multiplier + (1.0 - min_angle_multiplier) / (angleRepeatCount + 1.0);
-
+            flashlightDifficulty *= calculateRepeatedAngleNerf(angleRepeatCount);
             flashlightDifficulty += calculateSliderBonus(osuCurrent, scalingFactor);
 
             return flashlightDifficulty;
+        }
+
+        private static double calculateHiddenBonus(IReadOnlyList<Mod> mods)
+        {
+            const double hidden_bonus = 1.2;
+
+            // Additional bonus for Hidden due to there being no approach circles.
+            return mods.OfType<OsuModHidden>().Any() ? hidden_bonus : 1.0;
+        }
+
+        private static double calculateRepeatedAngleNerf(double angleRepeatCount)
+        {
+            const double min_angle_multiplier = 0.2;
+
+            // Nerf patterns with repeated angles.
+            return min_angle_multiplier + (1.0 - min_angle_multiplier) / (angleRepeatCount + 1.0);
         }
 
         private static double calculateSliderBonus(OsuDifficultyHitObject osuCurrent, double scalingFactor)
@@ -110,14 +121,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus /= (osuSlider.RepeatCount + 1);
 
             return sliderBonus * slider_multiplier;
-        }
-
-        private static double calculateHiddenBonus(IReadOnlyList<Mod> mods)
-        {
-            const double hidden_bonus = 1.2;
-
-            // Additional bonus for Hidden due to there being no approach circles.
-            return mods.OfType<OsuModHidden>().Any() ? hidden_bonus : 1.0;
         }
     }
 }
