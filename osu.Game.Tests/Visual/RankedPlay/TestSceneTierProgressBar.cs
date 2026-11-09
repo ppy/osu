@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("skip animation", () =>
             {
                 progressBar.FinishTransforms();
-                progressBar.ChildrenOfType<FillFlowContainer<TierProgressBar.DivisionSegment>>().Single().FinishTransforms();
+                progressBar.ChildrenOfType<FillFlowContainer<TierProgressBar.Segment>>().Single().FinishTransforms();
             });
             AddStep("save length", () => originalLength = getLastDivisionLength());
             AddStep("update divisions", () => progressBar.Divisions = new List<APIRankedPlayDivision>(DIVISIONS)

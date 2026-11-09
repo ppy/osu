@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
@@ -13,36 +14,30 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
     public partial class TierProgressBar
     {
-        public partial class DivisionSegment : CompositeDrawable
+        public partial class Segment : CompositeDrawable
         {
-            public readonly APIRankedPlayDivision Division;
+            protected Container BarContainer = null!;
 
-            public readonly IBindable<float> CurrentRating = new BindableFloat();
-
-            private readonly Container foregroundContainer;
-            private readonly CompactDivisionBadge divisionBadge;
-
-            public DivisionSegment(APIRankedPlayDivision division)
+            public Segment(int ratingWidth)
             {
-                Division = division;
-
                 AutoSizeAxes = Axes.Y;
                 Padding = new MarginPadding { Horizontal = 2 };
 
+                RatingWidth = ratingWidth;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 InternalChildren = new Drawable[]
                 {
-                    new OsuSpriteText
-                    {
-                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                        Colour = Colour4.White,
-                        Text = division.StartRating.ToLocalisableString(@"N0"),
-                    },
-                    new Container
+                    BarContainer = new Container
                     {
                         Y = 15,
                         RelativeSizeAxes = Axes.X,
@@ -57,34 +52,69 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                 Child = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = getColour(),
+                                    Colour = GetColour(),
                                 },
                                 Alpha = 0.25f,
                             },
-                            foregroundContainer = new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Masking = true,
-                                CornerRadius = 4,
-                                Child = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = getColour(),
-                                },
-                            },
                         },
                     },
+                };
+            }
+
+            public int RatingWidth { get; }
+
+            protected virtual ColourInfo GetColour() => Color4.Black;
+        }
+
+        public partial class DivisionSegment : Segment
+        {
+            public readonly APIRankedPlayDivision Division;
+
+            public readonly IBindable<float> CurrentRating = new BindableFloat();
+
+            private Container foregroundContainer = null!;
+            private CompactDivisionBadge divisionBadge = null!;
+
+            public DivisionSegment(APIRankedPlayDivision division)
+                : base(division.Width)
+            {
+                Division = division;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BarContainer.Add(foregroundContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 4,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = GetColour(),
+                    },
+                });
+
+                AddRangeInternal(new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                        Colour = Colour4.White,
+                        Text = Division.StartRating.ToLocalisableString(@"N0"),
+                    },
                     // TODO: display actual player rank
-                    divisionBadge = new CompactDivisionBadge(division, 100)
+                    divisionBadge = new CompactDivisionBadge(Division, 100)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Y = 27,
                     },
-                };
+                });
             }
 
-            private ColourInfo getColour() => Division.Tier switch
+            protected override ColourInfo GetColour() => Division.Tier switch
             {
                 RankingTier.Bronze => ColourInfo.GradientVertical(Colour4.FromHex(@"#B88F7A"), Colour4.FromHex(@"#855C47")),
                 RankingTier.Silver => ColourInfo.GradientVertical(Colour4.FromHex(@"#E0E0EB"), Colour4.FromHex(@"#A3A3C2")),
