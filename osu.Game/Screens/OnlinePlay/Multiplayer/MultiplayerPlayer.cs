@@ -220,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             // Await up to 60 seconds for results to become available (6 api request timeouts).
             // This is arbitrary just to not leave the player in an essentially deadlocked state if any connection issues occur.
-            await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60))).ConfigureAwait(false);
+            await resultsReady.Task.WaitAsync(TimeSpan.FromSeconds(60)).ConfigureAwait(false);
         }
 
         protected override void RequestIntroSkip()
