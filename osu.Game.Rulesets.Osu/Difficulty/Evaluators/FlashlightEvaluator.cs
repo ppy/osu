@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Nerf sliders with repeats, as less memorisation is required.
             if (osuSlider.RepeatCount > 0)
-                sliderBonus /= (osuSlider.RepeatCount + 1);
+                sliderBonus /= osuSlider.RepeatCount + 1;
 
             return sliderBonus * slider_multiplier;
         }
