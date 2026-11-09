@@ -54,6 +54,31 @@ Unstable Rate: {2:0.00}", earlyAverage, lateAverage, unstableRate);
         /// </summary>
         public static LocalisableString LegacyOnlineRankingButtonText => new TranslatableString(getKey(@"legacy_online_ranking_button_text"), @"▼ Online Ranking ▼");
 
+        /// <summary>
+        /// "Ranking"
+        /// </summary>
+        public static LocalisableString RankingFooterButtonText => new TranslatableString(getKey(@"ranking_footer_button_text"), @"Ranking");
+
+        /// <summary>
+        /// "More statistics"
+        /// </summary>
+        public static LocalisableString MoreStatisticsFooterButtonText => new TranslatableString(getKey(@"more_statistics_footer_button_text"), @"More statistics");
+
+        /// <summary>
+        /// "Catalogue"
+        /// </summary>
+        public static LocalisableString CatalogueFooterButtonText => new TranslatableString(getKey(@"catalogue_footer_button_text"), @"Catalogue");
+
+        /// <summary>
+        /// "Watch replay"
+        /// </summary>
+        public static LocalisableString WatchReplayFooterButtonText => new TranslatableString(getKey(@"watch_replay_footer_button_text"), @"Watch replay");
+
+        /// <summary>
+        /// "Play again"
+        /// </summary>
+        public static LocalisableString PlayAgainFooterButtonText => new TranslatableString(getKey(@"play_again_footer_button_text"), @"Play again");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
