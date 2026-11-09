@@ -80,13 +80,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
             }
 
-            // Longer maps are worth more when FlashLight is applied. "Longer" means how many notes there are which can contribute to combo
-            int totalCombo = totalComboHits();
-            double flashLightLengthBonus =
-                1.35 * (0.95 + 0.3 * Math.Min(1.0, totalCombo / 2500.0) +
-                        (totalCombo > 2500 ? Math.Log10(totalCombo / 2500.0) * 0.475 : 0.0));
+            // Longer maps are worth more when Flashlight is applied. "Longer" means how many notes there are which can contribute to combo
             if (score.Mods.Any(m => m is ModFlashlight))
-                value *= flashLightLengthBonus;
+            {
+                int totalCombo = totalComboHits();
+                double flashlightLengthBonus =
+                    1.35 * (0.95 + 0.3 * Math.Min(1.0, totalCombo / 2500.0) +
+                            (totalCombo > 2500 ? Math.Log10(totalCombo / 2500.0) * 0.475 : 0.0));
+                value *= flashlightLengthBonus;
+            }
 
             value *= DiffUtils.Pow(accuracy(), 5.5);
 
