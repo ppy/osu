@@ -92,6 +92,20 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestHighSpeedSeeking()
+        {
+            AddStep("seek to 0", () => EditorClock.Seek(0));
+            AddAssert("time is 0", () => EditorClock.CurrentTime == 0);
+
+            pressAndCheckTime(Key.Right, 2000, modifiers: Key.ShiftLeft);
+            pressAndCheckTime(Key.Right, 4000, modifiers: Key.ShiftLeft);
+
+            pressAndCheckTime(Key.Left, 3500);
+            pressAndCheckTime(Key.Left, 2000, modifiers: Key.ShiftRight);
+            pressAndCheckTime(Key.Left, 0, modifiers: Key.ShiftRight);
+        }
+
+        [Test]
         public void TestSnappedSeekingAfterControlPointChange()
         {
             AddStep("seek to 0", () => EditorClock.Seek(0));

@@ -70,8 +70,7 @@ namespace osu.Game.Tests.Visual
         {
             Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
 
-            if (testBeatmapManager != null)
-                testBeatmapManager.TestBeatmap = Beatmap.Value;
+            testBeatmapManager?.TestBeatmap = Beatmap.Value;
 
             LoadScreen(editorLoader = new TestEditorLoader());
         }

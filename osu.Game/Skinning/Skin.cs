@@ -19,14 +19,16 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkin
+    public abstract class Skin : IDisposable, ISkin, IHasComboColours, IHasCustomColours
     {
         private readonly IStorageResourceProvider? resources;
 
@@ -38,7 +40,17 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected internal ISampleStore? Samples { get; private set; }
+        private ISampleStore? samples;
+
+        private ISampleStore? hitSamples;
+
+        private readonly ISampleStore? resourceHitSamples;
+
+        public IEnumerable<string> AllAvailableSamples => hitSamples?.GetAvailableResources() ?? Array.Empty<string>();
+
+        protected internal ISample? GetSampleFromSkinFiles(string lookup, bool isHitsound) => (isHitsound ? hitSamples : samples)?.Get(lookup);
+
+        protected internal ISample? GetSampleFromResourceFiles(string lookup, bool isHitsound) => (isHitsound ? resourceHitSamples : resources?.AudioManager?.Samples)?.Get(lookup);
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -75,11 +87,12 @@ namespace osu.Game.Skinning
         protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore = null, string configurationFilename = @"skin.ini")
         {
             this.resources = resources;
-
             Name = skin.Name;
 
             if (resources != null)
             {
+                resourceHitSamples = resources.AudioManager?.GetSampleStore(applyGlobalAdjustments: false);
+
                 SkinInfo = skin.ToLive(resources.RealmAccess);
 
                 store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
@@ -144,16 +157,17 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Recreates <see cref="Samples"/>.
+        /// Recreates <see cref="samples"/>.
         /// All users of samples from the skin are expected to manually re-retrieve their samples from this skin after this is called.
         /// Exposed as public for the purpose of e.g. editing flows where the skin's set of available samples changes.
         /// In such a scenario a full recycle of the store is required to avoid accidentally retrieving stale samples that don't exist in the skin anymore.
         /// </summary>
         public void RecycleSamples()
         {
-            Samples?.Dispose();
+            samples?.Dispose();
+            hitSamples?.Dispose();
 
-            var samples = resources?.AudioManager?.GetSampleStore(store);
+            samples = resources?.AudioManager?.GetSampleStore(store, applyGlobalAdjustments: true);
 
             if (samples != null)
             {
@@ -164,7 +178,16 @@ namespace osu.Game.Skinning
                 samples.AddExtension(@"ogg");
             }
 
-            Samples = samples;
+            hitSamples = resources?.AudioManager?.GetSampleStore(store, applyGlobalAdjustments: false);
+
+            if (hitSamples != null)
+            {
+                hitSamples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                hitSamples.AddExtension(@"ogg");
+            }
         }
 
         protected virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IStorageResourceProvider resources, IResourceStore<byte[]> storage)
@@ -355,7 +378,9 @@ namespace osu.Game.Skinning
             isDisposed = true;
 
             Textures?.Dispose();
-            Samples?.Dispose();
+            samples?.Dispose();
+            resourceHitSamples?.Dispose();
+            hitSamples?.Dispose();
             FallbackStore?.Dispose();
 
             store.Dispose();
@@ -407,5 +432,13 @@ namespace osu.Game.Skinning
             Enter,
             Exit
         }
+
+        #region Delegated colour access
+
+        IReadOnlyList<Color4>? IHasComboColours.ComboColours => Configuration.ComboColours;
+        List<Color4> IHasComboColours.CustomComboColours => Configuration.CustomComboColours;
+        Dictionary<string, Color4> IHasCustomColours.CustomColours => Configuration.CustomColours;
+
+        #endregion
     }
 }

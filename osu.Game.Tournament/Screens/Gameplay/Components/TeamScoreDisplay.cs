@@ -24,13 +24,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         public bool ShowScore
         {
             get => teamDisplay?.ShowScore ?? false;
-            set
-            {
-                if (teamDisplay != null)
-                {
-                    teamDisplay.ShowScore = value;
-                }
-            }
+            set => teamDisplay?.ShowScore = value;
         }
 
         public TeamScoreDisplay(TeamColour teamColour)

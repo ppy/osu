@@ -23,11 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new AudioOffsetAdjustControl
-                {
-                    Current = config.GetBindable<double>(OsuSetting.AudioOffset),
-                    Margin = new MarginPadding { Bottom = 5 },
-                },
+                new AudioOffsetAdjustControl { Current = config.GetBindable<double>(OsuSetting.AudioOffset) },
                 new SettingsItemV2(new FormCheckBox
                 {
                     Caption = AudioSettingsStrings.AdjustBeatmapOffsetAutomatically,

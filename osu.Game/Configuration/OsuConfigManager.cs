@@ -103,6 +103,8 @@ namespace osu.Game.Configuration
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
+            SetDefault(OsuSetting.HitsoundVolume, 0.6, 0, 1, 0.01);
+
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
             SetDefault(OsuSetting.MenuTips, true);
@@ -242,6 +244,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DashboardSortMode, UserSortCriteria.LastVisit);
             SetDefault(OsuSetting.DashboardDisplayStyle, OverlayPanelDisplayStyle.Card);
+
+            SetDefault(OsuSetting.PMFriendsOnly, false);
         }
 
         protected override bool CheckLookupContainsPrivateInformation(OsuSetting lookup)
@@ -478,5 +482,11 @@ namespace osu.Game.Configuration
 
         DashboardSortMode,
         DashboardDisplayStyle,
+
+        /// <summary>
+        /// Blocks private messages, multiplayer room invites, and duel requests from people not on the user's friends list.
+        /// </summary>
+        PMFriendsOnly,
+        HitsoundVolume,
     }
 }

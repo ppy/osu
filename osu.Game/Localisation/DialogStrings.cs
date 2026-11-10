@@ -79,7 +79,7 @@ namespace osu.Game.Localisation
         ///
         /// {0}"
         /// </summary>
-        public static LocalisableString ConfirmExitBodyTextOngoingOperations(string ongoingOperationsText) => new TranslatableString(getKey(@"confirm_exit_body_text_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:
+        public static LocalisableString ConfirmExitBodyTextOngoingOperations(LocalisableString ongoingOperationsText) => new TranslatableString(getKey(@"confirm_exit_body_text_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:
 
 {0}", ongoingOperationsText);
 
@@ -90,7 +90,7 @@ namespace osu.Game.Localisation
         ///
         /// and {1} other operation(s)."
         /// </summary>
-        public static LocalisableString ConfirmExitBodyTextOtherOngoingOperations(string ongoingOperationsText, int count) => new TranslatableString(getKey(@"confirm_exit_body_text_other_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:
+        public static LocalisableString ConfirmExitBodyTextOtherOngoingOperations(LocalisableString ongoingOperationsText, int count) => new TranslatableString(getKey(@"confirm_exit_body_text_other_ongoing_operations"), @"There are currently some background operations which will be aborted if you continue:
 
 {0}
 
