@@ -135,6 +135,213 @@ Click to see what's new!", version);
         /// </summary>
         public static LocalisableString Mention => new TranslatableString(getKey(@"mention"), @"Mention");
 
+        /// <summary>
+        /// "{0} in {1}"
+        /// </summary>
+        public static LocalisableString MentionDetails(string user, string channelName) => new TranslatableString(getKey(@"mention_details"), @"{0} in {1}", user, channelName);
+
+        /// <summary>
+        /// "Online: {0}"
+        /// </summary>
+        public static LocalisableString FriendOnline(string info) => new TranslatableString(getKey(@"friend_online"), @"Online: {0}", info);
+
+        /// <summary>
+        /// "Offline: {0}"
+        /// </summary>
+        public static LocalisableString FriendOffline(string info) => new TranslatableString(getKey(@"friend_offline"), @"Offline: {0}", info);
+
+        /// <summary>
+        /// "Connection to online services was interrupted. osu! will be operating with limited functionality."
+        /// </summary>
+        public static LocalisableString APIConnectionInterrupted => new TranslatableString(getKey(@"api_connection_interrupted"), @"Connection to online services was interrupted. osu! will be operating with limited functionality.");
+
+        /// <summary>
+        /// "You have been logged out on this device due to a login to your account on another device."
+        /// </summary>
+        public static LocalisableString AnotherDeviceDisconnect => new TranslatableString(getKey(@"another_device_disconnect"), @"You have been logged out on this device due to a login to your account on another device.");
+
+        /// <summary>
+        /// "You have been logged out due to a change to your account. Please log in again."
+        /// </summary>
+        public static LocalisableString AccountChangeDisconnect => new TranslatableString(getKey(@"account_change_disconnect"), @"You have been logged out due to a change to your account. Please log in again.");
+
+        /// <summary>
+        /// "Downloading {0}"
+        /// </summary>
+        public static LocalisableString Downloading(string info) => new TranslatableString(getKey(@"downloading"), @"Downloading {0}", info);
+
+        /// <summary>
+        /// "Collections import is initialising..."
+        /// </summary>
+        public static LocalisableString CollectionsImportInitialising => new TranslatableString(getKey(@"collections_import_initialising"), @"Collections import is initialising...");
+
+        /// <summary>
+        /// "Reading collections..."
+        /// </summary>
+        public static LocalisableString ReadingCollections => new TranslatableString(getKey(@"reading_collections"), @"Reading collections...");
+
+        /// <summary>
+        /// "Imported {0} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgress(int count) => new TranslatableString(getKey(@"collections_import_progress"), @"Imported {0} collections", count);
+
+        /// <summary>
+        /// "Imported {0} of {1} collections"
+        /// </summary>
+        public static LocalisableString CollectionsImportProgressTotal(int count, int totalCount) => new TranslatableString(getKey(@"collections_import_progress_total"), @"Imported {0} of {1} collections", count, totalCount);
+
+        /// <summary>
+        /// "This error has been automatically reported to the dev team."
+        /// </summary>
+        public static LocalisableString ErrorAutomaticallyReported => new TranslatableString(getKey(@"error_automatically_reported"), @"This error has been automatically reported to the dev team.");
+
+        /// <summary>
+        /// "A newer release of osu! has been found ({0} → {1})."
+        /// </summary>
+        public static LocalisableString UpdateAvailable(string oldVersion, string newVersion) => new TranslatableString(getKey(@"update_available"), @"A newer release of osu! has been found ({0} → {1}).", oldVersion, newVersion);
+
+        /// <summary>
+        /// "Click here to download the new version, which can be installed over the top of your existing installation."
+        /// </summary>
+        public static LocalisableString UpdateAvailableManualInstall => new TranslatableString(getKey(@"update_available_manual_install"), @"Click here to download the new version, which can be installed over the top of your existing installation.");
+
+        /// <summary>
+        /// "Check with your package manager / provider to bring osu! up-to-date!"
+        /// </summary>
+        public static LocalisableString UpdateAvailablePackageManaged => new TranslatableString(getKey(@"update_available_package_managed"), @"Check with your package manager / provider to bring osu! up-to-date!");
+
+        /// <summary>
+        /// "An action was interrupted due to a dialog being displayed."
+        /// </summary>
+        public static LocalisableString ActionInterruptedByDialog => new TranslatableString(getKey(@"action_interrupted_by_dialog"), @"An action was interrupted due to a dialog being displayed.");
+
+        /// <summary>
+        /// "Exporting {0}..."
+        /// </summary>
+        public static LocalisableString FileExportOngoing(string filename) => new TranslatableString(getKey(@"file_export_ongoing"), @"Exporting {0}...", filename);
+
+        /// <summary>
+        /// "Exported {0}! Click to view."
+        /// </summary>
+        public static LocalisableString FileExportFinished(string filename) => new TranslatableString(getKey(@"file_export_finished"), @"Exported {0}! Click to view.", filename);
+
+        /// <summary>
+        /// "Exporting logs..."
+        /// </summary>
+        public static LocalisableString LogsExportOngoing => new TranslatableString(getKey(@"logs_export_ongoing"), @"Exporting logs...");
+
+        /// <summary>
+        /// "Exported logs! Click to view."
+        /// </summary>
+        public static LocalisableString LogsExportFinished => new TranslatableString(getKey(@"logs_export_finished"), @"Exported logs! Click to view.");
+
+        /// <summary>
+        /// "Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user."
+        /// </summary>
+        public static LocalisableString ElevatedPrivileges(LocalisableString user) => new TranslatableString(getKey(@"elevated_privileges"), @"Running osu! as {0} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.", user);
+
+        /// <summary>
+        /// "On macOS, installing osu! to a directory other than /Applications or {0}/Applications can cause issues with updating the game. Please move your game installation to one of these locations."
+        /// </summary>
+        public static LocalisableString MacOSAppLocation(LocalisableString userProfile) => new TranslatableString(getKey(@"macos_app_location"), @"On macOS, installing osu! to a directory other than /Applications or {0}/Applications can cause issues with updating the game. Please move your game installation to one of these locations.", userProfile);
+
+        /// <summary>
+        /// "Screenshot saved! Click to view.
+        /// {0}"
+        /// </summary>
+        public static LocalisableString ScreenshotSaved(string filename) => new TranslatableString(getKey(@"screenshot_saved"), @"Screenshot saved! Click to view.
+{0}", filename);
+
+        /// <summary>
+        /// "Uploading screenshot..."
+        /// </summary>
+        public static LocalisableString UploadingScreenshot => new TranslatableString(getKey(@"uploading_screenshot"), @"Uploading screenshot...");
+
+        /// <summary>
+        /// "Screenshot uploaded! The link has been copied to the clipboard."
+        /// </summary>
+        public static LocalisableString ScreenshotUploadSuccess => new TranslatableString(getKey(@"screenshot_upload_success"), @"Screenshot uploaded! The link has been copied to the clipboard.");
+
+        /// <summary>
+        /// "Failed to upload screenshot."
+        /// </summary>
+        public static LocalisableString ScreenshotUploadFailure => new TranslatableString(getKey(@"screenshot_upload_failure"), @"Failed to upload screenshot.");
+
+        /// <summary>
+        /// "You are trying to upload screenshots too fast!"
+        /// </summary>
+        public static LocalisableString ScreenshotTooManyUploads => new TranslatableString(getKey(@"screenshot_too_many_uploads"), @"You are trying to upload screenshots too fast!");
+
+        /// <summary>
+        /// "The multiplayer server will be right back..."
+        /// </summary>
+        public static LocalisableString MultiplayerServerShuttingDownImmediately => new TranslatableString(getKey(@"multiplayer_server_shutting_down_immediately"), @"The multiplayer server will be right back...");
+
+        /// <summary>
+        /// "The multiplayer server is restarting in {0}."
+        /// </summary>
+        public static LocalisableString MultiplayerServerShuttingDownRemaining(string remainingTime) => new TranslatableString(getKey(@"multiplayer_server_shutting_down_remaining"), @"The multiplayer server is restarting in {0}.", remainingTime);
+
+        /// <summary>
+        /// "Created new collection &quot;{0}&quot; with {1} beatmaps."
+        /// </summary>
+        public static LocalisableString CollectionCreated(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_created"), @"Created new collection ""{0}"" with {1} beatmaps.", name, beatmapsCount);
+
+        /// <summary>
+        /// "Added {0} beatmaps to collection &quot;{1}&quot;."
+        /// </summary>
+        public static LocalisableString CollectionBeatmapsAdded(string name, int beatmapsCount) => new TranslatableString(getKey(@"collection_beatmaps_added"), @"Added {0} beatmaps to collection ""{1}"".", beatmapsCount, name);
+
+        /// <summary>
+        /// "Cannot start play"
+        /// </summary>
+        public static LocalisableString CannotStartPlay => new TranslatableString(getKey(@"cannot_start_play"), @"Cannot start play");
+
+        /// <summary>
+        /// "Score will not be submitted"
+        /// </summary>
+        public static LocalisableString ScoreWillNotBeSubmitted => new TranslatableString(getKey(@"score_will_not_be_submitted"), @"Score will not be submitted");
+
+        /// <summary>
+        /// "Failed to retrieve a score submission token."
+        /// </summary>
+        public static LocalisableString FailedToRetrieveScoreSubmissionToken => new TranslatableString(getKey(@"failed_to_retrieve_score_submission_token"), @"Failed to retrieve a score submission token.");
+
+        /// <summary>
+        /// "Please ensure that you are using the latest version of the official game releases."
+        /// </summary>
+        public static LocalisableString PreventSubmittingWithOutdatedClient => new TranslatableString(getKey(@"prevent_submitting_with_outdated_client"), @"Please ensure that you are using the latest version of the official game releases.");
+
+        /// <summary>
+        /// "This beatmap does not match the online version. Please update or redownload it."
+        /// </summary>
+        public static LocalisableString PreventSubmittingWithInvalidBeatmapHash => new TranslatableString(getKey(@"prevent_submitting_with_invalid_beatmap_hash"), @"This beatmap does not match the online version. Please update or redownload it.");
+
+        /// <summary>
+        /// "Your system clock is set incorrectly. Please check your system time, date and timezone."
+        /// </summary>
+        public static LocalisableString PreventSubmittingWithExpiredToken => new TranslatableString(getKey(@"prevent_submitting_with_expired_token"), @"Your system clock is set incorrectly. Please check your system time, date and timezone.");
+
+        /// <summary>
+        /// "Online functionality is not available."
+        /// </summary>
+        public static LocalisableString OnlineFunctionalityIsNotAvailable => new TranslatableString(getKey(@"online_functionality_is_not_available"), @"Online functionality is not available.");
+
+        /// <summary>
+        /// "Server outage in progress"
+        /// </summary>
+        public static LocalisableString ServerOutageInProgress => new TranslatableString(getKey(@"server_outage_in_progress"), @"Server outage in progress");
+
+        /// <summary>
+        /// "Online functionality is not available due to an outage. Sorry for the inconvenience."
+        /// </summary>
+        public static LocalisableString ServerOutageExplanation => new TranslatableString(getKey(@"server_outage_explanation"), @"Online functionality is not available due to an outage. Sorry for the inconvenience.");
+
+        /// <summary>
+        /// "{0} challenged you to a duel ({1}). Click to accept."
+        /// </summary>
+        public static LocalisableString UserChallengedYouToDuel(string username, string poolName) => new TranslatableString(getKey(@"user_challenged_you_to_duel"), @"{0} challenged you to a duel ({1}). Click to accept.", username, poolName);
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

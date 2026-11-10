@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -22,16 +23,13 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new AudioOffsetAdjustControl
+                new AudioOffsetAdjustControl { Current = config.GetBindable<double>(OsuSetting.AudioOffset) },
+                new SettingsItemV2(new FormCheckBox
                 {
-                    Current = config.GetBindable<double>(OsuSetting.AudioOffset),
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = AudioSettingsStrings.AdjustBeatmapOffsetAutomatically,
-                    TooltipText = AudioSettingsStrings.AdjustBeatmapOffsetAutomaticallyTooltip,
+                    Caption = AudioSettingsStrings.AdjustBeatmapOffsetAutomatically,
+                    HintText = AudioSettingsStrings.AdjustBeatmapOffsetAutomaticallyTooltip,
                     Current = config.GetBindable<bool>(OsuSetting.AutomaticallyAdjustBeatmapOffset),
-                }
+                })
             };
         }
     }

@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Rankings
                     case RankingsScope.Performance:
                     case RankingsScope.Score:
                     case RankingsScope.Country:
-                    case RankingsScope.Spotlights:
+                    case RankingsScope.Playlists:
                         return true;
 
                     default:

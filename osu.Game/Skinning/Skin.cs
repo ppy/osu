@@ -19,14 +19,16 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkin
+    public abstract class Skin : IDisposable, ISkin, IHasComboColours, IHasCustomColours
     {
         private readonly IStorageResourceProvider? resources;
 
@@ -38,7 +40,17 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
-        protected ISampleStore? Samples { get; }
+        private ISampleStore? samples;
+
+        private ISampleStore? hitSamples;
+
+        private readonly ISampleStore? resourceHitSamples;
+
+        public IEnumerable<string> AllAvailableSamples => hitSamples?.GetAvailableResources() ?? Array.Empty<string>();
+
+        protected internal ISample? GetSampleFromSkinFiles(string lookup, bool isHitsound) => (isHitsound ? hitSamples : samples)?.Get(lookup);
+
+        protected internal ISample? GetSampleFromResourceFiles(string lookup, bool isHitsound) => (isHitsound ? resourceHitSamples : resources?.AudioManager?.Samples)?.Get(lookup);
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -63,6 +75,8 @@ namespace osu.Game.Skinning
 
         public string Name { get; }
 
+        protected IResourceStore<byte[]>? FallbackStore { get; }
+
         /// <summary>
         /// Construct a new skin.
         /// </summary>
@@ -73,27 +87,17 @@ namespace osu.Game.Skinning
         protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? fallbackStore = null, string configurationFilename = @"skin.ini")
         {
             this.resources = resources;
-
             Name = skin.Name;
 
             if (resources != null)
             {
+                resourceHitSamples = resources.AudioManager?.GetSampleStore(applyGlobalAdjustments: false);
+
                 SkinInfo = skin.ToLive(resources.RealmAccess);
 
                 store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
 
-                var samples = resources.AudioManager?.GetSampleStore(store);
-
-                if (samples != null)
-                {
-                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-
-                    // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
-                    // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
-                    samples.AddExtension(@"ogg");
-                }
-
-                Samples = samples;
+                RecycleSamples();
                 Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, store));
             }
             else
@@ -102,6 +106,7 @@ namespace osu.Game.Skinning
                 SkinInfo = skin.ToLiveUnmanaged();
             }
 
+            FallbackStore = fallbackStore;
             if (fallbackStore != null)
                 store.AddStore(fallbackStore);
 
@@ -120,6 +125,7 @@ namespace osu.Game.Skinning
                     // generally won't be hit as we always write a `skin.ini` on import, but best be safe than sorry.
                     // see https://github.com/peppy/osu-stable-reference/blob/1531237b63392e82c003c712faa028406073aa8f/osu!/Graphics/Skinning/SkinManager.cs#L297-L298
                     LegacyVersion = SkinConfiguration.LATEST_VERSION,
+                    IsLatestVersion = true,
                 };
             }
 
@@ -147,6 +153,40 @@ namespace osu.Game.Skinning
                 {
                     Logger.Error(ex, "Failed to load skin configuration.");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Recreates <see cref="samples"/>.
+        /// All users of samples from the skin are expected to manually re-retrieve their samples from this skin after this is called.
+        /// Exposed as public for the purpose of e.g. editing flows where the skin's set of available samples changes.
+        /// In such a scenario a full recycle of the store is required to avoid accidentally retrieving stale samples that don't exist in the skin anymore.
+        /// </summary>
+        public void RecycleSamples()
+        {
+            samples?.Dispose();
+            hitSamples?.Dispose();
+
+            samples = resources?.AudioManager?.GetSampleStore(store, applyGlobalAdjustments: true);
+
+            if (samples != null)
+            {
+                samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                samples.AddExtension(@"ogg");
+            }
+
+            hitSamples = resources?.AudioManager?.GetSampleStore(store, applyGlobalAdjustments: false);
+
+            if (hitSamples != null)
+            {
+                hitSamples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+
+                // osu-stable performs audio lookups in order of wav -> mp3 -> ogg.
+                // The GetSampleStore() call above internally adds wav and mp3, so ogg is added at the end to ensure expected ordering.
+                hitSamples.AddExtension(@"ogg");
             }
         }
 
@@ -228,8 +268,9 @@ namespace osu.Game.Skinning
                 // First attempt to deserialise using the new SkinLayoutInfo format
                 layout = JsonConvert.DeserializeObject<SkinLayoutInfo>(jsonContent);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Log($"Deserialising skin layout to {nameof(SkinLayoutInfo)} failed. Falling back to {nameof(SerialisedDrawableInfo)}[].\nDetails: {ex}");
             }
 
             // If deserialisation using SkinLayoutInfo fails, attempt to deserialise using the old naked list.
@@ -337,7 +378,10 @@ namespace osu.Game.Skinning
             isDisposed = true;
 
             Textures?.Dispose();
-            Samples?.Dispose();
+            samples?.Dispose();
+            resourceHitSamples?.Dispose();
+            hitSamples?.Dispose();
+            FallbackStore?.Dispose();
 
             store.Dispose();
         }
@@ -388,5 +432,13 @@ namespace osu.Game.Skinning
             Enter,
             Exit
         }
+
+        #region Delegated colour access
+
+        IReadOnlyList<Color4>? IHasComboColours.ComboColours => Configuration.ComboColours;
+        List<Color4> IHasComboColours.CustomComboColours => Configuration.CustomComboColours;
+        Dictionary<string, Color4> IHasCustomColours.CustomColours => Configuration.CustomColours;
+
+        #endregion
     }
 }

@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play.HUD.JudgementCounter
         {
             // Due to weirdness in judgements, some results have the same name and should be aggregated for display purposes.
             // There's only one case of this right now ("slider end").
-            foreach (var group in ruleset.Value.CreateInstance().GetHitResults().GroupBy(r => r.displayName))
+            foreach (var group in ruleset.Value.CreateInstance().GetHitResultsForDisplay().GroupBy(r => r.displayName))
             {
                 var judgementCount = new JudgementCount
                 {

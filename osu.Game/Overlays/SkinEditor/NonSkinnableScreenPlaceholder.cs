@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.SkinEditor
@@ -56,7 +57,7 @@ namespace osu.Game.Overlays.SkinEditor
                             TextAnchor = Anchor.Centre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Text = "Please navigate to a skinnable screen using the scene library",
+                            Text = SkinEditorStrings.NavigateToSkinnableScreen,
                         },
                         new RoundedButton
                         {
@@ -65,7 +66,7 @@ namespace osu.Game.Overlays.SkinEditor
                             Width = 200,
                             Margin = new MarginPadding { Top = 20 },
                             Action = () => skinEditorOverlay?.Hide(),
-                            Text = "Return to game"
+                            Text = SkinEditorStrings.ReturnToGame,
                         }
                     }
                 },

@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -93,10 +94,10 @@ namespace osu.Game.Graphics.Cursor
             protected override void PopIn()
             {
                 instantMovement |= !IsPresent;
-                this.FadeIn(500, Easing.OutQuint);
+                this.FadeIn(300, Easing.OutQuint);
             }
 
-            protected override void PopOut() => this.Delay(150).FadeOut(500, Easing.OutQuint);
+            protected override void PopOut() => this.Delay(150).FadeOut(300, Easing.OutQuint);
 
             public override void Move(Vector2 pos)
             {
@@ -107,7 +108,8 @@ namespace osu.Game.Graphics.Cursor
                 }
                 else
                 {
-                    this.MoveTo(pos, 200, Easing.OutQuint);
+                    // This method is called every frame so we can do this safely here.
+                    Position = Interpolation.ValueAt(Time.Elapsed, Position, pos, 0, 120, Easing.OutQuint);
                 }
             }
         }

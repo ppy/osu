@@ -34,10 +34,12 @@ namespace osu.Game.Skinning
         private SkinnableSound rankDownSample = null!;
         private SkinnableSound rankUpSample = null!;
 
-        private Bindable<double?> lastSamplePlaybackTime = null!;
+        private Bindable<double?> lastSamplePlayback = null!;
+        private double lastChangeTime;
 
-        private IBindable<ScoreRank> rank = null!;
-        private ScoreRank lastRank;
+        private ScoreRank? displayedRank;
+
+        private const int time_between_changes = 1500;
 
         public LegacyRankDisplay()
         {
@@ -62,51 +64,69 @@ namespace osu.Game.Skinning
             if (skinEditor != null)
                 PlaySamples.Value = false;
 
-            lastSamplePlaybackTime = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
+            lastSamplePlayback = statics.GetBindable<double?>(Static.LastRankChangeSamplePlaybackTime);
         }
 
         protected override void LoadComplete()
         {
-            rank = scoreProcessor.Rank.GetBoundCopy();
-            rank.BindValueChanged(r =>
+            base.LoadComplete();
+
+            updateRank(scoreProcessor.Rank.Value);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            var currentRank = scoreProcessor.Rank.Value;
+
+            if (currentRank == displayedRank)
+                return;
+
+            if (Time.Current - lastChangeTime >= time_between_changes || scoreProcessor.HasCompleted.Value || currentRank == ScoreRank.F)
+                updateRank(currentRank);
+        }
+
+        private void updateRank(ScoreRank rank)
+        {
+            var texture = source.GetTexture($"ranking-{rank}-small");
+
+            rankDisplay.Texture = texture;
+
+            if (texture != null && displayedRank != null)
             {
-                var texture = source.GetTexture($"ranking-{r.NewValue}-small");
-
-                rankDisplay.Texture = texture;
-
-                if (texture != null)
+                var transientRank = new Sprite
                 {
-                    var transientRank = new Sprite
-                    {
-                        Texture = texture,
-                        Blending = BlendingParameters.Additive,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        BypassAutoSizeAxes = Axes.Both,
-                    };
-                    AddInternal(transientRank);
-                    transientRank.FadeOutFromOne(500, Easing.Out)
-                                 .ScaleTo(new Vector2(1.625f), 500, Easing.Out)
-                                 .Expire();
-                }
+                    Texture = texture,
+                    Blending = BlendingParameters.Additive,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    BypassAutoSizeAxes = Axes.Both,
+                };
 
-                bool enoughTimeElapsed = !lastSamplePlaybackTime.Value.HasValue || Time.Current - lastSamplePlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+                AddInternal(transientRank);
 
-                // Don't play rank-down sfx on quit/retry
-                if (r.NewValue != r.OldValue && r.NewValue > ScoreRank.F && PlaySamples.Value && enoughTimeElapsed)
-                {
-                    if (r.NewValue > lastRank)
-                        rankUpSample.Play();
-                    else
-                        rankDownSample.Play();
+                transientRank.FadeOutFromOne(500, Easing.Out)
+                             .ScaleTo(new Vector2(1.625f), 500, Easing.Out)
+                             .Expire();
+            }
 
-                    lastSamplePlaybackTime.Value = Time.Current;
-                }
+            // Check sample time separately to ensure two copies of the rank display don't both play samples on a change.
+            bool enoughSampleTimeElapsed = !lastSamplePlayback.Value.HasValue || Time.Current - lastSamplePlayback.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
 
-                lastRank = r.NewValue;
-            }, true);
+            // Also don't play rank-down sfx on quit/retry/initial update.
+            if (displayedRank != null && rank > ScoreRank.F && PlaySamples.Value && enoughSampleTimeElapsed)
+            {
+                if (rank > displayedRank)
+                    rankUpSample.Play();
+                else
+                    rankDownSample.Play();
 
-            FinishTransforms(true);
+                lastSamplePlayback.Value = Time.Current;
+            }
+
+            displayedRank = rank;
+            lastChangeTime = Time.Current;
         }
     }
 }

@@ -88,10 +88,15 @@ namespace osu.Game.Overlays
 
         public void MarkAllRead() => Notifications.ForEach(n => n.Read = true);
 
-        public void FlushAllToasts()
+        public void FlushAllToasts(bool force = false)
         {
             foreach (var notification in toastFlow.ToArray())
+            {
+                if (!force && notification.IsCritical)
+                    continue;
+
                 forwardNotification(notification);
+            }
         }
 
         public void Post(Notification notification)

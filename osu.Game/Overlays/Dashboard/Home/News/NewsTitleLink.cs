@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Dashboard.Home.News
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
 
             HoverColour = colourProvider.Light1;
 
-            TooltipText = "view in browser";
+            TooltipText = CommonStrings.ViewInBrowser;
             Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
         }
     }

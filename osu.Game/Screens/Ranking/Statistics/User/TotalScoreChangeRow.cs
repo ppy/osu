@@ -3,6 +3,7 @@
 
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Ranking.Statistics.User
@@ -15,6 +16,7 @@ namespace osu.Game.Screens.Ranking.Statistics.User
         }
 
         protected override LocalisableString Label => UsersStrings.ShowStatsTotalScore;
+        public override LocalisableString TooltipText => RankingStatisticsStrings.ClassicScoringAlwaysUsed;
 
         protected override LocalisableString FormatCurrentValue(long current) => current.ToLocalisableString(@"N0");
 

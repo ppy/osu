@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override ModType Type => ModType.Fun;
 
-        public override double ScoreMultiplier => 1;
-
         [SettingSource("Starting Size", "The initial size multiplier applied to all objects.")]
         public abstract BindableNumber<float> StartScale { get; }
 

@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             var hitWindows = new ManiaHitWindows();
 
-            AddInternal(judgementPooler = new JudgementPooler<DrawableManiaJudgement>(Enum.GetValues<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r))));
+            AddInternal(judgementPooler = new JudgementPooler<DrawableManiaJudgement>(Enum.GetValues<HitResult>().Where(hitWindows.IsHitResultAllowed)));
 
             RegisterPool<BarLine, DrawableBarLine>(50, 200);
         }

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 
@@ -8,11 +9,11 @@ namespace osu.Game.Rulesets.Edit.Tools
 {
     public abstract class CompositionTool
     {
-        public readonly string Name;
+        public readonly LocalisableString Name;
 
         public LocalisableString TooltipText { get; init; }
 
-        protected CompositionTool(string name)
+        protected CompositionTool(LocalisableString name)
         {
             Name = name;
         }
@@ -21,6 +22,17 @@ namespace osu.Game.Rulesets.Edit.Tools
 
         public virtual Drawable? CreateIcon() => null;
 
-        public override string ToString() => Name;
+        public override string ToString() => Name.ToString();
+    }
+
+    public abstract class CompositionTool<TAction> : CompositionTool
+        where TAction : struct, Enum
+    {
+        public TAction? Action { get; init; }
+
+        protected CompositionTool(LocalisableString name)
+            : base(name)
+        {
+        }
     }
 }

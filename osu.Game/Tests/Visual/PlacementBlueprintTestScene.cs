@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -55,6 +56,7 @@ namespace osu.Game.Tests.Visual
             var playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo);
             playable.BeatmapInfo.Ruleset = rulesetInfo;
             playable.Difficulty.CircleSize = 2;
+            playable.ControlPointInfo.Add(0, new TimingControlPoint());
             return playable;
         }
 

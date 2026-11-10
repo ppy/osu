@@ -18,6 +18,30 @@ namespace osu.Game.Online.Rooms
         [LocalisableDescription(typeof(MatchesStrings), nameof(MatchesStrings.MatchTeamTypesTeamVersus))]
         TeamVersus,
 
-        Matchmaking
+        /// <summary>
+        /// Matchmaking: Quick play
+        /// </summary>
+        Matchmaking,
+
+        /// <summary>
+        /// Matchmaking: Ranked play
+        /// </summary>
+        RankedPlay
+    }
+
+    public static class MatchTypeExtensions
+    {
+        public static bool IsMatchmakingType(this MatchType type)
+        {
+            switch (type)
+            {
+                case MatchType.Matchmaking:
+                case MatchType.RankedPlay:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
     }
 }

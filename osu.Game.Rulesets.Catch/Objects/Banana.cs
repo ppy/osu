@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -53,13 +54,25 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             public override IEnumerable<string> LookupNames => lookup_names;
 
-            public BananaHitSampleInfo(int volume = 100)
-                : base(string.Empty, volume: volume)
+            public BananaHitSampleInfo()
+                : this(string.Empty)
             {
             }
 
-            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default, Optional<bool> newEditorAutoBank = default)
-                => new BananaHitSampleInfo(newVolume.GetOr(Volume));
+            public BananaHitSampleInfo(HitSampleInfo info)
+                : this(info.Name, info.Bank, info.Suffix, info.Volume, info.EditorAutoBank, info.UseBeatmapSamples)
+            {
+            }
+
+            private BananaHitSampleInfo(string name, string bank = SampleControlPoint.DEFAULT_BANK, string? suffix = null, int volume = 100, bool editorAutoBank = true, bool useBeatmapSamples = false)
+                : base(name, bank, suffix, volume, editorAutoBank, useBeatmapSamples)
+            {
+            }
+
+            public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default,
+                                                      Optional<bool> newEditorAutoBank = default, Optional<bool> newUseBeatmapSamples = default)
+                => new BananaHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newSuffix.GetOr(Suffix), newVolume.GetOr(Volume),
+                    newEditorAutoBank.GetOr(EditorAutoBank), newUseBeatmapSamples.GetOr(UseBeatmapSamples));
 
             public bool Equals(BananaHitSampleInfo? other)
                 => other != null;

@@ -49,6 +49,7 @@ namespace osu.Game.Overlays.Music
                 RelativeSizeAxes = Axes.X,
                 InitialMoveDelay = 0,
                 AllowScrolling = false,
+                Padding = new MarginPadding { Horizontal = 15 },
             };
 
             selectedSet.BindTo(playlistOverlay.SelectedSet);

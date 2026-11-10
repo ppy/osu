@@ -25,12 +25,12 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public bool DisplayAsPercentage { get; set; }
 
-        public virtual LocalisableString TooltipText { get; private set; }
+        public virtual LocalisableString TooltipText { get; protected set; }
 
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
-        private const int max_decimal_digits = 5;
+        public const int MAX_DECIMAL_DIGITS = 5;
 
         private Sample sample = null!;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(current => TooltipText = GetDisplayableValue(current.NewValue), true);
+            CurrentNumber.BindValueChanged(current => TooltipText = GetTooltipText(current.NewValue), true);
         }
 
         protected override void OnUserChange(T value)
@@ -55,7 +55,7 @@ namespace osu.Game.Graphics.UserInterface
 
             playSample(value);
 
-            TooltipText = GetDisplayableValue(value);
+            TooltipText = GetTooltipText(value);
         }
 
         private void playSample(T value)
@@ -83,6 +83,6 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        public LocalisableString GetDisplayableValue(T value) => value.ToStandardFormattedString(max_decimal_digits, DisplayAsPercentage);
+        protected virtual LocalisableString GetTooltipText(T value) => value.ToStandardFormattedString(MAX_DECIMAL_DIGITS, DisplayAsPercentage);
     }
 }

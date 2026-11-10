@@ -49,6 +49,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Register => new TranslatableString(getKey(@"register"), @"Register");
 
+        /// <summary>
+        /// "An email has been sent to you with a verification code. Enter the code."
+        /// </summary>
+        public static LocalisableString CodeSent => new TranslatableString(getKey(@"code_sent"), @"An email has been sent to you with a verification code. Enter the code.");
+
+        /// <summary>
+        /// "Enter code"
+        /// </summary>
+        public static LocalisableString EnterCode => new TranslatableString(getKey(@"enter_code"), @"Enter code");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

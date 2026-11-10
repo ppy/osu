@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -21,9 +22,14 @@ namespace osu.Game.Graphics.Backgrounds
     {
         private readonly InterpolatingFramedClock storyboardClock;
 
-        private AudioContainer storyboardContainer = null!;
+        public readonly AudioContainer Storyboard;
+
         private DrawableStoryboard? drawableStoryboard;
         private CancellationTokenSource? loadCancellationSource = new CancellationTokenSource();
+
+        public Action? StoryboardLoaded { get; set; }
+
+        public readonly BindableBool ShowStoryboard = new BindableBool(true);
 
         [Resolved(CanBeNull = true)]
         private MusicController? musicController { get; set; }
@@ -35,17 +41,17 @@ namespace osu.Game.Graphics.Backgrounds
             : base(beatmap, fallbackTextureName)
         {
             storyboardClock = new InterpolatingFramedClock();
+
+            AddInternal(Storyboard = new AudioContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Volume = { Value = 0 },
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(storyboardContainer = new AudioContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Volume = { Value = 0 },
-            });
-
             LoadStoryboard(false);
         }
 
@@ -71,11 +77,11 @@ namespace osu.Game.Graphics.Backgrounds
 
             void finishLoad(DrawableStoryboard s)
             {
-                if (Beatmap.Storyboard.ReplacesBackground)
-                    Sprite.FadeOut(BackgroundScreen.TRANSITION_LENGTH, Easing.InQuint);
+                Storyboard.FadeInFromZero(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
+                Storyboard.Add(s);
 
-                storyboardContainer.FadeInFromZero(BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
-                storyboardContainer.Add(s);
+                StoryboardLoaded?.Invoke();
+                updateStoryboardVisibility();
             }
         }
 
@@ -88,11 +94,10 @@ namespace osu.Game.Graphics.Backgrounds
             loadCancellationSource = null;
 
             // clear is intentionally used here for the storyboard to be disposed asynchronously.
-            storyboardContainer.Clear();
+            Storyboard.Clear();
 
             drawableStoryboard = null;
-
-            Sprite.Alpha = 1f;
+            updateStoryboardVisibility();
         }
 
         protected override void LoadComplete()
@@ -102,6 +107,17 @@ namespace osu.Game.Graphics.Backgrounds
                 musicController.TrackChanged += onTrackChanged;
 
             updateStoryboardClockSource(Beatmap);
+
+            ShowStoryboard.BindValueChanged(_ => updateStoryboardVisibility(), true);
+        }
+
+        private void updateStoryboardVisibility()
+        {
+            bool showStoryboard = drawableStoryboard != null && ShowStoryboard.Value;
+            bool showBackground = !showStoryboard || !Beatmap.Storyboard.ReplacesBackground;
+
+            Storyboard.FadeTo(showStoryboard ? 1 : 0, BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
+            Sprite.FadeTo(showBackground ? 1 : 0, BackgroundScreen.TRANSITION_LENGTH, Easing.OutQuint);
         }
 
         private void onTrackChanged(WorkingBeatmap newBeatmap, TrackChangeDirection _) => updateStoryboardClockSource(newBeatmap);

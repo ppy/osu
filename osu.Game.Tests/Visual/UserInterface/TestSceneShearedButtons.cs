@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK.Input;
@@ -36,8 +37,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 if (bigButton)
                 {
-                    Child = button = new ShearedButton(400, 80)
+                    Child = button = new ShearedButton
                     {
+                        Width = 400,
+                        Height = 80,
                         LighterColour = Colour4.FromHex("#FFFFFF"),
                         DarkerColour = Colour4.FromHex("#FFCC22"),
                         TextColour = Colour4.Black,
@@ -50,8 +53,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
                 else
                 {
-                    Child = button = new ShearedButton(200, 80)
+                    Child = button = new ShearedButton
                     {
+                        Width = 200,
+                        Height = 80,
                         LighterColour = Colour4.FromHex("#FF86DD"),
                         DarkerColour = Colour4.FromHex("#DE31AE"),
                         TextColour = Colour4.White,
@@ -79,8 +84,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(200)
+                Child = button = new ShearedToggleButton
                 {
+                    Width = 200,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
@@ -92,12 +98,45 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestShearedButtonWithIcon()
+        {
+            var colours = new OsuColour();
+
+            ShearedButtonWithIcon button = null!;
+            bool actionFired = false;
+
+            AddStep("create button", () =>
+            {
+                Child = button = new ShearedButtonWithIcon
+                {
+                    Width = 220,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    LighterColour = colours.Blue1,
+                    DarkerColour = colours.Blue3,
+                    Text = "Add to playlist",
+                    Icon = OsuIcon.Add,
+                    Action = () => actionFired = true,
+                };
+            });
+
+            AddStep("set disabled", () => button.Enabled.Value = false);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action not fired", () => !actionFired);
+
+            AddStep("set enabled", () => button.Enabled.Value = true);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action fired", () => actionFired);
+        }
+
+        [Test]
         public void TestSizing()
         {
             ShearedToggleButton toggleButton = null;
 
-            AddStep("create fixed width button", () => Child = toggleButton = new ShearedToggleButton(200)
+            AddStep("create fixed width button", () => Child = toggleButton = new ShearedToggleButton
             {
+                Width = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "Fixed width"
@@ -109,6 +148,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create auto-sizing button", () => Child = toggleButton = new ShearedToggleButton
             {
+                AutoSizeAxes = Axes.X,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "This button autosizes to its text!"
@@ -130,8 +170,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(200)
+                Child = button = new ShearedToggleButton
                 {
+                    Width = 200,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
@@ -186,6 +227,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         new ShearedButton
                         {
+                            AutoSizeAxes = Axes.X,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Text = "Button",
@@ -194,6 +236,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         },
                         new ShearedButton
                         {
+                            AutoSizeAxes = Axes.X,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Text = "Button",
@@ -202,6 +245,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         },
                         new ShearedButton
                         {
+                            AutoSizeAxes = Axes.X,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Text = "Button",

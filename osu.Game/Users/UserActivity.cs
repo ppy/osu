@@ -208,12 +208,16 @@ namespace osu.Game.Users
             [Key(3)]
             public string? BeatmapDisplayTitle { get; set; }
 
+            [IgnoreMember]
+            public int UserID { get; set; }
+
             public WatchingReplay(ScoreInfo score)
             {
                 ScoreID = score.OnlineID;
                 PlayerName = score.User.Username;
                 BeatmapID = score.BeatmapInfo?.OnlineID ?? -1;
                 BeatmapDisplayTitle = score.BeatmapInfo?.GetDisplayTitle();
+                UserID = score.User.OnlineID;
             }
 
             [SerializationConstructor]
@@ -274,8 +278,23 @@ namespace osu.Game.Users
 
             public InLobby(MultiplayerRoom room)
             {
-                RoomID = room.RoomID;
-                RoomName = room.Settings.Name;
+                switch (room.Settings.MatchType)
+                {
+                    case MatchType.Matchmaking:
+                        RoomID = -1;
+                        RoomName = "Quick Play";
+                        break;
+
+                    case MatchType.RankedPlay:
+                        RoomID = -1;
+                        RoomName = "Ranked Play";
+                        break;
+
+                    default:
+                        RoomID = room.RoomID;
+                        RoomName = room.Settings.Name;
+                        break;
+                }
             }
 
             [SerializationConstructor]

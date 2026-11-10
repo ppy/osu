@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -21,6 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         protected override bool UseFreshStoragePerRun => true;
 
+        private RulesetStore rulesets = null!;
         private BeatmapManager beatmapManager = null!;
 
         private const int item_count = 20;
@@ -30,7 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(new RealmRulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
@@ -62,5 +64,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             // Ensure all the initial imports are present before running any tests.
             Realm.Run(r => r.Refresh());
         });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (rulesets.IsNotNull())
+                rulesets.Dispose();
+        }
     }
 }

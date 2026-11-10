@@ -11,10 +11,12 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.RankingV2.Argon;
 using osu.Game.Skinning.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -77,9 +79,9 @@ namespace osu.Game.Skinning
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(lookup)
-                             ?? Resources.AudioManager?.Samples.Get(lookup.Replace(@"Gameplay/", @"Gameplay/Argon/"))
-                             ?? Resources.AudioManager?.Samples.Get(lookup);
+                var sample = GetSampleFromSkinFiles(lookup, sampleInfo.IsHitsound)
+                             ?? GetSampleFromResourceFiles(lookup.Replace(@"Gameplay/", @"Gameplay/Argon/"), sampleInfo.IsHitsound)
+                             ?? GetSampleFromResourceFiles(lookup, sampleInfo.IsHitsound);
 
                 if (sample != null)
                     return sample;
@@ -114,9 +116,10 @@ namespace osu.Game.Skinning
                                     var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
                                     var comboCounter = container.OfType<ArgonComboCounter>().FirstOrDefault();
                                     var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
+                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
 
-                                    if (leaderboard != null)
-                                        leaderboard.Position = new Vector2(36, 115);
+                                    leaderboard?.Position = new Vector2(36, 115);
 
                                     Vector2 pos = new Vector2(36, -66);
 
@@ -126,8 +129,24 @@ namespace osu.Game.Skinning
                                         pos -= new Vector2(0, comboCounter.DrawHeight * 1.4f + 20);
                                     }
 
-                                    if (spectatorList != null)
-                                        spectatorList.Position = pos;
+                                    spectatorList?.Position = pos;
+
+                                    if (hitError != null)
+                                    {
+                                        hitError.Anchor = Anchor.CentreLeft;
+                                        hitError.Origin = Anchor.CentreLeft;
+                                    }
+
+                                    if (hitError2 != null)
+                                    {
+                                        hitError2.Anchor = Anchor.CentreRight;
+                                        hitError2.Scale = new Vector2(-1, 1);
+                                        // origin flipped to match scale above.
+                                        hitError2.Origin = Anchor.CentreLeft;
+                                    }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 })
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -144,7 +163,9 @@ namespace osu.Game.Skinning
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                        }
+                                        },
+                                        new BarHitErrorMeter(),
+                                        new BarHitErrorMeter(),
                                     },
                                 };
                             }
@@ -204,40 +225,26 @@ namespace osu.Game.Skinning
                                         performancePoints.Origin = Anchor.TopRight;
                                     }
 
-                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
-
-                                    if (hitError != null)
-                                    {
-                                        hitError.Anchor = Anchor.CentreLeft;
-                                        hitError.Origin = Anchor.CentreLeft;
-                                    }
-
-                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
-
-                                    if (hitError2 != null)
-                                    {
-                                        hitError2.Anchor = Anchor.CentreRight;
-                                        hitError2.Scale = new Vector2(-1, 1);
-                                        // origin flipped to match scale above.
-                                        hitError2.Origin = Anchor.CentreLeft;
-                                    }
-
                                     if (songProgress != null)
                                     {
                                         const float padding = 10;
                                         // Hard to find this at runtime, so taken from the most expanded state during replay.
                                         const float song_progress_offset_height = 36 + padding;
+                                        const float hit_error_offset_width = 26;
 
                                         songProgress.Position = new Vector2(0, -padding);
                                         songProgress.Scale = new Vector2(0.9f, 1);
 
-                                        if (keyCounter != null && hitError != null)
+                                        if (keyCounter != null)
                                         {
                                             keyCounter.Anchor = Anchor.BottomRight;
                                             keyCounter.Origin = Anchor.BottomRight;
-                                            keyCounter.Position = new Vector2(-(hitError.Width + padding), -(padding * 2 + song_progress_offset_height));
+                                            keyCounter.Position = new Vector2(-(hit_error_offset_width + padding), -(padding * 2 + song_progress_offset_height));
                                         }
                                     }
+
+                                    foreach (var d in container.OfType<ISerialisableDrawable>())
+                                        d.UsesFixedAnchor = true;
                                 }
                             })
                             {
@@ -266,14 +273,37 @@ namespace osu.Game.Skinning
                                     {
                                         Scale = new Vector2(0.8f),
                                     },
-                                    new BarHitErrorMeter(),
-                                    new BarHitErrorMeter(),
                                     new ArgonSongProgress(),
                                     new ArgonKeyCounterDisplay(),
                                 }
                             };
 
                             return mainHUDComponents;
+
+                        case GlobalSkinnableContainers.Results:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var beatmapInfoWedge = container.OfType<ArgonBeatmapInfoPanel>().FirstOrDefault();
+                                var userInfoWedge = container.OfType<ArgonPlayerInfoPanel>().FirstOrDefault();
+                                var totalScoreWedge = container.OfType<ArgonTotalScorePanel>().FirstOrDefault();
+                                var statisticsGrid = container.OfType<ArgonScoreStatisticsGrid>().FirstOrDefault();
+
+                                var leftWedgeBasePosition = new Vector2(-ShearedButton.CORNER_RADIUS);
+                                static Vector2 leftWedgeOffset(float y) => new Vector2(-y * OsuGame.SHEAR.X, y);
+
+                                beatmapInfoWedge?.Position = leftWedgeBasePosition;
+                                userInfoWedge?.Position = leftWedgeBasePosition + leftWedgeOffset(161);
+                                totalScoreWedge?.Position = leftWedgeBasePosition + leftWedgeOffset(233);
+                                statisticsGrid?.Position = new Vector2(20, 354);
+                            })
+                            {
+                                new ArgonScoreRankDisplay(),
+                                new ArgonBeatmapInfoPanel(),
+                                new ArgonPlayerInfoPanel(),
+                                new ArgonTotalScorePanel(),
+                                new ArgonScoreStatisticsGrid(),
+                                new ArgonResultsFooter(),
+                            };
                     }
 
                     return null;

@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
-            AddAssert("context menu open", () => this.ChildrenOfType<OsuContextMenu>().SingleOrDefault()?.State == MenuState.Open);
+            AddAssert("context menu open", () => this.ChildrenOfType<OsuContextMenu>().Any(m => m.State == MenuState.Open));
         }
 
         [Test]

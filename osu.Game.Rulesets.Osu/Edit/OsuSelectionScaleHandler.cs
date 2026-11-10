@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
@@ -37,13 +38,16 @@ namespace osu.Game.Rulesets.Osu.Edit
         [Resolved]
         private IEditorChangeHandler? changeHandler { get; set; }
 
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; } = null!;
+
         [Resolved(CanBeNull = true)]
         private IDistanceSnapProvider? snapProvider { get; set; }
 
         private BindableList<HitObject> selectedItems { get; } = new BindableList<HitObject>();
 
         [BackgroundDependencyLoader]
-        private void load(EditorBeatmap editorBeatmap)
+        private void load()
         {
             selectedItems.BindTo(editorBeatmap.SelectedHitObjects);
         }
@@ -52,16 +56,23 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.LoadComplete();
 
-            selectedItems.CollectionChanged += (_, __) => updateState();
+            selectedItems.CollectionChanged += (_, _) => updateState();
+            editorBeatmap.HitObjectUpdated += hitObjectUpdated;
             updateState();
+        }
+
+        private void hitObjectUpdated(HitObject hitObject)
+        {
+            if (selectedMovableObjects.Contains(hitObject))
+                updateState();
         }
 
         private void updateState()
         {
             var quad = GeometryUtils.GetSurroundingQuad(selectedMovableObjects);
 
-            CanScaleX.Value = quad.Width > 0;
-            CanScaleY.Value = quad.Height > 0;
+            CanScaleX.Value = Precision.DefinitelyBigger(quad.Width, 0);
+            CanScaleY.Value = Precision.DefinitelyBigger(quad.Height, 0);
             CanScaleDiagonally.Value = CanScaleX.Value && CanScaleY.Value;
             CanScaleFromPlayfieldOrigin.Value = selectedMovableObjects.Any();
             IsScalingSlider.Value = selectedMovableObjects.Count() == 1 && selectedMovableObjects.First() is Slider;
@@ -81,12 +92,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             changeHandler?.BeginChange();
 
             objectsInScale = selectedMovableObjects.ToDictionary(ho => ho, ho => new OriginalHitObjectState(ho));
-            OriginalSurroundingQuad = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider
-                ? GeometryUtils.GetSurroundingQuad(slider.Path.ControlPoints.Select(p => slider.Position + p.Position))
-                : GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
-            originalConvexHull = objectsInScale.Count == 1 && objectsInScale.First().Key is Slider slider2
-                ? GeometryUtils.GetConvexHull(slider2.Path.ControlPoints.Select(p => slider2.Position + p.Position))
-                : GeometryUtils.GetConvexHull(objectsInScale.Keys);
+            OriginalSurroundingQuad = GeometryUtils.GetSurroundingQuad(objectsInScale.Keys);
+            originalConvexHull = GeometryUtils.GetConvexHull(objectsInScale.Keys);
             defaultOrigin = GeometryUtils.MinimumEnclosingCircle(originalConvexHull).Item1;
         }
 
@@ -290,6 +297,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             // Computes the bounds for the magnitude of the scaled point p with respect to the bounds lowerBounds and upperBounds
             (float, float) computeBounds(Vector2 lowerBounds, Vector2 upperBounds, Vector2 p)
             {
+                // These divisions can be interpreted as calculating the scale factors that need to be applied to p
+                // to hit all four edges of the axis-aligned rectangle defined by lowerBounds and upperBounds.
                 var sLowerBounds = Vector2.Divide(lowerBounds, p);
                 var sUpperBounds = Vector2.Divide(upperBounds, p);
 
@@ -306,13 +315,26 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (Precision.AlmostEquals(p.Y, 0))
                     (sLowerBounds.Y, sUpperBounds.Y) = (float.NegativeInfinity, float.PositiveInfinity);
 
-                return (MathF.Max(sLowerBounds.X, sLowerBounds.Y), MathF.Min(sUpperBounds.X, sUpperBounds.Y));
+                float min = MathF.Max(sLowerBounds.X, sLowerBounds.Y);
+                float max = MathF.Min(sUpperBounds.X, sUpperBounds.Y);
+
+                if (min > max)
+                {
+                    // This condition can occur if no scaling factor exists that will bring p
+                    // inside the axis-aligned rectangle defined by lowerBounds and upperBounds.
+                    // Geometrically, this can be interpreted via a ray which starts at the origin of the coordinate space and passes through p.
+                    // If such ray never enters the aforementioned axis-aligned rectangle, this condition occurs.
+                    // In such a case there is nothing to be done other than prevent scaling altogether.
+                    return (1, 1);
+                }
+
+                return (min, max);
             }
         }
 
         private void moveSelectionInBounds()
         {
-            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys);
+            Quad quad = GeometryUtils.GetSurroundingQuad(objectsInScale!.Keys, true);
 
             Vector2 delta = Vector2.Zero;
 
@@ -342,6 +364,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 PathControlPointPositions = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Position).ToArray();
                 PathControlPointTypes = (hitObject as IHasPath)?.Path.ControlPoints.Select(p => p.Type).ToArray();
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (editorBeatmap.IsNotNull())
+                editorBeatmap.HitObjectUpdated -= hitObjectUpdated;
         }
     }
 }

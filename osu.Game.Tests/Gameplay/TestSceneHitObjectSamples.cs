@@ -127,6 +127,22 @@ namespace osu.Game.Tests.Gameplay
         }
 
         /// <summary>
+        /// Tests that a hitobject which specifies a specific sample file which doesn't exist (or isn't allowed to be looked up)
+        /// falls back to a normal sample.
+        /// </summary>
+        [Test]
+        public void TestFileSampleFallsBackToNormal()
+        {
+            const string expected_sample = "normal-hitnormal";
+
+            SetupSkins(null, expected_sample);
+
+            CreateTestWithBeatmap("file-beatmap-sample.osu");
+
+            AssertUserLookup(expected_sample);
+        }
+
+        /// <summary>
         /// Tests that a default hitobject and control point causes <see cref="TestDefaultSampleFromUserSkin"/>.
         /// </summary>
         [Test]
@@ -242,6 +258,6 @@ namespace osu.Game.Tests.Gameplay
         }
 
         private void disableLayeredHitSounds()
-            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[LegacySetting.LayeredHitSounds.ToString()] = "0");
+            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[nameof(LegacySetting.LayeredHitSounds)] = "0");
     }
 }

@@ -58,22 +58,21 @@ namespace osu.Game.Overlays.SkinEditor
 
         private void updateTernaryStates()
         {
-            var usingClosestAnchor = GetStateFromSelection(SelectedBlueprints, c => !c.Item.UsesFixedAnchor);
+            var usingClosestAnchor = SelectedBlueprints.GetTernaryState(c => !c.Item.UsesFixedAnchor);
 
-            if (closestAnchor != null)
-                closestAnchor.State.Value = usingClosestAnchor;
+            closestAnchor?.State.Value = usingClosestAnchor;
 
             if (fixedAnchors != null)
             {
                 foreach (var fixedAnchor in fixedAnchors)
-                    fixedAnchor.State.Value = GetStateFromSelection(SelectedBlueprints, c => c.Item.UsesFixedAnchor && ((Drawable)c.Item).Anchor == fixedAnchor.Anchor);
+                    fixedAnchor.State.Value = SelectedBlueprints.GetTernaryState(c => c.Item.UsesFixedAnchor && ((Drawable)c.Item).Anchor == fixedAnchor.Anchor);
             }
 
             if (originMenu != null)
             {
                 foreach (var origin in originMenu.Items.OfType<AnchorMenuItem>())
                 {
-                    origin.State.Value = GetStateFromSelection(SelectedBlueprints, c => ((Drawable)c.Item).Origin == origin.Anchor);
+                    origin.State.Value = SelectedBlueprints.GetTernaryState(c => ((Drawable)c.Item).Origin == origin.Anchor);
                     origin.Action.Disabled = usingClosestAnchor == TernaryState.True;
                 }
             }
@@ -81,6 +80,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
+            if (SelectedBlueprints.Any(b => !b.Item.CanBeScaled(direction == Direction.Horizontal ? Axes.X : Axes.Y)))
+                return false;
+
             var selectionQuad = getSelectionQuad();
             Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
 
@@ -88,7 +90,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawableItem = (Drawable)b.Item;
 
-                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent!.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
+                var flippedPosition = GeometryUtils.GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent!.ScreenSpaceDrawQuad : selectionQuad, drawableItem.ToScreenSpace(drawableItem.OriginPosition));
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
@@ -101,6 +103,9 @@ namespace osu.Game.Overlays.SkinEditor
 
         public override bool HandleMovement(MoveSelectionEvent<ISerialisableDrawable> moveEvent)
         {
+            if (SelectedBlueprints.Any(b => !b.Item.CanBeMoved))
+                return false;
+
             foreach (var c in SelectedBlueprints)
             {
                 var item = c.Item;
@@ -120,15 +125,15 @@ namespace osu.Game.Overlays.SkinEditor
             var closest = getClosestAnchor(drawable);
 
             applyAnchor(drawable, closest);
-            applyOrigin(drawable, closest);
+            applyScreenSpaceOrigin(drawable, closest);
         }
 
         protected override void OnSelectionChanged()
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanFlipX = true;
-            SelectionBox.CanFlipY = true;
+            SelectionBox.CanFlipX = SelectedItems.All(i => i.CanBeScaled(Axes.X));
+            SelectionBox.CanFlipY = SelectedItems.All(i => i.CanBeScaled(Axes.Y));
             SelectionBox.CanReverse = false;
         }
 
@@ -236,10 +241,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 var drawable = (Drawable)item;
 
-                applyOrigin(drawable, origin);
-
-                if (!item.UsesFixedAnchor)
-                    ApplyClosestAnchorOrigin(drawable);
+                applyLocalSpaceOrigin(drawable, origin);
             }
 
             OnOperationEnded();
@@ -320,7 +322,17 @@ namespace osu.Game.Overlays.SkinEditor
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
         }
 
-        private static void applyOrigin(Drawable drawable, Anchor screenSpaceOrigin)
+        private static void applyLocalSpaceOrigin(Drawable drawable, Anchor localSpaceOrigin)
+        {
+            if (localSpaceOrigin == drawable.Origin)
+                return;
+
+            Vector2 offset = drawable.ToParentSpace(localSpaceOrigin.PositionOnQuad(drawable.DrawRectangle)) - drawable.ToParentSpace(drawable.Origin.PositionOnQuad(drawable.DrawRectangle));
+            drawable.Origin = localSpaceOrigin;
+            drawable.Position += offset;
+        }
+
+        private static void applyScreenSpaceOrigin(Drawable drawable, Anchor screenSpaceOrigin)
         {
             var boundingBox = drawable.ScreenSpaceDrawQuad.AABBFloat;
 

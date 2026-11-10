@@ -18,7 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osuTK;
 using osuTK.Graphics;
 
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             user.BindValueChanged(_ => updateScoreBindings());
-            scores.BindCollectionChanged((_, __) => updateScoreBindings(), true);
+            scores.BindCollectionChanged((_, _) => updateScoreBindings(), true);
 
             showLeaderboard.BindValueChanged(_ => updateVisibility());
             localUserPlayingState.BindValueChanged(_ => updateVisibility(), true);

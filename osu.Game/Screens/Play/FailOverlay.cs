@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
 {
     public partial class FailOverlay : GameplayMenuOverlay
     {
-        public Func<Task<ScoreInfo>>? SaveReplay;
+        public Func<Task<ScoreInfo>>? SaveReplay { get; init; }
 
         public override LocalisableString Header => GameplayMenuOverlayStrings.FailedHeader;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
         private void load()
         {
             // from #10339 maybe this is a better visual effect
-            Add(new Container
+            FooterContent.Add(new Container
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,

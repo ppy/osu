@@ -75,14 +75,29 @@ namespace osu.Game.Localisation
         public static LocalisableString Accuracy => new TranslatableString(getKey(@"accuracy"), @"Accuracy");
 
         /// <summary>
+        /// "{0} hit window"
+        /// </summary>
+        public static LocalisableString HitResultWindow(string hitResult) => new TranslatableString(getKey(@"hit_result_window"), @"{0} hit window", hitResult);
+
+        /// <summary>
         /// "HP Drain"
         /// </summary>
         public static LocalisableString HPDrain => new TranslatableString(getKey(@"hp_drain"), @"HP Drain");
 
         /// <summary>
+        /// "Affects the harshness of health drain and the health penalties for missing."
+        /// </summary>
+        public static LocalisableString HPDrainDescription => new TranslatableString(getKey(@"hp_drain_description"), @"Affects the harshness of health drain and the health penalties for missing.");
+
+        /// <summary>
         /// "Scroll Speed"
         /// </summary>
         public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll Speed");
+
+        /// <summary>
+        /// "This value is being adjusted by mods ({0:0.0#} → {1:0.0#})."
+        /// </summary>
+        public static LocalisableString ThisValueIsBeingAdjustedByMods(float originalValue, float adjustedValue) => new TranslatableString(getKey(@"this_value_is_being_adjusted_by_mods"), @"This value is being adjusted by mods ({0:0.0#} → {1:0.0#}).", originalValue, adjustedValue);
 
         /// <summary>
         /// "Submitted"
@@ -110,6 +125,11 @@ namespace osu.Game.Localisation
         public static LocalisableString UseTheseMods => new TranslatableString(getKey(@"use_these_mods"), @"Use these mods");
 
         /// <summary>
+        /// "Watch replay"
+        /// </summary>
+        public static LocalisableString WatchReplay => new TranslatableString(getKey(@"watch_replay"), @"Watch replay");
+
+        /// <summary>
         /// "For all difficulties"
         /// </summary>
         public static LocalisableString ForAllDifficulties => new TranslatableString(getKey(@"for_all_difficulties"), @"For all difficulties");
@@ -130,14 +150,14 @@ namespace osu.Game.Localisation
         public static LocalisableString MarkAsPlayed => new TranslatableString(getKey(@"mark_as_played"), @"Mark as played");
 
         /// <summary>
-        /// "Clear all local scores"
+        /// "Remove from played"
         /// </summary>
-        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
+        public static LocalisableString RemoveFromPlayed => new TranslatableString(getKey(@"remove_from_played"), @"Remove from played");
 
         /// <summary>
-        /// "Delete beatmap"
+        /// "Clear all local scores..."
         /// </summary>
-        public static LocalisableString DeleteBeatmap => new TranslatableString(getKey(@"delete_beatmap"), @"Delete beatmap");
+        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores...");
 
         /// <summary>
         /// "Restore all hidden"
@@ -253,6 +273,21 @@ namespace osu.Game.Localisation
         /// "No beatmaps match your filter criteria!"
         /// </summary>
         public static LocalisableString NoMatchingBeatmapsDescription => new TranslatableString(getKey(@"no_matching_beatmaps_description"), @"No beatmaps match your filter criteria!");
+
+        /// <summary>
+        /// "Temporarily showing all beatmaps in"
+        /// </summary>
+        public static LocalisableString TemporarilyShowingAllBeatmapsIn => new TranslatableString(getKey(@"temporarily_showing_all_beatmaps_in"), @"Temporarily showing all beatmaps in");
+
+        /// <summary>
+        /// "mostly {0}"
+        /// </summary>
+        public static LocalisableString MostlyBPM(int mostCommonBPM) => new TranslatableString(getKey(@"mostly_bpm"), @"mostly {0}", mostCommonBPM);
+
+        /// <summary>
+        /// "{0:#,0} match|{0:#,0} matches"
+        /// </summary>
+        public static LocalisableString MatchesCount(int quantity) => new PluralisableString(new TranslatableString(getKey(@"matches_count"), @"{0:#,0} match|{0:#,0} matches", quantity), quantity, '|');
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

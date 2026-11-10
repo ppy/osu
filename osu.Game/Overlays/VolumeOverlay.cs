@@ -6,15 +6,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Volume;
 using osuTK;
 using osuTK.Graphics;
@@ -31,11 +34,15 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMaster = null!;
         private VolumeMeter volumeMeterEffect = null!;
         private VolumeMeter volumeMeterMusic = null!;
+        private VolumeMeter volumeMeterHitsound = null!;
+
+        // ReSharper disable once NotAccessedField.Local
+        private Bindable<double> volumeGameplay = null!;
 
         private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters = null!;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio, OsuColour colours, OsuConfigManager config)
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
@@ -67,9 +74,10 @@ namespace osu.Game.Overlays
                             Spacing = new Vector2(0, offset),
                             Children = new[]
                             {
-                                volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
-                                volumeMeterMaster = new MasterVolumeMeter("MASTER", 150, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
-                                volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
+                                volumeMeterMaster = new MasterVolumeMeter(AudioSettingsStrings.MasterVolume.ToUpper(), 140, colours.PinkDarker) { IsMuted = { BindTarget = IsMuted }, },
+                                volumeMeterMusic = new VolumeMeter(AudioSettingsStrings.MusicVolume.ToUpper(), 100, colours.BlueDarker),
+                                volumeMeterEffect = new VolumeMeter(AudioSettingsStrings.EffectVolume.ToUpper(), 100, colours.BlueDarker),
+                                volumeMeterHitsound = new VolumeMeter(AudioSettingsStrings.HitsoundVolume.ToUpper(), 100, colours.BlueDarker),
                             }
                         },
                     },
@@ -79,6 +87,7 @@ namespace osu.Game.Overlays
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
+            volumeMeterHitsound.Bindable.BindTo(volumeGameplay = config.GetBindable<double>(OsuSetting.HitsoundVolume));
         }
 
         protected override void LoadComplete()

@@ -10,6 +10,7 @@ using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -52,6 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                 var combo = container.OfType<LegacyDefaultComboCounter>().FirstOrDefault();
                                 var spectatorList = container.OfType<SpectatorList>().FirstOrDefault();
                                 var leaderboard = container.OfType<DrawableGameplayLeaderboard>().FirstOrDefault();
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
 
                                 Vector2 pos = new Vector2();
 
@@ -79,11 +81,21 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                                     spectatorList.Origin = Anchor.TopLeft;
                                     spectatorList.Position = pos;
                                 }
+
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.BottomCentre;
+                                    hitError.Origin = Anchor.BottomCentre;
+                                }
+
+                                foreach (var d in container.OfType<ISerialisableDrawable>())
+                                    d.UsesFixedAnchor = true;
                             })
                             {
                                 new LegacyDefaultComboCounter(),
                                 new SpectatorList(),
                                 new DrawableGameplayLeaderboard(),
+                                new LegacyBarHitErrorMeter(),
                             };
                     }
 
@@ -103,6 +115,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     switch (taikoComponent.Component)
                     {
+                        case TaikoSkinComponents.DrumRollHead:
+                            if (GetTexture("taiko-roll-middle") != null)
+                                return new LegacyCirclePiece();
+
+                            return null;
+
                         case TaikoSkinComponents.DrumRollBody:
                             if (GetTexture("taiko-roll-middle") != null)
                                 return new LegacyDrumRoll();
@@ -240,7 +258,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         private class LegacyTaikoSampleInfo : HitSampleInfo
         {
             public LegacyTaikoSampleInfo(HitSampleInfo sampleInfo)
-                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume)
+                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume, sampleInfo.EditorAutoBank, sampleInfo.UseBeatmapSamples)
 
             {
             }

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var definition = new StageDefinition(columns);
             var results = getResults(definition);
-            Assert.AreEqual(special, results);
+            ClassicAssert.AreEqual(special, results);
         }
 
         private IEnumerable<bool> getResults(StageDefinition definition)

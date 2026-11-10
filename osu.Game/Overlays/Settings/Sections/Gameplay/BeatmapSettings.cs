@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
@@ -23,35 +24,41 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = SkinSettingsStrings.BeatmapSkins,
+                    Caption = SkinSettingsStrings.BeatmapSkins,
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
-                },
-                new SettingsCheckbox
+                }),
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = SkinSettingsStrings.BeatmapColours,
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
+                })
                 {
                     Keywords = new[] { "combo", "override", "color" },
-                    LabelText = SkinSettingsStrings.BeatmapColours,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
                 },
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
+                {
+                    Caption = SkinSettingsStrings.BeatmapHitsounds,
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
+                })
                 {
                     Keywords = new[] { "samples", "override" },
-                    LabelText = SkinSettingsStrings.BeatmapHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
-                new SettingsCheckbox
+                new SettingsItemV2(new FormCheckBox
                 {
-                    LabelText = GraphicsSettingsStrings.StoryboardVideo,
+                    Caption = GraphicsSettingsStrings.StoryboardVideo,
                     Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
-                },
-                new SettingsSlider<float>
+                }),
+                new SettingsItemV2(new FormSliderBar<float>
                 {
-                    Keywords = new[] { "color" },
-                    LabelText = GraphicsSettingsStrings.ComboColourNormalisation,
+                    Caption = GraphicsSettingsStrings.ComboColourNormalisation,
                     Current = comboColourNormalisation,
                     DisplayAsPercentage = true,
-                }
+                })
+                {
+                    Keywords = new[] { "color" },
+                },
             };
         }
     }

@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("4 rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 4);
 
-            AddStep("filter one room", () => container.Filter.Value = new FilterCriteria { SearchString = rooms.First().Name });
+            AddStep("filter one room", () => container.Filter.Value = new LoungeFilterCriteria { SearchString = rooms.First().Name });
 
             AddUntilStep("1 rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 1);
 
@@ -160,13 +160,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => rooms.AddRange(GenerateRooms(3, new CatchRuleset().RulesetInfo)));
 
             // Todo: What even is this case...?
-            AddStep("set empty filter criteria", () => container.Filter.Value = new FilterCriteria());
+            AddStep("set empty filter criteria", () => container.Filter.Value = new LoungeFilterCriteria());
             AddUntilStep("5 rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 5);
 
-            AddStep("filter osu! rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo });
+            AddStep("filter osu! rooms", () => container.Filter.Value = new LoungeFilterCriteria { Ruleset = new OsuRuleset().RulesetInfo });
             AddUntilStep("2 rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 2);
 
-            AddStep("filter catch rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo });
+            AddStep("filter catch rooms", () => container.Filter.Value = new LoungeFilterCriteria { Ruleset = new CatchRuleset().RulesetInfo });
             AddUntilStep("3 rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 3);
         }
 
@@ -183,11 +183,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("both rooms visible", () => container.DrawableRooms.Count(r => r.IsPresent) == 2);
 
-            AddStep("filter public rooms", () => container.Filter.Value = new FilterCriteria { Permissions = RoomPermissionsFilter.Public });
+            AddStep("filter public rooms", () => container.Filter.Value = new LoungeFilterCriteria { Permissions = RoomPermissionsFilter.Public });
 
             AddUntilStep("private room hidden", () => container.DrawableRooms.All(r => !r.Room.HasPassword));
 
-            AddStep("filter private rooms", () => container.Filter.Value = new FilterCriteria { Permissions = RoomPermissionsFilter.Private });
+            AddStep("filter private rooms", () => container.Filter.Value = new LoungeFilterCriteria { Permissions = RoomPermissionsFilter.Private });
 
             AddUntilStep("public room hidden", () => container.DrawableRooms.All(r => r.Room.HasPassword));
         }

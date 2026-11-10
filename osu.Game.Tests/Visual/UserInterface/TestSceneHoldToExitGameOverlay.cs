@@ -40,20 +40,20 @@ namespace osu.Game.Tests.Visual.UserInterface
                 firedText
             };
 
-            AddStep("start confirming", () => overlay.Begin());
-            AddStep("abort confirming", () => overlay.Abort());
+            AddStep("start confirming", overlay.Begin);
+            AddStep("abort confirming", overlay.Abort);
 
             AddAssert("ensure not fired internally", () => !overlay.Fired);
             AddAssert("ensure aborted", () => !fired);
 
-            AddStep("start confirming", () => overlay.Begin());
+            AddStep("start confirming", overlay.Begin);
 
             AddUntilStep("wait until confirmed", () => fired);
             AddAssert("ensure fired internally", () => overlay.Fired);
 
-            AddStep("abort after fire", () => overlay.Abort());
+            AddStep("abort after fire", overlay.Abort);
             AddAssert("ensure not fired internally", () => !overlay.Fired);
-            AddStep("start confirming", () => overlay.Begin());
+            AddStep("start confirming", overlay.Begin);
             AddUntilStep("wait until fired again", () => overlay.Fired);
         }
 

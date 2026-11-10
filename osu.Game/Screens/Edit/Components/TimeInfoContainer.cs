@@ -151,9 +151,9 @@ namespace osu.Game.Screens.Edit.Components
                     });
                 };
 
-                inputTextBox.Current.BindValueChanged(val => editor?.HandleTimestamp(val.NewValue));
+                inputTextBox.Current.BindValueChanged(val => editor?.HandleTimestamp(val.NewValue.Trim()));
 
-                inputTextBox.OnCommit += (_, __) =>
+                inputTextBox.OnCommit += (_, _) =>
                 {
                     trackTimer.Alpha = 1;
                     inputTextBox.Alpha = 0;

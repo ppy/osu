@@ -8,18 +8,27 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
 {
-    public partial class SampleBankTernaryButton : CompositeDrawable
+    public partial class SampleBankTernaryButton : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         public string BankName { get; }
-        public Func<Drawable>? CreateIcon { get; init; }
+        public required Func<Drawable> CreateIcon { get; init; }
+
+        public required Func<Drawable> CreateCompactIcon { get; init; }
 
         public readonly BindableWithCurrent<TernaryState> NormalState = new BindableWithCurrent<TernaryState>();
         public readonly BindableWithCurrent<TernaryState> AdditionsState = new BindableWithCurrent<TernaryState>();
+
+        public required GlobalAction NormalHotkey { get; init; }
+        public required GlobalAction AdditionsHotkey { get; init; }
 
         public DrawableTernaryButton NormalButton { get; private set; } = null!;
         public DrawableTernaryButton AdditionsButton { get; private set; } = null!;
@@ -50,6 +59,8 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                         Current = NormalState,
                         Description = BankName.Titleize(),
                         CreateIcon = CreateIcon,
+                        CreateCompactIcon = CreateCompactIcon,
+                        Hotkey = new Hotkey(NormalHotkey),
                     },
                 },
                 new Container
@@ -65,19 +76,69 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                         Current = AdditionsState,
                         Description = BankName.Titleize(),
                         CreateIcon = CreateIcon,
+                        CreateCompactIcon = CreateCompactIcon,
+                        Hotkey = new Hotkey(AdditionsHotkey),
                     },
                 },
             };
         }
 
-        private partial class InlineDrawableTernaryButton : DrawableTernaryButton
+        private partial class InlineDrawableTernaryButton : DrawableTernaryButton, IExpandable
         {
+            private const float text_position = 31f;
+
+            public new required Func<Drawable> CreateIcon { get; init; }
+
+            public required Func<Drawable> CreateCompactIcon { get; init; }
+
+            private Drawable icon = null!;
+            private Drawable iconCompact = null!;
+
+            public BindableBool Expanded { get; } = new BindableBool();
+
+            [Resolved(canBeNull: true)]
+            private IExpandingContainer? expandingContainer { get; set; }
+
+            public InlineDrawableTernaryButton()
+            {
+                base.CreateIcon = createBaseIcon;
+            }
+
+            private Drawable createBaseIcon() => new Container
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Children = new[]
+                {
+                    icon = CreateIcon(),
+                    iconCompact = CreateCompactIcon(),
+                }
+            };
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 Content.Masking = false;
                 Content.CornerRadius = 0;
                 Icon.X = 4.5f;
+                HotkeyDisplay.X = text_position;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                expandingContainer?.Expanded.BindValueChanged(containerExpanded =>
+                {
+                    Expanded.Value = containerExpanded.NewValue;
+                }, true);
+
+                Expanded.BindValueChanged(expanded =>
+                {
+                    icon.FadeTo(expanded.NewValue ? 1 : 0, 150, Easing.OutQuint);
+                    HotkeyDisplay.FadeTo(expanded.NewValue ? 1 : 0, 150, Easing.OutQuint);
+                    iconCompact.FadeTo(expanded.NewValue ? 0 : 1, 150, Easing.OutQuint);
+                }, true);
             }
 
             protected override SpriteText CreateText() => new ExpandableSpriteText
@@ -85,8 +146,32 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 Depth = -1,
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
-                X = 31f
+                X = text_position,
             };
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+                return false;
+
+            if (e.Action == NormalHotkey)
+            {
+                NormalButton.TriggerClick();
+                return true;
+            }
+
+            if (e.Action == AdditionsHotkey)
+            {
+                AdditionsButton.TriggerClick();
+                return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 }

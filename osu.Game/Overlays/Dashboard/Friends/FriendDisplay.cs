@@ -17,6 +17,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 {
     public partial class FriendDisplay : CompositeDrawable
     {
+        public IBindable<bool> Loading => loading;
+        private readonly BindableBool loading = new BindableBool();
+
         private readonly IBindableList<APIRelation> apiFriends = new BindableList<APIRelation>();
 
         [Resolved]
@@ -27,7 +30,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
         private Box controlBackground = null!;
         private UserListToolbar userListToolbar = null!;
         private Container<FriendsList> listContainer = null!;
-        private LoadingLayer loading = null!;
         private BasicSearchTextBox searchTextBox = null!;
 
         private CancellationTokenSource? listLoadCancellation;
@@ -144,7 +146,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                                 AutoSizeAxes = Axes.Y,
                                                 Padding = new MarginPadding { Horizontal = WaveOverlayContainer.HORIZONTAL_PADDING }
                                             },
-                                            loading = new LoadingLayer(true)
                                         }
                                     }
                                 }
@@ -162,7 +163,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
         {
             base.LoadComplete();
 
-            apiFriends.BindTo(api.Friends);
+            apiFriends.BindTo(api.LocalUserState.Friends);
             apiFriends.BindCollectionChanged((_, _) => reloadList());
 
             userListToolbar.DisplayStyle.BindValueChanged(_ => reloadList(), true);
@@ -173,20 +174,22 @@ namespace osu.Game.Overlays.Dashboard.Friends
             listLoadCancellation?.Cancel();
             var cancellationSource = listLoadCancellation = new CancellationTokenSource();
 
-            FriendsList? currentList = listContainer.SingleOrDefault();
+            // There may be more than one active list in the container due to the delayed fade out.
+            FriendsList? currentList = listContainer.SingleOrDefault(d => d.LifetimeEnd == double.MaxValue);
+
             FriendsList newList = new FriendsList(userListToolbar.DisplayStyle.Value, apiFriends.Select(f => f.TargetUser!).ToArray())
             {
-                OnlineStream = { BindTarget = streamControl.Current },
+                StatusFilter = { BindTarget = streamControl.Current },
                 SortCriteria = { BindTarget = userListToolbar.SortCriteria },
                 SearchText = { BindTarget = searchTextBox.Current }
             };
 
-            loading.Show();
+            loading.Value = true;
             LoadComponentAsync(newList, finishLoad, cancellationSource.Token);
 
             void finishLoad(FriendsList list)
             {
-                loading.Hide();
+                loading.Value = false;
 
                 if (currentList != null)
                 {

@@ -34,8 +34,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 osuHeader.Dropdown = this;
                 osuHeader.LeftSideLabel = label;
             }
-
-            AddInternal(new HoverClickSounds());
         }
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -51,6 +49,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
         }
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         protected partial class ShearedDropdownMenu : OsuDropdown<T>.OsuDropdownMenu
         {
@@ -192,6 +192,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         }
                     },
                 };
+
+                AddInternal(new HoverClickSounds());
             }
 
             [BackgroundDependencyLoader]

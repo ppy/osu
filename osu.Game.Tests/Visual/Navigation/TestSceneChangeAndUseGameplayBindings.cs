@@ -15,7 +15,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings.Sections.Input;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.SelectV2;
+using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
 

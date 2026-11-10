@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase("mania-samples")]
         [TestCase("mania-slider")] // e.g. second and fourth notes of https://osu.ppy.sh/beatmapsets/73883#mania/216407
         [TestCase("slider-convert-samples")]
+        [TestCase("spinner-convert-samples")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<SampleConvertValue> CreateConvertValue(HitObject hitObject)

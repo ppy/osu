@@ -26,6 +26,9 @@ namespace osu.Game.Storyboards.Drawables
         [Cached(typeof(Storyboard))]
         public Storyboard Storyboard { get; }
 
+        [Cached(typeof(StoryboardTriggerController))]
+        public StoryboardTriggerController TriggerController { get; }
+
         /// <summary>
         /// Whether the storyboard is considered finished.
         /// </summary>
@@ -78,6 +81,10 @@ namespace osu.Game.Storyboards.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
+            AddInternal(TriggerController = new StoryboardTriggerController
+            {
+                Passing = passing,
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -107,7 +114,14 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.LoadComplete();
 
-            health.BindValueChanged(val => passing.Value = val.NewValue >= 0.5, true);
+            health.BindValueChanged(val =>
+            {
+                // TODO: this is very arbitrary and doesn't work how it is historically supposed to.
+                // - For taiko ruleset, this will cause the first half of a perfect play to be "failing".
+                // - For all cases, it can flip-flop states too often (on stable it only updated at end of combo).
+                // - Also, in stable a different condition was used for non-break-time passing state (local combo performance).
+                passing.Value = val.NewValue >= 0.5;
+            }, true);
             passing.BindValueChanged(_ => updateLayerVisibility(), true);
         }
 
@@ -127,7 +141,7 @@ namespace osu.Game.Storyboards.Drawables
                 layer.Enabled = passing.Value ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
 
-        private class StoryboardResourceLookupStore : IResourceStore<byte[]>
+        public class StoryboardResourceLookupStore : IResourceStore<byte[]>
         {
             private readonly IResourceStore<byte[]> realmFileStore;
             private readonly Storyboard storyboard;

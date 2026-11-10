@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,6 +18,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Volume
         protected readonly float CircleSize;
 
         private readonly Color4 meterColour;
-        private readonly string name;
+        private readonly LocalisableString name;
 
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Volume
 
         private const float transition_length = 500;
 
-        public VolumeMeter(string name, float circleSize, Color4 meterColour)
+        public VolumeMeter(LocalisableString name, float circleSize, Color4 meterColour)
         {
             CircleSize = circleSize;
             this.meterColour = meterColour;
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-hover");
+            hoverSample = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetResourceName()}-hover");
             notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
 
@@ -214,6 +214,7 @@ namespace osu.Game.Overlays.Volume
                 new Container
                 {
                     Size = LABEL_SIZE,
+                    AutoSizeAxes = Axes.X,
                     CornerRadius = 10,
                     Masking = true,
                     Margin = new MarginPadding { Left = CircleSize + 10 },
@@ -228,6 +229,10 @@ namespace osu.Game.Overlays.Volume
                         },
                         new OsuSpriteText
                         {
+                            Margin = new MarginPadding
+                            {
+                                Horizontal = 32,
+                            },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
@@ -320,6 +325,8 @@ namespace osu.Game.Overlays.Volume
         private void resetAcceleration() => accelerationModifier = 1;
 
         private float dragDelta;
+
+        protected override bool OnMouseDown(MouseDownEvent e) => true; // handle to prevent drawables behind from potentially receiving the mouse down
 
         protected override bool OnDragStart(DragStartEvent e)
         {

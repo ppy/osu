@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public partial class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject
     {
-        public override double ScoreMultiplier => UsesDefaultConfiguration ? 1.12 : 1;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModBloom), typeof(OsuModBlinds) }).ToArray();
 
         private const double default_follow_delay = 120;
@@ -50,12 +49,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableSlider s)
-                s.OnUpdate += _ => flashlight.OnSliderTrackingChange(s);
+                s.OnUpdate += _ => flashlight.OnSliderUpdate(s);
         }
 
         private partial class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
             private readonly double followDelay;
+
+            private DrawableSlider? activeSlider;
 
             public OsuFlashlight(OsuModFlashlight modFlashlight)
                 : base(modFlashlight)
@@ -66,10 +67,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                 FlashlightSmoothness = 1.4f;
             }
 
-            public void OnSliderTrackingChange(DrawableSlider e)
+            public void OnSliderUpdate(DrawableSlider e)
             {
                 // If a slider is in a tracking state, a further dim should be applied to the (remaining) visible portion of the playfield.
-                FlashlightDim = Time.Current >= e.HitObject.StartTime && e.Tracking.Value ? 0.8f : 0.0f;
+                // A few things are required here:
+                // - For the purposes of dimming during slider tracking, only one slider is considered "active".
+                //   This more or less matches stable: https://github.com/peppy/osu-stable-reference/blob/4a8545de2f93f4586bb78f2f941084e4a6385ef2/osu!/GameModes/Play/Player.cs#L3951
+                // - The active slider should stop dimming the playfield as soon as it is fully judged.
+                //   This is taken care of by `activeSlider.Tracking.Value` which will become false after the slider's end time once it's fully hit:
+                //   https://github.com/ppy/osu/blob/876b80642357996f90e8469cc25eb1e490f1f224/osu.Game.Rulesets.Osu/Objects/Drawables/SliderInputManager.cs#L266
+                // - However, in the case of multiple sliders one after another (visible simultaneously on the playfield),
+                //   the first slider ending and relinquishing dim shouldn't suppress the dimming once the *second* slider starts tracking.
+                //   A naive implementation here would run into this issue, as this runs as an update hook for all visible sliders on the playfield until their lifetime ends
+                //   (which necessarily happens *after* the slider is fully judged).
+                if (e.Tracking.Value)
+                    activeSlider = e;
+
+                FlashlightDim = activeSlider != null && activeSlider.IsInUse && Time.Current >= activeSlider.HitObject.StartTime && activeSlider.Tracking.Value ? 0.8f : 0.0f;
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
@@ -83,9 +97,17 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return base.OnMouseMove(e);
             }
 
+            // as per https://github.com/peppy/osu-stable-reference/blob/baa8705f782c0de2b10a7387d78014c61c8b17fb/osu!/GameModes/Play/Rulesets/Ruleset.cs#L532-L535,
+            // stable's animation speed is 0.1 "units" per 1 frame at 60 fps
+            // converting to local units here, this is:
+            // (0.1 / 3.2) * (1 / 60 [s]) = 1.875 [1 / s] = (1.875 / 1000) [1 / ms]
+            private const double scale_animation_speed = 1.875 / 1000;
+
             protected override void UpdateFlashlightSize(float size)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), FLASHLIGHT_FADE_DURATION);
+                double relativeDelta = Math.Abs(FlashlightSize.Y - size) / DefaultFlashlightSize;
+                double duration = relativeDelta / scale_animation_speed;
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, size), duration);
             }
 
             protected override string FragmentShader => "CircularFlashlight";

@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Header
         [Resolved]
         private RankingsOverlay? rankingsOverlay { get; set; }
 
-        private UserCoverBackground cover = null!;
+        private CoverBackground cover = null!;
         private SupporterIcon supporterTag = null!;
         private UpdateableAvatar avatar = null!;
         private OsuSpriteText usernameText = null!;
@@ -48,7 +48,8 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText teamText = null!;
         private GroupBadgeFlow groupBadgeFlow = null!;
         private ToggleCoverButton coverToggle = null!;
-        private PreviousUsernamesDisplay previousUsernamesDisplay = null!;
+
+        public PreviousUsernamesDisplay PreviousUsernamesDisplay { get; } = new PreviousUsernamesDisplay();
 
         private Bindable<bool> coverExpanded = null!;
 
@@ -149,7 +150,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                         new Container
                                                         {
                                                             // Intentionally use a zero-size container, else the fill flow will adjust to (and cancel) the upwards animation.
-                                                            Child = previousUsernamesDisplay = new PreviousUsernamesDisplay(),
+                                                            Child = PreviousUsernamesDisplay,
                                                         }
                                                     }
                                                 },
@@ -241,7 +242,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             var user = data?.User;
 
-            cover.User = user;
+            cover.Model = user;
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
             openUserExternally.Link = $@"{api.Endpoints.WebsiteUrl}/users/{user?.Id ?? 0}";
@@ -254,7 +255,7 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Text = user?.Title ?? string.Empty;
             titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
             groupBadgeFlow.User.Value = user;
-            previousUsernamesDisplay.User.Value = user;
+            PreviousUsernamesDisplay.User.Value = user;
         }
 
         private void updateCoverState()
@@ -277,7 +278,7 @@ namespace osu.Game.Overlays.Profile.Header
             flow.TransformTo(nameof(flow.Spacing), new Vector2(expanded ? 20f : 10f), transition_duration, Easing.OutQuint);
         }
 
-        private partial class ProfileCoverBackground : UserCoverBackground
+        private partial class ProfileCoverBackground : CoverBackground
         {
             protected override double LoadDelay => 0;
 

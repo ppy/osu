@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => OsuIcon.ModBloom;
         public override ModType Type => ModType.Fun;
         public override LocalisableString Description => "The cursor blooms into.. a larger cursor!";
-        public override double ScoreMultiplier => 1;
         protected const float MIN_SIZE = 1;
         protected const float TRANSITION_DURATION = 100;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight), typeof(OsuModNoScope), typeof(ModTouchDevice) };
@@ -39,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource(
             "Max size at combo",
             "The combo count at which the cursor reaches its maximum size",
-            SettingControlType = typeof(SettingsSlider<int, RoundedSliderBar<int>>)
+            SettingControlType = typeof(SettingsSlider<int, MaxSizeComboSlider>)
         )]
         public BindableInt MaxSizeComboCount { get; } = new BindableInt(50)
         {
@@ -83,6 +82,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                 cursor.ModScaleAdjust.Value = 1;
             else
                 cursor.ModScaleAdjust.Value = (float)Interpolation.Lerp(cursor.ModScaleAdjust.Value, currentSize, Math.Clamp(cursor.Time.Elapsed / TRANSITION_DURATION, 0, 1));
+        }
+    }
+
+    public partial class MaxSizeComboSlider : RoundedSliderBar<int>
+    {
+        public MaxSizeComboSlider()
+        {
+            KeyboardStep = 1;
         }
     }
 }

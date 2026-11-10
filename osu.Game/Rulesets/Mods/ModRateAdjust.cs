@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mods
             get
             {
                 if (!SpeedChange.IsDefault)
-                    yield return ("Speed change", $"{SpeedChange.Value:N2}x");
+                    yield return ("Speed change", FormattableString.Invariant($@"{SpeedChange.Value:N2}x"));
             }
         }
 

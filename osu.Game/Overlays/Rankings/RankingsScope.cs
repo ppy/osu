@@ -17,8 +17,8 @@ namespace osu.Game.Overlays.Rankings
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCountry))]
         Country,
 
-        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeCharts))]
-        Spotlights,
+        [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypePlaylists))]
+        Playlists,
 
         [LocalisableDescription(typeof(RankingsStrings), nameof(RankingsStrings.TypeKudosu))]
         Kudosu,

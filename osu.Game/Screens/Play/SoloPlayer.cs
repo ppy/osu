@@ -13,7 +13,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 
 namespace osu.Game.Screens.Play
 {
@@ -40,6 +40,9 @@ namespace osu.Game.Screens.Play
             int rulesetId = Ruleset.Value.OnlineID;
 
             if (beatmapId <= 0)
+                return null;
+
+            if (Beatmap.Value.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified)
                 return null;
 
             if (!Ruleset.Value.IsLegacyRuleset())

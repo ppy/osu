@@ -35,13 +35,13 @@ namespace osu.Game.Overlays.SkinEditor
         {
             base.LoadComplete();
 
-            selectedItems.CollectionChanged += (_, __) => updateState();
+            selectedItems.CollectionChanged += (_, _) => updateState();
             updateState();
         }
 
         private void updateState()
         {
-            CanRotateAroundSelectionOrigin.Value = selectedItems.Count > 0;
+            CanRotateAroundSelectionOrigin.Value = selectedItems.Count > 0 && selectedItems.All(i => i.CanBeRotated);
         }
 
         private Drawable[]? objectsInRotation;
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.SkinEditor
 
             foreach (var drawableItem in objectsInRotation)
             {
-                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], actualOrigin, rotation);
+                var rotatedPosition = GeometryUtils.RotatePointAroundOrigin(originalPositions[drawableItem], ToScreenSpace(actualOrigin), rotation);
                 UpdatePosition(drawableItem, rotatedPosition);
 
                 drawableItem.Rotation = originalRotations[drawableItem] + rotation;

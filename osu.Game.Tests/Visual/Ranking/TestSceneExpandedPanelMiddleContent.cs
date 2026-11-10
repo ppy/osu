@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("mapped by text not present", () =>
                 this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
 
-            AddAssert("play time displayed", () => this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
+            AddAssert("play time displayed", () => this.ChildrenOfType<PlayedOnText>().Any());
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 showPanel(score);
             });
 
-            AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
+            AddAssert("play time not displayed", () => !this.ChildrenOfType<PlayedOnText>().Any());
         }
 
         [Test]

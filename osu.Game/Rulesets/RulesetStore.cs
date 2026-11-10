@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 
@@ -32,10 +31,10 @@ namespace osu.Game.Rulesets
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
 
-            // This null check prevents Android from attempting to load the rulesets from disk,
-            // as the underlying path "AppContext.BaseDirectory", despite being non-nullable, it returns null on android.
+            // This check prevents Android from attempting to load the rulesets from disk,
+            // as the underlying path "AppContext.BaseDirectory" returns an empty string on Android.
             // See https://github.com/xamarin/xamarin-android/issues/3489.
-            if (RuntimeInfo.StartupDirectory.IsNotNull())
+            if (!string.IsNullOrEmpty(RuntimeInfo.StartupDirectory))
                 loadFromDisk();
 
             // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
@@ -118,10 +117,7 @@ namespace osu.Game.Rulesets
         {
             try
             {
-                // On net6-android (Debug), StartupDirectory can be different from where assemblies are placed.
-                // Search sub-directories too.
-
-                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll", SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(RuntimeInfo.StartupDirectory, @$"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
@@ -147,7 +143,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                LogFailedLoad(filename, e);
+                logRulesetFailure(filename, e);
             }
 
             return null;
@@ -169,7 +165,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                LogFailedLoad(assembly.GetName().Name!.Split('.').Last(), e);
+                logRulesetFailure(assembly.GetName().Name!.Split('.').Last(), e);
             }
         }
 
@@ -184,10 +180,12 @@ namespace osu.Game.Rulesets
             AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
 
-        protected void LogFailedLoad(string name, Exception exception)
+        public static void LogRulesetFailure(RulesetInfo ruleset, Exception e) => logRulesetFailure(ruleset.Name, e);
+
+        private static void logRulesetFailure(string name, Exception exception)
         {
-            Logger.Log($"Could not load ruleset \"{name}\". Please check for an update from the developer.", level: LogLevel.Error);
-            Logger.Log($"Ruleset load failed: {exception}");
+            Logger.Log($"An issue with ruleset \"{name}\" occurred. Please check for an update from the developer.", level: LogLevel.Error);
+            Logger.Log(exception.ToString());
         }
 
         #region Implementation of IRulesetStore

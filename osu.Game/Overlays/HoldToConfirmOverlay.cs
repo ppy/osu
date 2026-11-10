@@ -58,11 +58,18 @@ namespace osu.Game.Overlays
             };
 
             audio.Tracks.AddAdjustment(AdjustableProperty.Volume, audioVolume);
+            audio.Samples.AddAdjustment(AdjustableProperty.Volume, audioVolume);
+        }
+
+        protected void RemoveAudioAdjustments()
+        {
+            audio?.Tracks.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
+            audio?.Samples.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            audio?.Tracks.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
+            RemoveAudioAdjustments();
             base.Dispose(isDisposing);
         }
     }

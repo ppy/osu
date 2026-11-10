@@ -122,10 +122,10 @@ namespace osu.Game.Configuration
                         throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} had an unsupported custom control type ({controlType.ReadableName()})");
 
                     var control = (Drawable)Activator.CreateInstance(controlType)!;
-                    controlType.GetProperty(nameof(SettingsItem<object>.SettingSourceObject))?.SetValue(control, obj);
-                    controlType.GetProperty(nameof(SettingsItem<object>.LabelText))?.SetValue(control, attr.Label);
-                    controlType.GetProperty(nameof(SettingsItem<object>.TooltipText))?.SetValue(control, attr.Description);
-                    controlType.GetProperty(nameof(SettingsItem<object>.Current))?.SetValue(control, value);
+                    controlType.GetProperty(nameof(SettingsItem<>.SettingSourceObject))?.SetValue(control, obj);
+                    controlType.GetProperty(nameof(SettingsItem<>.LabelText))?.SetValue(control, attr.Label);
+                    controlType.GetProperty(nameof(SettingsItem<>.TooltipText))?.SetValue(control, attr.Description);
+                    controlType.GetProperty(nameof(SettingsItem<>.Current))?.SetValue(control, value);
 
                     yield return control;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Configuration
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
                             Current = bNumber,
-                            KeyboardStep = 0.1f,
+                            KeyboardStep = bNumber.Precision,
                         };
 
                         break;
@@ -151,7 +151,7 @@ namespace osu.Game.Configuration
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
                             Current = bNumber,
-                            KeyboardStep = 0.1f,
+                            KeyboardStep = (float)bNumber.Precision,
                         };
 
                         break;
@@ -161,7 +161,8 @@ namespace osu.Game.Configuration
                         {
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
-                            Current = bNumber
+                            Current = bNumber,
+                            KeyboardStep = bNumber.Precision,
                         };
 
                         break;
@@ -200,9 +201,9 @@ namespace osu.Game.Configuration
                         var dropdownType = typeof(ModSettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType)!;
 
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.LabelText))?.SetValue(dropdown, attr.Label);
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.TooltipText))?.SetValue(dropdown, attr.Description);
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.Current))?.SetValue(dropdown, bindable);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<>.LabelText))?.SetValue(dropdown, attr.Label);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<>.TooltipText))?.SetValue(dropdown, attr.Description);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<>.Current))?.SetValue(dropdown, bindable);
 
                         yield return dropdown;
 

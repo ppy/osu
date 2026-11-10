@@ -8,7 +8,7 @@ using osu.Game.IO;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Users;
 
 namespace osu.Game.Extensions
@@ -105,7 +105,7 @@ namespace osu.Game.Extensions
         /// <param name="instance">The instance to compare.</param>
         /// <param name="other">The other instance to compare against.</param>
         /// <returns>Whether online IDs match. If either instance is missing an online ID, this will return false.</returns>
-        public static bool MatchesOnlineID(this APIUser? instance, APIUser? other) => matchesOnlineID(instance, other);
+        public static bool MatchesOnlineID(this IUser? instance, IUser? other) => matchesOnlineID(instance, other);
 
         /// <summary>
         /// Check whether the online ID of two <see cref="IScoreInfo"/>s match.

@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Markdig;
+using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.Footnotes;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
@@ -32,6 +34,19 @@ namespace osu.Game.Graphics.Containers.Markdown
             {
                 case YamlFrontMatterBlock:
                     // Don't parse YAML Frontmatter
+                    break;
+
+                case CustomContainer customContainer:
+                    if (customContainer.Info.StartsWith(@"alert-", StringComparison.Ordinal))
+                    {
+                        var alertContainer = CreateStyledAlert(customContainer);
+
+                        container.Add(alertContainer);
+
+                        foreach (var block in customContainer)
+                            AddMarkdownComponent(block, alertContainer.Content, level);
+                    }
+
                     break;
 
                 case ListItemBlock listItemBlock:
@@ -92,6 +107,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override MarkdownFootnote CreateFootnote(Footnote footnote) => new OsuMarkdownFootnote(footnote);
 
+        protected virtual OsuMarkdownStyledAlert CreateStyledAlert(CustomContainer customContainer) => new OsuMarkdownStyledAlert(customContainer);
+
         protected sealed override MarkdownPipeline CreateBuilder()
             => Options.BuildPipeline();
 
@@ -99,6 +116,9 @@ namespace osu.Game.Graphics.Containers.Markdown
         /// Creates a <see cref="OsuMarkdownContainerOptions"/> instance which is used to determine
         /// which CommonMark/Markdig extensions should be enabled for this <see cref="OsuMarkdownContainer"/>.
         /// </summary>
-        protected virtual OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions();
+        protected virtual OsuMarkdownContainerOptions Options => new OsuMarkdownContainerOptions
+        {
+            CustomContainers = true,
+        };
     }
 }

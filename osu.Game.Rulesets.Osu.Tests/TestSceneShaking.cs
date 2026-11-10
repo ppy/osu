@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             Debug.Assert(drawableHitObject.HitObject.HitWindows != null);
 
             double delay = drawableHitObject.HitObject.StartTime - (drawableHitObject.HitObject.HitWindows.WindowFor(HitResult.Miss) + RNG.Next(0, 300)) - Time.Current;
-            scheduledTasks.Add(Scheduler.AddDelayed(() => drawableHitObject.TriggerJudgement(), delay));
+            scheduledTasks.Add(Scheduler.AddDelayed(drawableHitObject.TriggerJudgement, delay));
 
             return drawableHitObject;
         }

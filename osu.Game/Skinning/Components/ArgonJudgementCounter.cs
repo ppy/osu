@@ -37,7 +37,7 @@ namespace osu.Game.Skinning.Components
             Result = result;
 
             AutoSizeAxes = Axes.Both;
-            AddInternal(textComponent = new ArgonCounterTextComponent(Anchor.TopRight, result.DisplayName.ToUpper()));
+            AddInternal(textComponent = new ArgonCounterTextComponent(Anchor.TopLeft, result.DisplayName.ToUpper()));
         }
 
         private void updateWireframe()
@@ -60,7 +60,7 @@ namespace osu.Game.Skinning.Components
 
             var result = Result.Types.First();
             textComponent.LabelColour.Value = getJudgementColor(result);
-            textComponent.ShowLabel.BindValueChanged(v => textComponent.TextColour.Value = !v.NewValue ? getJudgementColor(result) : Color4.White);
+            textComponent.ShowLabel.BindValueChanged(v => textComponent.TextColour.Value = !v.NewValue ? getJudgementColor(result) : Color4.White, true);
         }
 
         private Color4 getJudgementColor(HitResult result)

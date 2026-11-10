@@ -54,6 +54,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             : base(beatmapSet, false)
         {
             content = new BeatmapCardContent(height);
+
+            Action = DefaultAction;
         }
 
         [BackgroundDependencyLoader]

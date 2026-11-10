@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -87,6 +88,7 @@ namespace osu.Game.Overlays.SkinEditor
         private EditorSidebar settingsSidebar = null!;
 
         private SkinEditorChangeHandler? changeHandler;
+        private readonly IBindableList<ISerialisableDrawable> components = new BindableList<ISerialisableDrawable>();
 
         private EditorMenuItem undoMenuItem = null!;
         private EditorMenuItem redoMenuItem = null!;
@@ -279,6 +281,7 @@ namespace osu.Game.Overlays.SkinEditor
                 Scheduler.AddOnce(skinChanged);
             }, true);
 
+            components.BindCollectionChanged((_, _) => Scheduler.AddOnce(reloadToolboxes), true);
             SelectedComponents.BindCollectionChanged((_, _) => Scheduler.AddOnce(populateSettings), true);
 
             selectedTarget.BindValueChanged(targetChanged, true);
@@ -391,10 +394,10 @@ namespace osu.Game.Overlays.SkinEditor
                 return;
             }
 
-            if (skinComponentsContainer.IsLoaded)
-                bindChangeHandler(skinComponentsContainer);
+            if (skinComponentsContainer.ComponentsLoaded)
+                bindSkinnableContainer(skinComponentsContainer);
             else
-                skinComponentsContainer.OnLoadComplete += d => Schedule(() => bindChangeHandler((SkinnableContainer)d));
+                skinComponentsContainer.OnComponentsLoaded += onComponentsLoaded;
 
             content.Child = new SkinBlueprintContainer(skinComponentsContainer);
 
@@ -428,6 +431,13 @@ namespace osu.Game.Overlays.SkinEditor
                 RequestPlacement = requestPlacement
             });
 
+            void onComponentsLoaded(Drawable d)
+            {
+                SkinnableContainer container = (SkinnableContainer)d;
+                container.OnComponentsLoaded -= onComponentsLoaded;
+                Schedule(() => bindSkinnableContainer(container));
+            }
+
             void requestPlacement(Type type)
             {
                 if (!(Activator.CreateInstance(type) is ISerialisableDrawable component))
@@ -437,12 +447,21 @@ namespace osu.Game.Overlays.SkinEditor
                 placeComponent(component);
             }
 
-            void bindChangeHandler(SkinnableContainer skinnableContainer)
+            void bindSkinnableContainer(SkinnableContainer skinnableContainer)
             {
                 changeHandler = new SkinEditorChangeHandler(skinnableContainer);
                 changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
                 changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+
+                components.UnbindBindings();
+                components.BindTo(skinnableContainer.Components);
             }
+        }
+
+        private void reloadToolboxes()
+        {
+            foreach (var toolbox in componentsSidebar.OfType<SkinComponentToolbox>())
+                toolbox.ReloadComponents();
         }
 
         private void skinChanged()
@@ -469,6 +488,8 @@ namespace osu.Game.Overlays.SkinEditor
 
             changeHandler?.Dispose();
             changeHandler = null;
+
+            components.UnbindBindings();
 
             // Schedule is required to ensure that all layout in `LoadComplete` methods has been completed
             // before storing an undo state.
@@ -522,7 +543,9 @@ namespace osu.Game.Overlays.SkinEditor
             }
 
             SelectedComponents.Add(component);
-            SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
+
+            if (!component.UsesFixedAnchor)
+                SkinSelectionHandler.ApplyClosestAnchorOrigin(drawableComponent);
             return true;
         }
 
@@ -607,7 +630,11 @@ namespace osu.Game.Overlays.SkinEditor
 
         void IEditorChangeHandler.RestoreState(int direction) => changeHandler?.RestoreState(direction);
 
-        public void Save(bool userTriggered = true) => save(currentSkin.Value, userTriggered);
+        public void Save(bool userTriggered = true)
+        {
+            if (currentSkin.IsNotNull())
+                save(currentSkin.Value, userTriggered);
+        }
 
         private void save(Skin skin, bool userTriggered = true)
         {
@@ -760,8 +787,9 @@ namespace osu.Game.Overlays.SkinEditor
         private partial class SkinEditorToast : Toast
         {
             public SkinEditorToast(LocalisableString value, string skinDisplayName)
-                : base(SkinSettingsStrings.SkinLayoutEditor, value, skinDisplayName)
+                : base(SkinSettingsStrings.SkinLayoutEditor, value)
             {
+                ExtraText = skinDisplayName;
             }
         }
 

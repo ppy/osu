@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
@@ -22,9 +21,11 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using CommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -68,9 +69,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
+        /// <summary>
+        /// If set to <see langword="true"/>, the selector will display a button,
+        /// which when clicked, will change <see cref="Current"/>'s value to <see langword="null"/>.
+        /// </summary>
+        public bool AllowClear { get; init; }
+
         public Container PreviewContainer { get; private set; } = null!;
 
-        private Box background = null!;
+        private FormControlBackground background = null!;
 
         private FormFieldCaption caption = null!;
         private OsuSpriteText placeholderText = null!;
@@ -93,16 +100,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Masking = true;
-            CornerRadius = 5;
-
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5,
-                },
+                background = new FormControlBackground(),
                 PreviewContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -117,34 +117,46 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 50,
+                    AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Padding = new MarginPadding(9),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        new FillFlowContainer
                         {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Caption = Caption,
-                            TooltipText = HintText,
-                        },
-                        placeholderText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
-                            Width = 1,
-                            Text = PlaceholderText,
-                            Colour = colourProvider.Foreground1,
-                        },
-                        filenameText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Width = 1,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0f, 4f),
+                            Children = new Drawable[]
+                            {
+                                caption = new FormFieldCaption
+                                {
+                                    Caption = Caption,
+                                    TooltipText = HintText,
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new[]
+                                    {
+                                        placeholderText = new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 1,
+                                            Text = PlaceholderText,
+                                            Colour = colourProvider.Foreground1,
+                                        },
+                                        filenameText = new OsuSpriteText
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Width = 1,
+                                        },
+                                    }
+                                }
+                            },
                         },
                         new SpriteIcon
                         {
@@ -176,13 +188,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void onFileSelected()
         {
-            if (Current.Value != null)
+            if (Current.Value != null || AllowClear)
                 this.HidePopover();
 
             initialChooserPath = Current.Value?.DirectoryName;
             placeholderText.Alpha = Current.Value == null ? 1 : 0;
             filenameText.Text = Current.Value?.Name ?? string.Empty;
-            background.FlashColour(ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark2), 800, Easing.OutQuint);
+            background.FlashOnCommit();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -208,22 +220,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             caption.Colour = Current.Disabled ? colourProvider.Foreground1 : colourProvider.Content2;
             filenameText.Colour = Current.Disabled || Current.Value == null ? colourProvider.Foreground1 : colourProvider.Content1;
 
-            if (!Current.Disabled)
-            {
-                BorderThickness = IsHovered || popoverState.Value == Visibility.Visible ? 2 : 0;
-                BorderColour = popoverState.Value == Visibility.Visible ? colourProvider.Highlight1 : colourProvider.Light4;
-
-                if (popoverState.Value == Visibility.Visible)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark3);
-                else if (IsHovered)
-                    background.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Dark4);
-                else
-                    background.Colour = colourProvider.Background5;
-            }
+            if (Current.Disabled)
+                background.VisualStyle = VisualStyle.Disabled;
+            else if (popoverState.Value == Visibility.Visible)
+                background.VisualStyle = VisualStyle.Focused;
+            else if (IsHovered)
+                background.VisualStyle = VisualStyle.Hovered;
             else
-            {
-                background.Colour = colourProvider.Background4;
-            }
+                background.VisualStyle = VisualStyle.Normal;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -242,17 +246,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
-        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath) => new FileChooserPopover(handledExtensions, current, chooserPath);
+        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool allowClear) =>
+            new FileChooserPopover(handledExtensions, current, chooserPath, allowClear);
 
         public Popover GetPopover()
         {
-            var popover = CreatePopover(handledExtensions, Current, initialChooserPath);
+            var popover = CreatePopover(handledExtensions, Current, initialChooserPath, AllowClear);
             popoverState.UnbindBindings();
             popoverState.BindTo(popover.State);
             return popover;
         }
 
-        protected partial class FileChooserPopover : OsuPopover
+        public partial class FileChooserPopover : OsuPopover
         {
             protected override string PopInSampleName => "UI/overlay-big-pop-in";
             protected override string PopOutSampleName => "UI/overlay-big-pop-out";
@@ -261,7 +266,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected OsuFileSelector FileSelector;
 
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool allowClear)
                 : base(false)
             {
                 Child = new Container
@@ -270,9 +275,37 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     // simplest solution to avoid underlying text to bleed through the bottom border
                     // https://github.com/ppy/osu/pull/30005#issuecomment-2378884430
                     Padding = new MarginPadding { Bottom = 1 },
-                    Child = FileSelector = new OsuFileSelector(chooserPath, handledExtensions)
+                    Children = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Bottom = allowClear ? 50 : 0 },
+                            Child = FileSelector = new OsuFileSelector(chooserPath, handledExtensions)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        },
+                        allowClear
+                            ? new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                Padding = new MarginPadding(5),
+                                Child = new DangerousRoundedButton
+                                {
+                                    Text = CommonStrings.ButtonsClear,
+                                    Action = () => OnFileSelected(null),
+                                    Enabled = { Value = current.Value != null },
+                                    Padding = new MarginPadding(5),
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Width = 60,
+                                }
+                            }
+                            : Empty()
                     },
                 };
 
@@ -311,7 +344,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 };
             }
 
-            protected virtual void OnFileSelected(FileInfo file) => current.Value = file;
+            protected virtual void OnFileSelected(FileInfo? file) => current.Value = file;
         }
     }
 }

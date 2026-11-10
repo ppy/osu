@@ -15,7 +15,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Screens.Play.Leaderboards;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
-                    var hudOverlay = new HUDOverlay(drawableRuleset, mods)
+                    var hudOverlay = new HUDOverlay(drawableRuleset, mods, new PlayerConfiguration())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

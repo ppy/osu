@@ -47,6 +47,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             : base(beatmapSet, allowExpansion)
         {
             content = new BeatmapCardContent(HEIGHT);
+
+            Action = DefaultAction;
         }
 
         [BackgroundDependencyLoader]
@@ -224,10 +226,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             });
 
             if (BeatmapSet.HasVideo)
-                leftIconArea.Add(new VideoIconPill { IconSize = new Vector2(16) });
+                leftIconArea.Add(new VideoIconPill());
 
             if (BeatmapSet.HasStoryboard)
-                leftIconArea.Add(new StoryboardIconPill { IconSize = new Vector2(16) });
+                leftIconArea.Add(new StoryboardIconPill());
 
             if (BeatmapSet.FeaturedInSpotlight)
             {
@@ -276,8 +278,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             if (nominationsStatistic != null)
                 yield return nominationsStatistic;
 
-            yield return new FavouritesStatistic(BeatmapSet) { Current = FavouriteState };
             yield return new PlayCountStatistic(BeatmapSet);
+            yield return new FavouritesStatistic(BeatmapSet) { Current = FavouriteState };
 
             var dateStatistic = BeatmapCardDateStatistic.CreateFor(BeatmapSet);
             if (dateStatistic != null)

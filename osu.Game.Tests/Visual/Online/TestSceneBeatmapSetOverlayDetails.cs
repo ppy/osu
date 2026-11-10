@@ -12,7 +12,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Tests.Visual.Online
 {

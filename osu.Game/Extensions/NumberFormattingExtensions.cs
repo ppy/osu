@@ -13,6 +13,9 @@ namespace osu.Game.Extensions
         /// <summary>
         /// For a given numeric type, return a formatted string in the standard format we use for display everywhere.
         /// </summary>
+        /// <remarks>
+        /// Number formatting will abide by <see cref="CultureInfo.CurrentCulture"/>.
+        /// </remarks>
         /// <param name="value">The numeric value.</param>
         /// <param name="maxDecimalDigits">The maximum number of decimals to be considered in the original value.</param>
         /// <param name="asPercentage">Whether the output should be a percentage. For integer types, 0-100 is mapped to 0-100%; for other types 0-1 is mapped to 0-100%.</param>
@@ -21,7 +24,7 @@ namespace osu.Game.Extensions
         {
             double floatValue = double.CreateTruncating(value);
 
-            decimal decimalPrecision = normalise(decimal.CreateTruncating(value), maxDecimalDigits);
+            decimal decimalPrecision = Normalise(decimal.CreateTruncating(value), maxDecimalDigits);
 
             // Find the number of significant digits (we could have less than maxDecimalDigits after normalize())
             int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
@@ -31,12 +34,12 @@ namespace osu.Game.Extensions
                 if (value is int)
                     floatValue /= 100;
 
-                return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.InvariantCulture);
+                return floatValue.ToString($@"0.{new string('0', Math.Max(0, significantDigits - 2))}%", CultureInfo.CurrentCulture);
             }
 
-            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? "-" : string.Empty;
+            string negativeSign = Math.Round(floatValue, significantDigits) < 0 ? CultureInfo.CurrentCulture.NumberFormat.NegativeSign : string.Empty;
 
-            return FormattableString.Invariant($"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}")}");
+            return $"{negativeSign}{Math.Abs(floatValue).ToString($"N{significantDigits}", CultureInfo.CurrentCulture)}";
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace osu.Game.Extensions
         /// <param name="d">The decimal to normalize.</param>
         /// <param name="sd">The maximum number of decimal digits to keep. The final result may have fewer decimal digits than this value.</param>
         /// <returns>The normalised decimal.</returns>
-        private static decimal normalise(decimal d, int sd)
+        public static decimal Normalise(decimal d, int sd)
             => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
     }
 }

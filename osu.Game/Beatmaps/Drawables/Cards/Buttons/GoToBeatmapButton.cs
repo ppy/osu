@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -16,10 +17,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         private readonly Bindable<DownloadState> state = new Bindable<DownloadState>();
 
         private readonly APIBeatmapSet beatmapSet;
+        private readonly bool allowNavigationToBeatmap;
 
-        public GoToBeatmapButton(APIBeatmapSet beatmapSet)
+        public GoToBeatmapButton(APIBeatmapSet beatmapSet, bool allowNavigationToBeatmap)
         {
             this.beatmapSet = beatmapSet;
+            this.allowNavigationToBeatmap = allowNavigationToBeatmap;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -27,7 +30,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         {
             Action = () => game?.PresentBeatmap(beatmapSet);
             Icon.Icon = FontAwesome.Solid.AngleDoubleRight;
-            TooltipText = "Go to beatmap";
         }
 
         protected override void LoadComplete()
@@ -40,8 +42,31 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
 
         private void updateState()
         {
-            Enabled.Value = state.Value == DownloadState.LocallyAvailable;
-            this.FadeTo(Enabled.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            bool available = state.Value == DownloadState.LocallyAvailable;
+            Enabled.Value = allowNavigationToBeatmap && available;
+
+            float alpha;
+
+            if (available && allowNavigationToBeatmap)
+            {
+                TooltipText = CommonStrings.GoToBeatmap;
+                Enabled.Value = true;
+                alpha = 1f;
+            }
+            else if (available)
+            {
+                TooltipText = string.Empty;
+                Enabled.Value = false;
+                alpha = 0.3f;
+            }
+            else
+            {
+                TooltipText = string.Empty;
+                Enabled.Value = false;
+                alpha = 0;
+            }
+
+            this.FadeTo(alpha, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }

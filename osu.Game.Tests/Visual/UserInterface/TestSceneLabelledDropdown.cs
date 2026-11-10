@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         [Test]
         public void TestLabelledDropdown()
-            => AddStep(@"create dropdown", () => Child = new LabelledDropdown<string>
+            => AddStep(@"create dropdown", () => Child = new LabelledDropdown<string>(true)
             {
                 Label = @"Countdown speed",
                 Items = new[]
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         [Test]
         public void TestLabelledEnumDropdown()
-            => AddStep(@"create dropdown", () => Child = new LabelledEnumDropdown<BeatmapOnlineStatus>
+            => AddStep(@"create dropdown", () => Child = new LabelledEnumDropdown<BeatmapOnlineStatus>(true)
             {
                 Label = @"Beatmap status",
                 Description = @"This is a description"

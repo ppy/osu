@@ -13,7 +13,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Argon
         public const int SAMPLE_VOLUME_THRESHOLD_MEDIUM = 60;
 
         public VolumeAwareHitSampleInfo(HitSampleInfo sampleInfo, bool isStrong = false)
-            : base(sampleInfo.Name, isStrong ? BANK_STRONG : getBank(sampleInfo.Bank, sampleInfo.Name, sampleInfo.Volume), sampleInfo.Suffix, sampleInfo.Volume)
+            : base(sampleInfo.Name, isStrong ? BANK_STRONG : getBank(sampleInfo.Bank, sampleInfo.Name, sampleInfo.Volume), sampleInfo.Suffix, sampleInfo.Volume,
+                sampleInfo.EditorAutoBank, sampleInfo.UseBeatmapSamples)
         {
         }
 

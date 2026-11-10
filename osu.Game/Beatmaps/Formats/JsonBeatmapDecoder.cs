@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<Beatmap>("{", _ => new JsonBeatmapDecoder());
         }
 
-        protected override void ParseStreamInto(LineBufferedReader stream, Beatmap output)
+        protected override void ParseStreamInto(LineBufferedReader stream, bool isPrimaryStream, Beatmap output)
         {
             stream.ReadToEnd().DeserializeInto(output);
 

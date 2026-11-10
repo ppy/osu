@@ -13,9 +13,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
 
@@ -26,17 +26,15 @@ namespace osu.Game.Tests.Skins
     public partial class TestSceneBeatmapSkinLookupDisables : OsuTestScene
     {
         private UserSkinSource userSource;
+        private BeatmapSkinProvidingContainer beatmapSkinProvider;
         private BeatmapSkinSource beatmapSource;
         private SkinRequester requester;
-
-        [Resolved]
-        private OsuConfigManager config { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             Add(new SkinProvidingContainer(userSource = new UserSkinSource())
-                .WithChild(new BeatmapSkinProvidingContainer(beatmapSource = new BeatmapSkinSource())
+                .WithChild(beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmapSource = new BeatmapSkinSource())
                     .WithChild(requester = new SkinRequester())));
         });
 
@@ -44,7 +42,7 @@ namespace osu.Game.Tests.Skins
         [TestCase(true)]
         public void TestDrawableLookup(bool allowBeatmapLookups)
         {
-            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
+            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => beatmapSkinProvider.BeatmapSkins.Value = allowBeatmapLookups);
 
             string expected = allowBeatmapLookups ? "beatmap" : "user";
 
@@ -55,11 +53,32 @@ namespace osu.Game.Tests.Skins
         [TestCase(true)]
         public void TestProviderLookup(bool allowBeatmapLookups)
         {
-            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => config.SetValue(OsuSetting.BeatmapSkins, allowBeatmapLookups));
+            AddStep($"Set beatmap skin enabled to {allowBeatmapLookups}", () => beatmapSkinProvider.BeatmapSkins.Value = allowBeatmapLookups);
 
             ISkin expected() => allowBeatmapLookups ? beatmapSource : userSource;
 
             AddAssert("Check lookup is from correct source", () => requester.FindProvider(s => s.GetDrawableComponent(new TestSkinComponentLookup()) != null) == expected());
+        }
+
+        [Test]
+        public void TestHitsoundLookupEnabled()
+        {
+            AddStep("Set beatmap hitsounds to enabled", () => beatmapSkinProvider.BeatmapHitsounds.Value = true);
+            AddAssert("Check hitsound lookup succeeds", () => beatmapSkinProvider.GetSample(new HitSampleInfo("test")), () => Is.Not.Null);
+        }
+
+        [Test]
+        public void TestHitsoundLookupDisabled()
+        {
+            AddStep("Set beatmap hitsounds to disables", () => beatmapSkinProvider.BeatmapHitsounds.Value = false);
+            AddAssert("Check hitsound lookup fails", () => beatmapSkinProvider.GetSample(new HitSampleInfo("test")), () => Is.Null);
+        }
+
+        [Test]
+        public void TestStoryboardSoundLookupBypassesHitsoundDisable()
+        {
+            AddStep("Set beatmap hitsounds to disables", () => beatmapSkinProvider.BeatmapHitsounds.Value = false);
+            AddAssert("Check storyboard sound lookup succeeds", () => beatmapSkinProvider.GetSample(new StoryboardSampleInfo(StoryboardElementSource.Beatmap, "test", 0, 1)), () => Is.Not.Null);
         }
 
         public class UserSkinSource : LegacySkin
@@ -73,6 +92,8 @@ namespace osu.Game.Tests.Skins
             {
                 return new Container { Name = "user" };
             }
+
+            public override ISample GetSample(ISampleInfo sampleInfo) => null;
         }
 
         public class BeatmapSkinSource : LegacyBeatmapSkin
@@ -86,6 +107,8 @@ namespace osu.Game.Tests.Skins
             {
                 return new Container { Name = "beatmap" };
             }
+
+            public override ISample GetSample(ISampleInfo sampleInfo) => new SampleVirtual();
         }
 
         public partial class SkinRequester : Drawable, ISkin

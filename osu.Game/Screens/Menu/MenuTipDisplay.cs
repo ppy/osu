@@ -199,7 +199,11 @@ namespace osu.Game.Screens.Menu
                     return MenuTipStrings.ModCustomisationSettings;
 
                 case 23:
-                    return MenuTipStrings.RandomSkinShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding);
+                    return MenuTipStrings.SkinChangeShortcuts([
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.RandomSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.PreviousSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
+                        keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.NextSkin).FirstOrDefault() ?? InputSettingsStrings.ActionHasNoKeyBinding,
+                    ]);
 
                 case 24:
                     return MenuTipStrings.ToggleReplaySettingsShortcut(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.ToggleReplaySettings).FirstOrDefault()

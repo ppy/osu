@@ -42,6 +42,7 @@ namespace osu.Game.Tests.Chat
                 sentMessages = new List<Message>();
                 silencedUserIds = new List<int>();
 
+                ((DummyAPIAccess)API).LocalUserState.Blocks.Clear();
                 ((DummyAPIAccess)API).HandleRequest = req =>
                 {
                     switch (req)
@@ -61,6 +62,10 @@ namespace osu.Game.Tests.Chat
                         case ChatAckRequest ack:
                             ack.TriggerSuccess(new ChatAckResponse { Silences = silencedUserIds.Select(u => new ChatSilence { UserId = u }).ToArray() });
                             silencedUserIds.Clear();
+                            return true;
+
+                        case GetMessagesRequest getMessages:
+                            getMessages.TriggerSuccess(sentMessages);
                             return true;
 
                         case GetUpdatesRequest updatesRequest:
@@ -161,6 +166,85 @@ namespace osu.Game.Tests.Chat
             AddUntilStep("/help command received", () => channel.Messages.Last().Content.Contains("Supported commands"));
         }
 
+        [Test]
+        public void TestBlockedUserMessagesAreDeletedFromInitialMessageBatch()
+        {
+            Channel channel = null;
+
+            AddStep("create channel", () => channel = createChannel(1, ChannelType.Public));
+            AddStep("post a message from blocked user", () => sentMessages.Add(new Message
+            {
+                ChannelId = channel.Id,
+                Content = "i am blocked",
+                SenderId = 1234
+            }));
+            AddStep("mark user as blocked", () => ((DummyAPIAccess)API).LocalUserState.Blocks.Add(new APIRelation
+            {
+                TargetUser = new APIUser { Username = "blocked", Id = 1234 },
+                TargetID = 1234,
+            }));
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel);
+                channelManager.CurrentChannel.Value = channel;
+            });
+            AddAssert("channel has no messages", () => channel.Messages, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestBlockedUserMessagesAreDeletedImmediatelyOnBlock()
+        {
+            Channel channel = null;
+
+            AddStep("create channel", () => channel = createChannel(1, ChannelType.Public));
+
+            AddStep("join channel and select it", () =>
+            {
+                channelManager.JoinChannel(channel);
+                channelManager.CurrentChannel.Value = channel;
+            });
+            AddStep("post a message from blocked user", () => sentMessages.Add(new Message
+            {
+                ChannelId = channel.Id,
+                Content = "i am blocked",
+                SenderId = 1234
+            }));
+            AddUntilStep("channel has message", () => channel.Messages, () => Is.Not.Empty);
+
+            AddStep("block user", () => ((DummyAPIAccess)API).LocalUserState.Blocks.Add(new APIRelation
+            {
+                TargetUser = new APIUser { Username = "blocked", Id = 1234 },
+                TargetID = 1234,
+            }));
+            AddAssert("channel has no messages", () => channel.Messages, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestPrivateChannelsPurgedOnUserChange()
+        {
+            var pmChannel = createChannel(1002, ChannelType.PM);
+            AddStep("join a few private channels", () =>
+            {
+                channelManager.JoinChannel(createChannel(1001, ChannelType.PM));
+                channelManager.JoinChannel(createChannel(1003, ChannelType.Team));
+                channelManager.JoinChannel(pmChannel);
+            });
+            AddStep("close a PM channel", () => channelManager.LeaveChannel(pmChannel));
+
+            AddStep("switch user", () =>
+            {
+                ((DummyAPIAccess.DummyLocalUserState)API.LocalUserState).User.Value = new APIUser
+                {
+                    Id = 9009,
+                    Username = "someone_else"
+                };
+            });
+
+            AddAssert("not joined to private channels of previous user",
+                () => !channelManager.JoinedChannels.Select(ch => ch.Id).Any(id => id >= 1001 && id <= 1003));
+        }
+
         private void handlePostMessageRequest(PostMessageRequest request)
         {
             var message = new Message(++currentMessageId)
@@ -191,7 +275,7 @@ namespace osu.Game.Tests.Chat
             }
         }
 
-        private Channel createChannel(int id, ChannelType type) => new Channel(new APIUser())
+        private Channel createChannel(int id, ChannelType type) => new Channel(new APIUser { Id = id })
         {
             Id = id,
             Name = $"Channel {id}",

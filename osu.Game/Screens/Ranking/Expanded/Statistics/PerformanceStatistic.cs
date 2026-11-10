@@ -49,17 +49,17 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             {
                 Task.Run(async () =>
                 {
-                    var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken ?? default).ConfigureAwait(false);
+                    var attributes = await difficultyCache.GetDifficultyAsync(score.BeatmapInfo!, score.Ruleset, score.Mods, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
                     var performanceCalculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator();
 
                     // Performance calculation requires the beatmap and ruleset to be locally available. If not, return a default value.
                     if (attributes?.DifficultyAttributes == null || performanceCalculator == null)
                         return;
 
-                    var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? default).ConfigureAwait(false);
+                    var result = await performanceCalculator.CalculateAsync(score, attributes.Value.DifficultyAttributes, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
 
                     Schedule(() => setPerformanceValue(score, result.Total));
-                }, cancellationToken ?? default);
+                }, cancellationToken ?? CancellationToken.None);
             }
         }
 

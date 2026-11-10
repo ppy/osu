@@ -220,10 +220,13 @@ namespace osu.Game.Tests.Visual.Components
 
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             {
-                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
                 if (registerAsOwner)
-                    dependencies.CacheAs<IPreviewTrackOwner>(this);
-                return dependencies;
+                {
+                    // Automatically handled by interface caching.
+                    return base.CreateChildDependencies(parent);
+                }
+
+                return new DependencyContainer();
             }
         }
 

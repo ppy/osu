@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,13 +12,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
     public partial class SettingsSidebar : ExpandingContainer
     {
-        public const float CONTRACTED_WIDTH = 70;
+        public const float CONTRACTED_WIDTH = 60;
         public const int EXPANDED_WIDTH = 170;
 
         public Action? BackButtonAction;
@@ -94,7 +96,7 @@ namespace osu.Game.Overlays.Settings
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
-                                Text = @"back",
+                                Text = CommonStrings.Back.ToLower(),
                             },
                         }
                     }

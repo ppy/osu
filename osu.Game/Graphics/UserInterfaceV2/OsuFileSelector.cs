@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2.FileSelection;
@@ -69,7 +70,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override DirectorySelectorDirectory CreateParentDirectoryItem(DirectoryInfo directory) => new OsuDirectorySelectorParentDirectory(directory);
 
-        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string? displayName = null) => new OsuDirectorySelectorDirectory(directory, displayName);
+        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, LocalisableString? displayName = null) => new OsuDirectorySelectorDirectory(directory, displayName);
 
         protected override DirectoryListingFile CreateFileItem(FileInfo file) => new OsuDirectoryListingFile(file);
 

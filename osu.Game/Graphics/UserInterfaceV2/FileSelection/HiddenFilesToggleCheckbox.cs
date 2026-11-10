@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -22,7 +23,7 @@ namespace osu.Game.Graphics.UserInterfaceV2.FileSelection
             Origin = Anchor.CentreLeft;
             LabelTextFlowContainer.Anchor = Anchor.CentreLeft;
             LabelTextFlowContainer.Origin = Anchor.CentreLeft;
-            LabelText = @"Show hidden";
+            LabelText = UserInterfaceStrings.ShowHidden;
 
             Scale = new Vector2(0.8f);
         }

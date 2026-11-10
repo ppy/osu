@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual
             // Until this is handled properly at game-side, ensure EndPlaying is called before exiting player.
             // see: https://github.com/ppy/osu/issues/22220
             if (LoadedBeatmapSuccessfully)
-                spectatorClient?.EndPlaying(GameplayState);
+                spectatorClient?.EndPlaying(null, GameplayState);
 
             return exiting;
         }
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual
             // Specific to tests, the player can be disposed without OnExiting() ever being called.
             // We should make sure that the gameplay session has finished even in this case.
             if (LoadedBeatmapSuccessfully)
-                spectatorClient?.EndPlaying(GameplayState);
+                spectatorClient?.EndPlaying(null, GameplayState);
         }
     }
 }

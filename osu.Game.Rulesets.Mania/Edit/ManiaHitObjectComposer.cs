@@ -1,11 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
@@ -20,8 +25,10 @@ using osuTK;
 namespace osu.Game.Rulesets.Mania.Edit
 {
     [Cached]
-    public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject>
+    public partial class ManiaHitObjectComposer : ScrollingHitObjectComposer<ManiaHitObject, ManiaAction>
     {
+        public override Bindable<TernaryState>? SelectionNewComboState => null;
+
         private DrawableManiaEditorRuleset drawableRuleset = null!;
 
         [Resolved]
@@ -30,6 +37,29 @@ namespace osu.Game.Rulesets.Mania.Edit
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
+        }
+
+        private Bindable<bool> limitPlacementToCurrentTime = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            limitPlacementToCurrentTime = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
+        }
+
+        public override SnapResult FindSnappedPositionAndTime(Vector2 screenSpacePosition)
+        {
+            if (limitPlacementToCurrentTime.Value
+                && BlueprintContainer.CurrentHitObjectPlacement?.PlacementActive == PlacementBlueprint.PlacementState.Waiting)
+            {
+                if (PlayfieldAtScreenSpacePosition(screenSpacePosition) is ScrollingPlayfield playfield)
+                {
+                    double time = BeatSnapProvider.SnapTime(EditorClock.CurrentTime);
+                    return base.FindSnappedPositionAndTime(playfield.ScreenSpacePositionAtTime(time));
+                }
+            }
+
+            return base.FindSnappedPositionAndTime(screenSpacePosition);
         }
 
         public new ManiaPlayfield Playfield => drawableRuleset.Playfield;
@@ -47,14 +77,15 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override BeatSnapGrid CreateBeatSnapGrid() => new ManiaBeatSnapGrid();
 
-        protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
+        protected override IReadOnlyList<CompositionTool<ManiaAction>> CompositionTools => new CompositionTool<ManiaAction>[]
         {
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()
         };
 
         public override string ConvertSelectionToString()
-            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
+            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime)
+                                             .Select(h => FormattableString.Invariant($"{Math.Round(h.StartTime)}|{h.Column}")));
 
         // 123|0,456|1,789|2 ...
         private static readonly Regex selection_regex = new Regex(@"^\d+\|\d+(,\d+\|\d+)*$", RegexOptions.Compiled);
@@ -73,10 +104,10 @@ namespace osu.Game.Rulesets.Mania.Edit
                 if (split.Length != 2)
                     continue;
 
-                if (!double.TryParse(split[0], out double time) || !int.TryParse(split[1], out int column))
+                if (!int.TryParse(split[0], out int time) || !int.TryParse(split[1], out int column))
                     continue;
 
-                ManiaHitObject? current = remainingHitObjects.FirstOrDefault(h => h.StartTime == time && h.Column == column);
+                ManiaHitObject? current = remainingHitObjects.FirstOrDefault(h => Precision.AlmostEquals(h.StartTime, time, 0.5) && h.Column == column);
 
                 if (current == null)
                     continue;

@@ -1,13 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Footer;
 
@@ -20,10 +26,22 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFooterButtonsOnScreenTransitions()
         {
-            PushAndConfirm(() => new TestScreenOne());
+            PushAndConfirm(() => new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button One" }]),
+                },
+            });
             AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
 
-            PushAndConfirm(() => new TestScreenTwo());
+            PushAndConfirm(() => new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button Two" }]),
+                },
+            });
             AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
 
             AddStep("exit screen", () => Game.ScreenStack.Exit());
@@ -31,17 +49,52 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestChangeFooterContentOnCurrentScreen()
+        {
+            TestScreen testScreen = null!;
+
+            PushAndConfirm(() => testScreen = new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button One" }]),
+                },
+            });
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            AddStep("change button", () =>
+            {
+                testScreen.FooterContent.Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button Two" }]);
+            });
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+
+            AddStep("show legacy back button", () => testScreen.FooterContent.Value = ScreenFooterContent.Legacy(showBackButton: true));
+            AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("show nothing", () => testScreen.FooterContent.Value = ScreenFooterContent.None);
+            AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("back button hidden", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Hidden));
+        }
+
+        [Test]
         public void TestFooterHidesOldBackButton()
         {
-            PushAndConfirm(() => new TestScreen(false));
+            PushAndConfirm(() => new TestScreen
+            {
+                FooterContent = { Value = ScreenFooterContent.Legacy(showBackButton: true) }
+            });
             AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
             AddAssert("old back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
 
-            PushAndConfirm(() => new TestScreen(true));
+            PushAndConfirm(() => new TestScreen());
             AddAssert("footer shown", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Visible));
             AddAssert("old back button hidden", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Hidden));
 
-            PushAndConfirm(() => new TestScreen(false));
+            PushAndConfirm(() => new TestScreen
+            {
+                FooterContent = { Value = ScreenFooterContent.Legacy(showBackButton: true) }
+            });
             AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
             AddAssert("back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
 
@@ -54,39 +107,329 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("old back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
         }
 
-        private partial class TestScreenOne : OsuScreen
+        /// <summary>
+        /// Tests pushing and exiting subscreens that have footers.
+        /// </summary>
+        [Test]
+        public void TestPushAndExitSubScreens()
         {
-            public override bool ShowFooter => true;
+            TestScreenWithSubScreen screen = null!;
 
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+            PushAndConfirm(() => screen = new TestScreenWithSubScreen());
+            AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("old back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
 
-            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
             {
-                new ScreenFooterButton { Text = "Button One" },
-            };
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button One" }]),
+                },
+            });
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button Two" }]),
+                },
+            });
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+
+            AddStep("exit sub screen", () => screen.ExitSubScreen());
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            AddStep("exit sub screen", () => screen.ExitSubScreen());
+            AddAssert("footer hidden", () => screenFooter.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("old back button shown", () => Game.BackButton.State.Value, () => Is.EqualTo(Visibility.Visible));
         }
 
-        private partial class TestScreenTwo : OsuScreen
+        /// <summary>
+        /// Tests pushing a new parenting screen while the footer is displayed from a subscreen.
+        /// </summary>
+        [Test]
+        public void TestPushParentScreenDuringSubScreen()
         {
-            public override bool ShowFooter => true;
+            TestScreenWithSubScreen screen = null!;
 
-            [Cached]
-            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
-            public override IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => new[]
+            PushAndConfirm(() => screen = new TestScreenWithSubScreen());
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
             {
-                new ScreenFooterButton { Text = "Button Two" },
-            };
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button One" }]),
+                },
+            });
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            PushAndConfirm(() => new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button Two" }]),
+                },
+            });
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+
+            AddStep("exit parent screen", () => Game.ScreenStack.Exit());
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+        }
+
+        /// <summary>
+        /// Tests pushing a new subscreen after a new parenting screen has been pushed.
+        /// </summary>
+        [Test]
+        public void TestPushSubScreenWhileNotCurrent()
+        {
+            TestScreenWithSubScreen screen = null!;
+
+            PushAndConfirm(() => screen = new TestScreenWithSubScreen());
+            pushSubScreenAndConfirm(() => screen, () => new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button One" }]),
+                },
+            });
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            PushAndConfirm(() => new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button One" }]),
+                },
+            });
+            AddUntilStep("button one shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            // Can't use the helper method because the screen never loads
+            AddStep("Push new sub screen", () => screen.PushSubScreen(new TestScreen
+            {
+                FooterContent =
+                {
+                    Value = ScreenFooterContent.Argon(() => [new ScreenFooterButton { Text = "Button Two" }]),
+                },
+            }));
+            AddWaitStep("wait for potential screen load", 5);
+            AddUntilStep("button one still shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button One"));
+
+            AddStep("exit parent screen", () => Game.ScreenStack.Exit());
+            AddUntilStep("button two shown", () => screenFooter.ChildrenOfType<ScreenFooterButton>().First().Text.ToString(), () => Is.EqualTo("Button Two"));
+        }
+
+        /// <summary>
+        /// Tests clicking the back button while an overlay is open.
+        /// </summary>
+        [Test]
+        public void TestBackButtonWhenOverlayOpen()
+        {
+            TestScreen screen = null!;
+
+            PushAndConfirm(() =>
+            {
+                ShearedOverlayContainer overlay = new TestShearedOverlayContainer();
+
+                return screen = new TestScreen
+                {
+                    Overlay = overlay,
+                    FooterContent =
+                    {
+                        Value = ScreenFooterContent.Argon(() =>
+                        [
+                            new ScreenFooterButton(overlay)
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new ScreenFooterButton { Text = "Two", Action = () => { } },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        ]),
+                    },
+                };
+            });
+
+            AddStep("show overlay", () => screen.Overlay.Show());
+            AddAssert("overlay shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("press back", () => screenFooter.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
+            AddAssert("overlay hidden", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("screen still shown", () => screen.IsCurrentScreen(), () => Is.True);
+        }
+
+        /// <summary>
+        /// Tests clicking the back button on an overlay with `BackButtonPressed` being overridden.
+        /// </summary>
+        [Test]
+        public void TestBackButtonWithCustomBackButtonPressed()
+        {
+            TestScreen screen = null!;
+            TestShearedOverlayContainer overlay = null!;
+
+            PushAndConfirm(() =>
+            {
+                return screen = new TestScreen
+                {
+                    Overlay = overlay = new TestShearedOverlayContainer(),
+                    FooterContent =
+                    {
+                        Value = ScreenFooterContent.Argon(() =>
+                        [
+                            new ScreenFooterButton(overlay)
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new ScreenFooterButton { Text = "Two", Action = () => { } },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        ]),
+                    },
+                };
+            });
+
+            AddStep("show overlay", () => screen.Overlay.Show());
+            AddAssert("overlay shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddStep("set block count", () => overlay.BackButtonCount = 1);
+
+            AddStep("press back", () => screenFooter.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
+            AddAssert("overlay still shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+
+            AddStep("press back again", () => screenFooter.ChildrenOfType<ScreenBackButton>().Single().TriggerClick());
+            AddAssert("overlay hidden", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
+            AddAssert("screen still shown", () => screen.IsCurrentScreen(), () => Is.True);
+        }
+
+        private void pushSubScreenAndConfirm(Func<TestScreenWithSubScreen> target, Func<Screen> newScreen)
+        {
+            Screen screen = null!;
+            IScreen? previousScreen = null;
+
+            AddStep("Push new sub screen", () =>
+            {
+                previousScreen = target().CurrentSubScreen;
+                target().PushSubScreen(screen = newScreen());
+            });
+
+            AddUntilStep("Wait for new screen", () => screen.IsLoaded
+                                                      && target().CurrentSubScreen != previousScreen
+                                                      && (previousScreen == null || previousScreen.GetChildScreen() == screen));
         }
 
         private partial class TestScreen : OsuScreen
         {
-            public override bool ShowFooter { get; }
+            public ShearedOverlayContainer Overlay = new TestShearedOverlayContainer();
 
-            public TestScreen(bool footer)
+            private IDisposable? overlayRegistration;
+
+            [Cached]
+            private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            [Resolved]
+            private IOverlayManager? overlayManager { get; set; }
+
+            public TestScreen()
             {
-                ShowFooter = footer;
+                FooterContent.Value = ScreenFooterContent.Argon();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponent(Overlay);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                overlayRegistration = overlayManager?.RegisterBlockingOverlay(Overlay);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                overlayRegistration?.Dispose();
+            }
+        }
+
+        private partial class TestScreenWithSubScreen : OsuScreen, IHasSubScreenStack
+        {
+            public ScreenStack SubScreenStack { get; }
+
+            public TestScreenWithSubScreen()
+            {
+                InternalChild = SubScreenStack = new ScreenStack
+                {
+                    RelativeSizeAxes = Axes.Both
+                };
+            }
+
+            public IScreen? CurrentSubScreen => SubScreenStack.CurrentScreen;
+
+            public void PushSubScreen(IScreen screen) => SubScreenStack.Push(screen);
+
+            public void ExitSubScreen() => SubScreenStack.Exit();
+        }
+
+        private partial class TestShearedOverlayContainer : ShearedOverlayContainer
+        {
+            public TestShearedOverlayContainer()
+                : base(OverlayColourScheme.Orange)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Header.Title = "Test overlay";
+                Header.Description = "An overlay that is made purely for testing purposes.";
+            }
+
+            public int BackButtonCount;
+
+            public override bool OnBackButton()
+            {
+                if (BackButtonCount > 0)
+                {
+                    BackButtonCount--;
+                    return true;
+                }
+
+                return false;
+            }
+
+            public override VisibilityContainer CreateFooterContent() => new TestFooterContent();
+
+            public partial class TestFooterContent : VisibilityContainer
+            {
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                    AutoSizeAxes = Axes.Both;
+
+                    InternalChild = new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Children = new[]
+                        {
+                            new ShearedButton { Width = 200, Text = "Action #1", Action = () => { } },
+                            new ShearedButton { Width = 140, Text = "Action #2", Action = () => { } },
+                        }
+                    };
+                }
+
+                protected override void PopIn()
+                {
+                    this.MoveToY(0, 400, Easing.OutQuint)
+                        .FadeIn(400, Easing.OutQuint);
+                }
+
+                protected override void PopOut()
+                {
+                    this.MoveToY(-20f, 200, Easing.OutQuint)
+                        .FadeOut(200, Easing.OutQuint);
+                }
             }
         }
     }

@@ -11,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
 
@@ -26,6 +25,8 @@ namespace osu.Game.Skinning
         //  1. https://github.com/peppy/osu-stable-reference/blob/dc0994645801010d4b628fff5ff79cd3c286ca83/osu!/Graphics/Textures/TextureManager.cs#L115-L137 (beatmap skin textures lookup)
         //  2. https://github.com/peppy/osu-stable-reference/blob/dc0994645801010d4b628fff5ff79cd3c286ca83/osu!/Graphics/Textures/TextureManager.cs#L158-L196 (user skin textures lookup)
         protected override bool AllowHighResolutionSprites => false;
+
+        public RealmBackedResourceStore<BeatmapSetInfo>? BeatmapSetResources => FallbackStore as RealmBackedResourceStore<BeatmapSetInfo>;
 
         /// <summary>
         /// Construct a new legacy beatmap skin instance.
@@ -90,11 +91,8 @@ namespace osu.Game.Skinning
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
         {
-            if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
-            {
-                // When no custom sample bank is provided, always fall-back to the default samples.
+            if (sampleInfo is HitSampleInfo hitSampleInfo && !hitSampleInfo.UseBeatmapSamples)
                 return null;
-            }
 
             return base.GetSample(sampleInfo);
         }

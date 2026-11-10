@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestTinyDropletMissPreservesCatcherState()
+        public void TestTinyDropletMissChangesCatcherState()
         {
             AddStep("catch hyper kiai fruit", () => attemptCatch(new TestKiaiFruit
             {
@@ -165,8 +165,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             }));
             AddStep("catch tiny droplet", () => attemptCatch(new TinyDroplet()));
             AddStep("miss tiny droplet", () => attemptCatch(new TinyDroplet { X = 100 }));
-            // catcher state and hyper dash state is preserved
-            checkState(CatcherAnimationState.Kiai);
+            // catcher state is changed but hyper dash state is preserved
+            checkState(CatcherAnimationState.Fail);
             checkHyperDash(true);
         }
 

@@ -1,31 +1,30 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Users
 {
-    public partial class UserBrickPanel : UserPanel
+    public partial class UserBrickPanel : UserPanel, IHasCustomTooltip<APIUser?>
     {
         public UserBrickPanel(APIUser user)
             : base(user)
         {
             AutoSizeAxes = Axes.Both;
             CornerRadius = 6;
+            TooltipContent = user;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Background.FadeTo(0.2f);
-        }
+        // Matches osu!web styling.
+        protected override Drawable? CreateBackground() => Empty();
 
         protected override Drawable CreateLayout() => new FillFlowContainer
         {
@@ -62,5 +61,8 @@ namespace osu.Game.Users
                 })
             }
         };
+
+        public ITooltip<APIUser?> GetCustomTooltip() => new UserCardTooltip();
+        public APIUser? TooltipContent { get; }
     }
 }

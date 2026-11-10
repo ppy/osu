@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -75,9 +74,6 @@ namespace osu.Game.Screens.Backgrounds
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
-            var backgroundScreenStack = Parent as BackgroundScreenStack;
-            Debug.Assert(backgroundScreenStack != null);
-
             if (background is BeatmapBackgroundWithStoryboard storyboardBackground)
                 storyboardUnloadDelegate = gameHost.UpdateThread.Scheduler.AddDelayed(storyboardBackground.UnloadStoryboard, TRANSITION_LENGTH);
 
@@ -163,6 +159,7 @@ namespace osu.Game.Screens.Backgrounds
                             case TrianglesSkin:
                             case ArgonSkin:
                             case DefaultLegacySkin:
+                            case RetroSkin:
                                 // default skins should use the default background rotation, which won't be the case if a SkinBackground is created for them.
                                 break;
 

@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -38,28 +37,33 @@ namespace osu.Game.Screens.Ranking.Statistics
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                Height = 20,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5, 0),
-                Children = new Drawable[]
+                new Container
                 {
-                    new Circle
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Height = 9,
-                        Width = 4,
-                        Colour = Color4Extensions.FromHex("#00FFAA")
+                        Horizontal = 12,
+                        Top = 8,
+                        Bottom = 20,
                     },
-                    spriteText = new OsuSpriteText
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Text = text,
-                        Font = OsuFont.GetFont(size: StatisticItem.FONT_SIZE, weight: FontWeight.SemiBold),
+                        spriteText = new OsuSpriteText
+                        {
+                            Text = text,
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                        },
+                        new Box
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.TopCentre,
+                            Margin = new MarginPadding { Top = 4 },
+                            RelativeSizeAxes = Axes.X,
+                            Height = 2,
+                            Colour = Color4Extensions.FromHex("#66FFCC")
+                        }
                     }
                 }
             };
