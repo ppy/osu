@@ -53,10 +53,10 @@ namespace osu.Game.Overlays.SkinEditor
                 Spacing = new Vector2(EditorSidebar.PADDING)
             };
 
-            reloadComponents();
+            ReloadComponents();
         }
 
-        private void reloadComponents()
+        public void ReloadComponents()
         {
             fill.Clear();
 
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Drawable instance = (Drawable)Activator.CreateInstance(type)!;
 
-                if (!((ISerialisableDrawable)instance).IsEditable) return;
+                if (!((ISerialisableDrawable)instance).CanBePlaced(target.Components)) return;
 
                 fill.Add(new ToolboxComponentButton(instance, target)
                 {

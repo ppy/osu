@@ -2,18 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Notifications
 {
     public partial class OutageNotification : SimpleNotification
     {
-        private readonly string message;
+        private readonly LocalisableString message;
 
-        public OutageNotification(string message)
+        public OutageNotification(LocalisableString message)
         {
             Text = this.message = message;
 
@@ -27,7 +30,7 @@ namespace osu.Game.Overlays.Notifications
             IconContent.Colour = ColourInfo.GradientVertical(Colour4.Orange, Colour4.OrangeRed);
 
             TextFlow.Clear();
-            TextFlow.AddText("Server outage in progress".ToUpperInvariant(), s =>
+            TextFlow.AddText(NotificationsStrings.ServerOutageInProgress.ToUpper(), s =>
             {
                 s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
                 s.Colour = Colour4.Orange;
