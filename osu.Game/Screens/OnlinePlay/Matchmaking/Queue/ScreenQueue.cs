@@ -433,8 +433,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                            }), cancellation.Token);
 
             // Global (incremental) updates will not contain the user rating, so keep the one we already received from initial status data.
-            if (status.UserRating != null && status.UserSigma != null && status.UserRank != null)
-                userStats = new MatchmakingUserStats(status.UserRating.Value, status.UserSigma.Value, status.UserRank.Value);
+            // The rank value can be null if the rating is provisional, so we don't check for it here.
+            if (status.UserRating != null && status.UserSigma != null)
+                userStats = new MatchmakingUserStats(status.UserRating.Value, status.UserSigma.Value, status.UserRank);
 
             ratingGraph.SetData(status.RatingDistribution, userStats?.Rating);
 

@@ -5,16 +5,22 @@ namespace osu.Game.Online.Matchmaking
 {
     public class MatchmakingUserStats
     {
-        // Taken from https://github.com/ppy/osu-web/blob/8eb0994a64af8d68e365b487d35be24b2daff75a/app/Models/MatchmakingUserStats.php#L27.
-        public const int MIN_SIGMA_PROVISIONAL = 100;
-
+        /// <summary>
+        /// The user's current rating.
+        /// </summary>
         public int Rating { get; }
+
+        /// <summary>
+        /// The user's current sigma (rank uncertainty) value.
+        /// </summary>
         public double Sigma { get; }
-        public int Rank { get; }
 
-        public bool IsRatingProvisional => Sigma >= MIN_SIGMA_PROVISIONAL;
+        /// <summary>
+        /// The user's current rank. <c>null</c> if the current rating is provisional.
+        /// </summary>
+        public int? Rank { get; }
 
-        public MatchmakingUserStats(int rating, double sigma, int rank)
+        public MatchmakingUserStats(int rating, double sigma, int? rank)
         {
             Rating = rating;
             Sigma = sigma;
