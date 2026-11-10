@@ -132,8 +132,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 RelativeSizeAxes = Axes.Y;
                 Width = WIDTH;
+                Height = 0.5f;
 
-                Origin = Anchor.TopRight;
+                Origin = Anchor.TopLeft;
 
                 Point = effectPoint;
                 this.showScrollSpeed = showScrollSpeed;
@@ -152,29 +153,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.Yellow,
                         Masking = true,
-                        CornerRadius = TimelineTickDisplay.TICK_WIDTH / 2,
+                        CornerRadius = 3,
                         Child = new Box
                         {
                             Colour = Color4.White,
                             RelativeSizeAxes = Axes.Both,
                         },
                     },
-                    label = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Rotation = 90,
-                        Padding = new MarginPadding { Horizontal = 2 },
-                        Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
-                        Colour = colours.B5,
-                    },
                     star = new SpriteIcon
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding { Top = 3 },
-                        Size = new Vector2(12),
+                        Size = new Vector2(8),
                         Icon = FontAwesome.Regular.Star,
+                        Colour = colours.B5,
+                    },
+                    label = new OsuSpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.CentreLeft,
+                        Rotation = 90,
+                        Y = 14,
+                        Font = OsuFont.Default.With(size: 9, weight: FontWeight.Bold),
                         Colour = colours.B5,
                     },
                 };
@@ -182,7 +183,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (!showScrollSpeed)
                     label.Hide();
 
-                kiaiMode.BindValueChanged(kiai => star.Alpha = kiai.NewValue ? 1 : 0, true);
+                kiaiMode.BindValueChanged(kiai => star.Icon = kiai.NewValue ? FontAwesome.Solid.Star : FontAwesome.Regular.Star, true);
 
                 scrollSpeed.BindValueChanged(speed => label.Text = $"{speed.NewValue:n2}x", true);
             }
