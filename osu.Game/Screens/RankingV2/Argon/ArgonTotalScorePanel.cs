@@ -38,6 +38,14 @@ namespace osu.Game.Screens.RankingV2.Argon
     {
         public static readonly ColourInfo TEXT_GRADIENT = ColourInfo.GradientVertical(Colour4.White, Colour4.FromHex(@"B2E5FE"));
 
+        public static readonly ColourInfo PERFECT_GRADIENT = new ColourInfo
+        {
+            TopLeft = Colour4.FromHex(@"00FFAA"),
+            TopRight = Colour4.FromHex(@"7CF6FF"),
+            BottomLeft = Colour4.FromHex(@"7CF6FF"),
+            BottomRight = Colour4.FromHex(@"FF9AD7"),
+        };
+
         private Container scoreContainer = null!;
         private Drawable perfectIndicator = null!;
         private Container personalBestIndicator = null!;
@@ -199,15 +207,11 @@ namespace osu.Game.Screens.RankingV2.Argon
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the argon skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
 
         #region IAnimatableSkinnable
 
-        [SettingSource(nameof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
         public BindableInt GroupNumber { get; } = new BindableInt(2)
         {
             MinValue = 0,
@@ -231,10 +235,13 @@ namespace osu.Game.Screens.RankingV2.Argon
             {
                 scoreContainer.FadeIn(transition_duration, Easing.OutQuint)
                               .MoveToOffset(new Vector2(50, 0), transition_duration, Easing.OutQuint);
-
                 totalScoreText.ResetCount();
-                totalScoreText.Current.Value = score.Value.GetDisplayScore(scoringMode.Value);
-                latestTransformEndTime = totalScoreText.LatestTransformEndTime;
+
+                using (BeginDelayedSequence(ArgonScoreRankDisplay.SWOOSH_PRE_DELAY))
+                {
+                    totalScoreText.Current.Value = score.Value.GetDisplayScore(scoringMode.Value);
+                    latestTransformEndTime = totalScoreText.LatestTransformEndTime;
+                }
             }
 
             if (score.Value.MaxCombo == score.Value.GetMaximumAchievableCombo())
@@ -309,13 +316,7 @@ namespace osu.Game.Screens.RankingV2.Argon
 
                 Size = new Vector2(75);
 
-                Colour = new ColourInfo
-                {
-                    TopLeft = Colour4.FromHex(@"00FFAA"),
-                    TopRight = Colour4.FromHex(@"7CF6FF"),
-                    BottomLeft = Colour4.FromHex(@"7CF6FF"),
-                    BottomRight = Colour4.FromHex(@"FF9AD7"),
-                };
+                Colour = PERFECT_GRADIENT;
 
                 InternalChildren = new Drawable[]
                 {

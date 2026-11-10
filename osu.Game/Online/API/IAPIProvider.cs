@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -82,7 +83,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// When servers are on fire, this will contain a message which can be displayed to an end user.
         /// </summary>
-        IBindable<string?> UserFacingOutageMessage { get; }
+        IBindable<LocalisableString?> UserFacingOutageMessage { get; }
 
         /// <summary>
         /// Queue a new request.

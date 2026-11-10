@@ -48,8 +48,6 @@ namespace osu.Game.Overlays.Mods
             // with additive blending children elements.
             AddInternal(new Container
             {
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
                 RelativeSizeAxes = Axes.Both,
                 Shear = OsuGame.SHEAR,
                 CornerRadius = ShearedButton.CORNER_RADIUS,

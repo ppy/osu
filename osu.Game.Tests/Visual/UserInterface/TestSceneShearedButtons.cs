@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK.Input;
@@ -94,6 +95,38 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddToggleStep("toggle button", active => button.Active.Value = active);
             AddToggleStep("toggle disabled", disabled => button.Active.Disabled = disabled);
+        }
+
+        [Test]
+        public void TestShearedButtonWithIcon()
+        {
+            var colours = new OsuColour();
+
+            ShearedButtonWithIcon button = null!;
+            bool actionFired = false;
+
+            AddStep("create button", () =>
+            {
+                Child = button = new ShearedButtonWithIcon
+                {
+                    Width = 220,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    LighterColour = colours.Blue1,
+                    DarkerColour = colours.Blue3,
+                    Text = "Add to playlist",
+                    Icon = OsuIcon.Add,
+                    Action = () => actionFired = true,
+                };
+            });
+
+            AddStep("set disabled", () => button.Enabled.Value = false);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action not fired", () => !actionFired);
+
+            AddStep("set enabled", () => button.Enabled.Value = true);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action fired", () => actionFired);
         }
 
         [Test]
