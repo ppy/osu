@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Ranking
     public partial class TestSceneUserTagControl : OsuManualInputManagerTestScene
     {
         [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 

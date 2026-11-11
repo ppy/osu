@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Ranking
                             Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                             ColumnDimensions = new[]
                             {
-                                new Dimension(GridSizeMode.Absolute, 100),
+                                new Dimension(GridSizeMode.Absolute, 80),
                                 new Dimension(GridSizeMode.Absolute, 10),
                                 new Dimension(),
                             },
