@@ -47,19 +47,27 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public float DistanceMoved { get; private set; }
 
         /// <summary>
-        /// Normalized distance the player has to move from <see cref="LastPlayerPosition"/> in order to catch <see cref="BaseObject"/> at its <see cref="NormalizedPosition"/>.
+        /// Normalized distance between <see cref="LastNormalizedPosition"/> at its <see cref="NormalizedPosition"/>.
         /// </summary>
-        /// <remarks>
-        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
-        /// </remarks>
-        public float ExactDistanceMoved { get; private set; }
+        public float Distance { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 40ms.
         /// </summary>
         public readonly double StrainTime;
 
-        public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, int index)
+        /// <summary>
+        /// The sign of the <see cref="DistanceMoved"/>: negative is left and positive is right (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
+        /// </summary>
+        public int Direction;
+
+        /// <summary>
+        /// Subsequence of consecutive objects facing the same direction that the current <see cref="CatchDifficultyHitObject"/> is part of.
+        /// The last <see cref="CatchDifficultyHitObject"/> of each flow is a direction change.
+        /// </summary>
+        public Flow Flow;
+
+        public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, int index, List<Flow> flows)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
             // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
@@ -72,6 +80,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             StrainTime = Math.Max(40, DeltaTime);
 
             setMovementState();
+
+            // Divide all hit objects into flows, i.e. series of consecutive notes facing the same direction
+            var prev = (CatchDifficultyHitObject)Previous(0);
+
+            if (prev != null && prev.Flow.Direction == Direction)
+            {
+                prev.Flow.Add(this);
+                Flow = prev.Flow;
+            }
+            else // Previous object is a direction change (or null).
+            {
+                Flow = new Flow(new List<CatchDifficultyHitObject> { this }, flows, flows.Count);
+                flows.Add(Flow);
+            }
         }
 
         private void setMovementState()
@@ -85,13 +107,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             );
 
             DistanceMoved = PlayerPosition - LastPlayerPosition;
-
-            // For the exact position we consider that the catcher is in the correct position for both objects
-            ExactDistanceMoved = NormalizedPosition - LastPlayerPosition;
+            Distance = NormalizedPosition - LastNormalizedPosition;
 
             // After a hyperdash we ARE in the correct position. Always!
             if (LastObject.HyperDash)
                 PlayerPosition = NormalizedPosition;
+
+            Direction = Math.Sign(DistanceMoved);
         }
     }
 }
