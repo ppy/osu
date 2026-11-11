@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Play.HUD
                 // Stay expanded if the user is dragging a slider.
                 || inputManager.DraggedDrawable != null;
 
-            // Release focus if collapsed.
+            // Release focus when collapsed. Without doing this, UI controls may still accept keyboard input even after collapsing down.
             if (Expanded.Value && !expanded)
             {
                 if (inputManager.FocusedDrawable?.IsRootedAt(this) == true)
