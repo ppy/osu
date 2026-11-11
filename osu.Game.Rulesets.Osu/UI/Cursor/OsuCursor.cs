@@ -10,8 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -130,8 +130,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// <summary>
         /// Get the scale applicable to the ActiveCursor based on a beatmap's circle size.
         /// </summary>
-        public static float GetScaleForCircleSize(float circleSize) =>
-            1f - 0.7f * (1f + circleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
+        public static float GetScaleForCircleSize(float circleSize) => 1.8f * LegacyRulesetExtensions.CalculateScaleFromCircleSize(circleSize);
 
         private partial class DefaultCursor : SkinnableCursor
         {
