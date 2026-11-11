@@ -302,6 +302,7 @@ namespace osu.Game.Skinning
                                 new ArgonPlayerInfoPanel(),
                                 new ArgonTotalScorePanel(),
                                 new ArgonScoreStatisticsGrid(),
+                                new ArgonResultsFooter(),
                             };
                     }
 

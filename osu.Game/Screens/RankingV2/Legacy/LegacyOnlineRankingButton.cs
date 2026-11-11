@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Scoring;
+using osu.Game.Screens.RankingV2.Argon;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
 using osuTK;
@@ -15,6 +18,9 @@ namespace osu.Game.Screens.RankingV2.Legacy
 {
     public partial class LegacyOnlineRankingButton : CompositeDrawable, ISerialisableDrawable
     {
+        public bool CanBePlaced(IEnumerable<ISerialisableDrawable> components) => components.All(c => c is not ArgonResultsFooter && c is not LegacyOnlineRankingButton);
+        public bool CanBeScaled(Axes _) => false;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]

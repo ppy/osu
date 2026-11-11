@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -15,7 +16,16 @@ namespace osu.Game.Tests.Visual.Editing
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            EditorClock.Seek(10000);
+
+            EditorClock.Seek(2000);
+
+            AddStep("add effect points", () =>
+            {
+                EditorBeatmap.ControlPointInfo.Add(3000, new EffectControlPoint { KiaiMode = true });
+                EditorBeatmap.ControlPointInfo.Add(4400, new EffectControlPoint());
+                EditorBeatmap.ControlPointInfo.Add(5000, new EffectControlPoint { KiaiMode = true });
+                TimelineArea.Timeline.Zoom = 1f;
+            });
         }
     }
 }

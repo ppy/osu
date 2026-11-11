@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -21,6 +22,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Footer;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -39,6 +41,10 @@ namespace osu.Game.Screens.RankingV2.Argon
         /// Delay before the accuracy circle starts filling.
         /// </summary>
         public const double ACCURACY_TRANSFORM_DELAY = 450;
+
+        public bool CanBeScaled(Axes axes) => false;
+        public bool CanBeMoved => false;
+        public bool CanBePlaced(IEnumerable<ISerialisableDrawable> otherComponents) => !otherComponents.OfType<ArgonScoreRankDisplay>().Any();
 
         private Container gradedCirclesContainer = null!;
         private GradedCirclesV2 gradedCircles = null!;
@@ -68,6 +74,7 @@ namespace osu.Game.Screens.RankingV2.Argon
             Size = new Vector2(640);
             Anchor = Anchor.CentreRight;
             Origin = Anchor.CentreRight;
+            Y = -ScreenFooter.HEIGHT / 2f;
             Masking = true;
 
             InternalChildren =
@@ -192,7 +199,7 @@ namespace osu.Game.Screens.RankingV2.Argon
 
         #region ISerialisableDrawable
 
-        public bool UsesFixedAnchor { get; set; }
+        public bool UsesFixedAnchor { get; set; } = true;
 
         #endregion
 

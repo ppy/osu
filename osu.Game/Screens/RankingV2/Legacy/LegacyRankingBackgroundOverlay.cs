@@ -14,6 +14,8 @@ namespace osu.Game.Screens.RankingV2.Legacy
     /// <seealso href="https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L662-L669"/>
     public partial class LegacyRankingBackgroundOverlay : CompositeDrawable, ISerialisableDrawable
     {
+        public bool CanBeScaled(Axes axes) => axes == Axes.Both;
+
         private Sprite sprite = null!;
 
         // Note that `IBindable<IScoreInfo>` is resolved as required but not used
@@ -34,7 +36,6 @@ namespace osu.Game.Screens.RankingV2.Legacy
             // The fixed size is transferred manually from the sprite instead of using `AutoSizeAxes = Axes.Both`
             // so that the bounding box of this component does not pulsate back and forth in the skin editor
             // due to the sprite spinning.
-            // TODO: prevent resizing this sprite later.
             Size = sprite.Size;
         }
 

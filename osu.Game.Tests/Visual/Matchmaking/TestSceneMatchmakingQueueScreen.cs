@@ -3,13 +3,18 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Intro;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
@@ -21,13 +26,19 @@ namespace osu.Game.Tests.Visual.Matchmaking
     {
         private ScreenQueue? queueScreen => Stack.CurrentScreen as ScreenQueue;
 
+        [Cached(typeof(INotificationOverlay))]
+        private NotificationOverlay notificationOverlay = new NotificationOverlay();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            base.Content.Add(notificationOverlay);
+        }
+
         [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-
-            AddStep("join room", () => JoinRoom(CreateDefaultRoom(MatchType.Matchmaking)));
-            WaitForJoined();
 
             AddStep("load screen", () => LoadScreen(new ScreenIntro(MatchmakingPoolType.QuickPlay)));
             AddUntilStep("wait for queue screen", () => queueScreen?.IsLoaded == true);
@@ -57,15 +68,15 @@ namespace osu.Game.Tests.Visual.Matchmaking
         [Test]
         public void TestBasic()
         {
-            AddStep("change state to idle", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.Idle);
+            AddStep("change state to idle", () => setState(ScreenQueue.MatchmakingScreenState.Idle));
 
-            AddStep("change state to queueing", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.Queueing);
+            AddStep("change state to queueing", () => setState(ScreenQueue.MatchmakingScreenState.Queueing));
 
-            AddStep("change state to found match", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept);
+            AddStep("change state to found match", () => setState(ScreenQueue.MatchmakingScreenState.PendingAccept));
 
-            AddStep("change state to waiting for room", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom);
+            AddStep("change state to waiting for room", () => setState(ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom));
 
-            AddStep("change state to in room", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom);
+            AddStep("change state to in room", () => setState(ScreenQueue.MatchmakingScreenState.InRoom));
             waitForMatchScreenLoad();
         }
 
@@ -74,7 +85,7 @@ namespace osu.Game.Tests.Visual.Matchmaking
         {
             AddStep("change state to in room then immediately leave room", () =>
             {
-                QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom;
+                setState(ScreenQueue.MatchmakingScreenState.InRoom);
                 MultiplayerClient.LeaveRoom();
             });
 
@@ -86,13 +97,55 @@ namespace osu.Game.Tests.Visual.Matchmaking
         }
 
         [Test]
-        public void TestRoomScreenPushNullHandling()
+        public void TestRoomScreenPushDelayedRoomJoin()
         {
-            AddStep("leave room", () => MultiplayerClient.LeaveRoom());
+            AddStep("signal room ready", () =>
+            {
+                MultiplayerClient.RoomSetupAction = _ => Thread.Sleep(2500);
+                setState(ScreenQueue.MatchmakingScreenState.InRoom);
+            });
+            waitForMatchScreenLoad();
+        }
 
-            AddWaitStep("wait for room leave", 5);
+        [Test]
+        public void TestRoomJoinError()
+        {
+            AddStep("signal room ready", () =>
+            {
+                MultiplayerClient.RoomSetupAction = _ =>
+                {
+                    Thread.Sleep(1000);
+                    throw new InvalidOperationException();
+                };
+                setState(ScreenQueue.MatchmakingScreenState.InRoom);
+            });
 
-            AddStep("change state to in room", () => QueueController.CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom);
+            AddUntilStep("state reverted to idle", () => QueueController.CurrentState.Value, () => Is.EqualTo(ScreenQueue.MatchmakingScreenState.Idle));
+            AddAssert("notification posted", () => notificationOverlay.AllNotifications.OfType<SimpleErrorNotification>().Any());
+        }
+
+        private void setState(ScreenQueue.MatchmakingScreenState state)
+        {
+            if (QueueController.CurrentState.Value == state)
+                return;
+
+            switch (state)
+            {
+                case ScreenQueue.MatchmakingScreenState.InRoom:
+                    // ensure we're not currently in a room
+                    MultiplayerClient.LeaveRoom();
+
+                    var room = CreateDefaultRoom(MatchType.Matchmaking);
+                    room.Password = "password";
+                    MultiplayerClient.AddServerSideRoom(room, new APIUser { Id = 3 });
+
+                    long createdRoomId = MultiplayerClient.ServerSideRooms.Last().RoomID!.Value;
+
+                    ((IMatchmakingClient)MultiplayerClient).MatchmakingRoomReady(createdRoomId, "password").FireAndForget();
+                    break;
+            }
+
+            QueueController.CurrentState.Value = state;
         }
 
         private void waitForMatchScreenLoad() => AddUntilStep("wait for match screen load", () => Stack.CurrentScreen is ScreenMatchmaking matchmaking && matchmaking.IsLoaded);
