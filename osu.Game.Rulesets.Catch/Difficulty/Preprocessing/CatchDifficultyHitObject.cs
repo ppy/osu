@@ -76,7 +76,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
         private void setMovementState()
         {
-            LastPlayerPosition = Index == 0 ? LastNormalizedPosition : ((CatchDifficultyHitObject)Previous(0)).PlayerPosition;
+            var previousObj = (CatchDifficultyHitObject?)Previous();
+
+            LastPlayerPosition = previousObj?.PlayerPosition ?? LastNormalizedPosition;
 
             PlayerPosition = Math.Clamp(
                 LastPlayerPosition,
