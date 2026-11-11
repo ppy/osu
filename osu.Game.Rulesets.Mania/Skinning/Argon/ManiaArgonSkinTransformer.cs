@@ -47,8 +47,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                 var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
                                 var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
 
-                                if (leaderboard != null)
-                                    leaderboard.Position = new Vector2(36, 115);
+                                leaderboard?.Position = new Vector2(36, 115);
 
                                 if (combo != null)
                                 {
@@ -58,8 +57,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
                                     combo.Y = 200;
                                 }
 
-                                if (spectatorList != null)
-                                    spectatorList.Position = new Vector2(36, -66);
+                                spectatorList?.Position = new Vector2(36, -66);
 
                                 if (hitError != null)
                                 {

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (skins != null) skins.CurrentSkinInfo.Value = skins.DefaultClassicSkin.SkinInfo;
+            skins?.CurrentSkinInfo.Value = skins.DefaultClassicSkin.SkinInfo;
         }
 
         [SetUpSteps]

@@ -105,6 +105,44 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
+        [Test]
+        public void TestHpGraphIsThinnedOutAndValuesAreRounded()
+        {
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo();
+            var beatmap = new TestBeatmap(ruleset);
+
+            scoreInfo.HealthGraph =
+            [
+                // will be preserved with rounding (first point)
+                new HealthValue(0, 0.123123),
+                // will be dropped
+                new HealthValue(1100, 0.342424),
+                // will be preserved with rounding (more than 2000ms since last preserved point)
+                new HealthValue(2200, 0.5345634),
+                // will be dropped
+                new HealthValue(3300, 0.902348),
+                // will be preserved with rounding (more than 2000ms since last preserved point)
+                new HealthValue(4400, 0.536890),
+                // will be dropped
+                new HealthValue(5500, 0.58904),
+                // will be preserved with rounding (last point)
+                new HealthValue(5501, 0.35489),
+            ];
+
+            var score = new Score { ScoreInfo = scoreInfo };
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(decodedAfterEncode.ScoreInfo.HealthGraph, Has.Count.EqualTo(4));
+                Assert.That(decodedAfterEncode.ScoreInfo.HealthGraph[0], Is.EqualTo(new HealthValue(0, 0.12f)));
+                Assert.That(decodedAfterEncode.ScoreInfo.HealthGraph[1], Is.EqualTo(new HealthValue(2200, 0.53f)));
+                Assert.That(decodedAfterEncode.ScoreInfo.HealthGraph[2], Is.EqualTo(new HealthValue(4400, 0.54f)));
+                Assert.That(decodedAfterEncode.ScoreInfo.HealthGraph[3], Is.EqualTo(new HealthValue(5501, 0.35f)));
+            });
+        }
+
         private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap)
         {
             var encodeStream = new MemoryStream();

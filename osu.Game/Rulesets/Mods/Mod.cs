@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Scoring;
 using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mods
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
     /// The base class for gameplay modifiers.
     /// </summary>
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-    public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>
+    public abstract class Mod : IMod, IEquatable<Mod>, IDeepCloneable<Mod>, IConfiguredMod
     {
         [JsonIgnore]
         public abstract string Name { get; }
@@ -279,5 +280,11 @@ namespace osu.Game.Rulesets.Mods
 
             public int GetHashCode(IBindable obj) => obj.GetUnderlyingSettingValue().GetHashCode();
         }
+
+        #region IConfiguredMod
+
+        IReadOnlyDictionary<string, object> IConfiguredMod.Settings => SettingsMap.ToDictionary(kv => kv.Key, kv => kv.Value.GetUnderlyingSettingValue());
+
+        #endregion
     }
 }

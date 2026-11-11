@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private OsuConfigManager config { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
+        private void load(OverlayColourProvider colourProvider)
         {
             sortControlBackground.Colour = colourProvider.Background4;
         }

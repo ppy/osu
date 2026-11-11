@@ -2,30 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
-using osu.Desktop.IPC.Messages;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Game.Configuration;
 using osu.Game.IPC;
+using osu.Game.IPC.Messages;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
-using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace osu.Desktop.IPC
 {
-    public partial class OsuWebSocketProvider : Component
+    public partial class OsuWebSocketProvider : Component, IWebSocketProvider
     {
         private WebSocketServer? server;
-        private readonly Bindable<ScoreInfo> lastLocalScore = new Bindable<ScoreInfo>();
+        private readonly List<WebSocketDataSource> dataSources = [];
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics)
+        private void load()
         {
             int port = 49727;
 
@@ -33,36 +30,51 @@ namespace osu.Desktop.IPC
                 port = portOverride;
 
             server = new WebSocketServer(port);
+            server.ClientConnected += onClientConnected;
             server.StartAsync().FireAndForget(onError: ex => Logger.Error(ex, "Failed to start websocket"));
-
-            sessionStatics.BindWith(Static.LastLocalUserScore, lastLocalScore);
         }
 
-        protected override void LoadComplete()
+        public void Register(WebSocketDataSource dataSource)
         {
-            base.LoadComplete();
-
-            lastLocalScore.BindValueChanged(val =>
-            {
-                if (val.NewValue == null)
-                    return;
-
-                if (server?.IsRunning != true)
-                    return;
-
-                var msg = new HitCountMessage { NewHits = val.NewValue.Statistics.Where(kv => kv.Key.IsBasic() && kv.Key.IsHit()).Sum(kv => kv.Value) };
-                broadcast(msg);
-            });
+            dataSources.Add(dataSource);
+            dataSource.BroadcastMessageReceived += onDataSourceBroadcastMessageReceived;
+            dataSource.ClientMessageReceived += onDataSourceClientMessageReceived;
         }
 
-        private void broadcast(OsuWebSocketMessage message)
+        public void Unregister(WebSocketDataSource dataSource)
         {
-            if (server?.IsRunning != true)
-                return;
-
-            string messageString = JsonConvert.SerializeObject(message);
-            server.BroadcastAsync(messageString).FireAndForget();
+            dataSource.ClientMessageReceived -= onDataSourceClientMessageReceived;
+            dataSource.BroadcastMessageReceived -= onDataSourceBroadcastMessageReceived;
+            dataSources.Remove(dataSource);
         }
+
+        private void onClientConnected(int clientId)
+        {
+            foreach (WebSocketDataSource dataSource in dataSources)
+                dataSource.OnClientConnected(clientId).FireAndForget();
+        }
+
+        private void onDataSourceClientMessageReceived(int clientId, OsuWebSocketMessage message) =>
+            Task.Run(async () =>
+                {
+                    if (server?.IsRunning != true)
+                        return;
+
+                    string messageString = JsonSerializer.Serialize(message, message.GetType());
+                    await server.SendAsync(clientId, messageString).ConfigureAwait(false);
+                })
+                .FireAndForget();
+
+        private void onDataSourceBroadcastMessageReceived(OsuWebSocketMessage message) =>
+            Task.Run(async () =>
+                {
+                    if (server?.IsRunning != true)
+                        return;
+
+                    string messageString = JsonSerializer.Serialize(message, message.GetType());
+                    await server.BroadcastAsync(messageString).ConfigureAwait(false);
+                })
+                .FireAndForget();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -73,6 +85,7 @@ namespace osu.Desktop.IPC
                 var cts = new CancellationTokenSource();
                 cts.CancelAfter(TimeSpan.FromSeconds(10));
                 server.StopAsync(cts.Token).WaitSafely();
+                server.ClientConnected -= onClientConnected;
                 server = null;
             }
         }
