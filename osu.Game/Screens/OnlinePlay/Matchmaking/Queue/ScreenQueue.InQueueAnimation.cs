@@ -93,8 +93,28 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             },
                         },
                     },
-                    outerRing = createOuterRing(),
-                    innerRing = createInnerRing(),
+                    outerRing = new CircularContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(outer_size),
+                        Alpha = 0,
+                        Masking = true,
+                        BorderColour = Color4.White.Opacity(0.05f),
+                        BorderThickness = 2,
+                        Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Transparent },
+                    },
+                    innerRing = new CircularContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(inner_size),
+                        Alpha = 0,
+                        Masking = true,
+                        BorderColour = Color4.White.Opacity(0.2f),
+                        BorderThickness = 2,
+                        Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Transparent },
+                    },
                 };
             }
 
@@ -142,30 +162,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     Scheduler.Add(queueAnimationDelegate);
                 }
             }
-
-            private CircularContainer createOuterRing() => new CircularContainer
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(outer_size),
-                Alpha = 0,
-                Masking = true,
-                BorderColour = Color4.White.Opacity(0.05f),
-                BorderThickness = 2,
-                Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Transparent },
-            };
-
-            private CircularContainer createInnerRing() => new CircularContainer
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(inner_size),
-                Alpha = 0,
-                Masking = true,
-                BorderColour = Color4.White.Opacity(0.2f),
-                BorderThickness = 2,
-                Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Transparent },
-            };
 
             private CircularContainer createAnimationRing(float size) => new CircularContainer
             {
