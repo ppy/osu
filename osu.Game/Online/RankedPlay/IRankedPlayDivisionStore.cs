@@ -14,7 +14,7 @@ namespace osu.Game.Online.RankedPlay
         /// <summary>
         /// Gets a list of all divisions currently used by the system.
         /// </summary>
-        public Task<APIRankedPlayDivision[]> GetDivisions();
+        Task<APIRankedPlayDivision[]> GetDivisions();
 
         /// <summary>
         /// Gets the division the provided rating belongs to.
@@ -23,6 +23,6 @@ namespace osu.Game.Online.RankedPlay
         /// A <see cref="APIRankedPlayDivision"/> that contains the provided rating
         /// within its bounds. <c>null</c> otherwise.
         /// </returns>
-        public Task<APIRankedPlayDivision?> GetDivisionForRating(int rating);
+        Task<APIRankedPlayDivision?> GetDivisionForRating(int rating);
     }
 }
