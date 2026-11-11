@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Caption = RulesetSettingsStrings.TouchDrumSize,
                     Current = config.GetBindable<float>(TaikoRulesetSetting.TouchDrumSize),
-                    KeyboardStep = 1f,
-                    DisplayAsPercentage = true
+                    KeyboardStep = 0.01f,
+                    LabelFormat = v => $"{v:0.##}x",
                 }),
                 new SettingsItemV2(hitAnimations = new FormCheckBox
                 {
