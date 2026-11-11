@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Users.Drawables
 {
@@ -46,7 +47,10 @@ namespace osu.Game.Users.Drawables
         private void openProfile()
         {
             if (team != null)
-                game?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/teams/{team.Id}");
+                // LinkWarnMode.AlwaysWarn is set to prevent users from being instantly kicked out of the game
+                // on accidental clicks (for example, when selecting a score on song select).
+                // This should be changed when in-game team profile overlay is added.
+                game?.OpenUrlExternally($@"{api.Endpoints.WebsiteUrl}/teams/{team.Id}", LinkWarnMode.AlwaysWarn);
         }
     }
 }

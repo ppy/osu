@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -118,12 +119,36 @@ namespace osu.Game.Overlays.Login
                                 Origin = Anchor.TopCentre,
                                 TextAnchor = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
-                                Text = state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting,
                             },
                         },
                     };
 
-                    linkFlow.AddLink(Resources.Localisation.Web.CommonStrings.ButtonsCancel.ToLower(), api.Logout, string.Empty);
+                    if (api.UserFacingOutageMessage.Value is LocalisableString userFacingMessage && !LocalisableString.IsNullOrEmpty(userFacingMessage))
+                    {
+                        linkFlow.AddText(NotificationsStrings.ServerOutageInProgress.ToUpper(), s =>
+                        {
+                            s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
+                            s.Colour = Colour4.Orange;
+                        });
+
+                        linkFlow.AddParagraph(userFacingMessage, s => s.Font = OsuFont.Style.Caption1);
+                    }
+                    else if (state.NewValue == APIState.Failing)
+                    {
+                        linkFlow.AddParagraph(state.NewValue == APIState.Failing ? ToolbarStrings.AttemptingToReconnect : ToolbarStrings.Connecting, s =>
+                        {
+                            s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
+                            s.Colour = Colour4.Orange;
+                        });
+                    }
+                    else
+                    {
+                        linkFlow.AddParagraph(ToolbarStrings.Connecting, s =>
+                            s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold));
+                    }
+
+                    linkFlow.NewParagraph();
+                    linkFlow.AddLink(LoginPanelStrings.SignOut, api.Logout, string.Empty, s => s.Font = OsuFont.Style.Caption2);
                     break;
 
                 case APIState.Online:

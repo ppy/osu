@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             /// </summary>
             public readonly double Position;
 
-            public PositionMapping(double time, MultiplierControlPoint controlPoint = null, double position = default)
+            public PositionMapping(double time, MultiplierControlPoint controlPoint = null, double position = 0)
             {
                 Time = time;
                 ControlPoint = controlPoint;

@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var storyboard = new Storyboard();
 
-            var video = new StoryboardVideo("abc123.mp4", 0);
+            var video = new StoryboardVideo(StoryboardElementSource.Beatmap, "abc123.mp4", 0);
 
             storyboard.GetLayer("Video").Add(video);
 
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var storyboard = new Storyboard();
 
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
 
             storyboard.GetLayer("Background").Add(sprite);
 

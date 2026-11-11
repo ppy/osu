@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Editing
                        && beatmap.DifficultyName == secondDifficultyName
                        && set != null
                        && set.PerformRead(s =>
-                           s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(b => s.Status == BeatmapOnlineStatus.LocallyModified));
+                           s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName) && s.Beatmaps.All(_ => s.Status == BeatmapOnlineStatus.LocallyModified));
             });
         }
 
@@ -881,7 +881,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             try
             {
-                using (var zip = ZipArchive.Open(temp))
+                using (var zip = ZipArchive.OpenArchive(temp))
                     zip.WriteToDirectory(extractedFolder);
 
                 return func(extractedFolder);

@@ -11,6 +11,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osuTK;
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         {
             InternalChildren = new Drawable[]
             {
-                new SectionHeader("Time remaining"),
+                new SectionHeader(DailyChallengeStrings.SectionTimeRemaining),
                 new DrawSizePreservingFillContainer
                 {
                     RelativeSizeAxes = Axes.Both,

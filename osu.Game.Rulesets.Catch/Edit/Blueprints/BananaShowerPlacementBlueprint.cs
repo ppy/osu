@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         public BananaShowerPlacementBlueprint()
         {
-            InternalChild = outline = new TimeSpanOutline();
+            Child = outline = new TimeSpanOutline();
         }
 
         protected override void LoadComplete()

@@ -14,6 +14,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
@@ -49,12 +50,15 @@ namespace osu.Game.Utils
             if (Environment.GetEnvironmentVariable("OSU_DISABLE_ERROR_REPORTING") == "1")
                 return;
 
+            if (DebugUtils.IsNUnitRunning)
+                return;
+
             if (!game.IsDeployedBuild || !game.CreateEndpoints().WebsiteUrl.EndsWith(@".ppy.sh", StringComparison.Ordinal))
                 return;
 
             sentrySession = SentrySdk.Init(options =>
             {
-                options.Dsn = "https://ad9f78529cef40ac874afb95a9aca04e@sentry.ppy.sh/2";
+                options.Dsn = string.Empty;
                 options.AutoSessionTracking = true;
                 options.IsEnvironmentUser = false;
                 options.IsGlobalModeEnabled = true;
@@ -244,9 +248,14 @@ namespace osu.Game.Utils
 
             switch (exception)
             {
-                // disk I/O failures, invalid formats, etc.
-
                 case IOException ioe:
+                    // named pipe failures, often due to a user error.
+                    // fires from osu!framework NamedPipeIpcProvider.listen(NamedPipeServerStream pipe)
+                    // see https://github.com/dotnet/runtime/blob/719ca2546bd31a54244731185c55c8fc208204bf/src/libraries/System.IO.Pipes/src/System/IO/Pipes/NamedPipeServerStream.cs#L185
+                    if (ioe.Message == "Pipe is broken.")
+                        return false;
+
+                    // disk I/O failures, invalid formats, etc.
                     if (ignored_io_exception_hresults.Contains(ioe.HResult))
                         return false;
 

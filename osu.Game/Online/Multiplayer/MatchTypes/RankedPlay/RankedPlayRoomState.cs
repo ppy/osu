@@ -27,7 +27,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.RankedPlay
         /// A multiplier applied to life point damage.
         /// </summary>
         [Key(2)]
-        public double DamageMultiplier { get; set; } = 1;
+        public double DamageMultiplier { get; set; } = 0.5;
 
         /// <summary>
         /// A dictionary containing all users in the room.

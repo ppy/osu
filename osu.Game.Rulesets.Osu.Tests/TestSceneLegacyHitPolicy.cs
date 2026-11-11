@@ -792,7 +792,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 AddStep("export beatmap", () =>
                 {
-                    var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null);
+                    var beatmapEncoder = new LegacyBeatmapEncoder(playableBeatmap, null, null);
 
                     using (var stream = File.Open(Path.Combine(exportLocation, $"{testCaseName}.osu"), FileMode.Create))
                     {

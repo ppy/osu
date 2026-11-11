@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // components wrapped in skinnable target containers load asynchronously, potentially taking more than one frame to load.
             // therefore use until step rather than direct assert to account for that.
             AddUntilStep("all interactive elements removed", () => this.ChildrenOfType<Player>().All(p =>
-                !p.ChildrenOfType<PlayerSettingsOverlay>().Any() &&
+                !p.ChildrenOfType<ReplaySettingsOverlay>().Any() &&
                 !p.ChildrenOfType<HoldForMenuButton>().Any() &&
                 p.ChildrenOfType<ArgonSongProgressBar>().SingleOrDefault()?.Interactive == false));
 
@@ -493,7 +493,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestIntroStoryboardElement() => testLeadIn(b =>
         {
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
             sprite.Commands.AddAlpha(Easing.None, -2000, 0, 0, 1);
             b.Storyboard.GetLayer("Background").Add(sprite);
         });

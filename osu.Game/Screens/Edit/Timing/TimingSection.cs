@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private LabelledTimeSignature timeSignature = null!;
         private LabelledSwitchButton omitBarLine = null!;
-        private BPMTextBox bpmTextEntry = null!;
 
         [Resolved]
         private OsuConfigManager configManager { get; set; } = null!;
@@ -33,7 +32,6 @@ namespace osu.Game.Screens.Edit.Timing
                     Current = configManager.GetBindable<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges),
                 },
                 new TapTimingControl(),
-                bpmTextEntry = new BPMTextBox(),
                 timeSignature = new LabelledTimeSignature
                 {
                     Label = "Time Signature"
@@ -46,7 +44,6 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            bpmTextEntry.Current.BindValueChanged(_ => saveChanges());
             omitBarLine.Current.BindValueChanged(_ => saveChanges());
             timeSignature.Current.BindValueChanged(_ => saveChanges());
 
@@ -54,20 +51,17 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 if (!isRebinding) ChangeHandler?.SaveState();
             }
-
-            bpmTextEntry.OnCommit = (oldBeatLength, _) =>
-            {
-                if (!configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges) || ControlPoint.Value == null)
-                    return;
-
-                Beatmap.BeginChange();
-                TimingSectionAdjustments.SetHitObjectBPM(Beatmap, ControlPoint.Value, oldBeatLength);
-                Beatmap.UpdateAllHitObjects();
-                Beatmap.EndChange();
-            };
         }
 
         private bool isRebinding;
+
+        protected override void OnSelectedGroupChanged(ValueChangedEvent<ControlPointGroup?> group)
+        {
+            Checkbox.Current.Disabled = false;
+            base.OnSelectedGroupChanged(group);
+            // The first control point group is expected to contain timing information at all times.
+            Checkbox.Current.Disabled = group.NewValue?.Equals(Beatmap.ControlPointInfo.Groups.FirstOrDefault()) == true;
+        }
 
         protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint?> point)
         {
@@ -75,7 +69,6 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 isRebinding = true;
 
-                bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
                 timeSignature.Current = point.NewValue.TimeSignatureBindable;
                 omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
 
@@ -83,9 +76,9 @@ namespace osu.Game.Screens.Edit.Timing
             }
         }
 
-        protected override TimingControlPoint CreatePoint()
+        protected override TimingControlPoint CreatePoint(ControlPointGroup selectedGroup)
         {
-            var reference = Beatmap.ControlPointInfo.TimingPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.TimingPointAt(selectedGroup.Time);
 
             return new TimingControlPoint
             {
@@ -93,57 +86,6 @@ namespace osu.Game.Screens.Edit.Timing
                 TimeSignature = reference.TimeSignature,
                 OmitFirstBarLine = reference.OmitFirstBarLine,
             };
-        }
-
-        private partial class BPMTextBox : LabelledTextBox
-        {
-            public new Action<double, double>? OnCommit { get; set; }
-
-            private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
-
-            public BPMTextBox()
-            {
-                Label = "BPM";
-                SelectAllOnFocus = true;
-
-                base.OnCommit += (_, isNew) =>
-                {
-                    if (!isNew) return;
-
-                    double oldBeatLength = beatLengthBindable.Value;
-
-                    try
-                    {
-                        if (double.TryParse(Current.Value, out double doubleVal) && doubleVal > 0)
-                            beatLengthBindable.Value = BeatLengthToBpm(doubleVal);
-                    }
-                    catch
-                    {
-                        // TriggerChange below will restore the previous text value on failure.
-                    }
-
-                    // This is run regardless of parsing success as the parsed number may not actually trigger a change
-                    // due to bindable clamping. Even in such a case we want to update the textbox to a sane visual state.
-                    beatLengthBindable.TriggerChange();
-                    OnCommit?.Invoke(oldBeatLength, beatLengthBindable.Value);
-                };
-
-                beatLengthBindable.BindValueChanged(val =>
-                {
-                    Current.Value = BeatLengthToBpm(val.NewValue).ToString("N2");
-                }, true);
-            }
-
-            public Bindable<double> Bindable
-            {
-                get => beatLengthBindable;
-                set
-                {
-                    // incoming will be beat length, not bpm
-                    beatLengthBindable.UnbindBindings();
-                    beatLengthBindable.BindTo(value);
-                }
-            }
         }
 
         public static double BeatLengthToBpm(double beatLength) => 60000 / beatLength;

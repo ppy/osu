@@ -2,22 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Localisation.Catch;
 using osu.Game.Rulesets.Catch.Edit.Blueprints;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
-    public class BananaShowerCompositionTool : CompositionTool
+    public class BananaShowerCompositionTool : CompositionTool<CatchAction>
     {
         public BananaShowerCompositionTool()
-            : base(nameof(BananaShower))
+            : base(CatchEditorStrings.BananaShowerTool)
         {
+            Action = CatchAction.EditorBananaShowerTool;
         }
 
-        public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners);
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.EditorBananaShower };
 
         public override HitObjectPlacementBlueprint CreatePlacementBlueprint() => new BananaShowerPlacementBlueprint();
     }

@@ -180,6 +180,7 @@ namespace osu.Game.Database
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
+            c.CreateMap<RealmOnlineAsset, RealmOnlineAsset>();
             c.CreateMap<SkinInfo, SkinInfo>();
         }
 
@@ -299,7 +300,7 @@ namespace osu.Game.Database
                 throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
 
             bool initial = true;
-            return collection.SubscribeForNotifications(((sender, changes) =>
+            return collection.SubscribeForNotifications((sender, changes) =>
             {
                 if (initial)
                 {
@@ -315,7 +316,7 @@ namespace osu.Game.Database
                 }
 
                 callback(sender, changes);
-            }));
+            });
         }
 
         /// <summary>

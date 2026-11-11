@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -24,6 +25,12 @@ namespace osu.Game.Online.API
         /// as well as methods to manage those in a way that keeps this state consistent throughout the game.
         /// </summary>
         ILocalUserState LocalUserState { get; }
+
+        /// <summary>
+        /// When there's ongoing SR/PP reprocessing, this will be non-empty and contain a URL leading to the news post
+        /// giving user facing details about the ongoing deployment process.
+        /// </summary>
+        string ScoreProcessingNoticeUrl { get; }
 
         /// <summary>
         /// The language supplied by this provider to API requests.
@@ -72,6 +79,11 @@ namespace osu.Game.Online.API
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
         IBindable<APIState> State { get; }
+
+        /// <summary>
+        /// When servers are on fire, this will contain a message which can be displayed to an end user.
+        /// </summary>
+        IBindable<LocalisableString?> UserFacingOutageMessage { get; }
 
         /// <summary>
         /// Queue a new request.

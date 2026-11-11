@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -59,70 +58,68 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 case 1:
                     var selected = objects.Single();
 
-                    AddHeader("Type");
-                    AddValue($"{selected.GetType().ReadableName()}");
+                    if (selected is IHasDuration duration)
+                    {
+                        AddHeader("Time");
+                        AddValue($"{selected.StartTime:#,0.##} - {duration.EndTime:#,0.##} ms");
 
-                    AddHeader("Time");
-                    AddValue($"{selected.StartTime:#,0.##}ms");
+                        if (selected is IHasRepeats repeats && repeats.RepeatCount > 0)
+                        {
+                            AddHeader("Duration");
+                            AddValue($"{duration.Duration:#,0.##} ms");
+                            AddValue($"({repeats.RepeatCount:#,0.##} repeats)");
+                        }
+                        else
+                        {
+                            AddHeader("Duration");
+                            AddValue($"{duration.Duration:#,0.##} ms");
+                        }
+                    }
+                    else
+                    {
+                        AddHeader("Time");
+                        AddValue($"{selected.StartTime:#,0.##} ms");
+                    }
 
                     switch (selected)
                     {
                         case IHasPosition pos:
                             AddHeader("Position");
-                            AddValue($"x:{pos.X:#,0.##}");
-                            AddValue($"y:{pos.Y:#,0.##}");
+                            AddValue($"({pos.X:#,0.##}, {pos.Y:#,0.##})");
                             break;
 
                         case IHasXPosition x:
                             AddHeader("Position");
-
-                            AddValue($"x:{x.X:#,0.##} ");
+                            AddValue($"{x.X:#,0.##}");
                             break;
 
                         case IHasYPosition y:
                             AddHeader("Position");
-
-                            AddValue($"y:{y.Y:#,0.##}");
+                            AddValue($"{y.Y:#,0.##}");
                             break;
-                    }
-
-                    if (selected is IHasDistance distance)
-                    {
-                        AddHeader("Distance");
-                        AddValue($"{distance.Distance:#,0.##}px");
                     }
 
                     if (selected is IHasSliderVelocity sliderVelocity)
                     {
                         AddHeader("Slider Velocity");
-                        AddValue($"{sliderVelocity.SliderVelocityMultiplier:#,0.00}x ({sliderVelocity.SliderVelocityMultiplier * EditorBeatmap.Difficulty.SliderMultiplier:#,0.00}x)");
+                        AddValue($"{sliderVelocity.SliderVelocityMultiplier:#,0.00}x");
+                        AddValue($"(actual: {sliderVelocity.SliderVelocityMultiplier * EditorBeatmap.Difficulty.SliderMultiplier:#,0.00}x)");
                     }
 
-                    if (selected is IHasRepeats repeats)
+                    if (selected is IHasDistance distance)
                     {
-                        AddHeader("Repeats");
-                        AddValue($"{repeats.RepeatCount:#,0.##}");
-                    }
-
-                    if (selected is IHasDuration duration)
-                    {
-                        AddHeader("End Time");
-                        AddValue($"{duration.EndTime:#,0.##}ms");
-                        AddHeader("Duration");
-                        AddValue($"{duration.Duration:#,0.##}ms");
+                        AddHeader("Distance covered");
+                        AddValue($"{distance.Distance:#,0.##} px");
                     }
 
                     break;
 
                 default:
-                    AddHeader("Selected Objects");
+                    AddHeader("Object count");
                     AddValue($"{objects.Length:#,0.##}");
 
-                    AddHeader("Start Time");
-                    AddValue($"{objects.Min(o => o.StartTime):#,0.##}ms");
-
-                    AddHeader("End Time");
-                    AddValue($"{objects.Max(o => o.GetEndTime()):#,0.##}ms");
+                    AddHeader("Selection");
+                    AddValue($"{objects.Min(o => o.StartTime):#,0.##} ms - {objects.Max(o => o.GetEndTime()):#,0.##} ms");
                     break;
             }
         }

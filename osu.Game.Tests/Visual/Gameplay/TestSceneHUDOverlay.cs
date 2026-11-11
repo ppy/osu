@@ -17,7 +17,6 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning;
 using osu.Game.Tests.Gameplay;
 using osuTK.Input;
@@ -143,8 +142,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 localConfig.SetValue(OsuSetting.KeyOverlay, false);
                 var kcd = hudOverlay.ChildrenOfType<KeyCounterDisplay>().FirstOrDefault();
-                if (kcd != null)
-                    kcd.AlwaysVisible.Value = false;
+                kcd?.AlwaysVisible.Value = false;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
@@ -247,7 +245,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("bind on update", () =>
             {
-                hudOverlay.ChildrenOfType<BarHitErrorMeter>().First().OnUpdate += _ => updateCount++;
+                hudOverlay.ChildrenOfType<ArgonSongProgressBar>().First().OnUpdate += _ => updateCount++;
             });
 
             AddUntilStep("wait for updates", () => updateCount > 0);

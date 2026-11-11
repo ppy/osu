@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider, OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
                 SliderContainer.AddRange(new Drawable[]
                 {

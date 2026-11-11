@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Humanizer;
-using Humanizer.Localisation;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,14 +17,14 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
-using osu.Game.Localisation;
-using osu.Game.Rulesets;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
@@ -313,7 +312,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                DurationField.Current.BindValueChanged(duration =>
+                DurationField.Current.BindValueChanged(_ =>
                 {
                     if (hasValidDuration)
                         durationNoticeText.Hide();
@@ -341,7 +340,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 updateRoomMaxAttempts();
                 updateRoomPlaylist();
 
-                playlist.Items.BindCollectionChanged((_, __) => room.Playlist = playlist.Items.ToArray());
+                playlist.Items.BindCollectionChanged((_, _) => room.Playlist = playlist.Items.ToArray());
             }
 
             private void onRoomPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -441,7 +440,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 room.Name = NameField.Text;
                 room.Availability = AvailabilityPicker.Current.Value;
-                room.MaxParticipants = int.TryParse(MaxParticipantsField.Text, out int maxParticipants) ? maxParticipants : null;
+                room.MaxParticipants = !string.IsNullOrWhiteSpace(MaxParticipantsField.Text) && byte.TryParse(MaxParticipantsField.Text, out byte maxParticipants) ? maxParticipants : null;
                 room.MaxAttempts = int.TryParse(MaxAttemptsField.Text, out int maxAttempts) ? maxAttempts : null;
                 room.Duration = DurationField.Current.Value;
 

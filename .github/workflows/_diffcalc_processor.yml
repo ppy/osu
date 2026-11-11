@@ -36,7 +36,7 @@ jobs:
   generator:
     name: Run
     runs-on: self-hosted
-    timeout-minutes: 1440
+    timeout-minutes: 2880
 
     outputs:
       target: ${{ steps.run.outputs.target }}
@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Checkout diffcalc-sheet-generator
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{ inputs.id }}
           repository: 'smoogipoo/diffcalc-sheet-generator'

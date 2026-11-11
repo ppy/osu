@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Storyboards
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Storyboards
         private readonly Dictionary<string, StoryboardLayer> layers = new Dictionary<string, StoryboardLayer>();
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
 
-        public BeatmapInfo BeatmapInfo = new BeatmapInfo();
+        public BeatmapInfo BeatmapInfo { get; set; } = new BeatmapInfo();
         public IBeatmap Beatmap { get; set; } = new Beatmap();
 
         /// <summary>
@@ -52,6 +53,8 @@ namespace osu.Game.Storyboards
         public double? LatestEventTime => Layers.SelectMany(l => l.Elements)
                                                 .Where(e => e is not StoryboardVideo)
                                                 .MaxBy(e => e.GetEndTime())?.GetEndTime();
+
+        public StoryboardVideo? PrimaryVideo => GetLayer(@"Video").Elements.OfType<StoryboardVideo>().FirstOrDefault();
 
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
@@ -95,6 +98,12 @@ namespace osu.Game.Storyboards
                 return GetLayer("Background").Elements.Any(e => string.Equals(e.Path, backgroundPath, StringComparison.OrdinalIgnoreCase));
             }
         }
+
+        /// <summary>
+        /// Offset to be applied to the beatmap background.
+        /// TODO: Unused yet. See https://github.com/ppy/osu/issues/14238.
+        /// </summary>
+        public Vector2 BackgroundOffset { get; set; } = Vector2.Zero;
 
         public virtual DrawableStoryboard CreateDrawable(IReadOnlyList<Mod>? mods = null) =>
             new DrawableStoryboard(this, mods);

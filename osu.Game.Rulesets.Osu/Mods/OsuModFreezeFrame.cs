@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override IconUsage? Icon => OsuIcon.ModFreezeFrame;
 
-        public override double ScoreMultiplier => 1;
-
         public override LocalisableString Description => "Burn the notes into your memory.";
 
         /// <remarks>

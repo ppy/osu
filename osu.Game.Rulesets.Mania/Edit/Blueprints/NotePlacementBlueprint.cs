@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             RelativeSizeAxes = Axes.Both;
             Masking = true;
 
-            InternalChild = piece = new Circle
+            Child = piece = new Circle
             {
                 Origin = Anchor.Centre,
                 Colour = colours.Yellow,

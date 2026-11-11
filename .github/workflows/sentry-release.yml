@@ -13,17 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Create Sentry release
-        uses: getsentry/action-release@v1
+        uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ppy
-          SENTRY_PROJECT: osu
-          SENTRY_URL: https://sentry.ppy.sh/
+          SENTRY_PROJECT: osu-lazer
         with:
           environment: production
-          version: osu@${{ github.ref_name }}
+          version: osu-lazer@${{ github.ref_name }}

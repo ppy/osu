@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             });
 
             SaveEditor();
+            AddStep("back to select tool", () => InputManager.Key(Key.Number1));
             ReloadEditorToSameBeatmap();
 
             AddAssert("large droplet count is the same", () => EditorBeatmap.HitObjects[0].NestedHitObjects.Count(t => t.GetType() == typeof(Droplet)), () => Is.EqualTo(largeDropletCount));

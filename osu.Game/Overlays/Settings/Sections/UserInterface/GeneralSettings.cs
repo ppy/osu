@@ -35,10 +35,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     KeyboardStep = 0.01f,
                     LabelFormat = v => $"{v:0.##}x"
                 }),
-                new SettingsItemV2(new FormCheckBox
+                new SettingsItemV2(new FormSliderBar<float>
                 {
                     Caption = UserInterfaceStrings.Parallax,
-                    Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
+                    Current = config.GetBindable<float>(OsuSetting.MenuParallaxScale),
+                    DisplayAsPercentage = true,
+                    LabelFormat = v => v == 0 ? CommonStrings.Disabled : FormSliderBar<float>.DefaultLabelFormat(v, true),
                 }),
                 new SettingsItemV2(new FormSliderBar<double>
                 {

@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -40,7 +41,13 @@ namespace osu.Game.Screens.Select
             AccentColour = colour.Purple1;
             Hotkey = GlobalAction.ToggleBeatmapOptions;
 
-            Action = this.ShowPopover;
+            Action = () =>
+            {
+                if (this.FindClosestParent<PopoverContainer>()?.CurrentTarget == this)
+                    this.HidePopover();
+                else
+                    this.ShowPopover();
+            };
         }
 
         protected override void LoadComplete()

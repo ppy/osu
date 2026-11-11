@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
@@ -15,6 +16,7 @@ using osu.Game.Collections;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osuTK;
 using Realms;
 
@@ -41,7 +43,7 @@ namespace osu.Game.Screens.Ranking
 
             Size = new Vector2(75, 30);
 
-            TooltipText = "collections";
+            TooltipText = CommonStrings.Collections.ToLower();
         }
 
         [BackgroundDependencyLoader]

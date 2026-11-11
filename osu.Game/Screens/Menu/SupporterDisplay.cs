@@ -9,12 +9,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,6 +30,7 @@ namespace osu.Game.Screens.Menu
         private Drawable heart = null!;
 
         private readonly IBindable<APIUser> currentUser = new Bindable<APIUser>();
+        private IBindable<string> considerBecomingASupporterText = new Bindable<string>();
 
         private Box backgroundBox = null!;
 
@@ -35,6 +39,9 @@ namespace osu.Game.Screens.Menu
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
+
+        [Resolved]
+        private LocalisationManager localisation { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -65,50 +72,24 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.CentreLeft,
                 },
             };
+
+            const string url = @"https://osu.ppy.sh/home/support";
+            considerBecomingASupporterText = localisation.GetLocalisedBindableString(SupporterDisplayStrings.ConsiderBecomingASupporter(url));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            const float font_size = 14;
-
-            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold);
-
             currentUser.BindTo(api.LocalUser);
             currentUser.BindValueChanged(e =>
             {
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
 
-                if (e.NewValue.IsSupporter)
-                {
-                    supportFlow.AddText("Eternal thanks to you for supporting osu!", formatSemiBold);
-
-                    backgroundBox.FadeColour(colours.Pink, 250);
-                }
-                else
-                {
-                    supportFlow.AddText("Consider becoming an ", formatSemiBold);
-                    supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", formatSemiBold);
-                    supportFlow.AddText(" to help support osu!'s development", formatSemiBold);
-
-                    backgroundBox.FadeColour(colours.Pink4, 250);
-                }
-
-                supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
-                {
-                    heart = t;
-
-                    t.Padding = new MarginPadding { Left = 5, Top = 1 };
-                    t.Font = t.Font.With(size: font_size);
-                    t.Colour = colours.Pink;
-
-                    Schedule(() =>
-                    {
-                        heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
-                    });
-                });
+                updateDisplay(e.NewValue);
             }, true);
+
+            considerBecomingASupporterText.BindValueChanged(_ => updateDisplay(currentUser.Value));
 
             this
                 .FadeOut()
@@ -116,6 +97,43 @@ namespace osu.Game.Screens.Menu
                 .FadeInFromZero(800, Easing.OutQuint);
 
             scheduleDismissal();
+        }
+
+        private void updateDisplay(APIUser user)
+        {
+            const float font_size = 14;
+
+            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold);
+
+            supportFlow.Clear();
+
+            if (user.IsSupporter)
+            {
+                supportFlow.AddText(SupporterDisplayStrings.ThankYouForSupporting, formatSemiBold);
+
+                backgroundBox.FadeColour(colours.Pink, 250);
+            }
+            else
+            {
+                var formattedSource = MessageFormatter.FormatText(considerBecomingASupporterText.Value);
+                supportFlow.AddLinks(formattedSource.Text, formattedSource.Links, formatSemiBold);
+
+                backgroundBox.FadeColour(colours.Pink4, 250);
+            }
+
+            supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
+            {
+                heart = t;
+
+                t.Padding = new MarginPadding { Left = 5, Top = 1 };
+                t.Font = t.Font.With(size: font_size);
+                t.Colour = colours.Pink;
+
+                Schedule(() =>
+                {
+                    heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
+                });
+            });
         }
 
         protected override bool OnClick(ClickEvent e)

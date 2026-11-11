@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osuTK.Input;
@@ -40,11 +39,11 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select")
-                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetResourceName()}-select")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetResourceName()}-select");
 
-            sampleClickDisabled = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select-disabled")
-                                  ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select-disabled");
+            sampleClickDisabled = audio.Samples.Get($@"UI/{SampleSet.GetResourceName()}-select-disabled")
+                                  ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetResourceName()}-select-disabled");
         }
 
         protected override bool OnClick(ClickEvent e)

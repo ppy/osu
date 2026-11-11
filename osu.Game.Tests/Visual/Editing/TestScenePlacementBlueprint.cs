@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -12,10 +13,11 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Beatmaps;
@@ -49,6 +51,161 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("undo", () => Editor.Undo());
 
             AddAssert("circle removed", () => EditorBeatmap.HitObjects, () => Is.Empty);
+        }
+
+        [Test]
+        public void TestPlacementReplacesObjectAtSameStartTime()
+        {
+            HitCircle existing = null!;
+            var existingPosition = new Vector2(128, 160);
+            var replacementPosition = new Vector2(400, 280);
+            Playfield playfield = null!;
+
+            AddStep("add existing circle", () =>
+            {
+                EditorBeatmap.Add(existing = new HitCircle
+                {
+                    StartTime = 500,
+                    Position = existingPosition,
+                });
+            });
+
+            AddStep("seek to same time", () => EditorClock.Seek(500));
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("grab playfield", () => playfield = this.ChildrenOfType<Playfield>().Single());
+            AddStep("move mouse to replacement coordinates", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(replacementPosition)));
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("only one hit object", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
+            AddAssert("original instance removed from beatmap", () => EditorBeatmap.HitObjects.Single(), () => Is.Not.SameAs(existing));
+            AddAssert("start time unchanged", () => Precision.AlmostEquals(EditorBeatmap.HitObjects.Single().StartTime, 500));
+            AddAssert("circle at new coordinates", () =>
+            {
+                var circle = (HitCircle)EditorBeatmap.HitObjects.Single();
+                return circle != null
+                       && Precision.AlmostEquals(circle.Position.X, replacementPosition.X)
+                       && Precision.AlmostEquals(circle.Position.Y, replacementPosition.Y);
+            });
+        }
+
+        [Test]
+        public void TestSliderPlacementReplacesSliderAtSameStartTime()
+        {
+            Playfield playfield = null!;
+
+            AddStep("seek to 500", () => EditorClock.Seek(500));
+            AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
+            AddStep("grab playfield", () => playfield = this.ChildrenOfType<Playfield>().Single());
+
+            AddStep("start first slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(0)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(100))));
+            AddStep("end first slider", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("start second slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end second slider", () => InputManager.Click(MouseButton.Right));
+
+            AddAssert("only one hit object", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(1));
+            AddAssert("slider at correct position", () => Precision.AlmostEquals(EditorBeatmap.HitObjects.OfType<Slider>().Single().Position, new Vector2(200)));
+        }
+
+        [Test]
+        public void TestSliderPlacementNewComboAppliedCorrectly()
+        {
+            Playfield playfield = null!;
+
+            AddStep("seek to 500", () => EditorClock.Seek(500));
+            AddStep("select slider placement tool", () => InputManager.Key(Key.Number3));
+            AddStep("grab playfield", () => playfield = this.ChildrenOfType<Playfield>().Single());
+
+            AddStep("start first slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("toggle new combo", () => InputManager.Key(Key.Q));
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end first slider", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("seek to 5000", () => EditorClock.Seek(5000));
+            AddStep("start second slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("toggle new combo", () => InputManager.Key(Key.Q));
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end second slider", () => InputManager.Click(MouseButton.Right));
+
+            AddStep("seek to 2000", () => EditorClock.Seek(2000));
+            AddStep("start third slider", () =>
+            {
+                InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(200)));
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("toggle new combo", () => InputManager.Key(Key.Q));
+            AddStep("move", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300))));
+            AddStep("end third slider", () => InputManager.Click(MouseButton.Right));
+
+            AddAssert("3 hit objects", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(3));
+            AddAssert("all sliders start combo", () => EditorBeatmap.HitObjects.OfType<Slider>().All(s => s.NewCombo));
+        }
+
+        [Test]
+        public void TestPlacementOnSliderBodyDoesNotRemoveSlider()
+        {
+            Slider originalSlider = null!;
+
+            AddStep("add slider", () =>
+            {
+                EditorBeatmap.Add(originalSlider = new Slider
+                {
+                    StartTime = 0,
+                    Position = new Vector2(256, 192),
+                    Path = new SliderPath(new[]
+                    {
+                        new PathControlPoint(Vector2.Zero),
+                        new PathControlPoint(new Vector2(256, 0)),
+                    }),
+                });
+            });
+
+            AddUntilStep("slider duration resolved", () => originalSlider.EndTime > originalSlider.StartTime + 1);
+
+            double midTime = 0;
+            double endTime = 0;
+
+            AddStep("capture slider times", () =>
+            {
+                midTime = originalSlider.StartTime + originalSlider.Duration / 2;
+                endTime = originalSlider.EndTime;
+            });
+
+            Playfield playfield = null!;
+
+            AddStep("seek to slider mid", () => EditorClock.Seek(midTime));
+            AddStep("select circle placement tool", () => InputManager.Key(Key.Number2));
+            AddStep("grab playfield", () => playfield = this.ChildrenOfType<Playfield>().Single());
+            AddStep("move mouse for mid placement", () => InputManager.MoveMouseTo(playfield.GamefieldToScreenSpace(new Vector2(300, 200))));
+            AddStep("place circle at slider mid time", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("slider preserved after mid placement", () => EditorBeatmap.HitObjects.Contains(originalSlider));
+            AddAssert("one circle after mid placement", () => EditorBeatmap.HitObjects.Count(h => h is HitCircle), () => Is.EqualTo(1));
+
+            AddStep("seek to slider end", () => EditorClock.Seek(endTime));
+            AddStep("place circle at slider end time", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("slider still preserved", () => EditorBeatmap.HitObjects.Contains(originalSlider));
+            AddAssert("three hit objects total", () => EditorBeatmap.HitObjects.Count, () => Is.EqualTo(3));
+            AddAssert("two circles placed", () => EditorBeatmap.HitObjects.Count(h => h is HitCircle), () => Is.EqualTo(2));
         }
 
         [Test]
@@ -318,10 +475,12 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("select drum bank", () =>
             {
                 InputManager.PressKey(Key.LShift);
+                InputManager.Key(Key.R);
+                InputManager.ReleaseKey(Key.LShift);
+
                 InputManager.PressKey(Key.LAlt);
                 InputManager.Key(Key.R);
                 InputManager.ReleaseKey(Key.LAlt);
-                InputManager.ReleaseKey(Key.LShift);
             });
             AddStep("enable clap addition", () => InputManager.Key(Key.R));
 

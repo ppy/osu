@@ -24,9 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private AudioDeviceDropdown dropdown = null!;
 
-        private FormCheckBox? wasapiExperimental;
-
-        private readonly Bindable<SettingsNote.Data?> wasapiExperimentalNote = new Bindable<SettingsNote.Data?>();
+        private FormCheckBox? legacyAudio;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -44,18 +42,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
             {
-                Add(new SettingsItemV2(wasapiExperimental = new FormCheckBox
+                Add(new SettingsItemV2(legacyAudio = new LegacyAudioCheckbox())
                 {
-                    Caption = AudioSettingsStrings.WasapiLabel,
-                    HintText = AudioSettingsStrings.WasapiTooltip,
-                    Current = audio.UseExperimentalWasapi,
-                })
-                {
-                    Keywords = new[] { "wasapi", "latency", "exclusive" },
-                    Note = { BindTarget = wasapiExperimentalNote },
+                    Keywords = new[] { "wasapi", "latency", "exclusive", "legacy", "experimental" },
                 });
 
-                wasapiExperimental.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
+                legacyAudio.Current.ValueChanged += _ => onDeviceChanged(string.Empty);
             }
 
             audio.OnNewDevice += onDeviceChanged;
@@ -65,18 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             onDeviceChanged(string.Empty);
         }
 
-        private void onDeviceChanged(string _)
-        {
-            updateItems();
-
-            if (wasapiExperimental != null)
-            {
-                if (wasapiExperimental.Current.Value)
-                    wasapiExperimentalNote.Value = new SettingsNote.Data(AudioSettingsStrings.WasapiNotice, SettingsNote.Type.Warning);
-                else
-                    wasapiExperimentalNote.Value = null;
-            }
-        }
+        private void onDeviceChanged(string _) => Scheduler.AddOnce(updateItems);
 
         private void updateItems()
         {
@@ -115,6 +96,39 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             protected override LocalisableString GenerateItemText(string item)
                 => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
+        }
+    }
+
+    public partial class LegacyAudioCheckbox : FormCheckBox
+    {
+        private Bindable<bool> configExperimentalAudio = null!;
+
+        public LegacyAudioCheckbox()
+        {
+            Caption = AudioSettingsStrings.LegacyAudioLabel;
+            HintText = AudioSettingsStrings.LegacyAudioTooltip;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            configExperimentalAudio = audio.UseExperimentalWasapi.GetBoundCopy();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Manual two-way binding because we're inverting what the framework exposes.
+            Current.ValueChanged += legacy =>
+            {
+                configExperimentalAudio.Value = !legacy.NewValue;
+            };
+
+            configExperimentalAudio.BindValueChanged(experimental =>
+            {
+                Current.Value = !experimental.NewValue;
+            }, true);
         }
     }
 }

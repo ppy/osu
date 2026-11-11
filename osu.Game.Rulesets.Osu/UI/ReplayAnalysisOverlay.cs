@@ -67,9 +67,9 @@ namespace osu.Game.Rulesets.Osu.UI
             if (requireDisplay)
                 initialise();
 
-            if (ClickMarkers != null) ClickMarkers.Alpha = showClickMarkers.Value ? 1 : 0;
-            if (FrameMarkers != null) FrameMarkers.Alpha = showFrameMarkers.Value ? 1 : 0;
-            if (CursorPath != null) CursorPath.Alpha = showCursorPath.Value ? 1 : 0;
+            ClickMarkers?.Alpha = showClickMarkers.Value ? 1 : 0;
+            FrameMarkers?.Alpha = showFrameMarkers.Value ? 1 : 0;
+            CursorPath?.Alpha = showCursorPath.Value ? 1 : 0;
         }
 
         private void initialise()

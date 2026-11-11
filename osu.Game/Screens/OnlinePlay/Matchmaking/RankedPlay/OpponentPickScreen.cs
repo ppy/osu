@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -11,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Audio;
-using osu.Game.Online.Multiplayer.MatchTypes.RankedPlay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Card;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Hand;
@@ -23,10 +21,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     {
         public CardFlow CenterRow { get; private set; } = null!;
 
-        protected override LocalisableString StageHeading => "Pick Phase";
-        protected override LocalisableString StageCaption => "Waiting for your opponent...";
+        public override bool ShowStageOverlay => true;
+        public override LocalisableString StageHeading => "Pick Phase";
 
-        protected override RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.Red;
+        protected override RankedPlayColourScheme ColourScheme => RankedPlayColourScheme.RED;
 
         private PlayerHandOfCards playerHand = null!;
         private OpponentHandOfCards opponentHand = null!;
@@ -34,16 +32,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         [Resolved]
         private RankedPlayMatchInfo matchInfo { get; set; } = null!;
 
+        private Sample? cardAddSample;
+
         private const int card_play_samples = 2;
         private Sample?[]? cardPlaySamples;
+
+        public OpponentPickScreen()
+        {
+            StageCaption = "Waiting for your opponent...";
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            var matchState = Client.Room?.MatchState as RankedPlayRoomState;
-
-            Debug.Assert(matchState != null);
-
             Children =
             [
                 CenterRow = new CardFlow
@@ -56,15 +57,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
             CenterColumn.Children =
             [
-                playerHand = new PlayerHandOfCards
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Y = 100,
-                    HoverYOffset = 90
-                },
                 opponentHand = new OpponentHandOfCards
                 {
                     Anchor = Anchor.TopCentre,
@@ -72,9 +64,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                 },
+                playerHand = new PlayerHandOfCards
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
+                },
                 new HandReplayRecorder(playerHand),
                 new HandReplayPlayer(matchInfo.OpponentId, opponentHand),
             ];
+
+            cardAddSample = audio.Samples.Get(@"Multiplayer/Matchmaking/Ranked/card-add-1");
 
             cardPlaySamples = new Sample?[card_play_samples];
             for (int i = 0; i < card_play_samples; i++)
@@ -85,24 +86,51 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
         {
             base.OnEntering(previous);
 
-            foreach (var card in matchInfo.PlayerCards)
+            const double stagger = 50;
+            double delay = 0;
+
+            foreach (var item in matchInfo.PlayerCards)
             {
-                playerHand.AddCard(card, c =>
+                double currentDelay = delay;
+
+                if ((previous as DiscardScreen)?.CenterRow.RemoveCard(item, out var card, out var drawQuad) == true)
                 {
-                    c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, DrawHeight), playerHand);
-                });
+                    playerHand.AddCard(card, c =>
+                    {
+                        c.MatchScreenSpaceDrawQuad(drawQuad, playerHand);
+                        c.DelayMovementOnEntering(currentDelay);
+                    });
+                }
+                else
+                {
+                    playerHand.AddCard(item, c =>
+                    {
+                        c.Position = playerHand.BottomCardInsertPosition;
+                        c.DelayMovementOnEntering(currentDelay);
+                    });
+                    Scheduler.AddDelayed(() =>
+                    {
+                        SamplePlaybackHelper.PlayWithRandomPitch(cardAddSample);
+                    }, delay);
+                }
+
+                delay += stagger;
             }
+
+            delay = 0;
 
             foreach (var card in matchInfo.OpponentCards)
             {
+                double currentDelay = delay;
+
                 opponentHand.AddCard(card, c =>
                 {
-                    c.Position = ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), playerHand);
+                    c.Position = opponentHand.BottomCardInsertPosition;
+                    c.DelayMovementOnEntering(currentDelay);
                 });
-            }
 
-            playerHand.UpdateLayout(stagger: 50);
-            opponentHand.UpdateLayout(stagger: 50);
+                delay += 50;
+            }
         }
 
         protected override void LoadComplete()

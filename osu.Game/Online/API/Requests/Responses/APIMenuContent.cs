@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace osu.Game.Online.API.Requests.Responses

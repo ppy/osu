@@ -100,8 +100,10 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestPlacementOfConcurrentObjectWithDuration()
         {
-            AddStep("seek to timing point", () => EditorClock.Seek(2170));
-            AddStep("add hit circle", () => EditorBeatmap.Add(createHitCircle(2170, Vector2.Zero)));
+            const double spinner_start_time = 2170;
+            const double spinner_end_seek_time = 2500;
+
+            AddStep("seek to timing point", () => EditorClock.Seek(spinner_start_time));
 
             AddStep("choose spinner placement tool", () =>
             {
@@ -116,8 +118,13 @@ namespace osu.Game.Tests.Visual.Editing
             });
             AddStep("end placing spinner", () =>
             {
-                EditorClock.Seek(2500);
+                EditorClock.Seek(spinner_end_seek_time);
                 InputManager.Click(MouseButton.Right);
+            });
+
+            AddStep("add hit circle mid-spinner", () =>
+            {
+                EditorBeatmap.Add(createHitCircle((spinner_start_time + spinner_end_seek_time) / 2, Vector2.Zero));
             });
 
             AddAssert("two timeline blueprints present", () => Editor.ChildrenOfType<TimelineHitObjectBlueprint>().Count() == 2);

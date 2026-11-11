@@ -5,13 +5,9 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -63,12 +59,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private readonly BindableWithCurrent<string> current = new BindableWithCurrent<string>();
 
         /// <summary>
-        /// Caption describing this slider bar, displayed on top of the controls.
+        /// Caption describing this control, displayed on top of the controls.
         /// </summary>
         public LocalisableString Caption { get; init; }
 
         /// <summary>
-        /// Hint text containing an extended description of this slider bar, displayed in a tooltip when hovering the caption.
+        /// Hint text containing an extended description of this control, displayed in a tooltip when hovering the caption.
         /// </summary>
         public LocalisableString HintText { get; init; }
 
@@ -77,17 +73,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
 
+        /// <summary>
+        /// Maximum allowed length of text.
+        /// </summary>
+        public int? LengthLimit { get; init; }
+
+        public bool SelectAllOnFocus { get; init; }
+
         private FormControlBackground background = null!;
-        private Box flashLayer = null!;
         private InnerTextBox textBox = null!;
         private FormFieldCaption caption = null!;
         private IFocusManager focusManager = null!;
+
+        protected Container CaptionContainer { get; private set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -95,11 +99,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
             InternalChildren = new Drawable[]
             {
                 background = new FormControlBackground(),
-                flashLayer = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Transparent,
-                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -108,18 +107,30 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Spacing = new Vector2(0, 4),
                     Children = new Drawable[]
                     {
-                        caption = new FormFieldCaption
+                        CaptionContainer = new Container
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
-                            Caption = Caption,
-                            TooltipText = HintText,
+                            Children = new Drawable[]
+                            {
+                                caption = new FormFieldCaption
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Caption = Caption,
+                                    TooltipText = HintText,
+                                },
+                            },
                         },
                         textBox = CreateTextBox().With(t =>
                         {
                             t.RelativeSizeAxes = Axes.X;
                             t.Width = 1;
                             t.PlaceholderText = PlaceholderText;
+                            t.LengthLimit = LengthLimit;
+                            t.SelectAllOnFocus = SelectAllOnFocus;
                             t.Current = Current;
                             t.CommitOnFocusLost = true;
                             t.OnCommit += (textBox, newText) =>
@@ -127,16 +138,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 OnCommit?.Invoke(textBox, newText);
 
                                 if (!current.Disabled && !ReadOnly)
-                                {
-                                    flashLayer.Colour = ColourInfo.GradientVertical(colourProvider.Dark2.Opacity(0), colourProvider.Dark2);
-                                    flashLayer.FadeOutFromOne(800, Easing.OutQuint);
-                                }
+                                    background.FlashOnCommit();
                             };
-                            t.OnInputError = () =>
-                            {
-                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
-                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
-                            };
+                            t.OnInputError = () => background.FlashOnInputError();
                             t.TabbableContentContainer = tabbableContentContainer;
                         }),
                     },
@@ -214,6 +218,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Height = 16;
                 TextContainer.Height = 1;
                 BackgroundUnfocused = BackgroundFocused = BackgroundCommit = Colour4.Transparent;
+                CornerRadius = 0;
             }
 
             protected override SpriteText CreatePlaceholder() => base.CreatePlaceholder().With(t => t.Margin = default);
@@ -248,7 +253,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool IsDisabled => current.Disabled;
 
-        public IEnumerable<LocalisableString> FilterTerms => Caption.Yield();
+        public IEnumerable<LocalisableString> FilterTerms => new[] { Caption, HintText };
 
         public float MainDrawHeight => DrawHeight;
     }

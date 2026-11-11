@@ -97,7 +97,7 @@ namespace osu.Game.Online.Notifications.WebSocket
             }
         }
 
-        public async Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = default)
+        public async Task SendAsync(SocketMessage message, CancellationToken? cancellationToken = null)
         {
             if (socket.State != WebSocketState.Open)
                 return;

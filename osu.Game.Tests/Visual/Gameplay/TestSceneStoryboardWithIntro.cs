@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private Storyboard createStoryboard(double startTime)
         {
             var storyboard = new Storyboard();
-            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            var sprite = new StoryboardSprite(StoryboardElementSource.Beatmap, "unknown", Anchor.TopLeft, Vector2.Zero);
             sprite.Commands.AddAlpha(Easing.None, startTime, 0, 0, 1);
             storyboard.GetLayer("Background").Add(sprite);
             return storyboard;

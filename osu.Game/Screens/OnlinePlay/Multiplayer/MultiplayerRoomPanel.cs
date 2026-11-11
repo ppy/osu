@@ -3,13 +3,14 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -34,12 +35,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            ButtonsContainer.Add(ChangeSettingsButton = new PurpleRoundedButton
+            ButtonsContainer.Add(ChangeSettingsButton = new ShearedButton
             {
                 RelativeSizeAxes = Axes.Y,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(120, 0.7f),
+                Size = new Vector2(130, 1),
+                DarkerColour = Color4Extensions.FromHex(@"593790"),
+                LighterColour = Color4Extensions.FromHex(@"593790").Lighten(0.5f),
                 Text = "Change settings",
                 Action = () => OnEdit?.Invoke()
             });
@@ -58,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null || client.LocalUser == null)
                 return;
 
-            ChangeSettingsButton.Alpha = client.IsHost ? 1 : 0;
+            ChangeSettingsButton.Alpha = client.IsHost || client.IsReferee ? 1 : 0;
             SelectedItem.Value = new PlaylistItem(client.Room.CurrentPlaylistItem);
         });
 

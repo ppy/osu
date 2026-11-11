@@ -6,6 +6,8 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -71,6 +73,41 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("slider length shrunk", () => slider.Path.Distance < distanceBefore);
         }
 
+        [Test]
+        public void TestScalingMultipleSlidersClampedToEdge()
+        {
+            AddStep("Add slider", () =>
+            {
+                EditorBeatmap.Add(new Slider
+                {
+                    StartTime = EditorClock.CurrentTime,
+                    Position = new Vector2(20, 50),
+                    Path = new SliderPath
+                    (
+                        PathType.LINEAR,
+                        [Vector2.Zero, new Vector2(-20.934783f, 70)]
+                    )
+                });
+                EditorBeatmap.Add(new Slider
+                {
+                    StartTime = EditorClock.CurrentTime,
+                    Position = new Vector2(70, 220),
+                    Path = new SliderPath
+                    (
+                        PathType.LINEAR,
+                        [Vector2.Zero, new Vector2(20, -70)]
+                    )
+                });
+            });
+
+            AddStep("select everything", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+
+            AddStep("move mouse to handle", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<SelectionBoxScaleHandle>().Single(h => h.Anchor == Anchor.BottomRight)));
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+            moveMouse(new Vector2(50, 300));
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
+        }
+
         private void moveMouse(Vector2 pos) =>
             AddStep($"move mouse to {pos}", () => InputManager.MoveMouseTo(playfield.ToScreenSpace(pos)));
     }
@@ -102,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             for (int i = 0; i < 100; i++)
             {
-                Assert.True(Precision.AlmostEquals(sliderPathPerfect.PositionAt(i / 100.0f), sliderPathBezier.PositionAt(i / 100.0f)));
+                ClassicAssert.True(Precision.AlmostEquals(sliderPathPerfect.PositionAt(i / 100.0f), sliderPathBezier.PositionAt(i / 100.0f)));
             }
         }
 
@@ -174,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 double theta = circularArcProperties.ThetaStart + (circularArcProperties.Direction * progress * circularArcProperties.ThetaRange);
                 Vector2 vector = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * circularArcProperties.Radius;
 
-                Assert.True(Precision.AlmostEquals(circularArcProperties.Centre + vector, path.PositionAt(progress), 0.01f),
+                ClassicAssert.True(Precision.AlmostEquals(circularArcProperties.Centre + vector, path.PositionAt(progress), 0.01f),
                     "A perfect circle with points " + string.Join(", ", path.ControlPoints.Select(x => x.Position)) + " and radius" + circularArcProperties.Radius + "from SliderPath does not almost equal a theoretical perfect circle with " + subpoints + " subpoints"
                     + ": " + (circularArcProperties.Centre + vector) + " - " + path.PositionAt(progress)
                     + " = " + (circularArcProperties.Centre + vector - path.PositionAt(progress))

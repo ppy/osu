@@ -5,20 +5,25 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -48,7 +53,11 @@ namespace osu.Game.Screens.Play
         [CanBeNull]
         private UserStatisticsWatcher userStatisticsWatcher { get; set; }
 
-        private readonly object scoreSubmissionLock = new object();
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        private INotificationOverlay notifications { get; set; }
+
+        private readonly Lock scoreSubmissionLock = new Lock();
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
@@ -99,9 +108,9 @@ namespace osu.Game.Screens.Play
                 return false;
             }
 
-            if (!api.IsLoggedIn)
+            if (!api.IsLoggedIn || api.State.Value == APIState.Failing)
             {
-                handleTokenFailure(new InvalidOperationException("API is not online."));
+                handleTokenFailure(new InvalidOperationException("Online functionality is not available."), displayNotification: api.State.Value == APIState.Failing);
                 return false;
             }
 
@@ -137,35 +146,14 @@ namespace osu.Game.Screens.Play
 
                 if (displayNotification || shouldExit)
                 {
-                    string whatWillHappen = shouldExit
-                        ? "Play in this state is not permitted."
-                        : "Your score will not be submitted.";
+                    LocalisableString whatWillHappen = shouldExit
+                        ? NotificationsStrings.CannotStartPlay
+                        : NotificationsStrings.ScoreWillNotBeSubmitted;
 
                     if (string.IsNullOrEmpty(exception.Message))
-                        Logger.Error(exception, $"Failed to retrieve a score submission token.\n\n{whatWillHappen}");
+                        notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, NotificationsStrings.FailedToRetrieveScoreSubmissionToken));
                     else
-                    {
-                        switch (exception.Message)
-                        {
-                            case @"missing token header":
-                            case @"invalid client hash":
-                            case @"invalid verification hash":
-                                Logger.Log($"Please ensure that you are using the latest version of the official game releases.\n\n{whatWillHappen}", level: LogLevel.Important);
-                                break;
-
-                            case @"invalid or missing beatmap_hash":
-                                Logger.Log($"This beatmap does not match the online version. Please update or redownload it.\n\n{whatWillHappen}", level: LogLevel.Important);
-                                break;
-
-                            case @"expired token":
-                                Logger.Log($"Your system clock is set incorrectly. Please check your system time, date and timezone.\n\n{whatWillHappen}", level: LogLevel.Important);
-                                break;
-
-                            default:
-                                Logger.Log($"{whatWillHappen} {exception.Message}", level: LogLevel.Important);
-                                break;
-                        }
-                    }
+                        notifications?.Post(new ScoreSubmissionFailureNotification(whatWillHappen, getUserFacingAPIError(exception)));
                 }
 
                 if (shouldExit)
@@ -211,7 +199,7 @@ namespace osu.Game.Screens.Play
             score.ScoreInfo.Date = DateTimeOffset.Now;
 
             await submitScore(score).ConfigureAwait(false);
-            spectatorClient.EndPlaying(GameplayState);
+            spectatorClient.EndPlaying(token, GameplayState);
             userStatisticsWatcher?.RegisterForStatisticsUpdateAfter(score.ScoreInfo);
         }
 
@@ -227,8 +215,7 @@ namespace osu.Game.Screens.Play
             realm.WriteAsync(r =>
             {
                 var realmBeatmap = r.Find<BeatmapInfo>(Beatmap.Value.BeatmapInfo.ID);
-                if (realmBeatmap != null)
-                    realmBeatmap.LastPlayed = DateTimeOffset.Now;
+                realmBeatmap?.LastPlayed = DateTimeOffset.Now;
             });
 
             spectatorClient.BeginPlaying(token, GameplayState, Score);
@@ -270,7 +257,7 @@ namespace osu.Game.Screens.Play
                 Task.Run(async () =>
                 {
                     await submitScore(scoreCopy).ConfigureAwait(false);
-                    spectatorClient.EndPlaying(GameplayState);
+                    spectatorClient.EndPlaying(token, GameplayState);
                 }).FireAndForget();
             }
         }
@@ -346,12 +333,39 @@ namespace osu.Game.Screens.Play
 
             request.Failure += e =>
             {
-                Logger.Error(e, $"Failed to submit score (token:{token.Value}): {e.Message}");
+                Logger.Error(e, $"{getUserFacingAPIError(e)}\n\nScore was not submitted (id: {token.Value})");
                 scoreSubmissionSource.SetResult(false);
             };
 
             api.Queue(request);
             return scoreSubmissionSource.Task;
+        }
+
+        private static LocalisableString getUserFacingAPIError(Exception exception)
+        {
+            switch (exception.Message)
+            {
+                case @"missing token header":
+                case @"invalid client hash":
+                case @"invalid verification hash":
+                case @"invalid token":
+                case @"outdated client":
+                    return NotificationsStrings.PreventSubmittingWithOutdatedClient;
+
+                case @"invalid or missing beatmap_hash":
+                    return NotificationsStrings.PreventSubmittingWithInvalidBeatmapHash;
+
+                case @"expired token":
+                    return NotificationsStrings.PreventSubmittingWithExpiredToken;
+
+                // Exception message, may be actually displayed to user.
+                // See https://github.com/ppy/osu/blob/382c3bf717b7736bc74387b82249757ef5b12947/osu.Game/Screens/Play/SubmittingPlayer.cs#L111
+                case @"Online functionality is not available.":
+                    return NotificationsStrings.OnlineFunctionalityIsNotAvailable;
+
+                default:
+                    return exception.Message;
+            }
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score)

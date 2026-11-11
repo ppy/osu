@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private readonly bool hasNumber;
 
         protected LegacyKiaiFlashingDrawable CircleSprite = null!;
-        protected LegacyKiaiFlashingDrawable OverlaySprite = null!;
+        protected Sprite OverlaySprite = null!;
 
         protected Container OverlayLayer { get; private set; } = null!;
 
@@ -45,6 +46,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
+
+        [Resolved]
+        private OsuRulesetConfigManager? osuConfig { get; set; }
 
         public LegacyMainCirclePiece(string? priorityLookupPrefix = null, bool hasNumber = true)
         {
@@ -93,12 +97,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = OverlaySprite = new LegacyKiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(@$"{circleName}overlay")?.WithMaximumSize(maxSize) })
+                    Child = OverlaySprite = new Sprite
                     {
+                        Texture = skin.GetTexture(@$"{circleName}overlay")?.WithMaximumSize(maxSize),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                }
+                },
+                CircleSprite.FlashingDrawable.CreateProxy(),
             };
 
             if (hasNumber)
@@ -142,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     255);
 
                 CircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue);
-                OverlaySprite.KiaiGlowColour = CircleSprite.KiaiGlowColour = LegacyColourCompatibility.DisallowZeroAlpha(kiaiTintColour);
+                CircleSprite.KiaiGlowColour = LegacyColourCompatibility.DisallowZeroAlpha(kiaiTintColour);
             }, true);
 
             if (hasNumber)
@@ -175,8 +181,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             decimal? legacyVersion = skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value;
 
                             if (legacyVersion > 1.0m)
+                            {
                                 // legacy skins of version 2.0 and newer only apply very short fade out to the number piece.
-                                hitCircleText.FadeOut(legacy_fade_duration / 4);
+                                //
+                                // if the new hit animation setting is disabled, the fade is bypassed here to avoid users abusing this to achieve "even better" results.
+                                // note that this means the number fades slightly slower than other components when hit animations are off.
+                                // in practice, the fade is so short this is not perceivable.
+                                if (osuConfig?.Get<bool>(OsuRulesetSetting.HitAnimations) != false)
+                                    hitCircleText.FadeOut(legacy_fade_duration / 4);
+                            }
                             else
                             {
                                 // old skins scale and fade it normally along other pieces.

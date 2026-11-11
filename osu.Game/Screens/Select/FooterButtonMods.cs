@@ -13,16 +13,18 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Utils;
@@ -32,7 +34,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
-    public partial class FooterButtonMods : ScreenFooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    public partial class FooterButtonMods : ScreenFooterButton
     {
         public Action? RequestDeselectAllMods { get; init; }
 
@@ -40,12 +42,20 @@ namespace osu.Game.Screens.Select
 
         private const float mod_display_portion = 0.65f;
 
-        private readonly BindableWithCurrent<IReadOnlyList<Mod>> current = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        private readonly BindableWithCurrent<IReadOnlyList<Mod>> mods = new BindableWithCurrent<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        public Bindable<IReadOnlyList<Mod>> Current
+        public Bindable<IReadOnlyList<Mod>> Mods
         {
-            get => current.Current;
-            set => current.Current = value;
+            get => mods.Current;
+            set => mods.Current = value;
+        }
+
+        private readonly BindableWithCurrent<RulesetInfo?> ruleset = new BindableWithCurrent<RulesetInfo?>();
+
+        public Bindable<RulesetInfo?> Ruleset
+        {
+            get => ruleset.Current;
+            set => ruleset.Current = value;
         }
 
         private Container modDisplayBar = null!;
@@ -68,6 +78,9 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private OsuGameBase game { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         private IBindable<Language> currentLanguage = null!;
 
@@ -145,10 +158,10 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     Shear = -OsuGame.SHEAR,
                                     Scale = new Vector2(0.5f),
-                                    Current = { BindTarget = Current },
+                                    Current = { BindTarget = Mods },
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
                                 },
-                                overflowModCountDisplay = new ModCountText { Mods = { BindTarget = Current }, },
+                                overflowModCountDisplay = new ModCountText { Mods = { BindTarget = Mods }, },
                             }
                         },
                     }
@@ -165,7 +178,9 @@ namespace osu.Game.Screens.Select
             currentLanguage = game.CurrentLanguage.GetBoundCopy();
             currentLanguage.BindValueChanged(_ => ScheduleAfterChildren(updateDisplay));
 
-            Current.BindValueChanged(m =>
+            Ruleset.BindValueChanged(_ => updateDisplay());
+            beatmap.BindValueChanged(_ => updateDisplay());
+            Mods.BindValueChanged(m =>
             {
                 modSettingChangeTracker?.Dispose();
 
@@ -198,7 +213,7 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplay()
         {
-            if (Current.Value.Count == 0)
+            if (Mods.Value.Count == 0)
             {
                 modDisplayBar.MoveToY(20, duration, easing);
                 modDisplayBar.FadeOut(duration, easing);
@@ -213,7 +228,7 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                if (Current.Value.Any(m => !m.Ranked))
+                if (Mods.Value.Any(m => !m.Ranked))
                 {
                     unrankedBadge.MoveToX(0, duration, easing);
                     unrankedBadge.FadeIn(duration, easing);
@@ -234,7 +249,8 @@ namespace osu.Game.Screens.Select
                 modDisplay.FadeIn(duration, easing);
             }
 
-            double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
+            var scoreMultiplierCalculator = Ruleset.Value?.CreateInstance().CreateScoreMultiplierCalculator(new ScoreMultiplierContext(beatmap.Value.BeatmapInfo.Difficulty));
+            double multiplier = scoreMultiplierCalculator?.CalculateFor(Mods.Value) ?? 1;
             multiplierText.Text = ModUtils.FormatScoreMultiplier(multiplier);
 
             if (multiplier > 1)
@@ -249,7 +265,7 @@ namespace osu.Game.Screens.Select
         {
             base.Update();
 
-            if (Current.Value.Count == 0)
+            if (Mods.Value.Count == 0)
                 return;
 
             if (modDisplay.DrawWidth * modDisplay.Scale.X > modContainer.DrawWidth)

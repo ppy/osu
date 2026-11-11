@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings
             set
             {
                 if (value.Default == null)
-                    throw new InvalidOperationException($"Bindable settings of type {nameof(Bindable<string>)} should have a non-null default value.");
+                    throw new InvalidOperationException("Bindable settings of string type should have a non-null default value.");
 
                 base.Current = value;
             }

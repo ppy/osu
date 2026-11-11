@@ -13,6 +13,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osuTK;
@@ -54,9 +55,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             void endOperation() => clickOperation.Dispose();
         }
 
+        private Bindable<bool> preferNoVideo = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
+
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
             operationInProgress.BindValueChanged(_ => updateState());
 
@@ -154,10 +159,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     if (beatmapSet == null)
                         return;
 
-                    if (beatmaps.IsAvailableLocally(new BeatmapSetInfo { OnlineID = beatmapSet.OnlineID }))
+                    if (beatmaps.IsAvailableLocally(new APIBeatmap { OnlineID = item.BeatmapID }))
                         return;
 
-                    beatmapDownloader.Download(beatmapSet);
+                    beatmapDownloader.Download(beatmapSet, preferNoVideo.Value);
                 }));
         }
 

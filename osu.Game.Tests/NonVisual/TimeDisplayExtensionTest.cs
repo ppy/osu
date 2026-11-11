@@ -3,6 +3,7 @@
 
 using System;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using osu.Game.Extensions;
 
 namespace osu.Game.Tests.NonVisual
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.NonVisual
         [TestCaseSource(nameof(editor_formatted_duration_tests))]
         public void TestEditorFormat(TimeSpan input, string expectedOutput)
         {
-            Assert.AreEqual(expectedOutput, input.ToEditorFormattedString());
+            ClassicAssert.AreEqual(expectedOutput, input.ToEditorFormattedString());
         }
 
         private static readonly object[][] formatted_duration_tests =
@@ -35,7 +36,7 @@ namespace osu.Game.Tests.NonVisual
         [TestCaseSource(nameof(formatted_duration_tests))]
         public void TestFormattedDuration(TimeSpan input, string expectedOutput)
         {
-            Assert.AreEqual(expectedOutput, input.ToFormattedDuration().ToString());
+            ClassicAssert.AreEqual(expectedOutput, input.ToFormattedDuration().ToString());
         }
     }
 }

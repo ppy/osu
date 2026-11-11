@@ -56,6 +56,17 @@ namespace osu.Game.Tests.Visual.Online
                             {
                                 Username = @"flyte",
                                 Id = 3103765,
+                                Rank = new APIUser.GlobalRank
+                                {
+                                    Rank = null,
+                                },
+                                Team = new APITeam
+                                {
+                                    Id = 2,
+                                    Name = "mom?",
+                                    ShortName = "MOM",
+                                    FlagUrl = "https://assets.ppy.sh/teams/flag/1/b46fb10dbfd8a35dc50e6c00296c0dc6172dffc3ed3d3a4b379277ba498399fe.png",
+                                },
                                 CountryCode = CountryCode.JP,
                                 CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                                 WasRecentlyOnline = true
@@ -64,6 +75,17 @@ namespace osu.Game.Tests.Visual.Online
                             {
                                 Username = @"peppy",
                                 Id = 2,
+                                Rank = new APIUser.GlobalRank
+                                {
+                                    Rank = 9999999,
+                                },
+                                Team = new APITeam
+                                {
+                                    Id = 2,
+                                    Name = "mom?",
+                                    ShortName = "MOM",
+                                    FlagUrl = "https://assets.ppy.sh/teams/flag/1/b46fb10dbfd8a35dc50e6c00296c0dc6172dffc3ed3d3a4b379277ba498399fe.png",
+                                },
                                 CountryCode = CountryCode.AU,
                                 CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                                 IsSupporter = true,
@@ -72,7 +94,18 @@ namespace osu.Game.Tests.Visual.Online
                             new OnlineUserListPanel(new APIUser
                             {
                                 Username = @"flyte",
+                                Rank = new APIUser.GlobalRank
+                                {
+                                    Rank = null,
+                                },
                                 Id = 3103765,
+                                Team = new APITeam
+                                {
+                                    Id = 2,
+                                    Name = "mom?",
+                                    ShortName = "MOM",
+                                    FlagUrl = "https://assets.ppy.sh/teams/flag/1/b46fb10dbfd8a35dc50e6c00296c0dc6172dffc3ed3d3a4b379277ba498399fe.png",
+                                },
                                 CountryCode = CountryCode.JP,
                                 CoverUrl = @"https://assets.ppy.sh/user-cover-presets/1/df28696b58541a9e67f6755918951d542d93bdf1da41720fcca2fd2c1ea8cf51.jpeg",
                                 WasRecentlyOnline = true
@@ -81,6 +114,17 @@ namespace osu.Game.Tests.Visual.Online
                             {
                                 Username = @"peppy",
                                 Id = 2,
+                                Rank = new APIUser.GlobalRank
+                                {
+                                    Rank = 9999999,
+                                },
+                                Team = new APITeam
+                                {
+                                    Id = 2,
+                                    Name = "mom?",
+                                    ShortName = "MOM",
+                                    FlagUrl = "https://assets.ppy.sh/teams/flag/1/b46fb10dbfd8a35dc50e6c00296c0dc6172dffc3ed3d3a4b379277ba498399fe.png",
+                                },
                                 CountryCode = CountryCode.AU,
                                 CoverUrl = @"https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                                 LastVisit = DateTimeOffset.Now

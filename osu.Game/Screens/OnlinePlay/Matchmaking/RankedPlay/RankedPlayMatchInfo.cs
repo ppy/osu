@@ -74,6 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         public bool IsOwnTurn => RoomState.ActiveUserId == client.LocalUser?.UserID;
 
+        public bool IsOpponentTurn => RoomState.ActiveUserId == OpponentId;
+
         public int CurrentRound => RoomState.CurrentRound;
 
         public int OpponentId => RoomState.Users.Keys.Single(u => u != client.LocalUser?.UserID);

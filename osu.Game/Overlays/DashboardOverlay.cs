@@ -2,27 +2,34 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Online.Metadata;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.CurrentlyOnline;
 using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Overlays.Dashboard.UserSearch;
 
 namespace osu.Game.Overlays
 {
     public partial class DashboardOverlay : TabbableOnlineOverlay<DashboardOverlayHeader, DashboardOverlayTabs>
     {
-        [Resolved]
-        private MetadataClient metadataClient { get; set; } = null!;
-
-        private IBindable<bool> metadataConnected = null!;
-        private IDisposable? userPresenceWatchToken;
+        private readonly BindableBool loading = new BindableBool();
 
         public DashboardOverlay()
             : base(OverlayColourScheme.Purple)
         {
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            loading.BindValueChanged(loading =>
+            {
+                if (loading.NewValue)
+                    Loading.Show();
+                else
+                    Loading.Hide();
+            }, true);
         }
 
         protected override DashboardOverlayHeader CreateHeader() => new DashboardOverlayHeader();
@@ -34,39 +41,29 @@ namespace osu.Game.Overlays
             switch (tab)
             {
                 case DashboardOverlayTabs.Friends:
-                    LoadDisplay(new FriendDisplay());
+                    LoadDisplay(new FriendDisplay
+                    {
+                        Loading = { BindTarget = loading },
+                    });
                     break;
 
                 case DashboardOverlayTabs.CurrentlyPlaying:
-                    LoadDisplay(new CurrentlyOnlineDisplay());
+                    LoadDisplay(new CurrentlyOnlineDisplay
+                    {
+                        Loading = { BindTarget = loading },
+                        OverlayState = { BindTarget = State }
+                    });
+                    break;
+
+                case DashboardOverlayTabs.UserSearch:
+                    LoadDisplay(new UserSearchDisplay
+                    {
+                        Loading = { BindTarget = loading },
+                    });
                     break;
 
                 default:
                     throw new NotImplementedException($"Display for {tab} tab is not implemented");
-            }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            metadataConnected = metadataClient.IsConnected.GetBoundCopy();
-            metadataConnected.BindValueChanged(_ => updateUserPresenceState());
-            State.BindValueChanged(_ => updateUserPresenceState());
-            updateUserPresenceState();
-        }
-
-        private void updateUserPresenceState()
-        {
-            if (!metadataConnected.Value)
-                return;
-
-            if (State.Value == Visibility.Visible)
-                userPresenceWatchToken ??= metadataClient.BeginWatchingUserPresence();
-            else
-            {
-                userPresenceWatchToken?.Dispose();
-                userPresenceWatchToken = null;
             }
         }
     }
