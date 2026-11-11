@@ -11,12 +11,12 @@
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <Version>0.0.0</Version>
     <FileVersion>0.0.0</FileVersion>
+    <CETCompat>false</CETCompat>
   </PropertyGroup>
 
   <!-- Required for deployment. -->
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <StartupHookSupport>false</StartupHookSupport>
-    <CETCompat>false</CETCompat>
   </PropertyGroup>
 
   <PropertyGroup>

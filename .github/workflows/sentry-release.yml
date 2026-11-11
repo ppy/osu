@@ -22,8 +22,7 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ppy
-          SENTRY_PROJECT: osu
-          SENTRY_URL: https://sentry.ppy.sh/
+          SENTRY_PROJECT: osu-lazer
         with:
           environment: production
-          version: osu@${{ github.ref_name }}
+          version: osu-lazer@${{ github.ref_name }}

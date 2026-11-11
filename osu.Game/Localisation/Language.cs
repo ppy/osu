@@ -42,6 +42,9 @@ namespace osu.Game.Localisation
         [Description(@"español")]
         es,
 
+        [Description(@"español (Latinoamérica)")]
+        es_419,
+
         // TODO: Requires Arabic glyphs to be added to resources (and possibly also RTL support).
         // [Description(@"فارسی")]
         // fa_ir,
@@ -80,10 +83,10 @@ namespace osu.Game.Localisation
         [Description(@"lietuvių kalba")]
         lt,
 
-        [Description(@"Latviešu")]
+        [Description(@"latviešu valoda")]
         lv_lv,
 
-        [Description(@"Melayu")]
+        [Description(@"bahasa Melayu")]
         ms_my,
 
         [Description(@"Nederlands")]

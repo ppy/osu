@@ -28,6 +28,7 @@ using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Volume;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Match.Gameplay;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
@@ -43,8 +44,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
     [Cached]
     public sealed partial class RankedPlayScreen : OsuScreen, IPreviewTrackOwner, IHandlePresentBeatmap
     {
-        protected override bool InitialBackButtonVisibility => false;
-
         public override bool? ApplyModTrackAdjustments => true;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -126,13 +125,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
             this.room = room;
 
             Activity.Value = new UserActivity.InLobby(room);
+            FooterContent.Value = ScreenFooterContent.None;
 
             InternalChildren = new Drawable[]
             {
                 matchInfo = new RankedPlayMatchInfo(),
                 backgroundMusic = new BackgroundMusicManager(),
                 new RankedPlayBeatmapAvailabilityTracker(),
-                new GlobalScrollAdjustsVolume(),
+                new ScrollAdjustsVolume(),
                 content = new InverseScalingDrawSizePreservingFillContainer
                 {
                     Anchor = Anchor.Centre,

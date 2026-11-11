@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             bool didSelect = false;
 
-            configScaleOrigin.BindValueChanged(val =>
+            configScaleOrigin.BindValueChanged(_ =>
             {
                 switch (configScaleOrigin.Value)
                 {

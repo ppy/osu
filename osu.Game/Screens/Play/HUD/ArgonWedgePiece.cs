@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             InvertShear.BindValueChanged(v => Shear = new Vector2(0.8f, 0f) * (v.NewValue ? -1 : 1), true);
-            AccentColour.BindValueChanged(c => InternalChild.Colour = ColourInfo.GradientVertical(AccentColour.Value.Opacity(0.0f), AccentColour.Value.Opacity(0.25f)), true);
+            AccentColour.BindValueChanged(_ => InternalChild.Colour = ColourInfo.GradientVertical(AccentColour.Value.Opacity(0.0f), AccentColour.Value.Opacity(0.25f)), true);
         }
     }
 }

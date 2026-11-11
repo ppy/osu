@@ -26,7 +26,7 @@ namespace osu.Game.Scoring
     /// A realm model containing metadata for a single score.
     /// </summary>
     [MapTo("Score")]
-    public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
+    public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreWithReplayData
     {
         [PrimaryKey]
         public Guid ID { get; set; }
@@ -209,9 +209,18 @@ namespace osu.Game.Scoring
         [MapTo(nameof(Rank))]
         public int RankInt { get; set; }
 
+        #region IScoreWithReplayData
+
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
         IBeatmapInfo? IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
+        IEnumerable<IConfiguredMod> IScoreInfo.Mods => APIMods;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.Statistics => Statistics;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.MaximumStatistics => MaximumStatistics;
+        IReadOnlyList<HitEvent> IScoreWithReplayData.HitEvents => HitEvents;
+        IReadOnlyList<HealthValue> IScoreWithReplayData.HealthGraph => HealthGraph;
+
+        #endregion
 
         #region Properties required to make things work with existing usages
 
@@ -221,6 +230,9 @@ namespace osu.Game.Scoring
 
         [Ignored]
         public List<HitEvent> HitEvents { get; set; } = new List<HitEvent>();
+
+        [Ignored]
+        public List<HealthValue> HealthGraph { get; set; } = new List<HealthValue>();
 
         public ScoreInfo DeepClone()
         {
@@ -359,36 +371,6 @@ namespace osu.Game.Scoring
             ModsJson = APIMods.Length > 0
                 ? JsonConvert.SerializeObject(APIMods)
                 : string.Empty;
-        }
-
-        public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
-        {
-            foreach (var r in Ruleset.CreateInstance().GetHitResultsForDisplay())
-            {
-                int value = Statistics.GetValueOrDefault(r.result);
-
-                switch (r.result)
-                {
-                    case HitResult.SmallTickHit:
-                    case HitResult.LargeTickHit:
-                    case HitResult.SliderTailHit:
-                    case HitResult.LargeBonus:
-                    case HitResult.SmallBonus:
-                        if (MaximumStatistics.TryGetValue(r.result, out int count) && count > 0)
-                            yield return new HitResultDisplayStatistic(r.result, value, count, r.displayName);
-
-                        break;
-
-                    case HitResult.SmallTickMiss:
-                    case HitResult.LargeTickMiss:
-                        break;
-
-                    default:
-                        yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
-
-                        break;
-                }
-            }
         }
 
         #endregion

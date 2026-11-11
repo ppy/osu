@@ -14,6 +14,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Replays.Legacy;
@@ -205,6 +206,9 @@ namespace osu.Game.Online.Spectator
             {
                 if (isPlaying)
                     throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
+
+                if (!score.ScoreInfo.Ruleset.IsLegacyRuleset())
+                    return;
 
                 // transfer state at point of beginning play
                 currentState.BeatmapID = score.ScoreInfo.BeatmapInfo!.OnlineID;
