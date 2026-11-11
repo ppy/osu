@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Setup
                 new RoundedButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = LocalisableString.Interpolate($@"{EditorSetupStrings.SyncMetadataWithAllDifficulties}..."),
+                    Text = EditorSetupStrings.SyncMetadataWithAllDifficulties,
                     TooltipText = EditorSetupStrings.SyncMetadataWithAllDifficultiesTooltip,
                     Margin = new MarginPadding { Top = 10 },
                     Action = () => dialogOverlay?.Push(new SyncMetadataConfirmationDialog(syncMetadataToAllOtherDifficulties)),
