@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
 
             // Repetitive spacing nerf: it is harder to catch irregular distances, especially in case of non-hyperdashes which require one to "miss the rhythm on purpose".
             // Penalty is given based on the ratio between the current (incoming) normalised spacing and the previous normalised spacing.
-            if (catchLast != null)
+            if (current.Index >= 1)
             {
                 double repetitiveSpacingWeight = 0;
 
