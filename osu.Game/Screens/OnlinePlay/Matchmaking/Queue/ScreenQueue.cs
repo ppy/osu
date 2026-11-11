@@ -97,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private DrawableSample waitingLoop = null!;
         private ScheduledDelegate? pushScreenDelegate;
 
-        private int? userRating;
+        private MatchmakingUserStats? userStats;
 
         private GridContainer mainGrid = null!;
 
@@ -432,10 +432,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                            }), cancellation.Token);
 
             // Global (incremental) updates will not contain the user rating, so keep the one we already received from initial status data.
-            if (status.UserRating != null)
-                userRating = status.UserRating;
+            // The rank value can be null if the rating is provisional, so we don't check for it here.
+            if (status.UserRating != null && status.UserSigma != null)
+                userStats = new MatchmakingUserStats(status.UserRating.Value, status.UserSigma.Value, status.UserRank);
 
-            ratingGraph.SetData(status.RatingDistribution, userRating);
+            ratingGraph.SetData(status.RatingDistribution, userStats?.Rating);
 
             loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
         });
@@ -491,7 +492,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             resultPanelContainer.Clear();
             resultPanelContainer.LayoutDuration = 0;
-            userRating = null;
+            userStats = null;
             ratingGraph.SetData([], null);
 
             cloud.Users = Array.Empty<APIUser>();
