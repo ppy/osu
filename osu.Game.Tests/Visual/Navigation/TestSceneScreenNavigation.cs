@@ -35,6 +35,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -704,7 +705,7 @@ namespace osu.Game.Tests.Visual.Navigation
             {
                 var dropdownItem = Game
                                    .ChildrenOfType<BeatmapLeaderboardWedge>().First()
-                                   .ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.ToString() == "Delete");
+                                   .ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.Value == CommonStrings.ButtonsDelete);
 
                 InputManager.MoveMouseTo(dropdownItem);
                 InputManager.Click(MouseButton.Left);
