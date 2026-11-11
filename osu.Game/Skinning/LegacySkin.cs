@@ -18,11 +18,14 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.RankingV2.Legacy;
+using osu.Game.Skinning.Components;
 using osuTK;
 using osuTK.Graphics;
 
@@ -470,6 +473,113 @@ namespace osu.Game.Skinning
                                     // for the sake of hacky full screen area health bars
                                     new LegacyHealthDisplay(),
                                 }
+                            };
+
+                        case GlobalSkinnableContainers.Results:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var backgroundOverlay = container.OfType<LegacyRankingBackgroundOverlay>().FirstOrDefault();
+                                var headerBox = container.OfType<BoxElement>().FirstOrDefault();
+                                var artistTitleText = container.OfType<BeatmapAttributeText>().ElementAtOrDefault(0);
+                                var creatorText = container.OfType<BeatmapAttributeText>().ElementAtOrDefault(1);
+                                var playedByText = container.OfType<ScoreAttributeText>().FirstOrDefault();
+                                var rankingTitle = container.OfType<SkinnableSprite>().FirstOrDefault();
+                                var rankingPanel = container.OfType<LegacyRankingPanel>().FirstOrDefault();
+                                var rankingGraph = container.OfType<LegacyRankingHealthGraph>().FirstOrDefault();
+                                var perfectIndicator = container.OfType<LegacyRankingPerfectIndicator>().FirstOrDefault();
+                                var rankingGrade = container.OfType<LegacyRankingGrade>().FirstOrDefault();
+                                var modDisplay = container.OfType<SkinnableModDisplay>().FirstOrDefault();
+                                var retryButton = container.OfType<LegacyRankingRetryButton>().FirstOrDefault();
+                                var watchReplayButton = container.OfType<LegacyRankingWatchReplayButton>().FirstOrDefault();
+                                var onlineRankingButton = container.OfType<LegacyOnlineRankingButton>().FirstOrDefault();
+
+                                bool useNewLayout = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value > 1M;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L662-L665
+                                backgroundOverlay?.Anchor = Anchor.TopRight;
+                                backgroundOverlay?.Origin = Anchor.Centre;
+                                backgroundOverlay?.Position = new Vector2(-180, useNewLayout ? 200 : 170) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                headerBox?.Position = new Vector2(-5);
+                                headerBox?.Size = new Vector2(9999, 60) * STABLE_MAGIC_SCALE_FACTOR + new Vector2(5);
+                                headerBox?.CornerRadius.Value = 0;
+                                headerBox?.AccentColour.Value = Colour4.Black;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L807-L811
+                                artistTitleText?.Scale = new Vector2(22 * STABLE_MAGIC_SCALE_FACTOR / BeatmapAttributeText.DEFAULT_TEXT_SIZE);
+                                artistTitleText?.Template.Value = @"{Artist} - {Title} [{DifficultyName}]";
+                                artistTitleText?.Font.Value = Typeface.Inter;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L813-L817
+                                creatorText?.Position = new Vector2(1, 20) * STABLE_MAGIC_SCALE_FACTOR;
+                                creatorText?.Scale = new Vector2(16 * STABLE_MAGIC_SCALE_FACTOR / BeatmapAttributeText.DEFAULT_TEXT_SIZE);
+                                creatorText?.Template.Value = @"Beatmap by {Creator}";
+                                creatorText?.Font.Value = Typeface.Inter;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L819-L822
+                                playedByText?.Position = new Vector2(1, 34) * STABLE_MAGIC_SCALE_FACTOR;
+                                playedByText?.Scale = new Vector2(16 * STABLE_MAGIC_SCALE_FACTOR / ScoreAttributeText.DEFAULT_TEXT_SIZE);
+                                playedByText?.Template.Value = @"Played by {Username} on {Date}";
+                                playedByText?.Font.Value = Typeface.Inter;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L671-L675
+                                rankingTitle?.SpriteName.Value = @"ranking-title";
+                                rankingTitle?.Anchor = Anchor.TopRight;
+                                rankingTitle?.Origin = Anchor.TopRight;
+                                rankingTitle?.Position = new Vector2(-20, 0) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L712-L715
+                                rankingPanel?.Position = new Vector2(0, useNewLayout ? 64 : 46) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L707-L710
+                                rankingGraph?.Position = new Vector2(160, useNewLayout ? 380 : 360) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L447
+                                perfectIndicator?.Origin = Anchor.Centre;
+                                perfectIndicator?.Position = new Vector2(useNewLayout ? 260 : 200, 430) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L572-L575
+                                rankingGrade?.Anchor = Anchor.TopRight;
+                                rankingGrade?.Origin = Anchor.Centre;
+                                rankingGrade?.Position = new Vector2(-120, useNewLayout ? 200 : 170) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                // y position taken from https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L557
+                                // x position, anchors, and scale arbitrarily adjusted to visually match
+                                modDisplay?.Anchor = Anchor.TopRight;
+                                modDisplay?.Origin = Anchor.CentreRight;
+                                modDisplay?.Position = new Vector2(-20, 260) * STABLE_MAGIC_SCALE_FACTOR;
+                                modDisplay?.Scale = new Vector2(1.5f);
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L838
+                                retryButton?.Anchor = Anchor.TopRight;
+                                retryButton?.Origin = Anchor.CentreRight;
+                                retryButton?.Position = new Vector2(0, 360) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L845
+                                watchReplayButton?.Anchor = Anchor.TopRight;
+                                watchReplayButton?.Origin = Anchor.CentreRight;
+                                watchReplayButton?.Position = new Vector2(0, 420) * STABLE_MAGIC_SCALE_FACTOR;
+
+                                // https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L878
+                                onlineRankingButton?.Anchor = Anchor.BottomCentre;
+                                onlineRankingButton?.Origin = Anchor.TopLeft;
+                                onlineRankingButton?.Position = new Vector2(-100, -26) * STABLE_MAGIC_SCALE_FACTOR;
+                            })
+                            {
+                                new LegacyRankingBackgroundOverlay(),
+                                new BoxElement(),
+                                new BeatmapAttributeText(),
+                                new BeatmapAttributeText(),
+                                new ScoreAttributeText(),
+                                new SkinnableSprite(),
+                                new LegacyRankingPanel(),
+                                new LegacyRankingHealthGraph(),
+                                new LegacyRankingPerfectIndicator(),
+                                new LegacyRankingGrade(),
+                                new SkinnableModDisplay(),
+                                new LegacyRankingRetryButton(),
+                                new LegacyRankingWatchReplayButton(),
+                                new LegacyOnlineRankingButton(),
                             };
                     }
 

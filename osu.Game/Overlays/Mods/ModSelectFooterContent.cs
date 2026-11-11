@@ -73,7 +73,6 @@ namespace osu.Game.Overlays.Mods
                     Spacing = new Vector2(30, 10),
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding { Horizontal = 20 },
                     Children = new Drawable[]
                     {
                         rankingInformationDisplay = new RankingInformationDisplay
@@ -145,9 +144,9 @@ namespace osu.Game.Overlays.Mods
             {
                 float rightEdgeOfLastButton = buttonFlow[^1].ScreenSpaceDrawQuad.TopRight.X;
 
-                // this is cheating a bit; the 640 value is hardcoded based on how wide the expanded panel _generally_ is.
+                // this is cheating a bit; the 620 value is hardcoded based on how wide the expanded panel _generally_ is.
                 // due to the transition applied, the raw screenspace quad of the panel cannot be used, as it will trigger an ugly feedback cycle of expanding and collapsing.
-                float projectedLeftEdgeOfExpandedBeatmapAttributesDisplay = buttonFlow.ToScreenSpace(buttonFlow.DrawSize - new Vector2(640, 0)).X;
+                float projectedLeftEdgeOfExpandedBeatmapAttributesDisplay = buttonFlow.ToScreenSpace(buttonFlow.DrawSize - new Vector2(620, 0)).X;
 
                 DisplaysStackedVertically = rightEdgeOfLastButton > projectedLeftEdgeOfExpandedBeatmapAttributesDisplay;
 

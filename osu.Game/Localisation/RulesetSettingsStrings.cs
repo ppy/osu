@@ -115,6 +115,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
 
         /// <summary>
+        /// "Touch drum size"
+        /// </summary>
+        public static LocalisableString TouchDrumSize => new TranslatableString(getKey(@"touch_drum_size"), @"Touch drum size");
+
+        /// <summary>
         /// "Mobile layout"
         /// </summary>
         public static LocalisableString MobileLayout => new TranslatableString(getKey(@"mobile_layout"), @"Mobile layout");

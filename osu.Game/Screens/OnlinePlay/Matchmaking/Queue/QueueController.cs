@@ -91,6 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            QueueTimer.Stop();
 
             client.MatchmakingLeaveQueue().FireAndForget();
         }
@@ -186,6 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
+            QueueTimer.Stop();
 
             postNotification();
             backgroundNotification?.Complete(invitation);
@@ -195,7 +197,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom;
 
-            client.JoinRoom(new Room { RoomID = roomId }, password).FireAndForget();
+            client.JoinRoom(new Room { RoomID = roomId }, password).FireAndForget(onError: _ => Scheduler.Add(() =>
+            {
+                // TODO: in the future this should allow the user to retry joining the room
+                //       once rejoining is in place
+                CurrentState.Value = ScreenQueue.MatchmakingScreenState.Idle;
+                notifications?.Post(new SimpleErrorNotification { Text = "Failed to join room." });
+            }));
         });
 
         private void onMatchmakingDuelIssued(MatchmakingDuelIssuedParams duel)
@@ -369,7 +377,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             public DuelNotification(QueueController controller, APIUser user, MatchmakingDuelIssuedParams duel)
             {
-                Text = $"{user.Username} challenged you to a duel ({duel.Pool.DisplayName}). Click to accept.";
+                Text = NotificationsStrings.UserChallengedYouToDuel(user.Username, duel.Pool.DisplayName);
 
                 Activated = () =>
                 {
