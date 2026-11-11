@@ -34,13 +34,13 @@ namespace osu.Game.Tests.Visual.Online
             Colour = "f2ca34"
         };
 
-        private readonly APIUser redUser = new APIUser
+        private readonly APIUser firstUser = new APIUser
         {
             Username = "BanchoBot",
             Id = 3,
         };
 
-        private readonly APIUser blueUser = new APIUser
+        private readonly APIUser secondUser = new APIUser
         {
             Username = "Zallius",
             Id = 4,
@@ -424,7 +424,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("join second channel", () => chatWithTextBox2.Channel.Value = testChannel2 = new Channel());
             AddStep("send message", () => testChannel2.AddNewMessages(new Message(messageIdSequence++)
             {
-                Sender = redUser,
+                Sender = firstUser,
                 Content = "wangs",
             }));
             AddStep("open context menu", () =>
@@ -487,21 +487,21 @@ namespace osu.Game.Tests.Visual.Online
                 Content = "I am a wang!"
             }));
 
-            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            AddStep("message from first user", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
-                Sender = redUser,
-                Content = "I am team red."
+                Sender = firstUser,
+                Content = "I am first user."
             }));
 
-            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            AddStep("message from first user", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
-                Sender = redUser,
+                Sender = firstUser,
                 Content = "I plan to win!"
             }));
 
-            AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            AddStep("message from second user", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
-                Sender = blueUser,
+                Sender = secondUser,
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 

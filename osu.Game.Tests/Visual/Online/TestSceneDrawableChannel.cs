@@ -307,5 +307,78 @@ namespace osu.Game.Tests.Visual.Online
                     () => drawableChannel.ChildrenOfType<ChatLine>().ElementAt(lineIndex).RequiresTimestamp,
                     () => Is.EqualTo(shouldHaveTimestamp));
         }
+
+        [Test]
+        public void TestAppearance()
+        {
+            int messageId = 1;
+            AddStep("normal user", () => channel.AddNewMessages(
+                new Message(++messageId)
+                {
+                    Sender = new APIUser
+                    {
+                        Id = messageId,
+                        Username = $"TestUser{messageId}"
+                    },
+                    Content = "Hello how are you today?",
+                    Timestamp = new DateTimeOffset(2021, 12, 11, 13, 33, 24, TimeSpan.Zero)
+                }));
+            AddStep("supporter without hue", () => channel.AddNewMessages(
+                new Message(++messageId)
+                {
+                    Sender = new APIUser
+                    {
+                        Id = messageId,
+                        Username = $"TestUser{messageId}",
+                        IsSupporter = true,
+                    },
+                    Content = "Hello how are you today?",
+                    Timestamp = new DateTimeOffset(2021, 12, 11, 13, 33, 24, TimeSpan.Zero)
+                }));
+            AddStep("non-supporter with hue", () => channel.AddNewMessages(
+                new Message(++messageId)
+                {
+                    Sender = new APIUser
+                    {
+                        Id = messageId,
+                        Username = $"TestUser{messageId}",
+                        ProfileHue = 230,
+                    },
+                    Content = "Hello how are you today?",
+                    Timestamp = new DateTimeOffset(2021, 12, 11, 13, 33, 24, TimeSpan.Zero)
+                }));
+
+            for (int i = 0; i < 360; i += 60)
+            {
+                int hue = i;
+                AddStep($"supporter with hue {hue}deg", () => channel.AddNewMessages(
+                    new Message(++messageId)
+                    {
+                        Sender = new APIUser
+                        {
+                            Id = messageId,
+                            Username = $"TestUser{messageId}",
+                            IsSupporter = true,
+                            ProfileHue = hue,
+                        },
+                        Content = "Hello how are you today?",
+                        Timestamp = new DateTimeOffset(2021, 12, 11, 13, 33, 24, TimeSpan.Zero)
+                    }));
+            }
+
+            AddStep("special", () => channel.AddNewMessages(
+                new Message(++messageId)
+                {
+                    Sender = new APIUser
+                    {
+                        Id = messageId,
+                        Username = $"TestUser{messageId}",
+                        IsSupporter = true,
+                        Colour = "#E45678",
+                    },
+                    Content = "Hello how are you today?",
+                    Timestamp = new DateTimeOffset(2021, 12, 11, 13, 33, 24, TimeSpan.Zero)
+                }));
+        }
     }
 }

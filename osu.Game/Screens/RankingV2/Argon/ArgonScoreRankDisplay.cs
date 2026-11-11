@@ -22,6 +22,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Footer;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -73,6 +74,7 @@ namespace osu.Game.Screens.RankingV2.Argon
             Size = new Vector2(640);
             Anchor = Anchor.CentreRight;
             Origin = Anchor.CentreRight;
+            Y = -ScreenFooter.HEIGHT / 2f;
             Masking = true;
 
             InternalChildren =
