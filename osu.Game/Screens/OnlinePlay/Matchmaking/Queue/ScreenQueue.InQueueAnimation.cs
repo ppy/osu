@@ -124,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                             .With(r => r.OnLoadComplete += _ => r.FadeIn(ping_duration)
                                                                  .ResizeTo(r.Size + new Vector2(500), 5000 + ping_duration, ring_pulse)
                                                                  .Delay(ping_duration)
-                                                                 .FadeOut(5270)
+                                                                 .FadeOut(4900 + ping_duration)
                                                                  .Expire());
 
                         var ring2 = createAnimationRing(180)
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                                  .FadeIn(ping_duration)
                                                                  .ResizeTo(r.Size + new Vector2(500), 5000 + ping_duration, ring_pulse)
                                                                  .Delay(ping_duration)
-                                                                 .FadeOut(5270)
+                                                                 .FadeOut(4900 + ping_duration)
                                                                  .Expire());
 
                         AddRange([ring1, ring2]);
