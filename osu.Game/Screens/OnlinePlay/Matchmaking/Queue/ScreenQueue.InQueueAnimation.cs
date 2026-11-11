@@ -32,10 +32,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             private const int outer_size = 200;
             private const int inner_size = 120;
 
-            private const int sample_length = 2881;
+            private const int sample_length = 2812;
 
             // values eyeballed by looking at the sample waveform in audacity
-            private const int ping_duration = 270;
+            private const double ping_duration = 270;
             private const int ping_stagger = 468;
 
             private static readonly IEasingFunction ring_pulse = new CubicBezierEasingFunction(0, 0.2, 0.15, 0.3);
@@ -137,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                         AddRange([ring1, ring2]);
                         ringsInMotion.AddRange([ring1, ring2]);
-                    }, Clock.CurrentTime + WAITING_LOOP_DELAY, sample_length);
+                    }, Clock.CurrentTime + WAITING_LOOP_DELAY - ping_duration / 2, sample_length);
 
                     Scheduler.Add(queueAnimationDelegate);
                 }
