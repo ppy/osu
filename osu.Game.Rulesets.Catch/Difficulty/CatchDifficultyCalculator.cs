@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 4.59;
+        private const double difficulty_multiplier = 5.81;
 
         public override int Version => 20260706;
 
