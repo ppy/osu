@@ -91,6 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            QueueTimer.Stop();
 
             client.MatchmakingLeaveQueue().FireAndForget();
         }
@@ -186,6 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
+            QueueTimer.Stop();
 
             postNotification();
             backgroundNotification?.Complete(invitation);
@@ -369,7 +371,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             public DuelNotification(QueueController controller, APIUser user, MatchmakingDuelIssuedParams duel)
             {
-                Text = $"{user.Username} challenged you to a duel ({duel.Pool.DisplayName}). Click to accept.";
+                Text = NotificationsStrings.UserChallengedYouToDuel(user.Username, duel.Pool.DisplayName);
 
                 Activated = () =>
                 {

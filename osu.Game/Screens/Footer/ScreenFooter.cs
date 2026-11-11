@@ -104,7 +104,6 @@ namespace osu.Game.Screens.Footer
                     {
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
                     {
@@ -126,18 +125,19 @@ namespace osu.Game.Screens.Footer
                                 RelativeSizeAxes = Axes.Both,
                                 Y = -OsuGame.SCREEN_EDGE_MARGIN,
                             },
-                            rightButtonsFlow = new FillFlowContainer<ShearedButton>
-                            {
-                                Name = @"Right footer buttons",
-                                Anchor = Anchor.BottomRight,
-                                Origin = Anchor.BottomRight,
-                                Y = -OsuGame.SCREEN_EDGE_MARGIN,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(7, 0),
-                                AutoSizeAxes = Axes.Both,
-                            }
                         },
                     }
+                },
+                rightButtonsFlow = new FillFlowContainer<ShearedButton>
+                {
+                    Name = @"Right footer buttons",
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Y = -OsuGame.SCREEN_EDGE_MARGIN,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(7, 0),
+                    AutoSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Right = OsuGame.SCREEN_EDGE_MARGIN },
                 },
                 BackButton = new ScreenBackButton
                 {
