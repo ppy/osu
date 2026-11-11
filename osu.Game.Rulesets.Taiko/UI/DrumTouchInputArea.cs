@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             };
 
             config.BindWith(TaikoRulesetSetting.TouchControlScheme, configTouchControlScheme);
-            config.BindWith(TaikoRulesetSetting.DrumTouchSize, configDrumTouchSize);
+            config.BindWith(TaikoRulesetSetting.TouchDrumSize, configDrumTouchSize);
 
             configTouchControlScheme.BindValueChanged(scheme =>
             {

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             var config = (TaikoRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             config.BindWith(TaikoRulesetSetting.TouchControlScheme, controlScheme);
-            config.BindWith(TaikoRulesetSetting.DrumTouchSize, drumSize);
+            config.BindWith(TaikoRulesetSetting.TouchDrumSize, drumSize);
         }
 
         private void createDrum()

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -34,6 +33,13 @@ namespace osu.Game.Rulesets.Taiko
                     Caption = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
                 }),
+                new SettingsItemV2(new FormSliderBar<float>
+                {
+                    Caption = RulesetSettingsStrings.TouchDrumSize,
+                    Current = config.GetBindable<float>(TaikoRulesetSetting.TouchDrumSize),
+                    KeyboardStep = 1f,
+                    DisplayAsPercentage = true
+                }),
                 new SettingsItemV2(hitAnimations = new FormCheckBox
                 {
                     Caption = RulesetSettingsStrings.HitAnimations,
@@ -51,17 +57,6 @@ namespace osu.Game.Rulesets.Taiko
                 }
             };
 
-            if (RuntimeInfo.IsMobile)
-            {
-                Add(new SettingsSlider<float>
-                {
-                    LabelText = RulesetSettingsStrings.DrumTouchSize,
-                    Current = config.GetBindable<float>(TaikoRulesetSetting.DrumTouchSize),
-                    KeyboardStep = 1f,
-                    DisplayAsPercentage = true
-                });
-            }
-            
             hitAnimations.Current.BindValueChanged(val =>
             {
                 rateAdjustedAnimations.Current.Disabled = !val.NewValue;
