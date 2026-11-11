@@ -3,12 +3,12 @@
 
 using System.ComponentModel;
 using osu.Framework.Allocation;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Footer;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         private readonly Room room;
 
-        private ScheduledDelegate? hideDelegate;
+        private ScheduledDelegate? disableDelegate;
 
         public PlaylistsCloseButton(Room room)
         {
@@ -55,13 +55,27 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private void updateState()
         {
-            hideDelegate?.Cancel();
-            hideDelegate = Scheduler.AddDelayed(
-                () => ((IScreenFooterButton)this).DisappearToBottom(0, true),
+            disableDelegate?.Cancel();
+            disableDelegate = Scheduler.AddDelayed(
+                () => Enabled.Value = false,
                 room.InDeletionGracePeriod
                     ? room.DeletionGracePeriodRemaining.Value.TotalMilliseconds
                     : 0
             );
+        }
+
+        public override LocalisableString TooltipText
+        {
+            get
+            {
+                if (Enabled.Value)
+                    return string.Empty;
+
+                if (room.DeletedEarly)
+                    return OnlinePlayStrings.FooterButtonPlaylistCloseAlreadyClosed;
+
+                return OnlinePlayStrings.FooterButtonPlaylistClosePastGracePeriod;
+            }
         }
 
         protected override void Dispose(bool isDisposing)

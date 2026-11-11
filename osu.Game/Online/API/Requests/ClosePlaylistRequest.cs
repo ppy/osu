@@ -8,11 +8,11 @@ namespace osu.Game.Online.API.Requests
 {
     public class ClosePlaylistRequest : APIRequest
     {
-        private readonly long roomId;
+        public readonly long RoomId;
 
         public ClosePlaylistRequest(long roomId)
         {
-            this.roomId = roomId;
+            RoomId = roomId;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -22,6 +22,6 @@ namespace osu.Game.Online.API.Requests
             return request;
         }
 
-        protected override string Target => $@"rooms/{roomId}";
+        protected override string Target => $@"rooms/{RoomId}";
     }
 }

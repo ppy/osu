@@ -279,6 +279,8 @@ namespace osu.Game.Online.Rooms
             set => SetField(ref pinned, value);
         }
 
+        private const int deletion_grace_minutes = 5;
+
         public TimeSpan? DeletionGracePeriodRemaining
         {
             get
@@ -286,12 +288,14 @@ namespace osu.Game.Online.Rooms
                 if (Type != MatchType.Playlists)
                     return null;
 
-                return startDate?.AddMinutes(5) - DateTimeOffset.Now;
+                return startDate?.AddMinutes(deletion_grace_minutes) - DateTimeOffset.Now;
             }
         }
 
         [MemberNotNullWhen(true, nameof(DeletionGracePeriodRemaining))]
         public bool InDeletionGracePeriod => DeletionGracePeriodRemaining > TimeSpan.Zero && !HasEnded;
+
+        public bool DeletedEarly => EndDate - StartDate <= TimeSpan.FromMinutes(deletion_grace_minutes);
 
         [JsonProperty("id")]
         private long? roomId;

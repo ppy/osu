@@ -35,6 +35,16 @@ namespace osu.Game.Localisation
         public static LocalisableString FooterButtonPlaylistClose => new TranslatableString(getKey(@"footer_button_playlist_close"), @"Close");
 
         /// <summary>
+        /// "Playlists can only be closed within 5 minutes of their creation."
+        /// </summary>
+        public static LocalisableString FooterButtonPlaylistClosePastGracePeriod => new TranslatableString(getKey(@"footer_button_playlist_close_past_grace_period"), "Playlists can only be closed within 5 minutes of their creation.");
+
+        /// <summary>
+        /// "You have already closed this playlist."
+        /// </summary>
+        public static LocalisableString FooterButtonPlaylistCloseAlreadyClosed => new TranslatableString(getKey(@"footer_button_playlist_close_already_closed"), @"You have already closed this playlist.");
+
+        /// <summary>
         /// "Play!"
         /// </summary>
         public static LocalisableString FooterButtonPlaylistPlay => new TranslatableString(getKey(@"footer_button_playlist_play"), @"Play!");

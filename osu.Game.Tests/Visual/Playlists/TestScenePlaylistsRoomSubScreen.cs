@@ -672,7 +672,7 @@ namespace osu.Game.Tests.Visual.Playlists
         }
 
         [Test]
-        public void TestCloseButtonDisappearsWhenGracePeriodEnds()
+        public void TestCloseButtonGetsDisabledWhenGracePeriodEnds()
         {
             Room room = null!;
 
@@ -701,12 +701,13 @@ namespace osu.Game.Tests.Visual.Playlists
             TestPlaylistsRoomSubScreen screen = null!;
             AddStep("push screen", () => LoadScreen(new TestPlaylistsScreen(screen = new TestPlaylistsRoomSubScreen(room))));
             AddUntilStep("wait for screen load", () => screen.IsCurrentScreen());
-            AddAssert("close button present", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Any(), () => Is.True);
-            AddUntilStep("wait for close button to disappear", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Any(), () => Is.False);
+            AddAssert("close button enabled", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Single().Enabled.Value, () => Is.True);
+            AddUntilStep("wait for close button to get disabled", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Single().Enabled.Value, () => Is.False);
+            AddAssert("close button has tooltip", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Single().TooltipText, () => Is.EqualTo(OnlinePlayStrings.FooterButtonPlaylistClosePastGracePeriod));
         }
 
         [Test]
-        public void TestCloseButtonDisappearsWhenRoomIsClosed()
+        public void TestCloseButtonGetsDisabledWhenRoomIsClosed()
         {
             Room room = null!;
 
@@ -735,11 +736,12 @@ namespace osu.Game.Tests.Visual.Playlists
             TestPlaylistsRoomSubScreen screen = null!;
             AddStep("push screen", () => LoadScreen(new TestPlaylistsScreen(screen = new TestPlaylistsRoomSubScreen(room))));
             AddUntilStep("wait for screen load", () => screen.IsCurrentScreen());
-            AddAssert("close button present", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Any(), () => Is.True);
+            AddAssert("close button enabled", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Single().Enabled.Value, () => Is.True);
             AddStep("click close button", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Single().TriggerClick());
 
             AddStep("confirm dialog", () => InputManager.Key(Key.Enter));
-            AddUntilStep("wait for close button to disappear", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Any(), () => Is.False);
+            AddUntilStep("wait for close button to get disabled", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Single().Enabled.Value, () => Is.False);
+            AddAssert("close button has tooltip", () => ScreenFooter.ChildrenOfType<PlaylistsCloseButton>().Single().TooltipText, () => Is.EqualTo(OnlinePlayStrings.FooterButtonPlaylistCloseAlreadyClosed));
         }
 
         [Test]

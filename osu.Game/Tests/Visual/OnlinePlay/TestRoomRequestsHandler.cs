@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using Newtonsoft.Json;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -238,6 +239,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 }
 
                 case ClosePlaylistRequest closePlaylistRequest:
+                    var roomToClose = ServerSideRooms.FirstOrDefault(r => r.RoomID == closePlaylistRequest.RoomId);
+
+                    if (roomToClose == null)
+                    {
+                        closePlaylistRequest.TriggerFailure(new APIException("Not found", null, HttpStatusCode.NotFound));
+                        return true;
+                    }
+
+                    roomToClose.EndDate = DateTimeOffset.UtcNow;
                     closePlaylistRequest.TriggerSuccess();
                     return true;
             }
