@@ -18,6 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -318,7 +319,10 @@ namespace osu.Game.Screens.Ranking
             public Action<UserTag>? OnTagSelected { get; set; }
 
             [Resolved]
-            private OverlayColourProvider overlayColourProvider { get; set; } = null!;
+            private OverlayColourProvider colourProvider { get; set; } = null!;
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
 
             public AddNewTagUserTag()
                 : base(new UserTag(new APITag { Name = "+/add" }), false)
@@ -332,9 +336,9 @@ namespace osu.Game.Screens.Ranking
                 AvailableTags.BindCollectionChanged((_, _) => Enabled.Value = AvailableTags.Count > 0, true);
                 Action = this.ShowPopover;
 
-                MainBackground.FadeColour(overlayColourProvider.Background2);
-                TagCategoryText.FadeColour(overlayColourProvider.Colour0);
-                TagNameText.FadeColour(overlayColourProvider.Colour0);
+                MainBackground.FadeColour(colours.Lime2);
+                TagCategoryText.FadeColour(colourProvider.Background3);
+                TagNameText.FadeColour(colourProvider.Background3);
                 FadeEdgeEffectTo(0);
             }
 
