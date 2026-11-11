@@ -3,12 +3,9 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Platform;
-using osu.Game.Input;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
@@ -38,36 +35,6 @@ namespace osu.Game.Graphics.UserInterface
         public Hotkey(string ruleset, int variant, int action)
         {
             RulesetAction = (ruleset, variant, action);
-        }
-
-        public IEnumerable<string> ResolveKeyCombination(ReadableKeyCombinationProvider keyCombinationProvider, RealmKeyBindingStore keyBindingStore, GameHost gameHost)
-        {
-            var result = new List<string>();
-
-            if (KeyCombinations != null)
-            {
-                result.AddRange(KeyCombinations.Select(keyCombinationProvider.GetReadableString));
-            }
-
-            if (GlobalAction != null)
-            {
-                result.AddRange(keyBindingStore.GetReadableKeyCombinationsFor(GlobalAction.Value));
-            }
-
-            if (RulesetAction != null)
-            {
-                var (ruleset, variant, action) = RulesetAction.Value;
-                result.AddRange(keyBindingStore.GetReadableKeyCombinationsFor(ruleset, variant, action));
-            }
-
-            if (PlatformAction != null)
-            {
-                var action = PlatformAction.Value;
-                var bindings = gameHost.PlatformKeyBindings.Where(kb => (PlatformAction)kb.Action == action);
-                result.AddRange(bindings.Select(b => keyCombinationProvider.GetReadableString(b.KeyCombination)));
-            }
-
-            return result;
         }
 
         public bool Equals(Hotkey other)
