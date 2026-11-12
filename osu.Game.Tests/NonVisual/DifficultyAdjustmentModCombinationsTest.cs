@@ -211,7 +211,7 @@ namespace osu.Game.Tests.NonVisual
         private class TestLegacyDifficultyCalculator : DifficultyCalculator
         {
             public TestLegacyDifficultyCalculator(params Mod[] mods)
-                : base(null, null)
+                : base(null!, null!)
             {
                 DifficultyAdjustmentMods = mods;
             }
