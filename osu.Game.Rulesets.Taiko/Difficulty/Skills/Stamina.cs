@@ -63,6 +63,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         protected override double CalculateInitialStrain(double time, DifficultyHitObject current) =>
             SingleColourStamina
                 ? 0
-                : currentStrain * strainDecay(time - current.Previous(0).StartTime);
+                : currentStrain * strainDecay(time - current.Previous(0)!.StartTime);
     }
 }

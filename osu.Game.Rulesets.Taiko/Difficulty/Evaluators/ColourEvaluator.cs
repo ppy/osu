@@ -28,12 +28,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Evaluators
 
             List<double> recentRatios = new List<double>();
             TaikoDifficultyHitObject current = hitObject;
-            var previousHitObject = (TaikoDifficultyHitObject)current.Previous(1);
+            var previousHitObject = (TaikoDifficultyHitObject?)current.Previous(1);
 
             for (int i = 0; i < maxObjectsToCheck; i++)
             {
                 // Break if there is no valid previous object
-                if (current.Index <= 1)
+                if (previousHitObject == null)
                     break;
 
                 double currentRatio = current.RhythmData.Ratio;
