@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 return 1;
 
             const double note_limit = 6;
-            const double maximum_repetition_nerf = 0.16;
+            const double maximum_repetition_nerf = 0.18;
             const double maximum_vector_influence = 0.5;
 
             double constantAngleCount = 0;
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
 
-            double baseNerf = 1 - maximum_repetition_nerf * DiffUtils.Smoothstep(lastAngle, double.DegreesToRadians(180), double.DegreesToRadians(0)) * angleDifferenceAdjusted;
+            double baseNerf = 1 - maximum_repetition_nerf * DiffUtils.ReverseLerp(lastAngle, double.DegreesToRadians(180), double.DegreesToRadians(0)) * angleDifferenceAdjusted;
 
             return DiffUtils.Pow(baseNerf + (1 - baseNerf) * vectorRepetition * maximum_vector_influence * stackFactor, 2);
         }
