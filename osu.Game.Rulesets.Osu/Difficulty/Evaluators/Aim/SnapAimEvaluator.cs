@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             }
 
             // Apply high circle size bonus
-            snapDifficulty *= osuCurrObj.SmallCircleBonus;
+            snapDifficulty += osuCurrObj.SmallCircleBonus * 3.25;
 
             snapDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
