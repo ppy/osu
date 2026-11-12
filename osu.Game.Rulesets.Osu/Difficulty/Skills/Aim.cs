@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double calculateAdjustedDifficulty(DifficultyHitObject current)
         {
             const double skill_multiplier_snap = 78.3;
-            const double skill_multiplier_agility = 32.5;
+            const double skill_multiplier_agility = 30.0;
             const double skill_multiplier_flow = 251.0;
             const double skill_multiplier_spinner = 22.0;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // This logistic function is a solution, which fits nicely with the general idea of interpolation and provides a tuneable constant
         private static double calculateSnapFlowProbability(double ratio)
         {
-            const double k = 7.27;
+            const double k = 5;
 
             if (ratio == 0)
                 return 0;
