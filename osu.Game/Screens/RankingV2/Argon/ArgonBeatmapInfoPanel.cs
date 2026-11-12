@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -251,7 +252,7 @@ namespace osu.Game.Screens.RankingV2.Argon
                                    rulesetIconContainer.Colour = col;
                                    difficultyText.Colour = col;
                                });
-                           });
+                           }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         #region ISerialisableDrawable

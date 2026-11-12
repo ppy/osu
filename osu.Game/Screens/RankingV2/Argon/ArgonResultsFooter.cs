@@ -37,7 +37,7 @@ namespace osu.Game.Screens.RankingV2.Argon
         private OsuColour colours { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(IResultsScreenV2? results, SkinEditor? skinEditor)
+        private void load(IResultsScreenV2 results, SkinEditor? skinEditor)
         {
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.RankingV2.Argon
 
             if (skinEditor == null)
             {
-                leasedFooterContent = results?.FooterContent.BeginLease(true);
+                leasedFooterContent = results.FooterContent.BeginLease(true);
 
                 leasedFooterContent?.Value = ScreenFooterContent.Argon(
                     leftButtons: createLeftButtons,
