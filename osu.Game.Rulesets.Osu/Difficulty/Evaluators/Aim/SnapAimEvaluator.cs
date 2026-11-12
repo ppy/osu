@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             }
 
             // Apply high circle size bonus
-            snapDifficulty *= osuCurrObj.SmallCircleBonus;
+            snapDifficulty += osuCurrObj.SmallCircleBonus * 3.25;
 
             snapDifficulty *= highBpmBonus(osuCurrObj.AdjustedDeltaTime);
 
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double calculateWideAngleBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj,
                                                       double currDistance, double prevDistance, bool withSliderTravelDistance)
         {
-            const double wide_angle_multiplier = 0.6;
+            const double wide_angle_multiplier = 0.65;
 
             if (osuCurrObj.Angle == null || osuLastObj.Angle == null)
                 return 0;
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
                 return 1;
 
             const double note_limit = 6;
-            const double maximum_repetition_nerf = 0.15;
+            const double maximum_repetition_nerf = 0.18;
             const double maximum_vector_influence = 0.5;
 
             double constantAngleCount = 0;
@@ -200,7 +200,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double angleDifferenceAdjusted = Math.Cos(2 * Math.Min(double.DegreesToRadians(45), Math.Abs(currAngle - lastAngle) * stackFactor));
 
-            double baseNerf = 1 - maximum_repetition_nerf * AngleUtils.CalculateAcuteness(lastAngle) * angleDifferenceAdjusted;
+            double baseNerf = 1 - maximum_repetition_nerf * DiffUtils.ReverseLerp(lastAngle, double.DegreesToRadians(180), double.DegreesToRadians(0)) * angleDifferenceAdjusted;
 
             return DiffUtils.Pow(baseNerf + (1 - baseNerf) * vectorRepetition * maximum_vector_influence * stackFactor, 2);
         }
