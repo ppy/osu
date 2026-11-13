@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double ProcessInternal(DifficultyHitObject current)
         {
-            const double total_multiplier = 0.81;
-            const double burst_multiplier = 2.31;
+            const double total_multiplier = 0.8;
+            const double burst_multiplier = 2.3;
             const double stream_multiplier = 0.16;
             const double stamina_multiplier = 0.028;
             const double mean_exponent = 1.25;
