@@ -39,9 +39,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double combinedDelta = currentDelta + previousDelta * previous_delta_influence;
 
-            double angleSwitchingBonus = calculateWideAngleBonus(osuCurrObj, osuPrevObj);
+            double wideAngleBonus = calculateWideAngleBonus(osuCurrObj, osuPrevObj);
 
-            double agilityDifficulty = (1 + angleSwitchingBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
+            double agilityDifficulty = (1 + wideAngleBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
 
             agilityDifficulty += osuCurrObj.SmallCircleBonus * 5.0;
 
