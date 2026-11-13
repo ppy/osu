@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             }
 
             // Final velocity is being raised to a power because flow difficulty scales harder with both high distance and time, and we want to account for that
-            flowDifficulty = DiffUtils.Pow(flowDifficulty, 1.37);
+            flowDifficulty = DiffUtils.Pow(flowDifficulty, 1.4);
 
             flowDifficulty += osuCurrObj.SmallCircleBonus * 0.9;
 
