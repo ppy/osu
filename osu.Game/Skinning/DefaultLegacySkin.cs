@@ -36,12 +36,14 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public DefaultLegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : base(
-                skin,
-                resources,
-                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy")
-            )
+            : base(skin, resources, new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy"))
         {
+        }
+
+        protected override void SetDefaultConfiguration()
+        {
+            base.SetDefaultConfiguration();
+
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
             Configuration.CustomComboColours = DEFAULT_COMBO_COLOURS;
 

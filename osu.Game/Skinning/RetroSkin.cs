@@ -35,12 +35,14 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public RetroSkin(SkinInfo skin, IStorageResourceProvider resources)
-            : base(
-                skin,
-                resources,
-                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Retro")
-            )
+            : base(skin, resources, new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Retro"))
         {
+        }
+
+        protected override void SetDefaultConfiguration()
+        {
+            base.SetDefaultConfiguration();
+
             Configuration.ConfigDictionary[@"SliderBallFlip"] = "0";
             Configuration.ConfigDictionary[@"SliderBallFrames"] = "10";
             Configuration.ConfigDictionary[@"AllowSliderBallTint"] = "0";
