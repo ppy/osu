@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Aggregation;
@@ -37,9 +38,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecayBurst(double ms) => DiffUtils.Pow(0.1, ms / 1000);
         private double strainDecayStream(double ms) => DiffUtils.Pow(0.01, DiffUtils.Pow(ms / 1000, 1.6));
 
-        private double strainDecayStamina(double ms, double staminaValue)
+        private double strainDecayStamina(double ms, double currentStrain)
         {
-            double changeFactor = currentStaminaStrain > 0 ? 1 + DiffUtils.Pow(currentStaminaStrain / (staminaValue + currentStaminaStrain), 25.0) : 1.0;
+            const double strain_lowering_multiplier = 2.5;
+
+            double decay = DiffUtils.Pow(0.05, DiffUtils.Pow(ms / 1000, 3.5));
+
+            double newStrain = currentStrain * decay;
+
+            if (currentStrain <= 0 || newStrain <= 0 || newStrain >= currentStrain)
+                return newStrain;
+
+            // We want strain to decay faster when it's not building up
+            double changeFactor = currentStrain / newStrain * strain_lowering_multiplier;
+
             return DiffUtils.Pow(0.05, DiffUtils.Pow(ms * changeFactor / 1000, 3.5));
         }
 
@@ -47,8 +59,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             const double total_multiplier = 0.8;
             const double burst_multiplier = 2.3;
-            const double stream_multiplier = 0.16;
-            const double stamina_multiplier = 0.028;
+            const double stream_multiplier = 0.18;
+            const double stamina_multiplier = 0.04;
             const double mean_exponent = 1.25;
 
             if (Mods.Any(m => m is OsuModRelax))
@@ -66,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStreamStrain *= strainDecayStream(((OsuDifficultyHitObject)current).AdjustedDeltaTime);
             currentStreamStrain += staminaDifficulty * stream_multiplier;
 
-            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).AdjustedDeltaTime, staminaDifficulty * stamina_multiplier);
+            currentStaminaStrain *= strainDecayStamina(((OsuDifficultyHitObject)current).AdjustedDeltaTime, currentStaminaStrain);
             currentStaminaStrain += staminaDifficulty * stamina_multiplier;
 
             double totalValue = DiffUtils.Norm(mean_exponent,
