@@ -1,0 +1,32 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Objects;
+
+namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
+{
+    public static class StaminaEvaluator
+    {
+        public static double EvaluateDifficultyOf(DifficultyHitObject current)
+        {
+            if (current.BaseObject is Spinner)
+                return 0;
+
+            var osuCurrObj = (OsuDifficultyHitObject)current;
+
+            double bpmBonus = 0.0;
+
+            if (DiffUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime) > 240)
+                bpmBonus = DiffUtils.Pow((DiffUtils.BPMToMilliseconds(240) - osuCurrObj.AdjustedDeltaTime) / 20, 1.05);
+
+            double finalValue = (1 + bpmBonus) * 1000 / osuCurrObj.AdjustedDeltaTime;
+
+            double doubletapness = 1.0 - osuCurrObj.CalculateDoubleTapFeasibility((OsuDifficultyHitObject?)osuCurrObj.Next());
+
+            return finalValue * doubletapness;
+        }
+    }
+}

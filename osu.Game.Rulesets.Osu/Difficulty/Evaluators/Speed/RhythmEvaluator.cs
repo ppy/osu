@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                                 // repeated island (ex: triplet -> triplet)
                                 double power = DiffUtils.Logistic(island.Delta, maxValue: 2.75, multiplier: 0.24, midpointOffset: 58.33);
-                                effectiveDifficulty *= Math.Min(3.0 / existingIsland.Occurrences, DiffUtils.Pow(1.0 / existingIsland.Occurrences, power));
+                                effectiveDifficulty *= Math.Min(3.0 / existingIsland.Occurrences, DiffUtils.Pow(1.5 / existingIsland.Occurrences, power));
 
                                 found = true;
                                 break;
@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static double getEffectiveDifficulty(double deltaDifferenceRatio)
         {
-            const double rhythm_ratio_difficulty_multiplier = 26.0;
+            const double rhythm_ratio_difficulty_multiplier = 27.0;
 
             // Take only the fractional part of the value since we're only interested in punishing multiples
             double deltaDifferenceFraction = deltaDifferenceRatio - Math.Truncate(deltaDifferenceRatio);

@@ -26,9 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             var osuCurrObj = (OsuDifficultyHitObject)current;
             double doubleTapFeasibility = 1.0 - osuCurrObj.CalculateDoubleTapFeasibility((OsuDifficultyHitObject?)osuCurrObj.Next(0));
 
-            double speedDifficulty = DiffUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime);
-
-            speedDifficulty *= calculateSpeedBonus(osuCurrObj);
+            double speedDifficulty = calculateSpeedBonus(osuCurrObj);
 
             // Apply penalty if there's doubletappable doubles
             return speedDifficulty * doubleTapFeasibility;
@@ -37,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
         private static double calculateSpeedBonus(OsuDifficultyHitObject osuCurrObj)
         {
             const double min_speed_bonus = 200; // 200 BPM 1/4th
-            const double speed_balancing_factor = 40;
+            const double speed_balancing_factor = 44;
 
             double strainTime = osuCurrObj.AdjustedDeltaTime;
 
@@ -50,9 +48,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
             // Add additional scaling bonus for streams/bursts higher than 200bpm
             if (DiffUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
-                speedBonus = 0.75 * DiffUtils.Pow((DiffUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
+                speedBonus = DiffUtils.Pow((DiffUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2.1);
 
-            return (1 + speedBonus) / strainTime;
+            return (1 + speedBonus) * 1000 / strainTime;
         }
     }
 }
