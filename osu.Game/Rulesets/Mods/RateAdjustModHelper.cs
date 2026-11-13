@@ -14,6 +14,14 @@ namespace osu.Game.Rulesets.Mods
     {
         public readonly IBindableNumber<double> SpeedChange;
 
+        private readonly BindableNumber<double> speedChange = new BindableNumber<double>();
+
+        /// <summary>
+        /// Use with mods containing <see cref="IAdjustableWhenReplay"/>.
+        /// When it set to true, speed change will be 1.0.
+        /// </summary>
+        public BindableBool DisableSpeedChange = new BindableBool();
+
         private IAdjustableAudioComponent? track;
 
         private BindableBool? adjustPitch;
@@ -25,6 +33,14 @@ namespace osu.Game.Rulesets.Mods
         public RateAdjustModHelper(IBindableNumber<double> speedChange)
         {
             SpeedChange = speedChange;
+
+            SpeedChange.BindValueChanged(_ => updateSpeedChange(), true);
+            DisableSpeedChange.BindValueChanged(_ => updateSpeedChange(), true);
+        }
+
+        private void updateSpeedChange()
+        {
+            speedChange.Value = DisableSpeedChange.Value ? 1 : SpeedChange.Value;
         }
 
         /// <summary>
@@ -39,8 +55,8 @@ namespace osu.Game.Rulesets.Mods
             // When switching between pitch adjust, we need to update adjustments to time-shift or frequency-scale.
             adjustPitch.BindValueChanged(adjustPitchSetting =>
             {
-                track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
-                track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+                track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), speedChange);
+                track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), speedChange);
 
                 AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
                     => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
