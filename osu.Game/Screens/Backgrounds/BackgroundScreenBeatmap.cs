@@ -55,13 +55,14 @@ namespace osu.Game.Screens.Backgrounds
 
         private readonly DimmableBackground dimmable;
 
-        protected virtual DimmableBackground CreateFadeContainer() => new DimmableBackground { RelativeSizeAxes = Axes.Both };
+        protected virtual DimmableBackground CreateFadeContainer() => new DimmableBackground();
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
 
             InternalChild = dimmable = CreateFadeContainer();
+            dimmable.RelativeSizeAxes = Axes.Both;
 
             dimmable.StoryboardReplacesBackground.BindTo(StoryboardReplacesBackground);
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
@@ -124,7 +125,7 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        public partial class DimmableBackground : UserDimContainer
+        public partial class DimmableBackground : ColouredUserDimContainer
         {
             /// <summary>
             /// The amount of blur to be applied to the background in addition to user-specified blur.
@@ -194,6 +195,17 @@ namespace osu.Game.Screens.Backgrounds
                     return base.DimLevel;
                 }
             }
+
+            // Needed to ensure that DimColour is not affected by the storyboard replacing
+            // the background, only by user settings. Also used in tests.
+            protected float DimLevelNoStoryboard => base.DimLevel;
+
+            protected override Colour4 InvertedDimLevel => new Colour4(
+                1f - DimLevelNoStoryboard,
+                1f - DimLevelNoStoryboard,
+                1f - DimLevelNoStoryboard,
+                1f
+            );
 
             protected override void UpdateVisuals()
             {

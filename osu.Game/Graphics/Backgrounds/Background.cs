@@ -31,13 +31,11 @@ namespace osu.Game.Graphics.Backgrounds
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(Sprite = new Sprite
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-            });
+            AddInternal(Sprite = CreateSprite());
+            Sprite.RelativeSizeAxes = Axes.Both;
+            Sprite.Anchor = Anchor.Centre;
+            Sprite.Origin = Anchor.Centre;
+            Sprite.FillMode = FillMode.Fill;
         }
 
         [BackgroundDependencyLoader]
@@ -46,6 +44,10 @@ namespace osu.Game.Graphics.Backgrounds
             if (!string.IsNullOrEmpty(textureName))
                 Sprite.Texture = textures.Get(textureName);
         }
+
+        protected virtual Sprite CreateSprite() => new Sprite();
+
+        protected virtual BufferedContainer CreateBufferedContainer(bool cachedFrameBuffer) => new BufferedContainer(cachedFrameBuffer: cachedFrameBuffer);
 
         public Vector2 BlurSigma => Vector2.Divide(bufferedContainer?.BlurSigma ?? Vector2.Zero, blurScale);
 
@@ -59,12 +61,10 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 RemoveInternal(Sprite, false);
 
-                AddInternal(bufferedContainer = new BufferedContainer(cachedFrameBuffer: true)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RedrawOnScale = false,
-                    Child = Sprite
-                });
+                AddInternal(bufferedContainer = CreateBufferedContainer(cachedFrameBuffer: true));
+                bufferedContainer.RelativeSizeAxes = Axes.Both;
+                bufferedContainer.RedrawOnScale = false;
+                bufferedContainer.Child = Sprite;
             }
 
             if (bufferedContainer != null)
