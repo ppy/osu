@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -36,8 +37,6 @@ namespace osu.Game.Screens.Ranking
             protected OsuSpriteText TagCategoryText { get; private set; } = null!;
             protected OsuSpriteText TagNameText { get; private set; } = null!;
 
-            private VoteCountText voteCountText = null!;
-
             private readonly bool showVoteCount;
 
             private LoadingLayer loadingLayer = null!;
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Ranking
             private FillFlowContainer contentFlow = null!;
 
             [Resolved]
-            private OsuColour colours { get; set; } = null!;
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
             public DrawableUserTag(UserTag userTag, bool showVoteCount = true)
             {
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Ranking
 
                 EdgeEffect = new EdgeEffectParameters
                 {
-                    Colour = colours.Lime1,
+                    Colour = colourProvider.Highlight2,
                     Radius = 6,
                     Type = EdgeEffectType.Glow,
                 };
@@ -128,7 +127,7 @@ namespace osu.Game.Screens.Ranking
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        voteCountText = new VoteCountText(voteCount)
+                                        new VoteCountText(voteCount)
                                         {
                                             Margin = new MarginPadding { Horizontal = 6 },
                                         },
@@ -160,31 +159,21 @@ namespace osu.Game.Screens.Ranking
                     voted.BindValueChanged(v =>
                     {
                         if (v.NewValue)
-                        {
-                            voteBackground.FadeColour(colours.Lime2, transition_duration, Easing.OutQuint);
-                            voteCountText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
-                        }
+                            voteBackground.FadeColour(colourProvider.Highlight2, transition_duration, Easing.OutQuint);
                         else
-                        {
-                            voteBackground.FadeColour(colours.Gray2, transition_duration, Easing.OutQuint);
-                            voteCountText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
-                        }
+                            voteBackground.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
                     }, true);
 
                     confirmed.BindValueChanged(c =>
                     {
                         if (c.NewValue)
                         {
-                            MainBackground.FadeColour(colours.Lime2, transition_duration, Easing.OutQuint);
-                            TagCategoryText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
-                            TagNameText.FadeColour(Colour4.Black, transition_duration, Easing.OutQuint);
+                            MainBackground.FadeColour(colourProvider.Highlight2, transition_duration, Easing.OutQuint);
                             FadeEdgeEffectTo(0.3f, transition_duration, Easing.OutQuint);
                         }
                         else
                         {
-                            MainBackground.FadeColour(colours.Gray6, transition_duration, Easing.OutQuint);
-                            TagCategoryText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
-                            TagNameText.FadeColour(Colour4.White, transition_duration, Easing.OutQuint);
+                            MainBackground.FadeColour(colourProvider.Background2, transition_duration, Easing.OutQuint);
                             FadeEdgeEffectTo(0f, transition_duration, Easing.OutQuint);
                         }
                     }, true);
