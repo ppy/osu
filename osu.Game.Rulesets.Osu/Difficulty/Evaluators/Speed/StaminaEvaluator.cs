@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             double bpmBonus = 0.0;
 
             if (DiffUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime) > 240)
-                bpmBonus = Math.Pow((DiffUtils.BPMToMilliseconds(240) - osuCurrObj.AdjustedDeltaTime) / 18, 1.1);
+                bpmBonus = DiffUtils.Pow((DiffUtils.BPMToMilliseconds(240) - osuCurrObj.AdjustedDeltaTime) / 20, 1.05);
 
             double finalValue = (1 + bpmBonus) * 1000 / osuCurrObj.AdjustedDeltaTime;
 
