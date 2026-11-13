@@ -108,7 +108,7 @@ namespace osu.Game
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
         /// </summary>
-        protected const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
+        public const float SIDE_OVERLAY_OFFSET_RATIO = 0.05f;
 
         /// <summary>
         /// A common shear factor applied to most components of the game.

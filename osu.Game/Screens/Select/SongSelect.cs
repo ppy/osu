@@ -201,6 +201,7 @@ namespace osu.Game.Screens.Select
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    X = -SettingsPanel.WIDTH * OsuGame.SIDE_OVERLAY_OFFSET_RATIO,
                                     Width = 0.6f,
                                     Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0f)),
                                 },
@@ -266,6 +267,7 @@ namespace osu.Game.Screens.Select
                                                     {
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
+                                                        X = NotificationOverlay.WIDTH * OsuGame.SIDE_OVERLAY_OFFSET_RATIO,
                                                         Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.0f), Color4.Black.Opacity(0.5f)),
                                                         RelativeSizeAxes = Axes.Both,
                                                     },
