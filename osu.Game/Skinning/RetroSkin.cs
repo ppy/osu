@@ -64,13 +64,13 @@ namespace osu.Game.Skinning
 
             Configuration.CustomColours[@"SpinnerApproachCircle"] = new Color4(77, 139, 217, 255);
 
-            Configuration.CustomComboColours =
-            [
+            Configuration.DefaultComboColours.Clear();
+            Configuration.DefaultComboColours.AddRange([
                 new Color4(255, 150, 0, 255),
                 new Color4(5, 240, 5, 255),
                 new Color4(5, 5, 240, 255),
                 new Color4(240, 5, 5, 255)
-            ];
+            ]);
 
             Configuration.LegacyVersion = 1m;
         }

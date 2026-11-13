@@ -58,8 +58,8 @@ namespace osu.Game.Screens.Edit.Setup
             if (comboColours.Colours.Count == 0)
             {
                 // compare ctor of `EditorBeatmapSkin`
-                for (int i = 0; i < SkinConfiguration.DefaultComboColours.Count; ++i)
-                    comboColours.Colours.Add(SkinConfiguration.DefaultComboColours[(i + 1) % SkinConfiguration.DefaultComboColours.Count]);
+                for (int i = 0; i < SkinConfiguration.DEFAULT_COMBO_COLOURS.Count; ++i)
+                    comboColours.Colours.Add(SkinConfiguration.DEFAULT_COMBO_COLOURS[(i + 1) % SkinConfiguration.DEFAULT_COMBO_COLOURS.Count]);
             }
 
             comboColours.Colours.BindCollectionChanged((_, _) =>

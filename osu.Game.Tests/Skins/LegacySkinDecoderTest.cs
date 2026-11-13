@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Skins
             using (var stream = new LineBufferedReader(resStream))
             {
                 var comboColors = decoder.Decode(stream).ComboColours;
-                var expectedColors = SkinConfiguration.DefaultComboColours;
+                var expectedColors = SkinConfiguration.DEFAULT_COMBO_COLOURS;
 
                 ClassicAssert.AreEqual(expectedColors.Count, comboColors?.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
