@@ -624,14 +624,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                         {
                             SampleChannel dmgHitChannel;
 
-                            if ((OpponentDamageInfo.OldLife != 0 && OpponentDamageInfo.NewLife == 0) ||
-                                (PlayerDamageInfo.OldLife != 0 && PlayerDamageInfo.NewLife == 0))
+                            if ((OpponentDamageInfo.OldLife == 1 && OpponentDamageInfo.NewLife == 0) ||
+                                (PlayerDamageInfo.OldLife == 1 && PlayerDamageInfo.NewLife == 0))
                             {
+                                // 1hp damage (i.e. hit after a last stand), takes priority over regular last hit
+                                dmgHitChannel = dmg1HpHitSample.GetChannel();
+                            }
+                            else if ((OpponentDamageInfo.OldLife != 0 && OpponentDamageInfo.NewLife == 0) ||
+                                     (PlayerDamageInfo.OldLife != 0 && PlayerDamageInfo.NewLife == 0))
+                            {
+                                // regular last hit
                                 dmgHitChannel = dmgLastHitSample.GetChannel();
                             }
                             else if ((OpponentDamageInfo.OldLife != 1 && OpponentDamageInfo.NewLife == 1) ||
                                      (PlayerDamageInfo.OldLife != 1 && PlayerDamageInfo.NewLife == 1))
                             {
+                                // last stand
                                 dmgHitChannel = dmgLastStandSample.GetChannel();
                             }
                             else
@@ -644,10 +652,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
                                     case >= 100_000:
                                         dmgHitChannel = dmgHitMediumSample.GetChannel();
-                                        break;
-
-                                    case <= 1:
-                                        dmgHitChannel = dmg1HpHitSample.GetChannel();
                                         break;
 
                                     default:
