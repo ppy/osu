@@ -53,6 +53,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     /// </summary>
     public partial class ScreenQueue : OsuScreen
     {
+        public const int WAITING_LOOP_DELAY = 2000;
+
         public override bool? ApplyModTrackAdjustments => false;
 
         private Container mainContent = null!;
@@ -665,7 +667,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     };
 
                     enqueueSample?.Play();
-                    startLoopPlaybackDelegate = Scheduler.AddDelayed(startWaitingLoopPlayback, 2000);
+                    startLoopPlaybackDelegate = Scheduler.AddDelayed(startWaitingLoopPlayback, WAITING_LOOP_DELAY);
                     break;
 
                 case MatchmakingScreenState.PendingAccept:
