@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
             base.ParseLine(skin, section, line, isPrimaryStream);
         }
 
-        protected override SkinConfiguration CreateTemplateObject()
+        public override SkinConfiguration CreateTemplateObject()
         {
             var config = base.CreateTemplateObject();
             config.LegacyVersion = 1.0m;

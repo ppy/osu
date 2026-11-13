@@ -75,7 +75,7 @@ namespace osu.Game.Beatmaps.Formats
             offset = FormatVersion < 5 ? EARLY_VERSION_TIMING_OFFSET : 0;
         }
 
-        protected override Beatmap CreateTemplateObject()
+        public override Beatmap CreateTemplateObject()
         {
             var templateBeatmap = base.CreateTemplateObject();
             templateBeatmap.ControlPointInfo = new LegacyControlPointInfo();

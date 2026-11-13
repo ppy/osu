@@ -130,18 +130,18 @@ namespace osu.Game.Tests.Skins
         public void TestEmptyComboColours()
         {
             AddAssert("Check retrieved combo colours is skin default colours", () =>
-                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(SkinConfiguration.DefaultComboColours) ?? false);
+                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(SkinConfiguration.DEFAULT_COMBO_COLOURS) ?? false);
         }
 
         [Test]
         public void TestEmptyComboColoursNoFallback()
         {
-            AddStep("Add custom combo colours to user skin", () => userSource.Configuration.CustomComboColours = new List<Color4>
-            {
+            AddStep("Add custom combo colours to user skin", () => userSource.Configuration.CustomComboColours.AddRange(
+            [
                 new Color4(100, 150, 200, 255),
                 new Color4(55, 110, 166, 255),
                 new Color4(75, 125, 175, 255)
-            });
+            ]));
 
             AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
 

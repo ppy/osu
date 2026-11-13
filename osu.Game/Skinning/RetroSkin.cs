@@ -35,12 +35,14 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public RetroSkin(SkinInfo skin, IStorageResourceProvider resources)
-            : base(
-                skin,
-                resources,
-                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Retro")
-            )
+            : base(skin, resources, new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Retro"))
         {
+        }
+
+        protected override void SetDefaultConfiguration()
+        {
+            base.SetDefaultConfiguration();
+
             Configuration.ConfigDictionary[@"SliderBallFlip"] = "0";
             Configuration.ConfigDictionary[@"SliderBallFrames"] = "10";
             Configuration.ConfigDictionary[@"AllowSliderBallTint"] = "0";
@@ -62,13 +64,15 @@ namespace osu.Game.Skinning
 
             Configuration.CustomColours[@"SpinnerApproachCircle"] = new Color4(77, 139, 217, 255);
 
-            Configuration.CustomComboColours =
-            [
+            Configuration.DefaultComboColours.Clear();
+            Configuration.DefaultComboColours.AddRange([
                 new Color4(255, 150, 0, 255),
                 new Color4(5, 240, 5, 255),
                 new Color4(5, 5, 240, 255),
                 new Color4(240, 5, 5, 255)
-            ];
+            ]);
+
+            Configuration.LegacyVersion = 1m;
         }
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
