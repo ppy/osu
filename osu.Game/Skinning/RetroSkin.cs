@@ -71,6 +71,8 @@ namespace osu.Game.Skinning
                 new Color4(5, 5, 240, 255),
                 new Color4(240, 5, 5, 255)
             ];
+
+            Configuration.LegacyVersion = 1m;
         }
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
