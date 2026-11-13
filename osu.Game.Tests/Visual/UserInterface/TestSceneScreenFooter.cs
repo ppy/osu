@@ -457,6 +457,40 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("other buttons returned", () => ScreenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.ChildrenOfType<Container>().First().Y == 0));
         }
 
+        [Test]
+        public void TestSceneButtonResizedWhenChangingScreens()
+        {
+            TestScreen screen = null!;
+
+            AddStep("push screen", () =>
+            {
+                LoadScreen(screen = new TestScreen
+                {
+                    FooterContent =
+                    {
+                        Value = ScreenFooterContent.Argon(() => new[]
+                        {
+                            new ScreenFooterButton
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new ScreenFooterButton { Text = "Two", Action = () => { } },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        }),
+                    },
+                });
+            });
+            AddUntilStep("wait until screen is loaded", () => screen.IsCurrentScreen(), () => Is.True);
+
+            AddStep("resize button and immediately push second screen", () =>
+            {
+                ScreenFooter.ChildrenOfType<ScreenFooterButton>().First().ResizeWidthTo(300, 300, Easing.OutQuint);
+                LoadScreen(new TestScreen());
+            });
+        }
+
         private void contentHidden()
         {
             AddUntilStep("content hidden from footer", () => ScreenFooter.ChildrenOfType<TestShearedOverlayContainer.TestFooterContent>().SingleOrDefault()?.IsPresent != true);
