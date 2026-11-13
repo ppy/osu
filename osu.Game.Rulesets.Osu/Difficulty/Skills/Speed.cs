@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecayStamina(double ms, double currentStrain)
         {
-            const double strain_lowering_multiplier = 2.5;
+            const double slowdown_strain_lowering_multiplier = 2.5;
 
             double decay = DiffUtils.Pow(0.05, DiffUtils.Pow(ms / 1000, 3.5));
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return newStrain;
 
             // We want strain to decay faster when it's not building up
-            double changeFactor = currentStrain / newStrain * strain_lowering_multiplier;
+            double changeFactor = currentStrain / newStrain * slowdown_strain_lowering_multiplier;
 
             return DiffUtils.Pow(0.05, DiffUtils.Pow(ms * changeFactor / 1000, 3.5));
         }
