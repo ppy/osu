@@ -157,10 +157,12 @@ namespace osu.Game.Beatmaps.Formats
                 writer.WriteLine(string.Format(
                     CultureInfo.InvariantCulture,
                     @" L,{0},{1}",
-                    loopingGroup.StartTime, loopingGroup.TotalIterations));
+                    loopingGroup.LoopStartTime, loopingGroup.TotalIterations));
+
                 foreach (var command in loopingGroup.AllCommands)
-                    // see `StoryboardLoopingCommand` ctor for why `relativeToTime` is passed
-                    encodeCommand(writer, command, 2, relativeToTime: loopingGroup.StartTime);
+                {
+                    encodeCommand(writer, ((IStoryboardLoopingCommand)command).OriginalCommand, 2);
+                }
             }
 
             foreach (var command in sprite.Commands.AllCommands)
@@ -194,16 +196,13 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void encodeCommand(TextWriter writer, IStoryboardCommand command, int depth, double relativeToTime = 0)
+        private void encodeCommand(TextWriter writer, IStoryboardCommand command, int depth)
         {
             for (int i = 0; i < depth; ++i)
                 writer.Write(' ');
 
             string typeAcronym;
             string details;
-
-            if (command is IStoryboardLoopingCommand loopingCommand)
-                command = loopingCommand.OriginalCommand;
 
             // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1546-L1550
             // https://github.com/peppy/osu-stable-reference/blob/c34a74fb61c17c5667486a12548485d1f03baa2e/osu!/GameplayElements/HitObjectManager_LoadSave.cs#L1690-L1730
@@ -231,7 +230,7 @@ namespace osu.Game.Beatmaps.Formats
                 case StoryboardRotationCommand rotation:
                     typeAcronym = @"R";
                     details = rotation.StartValue == rotation.EndValue
-                        ? rotation.StartValue.ToString(CultureInfo.InvariantCulture)
+                        ? float.DegreesToRadians(rotation.StartValue).ToString(CultureInfo.InvariantCulture)
                         : string.Format(CultureInfo.InvariantCulture,
                             @"{0},{1}",
                             float.DegreesToRadians(rotation.StartValue),
@@ -305,8 +304,8 @@ namespace osu.Game.Beatmaps.Formats
                 @"{0},{1},{2},{3},{4}",
                 typeAcronym,
                 (int)command.Easing,
-                command.StartTime - relativeToTime,
-                command.StartTime == command.EndTime ? null : command.EndTime - relativeToTime,
+                command.StartTime,
+                command.StartTime == command.EndTime ? null : command.EndTime,
                 details));
         }
 

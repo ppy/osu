@@ -45,6 +45,36 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        private LocalisableString text;
+
+        public LocalisableString Text
+        {
+            get => text;
+            set
+            {
+                text = value;
+                spriteText.Text = Text;
+            }
+        }
+
+        public float TextSize
+        {
+            get => spriteText.Font.Size;
+            set => spriteText.Font = spriteText.Font.With(size: value);
+        }
+
+        private Color4 buttonColour;
+
+        public Color4 ButtonColour
+        {
+            get => buttonColour;
+            set
+            {
+                buttonColour = value;
+                updateColour();
+            }
+        }
+
         protected readonly Container ColourContainer;
 
         private readonly Container glowContainer;
@@ -158,65 +188,48 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = Color4.White,
                 },
             };
+        }
 
-            updateGlow();
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             StateChanged += selectionChanged;
+
+            Enabled.BindValueChanged(_ => updateColour(), true);
         }
 
-        private Color4 buttonColour;
-
-        public Color4 ButtonColour
+        private void updateColour()
         {
-            get => buttonColour;
-            set
-            {
-                buttonColour = value;
-                updateGlow();
-                ColourContainer.Colour = value;
-            }
-        }
-
-        private LocalisableString text;
-
-        public LocalisableString Text
-        {
-            get => text;
-            set
-            {
-                text = value;
-                spriteText.Text = Text;
-            }
-        }
-
-        public float TextSize
-        {
-            get => spriteText.Font.Size;
-            set => spriteText.Font = spriteText.Font.With(size: value);
+            ColourContainer.Colour = Enabled.Value ? buttonColour : buttonColour.Darken(0.8f);
+            updateGlow();
         }
 
         private bool clickAnimating;
 
         protected override bool OnClick(ClickEvent e)
         {
-            var flash = new Box
+            if (Enabled.Value)
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = ButtonColour,
-                Blending = BlendingParameters.Additive,
-                Alpha = 0.05f
-            };
+                var flash = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ButtonColour,
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0.05f
+                };
 
-            ColourContainer.Add(flash);
-            flash.FadeOutFromOne(100).Expire();
+                ColourContainer.Add(flash);
+                flash.FadeOutFromOne(100).Expire();
 
-            clickAnimating = true;
-            ColourContainer.ResizeWidthTo(ColourContainer.Width * 1.05f, 100, Easing.OutQuint)
-                           .OnComplete(_ =>
-                           {
-                               clickAnimating = false;
-                               StateChanged?.Invoke(State);
-                           });
+                clickAnimating = true;
+                ColourContainer.ResizeWidthTo(ColourContainer.Width * 1.05f, 100, Easing.OutQuint)
+                               .OnComplete(_ =>
+                               {
+                                   clickAnimating = false;
+                                   StateChanged?.Invoke(State);
+                               });
+            }
 
             return base.OnClick(e);
         }
@@ -274,9 +287,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
-            centerGlow.Colour = ButtonColour;
-            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
+            Color4 col = ColourContainer.Colour;
+
+            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(col.R, col.G, col.B, 0f), col);
+            centerGlow.Colour = col;
+            rightGlow.Colour = ColourInfo.GradientHorizontal(col, new Color4(col.R, col.G, col.B, 0f));
         }
     }
 }

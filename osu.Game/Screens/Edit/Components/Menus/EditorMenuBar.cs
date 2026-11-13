@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
@@ -34,7 +33,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, TextureStore textures)
+        private void load(OverlayColourProvider colourProvider)
         {
             BackgroundColour = colourProvider.Background3;
 

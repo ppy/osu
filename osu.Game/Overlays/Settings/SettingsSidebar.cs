@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings
 {
     public partial class SettingsSidebar : ExpandingContainer
     {
-        public const float CONTRACTED_WIDTH = 70;
+        public const float CONTRACTED_WIDTH = 60;
         public const int EXPANDED_WIDTH = 170;
 
         public Action? BackButtonAction;

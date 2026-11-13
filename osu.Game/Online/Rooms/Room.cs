@@ -37,6 +37,15 @@ namespace osu.Game.Online.Rooms
         }
 
         /// <summary>
+        /// An optional description of the room.
+        /// </summary>
+        public string? Description
+        {
+            get => description;
+            set => SetField(ref description, value);
+        }
+
+        /// <summary>
         /// Sets the room password. Will be <c>null</c> after the room is created.
         /// </summary>
         /// <remarks>
@@ -275,6 +284,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("name")]
         private string name = string.Empty;
 
+        [JsonProperty("description")]
+        private string? description;
+
         [JsonProperty("password")]
         private string? password;
 
@@ -381,6 +393,7 @@ namespace osu.Game.Online.Rooms
         {
             RoomID = other.RoomID;
             Name = other.Name;
+            Description = other.Description;
             Category = other.Category;
             Host = other.Host;
             ChannelId = other.ChannelId;

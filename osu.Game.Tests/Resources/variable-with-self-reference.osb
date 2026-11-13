@@ -1,0 +1,6 @@
+[Variables]
+$self=x$self
+
+[Events]
+Sprite,Foreground,TopCentre,"selfref.jpg",$self,240
+Sprite,Background,TopCentre,"normal.jpg",320,240

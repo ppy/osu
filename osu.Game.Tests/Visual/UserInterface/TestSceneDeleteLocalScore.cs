@@ -131,6 +131,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
             AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().Any());
+            AddUntilStep("wait for loaded", () => leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().All(s => s.IsLoaded));
         }
 
         [Test]

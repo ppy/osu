@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Select
 
             var rulesetInstance = ruleset.Value.CreateInstance();
 
-            if (rulesetInstance.AvailableVariants.Count() > 1)
+            if (rulesetInstance.GameplayVariants.Count() > 1)
             {
                 int variant = rulesetInstance.GetVariantForBeatmap(beatmap, mods.Value);
                 var variantName = rulesetInstance.GetVariantName(variant);

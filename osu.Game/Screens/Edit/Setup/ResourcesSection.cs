@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             backgroundPreview.UpdateBackground();
             editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackgroundAsync());
+            setupScreen.BackgroundChanged?.Invoke();
             return true;
         }
 

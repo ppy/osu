@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
@@ -207,32 +208,46 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Children = new[]
                 {
                     new MultiplayerRoomPanel(new Room
-                    {
-                        Name = "A host-only room",
-                        QueueMode = QueueMode.HostOnly,
-                        Type = MatchType.HeadToHead,
-                        RoomID = 1337,
-                    }),
+                        {
+                            Name = "A host-only room",
+                            Description = "Host controls the queue.",
+                            QueueMode = QueueMode.HostOnly,
+                            Type = MatchType.HeadToHead,
+                            RoomID = 1337,
+                        })
+                        { ShowDescription = true },
                     new MultiplayerRoomPanel(new Room
-                    {
-                        Name = "An all-players, team-versus room",
-                        QueueMode = QueueMode.AllPlayers,
-                        Type = MatchType.TeamVersus,
-                        RoomID = 1338,
-                    }),
+                        {
+                            Name = "An all-players, team-versus room",
+                            Description = "Everyone can add maps. Team versus mode.",
+                            QueueMode = QueueMode.AllPlayers,
+                            Type = MatchType.TeamVersus,
+                            RoomID = 1338,
+                        })
+                        { ShowDescription = true },
                     new MultiplayerRoomPanel(new Room
                     {
                         Name = "A round-robin room",
+                        Description = "This description shouldn't be visible.",
                         QueueMode = QueueMode.AllPlayersRoundRobin,
                         Type = MatchType.HeadToHead,
                         RoomID = 1339,
-                    }),
+                    })
                 }
             });
+
+            AddUntilStep("wait for panels",
+                () => this.ChildrenOfType<MultiplayerRoomPanel>().Count(p => p.ChildrenOfType<DrawableRoomParticipantsList>().Any()),
+                () => Is.EqualTo(3));
+
+            AddAssert("description not displayed on third room", () =>
+                this.ChildrenOfType<MultiplayerRoomPanel>().ElementAt(2)
+                    .ChildrenOfType<SpriteText>()
+                    .All(t => t.Text.ToString() != "This description shouldn't be visible."));
         }
 
         [Test]
-        public void TestRoomWithLongTitle()
+        public void TestRoomWithLongTitleAndDescription()
         {
             AddStep("create rooms", () => Child = new FillFlowContainer
             {
@@ -243,13 +258,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Children = new[]
                 {
                     new MultiplayerRoomPanel(new Room
-                    {
-                        Name =
-                            "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
-                        QueueMode = QueueMode.HostOnly,
-                        Type = MatchType.HeadToHead,
-                        RoomID = 1337,
-                    }),
+                        {
+                            Name =
+                                "This room has a very very long title enough to make the external link button reach the participants list on the right side unless the test window is very wide, at which point I don't know, hi.",
+                            Description = "This room also has a very very long description sitting under that title to check that it also properly truncates when it reaches the right side of the panel, and if it doesn't, then hello again.",
+                            QueueMode = QueueMode.HostOnly,
+                            Type = MatchType.HeadToHead,
+                            RoomID = 1337,
+                        })
+                        { ShowDescription = true },
                 }
             });
         }

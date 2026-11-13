@@ -21,6 +21,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
@@ -53,12 +54,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     /// </summary>
     public partial class ScreenQueue : OsuScreen
     {
-        public override bool ShowFooter => true;
-
         public override bool? ApplyModTrackAdjustments => false;
 
         private Container mainContent = null!;
-        private CloudVisualisation cloud = null!;
+        private QueueVisualisation cloud = null!;
         private RatingDistributionGraph ratingGraph = null!;
         private FillFlowContainer resultPanelContainer = null!;
 
@@ -108,6 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public ScreenQueue(MatchmakingPoolType poolType)
         {
             this.poolType = poolType;
+            FooterContent.Value = ScreenFooterContent.Argon();
         }
 
         [BackgroundDependencyLoader]
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 Children = new Drawable[]
                 {
                     waitingLoop = new DrawableSample(audio.Samples.Get(@"Multiplayer/Matchmaking/waiting-loop")),
-                    new GlobalScrollAdjustsVolume(),
+                    new ScrollAdjustsVolume(),
                     mainGrid = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                                                             RelativeSizeAxes = Axes.Both,
                                                             Children = new Drawable[]
                                                             {
-                                                                cloud = new CloudVisualisation
+                                                                cloud = new QueueVisualisation
                                                                 {
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre,
@@ -385,10 +385,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
 
             currentState.BindTo(queue.CurrentState);
-            currentState.BindValueChanged(s => SetState(s.NewValue));
+            currentState.BindValueChanged(_ => onStateChanged());
 
             selectedPool.BindTo(queue.SelectedPool);
-            selectedPool.BindValueChanged(e => refreshLobbyData());
+            selectedPool.BindValueChanged(_ => refreshLobbyData());
 
             isConnected = client.IsConnected.GetBoundCopy();
             isConnected.BindValueChanged(connected => Schedule(() =>
@@ -505,7 +505,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             queue.SearchInForeground();
 
             using (BeginDelayedSequence(800))
-                Schedule(() => SetState(currentState.Value));
+                Schedule(onStateChanged);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -549,7 +549,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             }
         }
 
-        public void SetState(MatchmakingScreenState newState)
+        private void onStateChanged()
         {
             mainContent.FadeInFromZero(500, Easing.OutQuint);
             mainContent.Clear();
@@ -560,7 +560,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             pushScreenDelegate?.Cancel();
             pushScreenDelegate = null;
 
-            switch (newState)
+            switch (currentState.Value)
             {
                 case MatchmakingScreenState.Idle:
                     LinkFlowContainer duelHint;
@@ -670,7 +670,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 case MatchmakingScreenState.PendingAccept:
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
 
                     matchFoundSample?.Play();
                     music.DuckMomentarily(1250);
@@ -728,14 +727,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     {
                         pushScreenDelegate = Schedule(() =>
                         {
+                            if (client.Room == null)
+                            {
+                                Logger.Log("Room became null, returning to idle");
+                                queue.CurrentState.Value = MatchmakingScreenState.Idle;
+                                return;
+                            }
+
                             switch (poolType)
                             {
                                 case MatchmakingPoolType.QuickPlay:
-                                    this.Push(new ScreenMatchmaking(client.Room!));
+                                    this.Push(new ScreenMatchmaking(client.Room));
                                     break;
 
                                 case MatchmakingPoolType.RankedPlay:
-                                    this.Push(new RankedPlayScreen(client.Room!));
+                                    this.Push(new RankedPlayScreen(client.Room));
                                     break;
                             }
                         });
@@ -744,7 +750,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
+                    throw new ArgumentOutOfRangeException(nameof(currentState), currentState.Value, null);
             }
         }
 

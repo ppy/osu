@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Evaluators
 {
-    public class OverallStrainEvaluator
+    public static class OverallStrainEvaluator
     {
         private const double release_threshold = 30;
 

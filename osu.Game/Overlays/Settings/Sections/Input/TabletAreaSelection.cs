@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 return;
 
             // allow for some degree of floating point error, as we don't care about being perfect here.
-            const float lenience = 0.5f;
+            const float lenience = 0.001f;
 
             var tabletArea = new Quad(-lenience, -lenience, tablet.Value.Size.X + lenience * 2, tablet.Value.Size.Y + lenience * 2);
 

@@ -26,7 +26,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
 {
     public partial class FormColourPalette : CompositeDrawable
     {
+        public LocalisableString PaletteHeaderText { get; init; } = string.Empty;
+
         public BindableList<Colour4> Colours { get; } = new BindableList<Colour4>();
+
+        /// <summary>
+        /// Optional colours offered as presets in each colour picker popover.
+        /// </summary>
+        public BindableList<Colour4> Suggestions { get; } = new BindableList<Colour4>();
 
         public LocalisableString Caption { get; init; }
         public LocalisableString HintText { get; init; }
@@ -149,7 +156,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 // copy to avoid accesses to modified closure.
                 int colourIndex = i;
-                var colourButton = new ColourButton { Current = { Value = Colours[colourIndex] } };
+                var colourButton = new ColourButton(Suggestions)
+                {
+                    PaletteHeaderText = PaletteHeaderText,
+                    Current = { Value = Colours[colourIndex] }
+                };
                 colourButton.Current.BindValueChanged(colour => Colours[colourIndex] = colour.NewValue);
                 colourButton.DeleteRequested = () => Colours.RemoveAt(colourIndex);
                 flow.Add(colourButton);
@@ -158,11 +169,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class ColourButton : OsuClickableContainer, IHasPopover, IHasContextMenu
         {
+            public LocalisableString PaletteHeaderText { get; init; } = string.Empty;
+
             public Bindable<Colour4> Current { get; } = new Bindable<Colour4>();
             public Action? DeleteRequested { get; set; }
 
+            private readonly BindableList<Colour4> suggestions;
+
             private Box background = null!;
             private OsuSpriteText hexCode = null!;
+
+            public ColourButton(BindableList<Colour4> suggestions)
+            {
+                this.suggestions = suggestions;
+            }
 
             [BackgroundDependencyLoader]
             private void load()
@@ -195,8 +215,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Current.BindValueChanged(_ => updateState(), true);
             }
 
-            public Popover GetPopover() => new ColourPickerPopover
+            public Popover GetPopover() => new ColourPickerPopover(suggestions)
             {
+                PaletteHeaderText = PaletteHeaderText,
                 Current = { BindTarget = Current }
             };
 
@@ -215,6 +236,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private partial class ColourPickerPopover : OsuPopover, IHasCurrentValue<Colour4>
         {
+            public LocalisableString PaletteHeaderText { get; init; } = string.Empty;
+
             public Bindable<Colour4> Current
             {
                 get => current.Current;
@@ -222,19 +245,24 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
 
             private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>();
+            private readonly BindableList<Colour4> suggestions;
 
-            public ColourPickerPopover()
+            public ColourPickerPopover(BindableList<Colour4> suggestions)
                 : base(false)
             {
+                this.suggestions = suggestions;
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                Child = new OsuColourPicker
+                var picker = new OsuColourPicker
                 {
-                    Current = { BindTarget = Current }
+                    PaletteHeaderText = PaletteHeaderText,
+                    Current = { BindTarget = Current },
                 };
+                picker.Suggestions.BindTo(suggestions);
+                Child = picker;
 
                 Body.BorderThickness = 2;
                 Body.BorderColour = colourProvider.Highlight1;

@@ -57,6 +57,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected bool ShowExternalLink { get; init; } = true;
 
+        public bool ShowDescription { get; init; }
+
         private DrawableRoomParticipantsList? drawableRoomParticipantsList;
         private RoomSpecialCategoryPill? specialCategoryPill;
         private CornerIcon? passwordIcon;
@@ -99,6 +101,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Colour = colourProvider.Background6.Opacity(0.4f),
                 Radius = 4,
             };
+
+            IEnumerable<Drawable> createNameAndStatus()
+            {
+                yield return roomName = new RoomNameLine();
+
+                if (ShowDescription && !string.IsNullOrEmpty(Room.Description))
+                {
+                    Height = height + 16;
+
+                    yield return new TruncatingSpriteText
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = Room.Description,
+                        Font = OsuFont.Style.Caption2,
+                        Colour = colourProvider.Content2,
+                    };
+                }
+
+                yield return new RoomStatusText(Room)
+                {
+                    Beatmap = { BindTarget = currentBeatmap }
+                };
+            }
 
             InternalChildren = new Drawable[]
             {
@@ -207,14 +232,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                                 AutoSizeAxes = Axes.Y,
                                                                 Padding = new MarginPadding { Top = 3 },
                                                                 Direction = FillDirection.Vertical,
-                                                                Children = new Drawable[]
-                                                                {
-                                                                    roomName = new RoomNameLine(),
-                                                                    new RoomStatusText(Room)
-                                                                    {
-                                                                        Beatmap = { BindTarget = currentBeatmap }
-                                                                    }
-                                                                }
+                                                                ChildrenEnumerable = createNameAndStatus()
                                                             }
                                                         },
                                                     },
@@ -375,8 +393,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateRoomName()
         {
-            if (roomName != null)
-                roomName.Text = Room.Name;
+            roomName?.Text = Room.Name;
         }
 
         private void updateRoomCategory()
@@ -389,20 +406,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateRoomType()
         {
-            if (endDateInfo != null)
-                endDateInfo.Alpha = Room.Type == MatchType.Playlists ? 1 : 0;
+            endDateInfo?.Alpha = Room.Type == MatchType.Playlists ? 1 : 0;
         }
 
         private void updateRoomHasPassword()
         {
-            if (passwordIcon != null)
-                passwordIcon.Alpha = Room.HasPassword ? 1 : 0;
+            passwordIcon?.Alpha = Room.HasPassword ? 1 : 0;
         }
 
         private void updateRoomPinned()
         {
-            if (pinnedIcon != null)
-                pinnedIcon.Alpha = Room.Pinned ? 1 : 0;
+            pinnedIcon?.Alpha = Room.Pinned ? 1 : 0;
         }
 
         private int numberOfAvatars = 7;
@@ -414,8 +428,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 numberOfAvatars = value;
 
-                if (drawableRoomParticipantsList != null)
-                    drawableRoomParticipantsList.NumberOfCircles = value;
+                drawableRoomParticipantsList?.NumberOfCircles = value;
             }
         }
 

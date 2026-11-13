@@ -48,14 +48,16 @@ namespace osu.Game.Database
         /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
         /// It is mainly being used as a queue mechanism for large imports.
         /// </remarks>
-        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<>));
 
         /// <summary>
         /// A second scheduler for batch imports.
         /// For simplicity, these will just run in parallel with normal priority imports, but a future refactor would see this implemented via a custom scheduler/queue.
         /// See https://gist.github.com/peppy/f0e118a14751fc832ca30dd48ba3876b for an incomplete version of this.
         /// </summary>
-        private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<TModel>));
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly ThreadedTaskScheduler import_scheduler_batch = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(RealmArchiveModelImporter<>));
 
         /// <summary>
         /// Temporarily pause imports to avoid performance overheads affecting gameplay scenarios.
@@ -520,8 +522,20 @@ namespace osu.Game.Database
             if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
+            // filename lookups on models are case insensitive (see `BeatmapSetInfoExtensions.GetFile()`), but an
+            // archive can contain both "audio.mp3" and "Audio.MP3". importing such a pair would result in a model which
+            // throws on any file lookup or be unclear which file should be chosen should that be guarded
+            var seenFilenames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             foreach (string file in reader.Filenames)
-                yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
+            {
+                string shortened = file.Substring(prefix.Length).ToStandardisedPath();
+
+                if (!seenFilenames.Add(shortened))
+                    throw new InvalidOperationException($@"Multiple files with the name ""{shortened}"" (ignoring case) are present. Only one of them can be kept.");
+
+                yield return (file, shortened);
+            }
         }
 
         /// <summary>

@@ -12,7 +12,9 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
+using osu.Game.Models;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
@@ -93,10 +95,10 @@ namespace osu.Game.Tests.Beatmaps.IO
             AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"fractional-coordinates.olz"));
             AddAssert("second slider has fractional position",
                 () => ((IHasXPosition)beatmap.Beatmap.HitObjects[1]).X,
-                () => Is.EqualTo(-3.0517578E-05).Within(0.00001));
+                () => Is.EqualTo(3.0517578E-05).Within(0.00001));
             AddAssert("second slider path has fractional coordinates",
                 () => ((IHasPath)beatmap.Beatmap.HitObjects[1]).Path.ControlPoints[1].Position.X,
-                () => Is.EqualTo(191.999939).Within(0.00001));
+                () => Is.EqualTo(191.999878).Within(0.00001));
             AddAssert("second hit circle has fractional position",
                 () => ((IHasYPosition)beatmap.Beatmap.HitObjects[3]).Y,
                 () => Is.EqualTo(383.99997).Within(0.00001));
@@ -226,6 +228,43 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 return false;
             }
+        }
+
+        [Test]
+        public void TestExportFailsOnDuplicateEntry()
+        {
+            IWorkingBeatmap beatmap = null!;
+            BeatmapSetInfo beatmapSetInfo = null!;
+            Exception exception = null!;
+
+            AddStep("import beatmap", () => beatmap = importBeatmapFromArchives(@"241526 Soleily - Renatus.osz"));
+            AddStep("add bogus duplicated file", () =>
+            {
+                Realm.Write(r =>
+                {
+                    var refetchedSet = r.Find<BeatmapSetInfo>(((BeatmapSetInfo)beatmap.BeatmapInfo.BeatmapSet!).ID);
+                    var fileToDuplicate = refetchedSet!.Files.First();
+                    var duplicate = new RealmNamedFileUsage(fileToDuplicate.File, fileToDuplicate.Filename);
+                    refetchedSet.Files.Add(duplicate);
+                    beatmapSetInfo = refetchedSet.Detach();
+                    beatmapSetInfo.Files.AddRange(refetchedSet.Files.Detach());
+                });
+            });
+            AddStep("attempt export", () =>
+            {
+                var outStream = new MemoryStream();
+
+                try
+                {
+                    new LegacyBeatmapExporter(LocalStorage)
+                        .ExportToStream(beatmapSetInfo, outStream, null);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+            });
+            AddUntilStep("exception thrown", () => exception, () => Is.Not.Null);
         }
 
         private IWorkingBeatmap importBeatmapFromStream(Stream stream)

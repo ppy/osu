@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Database
                     var stableStorage = new StableStorage(tmpStorage.GetFullPath(""), host);
                     var songsStorage = stableStorage.GetStorageForDirectory(StableStorage.STABLE_DEFAULT_SONGS_PATH);
 
-                    ZipFile.ExtractToDirectory(TestResources.GetQuickTestBeatmapForImport(), songsStorage.GetFullPath("renatus"));
+                    await ZipFile.ExtractToDirectoryAsync(TestResources.GetQuickTestBeatmapForImport(), songsStorage.GetFullPath("renatus"));
 
                     string[] beatmaps = Directory.GetFiles(songsStorage.GetFullPath("renatus"), "*.osu", SearchOption.TopDirectoryOnly);
 

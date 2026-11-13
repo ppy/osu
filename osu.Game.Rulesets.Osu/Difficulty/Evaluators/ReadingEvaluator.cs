@@ -17,13 +17,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
         public static double EvaluateDifficultyOf(DifficultyHitObject current, bool hidden)
         {
-            if (current.BaseObject is Spinner || current.Index == 0)
+            if (current.BaseObject is Spinner)
                 return 0;
 
             var currObj = (OsuDifficultyHitObject)current;
-            var nextObj = (OsuDifficultyHitObject)current.Next(0);
+            var nextObj = (OsuDifficultyHitObject?)current.Next();
 
-            double velocity = Math.Max(1, currObj.LazyJumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
+            double velocity = Math.Max(1, currObj.JumpDistance / currObj.AdjustedDeltaTime); // Only allow velocity to buff
 
             double currentVisibleObjectDensity = retrieveCurrentVisibleObjectDensity(currObj);
             double pastObjectDifficultyInfluence = getPastObjectDifficultyInfluence(currObj);
@@ -128,16 +128,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double hiddenDifficulty = (preemptFactor + densityFactor) * constantAngleNerfFactor * velocity * 0.01;
 
-            // Apply a soft cap to general HD reading to account for partial memorization
-            hiddenDifficulty = DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
-
-            var previousObj = (OsuDifficultyHitObject)currObj.Previous(0);
+            var previousObj = (OsuDifficultyHitObject?)currObj.Previous();
 
             // Buff perfect stacks only if current note is completely invisible at the time you click the previous note.
-            if (currObj.LazyJumpDistance == 0 && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
-                hiddenDifficulty += hidden_multiplier * 2500 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 1.5); // Perfect stacks are harder the less time between notes
+            if (currObj.LazyJumpDistance == 0 && previousObj != null && currObj.OpacityAt(previousObj.BaseObject.StartTime, true) == 0 && previousObj.StartTime > currObj.StartTime - currObj.Preempt)
+                hiddenDifficulty += 1000000 / DiffUtils.Pow(currObj.AdjustedDeltaTime, 2); // Perfect stacks are harder the less time between notes
 
-            return hiddenDifficulty;
+            // Apply a soft cap to general HD reading to account for partial memorization
+            return DiffUtils.Pow(hiddenDifficulty, 0.4) * hidden_multiplier;
         }
 
         private static double getPastObjectDifficultyInfluence(OsuDifficultyHitObject currObj)
@@ -167,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             for (int i = 0; i < current.Index; i++)
             {
-                OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
+                var hitObject = (OsuDifficultyHitObject?)current.Previous(i);
 
                 if (hitObject == null ||
                     current.StartTime - hitObject.StartTime > reading_window_size ||
@@ -183,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         {
             double visibleObjectCount = 0;
 
-            OsuDifficultyHitObject? hitObject = (OsuDifficultyHitObject)current.Next(0);
+            var hitObject = (OsuDifficultyHitObject?)current.Next();
 
             while (hitObject != null)
             {
@@ -196,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 visibleObjectCount += hitObject.OpacityAt(current.BaseObject.StartTime, false) * timeNerfFactor;
 
-                hitObject = (OsuDifficultyHitObject?)hitObject.Next(0);
+                hitObject = (OsuDifficultyHitObject?)hitObject.Next();
             }
 
             return visibleObjectCount;
@@ -220,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             while (currentTimeGap < minimum_angle_relevancy_time)
             {
-                var loopObj = (OsuDifficultyHitObject)current.Previous(index);
+                var loopObj = (OsuDifficultyHitObject?)current.Previous(index);
 
                 if (loopObj == null)
                     break;
