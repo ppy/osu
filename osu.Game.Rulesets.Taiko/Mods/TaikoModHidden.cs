@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets.Mods;
@@ -17,6 +19,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
     public class TaikoModHidden : ModHidden, IApplicableToDrawableRuleset<TaikoHitObject>
     {
         public override LocalisableString Description => @"Beats fade out before you hit them!";
+
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(TaikoModColourBlind)).ToArray();
 
         /// <summary>
         /// How far away from the hit target should hitobjects start to fade out.
