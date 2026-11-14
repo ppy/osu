@@ -51,6 +51,8 @@ namespace osu.Game.Tournament.Models
 
         public readonly ObservableCollection<BeatmapChoice> PicksBans = new ObservableCollection<BeatmapChoice>();
 
+        public readonly ObservableCollection<BeatmapChoice> Protects = new ObservableCollection<BeatmapChoice>();
+
         [JsonIgnore]
         public readonly Bindable<TournamentRound?> Round = new Bindable<TournamentRound?>();
 
@@ -126,6 +128,7 @@ namespace osu.Game.Tournament.Models
             Team2.Value = null;
             Completed.Value = false;
             PicksBans.Clear();
+            Protects.Clear();
         }
     }
 }
