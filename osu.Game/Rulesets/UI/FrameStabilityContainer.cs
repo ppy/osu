@@ -63,9 +63,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         private readonly FramedClock framedClock;
 
-        [Resolved]
-        private OsuGame? game { get; set; }
-
         private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
@@ -164,20 +161,20 @@ namespace osu.Game.Rulesets.UI
             //
             // In testing this triggers *very* rarely even when set to super low values (10 ms). The cases we're worried about involve multi-second jumps.
             // A difference of more than 500 ms seems like a sane number we should never exceed.
-            //
-            // Double-checking against the parent clock ensures we don't accidentally freeze time when the game stutters due to a long running frame.
-            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500 && game?.Clock.ElapsedFrameTime <= 500)
+            if (!allowReferenceClockSeeks && Math.Abs(proposedTime - referenceClock.CurrentTime) > 500)
             {
-                if (invalidBassTimeLogCount < 10)
+                const int max_frames_to_ignore = 3;
+
+                // When the BASS-side issue occurs, it usually recovers in a single frame.
+                // If it doesn't recover after `max_frames_to_ignore` frames, go back to normal execution. It might have been something else like a user PC freeze.
+                if (++invalidBassTimeLogCount <= max_frames_to_ignore)
                 {
-                    invalidBassTimeLogCount++;
-                    Logger.Log("Ignoring likely invalid time value provided by BASS during gameplay");
+                    Logger.Log($"Ignoring likely invalid time value provided by BASS during gameplay ({invalidBassTimeLogCount} / {max_frames_to_ignore} frames ignored)");
                     Logger.Log($"- provided: {referenceClock.CurrentTime:N2}");
                     Logger.Log($"- expected: {proposedTime:N2}");
+                    state = PlaybackState.NotValid;
+                    return;
                 }
-
-                state = PlaybackState.NotValid;
-                return;
             }
 
             invalidBassTimeLogCount = 0;
