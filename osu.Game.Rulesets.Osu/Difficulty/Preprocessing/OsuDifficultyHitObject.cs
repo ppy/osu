@@ -130,6 +130,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Object's immediate OverallDifficulty value calculated from the raw hitwindow.
         /// </summary>
+        /// <remarks>
+        /// This is NOT safe to use for spinners.
+        /// </remarks>
         public double OverallDifficulty => (79.5 - HitWindowGreat / 2) / 6;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, List<DifficultyHitObject> objects, int index)
