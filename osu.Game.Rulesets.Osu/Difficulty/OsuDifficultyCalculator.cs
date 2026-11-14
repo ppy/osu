@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             int totalHits = beatmap.HitObjects.Count;
 
-            double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
-            double aimNoSlidersRating = calculateAimDifficultyRating(aimNoSlidersDifficultyValue);
+            double aimRating = calculateAimDifficultyRating(aimDifficultyValue, totalHits);
+            double aimNoSlidersRating = calculateAimDifficultyRating(aimNoSlidersDifficultyValue, totalHits);
 
             double sliderFactor = aimDifficultyValue > 0
                 ? aimNoSlidersRating / aimRating
@@ -140,13 +140,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return DiffUtils.Norm(OsuPerformanceCalculator.PERFORMANCE_NORM_EXPONENT, reading, flashlight * Math.Clamp(flashlight / reading, 0.25, 1.0));
         }
 
-        private double calculateAimDifficultyRating(double difficultyValue) => DiffUtils.Pow(difficultyValue, 0.63) * 0.02275;
+        private double calculateAimDifficultyRating(double difficultyValue, int totalHits)
+        {
+            // Legacy length bonus. This should eventually be replaced by summation improvements.
+            // It's intentionally put here instead of the Aim skill to make sure difficult strain count (and miss penalty by extension) doesn't get affected by the length bonus.
+            difficultyValue *= 0.975 + 0.18 * Math.Min(1.0, totalHits / 2000.0) + (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.2 : 0.0);
+
+            return DiffUtils.Pow(difficultyValue, 0.63) * 0.02275;
+        }
 
         private double calculateDifficultyRating(double difficultyValue) => Math.Sqrt(difficultyValue) * 0.0675;
 
         private double calculateStarRating(double basePerformance)
         {
-            return Math.Cbrt(basePerformance * OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER);
+            // We scale down star rating slightly to better match what players expect. This doesn't affect pp in any way and is purely visual.
+            const double star_rating_visual_adjustment_multiplier = 0.975;
+
+            return Math.Cbrt(basePerformance * OsuPerformanceCalculator.PERFORMANCE_BASE_MULTIPLIER) * star_rating_visual_adjustment_multiplier;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, Mod[] mods)
