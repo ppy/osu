@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AlertsAndPrivacyHeader => new TranslatableString(getKey(@"alerts_and_privacy_header"), @"Alerts and Privacy");
 
         /// <summary>
+        /// "Chat ticker"
+        /// </summary>
+        public static LocalisableString ChatTicker => new TranslatableString(getKey(@"chat_ticker"), @"Chat ticker");
+
+        /// <summary>
         /// "Show a notification when someone mentions your name"
         /// </summary>
         public static LocalisableString NotifyOnMentioned => new TranslatableString(getKey(@"notify_on_mentioned"), @"Show a notification when someone mentions your name");
