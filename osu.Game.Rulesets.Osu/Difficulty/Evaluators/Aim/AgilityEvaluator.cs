@@ -5,7 +5,6 @@ using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
@@ -17,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
-            const double previous_delta_influence = 0.5;
+            const double previous_delta_influence = 0.6;
 
             if (current.BaseObject is Spinner)
                 return 0;
@@ -40,31 +39,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double combinedDelta = currentDelta + previousDelta * previous_delta_influence;
 
-            double angleSwitchingBonus = calculateAngleSwitchingBonus(osuCurrObj, osuPrevObj);
+            double wideAngleBonus = calculateWideAngleBonus(osuCurrObj, osuPrevObj);
 
-            double agilityDifficulty = (1 + angleSwitchingBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
+            double agilityDifficulty = (1 + wideAngleBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
 
             agilityDifficulty += osuCurrObj.SmallCircleBonus * 5.0;
 
             return agilityDifficulty;
         }
 
-        private static double calculateAngleSwitchingBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject? osuPrevObj)
+        private static double calculateWideAngleBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject? osuPrevObj)
         {
-            const double angle_switching_bonus = 0.8;
+            const double wide_bonus_multiplier = 2.5;
 
             if (osuCurrObj.Angle == null || osuPrevObj?.Angle == null)
                 return 0;
 
-            double acutenessDifference = 1 - Math.Min(AngleUtils.CalculateAcuteness(osuCurrObj.Angle.Value), DiffUtils.Pow(AngleUtils.CalculateAcuteness(osuPrevObj.Angle.Value), 3));
+            double wideness = DiffUtils.Smootherstep(osuCurrObj.Angle.Value, double.DegreesToRadians(0), double.DegreesToRadians(180));
 
             double rhythmDifferencePenalty = DiffUtils.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuPrevObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuPrevObj.AdjustedDeltaTime),
                 3);
 
-            return acutenessDifference *
+            return wideness *
                    rhythmDifferencePenalty *
                    DiffUtils.ReverseLerp(osuPrevObj.LazyJumpDistance, OsuDifficultyHitObject.NORMALISED_RADIUS, OsuDifficultyHitObject.NORMALISED_DIAMETER) *
-                   angle_switching_bonus;
+                   wide_bonus_multiplier;
         }
     }
 }
