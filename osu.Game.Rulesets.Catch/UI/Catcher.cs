@@ -237,8 +237,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     Drop();
             }
 
-            // droplet doesn't affect hyperdash state
-            if (hitObject is TinyDroplet) return;
+            // tiny droplet or banana doesn't affect hyperdash state
+            if (hitObject is TinyDroplet or Banana) return;
 
             // if a hyper fruit was already handled this frame, just go where it says to go.
             // this special-cases some aspire maps that have doubled-up objects (one hyper, one not) at the same time instant.
