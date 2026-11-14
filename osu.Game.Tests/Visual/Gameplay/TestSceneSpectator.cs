@@ -267,7 +267,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestFinalFramesPurgedBeforeEndingPlay()
         {
-            AddStep("begin playing", () => spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), new Score()));
+            AddStep("begin playing", () => spectatorClient.BeginPlaying(0, TestGameplayState.Create(new OsuRuleset()), new Score
+            {
+                ScoreInfo = new ScoreInfo
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                }
+            }));
 
             AddStep("send frames and finish play", () =>
             {
@@ -275,7 +281,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 var completedGameplayState = TestGameplayState.Create(new OsuRuleset());
                 completedGameplayState.HasPassed = true;
-                spectatorClient.EndPlaying(completedGameplayState);
+                spectatorClient.EndPlaying(null, completedGameplayState);
             });
 
             // We can't access API because we're an "online" test.

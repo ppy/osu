@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(2);
             AddStep("select control point", () =>
             {
-                if (visualiser is not null) visualiser.Pieces[2].IsSelected.Value = true;
+                visualiser?.Pieces[2].IsSelected.Value = true;
             });
             addContextMenuItemStep("Split control point");
 
@@ -128,12 +128,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(2);
             AddStep("select first control point", () =>
             {
-                if (visualiser is not null) visualiser.Pieces[2].IsSelected.Value = true;
+                visualiser?.Pieces[2].IsSelected.Value = true;
             });
             moveMouseToControlPoint(4);
             AddStep("select second control point", () =>
             {
-                if (visualiser is not null) visualiser.Pieces[4].IsSelected.Value = true;
+                visualiser?.Pieces[4].IsSelected.Value = true;
             });
             addContextMenuItemStep("Split 2 control points");
 
@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(2);
             AddStep("select control point", () =>
             {
-                if (visualiser is not null) visualiser.Pieces[2].IsSelected.Value = true;
+                visualiser?.Pieces[2].IsSelected.Value = true;
             });
             addContextMenuItemStep("Split control point");
             AddAssert("sliders have hitsounds", hasHitsounds);

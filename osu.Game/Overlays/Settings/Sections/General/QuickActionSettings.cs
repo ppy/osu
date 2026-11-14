@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 new SettingsButtonV2
                 {
-                    Text = GeneralSettingsStrings.RunSetupWizard,
+                    Text = LocalisableString.Interpolate($@"{GeneralSettingsStrings.RunSetupWizard}..."),
                     Keywords = new[] { @"first run", @"initial", @"getting started", @"import", @"tutorial", @"recommended beatmaps" },
                     TooltipText = FirstRunSetupOverlayStrings.FirstRunSetupDescription,
                     Action = () => firstRunSetupOverlay?.Show(),

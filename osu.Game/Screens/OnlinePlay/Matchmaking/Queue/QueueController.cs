@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -36,6 +37,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         public readonly Bindable<ScreenQueue.MatchmakingScreenState> CurrentState = new Bindable<ScreenQueue.MatchmakingScreenState>();
         public readonly Bindable<MatchmakingPool?> SelectedPool = new Bindable<MatchmakingPool?>();
 
+        /// <summary>
+        /// Timer since the queue was joined.
+        /// </summary>
+        public readonly Stopwatch QueueTimer = new Stopwatch();
+
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;
 
@@ -56,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.LoadComplete();
 
+            client.MatchmakingQueueStatusChanged += onMatchmakingQueueStatusChanged;
             client.RoomUpdated += onRoomUpdated;
             client.MatchmakingQueueJoined += onMatchmakingQueueJoined;
             client.MatchmakingQueueLeft += onMatchmakingQueueLeft;
@@ -72,6 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            QueueTimer.Restart();
 
             client.MatchmakingJoinQueue(pool.Id).FireAndForget();
         }
@@ -83,6 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            QueueTimer.Stop();
 
             client.MatchmakingLeaveQueue().FireAndForget();
         }
@@ -94,6 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             lastDuelUser = userId;
             lastDuelPool = pool;
+            QueueTimer.Restart();
 
             client.MatchmakingIssueDuel(new MatchmakingIssueDuelRequest
             {
@@ -148,6 +158,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             closeNotification();
         }
 
+        private void onMatchmakingQueueStatusChanged(MatchmakingQueueStatus status) => Scheduler.Add(() =>
+        {
+            if (status is MatchmakingQueueStatus.JoiningMatch)
+                CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+        });
+
         private void onRoomUpdated() => Scheduler.Add(() =>
         {
             if (client.Room == null)
@@ -171,6 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
+            QueueTimer.Stop();
 
             postNotification();
             backgroundNotification?.Complete(invitation);
@@ -180,7 +197,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom;
 
-            client.JoinRoom(new Room { RoomID = roomId }, password).FireAndForget();
+            client.JoinRoom(new Room { RoomID = roomId }, password).FireAndForget(onError: _ => Scheduler.Add(() =>
+            {
+                // TODO: in the future this should allow the user to retry joining the room
+                //       once rejoining is in place
+                CurrentState.Value = ScreenQueue.MatchmakingScreenState.Idle;
+                notifications?.Post(new SimpleErrorNotification { Text = "Failed to join room." });
+            }));
         });
 
         private void onMatchmakingDuelIssued(MatchmakingDuelIssuedParams duel)
@@ -230,6 +253,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             if (client.IsNotNull())
             {
+                client.MatchmakingQueueStatusChanged -= onMatchmakingQueueStatusChanged;
                 client.RoomUpdated -= onRoomUpdated;
                 client.MatchmakingQueueJoined -= onMatchmakingQueueJoined;
                 client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;
@@ -353,7 +377,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             public DuelNotification(QueueController controller, APIUser user, MatchmakingDuelIssuedParams duel)
             {
-                Text = $"{user.Username} challenged you to a duel ({duel.Pool.DisplayName}). Click to accept.";
+                Text = NotificationsStrings.UserChallengedYouToDuel(user.Username, duel.Pool.DisplayName);
 
                 Activated = () =>
                 {

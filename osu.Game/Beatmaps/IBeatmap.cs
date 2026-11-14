@@ -103,6 +103,8 @@ namespace osu.Game.Beatmaps
 
         int[] Bookmarks { get; internal set; }
 
+        double[] SliderVelocityPresets { get; internal set; }
+
         int BeatmapVersion { get; }
 
         /// <summary>

@@ -50,14 +50,14 @@ namespace osu.Game.Localisation
         public static LocalisableString DiscordRichPresence => new TranslatableString(getKey(@"discord_rich_presence"), @"Discord Rich Presence");
 
         /// <summary>
-        /// "Web"
+        /// "External content and downloads"
         /// </summary>
-        public static LocalisableString WebHeader => new TranslatableString(getKey(@"web_header"), @"Web");
+        public static LocalisableString ContentDownloadsHeader => new TranslatableString(getKey(@"content_and_downloads"), @"External content and downloads");
 
         /// <summary>
-        /// "Warn about opening external links"
+        /// "Warn before opening external links"
         /// </summary>
-        public static LocalisableString ExternalLinkWarning => new TranslatableString(getKey(@"external_link_warning"), @"Warn about opening external links");
+        public static LocalisableString ExternalLinkWarning => new TranslatableString(getKey(@"external_link_warning"), @"Warn before opening external links");
 
         /// <summary>
         /// "Prefer downloads without video"
@@ -90,9 +90,9 @@ namespace osu.Game.Localisation
         public static LocalisableString DiscordPresenceOff => new TranslatableString(getKey(@"discord_presence_off"), @"Off");
 
         /// <summary>
-        /// "Hide country flags"
+        /// "Hide all country flags"
         /// </summary>
-        public static LocalisableString HideCountryFlags => new TranslatableString(getKey(@"hide_country_flags"), @"Hide country flags");
+        public static LocalisableString HideCountryFlags => new TranslatableString(getKey(@"hide_country_flags"), @"Hide all country flags");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

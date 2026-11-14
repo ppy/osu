@@ -41,8 +41,7 @@ namespace osu.Game.Overlays.Wiki
             {
                 lastMainTitle.Margin = new MarginPadding(0);
 
-                if (lastSubTitle != null)
-                    lastSubTitle.Margin = new MarginPadding(0);
+                lastSubTitle?.Margin = new MarginPadding(0);
 
                 content.Add(lastSubTitle = entry.With(d => d.Margin = new MarginPadding { Bottom = 10 }));
 

@@ -36,7 +36,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 new Container
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    Height = MainDetails.BADGE_HEIGHT,
                     CornerRadius = 6,
                     BorderThickness = 2,
                     BorderColour = colourProvider.Background4,
@@ -53,18 +54,23 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Padding = new MarginPadding(3f),
-                            AutoSizeAxes = Axes.Both,
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                     Text = UsersStrings.ShowMatchmakingTitle,
-                                    Margin = new MarginPadding { Horizontal = 5f, Vertical = 7f },
+                                    Margin = new MarginPadding { Horizontal = 5f, },
                                     Font = OsuFont.GetFont(size: 12)
                                 },
                                 new Container
                                 {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.X,
                                     RelativeSizeAxes = Axes.Y,
                                     CornerRadius = 3,

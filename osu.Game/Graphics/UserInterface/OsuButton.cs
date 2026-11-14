@@ -138,7 +138,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(ClickEvent e)
         {
             if (Enabled.Value)
-                flashLayer.FadeOutFromOne(800, Easing.OutQuint);
+                flashLayer.FadeOutFromOne(500, Easing.OutQuint);
 
             return base.OnClick(e);
         }

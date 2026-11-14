@@ -30,6 +30,7 @@ namespace osu.Game.Graphics
         public static IconUsage RightCircle => get(OsuIconMapping.RightCircle);
         public static IconUsage Undo => get(OsuIconMapping.Undo);
 
+        public static IconUsage ArrowCycle => get(OsuIconMapping.ArrowCycle);
         public static IconUsage Audio => get(OsuIconMapping.Audio);
         public static IconUsage Beatmap => get(OsuIconMapping.Beatmap);
         public static IconUsage Calendar => get(OsuIconMapping.Calendar);
@@ -54,6 +55,7 @@ namespace osu.Game.Graphics
         public static IconUsage ExpandB => get(OsuIconMapping.ExpandB);
         public static IconUsage FeaturedArtist => get(OsuIconMapping.FeaturedArtist);
         public static IconUsage FeaturedArtistCircle => get(OsuIconMapping.FeaturedArtistCircle);
+        public static IconUsage Folder => get(OsuIconMapping.Folder);
         public static IconUsage GameplayA => get(OsuIconMapping.GameplayA);
         public static IconUsage GameplayB => get(OsuIconMapping.GameplayB);
         public static IconUsage GameplayC => get(OsuIconMapping.GameplayC);
@@ -61,6 +63,7 @@ namespace osu.Game.Graphics
         public static IconUsage Graphics => get(OsuIconMapping.Graphics);
         public static IconUsage Heart => get(OsuIconMapping.Heart);
         public static IconUsage Home => get(OsuIconMapping.Home);
+        public static IconUsage Information => get(OsuIconMapping.Information);
         public static IconUsage Input => get(OsuIconMapping.Input);
         public static IconUsage Maintenance => get(OsuIconMapping.Maintenance);
         public static IconUsage Megaphone => get(OsuIconMapping.Megaphone);
@@ -77,6 +80,7 @@ namespace osu.Game.Graphics
         public static IconUsage Prev => get(OsuIconMapping.Prev);
         public static IconUsage PrevCircle => get(OsuIconMapping.PrevCircle);
         public static IconUsage Ranking => get(OsuIconMapping.Ranking);
+        public static IconUsage Reel => get(OsuIconMapping.Reel);
         public static IconUsage Rulesets => get(OsuIconMapping.Rulesets);
         public static IconUsage Search => get(OsuIconMapping.Search);
         public static IconUsage Settings => get(OsuIconMapping.Settings);
@@ -90,6 +94,8 @@ namespace osu.Game.Graphics
         public static IconUsage Twitter => get(OsuIconMapping.Twitter);
         public static IconUsage UserInterface => get(OsuIconMapping.UserInterface);
         public static IconUsage Wiki => get(OsuIconMapping.Wiki);
+        public static IconUsage Add => get(OsuIconMapping.Add);
+        public static IconUsage Remove => get(OsuIconMapping.Remove);
         public static IconUsage EditorHitCircle => get(OsuIconMapping.EditorHitCircle);
         public static IconUsage EditorSlider => get(OsuIconMapping.EditorSlider);
         public static IconUsage EditorSpinner => get(OsuIconMapping.EditorSpinner);
@@ -233,6 +239,9 @@ namespace osu.Game.Graphics
             [Description(@"RightCircle")]
             RightCircle,
 
+            [Description(@"arrow-cycle")]
+            ArrowCycle,
+
             [Description(@"audio")]
             Audio,
 
@@ -305,6 +314,9 @@ namespace osu.Game.Graphics
             [Description(@"featured-artist-circle")]
             FeaturedArtistCircle,
 
+            [Description(@"folder")]
+            Folder,
+
             [Description(@"gameplay-a")]
             GameplayA,
 
@@ -325,6 +337,9 @@ namespace osu.Game.Graphics
 
             [Description(@"home")]
             Home,
+
+            [Description(@"information")]
+            Information,
 
             [Description(@"input")]
             Input,
@@ -374,6 +389,9 @@ namespace osu.Game.Graphics
             [Description(@"ranking")]
             Ranking,
 
+            [Description(@"reel")]
+            Reel,
+
             [Description(@"rulesets")]
             Rulesets,
 
@@ -415,6 +433,12 @@ namespace osu.Game.Graphics
 
             [Description(@"wiki")]
             Wiki,
+
+            [Description(@"add")]
+            Add,
+
+            [Description(@"remove")]
+            Remove,
 
             [Description(@"Editor/hitcircle")]
             EditorHitCircle,

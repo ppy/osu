@@ -40,9 +40,12 @@ namespace osu.Game.Beatmaps.Formats
             Section section = Section.General;
 
             string? line;
+            int lineNumber = 0;
 
             while ((line = stream.ReadLine()) != null)
             {
+                lineNumber++;
+
                 if (ShouldSkipLine(line))
                     continue;
 
@@ -69,7 +72,8 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}");
+                    const int line_length_limit = 50;
+                    Logger.Log($"Failed to process line {lineNumber} \"{(line.Length <= line_length_limit ? line : string.Concat(line.AsSpan(0, line_length_limit), "…"))}\" into \"{output}\": {e.Message}");
                 }
             }
         }

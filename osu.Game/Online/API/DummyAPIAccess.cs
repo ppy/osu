@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -21,6 +22,9 @@ namespace osu.Game.Online.API
         public const int DUMMY_USER_ID = 1001;
 
         public DummyLocalUserState LocalUserState { get; } = new DummyLocalUserState();
+
+        public string ScoreProcessingNoticeUrl { get; set; } = string.Empty;
+
         public Bindable<APIUser> LocalUser => LocalUserState.User;
 
         ILocalUserState IAPIProvider.LocalUserState => LocalUserState;
@@ -67,6 +71,8 @@ namespace osu.Game.Online.API
         /// The current connectivity state of the API.
         /// </summary>
         public IBindable<APIState> State => state;
+
+        public IBindable<LocalisableString?> UserFacingOutageMessage { get; } = new Bindable<LocalisableString?>();
 
         public virtual void Queue(APIRequest request)
         {

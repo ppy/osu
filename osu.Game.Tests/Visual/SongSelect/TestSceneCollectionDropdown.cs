@@ -172,10 +172,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
 
-            AddStep("add beatmap to collection", () => writeAndRefresh(r => getFirstCollection().BeatmapMD5Hashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash)));
+            AddStep("add beatmap to collection", () => writeAndRefresh(_ => getFirstCollection().BeatmapMD5Hashes.Add(Beatmap.Value.BeatmapInfo.MD5Hash)));
             assertFirstButtonIs(FontAwesome.Solid.MinusSquare);
 
-            AddStep("remove beatmap from collection", () => writeAndRefresh(r => getFirstCollection().BeatmapMD5Hashes.Clear()));
+            AddStep("remove beatmap from collection", () => writeAndRefresh(_ => getFirstCollection().BeatmapMD5Hashes.Clear()));
             assertFirstButtonIs(FontAwesome.Solid.PlusSquare);
         }
 

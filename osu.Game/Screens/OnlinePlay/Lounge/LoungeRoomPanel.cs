@@ -74,8 +74,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
-            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetDescription()}-select");
+            sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetResourceName()}-select");
+            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Button.GetResourceName()}-select");
 
             AddRangeInternal(new Drawable[]
             {
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 items.AddRange(base.ContextMenuItems);
 
                 items.Add(new OsuMenuItemSpacer());
-                items.Add(new OsuMenuItem(CommonStrings.CreateCopy, MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
+                items.Add(new OsuMenuItem(LocalisableString.Interpolate($@"{CommonStrings.CreateCopy}..."), MenuItemType.Standard, () => lounge?.OpenCopy(Room)));
 
                 if (Room.Type == MatchType.Playlists && Room.Host?.Id == api.LocalUser.Value.Id && Room.StartDate?.AddMinutes(5) >= DateTimeOffset.Now && !Room.HasEnded)
                 {

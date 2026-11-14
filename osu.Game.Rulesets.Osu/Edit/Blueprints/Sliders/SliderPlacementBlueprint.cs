@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);
 
-                freehandToolboxGroup.CircleThreshold.BindValueChanged(e =>
+                freehandToolboxGroup.CircleThreshold.BindValueChanged(_ =>
                 {
                     Scheduler.AddOnce(updateSliderPathFromBSplineBuilder);
                 }, true);

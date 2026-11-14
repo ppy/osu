@@ -20,16 +20,25 @@ namespace osu.Game.Tests.Visual.Menus
     {
         private OnlineMenuBanner onlineMenuBanner => Game.ChildrenOfType<OnlineMenuBanner>().Single();
 
-        public override void SetUpSteps()
+        [Test]
+        public void TestVolumeControlViaScroll()
         {
-            base.SetUpSteps();
-            AddStep("don't fetch online content", () => onlineMenuBanner.FetchOnlineContent = false);
-            AddStep("disable return to top on idle", () => Game.ChildrenOfType<ButtonSystem>().Single().ReturnToTopOnIdle = false);
+            AddUntilStep("wait for volume overlay loaded", () => Game.ChildrenOfType<VolumeOverlay>().Single().IsLoaded);
+            AddStep("reset volume", () => Audio.Volume.Value = 1);
+
+            AddStep("mouse in centre", () => InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre));
+
+            AddRepeatStep("scroll down", () => InputManager.ScrollVerticalBy(-10), 5);
+            AddAssert("volume lowered down", () => Audio.Volume.Value < 1);
+            AddRepeatStep("scroll up", () => InputManager.ScrollVerticalBy(10), 5);
+            AddAssert("volume raised up", () => Audio.Volume.Value == 1);
         }
 
         [Test]
         public void TestDailyChallenge()
         {
+            AddStep("don't fetch online content", () => onlineMenuBanner.FetchOnlineContent = false);
+            AddStep("disable return to top on idle", () => Game.ChildrenOfType<ButtonSystem>().Single().ReturnToTopOnIdle = false);
             AddStep("set up API", () => ((DummyAPIAccess)API).HandleRequest = req =>
             {
                 switch (req)
@@ -73,6 +82,8 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestOnlineMenuBannerTrusted()
         {
+            AddStep("don't fetch online content", () => onlineMenuBanner.FetchOnlineContent = false);
+            AddStep("disable return to top on idle", () => Game.ChildrenOfType<ButtonSystem>().Single().ReturnToTopOnIdle = false);
             AddStep("set online content", () => onlineMenuBanner.Current.Value = new APIMenuContent
             {
                 Images = new[]
@@ -102,6 +113,8 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestOnlineMenuBannerUntrustedDomain()
         {
+            AddStep("don't fetch online content", () => onlineMenuBanner.FetchOnlineContent = false);
+            AddStep("disable return to top on idle", () => Game.ChildrenOfType<ButtonSystem>().Single().ReturnToTopOnIdle = false);
             AddStep("set online content", () => onlineMenuBanner.Current.Value = new APIMenuContent
             {
                 Images = new[]

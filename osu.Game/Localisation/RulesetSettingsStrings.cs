@@ -90,6 +90,21 @@ namespace osu.Game.Localisation
         public static LocalisableString RateAdjustedHitAnimationTooltip => new TranslatableString(getKey(@"rate_adjusted_hit_animation_tooltip"), @"Hits will fly faster or slower when beatmap rate is adjusted via mods.");
 
         /// <summary>
+        /// "Hit animations"
+        /// </summary>
+        public static LocalisableString HitAnimations => new TranslatableString(getKey(@"hit_animations"), @"Hit animations");
+
+        /// <summary>
+        /// "When enabled, hits will fly off the screen. When disabled, hits will disappear immediately."
+        /// </summary>
+        public static LocalisableString HitAnimationsTaikoTooltip => new TranslatableString(getKey(@"hit_animations_taiko_tooltip"), @"When enabled, hits will fly off the screen. When disabled, hits will disappear immediately.");
+
+        /// <summary>
+        /// "When enabled, hit circles will play an animation when hit. When disabled, they will disappear almost immediately."
+        /// </summary>
+        public static LocalisableString HitAnimationsOsuTooltip => new TranslatableString(getKey(@"hit_animations_osu_tooltip"), @"When enabled, hit circles will play an animation when hit. When disabled, they will disappear almost immediately.");
+
+        /// <summary>
         /// "{0}ms (speed {1:N1})"
         /// </summary>
         public static LocalisableString ScrollSpeedTooltip(int scrollTime, double scrollSpeed) => new TranslatableString(getKey(@"ruleset"), @"{0}ms (speed {1:N1})", scrollTime, scrollSpeed);
@@ -98,6 +113,11 @@ namespace osu.Game.Localisation
         /// "Touch control scheme"
         /// </summary>
         public static LocalisableString TouchControlScheme => new TranslatableString(getKey(@"touch_control_scheme"), @"Touch control scheme");
+
+        /// <summary>
+        /// "Touch drum size"
+        /// </summary>
+        public static LocalisableString TouchDrumSize => new TranslatableString(getKey(@"touch_drum_size"), @"Touch drum size");
 
         /// <summary>
         /// "Mobile layout"

@@ -1,14 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Lists;
+using osu.Framework.Localisation;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
+using osu.Game.Localisation.Osu;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
@@ -105,13 +107,31 @@ namespace osu.Game.Rulesets.Osu
 
     public enum OsuAction
     {
-        [Description("Left button")]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.LeftButton))]
         LeftButton,
 
-        [Description("Right button")]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.RightButton))]
         RightButton,
 
-        [Description("Smoke")]
+        [LocalisableDescription(typeof(ActionStrings), nameof(ActionStrings.Smoke))]
         Smoke,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.HitCircleTool))]
+        EditorHitCircleTool = 10000,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.SliderTool))]
+        EditorSliderTool,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.SpinnerTool))]
+        EditorSpinnerTool,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.GridFromPointsTool))]
+        EditorGridFromPointsTool,
+
+        [LocalisableDescription(typeof(OsuEditorStrings), nameof(OsuEditorStrings.ToggleGridSnap))]
+        EditorToggleGridSnap,
+
+        [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.ToggleDistanceSnap))]
+        EditorToggleDistanceSnap,
     }
 }

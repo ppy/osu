@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         public FruitPlacementBlueprint()
         {
-            InternalChild = outline = new FruitOutline();
+            Child = outline = new FruitOutline();
         }
 
         protected override void LoadComplete()

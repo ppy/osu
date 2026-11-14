@@ -15,6 +15,7 @@ using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
+using osuTK.Graphics;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers.Zip;
@@ -184,6 +185,28 @@ namespace osu.Game.Tests.Skins.IO
 
             assertCorrectMetadata(import, $"Totally fully features skin [Real Skin with Real Features] [{filename[..^4]}]", "Unknown", 2.7m, osu);
             Assert.That(import.PerformRead(r => r.Files.Count), Is.EqualTo(3));
+        });
+
+        [Test]
+        public Task TestImportDefaultClassicWithCustomConfiguration() => runSkinTest(async osu =>
+        {
+            // Has changes to configuration via skin.ini
+            // Intended to cover the `SetDefaultConfiguration` flow in skin construction.
+            const string filename = "Archives/modified-classic-20261113.osk";
+            Live<SkinInfo> import = await loadSkinIntoOsu(osu, new ImportTask(TestResources.OpenResource(filename), filename));
+
+            import.PerformRead(live =>
+            {
+                var skinManager = osu.Dependencies.Get<SkinManager>();
+                var skin = live.CreateInstance(skinManager);
+
+                Assert.That(skin.Configuration.ConfigDictionary[nameof(SkinConfiguration.LegacySetting.AllowSliderBallTint)], Is.EqualTo("0"));
+
+                Assert.That(skin.Configuration.ComboColours![0], Is.EqualTo(new Color4(128, 128, 128, 255)));
+                Assert.That(skin.Configuration.ComboColours![1], Is.EqualTo(new Color4(128, 128, 128, 255)));
+                Assert.That(skin.Configuration.ComboColours![2], Is.EqualTo(new Color4(128, 128, 128, 255)));
+                Assert.That(skin.Configuration.ComboColours![3], Is.EqualTo(new Color4(128, 128, 128, 255)));
+            });
         });
 
         #endregion

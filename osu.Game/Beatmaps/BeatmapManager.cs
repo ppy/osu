@@ -175,7 +175,7 @@ namespace osu.Game.Beatmaps
                 newBeatmap.ControlPointInfo.Add(clonedEffectPoint.Time, clonedEffectPoint);
             }
 
-            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
+            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin, referenceWorkingBeatmap.Storyboard);
         }
 
         /// <summary>
@@ -206,10 +206,10 @@ namespace osu.Game.Beatmaps
             // clear online properties.
             newBeatmapInfo.ResetOnlineInfo();
 
-            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
+            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin, referenceWorkingBeatmap.Storyboard);
         }
 
-        private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin)
+        private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin, Storyboard storyboard)
         {
             // populate circular beatmap set info <-> beatmap info references manually.
             // several places like `Save()` or `GetWorkingBeatmap()`
@@ -217,7 +217,7 @@ namespace osu.Game.Beatmaps
             targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
             newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, new Storyboard(), transferCollections: false);
+            save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin, storyboard, transferCollections: false);
 
             workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
@@ -269,6 +269,27 @@ namespace osu.Game.Beatmaps
                         beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID)!;
 
                     beatmapInfo.Hidden = false;
+                    transaction.Commit();
+                }
+            });
+        }
+
+        /// <summary>
+        /// Restore a beatmap set.
+        /// </summary>
+        /// <param name="beatmapSetInfo">The beatmap set to restore.</param>
+        public void Restore(BeatmapSetInfo beatmapSetInfo)
+        {
+            Realm.Run(r =>
+            {
+                using (var transaction = r.BeginWrite())
+                {
+                    if (!beatmapSetInfo.IsManaged)
+                        beatmapSetInfo = r.Find<BeatmapSetInfo>(beatmapSetInfo.ID)!;
+
+                    foreach (var beatmapInfo in beatmapSetInfo.Beatmaps.Where(b => b.Hidden))
+                        beatmapInfo.Hidden = false;
+
                     transaction.Commit();
                 }
             });

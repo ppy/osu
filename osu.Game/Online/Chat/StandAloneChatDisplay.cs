@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -131,6 +132,8 @@ namespace osu.Game.Online.Chat
         {
             public Action? Focus;
             public Action? FocusLost;
+
+            protected override FontUsage Font => OsuFont.Inter.With(size: FontSize);
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {

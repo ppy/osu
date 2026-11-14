@@ -70,6 +70,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TakeScreenshot => new TranslatableString(getKey(@"take_screenshot"), @"Take screenshot");
 
         /// <summary>
+        /// "Take and upload screenshot"
+        /// </summary>
+        public static LocalisableString TakeAndUploadScreenshot => new TranslatableString(getKey(@"take_and_upload_screenshot"), @"Take and upload screenshot");
+
+        /// <summary>
         /// "Toggle gameplay mouse buttons"
         /// </summary>
         public static LocalisableString ToggleGameplayMouseButtons => new TranslatableString(getKey(@"toggle_gameplay_mouse_buttons"), @"Toggle gameplay mouse buttons");
@@ -363,6 +368,11 @@ namespace osu.Game.Localisation
         /// "Step replay backward one frame"
         /// </summary>
         public static LocalisableString StepReplayBackward => new TranslatableString(getKey(@"step_replay_backward"), @"Step replay backward one frame");
+
+        /// <summary>
+        /// "Fast forward replay"
+        /// </summary>
+        public static LocalisableString FastForwardReplay => new TranslatableString(getKey(@"fast_forward_replay"), @"Fast forward replay");
 
         /// <summary>
         /// "Toggle chat focus"

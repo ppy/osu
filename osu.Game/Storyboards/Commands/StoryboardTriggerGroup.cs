@@ -18,6 +18,8 @@ namespace osu.Game.Storyboards.Commands
             GroupNumber = groupNumber;
         }
 
+        public bool ActiveAt(double time) => TriggerStartTime <= time && time <= TriggerEndTime;
+
         public override string ToString()
             => $"{TriggerName} {TriggerStartTime} -> {TriggerEndTime} ({GroupNumber})";
     }

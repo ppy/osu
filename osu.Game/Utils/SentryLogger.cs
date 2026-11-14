@@ -248,9 +248,14 @@ namespace osu.Game.Utils
 
             switch (exception)
             {
-                // disk I/O failures, invalid formats, etc.
-
                 case IOException ioe:
+                    // named pipe failures, often due to a user error.
+                    // fires from osu!framework NamedPipeIpcProvider.listen(NamedPipeServerStream pipe)
+                    // see https://github.com/dotnet/runtime/blob/719ca2546bd31a54244731185c55c8fc208204bf/src/libraries/System.IO.Pipes/src/System/IO/Pipes/NamedPipeServerStream.cs#L185
+                    if (ioe.Message == "Pipe is broken.")
+                        return false;
+
+                    // disk I/O failures, invalid formats, etc.
                     if (ignored_io_exception_hresults.Contains(ioe.HResult))
                         return false;
 

@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             PrepareBeatmap(() => new OsuCustomSkinWorkingBeatmap(audio, true));
             ConfigureTest(useBeatmapSkin, false, false);
-            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DefaultComboColours));
+            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DEFAULT_COMBO_COLOURS));
         }
 
         [TestCase(true, true)]
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             PrepareBeatmap(() => new OsuCustomSkinWorkingBeatmap(audio, false));
             ConfigureTest(useBeatmapSkin, useBeatmapColour, false);
-            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DefaultComboColours));
+            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DEFAULT_COMBO_COLOURS));
         }
 
         [TestCase(true, true)]

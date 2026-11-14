@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public partial class MainDetails : CompositeDrawable
     {
+        public const float BADGE_HEIGHT = 36;
+
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private ProfileValueDisplay medalInfo = null!;
         private ProfileValueDisplay ppInfo = null!;

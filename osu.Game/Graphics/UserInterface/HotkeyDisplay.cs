@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -63,14 +64,29 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            readableKeyCombinationProvider.KeymapChanged += updateState;
             updateState();
         }
 
         private void updateState()
         {
-            flow.Clear();
-            foreach (string h in hotkey.ResolveKeyCombination(readableKeyCombinationProvider, realmKeyBindingStore, gameHost))
-                flow.Add(new HotkeyBox(h));
+            Scheduler.AddOnce(updateText);
+
+            void updateText()
+            {
+                flow.Clear();
+                foreach (string h in hotkey.ResolveKeyCombination(readableKeyCombinationProvider, realmKeyBindingStore, gameHost))
+                    flow.Add(new HotkeyBox(h));
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (readableKeyCombinationProvider.IsNotNull())
+                readableKeyCombinationProvider.KeymapChanged -= updateState;
         }
 
         private partial class HotkeyBox : CompositeDrawable
@@ -94,14 +110,14 @@ namespace osu.Game.Graphics.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider?.Background6 ?? Colour4.Black.Opacity(0.7f),
+                        Colour = colourProvider?.Background4 ?? Colour4.Black.Opacity(0.7f),
                     },
                     new OsuSpriteText
                     {
                         Margin = new MarginPadding { Horizontal = 5, Bottom = 1, },
                         Text = hotkey.ToUpperInvariant(),
                         Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold),
-                        Colour = colourProvider?.Light1 ?? colours.GrayA,
+                        Colour = colourProvider?.Light2 ?? colours.GrayA,
                     }
                 };
             }

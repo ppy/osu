@@ -40,6 +40,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private OsuSpriteText text = null!;
         private ChannelListItemCloseButton? close;
 
+        private DelayedLoadWrapper loadWrapper = null!;
+
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
 
@@ -57,54 +59,64 @@ namespace osu.Game.Overlays.Chat.ChannelList
             Height = 25;
             RelativeSizeAxes = Axes.X;
 
-            Children = new Drawable[]
+            Child = loadWrapper = new DelayedLoadWrapper(() => new Container
             {
-                hoverBox = new Box
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3,
-                    Alpha = 0f,
-                },
-                selectBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4,
-                    Alpha = 0f,
-                },
-                new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 18, Right = 10 },
-                    ColumnDimensions = new[]
+                    hoverBox = new Box
                     {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background3,
+                        Alpha = 0f,
                     },
-                    Content = new[]
+                    selectBox = new Box
                     {
-                        new Drawable?[]
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background4,
+                        Alpha = 0f,
+                    },
+                    new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Left = 10, Right = 10 },
+                        ColumnDimensions = new[]
                         {
-                            createIcon(),
-                            text = new TruncatingSpriteText
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable?[]
                             {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Text = Channel.Name,
-                                Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                Colour = colourProvider.Light3,
-                                Margin = new MarginPadding { Bottom = 2 },
-                                RelativeSizeAxes = Axes.X,
-                            },
-                            createMentionPill(),
-                            close = createCloseButton(),
+                                createIcon(),
+                                text = new TruncatingSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Text = Channel.Name,
+                                    Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
+                                    Colour = colourProvider.Light3,
+                                    Margin = new MarginPadding { Bottom = 2 },
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                                createMentionPill(),
+                                close = createCloseButton(),
+                            }
                         }
                     }
                 }
-            };
+            }, timeBeforeLoad: 50);
 
             Action = () => OnRequestSelect?.Invoke(Channel);
+
+            loadWrapper.DelayedLoadComplete += _ =>
+            {
+                loadWrapper.FadeInFromZero(300, Easing.OutQuint);
+                updateState();
+            };
         }
 
         protected override void LoadComplete()
@@ -117,17 +129,13 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         protected override bool OnHover(HoverEvent e)
         {
-            hoverBox.FadeIn(300, Easing.OutQuint);
-            close?.FadeIn(300, Easing.OutQuint);
-
+            updateState();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hoverBox.FadeOut(200, Easing.OutQuint);
-            close?.FadeOut(200, Easing.OutQuint);
-
+            updateState();
             base.OnHoverLost(e);
         }
 
@@ -188,7 +196,13 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private void updateState()
         {
+            if (!loadWrapper.DelayedLoadCompleted)
+                return;
+
             bool selected = selectedChannel.Value == Channel;
+
+            hoverBox.FadeTo(IsHovered ? 1 : 0, IsHovered ? 300 : 200, Easing.OutQuint);
+            close?.FadeTo(IsHovered ? 1 : 0, IsHovered ? 300 : 200, Easing.OutQuint);
 
             if (selected)
                 selectBox.FadeIn(300, Easing.OutQuint);

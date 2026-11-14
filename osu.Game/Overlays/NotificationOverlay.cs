@@ -233,7 +233,7 @@ namespace osu.Game.Overlays
             mainContent.FadeTo(1, TRANSITION_LENGTH / 2, Easing.OutQuint);
             mainContent.FadeEdgeEffectTo(WaveContainer.SHADOW_OPACITY, WaveContainer.APPEAR_DURATION, Easing.Out);
 
-            toastTray.FlushAllToasts();
+            toastTray.FlushAllToasts(true);
         }
 
         protected override void PopOut()

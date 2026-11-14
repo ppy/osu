@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Audio;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Skinning
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Skinning
 
         protected override bool AllowTextureLookup(string componentName) => BeatmapSkins.Value;
 
-        protected override bool AllowSampleLookup(ISampleInfo sampleInfo) => BeatmapHitsounds.Value;
+        protected override bool AllowSampleLookup(ISampleInfo sampleInfo) => sampleInfo is StoryboardSampleInfo || BeatmapHitsounds.Value;
 
         private readonly ISkin skin;
         private readonly ISkin? classicFallback;

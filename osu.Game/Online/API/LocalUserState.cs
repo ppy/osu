@@ -1,10 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
@@ -25,8 +30,15 @@ namespace osu.Game.Online.API
         private readonly BindableList<APIRelation> blocks = new BindableList<APIRelation>();
         private readonly BindableList<int> favouriteBeatmapSets = new BindableList<int>();
 
+        #region Config settings synced from online
+
+        private bool populatingSettings;
+
         private readonly Bindable<UserStatus> configStatus = new Bindable<UserStatus>();
         private readonly Bindable<bool> configSupporter = new Bindable<bool>();
+        private readonly Bindable<bool> configPMFriendsOnly = new Bindable<bool>();
+
+        #endregion
 
         public LocalUserState(IAPIProvider api, OsuConfigManager config)
         {
@@ -34,6 +46,9 @@ namespace osu.Game.Online.API
 
             config.BindWith(OsuSetting.UserOnlineStatus, configStatus);
             config.BindWith(OsuSetting.WasSupporter, configSupporter);
+
+            config.BindWith(OsuSetting.PMFriendsOnly, configPMFriendsOnly);
+            configPMFriendsOnly.BindValueChanged(_ => scheduleSettingSyncToWeb());
         }
 
         #region Logging in / out
@@ -60,12 +75,8 @@ namespace osu.Game.Online.API
         public void SetLocalUser(APIMe me)
         {
             localUser.Value = me;
-            configSupporter.Value = me.IsSupporter;
 
-            // `last_visit` is assumed to be `null` if and only if the web-side "hide online presence toggle" is enabled
-            if (me.LastVisit == null)
-                configStatus.Value = UserStatus.Offline;
-
+            syncSettingsFromWeb(me);
             UpdateFriends();
             UpdateBlocks();
             UpdateFavouriteBeatmapSets();
@@ -85,6 +96,68 @@ namespace osu.Game.Online.API
                 blocks.Clear();
                 favouriteBeatmapSets.Clear();
             });
+        }
+
+        #endregion
+
+        #region Setting sync between web and client
+
+        private void syncSettingsFromWeb(APIMe me)
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            populatingSettings = true;
+
+            configSupporter.Value = me.IsSupporter;
+
+            // `last_visit` is assumed to be `null` if and only if the web-side "hide online presence toggle" is enabled
+            if (me.LastVisit == null)
+                configStatus.Value = UserStatus.Offline;
+
+            configPMFriendsOnly.Value = me.PMFriendsOnly;
+
+            populatingSettings = false;
+        }
+
+        private void syncSettingsToWeb()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (!api.IsLoggedIn || populatingSettings)
+                return;
+
+            var request = new UpdateUserOptionsRequest
+            {
+                UserSettings = new UpdateUserOptionsRequest.UserSettingUpdate
+                {
+                    PMFriendsOnly = configPMFriendsOnly.Value
+                }
+            };
+            request.Success += me =>
+            {
+                if (!api.IsLoggedIn || !me.MatchesOnlineID(localUser.Value))
+                    return;
+
+                syncSettingsFromWeb(me);
+            };
+            request.Failure += ex =>
+            {
+                if (!api.IsLoggedIn)
+                    return;
+
+                Logger.Error(ex, @"Failed to synchronise setting");
+                if (localUser.Value is APIMe oldMe)
+                    syncSettingsFromWeb(oldMe);
+            };
+            api.Queue(request);
+        }
+
+        private ScheduledDelegate? scheduledSync;
+
+        private void scheduleSettingSyncToWeb()
+        {
+            scheduledSync?.Cancel();
+            scheduledSync = Scheduler.AddDelayed(syncSettingsToWeb, 500);
         }
 
         #endregion

@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Chat;
 using osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components;
 
 namespace osu.Game.Tests.Visual.RankedPlay
@@ -11,11 +12,12 @@ namespace osu.Game.Tests.Visual.RankedPlay
     public partial class TestSceneBubbleChatHistory : OsuTestScene
     {
         private RankedPlayChatDisplay.BubbleChatHistory history = null!;
+        private Channel testChannel = null!;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = history = new RankedPlayChatDisplay.BubbleChatHistory
+            Child = history = new RankedPlayChatDisplay.BubbleChatHistory(testChannel = new Channel())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.BottomCentre,
@@ -27,7 +29,11 @@ namespace osu.Game.Tests.Visual.RankedPlay
         public void TestPostMessages()
         {
             int messageId = 1;
-            AddRepeatStep("post message", () => history.PostMessage(new APIUser { Id = 2 }, $"message {messageId++}"), 20);
+            AddRepeatStep("post message", () => testChannel.AddNewMessages(new Message
+            {
+                Sender = new APIUser { Id = 2 },
+                Content = $"message {messageId++}",
+            }), 20);
         }
 
         [Test]
@@ -38,7 +44,13 @@ namespace osu.Game.Tests.Visual.RankedPlay
             AddStep("post some messages", () =>
             {
                 for (int i = 0; i < 10; i++)
-                    history.PostMessage(new APIUser { Id = 2 }, $"message {i}");
+                {
+                    testChannel.AddNewMessages(new Message
+                    {
+                        Sender = new APIUser { Id = 2 },
+                        Content = $"message {i}",
+                    });
+                }
             });
 
             AddWaitStep("wait a bit", 10);

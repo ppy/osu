@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
@@ -74,7 +75,7 @@ namespace osu.Game.Beatmaps.Formats
             offset = FormatVersion < 5 ? EARLY_VERSION_TIMING_OFFSET : 0;
         }
 
-        protected override Beatmap CreateTemplateObject()
+        public override Beatmap CreateTemplateObject()
         {
             var templateBeatmap = base.CreateTemplateObject();
             templateBeatmap.ControlPointInfo = new LegacyControlPointInfo();
@@ -316,7 +317,15 @@ namespace osu.Game.Beatmaps.Formats
                 case @"Bookmarks":
                     beatmap.Bookmarks = pair.Value.Split(',').Select(v =>
                     {
-                        bool result = int.TryParse(v, out int val);
+                        bool result = int.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out int val);
+                        return new { result, val };
+                    }).Where(p => p.result).Select(p => p.val).ToArray();
+                    break;
+
+                case @"VelocityPresets":
+                    beatmap.SliderVelocityPresets = pair.Value.Split(',').Select(v =>
+                    {
+                        bool result = double.TryParse(v, NumberStyles.Float, CultureInfo.InvariantCulture, out double val);
                         return new { result, val };
                     }).Where(p => p.result).Select(p => p.val).ToArray();
                     break;

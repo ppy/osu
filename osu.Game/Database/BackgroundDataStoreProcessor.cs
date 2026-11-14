@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -77,9 +78,14 @@ namespace osu.Game.Database
 
         protected virtual int TimeToSleepDuringGameplay => 30000;
 
+        protected virtual bool SkipProcessing => DebugUtils.IsNUnitRunning;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (SkipProcessing)
+                return;
 
             localMetadataSource = new LocalCachedBeatmapMetadataSource(storage);
 
@@ -706,7 +712,7 @@ namespace osu.Game.Database
         {
             if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))
             {
-                Logger.Log(@"Local metadata cache has too low version to backpopulate user tags, attempting refetch...");
+                Logger.Log(@"Local metadata cache doesn't exist, or has too low version to backpopulate user tags, attempting refetch...");
                 localMetadataSource.FetchCache().WaitSafely();
 
                 if (!localMetadataSource.Available || !localMetadataSource.IsAtLeastVersion(3))

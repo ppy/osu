@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -18,6 +19,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -69,7 +71,7 @@ namespace osu.Game.Screens.Select
 
             if (beatmap.OnlineID > 0)
             {
-                yield return new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
+                yield return new OsuMenuItem(LocalisableString.Interpolate($@"{CommonStrings.Details}..."), MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineID));
 
                 if (beatmap.GetOnlineURL(api, Ruleset.Value) is string url)
                     yield return new OsuMenuItem(CommonStrings.CopyLink, MenuItemType.Standard, () => game?.CopyToClipboard(url));
@@ -85,13 +87,13 @@ namespace osu.Game.Screens.Select
             else
                 yield return new OsuMenuItem(SongSelectStrings.RemoveFromPlayed, MenuItemType.Standard, () => beatmaps.MarkNotPlayed(beatmap)) { Icon = FontAwesome.Solid.TimesCircle };
 
-            yield return new OsuMenuItem(SongSelectStrings.ClearAllLocalScores, MenuItemType.Standard, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap)))
+            yield return new OsuMenuItem(SongSelectStrings.ClearAllLocalScores, MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap)))
             {
                 Icon = FontAwesome.Solid.Eraser
             };
 
             if (beatmaps.CanHide(beatmap))
-                yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Destructive, () => beatmaps.Hide(beatmap));
+                yield return new OsuMenuItem(WebCommonStrings.ButtonsHide.ToSentence(), MenuItemType.Standard, () => beatmaps.Hide(beatmap));
         }
 
         protected override void OnStart()
@@ -180,11 +182,10 @@ namespace osu.Game.Screens.Select
 
         private partial class PlayerLoader : Play.PlayerLoader
         {
-            public override bool ShowFooter => !QuickRestart;
-
             public PlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
             {
+                FooterContent.Value = ScreenFooterContent.Argon();
             }
         }
     }

@@ -59,8 +59,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
         {
-            if (explosion != null)
-                explosion.Anchor = direction.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            explosion?.Anchor = direction.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         public void Animate(JudgementResult result)
