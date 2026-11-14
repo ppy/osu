@@ -103,6 +103,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             [new Mod[] { new CatchModNightcore { SpeedChange = { Value = 2.00 } } }, 1.20],
 
             [new Mod[] { new CatchModHidden() }, 1.06],
+            [new Mod[] { new CatchModFadeIn() }, 1.06],
 
             [new Mod[] { new CatchModFlashlight() }, 1.12],
             [new Mod[] { new CatchModFlashlight { ComboBasedSize = { Value = false } } }, 1],
