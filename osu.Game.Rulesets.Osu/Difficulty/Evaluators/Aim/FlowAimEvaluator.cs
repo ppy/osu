@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double overlappedNotesWeight,
             bool withSliderTravelDistance)
         {
-            const double velocity_change_multiplier = 1.9;
+            const double velocity_change_multiplier = 1.95;
 
             if (Math.Max(prevVelocity, currVelocity) == 0)
                 return 0;
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             if (withSliderTravelDistance)
                 currVelocity = currDistance / current.AdjustedDeltaTime;
 
-            const double velocity_distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.1;
+            const double velocity_distance_cap = OsuDifficultyHitObject.NORMALISED_DIAMETER * 1.2;
 
             currVelocity = Math.Min(currVelocity, velocity_distance_cap / current.AdjustedDeltaTime);
             prevVelocity = Math.Min(prevVelocity, velocity_distance_cap / previous.AdjustedDeltaTime);
