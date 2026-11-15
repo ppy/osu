@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public float DistanceMoved { get; private set; }
 
         /// <summary>
-        /// Normalized distance between <see cref="LastNormalizedPosition"/> at its <see cref="NormalizedPosition"/>.
+        /// Normalized distance between <see cref="LastNormalizedPosition"/> and <see cref="NormalizedPosition"/>.
         /// </summary>
         public float Distance { get; private set; }
 
