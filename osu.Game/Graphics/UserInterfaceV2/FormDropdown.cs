@@ -327,7 +327,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override void UpdateSize(Vector2 newSize)
             {
-                newSize.Y = Math.Min(newSize.Y + FormControlBackground.BORDER_THICKNESS * 2.0f, MaxHeight);
+                if (newSize.Y > 0)
+                    newSize.Y = Math.Min(newSize.Y + FormControlBackground.BORDER_THICKNESS * 2.0f, MaxHeight);
 
                 base.UpdateSize(newSize);
             }
