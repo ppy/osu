@@ -29,11 +29,6 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override Type[] IncompatibleMods => new[] { typeof(CatchModAutoplay), typeof(CatchModCinema) };
         public override ModType Type => ModType.Conversion;
 
-        [SettingSource("Mute hit sounds", "Hit sounds become muted.")]
-        public BindableBool AffectsHitSounds { get; } = new BindableBool();
-
-        private readonly BindableNumber<double> hitSoundVolume = new BindableDouble(0);
-
         private CatcherArea catcherArea = null!;
         private BeatmapDifficulty difficulty = null!;
 
@@ -56,9 +51,6 @@ namespace osu.Game.Rulesets.Catch.Mods
             // To a point this could be maybe made to work everywhere except legacy skins.
             // However, `LegacyHitExplosion` is sort of designed to only show explosions on the catcher and that behaviour can never make any sense here.
             catcherArea.Catcher.HitExplosionContainer.Expire();
-
-            if (AffectsHitSounds.Value)
-                drawableRuleset.Audio.AddAdjustment(AdjustableProperty.Volume, hitSoundVolume);
         }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
