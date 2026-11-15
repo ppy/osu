@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             // Direction change bonus.
             if (Math.Abs(catchCurrent.DistanceMoved) > 0.1)
             {
-                if (current.Index >= 1 && Math.Abs(catchLast.DistanceMoved) > 0.1 && catchCurrent.Direction != catchLast.Direction)
+                if (current.Index >= 1 && Math.Abs(catchLast.DistanceMoved) > 0.1 && catchCurrent.MovementDirection != catchLast.MovementDirection)
                 {
                     double bonusFactor = Math.Min(50, Math.Abs(catchCurrent.DistanceMoved)) / 50;
                     double antiflowFactor = Math.Max(Math.Min(70, Math.Abs(catchLast.DistanceMoved)) / 70, 0.38);
@@ -46,8 +46,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                                     / (CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 6) / sqrtStrain;
             }
 
-            // Repetitive spacing nerf: it is harder to catch irregular distances, especially in case of non-hyperdashes which require one to "miss the rhythm on purpose".
-            // Penalty is given based on the ratio between the current (incoming) normalised spacing and the previous normalised spacing.
+            // Repetitive spacing penalty: it is harder to catch irregular distances, especially in case of non-hyperdashes which require one to "miss the rhythm on purpose".
+            // This feature may be treated as a reading penalty: even if the mechanical difficulty is the same, executing it is easier in case of repetitive spacings.
+            // Penalty is given based on the ratio between the current normalised spacing and the previous normalised spacings.
             if (current.Index >= 1)
             {
                 double repetitiveSpacingWeight = 0;
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                 var currentFlow = catchCurrent.Flow;
                 var lastFlow = catchLast.Flow;
 
-                // Penalty is applied only to the direction changes.
+                // Penalty is applied only to the direction changes (defined using Distance, excluding Distance == 0).
                 if (currentFlow.IsFirst(catchCurrent))
                 {
                     for (int i = 0; i < Math.Min(lastFlow.Index, 8); i++)
@@ -64,6 +65,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
 
                         if (prevFlow != null && prevFlow.Distance != 0)
                         {
+                            // We take Distance (instead of DistanceMoved) to measure the real spacing (that player can see) more accurately.
                             double lastSpacing = Math.Abs(lastFlow.Distance / lastFlow.StrainTime);
                             double prevSpacing = Math.Abs(prevFlow.Distance / prevFlow.StrainTime);
 
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                 var catchPrevObj = (CatchDifficultyHitObject)catchCurrent.Previous(i)!;
 
                 // Only same direction movements matter as they do not take any additional inputs.
-                if (catchCurrent.Direction != catchPrevObj.Direction || catchCurrent.Distance == 0 || catchPrevObj.Distance == 0)
+                if (catchCurrent.MovementDirection != catchPrevObj.MovementDirection || catchCurrent.Distance == 0 || catchPrevObj.Distance == 0)
                     break;
 
                 double currentSpacing = Math.Abs(catchCurrent.Distance / catchCurrent.StrainTime);

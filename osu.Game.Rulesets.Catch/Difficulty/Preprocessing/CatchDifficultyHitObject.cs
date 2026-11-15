@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public float DistanceMoved { get; private set; }
 
         /// <summary>
-        /// Normalized distance between <see cref="LastNormalizedPosition"/> at its <see cref="NormalizedPosition"/>.
+        /// Normalized distance between <see cref="LastNormalizedPosition"/> and <see cref="NormalizedPosition"/>.
         /// </summary>
         public float Distance { get; private set; }
 
@@ -57,7 +57,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public readonly double StrainTime;
 
         /// <summary>
-        /// The sign of the <see cref="DistanceMoved"/>: negative is left and positive is right (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
+        /// The sign of the <see cref="DistanceMoved"/>: negative is left, 0 is "no movement", and positive is right
+        /// (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
+        /// </summary>
+        public int MovementDirection;
+
+        /// <summary>
+        /// The sign of the <see cref="Distance"/>: negative is left, 0 is a vertical stack, and positive is right
+        /// (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
         /// </summary>
         public int Direction;
 
@@ -81,15 +88,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
             setMovementState();
 
-            // Divide all hit objects into flows, i.e. series of consecutive notes facing the same direction
+            // Divide all hit objects into flows, i.e. series of consecutive notes facing the same direction.
             var prev = (CatchDifficultyHitObject)Previous(0);
 
-            if (prev != null && prev.Flow.Direction == Direction)
-            {
-                prev.Flow.Add(this);
-                Flow = prev.Flow;
-            }
-            else // Previous object is a direction change (or null).
+            if (prev != null && (prev.Flow.Direction == Direction || Direction != 0))
+                {
+                    prev.Flow.Add(this);
+                    Flow = prev.Flow;
+                }
+            else // Create a new flow on direction change (or the first object of the map).
             {
                 Flow = new Flow(new List<CatchDifficultyHitObject> { this }, flows, flows.Count);
                 flows.Add(Flow);
@@ -115,7 +122,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             if (LastObject.HyperDash)
                 PlayerPosition = NormalizedPosition;
 
-            Direction = Math.Sign(DistanceMoved);
+            MovementDirection = Math.Sign(DistanceMoved);
+            Direction = Math.Sign(Distance);
         }
     }
 }

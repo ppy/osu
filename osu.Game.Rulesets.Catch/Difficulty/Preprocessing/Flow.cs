@@ -36,7 +36,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         }
 
         // Return true whenever the previous object is a direction change.
-        // We treat the first object of the map as a non-direction change.
+        // We treat the first object of the map as a direction change.
+        // We treat objects with Distance == 0 as non-direction changes.
         public bool IsFirst(CatchDifficultyHitObject hitObject) => hitObject.Index == hitObjects.First().Index;
 
         public Flow? Previous(int backwardsIndex)
