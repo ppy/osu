@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 set
                 {
-                    pageTitle.Text = value?.ShortTitle.Titleize() ?? default(LocalisableString);
+                    pageTitle.Text = value?.ShortTitle.ToTitle() ?? default(LocalisableString);
                     dot.Alpha = pageTitle.Text == default ? 0 : 1;
                 }
             }

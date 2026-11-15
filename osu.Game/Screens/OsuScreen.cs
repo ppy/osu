@@ -11,6 +11,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -33,9 +34,9 @@ namespace osu.Game.Screens
         /// <summary>
         /// A user-facing title for this screen.
         /// </summary>
-        public virtual string Title => GetType().Name;
+        public virtual LocalisableString Title => GetType().Name;
 
-        public string Description => Title;
+        public string Description => Title.ToString();
 
         public virtual bool AllowUserExit => true;
 

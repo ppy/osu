@@ -5,6 +5,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -223,7 +224,7 @@ namespace osu.Game.Screens.OnlinePlay
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
         }
 
-        protected abstract string ScreenTitle { get; }
+        protected abstract LocalisableString ScreenTitle { get; }
 
         protected abstract LoungeSubScreen CreateLounge();
 

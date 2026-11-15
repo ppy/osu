@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 
 namespace osu.Game.Screens.OnlinePlay
@@ -10,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
 
-        public virtual string ShortTitle => Title;
+        public virtual LocalisableString ShortTitle => Title;
 
         protected sealed override bool PlayExitSound => false;
 
@@ -50,6 +51,6 @@ namespace osu.Game.Screens.OnlinePlay
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
         }
 
-        public override string ToString() => Title;
+        public override string ToString() => Title.ToString();
     }
 }

@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay;
@@ -33,14 +34,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             private readonly int index;
 
-            public string ShortTitle => $"Screen {index}";
+            public LocalisableString ShortTitle => $"Screen {index}";
 
             public TestOnlinePlaySubScreen(int index)
             {
                 this.index = index;
             }
 
-            public override string ToString() => ShortTitle;
+            public override string ToString() => ShortTitle.ToString();
         }
     }
 }

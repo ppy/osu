@@ -3,12 +3,14 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -21,8 +23,10 @@ namespace osu.Game.Screens.OnlinePlay
     {
         private readonly PlaylistItem item;
 
-        public string ShortTitle => "style selection";
-        public override string Title => ShortTitle.Humanize();
+        public LocalisableString ShortTitle => OnlinePlayStrings.StyleSelectionTitle;
+
+        public override LocalisableString Title => ShortTitle.ToTitle();
+
         public bool ShowHeaderLine => false;
 
         protected abstract void StartAction();

@@ -15,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Audio;
@@ -71,9 +72,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private const float row_padding = 10;
 
-        public override string Title { get; }
+        public override LocalisableString Title { get; }
 
-        public override string ShortTitle => "playlist";
+        public override LocalisableString ShortTitle => OnlinePlayStrings.PlaylistTitle;
 
         public override bool? ApplyModTrackAdjustments => true;
 
