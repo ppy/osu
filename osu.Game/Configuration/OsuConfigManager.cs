@@ -103,6 +103,8 @@ namespace osu.Game.Configuration
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
+            SetDefault(OsuSetting.HitsoundVolume, 0.6, 0, 1, 0.01);
+
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
             SetDefault(OsuSetting.MenuTips, true);
@@ -485,5 +487,6 @@ namespace osu.Game.Configuration
         /// Blocks private messages, multiplayer room invites, and duel requests from people not on the user's friends list.
         /// </summary>
         PMFriendsOnly,
+        HitsoundVolume,
     }
 }

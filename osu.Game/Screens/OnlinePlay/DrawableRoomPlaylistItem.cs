@@ -38,6 +38,7 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -594,7 +595,7 @@ namespace osu.Game.Screens.OnlinePlay
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (beatmapOverlay != null)
-                    items.Add(new OsuMenuItem(CommonStrings.Details, MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
+                    items.Add(new OsuMenuItem(LocalisableString.Interpolate($@"{CommonStrings.Details}..."), MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(Item.Beatmap.OnlineID)));
 
                 if (beatmap != null)
                 {
@@ -606,7 +607,7 @@ namespace osu.Game.Screens.OnlinePlay
                                                    .Select(c => new CollectionToggleMenuItem(c.ToLive(realm), beatmap)).Cast<OsuMenuItem>().ToList();
 
                         if (manageCollectionsDialog != null)
-                            collectionItems.Add(new OsuMenuItem(CommonStrings.Manage, MenuItemType.Standard, manageCollectionsDialog.Show));
+                            collectionItems.Add(new OsuMenuItem(LocalisableString.Interpolate($@"{CommonStrings.Manage}..."), MenuItemType.Standard, manageCollectionsDialog.Show));
 
                         items.Add(new OsuMenuItem(CommonStrings.Collections) { Items = collectionItems });
                     }

@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddRange(new Drawable[]
             {
                 volume,
-                new GlobalScrollAdjustsVolume
+                new ScrollAdjustsVolume
                 {
                     RelativeSizeAxes = Axes.Both,
                 },

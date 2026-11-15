@@ -33,6 +33,13 @@ namespace osu.Game.Rulesets.Taiko
                     Caption = RulesetSettingsStrings.TouchControlScheme,
                     Current = config.GetBindable<TaikoTouchControlScheme>(TaikoRulesetSetting.TouchControlScheme)
                 }),
+                new SettingsItemV2(new FormSliderBar<float>
+                {
+                    Caption = RulesetSettingsStrings.TouchDrumSize,
+                    Current = config.GetBindable<float>(TaikoRulesetSetting.TouchDrumSize),
+                    KeyboardStep = 0.01f,
+                    LabelFormat = v => $"{v:0.##}x",
+                }),
                 new SettingsItemV2(hitAnimations = new FormCheckBox
                 {
                     Caption = RulesetSettingsStrings.HitAnimations,

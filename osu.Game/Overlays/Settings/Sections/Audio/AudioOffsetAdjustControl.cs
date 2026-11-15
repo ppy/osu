@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public partial class AudioOffsetAdjustControl : FillFlowContainer
     {
+        private const int notch_container_height = 10;
+
         public Bindable<double> Current
         {
             get => current.Current;
@@ -71,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Width = 0.5f,
-                                Height = 10,
+                                Height = notch_container_height,
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 Padding = new MarginPadding
@@ -156,14 +158,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 applySuggestion.Enabled.Value = false;
                 notchContainer.Hide();
                 hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetNote, SettingsNote.Type.Informational);
-                hintNote.MoveToY(0, 200, Easing.OutQuint);
+                hintNote.MoveToY(-SettingsSection.ITEM_SPACING_V2, 200, Easing.OutQuint);
             }
             else if (Math.Abs(SuggestedOffset.Value.Value - current.Value) < 1)
             {
                 applySuggestion.Enabled.Value = false;
                 notchContainer.Show();
                 hintNote.Current.Value = new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetCorrect(averageHitErrorHistory.Count), SettingsNote.Type.Informational);
-                hintNote.MoveToY(10, 200, Easing.OutQuint);
+                hintNote.MoveToY(notch_container_height, 200, Easing.OutQuint);
             }
             else
             {
@@ -172,7 +174,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 hintNote.Current.Value =
                     new SettingsNote.Data(AudioSettingsStrings.SuggestedOffsetValueReceived(averageHitErrorHistory.Count, SuggestedOffset.Value.Value.ToStandardFormattedString(0)),
                         SettingsNote.Type.Informational);
-                hintNote.MoveToY(10, 200, Easing.OutQuint);
+                hintNote.MoveToY(notch_container_height, 200, Easing.OutQuint);
             }
         }
     }

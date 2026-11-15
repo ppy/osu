@@ -283,10 +283,17 @@ namespace osu.Game.Overlays.BeatmapSet
                     var titleText = new RomanisableString(newBeatmapSet.TitleUnicode, newBeatmapSet.Title);
                     var artistText = new RomanisableString(newBeatmapSet.ArtistUnicode, newBeatmapSet.Artist);
 
+                    var titleSearchTerm = new RomanisableString(
+                        BeatmapListingOverlay.EscapeKeywordSearchTerm(newBeatmapSet.TitleUnicode),
+                        BeatmapListingOverlay.EscapeKeywordSearchTerm(newBeatmapSet.Title));
+                    var artistSearchTerm = new RomanisableString(
+                        BeatmapListingOverlay.EscapeKeywordSearchTerm(newBeatmapSet.ArtistUnicode),
+                        BeatmapListingOverlay.EscapeKeywordSearchTerm(newBeatmapSet.Artist));
+
                     title.Clear();
                     artist.Clear();
 
-                    title.AddLink(titleText, LinkAction.SearchBeatmapSet, LocalisableString.Interpolate($@"title=""""{titleText}"""""));
+                    title.AddLink(titleText, LinkAction.SearchBeatmapSet, LocalisableString.Interpolate($@"title=""""{titleSearchTerm}"""""));
 
                     title.AddArbitraryDrawable(Empty().With(d => d.Width = 5));
                     title.AddArbitraryDrawable(externalLink = new ExternalLinkButton());
@@ -303,7 +310,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         title.AddArbitraryDrawable(new SpotlightBeatmapBadge());
                     }
 
-                    artist.AddLink(artistText, LinkAction.SearchBeatmapSet, LocalisableString.Interpolate($@"artist=""""{artistText}"""""));
+                    artist.AddLink(artistText, LinkAction.SearchBeatmapSet, LocalisableString.Interpolate($@"artist=""""{artistSearchTerm}"""""));
 
                     if (newBeatmapSet.TrackId != null)
                     {

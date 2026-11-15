@@ -34,5 +34,17 @@ namespace osu.Game.Online.Matchmaking
         /// </summary>
         [Key(3)]
         public MatchRoomState[] RecentMatches { get; set; } = [];
+
+        /// <summary>
+        /// The current user's sigma (rating uncertainty) value.
+        /// </summary>
+        [Key(4)]
+        public double? UserSigma { get; set; }
+
+        /// <summary>
+        /// The current user's rank.
+        /// </summary>
+        [Key(5)]
+        public int? UserRank { get; set; }
     }
 }

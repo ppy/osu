@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 
@@ -32,10 +31,10 @@ namespace osu.Game.Rulesets
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
 
-            // This null check prevents Android from attempting to load the rulesets from disk,
-            // as the underlying path "AppContext.BaseDirectory", despite being non-nullable, it returns null on android.
+            // This check prevents Android from attempting to load the rulesets from disk,
+            // as the underlying path "AppContext.BaseDirectory" returns an empty string on Android.
             // See https://github.com/xamarin/xamarin-android/issues/3489.
-            if (RuntimeInfo.StartupDirectory.IsNotNull())
+            if (!string.IsNullOrEmpty(RuntimeInfo.StartupDirectory))
                 loadFromDisk();
 
             // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.

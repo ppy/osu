@@ -11,6 +11,7 @@ using osu.Framework.Development;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Performance;
 using osu.Game.Screens;
 using osu.Game.Updater;
 using osu.Game.Utils;
@@ -22,6 +23,9 @@ namespace osu.Android
     {
         [Cached]
         private readonly OsuGameActivity gameActivity;
+
+        [Cached(typeof(IHighPerformanceSessionManager))]
+        private readonly HighPerformanceSessionManager highPerformanceSessionManager = new HighPerformanceSessionManager();
 
         private readonly PackageInfo packageInfo;
 

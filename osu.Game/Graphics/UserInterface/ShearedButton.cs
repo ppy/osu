@@ -11,10 +11,11 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public partial class ShearedButton : OsuClickableContainer
+    public partial class ShearedButton : OsuClickableContainer, IScreenFooterButton
     {
         public const float DEFAULT_HEIGHT = 50;
         public const float CORNER_RADIUS = 7;
@@ -195,5 +196,59 @@ namespace osu.Game.Graphics.UserInterface
 
             ButtonContent.FadeColour(colourContent, 150, Easing.OutQuint);
         }
+
+        #region IScreenFooterButton
+
+        void IScreenFooterButton.AppearFromLeft(double delay)
+        {
+            Enabled.Value = Action != null;
+
+            Content.FinishTransforms();
+            Content.MoveToX(-300f)
+                   .FadeOut()
+                   .Delay(delay)
+                   .MoveToX(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        void IScreenFooterButton.AppearFromBottom(double delay)
+        {
+            Enabled.Value = Action != null;
+
+            Content.FinishTransforms();
+            Content.MoveToY(100f)
+                   .FadeOut()
+                   .Delay(delay)
+                   .MoveToY(0f, 240, Easing.OutCubic)
+                   .FadeIn(240, Easing.OutCubic);
+        }
+
+        void IScreenFooterButton.DisappearToRight(double delay, bool expire)
+        {
+            Enabled.Value = false;
+
+            Content.FinishTransforms();
+            Content.Delay(delay)
+                   .FadeOut(240, Easing.InOutCubic)
+                   .MoveToX(300f, 360, Easing.InOutCubic);
+
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+        }
+
+        void IScreenFooterButton.DisappearToBottom(double delay, bool expire)
+        {
+            Enabled.Value = false;
+
+            Content.FinishTransforms();
+            Content.Delay(delay)
+                   .FadeOut(240, Easing.InOutCubic)
+                   .MoveToY(100f, 240, Easing.InOutCubic);
+
+            if (expire)
+                this.Delay(Content.LatestTransformEndTime - Time.Current).Expire();
+        }
+
+        #endregion
     }
 }
