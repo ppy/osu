@@ -7,7 +7,7 @@ namespace osu.Game.Localisation.Taiko
 {
     public static class TaikoEditorStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.Osu.OsuEditor";
+        private const string prefix = @"osu.Game.Resources.Localisation.Taiko.TaikoEditor";
 
         /// <summary>
         /// "Hit"

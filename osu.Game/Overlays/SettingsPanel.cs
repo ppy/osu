@@ -261,13 +261,11 @@ namespace osu.Game.Overlays
 
                 SectionsContainer.SelectedSection.BindValueChanged(section =>
                 {
-                    if (selectedSidebarButton != null)
-                        selectedSidebarButton.Selected = false;
+                    selectedSidebarButton?.Selected = false;
 
                     selectedSidebarButton = Sidebar.Children.OfType<SidebarIconButton>().FirstOrDefault(b => b.Section == section.NewValue);
 
-                    if (selectedSidebarButton != null)
-                        selectedSidebarButton.Selected = true;
+                    selectedSidebarButton?.Selected = true;
                 }, true);
             });
         }

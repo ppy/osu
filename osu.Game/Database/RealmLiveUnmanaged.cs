@@ -26,7 +26,7 @@ namespace osu.Game.Database
             : base(data.ID)
         {
             if (data.IsManaged)
-                throw new InvalidOperationException($"Cannot use {nameof(RealmLiveUnmanaged<T>)} with managed instances");
+                throw new InvalidOperationException($"Cannot use {nameof(RealmLiveUnmanaged<>)} with managed instances");
 
             Value = data;
         }

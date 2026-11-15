@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
-            var catchLast = (CatchDifficultyHitObject)current.Previous(0);
-            var catchLastLast = (CatchDifficultyHitObject)current.Previous(1);
+            var catchLast = (CatchDifficultyHitObject?)current.Previous();
+            var catchLastLast = (CatchDifficultyHitObject?)current.Previous(1);
 
             // In catch, clockrate adjustments do not only affect the timings of hitobjects,
             // but also the speed of the player's catcher, which has an impact on difficulty
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
 
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
-                var catchPrevObj = (CatchDifficultyHitObject)catchCurrent.Previous(i);
+                var catchPrevObj = (CatchDifficultyHitObject)catchCurrent.Previous(i)!;
 
                 // Only same direction movements matter as they do not take any additional inputs.
                 if (catchCurrent.Direction != catchPrevObj.Direction || catchCurrent.Distance == 0 || catchPrevObj.Distance == 0)

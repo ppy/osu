@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Database
 
                 var liveBeatmap = beatmap.ToLive(realm);
 
-                Assert.Throws<InvalidOperationException>(() => liveBeatmap.PerformWrite(l => throw new InvalidOperationException()));
+                Assert.Throws<InvalidOperationException>(() => liveBeatmap.PerformWrite(_ => throw new InvalidOperationException()));
                 ClassicAssert.False(liveBeatmap.PerformRead(l => l.Hidden));
 
                 liveBeatmap.PerformWrite(l => l.Hidden = true);

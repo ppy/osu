@@ -71,7 +71,7 @@ namespace osu.Game.Database
 
         private readonly Queue<(TLookup id, TaskCompletionSource<TValue?>)> pendingTasks = new Queue<(TLookup, TaskCompletionSource<TValue?>)>();
         private Task? pendingRequestTask;
-        private readonly object taskAssignmentLock = new object();
+        private readonly Lock taskAssignmentLock = new Lock();
 
         private Task<TValue?> queryValue(TLookup id)
         {
@@ -170,7 +170,7 @@ namespace osu.Game.Database
             var nextTask = Task.Run(performLookup);
             nextTask.ContinueWith(t =>
             {
-                Logger.Error(t.Exception.AsSingular(), $"{nameof(OnlineLookupCache<TLookup, TValue, TRequest>)} lookup request failed!");
+                Logger.Error(t.Exception.AsSingular(), $"{nameof(OnlineLookupCache<,,>)} lookup request failed!");
             }, TaskContinuationOptions.OnlyOnFaulted);
             pendingRequestTask = nextTask;
         }

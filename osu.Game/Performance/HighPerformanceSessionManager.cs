@@ -6,9 +6,8 @@ using System.Runtime;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
-using osu.Game.Performance;
 
-namespace osu.Desktop.Performance
+namespace osu.Game.Performance
 {
     public class HighPerformanceSessionManager : IHighPerformanceSessionManager
     {

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Audio;
+using osu.Game.Audio.Effects;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
@@ -25,6 +26,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
 
         private Bindable<bool> isPlayingPreview = null!;
 
+        private readonly BindableDouble volumeBindable = new BindableDouble(1);
+
+        private AudioFilter? lowPassFilter;
+
         [Resolved]
         private MusicController musicController { get; set; } = null!;
 
@@ -34,7 +39,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            AddInternal(bgm = new DrawableTrack(audio.Tracks.Get("rankedplay_bgm.ogg")));
+            AddRangeInternal(new Drawable[]
+            {
+                bgm = new DrawableTrack(audio.Tracks.Get("rankedplay_bgm.ogg")),
+                lowPassFilter = new AudioFilter(audio.TrackMixer)
+            });
+            bgm.AddAdjustment(AdjustableProperty.Volume, volumeBindable);
         }
 
         protected override void LoadComplete()
@@ -48,9 +58,27 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Components
             });
         }
 
-        public void Play() => shouldBePlaying = true;
+        public void Play()
+        {
+            Unduck();
+            Unmute();
+            shouldBePlaying = true;
+        }
 
         public void Stop() => shouldBePlaying = false;
+
+        public void Mute() => volumeBindable.Value = 0;
+
+        public void Unmute(int fadeDuration = 0)
+        {
+            if (fadeDuration > 0)
+                this.TransformBindableTo(volumeBindable, 1, fadeDuration, Easing.OutCubic);
+            else
+                volumeBindable.Value = 1;
+        }
+
+        public void Duck() => lowPassFilter?.CutoffTo(300);
+        public void Unduck() => lowPassFilter?.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF);
 
         protected override void Update()
         {

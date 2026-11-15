@@ -95,6 +95,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll Speed");
 
         /// <summary>
+        /// "This value is being adjusted by mods ({0:0.0#} → {1:0.0#})."
+        /// </summary>
+        public static LocalisableString ThisValueIsBeingAdjustedByMods(float originalValue, float adjustedValue) => new TranslatableString(getKey(@"this_value_is_being_adjusted_by_mods"), @"This value is being adjusted by mods ({0:0.0#} → {1:0.0#}).", originalValue, adjustedValue);
+
+        /// <summary>
         /// "Submitted"
         /// </summary>
         public static LocalisableString Submitted => new TranslatableString(getKey(@"submitted"), @"Submitted");

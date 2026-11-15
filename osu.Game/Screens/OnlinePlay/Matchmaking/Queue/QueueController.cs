@@ -62,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             base.LoadComplete();
 
+            client.MatchmakingQueueStatusChanged += onMatchmakingQueueStatusChanged;
             client.RoomUpdated += onRoomUpdated;
             client.MatchmakingQueueJoined += onMatchmakingQueueJoined;
             client.MatchmakingQueueLeft += onMatchmakingQueueLeft;
@@ -156,6 +157,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             closeNotification();
         }
 
+        private void onMatchmakingQueueStatusChanged(MatchmakingQueueStatus status) => Scheduler.Add(() =>
+        {
+            if (status is MatchmakingQueueStatus.JoiningMatch)
+                CurrentState.Value = ScreenQueue.MatchmakingScreenState.AcceptedWaitingForRoom;
+        });
+
         private void onRoomUpdated() => Scheduler.Add(() =>
         {
             if (client.Room == null)
@@ -238,6 +245,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             if (client.IsNotNull())
             {
+                client.MatchmakingQueueStatusChanged -= onMatchmakingQueueStatusChanged;
                 client.RoomUpdated -= onRoomUpdated;
                 client.MatchmakingQueueJoined -= onMatchmakingQueueJoined;
                 client.MatchmakingQueueLeft -= onMatchmakingQueueLeft;

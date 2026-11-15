@@ -80,6 +80,7 @@ namespace osu.Game.Tests.Visual.Online
                 Name = $"#channel-{id}",
                 Topic = RNG.Next(4) < 3 ? $"We talk about the number {id} here" : null,
                 Type = ChannelType.Public,
+                ActiveUserCount = RNG.NextBool() ? null : RNG.Next(0, 200),
                 Id = id,
             };
         }

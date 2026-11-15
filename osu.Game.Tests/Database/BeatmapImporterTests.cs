@@ -1017,6 +1017,56 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestImportFailsWithFilenamesDifferingOnlyInCase()
+        {
+            RunTestWithRealmAsync(async (realm, storage) =>
+            {
+                var importer = new BeatmapImporter(storage, realm);
+                using var store = new RealmRulesetStore(realm, storage);
+
+                string? temp = TestResources.GetTestBeatmapForImport();
+
+                string extractedFolder = $"{temp}_extracted";
+                Directory.CreateDirectory(extractedFolder);
+
+                try
+                {
+                    using (var zip = ZipArchive.OpenArchive(temp))
+                        zip.WriteToDirectory(extractedFolder);
+
+                    string background = Directory.GetFiles(extractedFolder, "*.jpg").First();
+
+                    using (var zip = ZipArchive.CreateArchive())
+                    {
+                        zip.AddAllFromDirectory(extractedFolder);
+
+                        zip.AddEntry(Path.GetFileName(background).ToUpperInvariant(), background);
+
+                        zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                    }
+                }
+                finally
+                {
+                    Directory.Delete(extractedFolder, true);
+                }
+
+                Exception? exception = null;
+
+                try
+                {
+                    await importer.Import(new ImportTask(temp));
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+
+                Assert.That(exception, Is.TypeOf<InvalidOperationException>());
+                Assert.That(realm.Realm.All<BeatmapSetInfo>().Count(), Is.Zero);
+            });
+        }
+
+        [Test]
         public void TestBeatmapFilesInNestedDirectoriesAreIgnored()
         {
             RunTestWithRealmAsync(async (realm, storage) =>

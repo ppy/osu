@@ -130,7 +130,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.That(actual.Beatmap.HitObjects.Serialize(), Is.EqualTo(expected.Beatmap.HitObjects.Serialize()));
 
             // Check skin.
-            ClassicAssert.True(areComboColoursEqual(expected.Skin.Configuration, actual.Skin.Configuration));
+            Assert.That(actual.Skin.Configuration.ComboColours, Is.EquivalentTo(expected.Skin.Configuration.ComboColours!));
+            Assert.That(actual.Skin.Configuration.CustomColours, Is.EquivalentTo(expected.Skin.Configuration.CustomColours));
 
             // Do a rough pass on storyboard layers.
             foreach (string layer in actual.Storyboard.Layers.Concat(expected.Storyboard.Layers).Select(l => l.Name).Distinct())
@@ -294,18 +295,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Sort(decodedAfterEncode.Beatmap);
 
             CompareBeatmaps(decoded, decodedAfterEncode);
-        }
-
-        private static bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
-        {
-            // equal to null, no need to SequenceEqual
-            if (a.ComboColours == null && b.ComboColours == null)
-                return true;
-
-            if (a.ComboColours == null || b.ComboColours == null)
-                return false;
-
-            return a.ComboColours.SequenceEqual(b.ComboColours);
         }
 
         public static void Sort(IBeatmap beatmap)

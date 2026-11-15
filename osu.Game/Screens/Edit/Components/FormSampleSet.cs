@@ -276,10 +276,7 @@ namespace osu.Game.Screens.Edit.Components
 
                 recycleSamples();
 
-                if (triangles == null)
-                    return;
-
-                triangles.Colour = ColourInfo.GradientVertical(triangleGradientSecondColour.Value, BackgroundColour);
+                triangles?.Colour = ColourInfo.GradientVertical(triangleGradientSecondColour.Value, BackgroundColour);
             }
 
             private void recycleSamples() => Schedule(() =>
@@ -292,7 +289,7 @@ namespace osu.Game.Screens.Edit.Components
 
                 AddInternal(hoverSounds = (ActualFilename.Value == null ? new HoverClickSounds(HoverSampleSet.Button) : new HoverSounds(HoverSampleSet.Button)));
 
-                sample = ActualFilename.Value != null ? editorBeatmap?.BeatmapSkin?.Skin.Samples?.Get(ActualFilename.Value) : null;
+                sample = ActualFilename.Value != null ? editorBeatmap?.BeatmapSkin?.Skin.GetSampleFromSkinFiles(ActualFilename.Value, true) : null;
             });
 
             protected override bool OnHover(HoverEvent e)
