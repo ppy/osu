@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public void Add(CatchDifficultyHitObject hitObject)
         {
             hitObjects.Add(hitObject);
+            Distance = hitObjects.Aggregate(0.0f, (acc, h) => acc + h.Distance);
             StrainTime = Math.Max(hitObjects.Aggregate(0.0, (acc, h) => acc + h.DeltaTime), 40);
         }
 
