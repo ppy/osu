@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -24,13 +23,5 @@ namespace osu.Game.Overlays.Settings
         }
 
         public bool FilteringActive { get; set; }
-
-        public SettingsFilterableGroup()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(SettingsSection.ITEM_SPACING_V2);
-        }
     }
 }

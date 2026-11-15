@@ -61,6 +61,10 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new SettingsFilterableGroup
                 {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(ITEM_SPACING_V2),
                     Children = new Drawable[]
                     {
                         new SettingsItemV2(skinDropdown = new SkinDropdown
@@ -72,8 +76,9 @@ namespace osu.Game.Overlays.Settings.Sections
                         }),
                         new SettingsFilterableGroup
                         {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Horizontal,
-                            Spacing = Vector2.Zero,
                             Padding = SettingsPanel.CONTENT_PADDING,
                             Children = new Drawable[]
                             {
