@@ -45,6 +45,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Playfield => new TranslatableString(getKey(@"playfield"), @"Playfield");
 
         /// <summary>
+        /// "Results"
+        /// </summary>
+        public static LocalisableString Results => new TranslatableString(getKey(@"results"), @"Results");
+
+        /// <summary>
         /// "{0} ("{1}" only)"
         /// </summary>
         public static LocalisableString WorkingLayerOfRuleset(LocalisableString layerName, string rulesetName) => new TranslatableString(getKey(@"working_layer_of_ruleset"), @"{0} (""{1}"" only)", layerName, rulesetName);

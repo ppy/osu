@@ -165,8 +165,12 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
+      # The .NET workload (built against/requires a specific Xcode version) and the default Xcode on the GHA runner can get out of sync.
+      # Force a common Xcode version to prevent builds spontaneously failing.
       - name: Install .NET Workloads
-        run: dotnet workload install ios
+        run: |
+          sudo xcode-select -s /Applications/Xcode_27.0.app/Contents/Developer
+          dotnet workload install ios --version 10.0.402
 
       - name: Build
         run: dotnet build -c Debug osu.iOS.slnf

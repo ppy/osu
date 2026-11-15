@@ -29,24 +29,22 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract partial class QueueModeTestScene : ScreenTestScene
+    public abstract partial class QueueModeTestScene : MultiplayerTestScene
     {
         protected abstract QueueMode Mode { get; }
 
         protected BeatmapInfo InitialBeatmap { get; private set; } = null!;
         protected BeatmapInfo OtherBeatmap { get; private set; } = null!;
 
-        protected IScreen CurrentScreen => multiplayerComponents.CurrentScreen;
-        protected IScreen CurrentSubScreen => multiplayerComponents.MultiplayerScreen.CurrentSubScreen;
+        protected IScreen CurrentScreen => Stack.CurrentScreen;
+        protected IScreen CurrentSubScreen => screen.CurrentSubScreen;
 
         protected BeatmapManager Beatmaps { get; private set; } = null!;
 
         private BeatmapSetInfo importedSet = null!;
         private RulesetStore rulesets = null!;
 
-        private TestMultiplayerComponents multiplayerComponents = null!;
-
-        protected TestMultiplayerClient MultiplayerClient => multiplayerComponents.MultiplayerClient;
+        private Screens.OnlinePlay.Multiplayer.Multiplayer screen = null!;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -78,12 +76,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 OtherBeatmap = importedSet.Beatmaps.Last(b => b.Ruleset.OnlineID == 0);
             });
 
-            AddStep("load multiplayer", () => LoadScreen(multiplayerComponents = new TestMultiplayerComponents()));
-            AddUntilStep("wait for multiplayer to load", () => multiplayerComponents.IsLoaded);
+            AddStep("load multiplayer", () => LoadScreen(screen = new Screens.OnlinePlay.Multiplayer.Multiplayer()));
+            AddUntilStep("wait for multiplayer to load", () => screen.IsLoaded);
             AddUntilStep("wait for lounge to load", () => this.ChildrenOfType<MultiplayerLoungeSubScreen>().FirstOrDefault()?.IsLoaded == true);
 
-            AddUntilStep("wait for lounge", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
-            AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open(new Room
+            AddStep("open room", () => this.ChildrenOfType<LoungeSubScreen>().Single().Open(new Room
             {
                 Name = "Test Room",
                 QueueMode = Mode,
@@ -119,8 +116,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
-            AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player player && player.IsLoaded);
-            AddStep("exit player", () => multiplayerComponents.MultiplayerScreen.MakeCurrent());
+            AddUntilStep("wait for player", () => CurrentScreen is Player player && player.IsLoaded);
+            AddStep("exit player", () => screen.MakeCurrent());
         }
 
         protected void AddBeatmapFromSongSelect(Func<BeatmapInfo> beatmap, RulesetInfo? ruleset = null, IReadOnlyList<Mod>? mods = null)

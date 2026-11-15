@@ -18,6 +18,9 @@ namespace osu.Game.Skinning
         SongSelect,
 
         [LocalisableDescription(typeof(SkinEditorStrings), nameof(SkinEditorStrings.Playfield))]
-        Playfield
+        Playfield,
+
+        [LocalisableDescription(typeof(SkinEditorStrings), nameof(SkinEditorStrings.Results))]
+        Results,
     }
 }
