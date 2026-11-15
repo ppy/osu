@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                     }
                 }
                 
-                double repetitiveSpacingPenalty = catchCurrent.BaseObject.HyperDash ? DiffUtils.Pow(0.97, repetitiveSpacingWeight) : DiffUtils.Pow(0.93, repetitiveSpacingWeight);
+                double repetitiveSpacingPenalty = catchCurrent.BaseObject.HyperDash ? DiffUtils.Pow(0.975, repetitiveSpacingWeight) : DiffUtils.Pow(0.94, repetitiveSpacingWeight);
                 distanceAddition *= repetitiveSpacingPenalty;
             }
 
