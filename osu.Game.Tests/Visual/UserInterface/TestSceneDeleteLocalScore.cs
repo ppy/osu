@@ -19,6 +19,7 @@ using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -154,7 +155,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("click delete option", () =>
             {
                 InputManager.MoveMouseTo(leaderboard.ChildrenOfType<DrawableOsuMenuItem>()
-                                                    .First(i => string.Equals(i.Item.Text.Value.ToString(), "delete", System.StringComparison.OrdinalIgnoreCase)));
+                                                    .First(i => i.Item.Text.Value == CommonStrings.ButtonsDelete));
                 InputManager.Click(MouseButton.Left);
             });
 

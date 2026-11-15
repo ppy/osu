@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -48,10 +47,10 @@ namespace osu.Game.Tests.Visual.Editing
                 () => coloursSection.ChildrenOfType<FormColourPalette>().Single().Colours,
                 () => Is.EquivalentTo(new Colour4[]
                 {
-                    SkinConfiguration.DefaultComboColours[1],
-                    SkinConfiguration.DefaultComboColours[2],
-                    SkinConfiguration.DefaultComboColours[3],
-                    SkinConfiguration.DefaultComboColours[0],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[1],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[2],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[3],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[0],
                 }));
 
             AddStep("add a colour", () => coloursSection.ChildrenOfType<FormColourPalette>().Single().Colours.Add(Colour4.Aqua));
@@ -59,11 +58,11 @@ namespace osu.Game.Tests.Visual.Editing
                 () => skin.Configuration.CustomComboColours,
                 () => Is.EquivalentTo(new[]
                 {
-                    SkinConfiguration.DefaultComboColours[1],
-                    SkinConfiguration.DefaultComboColours[2],
-                    SkinConfiguration.DefaultComboColours[3],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[1],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[2],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[3],
                     Color4.Aqua,
-                    SkinConfiguration.DefaultComboColours[0],
+                    SkinConfiguration.DEFAULT_COMBO_COLOURS[0],
                 }));
         }
 
@@ -76,12 +75,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("create beatmap skin", () =>
             {
                 skin = new LegacyBeatmapSkin(new BeatmapInfo(), null);
-                skin.Configuration.CustomComboColours = new List<Color4>
-                {
+                skin.Configuration.CustomComboColours.AddRange([
                     Color4.Azure,
                     Color4.Beige,
                     Color4.Chartreuse
-                };
+                ]);
             });
             AddStep("create colours section", () => Child = new DependencyProvidingContainer
             {
