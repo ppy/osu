@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
-        private readonly Box blackBackground;
+        private readonly Box opaqueSafeLayer;
 
         private IBindable<BackgroundScalingMode> scalingMode = null!;
 
@@ -29,7 +29,9 @@ namespace osu.Game.Graphics.Backgrounds
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
 
-            AddInternal(blackBackground = new Box
+            // Used to be behind current background to prevent other elements from showing through when using `FillMode.Fit`.
+            // Can also be interpreted as fake letterboxes.
+            AddInternal(opaqueSafeLayer = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue,
@@ -59,13 +61,13 @@ namespace osu.Game.Graphics.Backgrounds
                 case BackgroundScalingMode.ScaleToFill:
                     Sprite.FillMode = FillMode.Fill;
 
-                    blackBackground.Hide();
+                    opaqueSafeLayer.Hide();
                     break;
 
                 case BackgroundScalingMode.ScaleToFit:
                     Sprite.FillMode = FillMode.Fit;
 
-                    blackBackground.Show();
+                    opaqueSafeLayer.Show();
                     break;
 
                 default:
