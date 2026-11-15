@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private IBindable<bool> isConnected = null!;
 
         private IReadOnlyList<MatchmakingPool>? availablePools { get; set; }
-        private Task? poolFetchTask;
+        private Task poolFetchTask = Task.CompletedTask;
 
         private int? lastDuelUser;
         private MatchmakingPool? lastDuelPool;
@@ -100,11 +100,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         public async Task<IReadOnlyList<MatchmakingPool>> GetMatchmakingPools()
         {
-            if (poolFetchTask != null)
-            {
-                await Task.WhenAll(poolFetchTask).ConfigureAwait(false);
-                poolFetchTask = null;
-            }
+            await Task.WhenAll(poolFetchTask).ConfigureAwait(false);
 
             // Return empty list on the off chance the fetch task fails.
             return availablePools ?? [];
