@@ -71,13 +71,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                             double relativeDifference = Math.Abs(lastSpacing / prevSpacing - 1);
                             relativeDifference = Math.Max(0, relativeDifference - 0.05); // Handle inaccuracies in repetitive patterns.
 
+                            // Scaling by time relative time difference: additional penalty for maintaining the rhythm.
+                            double relativeTimeDifference = Math.Abs(lastFlow.StrainTime / prevFlow.StrainTime - 1);
+                            relativeTimeDifference = 2.5 * double.Lerp(0, 1, Math.Clamp(relativeTimeDifference, 0, 0.1));
+
                             if (relativeDifference <= 0.15)
-                                repetitiveSpacingWeight += (1.0 - relativeDifference / 0.15) * DiffUtils.Pow(0.9, i);
+                                repetitiveSpacingWeight += (1 - relativeDifference / 0.15) * (1 - relativeTimeDifference) * DiffUtils.Pow(0.9, i);
                         }
                     }
                 }
                 
-                double repetitiveSpacingPenalty = catchCurrent.BaseObject.HyperDash ? DiffUtils.Pow(0.975, repetitiveSpacingWeight) : DiffUtils.Pow(0.94, repetitiveSpacingWeight);
+                double repetitiveSpacingPenalty = catchCurrent.BaseObject.HyperDash ? DiffUtils.Pow(0.96, repetitiveSpacingWeight) : DiffUtils.Pow(0.93, repetitiveSpacingWeight);
                 distanceAddition *= repetitiveSpacingPenalty;
             }
 
