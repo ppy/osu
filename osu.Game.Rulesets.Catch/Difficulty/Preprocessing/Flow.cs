@@ -13,9 +13,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         private readonly List<CatchDifficultyHitObject> hitObjects;
 
         public readonly int Index;
-        public readonly int Direction;
+        public readonly int MovementDirection;
 
-        public float Distance { get; private set; }
+        public float DistanceMoved { get; private set; }
         public double StrainTime { get; private set; }
 
         public Flow(List<CatchDifficultyHitObject> hitObjects, List<Flow> flows, int index)
@@ -23,15 +23,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             this.flows = flows;
             this.hitObjects = hitObjects;
             Index = index;
-            Direction = hitObjects.First().Direction;
-            Distance = hitObjects.Aggregate(0.0f, (acc, h) => acc + h.Distance);
+            MovementDirection = hitObjects.First().MovementDirection;
+            DistanceMoved = hitObjects.Aggregate(0.0f, (acc, h) => acc + h.DistanceMoved);
             StrainTime = Math.Max(hitObjects.Aggregate(0.0, (acc, h) => acc + h.DeltaTime), 40);
         }
 
         public void Add(CatchDifficultyHitObject hitObject)
         {
             hitObjects.Add(hitObject);
-            Distance = hitObjects.Aggregate(0.0f, (acc, h) => acc + h.Distance);
+            DistanceMoved = hitObjects.Aggregate(0.0f, (acc, h) => acc + h.DistanceMoved);
             StrainTime = Math.Max(hitObjects.Aggregate(0.0, (acc, h) => acc + h.DeltaTime), 40);
         }
 

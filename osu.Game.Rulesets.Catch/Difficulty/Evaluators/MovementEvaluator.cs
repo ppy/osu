@@ -56,18 +56,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                 var currentFlow = catchCurrent.Flow;
                 var lastFlow = catchLast.Flow;
 
-                // Penalty is applied only to the direction changes (defined using Distance, excluding Distance == 0).
+                // Penalty is applied only to the direction changes (under a convention that we exclude DistanceMoved == 0).
                 if (currentFlow.IsFirst(catchCurrent))
                 {
                     for (int i = 0; i < Math.Min(lastFlow.Index, 8); i++)
                     {
                         var prevFlow = lastFlow.Previous(i);
 
-                        if (prevFlow != null && prevFlow.Distance != 0)
+                        if (prevFlow != null && prevFlow.DistanceMoved != 0)
                         {
-                            // We take Distance (instead of DistanceMoved) to measure the real spacing (that player can see) more accurately.
-                            double lastSpacing = Math.Abs(lastFlow.Distance / lastFlow.StrainTime);
-                            double prevSpacing = Math.Abs(prevFlow.Distance / prevFlow.StrainTime);
+                            double lastSpacing = Math.Abs(lastFlow.DistanceMoved / lastFlow.StrainTime);
+                            double prevSpacing = Math.Abs(prevFlow.DistanceMoved / prevFlow.StrainTime);
 
                             double relativeDifference = Math.Abs(lastSpacing / prevSpacing - 1);
                             relativeDifference = Math.Max(0, relativeDifference - 0.05); // Handle inaccuracies in repetitive patterns.

@@ -63,13 +63,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         public int MovementDirection;
 
         /// <summary>
-        /// The sign of the <see cref="Distance"/>: negative is left, 0 is a vertical stack, and positive is right
-        /// (speaking of the relation between previous and current <see cref="CatchDifficultyHitObject"/>).
-        /// </summary>
-        public int Direction;
-
-        /// <summary>
-        /// Subsequence of consecutive objects facing the same direction that the current <see cref="CatchDifficultyHitObject"/> is part of.
+        /// Subsequence of consecutive objects facing the same <see cref="MovementDirection"/> that the current <see cref="CatchDifficultyHitObject"/> is part of.
+        /// If <see cref="MovementDirection"/> is equal to 0, it is added to the previous flow instead of making a new flow.
         /// The last <see cref="CatchDifficultyHitObject"/> of each flow is a direction change.
         /// </summary>
         public Flow Flow;
@@ -91,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             // Divide all hit objects into flows, i.e. series of consecutive notes facing the same direction.
             var prev = (CatchDifficultyHitObject)Previous(0);
 
-            if (prev != null && (prev.Flow.Direction == Direction || Direction != 0))
+            if (prev != null && (prev.Flow.MovementDirection == MovementDirection || MovementDirection == 0))
                 {
                     prev.Flow.Add(this);
                     Flow = prev.Flow;
@@ -123,7 +118,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
                 PlayerPosition = NormalizedPosition;
 
             MovementDirection = Math.Sign(DistanceMoved);
-            Direction = Math.Sign(Distance);
         }
     }
 }
