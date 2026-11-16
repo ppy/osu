@@ -50,6 +50,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
+
         protected partial class ShearedDropdownMenu : OsuDropdown<T>.OsuDropdownMenu
         {
             public ShearedDropdownMenu()

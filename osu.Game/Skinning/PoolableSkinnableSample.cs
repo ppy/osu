@@ -156,8 +156,7 @@ namespace osu.Game.Skinning
             {
                 looping = value;
 
-                if (activeChannel != null)
-                    activeChannel.Looping = value;
+                activeChannel?.Looping = value;
             }
         }
 

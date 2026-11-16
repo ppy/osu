@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Threading;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 
@@ -118,7 +119,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        private static readonly object access_token_retrieval_lock = new object();
+        private static readonly Lock access_token_retrieval_lock = new Lock();
 
         /// <summary>
         /// Should be run before any API request to make sure we have a valid key.

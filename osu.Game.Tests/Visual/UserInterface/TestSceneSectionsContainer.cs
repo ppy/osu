@@ -43,10 +43,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 container.SelectedSection.ValueChanged += section =>
                 {
-                    if (section.OldValue != null)
-                        section.OldValue.Selected = false;
-                    if (section.NewValue != null)
-                        section.NewValue.Selected = true;
+                    section.OldValue?.Selected = false;
+                    section.NewValue?.Selected = true;
                 };
 
                 Child = container;

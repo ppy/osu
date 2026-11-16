@@ -86,8 +86,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddToggleStep("toggle legacy classic skin", v =>
             {
-                if (skins != null)
-                    skins.CurrentSkinInfo.Value = v ? skins.DefaultClassicSkin.SkinInfo : skins.CurrentSkinInfo.Default;
+                skins?.CurrentSkinInfo.Value = v ? skins.DefaultClassicSkin.SkinInfo : skins.CurrentSkinInfo.Default;
             });
         }
 

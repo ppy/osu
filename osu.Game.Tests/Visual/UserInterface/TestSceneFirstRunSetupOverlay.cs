@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
+using osu.Game.Screens.Footer;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
@@ -213,8 +214,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private partial class TestFirstRunSetupOverlayScreen : OsuScreen
         {
-            public override bool ShowFooter => true;
-
             public FirstRunSetupOverlay Overlay = null!;
 
             [CanBeNull]
@@ -226,6 +225,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             [Cached]
             private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
+            public TestFirstRunSetupOverlayScreen()
+            {
+                FooterContent.Value = ScreenFooterContent.Argon();
+            }
 
             [BackgroundDependencyLoader]
             private void load()

@@ -148,6 +148,52 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestZeroDurationLoop()
+        {
+            AddStep("set clock = 1000", () => manualClock.CurrentTime = 1000);
+            AddStep("create storyboard", () => Child = createStoryboard(s =>
+            {
+                var loop = s.AddLoopingGroup(0, 10000);
+                loop.AddY(Easing.None, 0, 0, 100, 240);
+            }));
+
+            assert(1000, 240);
+            assert(clock_limit, 240);
+            assert(0, 240);
+
+            void assert(double time, double y)
+            {
+                AddStep($"set clock = {time}", () => manualClock.CurrentTime = time);
+                AddAssert($"sprite y = {y} at t = {time}", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().Y == y);
+            }
+        }
+
+        [Test]
+        public void TestZeroDurationLoopRewindsToStartValue()
+        {
+            AddStep("create storyboard", () => Child = createStoryboard(s =>
+            {
+                var loop = s.AddLoopingGroup(1000, 10000);
+                loop.AddY(Easing.None, 0, 0, 100, 240);
+            }));
+
+            assert(0, 100);
+            assert(999, 100);
+            assert(1000, 240);
+            assert(2000, 240);
+            assert(1000, 240);
+            assert(999, 100);
+            assert(0, 100);
+
+            void assert(double time, double y)
+            {
+                AddStep($"set clock = {time}", () => manualClock.CurrentTime = time);
+                AddWaitStep("settle", 3);
+                AddAssert($"sprite y = {y} at t = {time}", () => this.ChildrenOfType<DrawableStoryboardSprite>().Single().Y == y);
+            }
+        }
+
+        [Test]
         public void TestParameterTemporaryEffect()
         {
             AddStep("create storyboard", () => Child = createStoryboard(s =>

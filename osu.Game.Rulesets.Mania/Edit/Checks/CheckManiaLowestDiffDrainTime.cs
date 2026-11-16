@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Checks
     {
         protected override IEnumerable<(DifficultyRating rating, double thresholdMs, string name)> GetThresholds()
         {
-            // See lowest difficulty requirements in https://osu.ppy.sh/wiki/en/Ranking_criteria/osu%21mania#rules
+            // See lowest difficulty requirements in https://osu.ppy.sh/wiki/en/Ranking_criteria/osu%21mania#spread
             yield return (DifficultyRating.Hard, new TimeSpan(0, 2, 30).TotalMilliseconds, "Hard");
             yield return (DifficultyRating.Insane, new TimeSpan(0, 2, 45).TotalMilliseconds, "Insane");
             yield return (DifficultyRating.Expert, new TimeSpan(0, 3, 30).TotalMilliseconds, "Expert");

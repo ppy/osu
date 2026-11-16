@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
         public static double EvaluateDifficultyOf(DifficultyHitObject current, double circleSize)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
-            var catchLast = (CatchDifficultyHitObject)current.Previous(0);
-            var catchLastLast = (CatchDifficultyHitObject)current.Previous(1);
+            var catchLast = (CatchDifficultyHitObject?)current.Previous();
+            var catchLastLast = (CatchDifficultyHitObject?)current.Previous(1);
 
             // In catch, clockrate adjustments do not only affect the timings of hitobjects,
             // but also the speed of the player's catcher, which has an impact on difficulty
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             // Direction change bonus.
             if (Math.Abs(catchCurrent.DistanceMoved) > 0.1)
             {
-                if (current.Index >= 1 && Math.Abs(catchLast.DistanceMoved) > 0.1 && catchCurrent.Direction != catchLast.Direction)
+                if (current.Index >= 1 && Math.Abs(catchLast.DistanceMoved) > 0.1 && catchCurrent.MovementDirection != catchLast.MovementDirection)
                 {
                     double bonusFactor = Math.Min(50, Math.Abs(catchCurrent.DistanceMoved)) / 50;
                     double antiflowFactor = Math.Max(Math.Min(70, Math.Abs(catchLast.DistanceMoved)) / 70, 0.38);
@@ -46,8 +46,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                                     / (CatchDifficultyHitObject.NORMALIZED_HALF_CATCHER_WIDTH * 6) / sqrtStrain;
             }
 
-            // Repetitive spacing nerf: it is harder to catch irregular distances, especially in case of non-hyperdashes which require one to "miss the rhythm on purpose".
-            // Penalty is given based on the ratio between the current (incoming) normalised spacing and the previous normalised spacing.
+            // Repetitive spacing penalty: it is harder to catch irregular distances, especially in case of non-hyperdashes which require one to "miss the rhythm on purpose".
+            // This feature may be treated as a reading penalty: even if the mechanical difficulty is the same, executing it is easier in case of repetitive spacings.
+            // Penalty is given based on the ratio between the current normalised spacing and the previous normalised spacings.
             if (current.Index >= 1)
             {
                 double repetitiveSpacingWeight = 0;
@@ -55,17 +56,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                 var currentFlow = catchCurrent.Flow;
                 var lastFlow = catchLast.Flow;
 
-                // Penalty is applied only to the direction changes.
+                // Penalty is applied only to the direction changes (under a convention that we exclude DistanceMoved == 0).
                 if (currentFlow.IsFirst(catchCurrent))
                 {
                     for (int i = 0; i < Math.Min(lastFlow.Index, 8); i++)
                     {
                         var prevFlow = lastFlow.Previous(i);
 
-                        if (prevFlow != null && prevFlow.Distance != 0)
+                        if (prevFlow != null && prevFlow.DistanceMoved != 0)
                         {
-                            double lastSpacing = Math.Abs(lastFlow.Distance / lastFlow.StrainTime);
-                            double prevSpacing = Math.Abs(prevFlow.Distance / prevFlow.StrainTime);
+                            double lastSpacing = Math.Abs(lastFlow.DistanceMoved / lastFlow.StrainTime);
+                            double prevSpacing = Math.Abs(prevFlow.DistanceMoved / prevFlow.StrainTime);
 
                             double relativeDifference = Math.Abs(lastSpacing / prevSpacing - 1);
                             relativeDifference = Math.Max(0, relativeDifference - 0.05); // Handle inaccuracies in repetitive patterns.
@@ -86,10 +87,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
 
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
-                var catchPrevObj = (CatchDifficultyHitObject)catchCurrent.Previous(i);
+                var catchPrevObj = (CatchDifficultyHitObject)catchCurrent.Previous(i)!;
 
                 // Only same direction movements matter as they do not take any additional inputs.
-                if (catchCurrent.Direction != catchPrevObj.Direction || catchCurrent.Distance == 0 || catchPrevObj.Distance == 0)
+                if (catchCurrent.MovementDirection != catchPrevObj.MovementDirection || catchCurrent.Distance == 0 || catchPrevObj.Distance == 0)
                     break;
 
                 double currentSpacing = Math.Abs(catchCurrent.Distance / catchCurrent.StrainTime);

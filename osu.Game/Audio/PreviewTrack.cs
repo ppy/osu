@@ -72,8 +72,7 @@ namespace osu.Game.Audio
             {
                 looping = value;
 
-                if (Track != null)
-                    Track.Looping = looping;
+                Track?.Looping = looping;
             }
         }
 

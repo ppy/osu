@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                new GlobalScrollAdjustsVolume(),
+                new ScrollAdjustsVolume(),
                 (content = new LogoTrackingContainer
                 {
                     Anchor = Anchor.Centre,
@@ -585,7 +585,8 @@ namespace osu.Game.Screens.Play
 
             if (QuickRestart)
             {
-                BackButtonVisibility.Value = false;
+                var originalFooterContent = FooterContent.Value;
+                FooterContent.Value = ScreenFooterContent.None;
 
                 // A quick restart starts by triggering a fade to black
                 AddInternal(quickRestartBlackLayer = new Box
@@ -607,7 +608,7 @@ namespace osu.Game.Screens.Play
                     .FadeInFromZero(500, Easing.OutQuint);
 
                 quickRestartBackButtonRestore?.Cancel();
-                quickRestartBackButtonRestore = Scheduler.AddDelayed(() => BackButtonVisibility.Value = true, quick_restart_initial_delay);
+                quickRestartBackButtonRestore = Scheduler.AddDelayed(() => FooterContent.Value = originalFooterContent, quick_restart_initial_delay);
             }
             else
             {

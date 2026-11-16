@@ -56,8 +56,10 @@ using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Submission;
 using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
+using osu.Game.Screens.Footer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Users;
+using osuTK.Input;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
 namespace osu.Game.Screens.Edit
@@ -197,8 +199,6 @@ namespace osu.Game.Screens.Edit
             return new UserActivity.ModdingBeatmap(Beatmap.Value.BeatmapInfo);
         }
 
-        protected override bool InitialBackButtonVisibility => false;
-
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -239,6 +239,8 @@ namespace osu.Game.Screens.Edit
         public Editor(EditorLoader loader = null)
         {
             this.loader = loader;
+
+            FooterContent.Value = ScreenFooterContent.None;
         }
 
         [BackgroundDependencyLoader]
@@ -694,16 +696,44 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
+
+            switch (e.Key)
+            {
+                case Key.Left:
+                    seek(e, -1);
+                    return true;
+
+                case Key.Right:
+                    seek(e, 1);
+                    return true;
+            }
+
+            return false;
+        }
+
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             // Repeatable actions
             switch (e.Action)
             {
                 case GlobalAction.EditorSeekBackwards:
+                    // See implementation in OnKeyDown()
+                    // This is required to handle shift-modifier high speed seeking (see https://github.com/ppy/osu/issues/38697).
+                    if (e.CurrentState.Keyboard.Keys.SequenceEqual(new[] { Key.Left }))
+                        return false;
+
                     seek(e, -1);
                     return true;
 
                 case GlobalAction.EditorSeekForwards:
+                    // See implementation in OnKeyDown()
+                    // This is required to handle shift-modifier high speed seeking (see https://github.com/ppy/osu/issues/38697).
+                    if (e.CurrentState.Keyboard.Keys.SequenceEqual(new[] { Key.Right }))
+                        return false;
+
                     seek(e, 1);
                     return true;
 
@@ -886,8 +916,7 @@ namespace osu.Game.Screens.Edit
             realm.Write(r =>
             {
                 var beatmap = r.Find<BeatmapInfo>(editorBeatmap.BeatmapInfo.ID);
-                if (beatmap != null)
-                    beatmap.EditorTimestamp = clock.CurrentTime;
+                beatmap?.EditorTimestamp = clock.CurrentTime;
             });
 
             // `resetTrack()` MUST happen before `refetchBeatmap()`, because along other things, `refetchBeatmap()` causes a global working beatmap change,
@@ -1567,8 +1596,7 @@ namespace osu.Game.Screens.Edit
                 foreach (var beatmapInfo in Beatmap.Value.BeatmapSetInfo.Beatmaps)
                 {
                     var menuItem = difficultyItems.OfType<DifficultyMenuItem>().FirstOrDefault(i => i.BeatmapInfo.Equals(beatmapInfo));
-                    if (menuItem != null)
-                        menuItem.Text.Value = string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? "(unnamed)" : beatmapInfo.DifficultyName;
+                    menuItem?.Text.Value = string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? "(unnamed)" : beatmapInfo.DifficultyName;
                 }
             };
 

@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -51,6 +52,9 @@ namespace osu.Game.Overlays.Chat
         protected virtual float Spacing => 15;
 
         protected virtual float UsernameWidth => 150;
+
+        [Resolved]
+        private Bindable<Channel?>? currentChannel { get; set; }
 
         [Resolved]
         private ChannelManager? channelManager { get; set; }
@@ -224,20 +228,16 @@ namespace osu.Game.Overlays.Chat
             {
                 Success = () =>
                 {
-                    Debug.Assert(channelManager != null);
+                    Debug.Assert(currentChannel?.Value != null);
 
-                    switch (channelManager.CurrentChannel.Value.Type)
+                    switch (currentChannel.Value.Type)
                     {
                         case ChannelType.PM:
-                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage("""
-                                                                                            Chat moderators have been alerted. You have reported a private message so they will not be able to read history to maintain your privacy. Please make sure to include as much details as you can.
-                                                                                            You can submit a second report with more details if required, or contact abuse@ppy.sh if a user is being extremely offensive.
-                                                                                            You can also block a user via the block button on their user profile, or by right-clicking on their name in the chat and selecting "Block".
-                                                                                            """));
+                            currentChannel.Value.AddNewMessages(new InfoMessage(ChatStrings.ReportConfirmationPM));
                             break;
 
                         default:
-                            channelManager.CurrentChannel.Value.AddNewMessages(new InfoMessage(@"Chat moderators have been alerted. Thanks for your help."));
+                            currentChannel.Value.AddNewMessages(new InfoMessage(ChatStrings.ReportConfirmation));
                             break;
                     }
                 }
@@ -355,8 +355,7 @@ namespace osu.Game.Overlays.Chat
 
         private void updateBackground()
         {
-            if (background != null)
-                background.Alpha = alternatingBackground ? 0.2f : 0;
+            background?.Alpha = alternatingBackground ? 0.2f : 0;
         }
     }
 }
