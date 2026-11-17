@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 {
     public partial class TierProgressBar
     {
-        private partial class RatingToNextDivisionDisplay : CompositeDrawable
+        public partial class RatingToNextDivisionDisplay : CompositeDrawable
         {
             public bool Flipped
             {

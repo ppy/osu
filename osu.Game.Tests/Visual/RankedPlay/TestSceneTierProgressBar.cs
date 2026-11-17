@@ -73,6 +73,26 @@ namespace osu.Game.Tests.Visual.RankedPlay
         }
 
         [Test]
+        public void TestRatingToNextDivisionDisplay()
+        {
+            AddStep("set to 1500", () => progressBar.SetRating(1500));
+            AddWaitStep("wait for animations to complete", 10);
+            AddAssert("display is present", () => progressBar.ChildrenOfType<TierProgressBar.RatingToNextDivisionDisplay>().Single().IsPresent, () => Is.True);
+
+            AddStep("set to 2500", () => progressBar.SetRating(2500));
+            AddWaitStep("wait for animations to complete", 10);
+            AddAssert("display is not present", () => progressBar.ChildrenOfType<TierProgressBar.RatingToNextDivisionDisplay>().Single().IsPresent, () => Is.False);
+
+            AddStep("set to 2400", () => progressBar.SetRating(2400));
+            AddWaitStep("wait for animations to complete", 10);
+            AddAssert("display is not present", () => progressBar.ChildrenOfType<TierProgressBar.RatingToNextDivisionDisplay>().Single().IsPresent, () => Is.False);
+
+            AddStep("set to 2399", () => progressBar.SetRating(2399));
+            AddWaitStep("wait for animations to complete", 10);
+            AddAssert("display is present", () => progressBar.ChildrenOfType<TierProgressBar.RatingToNextDivisionDisplay>().Single().IsPresent, () => Is.True);
+        }
+
+        [Test]
         public void TestUpdateDivisions()
         {
             float originalLength = 0;
