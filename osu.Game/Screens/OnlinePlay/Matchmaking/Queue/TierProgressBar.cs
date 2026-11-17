@@ -24,8 +24,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private readonly BindableInt currentRating = new BindableInt();
         private readonly BindableFloat currentRatingInstantaneous = new BindableFloat();
 
-        private readonly Bindable<APIRankedPlayDivision> currentDivision = new Bindable<APIRankedPlayDivision>();
-
         public required IReadOnlyList<APIRankedPlayDivision> Divisions
         {
             private get;
@@ -133,7 +131,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 nextDivDisplay = new RatingToNextDivisionDisplay
                 {
                     CurrentRating = { BindTarget = currentRating },
-                    CurrentDivision = { BindTarget = currentDivision },
                     Anchor = Anchor.TopCentre,
                     Alpha = 0,
                 },
@@ -198,18 +195,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             currentRating.Value = newValue;
 
-            // TODO: This is currently a bindable only so that `RatingToNextDivisionDisplay` has
-            //       an up to date source of the division for the current rating. It should be
-            //       refactored to fetch that data from some centralized source of division data,
-            //       once it exists.
-            currentDivision.Value = Divisions.First(d => d.StartRating <= currentRating.Value && d.EndRating >= currentRating.Value);
-
             this.TransformBindableTo(currentRatingInstantaneous, currentRating.Value, rating_change_duration, rating_change_easing);
             segmentFlow.MoveToX(calculateContainerOffset(currentRating.Value), rating_change_duration, flowEasing);
 
             var nextDivDisplayTransform = nextDivDisplay.FadeOut(100, next_div_display_fade);
 
-            if (currentDivision.Value?.Tier == RankingTier.Lustrous)
+            if (currentRating.Value >= Divisions.First(d => d.Tier == RankingTier.Lustrous).StartRating)
                 return;
 
             nextDivDisplayTransform

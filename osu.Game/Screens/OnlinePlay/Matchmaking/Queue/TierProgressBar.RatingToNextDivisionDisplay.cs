@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -14,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.RankedPlay;
 using osu.Game.Scoring;
 using FontWeight = osu.Game.Graphics.FontWeight;
 using OsuFont = osu.Game.Graphics.OsuFont;
@@ -47,7 +49,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             private readonly OsuTextFlowContainer textFlow;
 
             public readonly IBindable<int> CurrentRating = new BindableInt();
-            public readonly IBindable<APIRankedPlayDivision> CurrentDivision = new Bindable<APIRankedPlayDivision>();
+
+            [Resolved]
+            private IRankedPlayDivisionStore divisionStore { get; set; } = null!;
 
             public RatingToNextDivisionDisplay()
             {
@@ -85,13 +89,24 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 textFlow.Clear();
 
-                int remaining = CurrentDivision.Value.EndRating - CurrentRating.Value + 1;
+                divisionStore.GetDivisionForRating(CurrentRating.Value).ContinueWith(result =>
+                {
+                    var division = result.GetResultSafely();
 
-                textFlow.AddText(remaining.ToLocalisableString(@"N0"), p => p.Font = p.Font.With(weight: FontWeight.Bold));
-                textFlow.AddText(" ");
-                textFlow.AddText(RankedPlayStrings.RatingToNextDivision);
+                    if (division == null)
+                        return;
 
-                background.Colour = getColour(CurrentDivision.Value);
+                    Schedule(() =>
+                    {
+                        int remaining = division.EndRating - CurrentRating.Value + 1;
+
+                        textFlow.AddText(remaining.ToLocalisableString(@"N0"), p => p.Font = p.Font.With(weight: FontWeight.Bold));
+                        textFlow.AddText(" ");
+                        textFlow.AddText(RankedPlayStrings.RatingToNextDivision);
+
+                        background.Colour = getColour(division);
+                    });
+                });
             }
 
             private ColourInfo getColour(APIRankedPlayDivision division) => division.Tier switch
