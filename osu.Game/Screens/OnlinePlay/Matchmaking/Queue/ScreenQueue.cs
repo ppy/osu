@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
-        private readonly Bindable<MatchmakingPool[]?> availablePools = new Bindable<MatchmakingPool[]?>();
+        private readonly Bindable<IReadOnlyList<MatchmakingPool>?> availablePools = new Bindable<IReadOnlyList<MatchmakingPool>?>();
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
         private readonly MatchmakingPoolType poolType;
 
@@ -383,6 +383,19 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
 
+            queue.GetMatchmakingPools().ContinueWith(t =>
+            {
+                var pools = t.GetResultSafely();
+
+                Schedule(() =>
+                {
+                    availablePools.Value = pools.Where(p => p.Type == poolType).ToList();
+
+                    // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
+                    selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
+                });
+            });
+
             currentState.BindTo(queue.CurrentState);
             currentState.BindValueChanged(_ => onStateChanged());
 
@@ -393,29 +406,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             isConnected.BindValueChanged(connected => Schedule(() =>
             {
                 if (connected.NewValue)
-                {
-                    populateAvailablePools().FireAndForget();
                     refreshLobbyData();
-                }
                 else
-                {
-                    availablePools.Value = null;
                     clearLobbyData();
-                }
             }), true);
-        }
-
-        private async Task populateAvailablePools()
-        {
-            MatchmakingPool[] pools = await client.GetMatchmakingPoolsOfType(poolType).ConfigureAwait(false);
-
-            Schedule(() =>
-            {
-                availablePools.Value = pools;
-
-                // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
-                selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
-            });
         }
 
         private void onMatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status) => Scheduler.Add(() =>
