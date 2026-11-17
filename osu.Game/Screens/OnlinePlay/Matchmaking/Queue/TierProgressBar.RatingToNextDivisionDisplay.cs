@@ -26,25 +26,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
     {
         public partial class RatingToNextDivisionDisplay : CompositeDrawable
         {
-            public bool Flipped
-            {
-                set
-                {
-                    if (value)
-                    {
-                        Origin = Anchor.CentreLeft;
-                        background.Rotation = 180;
-                        textFlow.Padding = new MarginPadding { Left = 20, Right = 15 };
-                    }
-                    else
-                    {
-                        Origin = Anchor.CentreRight;
-                        background.Rotation = 0;
-                        textFlow.Padding = new MarginPadding { Left = 15, Right = 20 };
-                    }
-                }
-            }
-
             private readonly NineSliceSprite background;
             private readonly OsuTextFlowContainer textFlow;
 
@@ -57,6 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             {
                 AutoSizeAxes = Axes.X;
                 Height = 22;
+                Origin = Anchor.CentreRight;
 
                 InternalChildren = new Drawable[]
                 {
@@ -72,10 +54,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Padding = new MarginPadding { Left = 15, Right = 20 },
                     }
                 };
-
-                Flipped = false;
             }
 
             [BackgroundDependencyLoader]
