@@ -8,7 +8,5 @@ namespace osu.Game.Screens.OnlinePlay
     public interface IOnlinePlaySubScreen : IOsuScreen
     {
         LocalisableString ShortTitle { get; }
-
-        bool ShowHeaderLine => true;
     }
 }

@@ -27,8 +27,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override LocalisableString Title => ShortTitle.ToTitle();
 
-        public bool ShowHeaderLine => false;
-
         protected abstract void StartAction();
 
         [Resolved]
@@ -39,6 +37,7 @@ namespace osu.Game.Screens.OnlinePlay
             this.item = item;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+            TopPadding = Header.HEIGHT - 10;
 
             SupportScoping = false;
         }

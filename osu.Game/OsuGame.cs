@@ -1403,6 +1403,10 @@ namespace osu.Game
                 LocalConfig.SetValue<float>(OsuSetting.MenuParallaxScale, LocalConfig.Get<bool>(OsuSetting.MenuParallax) ? 1 : 0);
 #pragma warning restore CS0612 // Type or member is obsolete
             }
+
+            // Hitsound volume should be set to the same user setting that they previously had for effect volume.
+            if (combined < 20261117 && LocalConfig.Get<double>(OsuSetting.HitsoundVolume) == 0.6)
+                LocalConfig.SetValue(OsuSetting.HitsoundVolume, frameworkConfig.Get<double>(FrameworkSetting.VolumeEffect));
         }
 
         private void handleBackButton()

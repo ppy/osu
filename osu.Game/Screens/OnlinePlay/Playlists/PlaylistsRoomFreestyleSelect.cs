@@ -7,7 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Screens.OnlinePlay
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class PlaylistsRoomFreestyleSelect : OnlinePlayFreestyleSelect
     {
