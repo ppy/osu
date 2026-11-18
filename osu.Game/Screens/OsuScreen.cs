@@ -33,7 +33,7 @@ namespace osu.Game.Screens
 
         public virtual LocalisableString Title => GetType().Name;
 
-        public string Description => Title.ToString();
+        public virtual string Description => Title.ToString();
 
         public virtual bool AllowUserExit => true;
 
