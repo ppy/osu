@@ -18,6 +18,42 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
     public partial class TestSceneOsuModMirror : OsuModTestScene
     {
         [Test]
+        public void TestStacking([Values] OsuModMirror.MirrorType type, [Values] bool mirrorStackingDirection) => CreateModTest(new ModTestData
+        {
+            Autoplay = true,
+            CreateBeatmap = () => new OsuBeatmap
+            {
+                HitObjects =
+                {
+                    new HitCircle { Position = new Vector2(0) },
+                    new HitCircle { Position = new Vector2(0), StartTime = 100 },
+                    new HitCircle { Position = new Vector2(0), StartTime = 200 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 300 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 400 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 500 },
+                    new HitCircle { Position = new Vector2(50), StartTime = 600 },
+                }
+            },
+            Mods = [new OsuModMirror { Reflection = { Value = type }, MirrorStacks = { Value = mirrorStackingDirection } }],
+            PassCondition = () =>
+            {
+                var circles = this.ChildrenOfType<DrawableHitCircle>();
+                var playfield = this.ChildrenOfType<OsuPlayfield>().Single();
+
+                if (!circles.Any())
+                    return false;
+
+                foreach (var circle in circles)
+                {
+                    if (!Precision.AlmostEquals(playfield.ToLocalSpace(circle.ScreenSpaceDrawQuad.Centre), circle.HitObject.StackedPosition))
+                        return false;
+                }
+
+                return true;
+            }
+        });
+
+        [Test]
         public void TestCorrectReflections([Values] OsuModMirror.MirrorType type, [Values] bool withStrictTracking) => CreateModTest(new ModTestData
         {
             Autoplay = true,
