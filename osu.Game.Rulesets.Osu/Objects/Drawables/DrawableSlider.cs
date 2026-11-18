@@ -367,10 +367,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
-        private partial class DefaultSliderBody : PlaySliderBody
-        {
-        }
-
         #region FOR EDITOR USE ONLY, DO NOT USE FOR ANY OTHER PURPOSE
 
         internal void SuppressHitAnimations()
