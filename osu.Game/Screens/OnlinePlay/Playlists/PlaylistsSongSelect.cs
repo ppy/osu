@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -25,11 +24,9 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public partial class PlaylistsSongSelect : SongSelect, IOnlinePlaySubScreen, ISongSelect
+    public partial class PlaylistsSongSelect : SongSelect, ISongSelect
     {
-        public LocalisableString ShortTitle => OnlinePlayStrings.SongSelectionTitle;
-
-        public override LocalisableString Title => ShortTitle.ToTitle();
+        public override LocalisableString Title => OnlinePlayStrings.SongSelectionTitle;
 
         protected readonly Bindable<bool> Freestyle = new Bindable<bool>(true);
         private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>([]);

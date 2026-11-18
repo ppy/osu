@@ -2,16 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Framework.Screens;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract partial class OnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
+    public abstract partial class OnlinePlaySubScreen : OsuScreen
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
-
-        public virtual LocalisableString ShortTitle => Title;
 
         protected sealed override bool PlayExitSound => false;
 

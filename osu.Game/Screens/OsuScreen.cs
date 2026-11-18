@@ -31,9 +31,6 @@ namespace osu.Game.Screens
         /// </summary>
         public const float HORIZONTAL_OVERFLOW_PADDING = 50;
 
-        /// <summary>
-        /// A user-facing title for this screen.
-        /// </summary>
         public virtual LocalisableString Title => GetType().Name;
 
         public string Description => Title.ToString();

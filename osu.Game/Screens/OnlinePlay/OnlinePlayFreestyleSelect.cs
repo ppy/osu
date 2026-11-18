@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
@@ -19,13 +18,11 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IHandlePresentBeatmap, IOnlinePlaySubScreen, ISongSelect
+    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IHandlePresentBeatmap, ISongSelect
     {
         private readonly PlaylistItem item;
 
-        public LocalisableString ShortTitle => OnlinePlayStrings.StyleSelectionTitle;
-
-        public override LocalisableString Title => ShortTitle.ToTitle();
+        public override LocalisableString Title => OnlinePlayStrings.StyleSelectionTitle;
 
         protected abstract void StartAction();
 

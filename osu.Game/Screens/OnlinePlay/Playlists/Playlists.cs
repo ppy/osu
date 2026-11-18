@@ -10,7 +10,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public partial class Playlists : OnlinePlayScreen
     {
-        protected override LocalisableString ScreenTitle => OnlinePlayStrings.PlaylistsScreenTitle;
+        public override LocalisableString Title => OnlinePlayStrings.PlaylistsScreenTitle;
 
         protected override LoungeSubScreen CreateLounge() => new PlaylistsLoungeSubScreen();
 

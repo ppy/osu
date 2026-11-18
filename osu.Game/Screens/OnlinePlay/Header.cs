@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -43,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private void updateSubScreenTitle() => title.Screen = stack?.CurrentScreen as IOnlinePlaySubScreen;
+        private void updateSubScreenTitle() => title.Screen = stack?.CurrentScreen as IOsuScreen;
 
         private partial class MultiHeaderTitle : CompositeDrawable
         {
@@ -52,11 +51,11 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly OsuSpriteText dot;
             private readonly OsuSpriteText pageTitle;
 
-            public IOnlinePlaySubScreen? Screen
+            public IOsuScreen? Screen
             {
                 set
                 {
-                    pageTitle.Text = value?.ShortTitle.ToTitle() ?? default(LocalisableString);
+                    pageTitle.Text = value?.Title ?? default(LocalisableString);
                     dot.Alpha = pageTitle.Text == default ? 0 : 1;
                 }
             }

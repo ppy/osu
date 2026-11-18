@@ -72,9 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// </summary>
         private const float row_padding = 10;
 
-        public override LocalisableString Title { get; }
-
-        public override LocalisableString ShortTitle => OnlinePlayStrings.PlaylistTitle;
+        public override LocalisableString Title => OnlinePlayStrings.PlaylistTitle;
 
         public override bool? ApplyModTrackAdjustments => true;
 
@@ -147,7 +145,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             this.room = room;
 
-            Title = room.RoomID == null ? "New playlist" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
 
             Padding = new MarginPadding

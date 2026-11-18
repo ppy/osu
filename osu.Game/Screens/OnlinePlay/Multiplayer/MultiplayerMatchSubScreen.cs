@@ -76,9 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private const float row_padding = 10;
 
-        public override LocalisableString Title { get; }
-
-        public override LocalisableString ShortTitle => OnlinePlayStrings.RoomTitle;
+        public override LocalisableString Title => OnlinePlayStrings.RoomTitle;
 
         public override bool? ApplyModTrackAdjustments => true;
 
@@ -163,7 +161,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             this.room = room;
 
-            Title = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
 
             Padding = new MarginPadding

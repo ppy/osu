@@ -101,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return false;
         }
 
-        protected override LocalisableString ScreenTitle => OnlinePlayStrings.MultiplayerScreenTitle;
+        public override LocalisableString Title => OnlinePlayStrings.MultiplayerScreenTitle;
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
 
