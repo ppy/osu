@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                                 Origin = Anchor.Centre,
                                 Direction = FillDirection.Full,
                                 Spacing = new Vector2(10),
-                                ChildrenEnumerable = TestSceneCompactDivisionBadge.DIVISIONS.Select(d => new DivisionBadge(d, ruleset)),
+                                ChildrenEnumerable = divisions.Select(d => new DivisionBadge(d, ruleset)),
                             },
                             new FillFlowContainer
                             {
@@ -68,5 +68,7 @@ namespace osu.Game.Tests.Visual.RankedPlay
                 };
             });
         }
+
+        private static readonly APIRankedPlayDivision[] divisions = TestSceneTierProgressBar.DIVISIONS[..^1];
     }
 }
