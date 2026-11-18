@@ -19,7 +19,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             base.LoadComplete();
 
-            AccentColourBindable.BindValueChanged(accent => BorderColour = accent.NewValue, true);
+            if (SliderBorder == null)
+                AccentColourBindable.BindValueChanged(accent => BorderColour = accent.NewValue, true);
             ScaleBindable.BindValueChanged(scale => PathRadius = path_radius * scale.NewValue, true);
 
             // This border size thing is kind of weird, hey.
