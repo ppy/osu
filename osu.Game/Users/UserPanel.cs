@@ -28,6 +28,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Matchmaking.Queue;
 using osu.Game.Screens.Play;
@@ -46,6 +47,12 @@ namespace osu.Game.Users
         /// This should be used to perform auxiliary tasks and not as a primary action for clicking a user panel (to maintain a consistent UX).
         /// </summary>
         public new Action? Action;
+
+        /// <summary>
+        /// The ruleset for which this user panel primarily applies to.
+        /// Used to decide which ruleset to open when showing the profile.
+        /// </summary>
+        protected virtual RulesetInfo? Ruleset => null;
 
         protected Action ViewProfile { get; private set; } = null!;
 
@@ -112,7 +119,7 @@ namespace osu.Game.Users
             base.Action = ViewProfile = () =>
             {
                 Action?.Invoke();
-                profileOverlay?.ShowUser(User);
+                profileOverlay?.ShowUser(User, Ruleset);
             };
         }
 
