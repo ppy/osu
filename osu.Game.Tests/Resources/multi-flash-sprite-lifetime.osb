@@ -1,0 +1,9 @@
+[Events]
+//Storyboard Layer 0 (Background)
+// Regression for ppy/osu#27627: must not end lifetime at the first fade-out.
+Sprite,Background,TopRight,"Textures/test-image.png",320,240
+ F,0,1000,2000,0,1
+ F,0,3000,4000,1,0
+ F,0,5000,6000,0,1
+ F,0,7000,8000,1,0
+ S,0,8000,20000,1,2
