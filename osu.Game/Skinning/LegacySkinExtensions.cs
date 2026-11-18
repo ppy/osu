@@ -184,6 +184,26 @@ namespace osu.Game.Skinning
             }
         }
 
+        public static float GetAccuracyCounterMaxWidth(this ISkin source)
+        {
+            const char reference_character = LegacySpriteText.FIXED_WIDTH_REFERENCE_CHARACTER;
+            const float counter_scale = 0.6f * 0.96f;
+
+            string fontName = source.GetFontPrefix(LegacyFont.Score);
+            float fontOverlap = source.GetFontOverlap(LegacyFont.Score);
+
+            var characterTexture = source.GetTexture($"{fontName}-{reference_character}");
+            var dotTexture = source.GetTexture($"{fontName}-dot");
+            var percentTexture = source.GetTexture($"{fontName}-percent");
+
+            float characterWidth = characterTexture?.Width / characterTexture?.ScaleAdjust ?? 0;
+            float dotWidth = dotTexture?.Width / dotTexture?.ScaleAdjust ?? 0;
+            float percentWidth = percentTexture?.Width / percentTexture?.ScaleAdjust ?? 0;
+
+            float counterWidth = characterWidth * 5 + dotWidth + percentWidth - fontOverlap * 6;
+            return counterWidth * counter_scale;
+        }
+
         public partial class SkinnableTextureAnimation : TextureAnimation
         {
             [Resolved(canBeNull: true)]
