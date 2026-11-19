@@ -83,13 +83,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             setMovementState();
 
             // Divide all hit objects into flows, i.e. series of consecutive notes facing the same direction.
-            var prev = (CatchDifficultyHitObject)Previous(0);
+            var prev = (CatchDifficultyHitObject?)Previous();
 
             if (prev != null && (prev.Flow.MovementDirection == MovementDirection || MovementDirection == Direction.None))
-                {
-                    prev.Flow.Add(this);
-                    Flow = prev.Flow;
-                }
+            {
+                prev.Flow.Add(this);
+                Flow = prev.Flow;
+            }
             else // Create a new flow on direction change (or the first object of the map).
             {
                 Flow = new Flow(new List<CatchDifficultyHitObject> { this }, flows, flows.Count);
