@@ -109,13 +109,18 @@ namespace osu.Game.Online.Chat
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
+        /// <summary>
+        /// Operations which should only be run after channels are initialised.
+        /// </summary>
+        private readonly Scheduler chatScheduler = new Scheduler();
+
         [BackgroundDependencyLoader]
         private void load()
         {
             chatClient = api.GetChatClient();
-            chatClient.ChannelJoined += ch => Schedule(() => joinChannel(ch));
-            chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getJoinedChannel(ch), false));
-            chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
+            chatClient.ChannelJoined += ch => chatScheduler.Add(() => joinChannel(ch));
+            chatClient.ChannelParted += ch => chatScheduler.Add(() => leaveChannel(getJoinedChannel(ch), false));
+            chatClient.NewMessages += msgs => chatScheduler.Add(() => addMessages(msgs));
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
             chatClient.RequestPresence();
 
@@ -453,6 +458,14 @@ namespace osu.Game.Online.Chat
             lastSilenceMessageId ??= messages.LastOrDefault()?.Id;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (availableChannels.Count > 0)
+                chatScheduler.Update();
+        }
+
         private void initializeChannels()
         {
             // This request is self-retrying until it succeeds.
@@ -462,14 +475,14 @@ namespace osu.Game.Online.Chat
 
             var req = new ListChannelsRequest();
 
-            bool joinDefaults = JoinedChannels.Count == 0;
-
             req.Success += channels =>
             {
                 availableChannels.Clear();
 
                 foreach (var channel in channels)
                 {
+                    // If we happen to already be joined to a channel, we should probably trust the new one from the server and replace our
+                    // local joined copy.
                     if (getJoinedChannel(channel) is Channel alreadyJoinedChannel)
                     {
                         joinedChannels.Remove(alreadyJoinedChannel);
@@ -481,9 +494,15 @@ namespace osu.Game.Online.Chat
                     }
 
                     availableChannels.Add(channel);
+                }
 
-                    // join any channels classified as "defaults"
-                    if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
+                // Process any pending joins.
+                chatScheduler.Update();
+
+                // Join default channels if none are joined.
+                if (JoinedChannels.Count == 0)
+                {
+                    foreach (var channel in channels.Where(c => defaultChannels.Contains(c.Name, StringComparer.OrdinalIgnoreCase)))
                         joinChannel(channel);
                 }
             };
