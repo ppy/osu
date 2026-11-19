@@ -114,7 +114,7 @@ namespace osu.Game.Online.Chat
         {
             chatClient = api.GetChatClient();
             chatClient.ChannelJoined += ch => Schedule(() => joinChannel(ch));
-            chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getChannel(ch), false));
+            chatClient.ChannelParted += ch => Schedule(() => leaveChannel(getJoinedChannel(ch), false));
             chatClient.NewMessages += msgs => Schedule(() => addMessages(msgs));
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
             chatClient.RequestPresence();
@@ -466,13 +466,25 @@ namespace osu.Game.Online.Chat
 
             req.Success += channels =>
             {
+                availableChannels.Clear();
+
                 foreach (var channel in channels)
                 {
-                    var ch = getChannel(channel, addToAvailable: true);
+                    if (getJoinedChannel(channel) is Channel alreadyJoinedChannel)
+                    {
+                        joinedChannels.Remove(alreadyJoinedChannel);
+
+                        channel.Joined.Value = true;
+                        joinChannel(channel);
+                        if (CurrentChannel.Value == alreadyJoinedChannel)
+                            CurrentChannel.Value = channel;
+                    }
+
+                    availableChannels.Add(channel);
 
                     // join any channels classified as "defaults"
                     if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
-                        joinChannel(ch);
+                        joinChannel(channel);
                 }
             };
 
@@ -549,12 +561,11 @@ namespace osu.Game.Online.Chat
         /// The provided channel may be used if an existing instance is not found.
         /// </summary>
         /// <param name="lookup">A candidate channel to be used for lookup or permanently on lookup failure.</param>
-        /// <param name="addToAvailable">Whether the channel should be added to <see cref="AvailableChannels"/> if not already.</param>
-        /// <param name="addToJoined">Whether the channel should be added to <see cref="JoinedChannels"/> if not already.</param>
+        /// <param name="createIfNotFound">Whether the channel should be added to <see cref="JoinedChannels"/> if not already.</param>
         /// <returns>The found channel.</returns>
-        private Channel getChannel(Channel lookup, bool addToAvailable = false, bool addToJoined = false)
+        private Channel getJoinedChannel(Channel lookup, bool createIfNotFound = false)
         {
-            Channel found = null;
+            Channel channel = null;
 
             bool lookupCondition(Channel ch)
             {
@@ -564,35 +575,21 @@ namespace osu.Game.Online.Chat
                 return ch.Name == lookup.Name;
             }
 
-            var available = AvailableChannels.FirstOrDefault(lookupCondition);
-            if (available != null)
-                found = available;
+            channel = JoinedChannels.FirstOrDefault(lookupCondition);
 
-            var joined = JoinedChannels.FirstOrDefault(lookupCondition);
-            if (found == null && joined != null)
-                found = joined;
+            if (channel != null || !createIfNotFound)
+                return channel;
 
-            if (found == null)
-            {
-                found = lookup;
+            channel = lookup;
 
-                // if we're using a channel object from the server, we want to remove ourselves from the users list.
-                // this is because we check the first user in the channel to display a name/icon on tabs for now.
-                var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
-                if (foundSelf != null)
-                    found.Users.Remove(foundSelf);
-            }
-            else
-            {
-                found.Id = lookup.Id;
-                found.Name = lookup.Name;
-                found.LastMessageId = Math.Max(found.LastMessageId ?? 0, lookup.LastMessageId ?? 0);
-            }
+            // if we're using a channel object from the server, we want to remove ourselves from the users list.
+            // this is because we check the first user in the channel to display a name/icon on tabs for now.
+            var foundSelf = channel.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
+            if (foundSelf != null)
+                channel.Users.Remove(foundSelf);
 
-            if (joined == null && addToJoined) joinedChannels.Add(found);
-            if (available == null && addToAvailable) availableChannels.Add(found);
-
-            return found;
+            joinedChannels.Add(channel);
+            return channel;
         }
 
         /// <summary>
@@ -606,7 +603,7 @@ namespace osu.Game.Online.Chat
         {
             if (channel == null) return null;
 
-            channel = getChannel(channel, addToJoined: true);
+            channel = getJoinedChannel(channel, createIfNotFound: true);
 
             // ensure we are joined to the channel
             if (!channel.Joined.Value)
