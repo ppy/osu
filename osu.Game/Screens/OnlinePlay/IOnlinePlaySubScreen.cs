@@ -8,7 +8,5 @@ namespace osu.Game.Screens.OnlinePlay
         string Title { get; }
 
         string ShortTitle { get; }
-
-        bool ShowHeaderLine => true;
     }
 }

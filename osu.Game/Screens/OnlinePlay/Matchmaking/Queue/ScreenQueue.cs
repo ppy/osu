@@ -21,7 +21,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Database;
@@ -84,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private readonly IBindable<MatchmakingScreenState> currentState = new Bindable<MatchmakingScreenState>();
 
-        private readonly Bindable<MatchmakingPool[]?> availablePools = new Bindable<MatchmakingPool[]?>();
+        private readonly Bindable<IReadOnlyList<MatchmakingPool>?> availablePools = new Bindable<IReadOnlyList<MatchmakingPool>?>();
         private readonly Bindable<MatchmakingPool?> selectedPool = new Bindable<MatchmakingPool?>();
         private readonly MatchmakingPoolType poolType;
 
@@ -98,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private DrawableSample waitingLoop = null!;
         private ScheduledDelegate? pushScreenDelegate;
 
-        private int? userRating;
+        private MatchmakingUserStats? userStats;
 
         private GridContainer mainGrid = null!;
 
@@ -384,8 +383,21 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
             client.MatchmakingLobbyStatusChanged += onMatchmakingLobbyStatusChanged;
 
+            queue.GetMatchmakingPools().ContinueWith(t =>
+            {
+                var pools = t.GetResultSafely();
+
+                Schedule(() =>
+                {
+                    availablePools.Value = pools.Where(p => p.Type == poolType).ToList();
+
+                    // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
+                    selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
+                });
+            });
+
             currentState.BindTo(queue.CurrentState);
-            currentState.BindValueChanged(s => SetState(s.NewValue));
+            currentState.BindValueChanged(_ => onStateChanged());
 
             selectedPool.BindTo(queue.SelectedPool);
             selectedPool.BindValueChanged(_ => refreshLobbyData());
@@ -394,29 +406,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             isConnected.BindValueChanged(connected => Schedule(() =>
             {
                 if (connected.NewValue)
-                {
-                    populateAvailablePools().FireAndForget();
                     refreshLobbyData();
-                }
                 else
-                {
-                    availablePools.Value = null;
                     clearLobbyData();
-                }
             }), true);
-        }
-
-        private async Task populateAvailablePools()
-        {
-            MatchmakingPool[] pools = await client.GetMatchmakingPoolsOfType(poolType).ConfigureAwait(false);
-
-            Schedule(() =>
-            {
-                availablePools.Value = pools;
-
-                // Default to the currently queueing pool, or fallback to the user's ruleset for the initial pool selection.
-                selectedPool.Value ??= pools.FirstOrDefault(p => p.RulesetId == ruleset.Value.OnlineID) ?? pools.FirstOrDefault();
-            });
         }
 
         private void onMatchmakingLobbyStatusChanged(MatchmakingLobbyStatus status) => Scheduler.Add(() =>
@@ -433,10 +426,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                            }), cancellation.Token);
 
             // Global (incremental) updates will not contain the user rating, so keep the one we already received from initial status data.
-            if (status.UserRating != null)
-                userRating = status.UserRating;
+            // The rank value can be null if the rating is provisional, so we don't check for it here.
+            if (status.UserRating != null && status.UserSigma != null)
+                userStats = new MatchmakingUserStats(status.UserRating.Value, status.UserSigma.Value, status.UserRank);
 
-            ratingGraph.SetData(status.RatingDistribution, userRating);
+            ratingGraph.SetData(status.RatingDistribution, userStats?.Rating);
 
             loadRecentMatches(status.RecentMatches.OfType<RankedPlayRoomState>().ToArray()).FireAndForget();
         });
@@ -492,7 +486,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             resultPanelContainer.Clear();
             resultPanelContainer.LayoutDuration = 0;
-            userRating = null;
+            userStats = null;
             ratingGraph.SetData([], null);
 
             cloud.Users = Array.Empty<APIUser>();
@@ -505,7 +499,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             queue.SearchInForeground();
 
             using (BeginDelayedSequence(800))
-                Schedule(() => SetState(currentState.Value));
+                Schedule(onStateChanged);
         }
 
         public override void OnResuming(ScreenTransitionEvent e)
@@ -549,7 +543,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             }
         }
 
-        public void SetState(MatchmakingScreenState newState)
+        private void onStateChanged()
         {
             mainContent.FadeInFromZero(500, Easing.OutQuint);
             mainContent.Clear();
@@ -560,7 +554,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             pushScreenDelegate?.Cancel();
             pushScreenDelegate = null;
 
-            switch (newState)
+            switch (currentState.Value)
             {
                 case MatchmakingScreenState.Idle:
                     LinkFlowContainer duelHint;
@@ -670,7 +664,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
                 case MatchmakingScreenState.PendingAccept:
                     client.MatchmakingAcceptInvitation().FireAndForget();
-                    SetState(MatchmakingScreenState.AcceptedWaitingForRoom);
 
                     matchFoundSample?.Play();
                     music.DuckMomentarily(1250);
@@ -724,34 +717,12 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         }
                     };
 
-                    using (BeginDelayedSequence(2000))
-                    {
-                        pushScreenDelegate = Schedule(() =>
-                        {
-                            if (client.Room == null)
-                            {
-                                Logger.Log("Room became null, returning to idle");
-                                SetState(MatchmakingScreenState.Idle);
-                                return;
-                            }
-
-                            switch (poolType)
-                            {
-                                case MatchmakingPoolType.QuickPlay:
-                                    this.Push(new ScreenMatchmaking(client.Room));
-                                    break;
-
-                                case MatchmakingPoolType.RankedPlay:
-                                    this.Push(new RankedPlayScreen(client.Room));
-                                    break;
-                            }
-                        });
-                    }
+                    pushScreenDelegate = Scheduler.AddDelayed(attemptJoinRoom, 2000);
 
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
+                    throw new ArgumentOutOfRangeException(nameof(currentState), currentState.Value, null);
             }
         }
 
@@ -794,6 +765,29 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             waitingLoopChannel?.Stop();
             waitingLoopChannel?.Dispose();
+        }
+
+        private void attemptJoinRoom()
+        {
+            if (currentState.Value != MatchmakingScreenState.InRoom)
+                return;
+
+            if (client.Room == null)
+            {
+                pushScreenDelegate = Scheduler.Add(attemptJoinRoom);
+                return;
+            }
+
+            switch (poolType)
+            {
+                case MatchmakingPoolType.QuickPlay:
+                    this.Push(new ScreenMatchmaking(client.Room));
+                    break;
+
+                case MatchmakingPoolType.RankedPlay:
+                    this.Push(new RankedPlayScreen(client.Room));
+                    break;
+            }
         }
 
         public partial class PanelBackground : CompositeDrawable

@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -22,7 +23,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation.SkinComponents;
 using osu.Game.Overlays;
-using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -230,8 +230,8 @@ namespace osu.Game.Screens.RankingV2.Argon
                     Margin = new MarginPadding { Bottom = 2, },
                 };
                 flow.AddText(score.Value.Beatmap.DifficultyName, t => t.Font = OsuFont.Style.Heading2.With(size: 22));
-                flow.AddText(" ");
-                flow.AddText(BeatmapsetsStrings.ShowDetailsMappedBy(string.Empty), t => t.Font = OsuFont.Style.Caption1.With(size: 18));
+                // TODO: unlocalised until text flow can do formatting on localisable string placeholders
+                flow.AddText(" mapped by ", t => t.Font = OsuFont.Style.Caption1.With(size: 18));
                 flow.AddText(score.Value.Beatmap.Metadata.Author.Username, t => t.Font = OsuFont.Style.Caption1.With(size: 18, weight: FontWeight.SemiBold));
 
                 return flow;
@@ -252,22 +252,18 @@ namespace osu.Game.Screens.RankingV2.Argon
                                    rulesetIconContainer.Colour = col;
                                    difficultyText.Colour = col;
                                });
-                           });
+                           }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         #region ISerialisableDrawable
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the argon skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
 
         #region IAnimatableSkinnable
 
-        [SettingSource(nameof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
         public BindableInt GroupNumber { get; } = new BindableInt
         {
             MinValue = 0,

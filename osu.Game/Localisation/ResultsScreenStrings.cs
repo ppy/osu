@@ -13,7 +13,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Achieved on {0:g}"
         /// </summary>
-        public static LocalisableString AchievedOnDate(DateTimeOffset date) => new TranslatableString(getKey(@"achieved_on_date"), @"Achieved on {0:g}", date);
+        public static LocalisableString AchievedOnDate(DateTimeOffset? date) => new TranslatableString(getKey(@"achieved_on_date"), @"Achieved on {0:g}", date);
 
         /// <summary>
         /// "Performance points are not granted for this score because the beatmap is not ranked."
@@ -39,6 +39,50 @@ namespace osu.Game.Localisation
         /// "Personal best"
         /// </summary>
         public static LocalisableString PersonalBest => new TranslatableString(getKey(@"personal_best"), @"Personal best");
+
+        /// <summary>
+        /// "Accuracy:
+        /// Error: {0:0.00}ms - {1:0.00}ms avg
+        /// Unstable Rate: {2:0.00}"
+        /// </summary>
+        public static LocalisableString LegacyHealthGraphTooltipText(double earlyAverage, double lateAverage, double unstableRate) => new TranslatableString(getKey(@"legacy_health_graph_tooltip_text"), @"Accuracy:
+Error: {0:0.00}ms - {1:0.00}ms avg
+Unstable Rate: {2:0.00}", earlyAverage, lateAverage, unstableRate);
+
+        /// <summary>
+        /// "▼ Online Ranking ▼"
+        /// </summary>
+        public static LocalisableString LegacyOnlineRankingButtonText => new TranslatableString(getKey(@"legacy_online_ranking_button_text"), @"▼ Online Ranking ▼");
+
+        /// <summary>
+        /// "Ranking"
+        /// </summary>
+        public static LocalisableString RankingFooterButtonText => new TranslatableString(getKey(@"ranking_footer_button_text"), @"Ranking");
+
+        /// <summary>
+        /// "More statistics"
+        /// </summary>
+        public static LocalisableString MoreStatisticsFooterButtonText => new TranslatableString(getKey(@"more_statistics_footer_button_text"), @"More statistics");
+
+        /// <summary>
+        /// "Catalogue"
+        /// </summary>
+        public static LocalisableString CatalogueFooterButtonText => new TranslatableString(getKey(@"catalogue_footer_button_text"), @"Catalogue");
+
+        /// <summary>
+        /// "Watch replay"
+        /// </summary>
+        public static LocalisableString WatchReplayFooterButtonText => new TranslatableString(getKey(@"watch_replay_footer_button_text"), @"Watch replay");
+
+        /// <summary>
+        /// "Play again"
+        /// </summary>
+        public static LocalisableString PlayAgainFooterButtonText => new TranslatableString(getKey(@"play_again_footer_button_text"), @"Play again");
+
+        /// <summary>
+        /// "Multiplier"
+        /// </summary>
+        public static LocalisableString ModScoreMultiplierCaption => new TranslatableString(getKey(@"mod_score_multiplier_caption"), @"Multiplier");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

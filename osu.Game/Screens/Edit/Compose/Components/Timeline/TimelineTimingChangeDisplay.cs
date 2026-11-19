@@ -110,8 +110,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 RelativeSizeAxes = Axes.Y;
                 Width = WIDTH;
+                Height = 0.5f;
 
-                Origin = Anchor.TopRight;
+                Anchor = Anchor.BottomLeft;
+                Origin = Anchor.BottomLeft;
 
                 Point = timingPoint;
 
@@ -128,7 +130,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         RelativeSizeAxes = Axes.Both,
                         Colour = Point.GetRepresentingColour(colours),
                         Masking = true,
-                        CornerRadius = TimelineTickDisplay.TICK_WIDTH / 2,
+                        CornerRadius = 3,
                         Child = new Box
                         {
                             Colour = Color4.White,
@@ -141,13 +143,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Origin = Anchor.Centre,
                         Rotation = 90,
                         Padding = new MarginPadding { Horizontal = 2 },
-                        Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
+                        Font = OsuFont.Default.With(size: 9, weight: FontWeight.Bold),
                     }
                 };
 
                 beatLength.BindValueChanged(beatLength =>
                 {
-                    Label.Text = $"{60000 / beatLength.NewValue:n1} BPM";
+                    Label.Text = $"{60000 / beatLength.NewValue:0.#} BPM";
                 }, true);
             }
 

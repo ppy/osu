@@ -19,6 +19,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
@@ -281,7 +282,7 @@ namespace osu.Game.Online.API
         private void triggerOutage(string reason)
         {
             state.Value = APIState.Failing;
-            string userFacingMessage = reason ?? "Online functionality is not available due to an outage. Sorry for the inconvenience.";
+            LocalisableString userFacingMessage = reason ?? NotificationsStrings.ServerOutageExplanation;
 
             userFacingOutageMessage.Value = userFacingMessage;
 
@@ -290,7 +291,7 @@ namespace osu.Game.Online.API
                 if (PostNotification != null)
                     PostNotification?.Invoke(new OutageNotification(userFacingMessage));
                 else
-                    log.Add(userFacingMessage, LogLevel.Important);
+                    log.Add(userFacingMessage.ToString(), LogLevel.Important);
             });
         }
 
@@ -610,9 +611,9 @@ namespace osu.Game.Online.API
         /// </summary>
         public IBindable<APIState> State => state;
 
-        public IBindable<string> UserFacingOutageMessage => userFacingOutageMessage;
+        public IBindable<LocalisableString?> UserFacingOutageMessage => userFacingOutageMessage;
 
-        private readonly Bindable<string> userFacingOutageMessage = new Bindable<string>(string.Empty);
+        private readonly Bindable<LocalisableString?> userFacingOutageMessage = new Bindable<LocalisableString?>(string.Empty);
 
         private void handleWebException(WebException we)
         {

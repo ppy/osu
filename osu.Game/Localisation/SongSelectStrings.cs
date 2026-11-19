@@ -95,6 +95,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ScrollSpeed => new TranslatableString(getKey(@"scroll_speed"), @"Scroll Speed");
 
         /// <summary>
+        /// "This value is being adjusted by mods ({0:0.0#} → {1:0.0#})."
+        /// </summary>
+        public static LocalisableString ThisValueIsBeingAdjustedByMods(float originalValue, float adjustedValue) => new TranslatableString(getKey(@"this_value_is_being_adjusted_by_mods"), @"This value is being adjusted by mods ({0:0.0#} → {1:0.0#}).", originalValue, adjustedValue);
+
+        /// <summary>
         /// "Submitted"
         /// </summary>
         public static LocalisableString Submitted => new TranslatableString(getKey(@"submitted"), @"Submitted");
@@ -150,9 +155,9 @@ namespace osu.Game.Localisation
         public static LocalisableString RemoveFromPlayed => new TranslatableString(getKey(@"remove_from_played"), @"Remove from played");
 
         /// <summary>
-        /// "Clear all local scores..."
+        /// "Clear all local scores"
         /// </summary>
-        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores...");
+        public static LocalisableString ClearAllLocalScores => new TranslatableString(getKey(@"clear_all_local_scores"), @"Clear all local scores");
 
         /// <summary>
         /// "Restore all hidden"
@@ -270,9 +275,9 @@ namespace osu.Game.Localisation
         public static LocalisableString NoMatchingBeatmapsDescription => new TranslatableString(getKey(@"no_matching_beatmaps_description"), @"No beatmaps match your filter criteria!");
 
         /// <summary>
-        /// "Temporarily showing all beatmaps in"
+        /// "Temporarily showing all difficulties in"
         /// </summary>
-        public static LocalisableString TemporarilyShowingAllBeatmapsIn => new TranslatableString(getKey(@"temporarily_showing_all_beatmaps_in"), @"Temporarily showing all beatmaps in");
+        public static LocalisableString TemporarilyShowingAllDifficultiesIn => new TranslatableString(getKey(@"temporarily_showing_all_difficulties_in"), @"Temporarily showing all difficulties in");
 
         /// <summary>
         /// "mostly {0}"

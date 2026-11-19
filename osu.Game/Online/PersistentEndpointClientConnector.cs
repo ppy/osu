@@ -70,7 +70,6 @@ namespace osu.Game.Online
         {
             switch (apiState.Value)
             {
-                case APIState.Failing:
                 case APIState.Offline:
                     await disconnect(true).ConfigureAwait(true);
                     break;
@@ -84,6 +83,9 @@ namespace osu.Game.Online
 
         private async Task connect()
         {
+            if (isConnected.Value)
+                return;
+
             cancelExistingConnect();
             // reset retry delay to default.
             retryDelay = 3000;
