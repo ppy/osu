@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Screens.Select;
@@ -25,50 +25,15 @@ namespace osu.Game.Tests.Visual.SongSelect
         private FillFlowContainer container = null!;
         private BeatmapLeaderboardScore.StatisticDisplay[] statistics = [];
 
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("create container", () =>
-            {
-                Child = new Container
-                {
-                    Masking = true,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.X,
-                    Height = 50,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Gray3,
-                        },
-                        container = new FillFlowContainer
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Direction = FillDirection.Horizontal,
-                            AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Horizontal = 20 },
-                            Spacing = new Vector2(20, 0)
-                        },
-                    },
-                };
-            });
-        }
-
         [Test]
         public void TestTwoElements()
         {
-            AddStep("create content", () =>
+            createContent(() => new[]
             {
-                container.AddRange(statistics = new[]
-                {
-                    new BeatmapLeaderboardScore.StatisticDisplay("MAX COMBO", "123x", false),
-                    new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
-                });
+                new BeatmapLeaderboardScore.StatisticDisplay("MAX COMBO", "123x", false),
+                new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
             });
+
             AddStep("vertical container, vertical stats", () =>
             {
                 container.Direction = FillDirection.Vertical;
@@ -104,15 +69,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestThreeElements()
         {
-            AddStep("create content", () =>
+            createContent(() => new[]
             {
-                container.AddRange(statistics = new[]
-                {
-                    new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
-                    new BeatmapLeaderboardScore.StatisticDisplay("ATTEMPTS", "32", false),
-                    new BeatmapLeaderboardScore.StatisticDisplay("COMPLETED", "9", false),
-                });
+                new BeatmapLeaderboardScore.StatisticDisplay("ACCURACY", "100.00%", true),
+                new BeatmapLeaderboardScore.StatisticDisplay("ATTEMPTS", "32", false),
+                new BeatmapLeaderboardScore.StatisticDisplay("COMPLETED", "9", false),
             });
+
             AddStep("vertical container, vertical stats", () =>
             {
                 container.Direction = FillDirection.Vertical;
@@ -144,6 +107,39 @@ namespace osu.Game.Tests.Visual.SongSelect
                 container.ScaleTo(1, 200, Easing.OutQuint);
 
                 setStatisticsDirection(Direction.Vertical);
+            });
+        }
+
+        private void createContent(Func<BeatmapLeaderboardScore.StatisticDisplay[]> createDisplays)
+        {
+            AddStep("create container", () =>
+            {
+                Child = new Container
+                {
+                    Masking = true,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.X,
+                    Height = 50,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Gray3,
+                        },
+                        container = new FillFlowContainer
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Direction = FillDirection.Horizontal,
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Horizontal = 20 },
+                            Spacing = new Vector2(20, 0),
+                            Children = statistics = createDisplays()
+                        },
+                    },
+                };
             });
         }
 
