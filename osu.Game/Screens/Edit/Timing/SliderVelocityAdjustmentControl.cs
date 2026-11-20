@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Timing
         public Bindable<double> Current { get; } = new BindableNumber<double>(1)
         {
             Precision = 0.01,
-            MinValue = 0.1,
+            MinValue = 0.01,
             MaxValue = 10
         };
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    control = new FormDiscreteAdjustmentControl<double>(0.05)
+                    control = new FormDiscreteAdjustmentControl<double>(0.01)
                     {
                         Caption = "Slider velocity",
                         Current = Current,
