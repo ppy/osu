@@ -15,6 +15,9 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Orange);
 
+        [Cached]
+        private readonly OverlayScrollContainer scrollContainer = new OverlayScrollContainer();
+
         public TestSceneWikiMainPage()
         {
             Children = new Drawable[]
