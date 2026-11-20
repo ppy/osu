@@ -218,7 +218,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            Text = CommonStrings.ButtonsCancel,
                                             Size = new Vector2(120, 30),
                                             Action = () => finalise(false)
                                         },
@@ -226,7 +225,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            Text = InputSettingsStrings.ClearBindingButton,
                                             Size = new Vector2(120, 30),
                                             Action = clear
                                         },
@@ -599,11 +597,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private partial class CancelButton : RoundedButton
         {
             public override IEnumerable<LocalisableString> FilterTerms => Enumerable.Empty<LocalisableString>();
+
+            public CancelButton()
+            {
+                Text = CommonStrings.ButtonsCancel;
+            }
         }
 
         private partial class ClearButton : DangerousRoundedButton
         {
             public override IEnumerable<LocalisableString> FilterTerms => Enumerable.Empty<LocalisableString>();
+
+            public ClearButton()
+            {
+                Text = InputSettingsStrings.ClearBindingButton;
+            }
         }
     }
 }
