@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -31,11 +31,9 @@ using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public partial class MultiplayerMatchSongSelect : SongSelect, IOnlinePlaySubScreen, ISongSelect
+    public partial class MultiplayerMatchSongSelect : SongSelect, ISongSelect
     {
-        public string ShortTitle => "song selection";
-
-        public override string Title => ShortTitle.Humanize();
+        public override LocalisableString Title => OnlinePlayStrings.SongSelectionTitle;
 
         [Resolved]
         private MultiplayerClient client { get; set; } = null!;

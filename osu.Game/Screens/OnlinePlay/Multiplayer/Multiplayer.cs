@@ -4,8 +4,10 @@
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Localisation;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
@@ -99,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return false;
         }
 
-        protected override string ScreenTitle => "Multiplayer";
+        public override LocalisableString Title => OnlinePlayStrings.MultiplayerScreenTitle;
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
 

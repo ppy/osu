@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -14,6 +15,11 @@ namespace osu.Game.Screens
 {
     public interface IOsuScreen : IScreen
     {
+        /// <summary>
+        /// A user-facing title for this screen.
+        /// </summary>
+        LocalisableString Title { get; }
+
         /// <summary>
         /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
         /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
