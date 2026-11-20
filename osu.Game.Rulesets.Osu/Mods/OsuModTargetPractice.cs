@@ -424,7 +424,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             IList<HitSampleInfo> samples;
 
             if (sampleObj is IHasRepeats slider)
-                samples = slider.NodeSamples[nodeIndexFromTime(slider, time - sampleObj.StartTime)];
+            {
+                int nodeIndex = Math.Clamp(nodeIndexFromTime(slider, time - sampleObj.StartTime), 0, slider.NodeSamples.Count - 1);
+                samples = slider.NodeSamples[nodeIndex];
+            }
             else
                 samples = sampleObj.Samples;
 
