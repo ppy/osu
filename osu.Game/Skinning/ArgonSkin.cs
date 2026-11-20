@@ -49,9 +49,14 @@ namespace osu.Game.Skinning
             )
         {
             Resources = resources;
+        }
 
-            Configuration.CustomComboColours = new List<Color4>
-            {
+        protected override void SetDefaultConfiguration()
+        {
+            base.SetDefaultConfiguration();
+
+            Configuration.DefaultComboColours.Clear();
+            Configuration.DefaultComboColours.AddRange(
                 // Standard combo progression order is green - blue - red - yellow.
                 // But for whatever reason, this starts from index 1, not 0.
                 //
@@ -69,8 +74,8 @@ namespace osu.Game.Skinning
                 // Yellow
                 new Color4(232, 235, 0, 255),
                 // Purple
-                new Color4(92, 0, 241, 255),
-            };
+                new Color4(92, 0, 241, 255)
+            );
         }
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);

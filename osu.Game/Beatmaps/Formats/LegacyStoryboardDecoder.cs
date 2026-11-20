@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps.Formats
             SetFallbackDecoder<Storyboard>(() => new LegacyStoryboardDecoder());
         }
 
-        protected override Storyboard CreateTemplateObject()
+        public override Storyboard CreateTemplateObject()
         {
             var sb = base.CreateTemplateObject();
 

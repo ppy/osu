@@ -205,7 +205,7 @@ namespace osu.Game.Screens.RankingV2.Extended
                                    starRatingDisplay.Current.Value = difficulty;
                                    applyStarRatingColour();
                                });
-                           });
+                           }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
             Task.Run(() =>
             {
