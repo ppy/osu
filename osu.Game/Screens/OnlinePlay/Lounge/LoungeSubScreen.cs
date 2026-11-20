@@ -32,6 +32,7 @@ using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Localisation;
+using osu.Game.Screens.Footer;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
@@ -80,6 +81,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected Dropdown<RoomModeFilter> StatusDropdown { get; private set; } = null!;
 
+        protected LoungeSubScreen()
+        {
+            FooterContent.Value = ScreenFooterContent.Argon(rightButtons: () =>
+            [
+                CreateNewRoomButton().With(b => b.Action = () => Open())
+            ]);
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load()
         {
@@ -107,6 +116,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     {
                         Horizontal = WaveOverlayContainer.WIDTH_PADDING,
                         Top = Header.HEIGHT + controls_area_height + 20,
+                        Bottom = ScreenFooter.HEIGHT + 20,
                     },
                     Child = roomListing = new RoomListing
                     {
@@ -158,53 +168,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                         Width = 0.6f,
                                     },
                                 },
-                                new GridContainer
+                                new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    ColumnDimensions = new[]
+                                    Direction = FillDirection.Full,
+                                    Spacing = new Vector2(10, 8),
+                                    ChildrenEnumerable = CreateFilterControls().Select(f => f.With(d =>
                                     {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(),
-                                    },
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                    },
-                                    Content = new[]
-                                    {
-                                        new Drawable[]
-                                        {
-                                            new Container
-                                            {
-                                                AutoSizeAxes = Axes.X,
-                                                Margin = new MarginPadding { Right = 20 },
-                                                Children = new Drawable[]
-                                                {
-                                                    CreateNewRoomButton().With(d =>
-                                                    {
-                                                        // Ballpark alignment with filter controls to right.
-                                                        // Done this way to ensure it still looks correct when UI scale causes multi-line flow.
-                                                        d.Y = -6;
-                                                        d.Size = new Vector2(180, 48 + 6);
-                                                        d.Action = () => Open();
-                                                    }),
-                                                }
-                                            },
-                                            new FillFlowContainer
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Direction = FillDirection.Full,
-                                                Spacing = new Vector2(10, 8),
-                                                ChildrenEnumerable = CreateFilterControls().Select(f => f.With(d =>
-                                                {
-                                                    d.Anchor = Anchor.TopRight;
-                                                    d.Origin = Anchor.TopRight;
-                                                }))
-                                            }
-                                        },
-                                    }
+                                        d.Anchor = Anchor.TopRight;
+                                        d.Origin = Anchor.TopRight;
+                                    }))
                                 },
                             },
                         },
@@ -457,7 +431,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             Logger.Log($"Polling adjusted (listing: {listingPoller.TimeBetweenPolls.Value})");
         }
 
-        protected abstract OsuButton CreateNewRoomButton();
+        protected abstract ShearedButton CreateNewRoomButton();
 
         /// <summary>
         /// Creates a new room.
