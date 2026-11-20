@@ -31,7 +31,10 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     Caption = SkinSettingsStrings.AutoCursorSize,
                     Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
-                }),
+                })
+                {
+                    Keywords = new[] { @"circle", @"cs" },
+                },
                 new SettingsItemV2(new FormCheckBox
                 {
                     Caption = SkinSettingsStrings.GameplayCursorDuringTouch,
