@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Wiki
                 DocumentMargin = new MarginPadding(0);
             }
 
-            public override SpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = t.Font.With(Typeface.Torus, weight: FontWeight.Bold));
+            public override SpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = t.Font.With(Typeface.Torus, size: 13, weight: FontWeight.SemiBold));
 
             public override OsuMarkdownTextFlowContainer CreateTextFlow() => base.CreateTextFlow().With(f => f.TextAnchor = Anchor.TopCentre);
 
