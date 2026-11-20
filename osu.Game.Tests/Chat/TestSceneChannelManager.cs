@@ -47,6 +47,13 @@ namespace osu.Game.Tests.Chat
                 {
                     switch (req)
                     {
+                        case ListChannelsRequest listChannelsRequest:
+                            listChannelsRequest.TriggerSuccess(new List<Channel>
+                            {
+                                createChannel(1, ChannelType.Public)
+                            });
+                            return true;
+
                         case JoinChannelRequest joinChannel:
                             joinChannel.TriggerSuccess();
                             return true;
@@ -106,25 +113,25 @@ namespace osu.Game.Tests.Chat
         [Test]
         public void TestMarkAsReadIgnoringLocalMessages()
         {
-            Channel channel = null;
+            Channel currentChannel() => channelManager.CurrentChannel.Value;
 
             AddStep("join channel and select it", () =>
             {
-                channelManager.JoinChannel(channel = createChannel(1, ChannelType.Public));
+                var channel = channelManager.JoinChannel(createChannel(1, ChannelType.Public));
                 channelManager.CurrentChannel.Value = channel;
             });
 
             AddStep("post message", () => channelManager.PostMessage("Something interesting"));
-            AddUntilStep("message posted", () => !channel.Messages.Any(m => m is LocalMessage));
+            AddUntilStep("message posted", () => !currentChannel().Messages.Any(m => m is LocalMessage));
 
-            AddStep("post /help command", () => channelManager.PostCommand("help", channel));
-            AddStep("post /me command with no action", () => channelManager.PostCommand("me", channel));
-            AddStep("post /join command with no channel", () => channelManager.PostCommand("join", channel));
-            AddStep("post /join command with non-existent channel", () => channelManager.PostCommand("join i-dont-exist", channel));
-            AddStep("post non-existent command", () => channelManager.PostCommand("non-existent-cmd arg", channel));
+            AddStep("post /help command", () => channelManager.PostCommand("help", currentChannel()));
+            AddStep("post /me command with no action", () => channelManager.PostCommand("me", currentChannel()));
+            AddStep("post /join command with no channel", () => channelManager.PostCommand("join", currentChannel()));
+            AddStep("post /join command with non-existent channel", () => channelManager.PostCommand("join i-dont-exist", currentChannel()));
+            AddStep("post non-existent command", () => channelManager.PostCommand("non-existent-cmd arg", currentChannel()));
 
-            AddStep("mark channel as read", () => channelManager.MarkChannelAsRead(channel));
-            AddAssert("channel's last read ID is set to the latest message", () => channel.LastReadId == sentMessages.Last().Id);
+            AddStep("mark channel as read", () => channelManager.MarkChannelAsRead(currentChannel()));
+            AddAssert("channel's last read ID is set to the latest message", () => currentChannel().LastReadId, () => Is.EqualTo(sentMessages.Last().Id));
         }
 
         [Test]
@@ -195,29 +202,27 @@ namespace osu.Game.Tests.Chat
         [Test]
         public void TestBlockedUserMessagesAreDeletedImmediatelyOnBlock()
         {
-            Channel channel = null;
-
-            AddStep("create channel", () => channel = createChannel(1, ChannelType.Public));
+            Channel currentChannel() => channelManager.CurrentChannel.Value;
 
             AddStep("join channel and select it", () =>
             {
-                channelManager.JoinChannel(channel);
+                var channel = channelManager.JoinChannel(createChannel(1, ChannelType.Public));
                 channelManager.CurrentChannel.Value = channel;
             });
             AddStep("post a message from blocked user", () => sentMessages.Add(new Message
             {
-                ChannelId = channel.Id,
+                ChannelId = currentChannel().Id,
                 Content = "i am blocked",
                 SenderId = 1234
             }));
-            AddUntilStep("channel has message", () => channel.Messages, () => Is.Not.Empty);
+            AddUntilStep("channel has message", () => currentChannel().Messages, () => Is.Not.Empty);
 
             AddStep("block user", () => ((DummyAPIAccess)API).LocalUserState.Blocks.Add(new APIRelation
             {
                 TargetUser = new APIUser { Username = "blocked", Id = 1234 },
                 TargetID = 1234,
             }));
-            AddAssert("channel has no messages", () => channel.Messages, () => Is.Empty);
+            AddAssert("channel has no messages", () => currentChannel().Messages, () => Is.Empty);
         }
 
         [Test]
