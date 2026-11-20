@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Ranking
 
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
-        private AddNewTagUserTag? addNewTagUserTag;
+        private AddTagButton? addNewTagUserTag;
 
         /// <summary>
         /// Determines whether the user can modify the contained tags
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Ranking
 
             if (Writable && Filter == null)
             {
-                tagFlow.Add(addNewTagUserTag = new AddNewTagUserTag
+                tagFlow.Add(addNewTagUserTag = new AddTagButton
                 {
                     AvailableTags = { BindTarget = relevantTagsById },
                     OnTagSelected = toggleVote,
@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Ranking
 
         protected override bool OnClick(ClickEvent e) => true;
 
-        private partial class AddNewTagUserTag : DrawableUserTag, IHasPopover
+        private partial class AddTagButton : DrawableUserTag, IHasPopover
         {
             public BindableDictionary<long, UserTag> AvailableTags { get; } = new BindableDictionary<long, UserTag>();
 
@@ -321,10 +321,7 @@ namespace osu.Game.Screens.Ranking
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; } = null!;
 
-            [Resolved]
-            private OsuColour colours { get; set; } = null!;
-
-            public AddNewTagUserTag()
+            public AddTagButton()
                 : base(new UserTag(new APITag { Name = "+/add" }), false)
             {
             }
@@ -336,7 +333,7 @@ namespace osu.Game.Screens.Ranking
                 AvailableTags.BindCollectionChanged((_, _) => Enabled.Value = AvailableTags.Count > 0, true);
                 Action = this.ShowPopover;
 
-                MainBackground.FadeColour(colours.Lime2);
+                MainBackground.FadeColour(colourProvider.Colour2);
                 TagCategoryText.FadeColour(colourProvider.Background3);
                 TagNameText.FadeColour(colourProvider.Background3);
                 FadeEdgeEffectTo(0);
