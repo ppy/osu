@@ -393,6 +393,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show test overlay", () => ScreenFooter.ChildrenOfType<ScreenFooterButton>().First(b => b.Text == "One").TriggerClick());
             AddUntilStep("wait until overlay is shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddAssert(
+                "button container width isn't larger than the visible buttons",
+                () => ScreenFooter.ChildrenOfType<FillFlowContainer<ScreenFooterButton>>().Single(d => d.Name == "Left footer buttons").DrawWidth,
+                () => Is.EqualTo(ScreenFooterButton.BUTTON_WIDTH).Within(0.001f)
+            );
             AddAssert("mod overlay is hidden", () => screen.SecondOverlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
 
             AddStep("hide test overlay", () => screen.Overlay.Hide());
@@ -455,6 +460,40 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("hide overlay", () => screen.Overlay.Hide());
             contentHidden();
             AddUntilStep("other buttons returned", () => ScreenFooter.ChildrenOfType<ScreenFooterButton>().Skip(1).All(b => b.ChildrenOfType<Container>().First().Y == 0));
+        }
+
+        [Test]
+        public void TestSceneButtonResizedWhenChangingScreens()
+        {
+            TestScreen screen = null!;
+
+            AddStep("push screen", () =>
+            {
+                LoadScreen(screen = new TestScreen
+                {
+                    FooterContent =
+                    {
+                        Value = ScreenFooterContent.Argon(() => new[]
+                        {
+                            new ScreenFooterButton
+                            {
+                                AccentColour = Dependencies.Get<OsuColour>().Orange1,
+                                Icon = FontAwesome.Solid.Toolbox,
+                                Text = "One",
+                            },
+                            new ScreenFooterButton { Text = "Two", Action = () => { } },
+                            new ScreenFooterButton { Text = "Three", Action = () => { } },
+                        }),
+                    },
+                });
+            });
+            AddUntilStep("wait until screen is loaded", () => screen.IsCurrentScreen(), () => Is.True);
+
+            AddStep("resize button and immediately push second screen", () =>
+            {
+                ScreenFooter.ChildrenOfType<ScreenFooterButton>().First().ResizeWidthTo(300, 300, Easing.OutQuint);
+                LoadScreen(new TestScreen());
+            });
         }
 
         private void contentHidden()
