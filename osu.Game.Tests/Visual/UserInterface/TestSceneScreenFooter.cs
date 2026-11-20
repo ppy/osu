@@ -393,6 +393,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show test overlay", () => ScreenFooter.ChildrenOfType<ScreenFooterButton>().First(b => b.Text == "One").TriggerClick());
             AddUntilStep("wait until overlay is shown", () => screen.Overlay.State.Value, () => Is.EqualTo(Visibility.Visible));
+            AddAssert(
+                "button container width isn't larger than the visible buttons",
+                () => ScreenFooter.ChildrenOfType<FillFlowContainer<ScreenFooterButton>>().Single(d => d.Name == "Left footer buttons").DrawWidth,
+                () => Is.EqualTo(ScreenFooterButton.BUTTON_WIDTH).Within(0.001f)
+            );
             AddAssert("mod overlay is hidden", () => screen.SecondOverlay.State.Value, () => Is.EqualTo(Visibility.Hidden));
 
             AddStep("hide test overlay", () => screen.Overlay.Hide());

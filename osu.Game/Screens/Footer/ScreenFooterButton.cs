@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Footer
         public const int CORNER_RADIUS = 10;
 
         public const int HEIGHT = 75;
-        protected const int BUTTON_WIDTH = 116;
+        public const int BUTTON_WIDTH = 116;
 
         /// <summary>
         /// If this footer button controls the visibility of an overlay, it will be bound to this bindable.
