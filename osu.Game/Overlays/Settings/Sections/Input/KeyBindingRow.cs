@@ -214,7 +214,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                             Text = InputSettingsStrings.PendingBinding,
                                             Font = OsuFont.Style.Caption1.With(weight: FontWeight.SemiBold),
                                         },
-                                        new RoundedButton
+                                        new CancelButton
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
@@ -222,7 +222,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                             Size = new Vector2(120, 30),
                                             Action = () => finalise(false)
                                         },
-                                        new DangerousRoundedButton
+                                        new ClearButton
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
@@ -594,6 +594,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private void updateIsDefaultValue()
         {
             isDefault.Value = KeyBindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
+        }
+
+        private partial class CancelButton : RoundedButton
+        {
+            public override IEnumerable<LocalisableString> FilterTerms => Enumerable.Empty<LocalisableString>();
+        }
+
+        private partial class ClearButton : DangerousRoundedButton
+        {
+            public override IEnumerable<LocalisableString> FilterTerms => Enumerable.Empty<LocalisableString>();
         }
     }
 }
