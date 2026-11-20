@@ -20,9 +20,9 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public partial class TestSceneBreakTracker : OsuTestScene
     {
-        private readonly BreakOverlay breakOverlay;
+        private BreakOverlay breakOverlay;
 
-        private readonly TestBreakTracker breakTracker;
+        private TestBreakTracker breakTracker;
 
         private readonly IReadOnlyList<BreakPeriod> testBreaks = new List<BreakPeriod>
         {
@@ -30,7 +30,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             new BreakPeriod(6000, 13500),
         };
 
-        public TestSceneBreakTracker()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
             Children = new Drawable[]
             {
@@ -51,13 +52,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                     BreakTracker = breakTracker,
                 },
             };
-        }
+        });
 
         protected override void Update()
         {
             base.Update();
 
-            breakOverlay.Clock = breakTracker.Clock;
+            if (breakOverlay != null && breakTracker != null)
+                breakOverlay.Clock = breakTracker.Clock;
         }
 
         [Test]
