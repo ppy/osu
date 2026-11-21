@@ -33,5 +33,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty("pool")]
         public APIMatchmakingPool Pool { get; set; } = new APIMatchmakingPool();
+
+        [JsonProperty("recent_history")]
+        public APIUserMatchmakingRatingHistory[] RecentHistory = [];
     }
 }
