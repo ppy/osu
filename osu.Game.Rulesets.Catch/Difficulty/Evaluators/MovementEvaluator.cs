@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
 
                             // Scaling by time relative time difference: additional penalty for maintaining the rhythm.
                             double relativeTimeDifference = Math.Abs(lastFlow.StrainTime / prevFlow.StrainTime - 1);
-                            relativeTimeDifference = 2.5 * Math.Clamp(relativeTimeDifference, 0, 0.1);
+                            relativeTimeDifference = 5.0 * Math.Clamp(relativeTimeDifference, 0, 0.1); // We apply only 50% of the penalty for different time interval than the current one.
 
                             if (relativeDifference <= 0.15)
                                 repetitiveSpacingWeight += (1 - relativeDifference / 0.15) * (1 - relativeTimeDifference) * DiffUtils.Pow(0.9, i);
