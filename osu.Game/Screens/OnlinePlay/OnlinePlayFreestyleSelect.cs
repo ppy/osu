@@ -22,8 +22,8 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly PlaylistItem item;
 
         public string ShortTitle => "style selection";
+
         public override string Title => ShortTitle.Humanize();
-        public bool ShowHeaderLine => false;
 
         protected abstract void StartAction();
 
@@ -35,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay
             this.item = item;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+            TopPadding = Header.HEIGHT - 10;
 
             SupportScoping = false;
         }
@@ -74,6 +75,13 @@ namespace osu.Game.Screens.OnlinePlay
             criteria.Length.Max = itemLength + 30000;
             criteria.Length.IsLowerInclusive = true;
             criteria.Length.IsUpperInclusive = true;
+
+            // Dismiss the user's config-persisted search criteria (difficulty range, selected collection, converts).
+            // In the context of freestyle selection applying them is counterproductive and can cause no beatmaps to be displayed at all.
+            criteria.UserStarDifficulty.Min = null;
+            criteria.UserStarDifficulty.Max = null;
+            criteria.CollectionBeatmapMD5Hashes = null;
+            criteria.AllowConvertedBeatmaps = true;
         }
 
         private bool isValidForSelection()

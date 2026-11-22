@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             PrepareBeatmap(() => new CatchCustomSkinWorkingBeatmap(audio, true));
             ConfigureTest(useBeatmapSkin, false, false);
-            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DefaultComboColours));
+            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DEFAULT_COMBO_COLOURS));
         }
 
         [TestCase(true, true)]
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             PrepareBeatmap(() => new CatchCustomSkinWorkingBeatmap(audio, false));
             ConfigureTest(useBeatmapSkin, useBeatmapColour, false);
-            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DefaultComboColours));
+            AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DEFAULT_COMBO_COLOURS));
         }
 
         [TestCase(true, true)]

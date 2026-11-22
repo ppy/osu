@@ -43,7 +43,7 @@ namespace osu.Game.Skinning
             InputOverlayText,
         }
 
-        public static List<Color4> DefaultComboColours { get; } = new List<Color4>
+        public static readonly List<Color4> DEFAULT_COMBO_COLOURS = new List<Color4>
         {
             new Color4(255, 192, 0, 255),
             new Color4(0, 202, 0, 255),
@@ -51,7 +51,15 @@ namespace osu.Game.Skinning
             new Color4(242, 24, 57, 255),
         };
 
-        public List<Color4> CustomComboColours { get; set; } = new List<Color4>();
+        /// <summary>
+        /// The default colours which are provided by the base skin.
+        /// </summary>
+        public List<Color4> DefaultComboColours { get; } = new List<Color4>(DEFAULT_COMBO_COLOURS);
+
+        /// <summary>
+        /// User override combo colours.
+        /// </summary>
+        public List<Color4> CustomComboColours { get; } = new List<Color4>();
 
         public IReadOnlyList<Color4>? ComboColours
         {
