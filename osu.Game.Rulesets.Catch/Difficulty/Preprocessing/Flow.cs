@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         private readonly List<CatchDifficultyHitObject> hitObjects;
 
         public readonly int Index;
-        public readonly int MovementDirection;
+        public readonly Direction MovementDirection;
 
         public float DistanceMoved { get; private set; }
         public double StrainTime { get; private set; }
