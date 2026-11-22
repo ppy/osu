@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Ranking
 
         private readonly Bindable<APIBeatmap?> apiBeatmap = new Bindable<APIBeatmap?>();
 
-        private AddNewTagUserTag? addNewTagUserTag;
+        private AddTagButton? addNewTagUserTag;
 
         /// <summary>
         /// Determines whether the user can modify the contained tags
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Ranking
 
             if (Writable && Filter == null)
             {
-                tagFlow.Add(addNewTagUserTag = new AddNewTagUserTag
+                tagFlow.Add(addNewTagUserTag = new AddTagButton
                 {
                     AvailableTags = { BindTarget = relevantTagsById },
                     OnTagSelected = toggleVote,
@@ -311,16 +311,16 @@ namespace osu.Game.Screens.Ranking
 
         protected override bool OnClick(ClickEvent e) => true;
 
-        private partial class AddNewTagUserTag : DrawableUserTag, IHasPopover
+        private partial class AddTagButton : DrawableUserTag, IHasPopover
         {
             public BindableDictionary<long, UserTag> AvailableTags { get; } = new BindableDictionary<long, UserTag>();
 
             public Action<UserTag>? OnTagSelected { get; set; }
 
             [Resolved]
-            private OverlayColourProvider overlayColourProvider { get; set; } = null!;
+            private OverlayColourProvider colourProvider { get; set; } = null!;
 
-            public AddNewTagUserTag()
+            public AddTagButton()
                 : base(new UserTag(new APITag { Name = "+/add" }), false)
             {
             }
@@ -332,9 +332,9 @@ namespace osu.Game.Screens.Ranking
                 AvailableTags.BindCollectionChanged((_, _) => Enabled.Value = AvailableTags.Count > 0, true);
                 Action = this.ShowPopover;
 
-                MainBackground.FadeColour(overlayColourProvider.Background2);
-                TagCategoryText.FadeColour(overlayColourProvider.Colour0);
-                TagNameText.FadeColour(overlayColourProvider.Colour0);
+                MainBackground.FadeColour(colourProvider.Colour2);
+                TagCategoryText.FadeColour(colourProvider.Background3);
+                TagNameText.FadeColour(colourProvider.Background3);
                 FadeEdgeEffectTo(0);
             }
 

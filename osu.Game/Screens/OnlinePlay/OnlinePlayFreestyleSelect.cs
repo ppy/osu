@@ -22,8 +22,8 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly PlaylistItem item;
 
         public string ShortTitle => "style selection";
+
         public override string Title => ShortTitle.Humanize();
-        public bool ShowHeaderLine => false;
 
         protected abstract void StartAction();
 
@@ -35,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay
             this.item = item;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+            TopPadding = Header.HEIGHT - 10;
 
             SupportScoping = false;
         }
