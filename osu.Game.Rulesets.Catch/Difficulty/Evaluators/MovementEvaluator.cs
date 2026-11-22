@@ -54,6 +54,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
             {
                 double repetitiveSpacingWeight = 0;
 
+                const double repetitive_spacing_cutoff = 0.15;
+                const double full_repetitive_spacing_penalty_cutoff = 0.05;
+                const double repetitive_timing_cutoff = 0.1;
+                const double repetitive_spacing_power = 0.9;
+
                 var currentFlow = catchCurrent.Flow;
                 var lastFlow = catchLast.Flow;
 
@@ -70,14 +75,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                             double prevSpacing = Math.Abs(prevFlow.DistanceMoved / prevFlow.StrainTime);
 
                             double relativeDifference = Math.Abs(lastSpacing / prevSpacing - 1);
-                            relativeDifference = Math.Max(0, relativeDifference - 0.05); // Handle inaccuracies in repetitive patterns.
+                            relativeDifference = Math.Max(0, relativeDifference - full_repetitive_spacing_penalty_cutoff); // Handle inaccuracies in repetitive patterns.
 
                             // Scaling by time relative time difference: additional penalty for maintaining the rhythm.
                             double relativeTimeDifference = Math.Abs(lastFlow.StrainTime / prevFlow.StrainTime - 1);
                             relativeTimeDifference = 5.0 * Math.Clamp(relativeTimeDifference, 0, 0.1); // We apply only 50% of the penalty for different time interval than the current one.
 
-                            if (relativeDifference <= 0.15)
-                                repetitiveSpacingWeight += (1 - relativeDifference / 0.15) * (1 - relativeTimeDifference) * DiffUtils.Pow(0.9, i);
+                            if (relativeDifference <= repetitive_spacing_cutoff)
+                                repetitiveSpacingWeight += (1 - relativeDifference / repetitive_spacing_cutoff)
+                                                        * (1 - relativeTimeDifference)
+                                                        * DiffUtils.Pow(repetitive_spacing_power, i);
                         }
                     }
                 }
