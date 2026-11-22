@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                     // Precision value (time window to hit the note) is lower for higher CS and for fixed distance to the hyperdash.
                     edgeDashBonus += 2.9 + 0.1 * DiffUtils.Pow(circleSize, 0.8);
                     if (current.Index >= 2 && catchLast.LastObject.HyperDash) // Edge dashes are harder when they appear right after a hyperdash.
-                        edgeDashBonus *= 1.4;
+                        edgeDashBonus *= 1.3;
                     if (catchLast != null && catchCurrent.MovementDirection == catchLast.MovementDirection)
                         edgeDashBonus *= 0.75;
                 }
