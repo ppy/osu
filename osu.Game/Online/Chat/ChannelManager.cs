@@ -527,10 +527,7 @@ namespace osu.Game.Online.Chat
         }
 
         /// <summary>
-        /// Fetches inital messages of a channel
-        ///
-        /// TODO: remove this when the API supports returning initial fetch messages for more than one channel by specifying the last message id per channel instead of one last message id globally.
-        /// right now it caps out at 50 messages and therefore only returns one channel's worth of content.
+        /// Fetches inital messages of a channel for display. Currently caps out at 50 messages, which isn't great.
         /// </summary>
         /// <param name="channel">The channel </param>
         private void fetchInitialMessages(Channel channel)
