@@ -493,6 +493,7 @@ namespace osu.Game.Online.Chat
                 {
                     // If we happen to already be joined to a channel, we should probably trust the new one from the server and replace our
                     // local joined copy.
+                    // TODO: this is a bit ugly
                     if (getJoinedChannel(channel) is Channel alreadyJoinedChannel)
                     {
                         joinedChannels.Remove(alreadyJoinedChannel);
