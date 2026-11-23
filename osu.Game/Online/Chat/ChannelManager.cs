@@ -497,7 +497,6 @@ namespace osu.Game.Online.Chat
                     {
                         joinedChannels.Remove(alreadyJoinedChannel);
 
-                        channel.Joined.Value = true;
                         joinChannel(channel, false);
                         if (CurrentChannel.Value == alreadyJoinedChannel)
                             CurrentChannel.Value = channel;
@@ -524,24 +523,6 @@ namespace osu.Game.Online.Chat
             };
 
             api.Queue(req);
-        }
-
-        /// <summary>
-        /// Fetches inital messages of a channel for display. Currently caps out at 50 messages, which isn't great.
-        /// </summary>
-        /// <param name="channel">The channel </param>
-        private void fetchInitialMessages(Channel channel)
-        {
-            if (channel.Id <= 0 || channel.MessagesLoaded) return;
-
-            var fetchInitialMsgReq = new GetMessagesRequest(channel);
-            fetchInitialMsgReq.Success += messages =>
-            {
-                addMessages(messages);
-                channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
-            };
-
-            api.Queue(fetchInitialMsgReq);
         }
 
         /// <summary>
@@ -619,9 +600,9 @@ namespace osu.Game.Online.Chat
         /// </summary>
         /// <param name="channel">The channel to join.</param>
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
-        public Channel JoinChannel(Channel channel) => joinChannel(channel, true);
+        public Channel JoinChannel(Channel channel) => joinChannel(channel);
 
-        private Channel joinChannel(Channel channel, bool fetchInitialMessages)
+        private Channel joinChannel(Channel channel, bool performInitialMessageFetch = true)
         {
             if (channel == null) return null;
 
@@ -635,19 +616,17 @@ namespace osu.Game.Online.Chat
                 switch (channel.Type)
                 {
                     case ChannelType.Multiplayer:
-                        // join is implicit. happens when you join a multiplayer game.
-                        // this will probably change in the future.
-                        joinChannel(channel, fetchInitialMessages);
-                        return channel;
+                        // join operation is implicit. happens when you join a multiplayer game.
+                        // this will probably change in the future?
+                        fetchInitialMessages();
+                        break;
 
                     case ChannelType.PM:
                         Logger.Log($"Attempting to join PM channel {channel}");
 
                         var createRequest = new CreateChannelRequest(channel);
-                        createRequest.Failure += e =>
-                        {
-                            Logger.Log($"Failed to join PM channel {channel} ({e.Message})");
-                        };
+
+                        createRequest.Failure += e => Logger.Log($"Failed to join PM channel {channel} ({e.Message})");
                         createRequest.Success += resChannel =>
                         {
                             Logger.Log($"Joined PM channel {channel} ({resChannel.ChannelID})");
@@ -668,10 +647,11 @@ namespace osu.Game.Online.Chat
                         Logger.Log($"Attempting to join public channel {channel}");
 
                         var req = new JoinChannelRequest(channel);
+
                         req.Success += () =>
                         {
                             Logger.Log($"Joined public channel {channel}");
-                            joinChannel(channel, fetchInitialMessages);
+                            fetchInitialMessages();
 
                             // Required after joining public channels to mark the user as online in them.
                             // Todo: Temporary workaround for https://github.com/ppy/osu-web/issues/9602
@@ -682,19 +662,37 @@ namespace osu.Game.Online.Chat
                             Logger.Log($"Failed to join public channel {channel} ({e.Message})");
                             LeaveChannel(channel);
                         };
+
                         api.Queue(req);
-                        return channel;
+                        break;
                 }
             }
             else
             {
-                if (fetchInitialMessages)
-                    this.fetchInitialMessages(channel);
+                // even if the channel is already joined, messages may not be fetched (as this is done so lazily).
+                fetchInitialMessages();
             }
 
             CurrentChannel.Value ??= channel;
-
             return channel;
+
+            void fetchInitialMessages()
+            {
+                if (!performInitialMessageFetch)
+                    return;
+
+                if (channel.Id > 0 && !channel.MessagesLoaded)
+                {
+                    var fetchInitialMsgReq = new GetMessagesRequest(channel);
+                    fetchInitialMsgReq.Success += messages =>
+                    {
+                        addMessages(messages);
+                        channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
+                    };
+
+                    api.Queue(fetchInitialMsgReq);
+                }
+            }
         }
 
         /// <summary>
