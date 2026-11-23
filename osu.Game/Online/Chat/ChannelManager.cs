@@ -594,17 +594,13 @@ namespace osu.Game.Online.Chat
         /// <returns>The found channel.</returns>
         private Channel getJoinedChannel(Channel lookup, bool createIfNotFound = false)
         {
-            Channel channel = null;
-
-            bool lookupCondition(Channel ch)
+            var channel = JoinedChannels.FirstOrDefault(ch =>
             {
                 if (ch.Id > 0 && lookup.Id > 0)
                     return ch.Id == lookup.Id;
 
                 return ch.Name == lookup.Name;
-            }
-
-            channel = JoinedChannels.FirstOrDefault(lookupCondition);
+            });
 
             if (channel != null || !createIfNotFound)
                 return channel;
