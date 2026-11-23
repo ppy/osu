@@ -59,6 +59,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestNoStatistics()
         {
+            AddStep("set iron", () => update(u => u.CurrentSeasonStatistics = createStatistics(RankingTier.Iron)));
             AddAssert("card is present", () => profileCard.IsPresent, () => Is.True);
 
             AddStep("remove statistics", () => update(u => u.CurrentSeasonStatistics = null));
