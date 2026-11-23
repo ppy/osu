@@ -101,11 +101,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                 var catchPrevObj = (CatchDifficultyHitObject)catchCurrent.Previous(i)!;
 
                 // Only same direction movements matter as they do not take any additional inputs.
-                if (catchCurrent.MovementDirection != catchPrevObj.MovementDirection || catchCurrent.Distance == 0 || catchPrevObj.Distance == 0)
+                if (catchCurrent.MovementDirection != catchPrevObj.MovementDirection || catchCurrent.DistanceMoved == 0 || catchPrevObj.DistanceMoved == 0)
                     break;
 
-                double currentSpacing = Math.Abs(catchCurrent.Distance / catchCurrent.StrainTime);
-                double prevSpacing = Math.Abs(catchPrevObj.Distance / catchPrevObj.StrainTime);
+                double currentSpacing = Math.Abs(catchCurrent.DistanceMoved / catchCurrent.StrainTime);
+                double prevSpacing = Math.Abs(catchPrevObj.DistanceMoved / catchPrevObj.StrainTime);
 
                 double relativeDifference = Math.Abs(currentSpacing / prevSpacing - 1);
 
