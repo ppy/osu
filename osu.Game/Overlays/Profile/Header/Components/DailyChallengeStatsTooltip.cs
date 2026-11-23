@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
-        private partial class StatisticsPiece : CompositeDrawable
+        public partial class StatisticsPiece : CompositeDrawable
         {
             private readonly OsuSpriteText valueText;
 
