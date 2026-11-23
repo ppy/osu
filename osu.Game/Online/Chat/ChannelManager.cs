@@ -118,7 +118,7 @@ namespace osu.Game.Online.Chat
         private void load()
         {
             chatClient = api.GetChatClient();
-            chatClient.ChannelJoined += ch => chatScheduler.Add(() => joinChannel(ch));
+            chatClient.ChannelJoined += ch => chatScheduler.Add(() => joinChannel(ch, false));
             chatClient.ChannelParted += ch => chatScheduler.Add(() => leaveChannel(getJoinedChannel(ch), false));
             chatClient.NewMessages += msgs => chatScheduler.Add(() => addMessages(msgs));
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
@@ -488,7 +488,7 @@ namespace osu.Game.Online.Chat
                         joinedChannels.Remove(alreadyJoinedChannel);
 
                         channel.Joined.Value = true;
-                        joinChannel(channel);
+                        joinChannel(channel, false);
                         if (CurrentChannel.Value == alreadyJoinedChannel)
                             CurrentChannel.Value = channel;
                     }
@@ -503,7 +503,7 @@ namespace osu.Game.Online.Chat
                 if (JoinedChannels.Count == 0)
                 {
                     foreach (var channel in channels.Where(c => defaultChannels.Contains(c.Name, StringComparer.OrdinalIgnoreCase)))
-                        joinChannel(channel);
+                        joinChannel(channel, false);
                 }
             };
 
@@ -618,7 +618,7 @@ namespace osu.Game.Online.Chat
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
         public Channel JoinChannel(Channel channel) => joinChannel(channel, true);
 
-        private Channel joinChannel(Channel channel, bool fetchInitialMessages = false)
+        private Channel joinChannel(Channel channel, bool fetchInitialMessages)
         {
             if (channel == null) return null;
 
