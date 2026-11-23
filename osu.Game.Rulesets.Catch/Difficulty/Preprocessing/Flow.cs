@@ -45,5 +45,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
             int index = Index - (backwardsIndex + 1);
             return index >= 0 && index < flows.Count ? flows[index] : null;
         }
+
+        public Flow? Next(int forwardsIndex)
+        {
+            int index = Index + (forwardsIndex + 1);
+            return index >= 0 && index < flows.Count ? flows[index] : null;
+        }
     }
 }
