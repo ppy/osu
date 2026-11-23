@@ -96,6 +96,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private APISeasonStatistics createStatistics(RankingTier tier, int? rulesetID = null, int? variantID = null)
         {
+            // Spotlights use a slightly different tier naming scheme from the usual `RankingTier`
+            // stuff, this is kept here for consistency.
             string tierName = tier switch
             {
                 RankingTier.Radiant => "Diamond",
