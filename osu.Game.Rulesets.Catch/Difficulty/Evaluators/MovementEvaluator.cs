@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
 
             // Repetitive spacing penalty: it is harder to catch irregular distances, especially in case of non-hyperdashes which require one to "miss the rhythm on purpose".
             // This feature may be treated as a reading penalty: even if the mechanical difficulty is the same, executing it is easier in case of repetitive spacings.
-            // Penalty is given based on the ratio between the current normalised spacing and the previous normalised spacings.
+            // Penalty is given based on the ratio between the last normalised spacing and the previous normalised spacings.
             if (catchLast != null)
             {
                 double repetitiveSpacingWeight = 0;
