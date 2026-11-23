@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("push multi screen", () => screenStack.CurrentScreen.Push(new TestOnlinePlaySubScreen(++index)));
         }
 
-        private partial class TestOnlinePlaySubScreen : OsuScreen
+        private partial class TestOnlinePlaySubScreen : OnlinePlaySubScreen
         {
             private readonly int index;
 
@@ -40,8 +40,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 this.index = index;
             }
-
-            public override string ToString() => Title.ToString();
         }
     }
 }
