@@ -64,33 +64,16 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 {
                     background = new Container
                     {
-                        Size = new Vector2(WIDTH),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Alpha = 0,
+                        Size = new Vector2(0),
                         Masking = true,
-                        CornerRadius = WIDTH / 2f,
-                        Children = new Drawable[]
+                        EdgeEffect = new EdgeEffectParameters
                         {
-                            new BufferedContainer
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(WIDTH),
-                                Child = new Container
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(0),
-                                    Masking = true,
-                                    EdgeEffect = new EdgeEffectParameters
-                                    {
-                                        Type = EdgeEffectType.Shadow,
-                                        Colour = Color4.Black.Opacity(0.75f),
-                                        Radius = 180,
-                                    },
-                                },
-                            },
+                            Type = EdgeEffectType.Shadow,
+                            Colour = Color4.Black.Opacity(0.75f),
+                            Radius = 180,
                         },
                     },
                     outerRing = new CircularContainer
