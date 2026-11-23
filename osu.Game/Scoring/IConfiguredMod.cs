@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -68,6 +69,64 @@ namespace osu.Game.Scoring
             }
 
             return resultMod;
+        }
+
+        public static bool TryCreateMod(this IConfiguredMod configuredMod, Ruleset ruleset, [NotNullWhen(true)] out Mod? mod)
+        {
+            if (configuredMod is Mod modAlready)
+            {
+                mod = modAlready;
+                return true;
+            }
+
+            Mod? resultMod = ruleset.CreateModFromAcronym(configuredMod.Acronym);
+
+            if (resultMod == null)
+            {
+                mod = null;
+                return false;
+            }
+
+            if (configuredMod.Settings.Count > 0)
+            {
+                var unhandledSettings = new Dictionary<string, object>(configuredMod.Settings);
+
+                foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
+                {
+                    if (!unhandledSettings.Remove(property.Name.ToSnakeCase(), out object? settingValue))
+                        continue;
+
+                    IBindable bindable;
+
+                    try
+                    {
+                        bindable = (IBindable)property.GetValue(resultMod)!;
+                        resultMod.CopyAdjustedSetting(bindable, settingValue);
+                    }
+                    catch (Exception)
+                    {
+                        mod = null;
+                        return false;
+                    }
+
+                    object value = bindable.GetUnderlyingSettingValue();
+
+                    if (value.GetType().IsEnum && !Enum.IsDefined(value.GetType(), value))
+                    {
+                        mod = null;
+                        return false;
+                    }
+                }
+
+                if (unhandledSettings.Count > 0)
+                {
+                    mod = null;
+                    return false;
+                }
+            }
+
+            mod = resultMod;
+            return true;
         }
     }
 }

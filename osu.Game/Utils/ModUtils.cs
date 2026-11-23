@@ -219,9 +219,7 @@ namespace osu.Game.Utils
 
             foreach (var apiMod in proposedMods)
             {
-                var mod = apiMod.ToMod(ruleset);
-
-                if (mod is UnknownMod)
+                if (!apiMod.TryCreateMod(ruleset, out var mod))
                 {
                     proposedWereValid = false;
                     continue;
