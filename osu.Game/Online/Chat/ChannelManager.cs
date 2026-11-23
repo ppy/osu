@@ -119,7 +119,17 @@ namespace osu.Game.Online.Chat
         {
             chatClient = api.GetChatClient();
             chatClient.ChannelJoined += ch => chatScheduler.Add(() => joinChannel(ch, false));
-            chatClient.ChannelParted += ch => chatScheduler.Add(() => leaveChannel(getJoinedChannel(ch), false));
+            chatClient.ChannelParted += ch => chatScheduler.Add(() =>
+            {
+                var channel = getJoinedChannel(ch);
+                if (channel == null)
+                    return;
+
+                // The server already knows that we parted. Setting this eagerly will avoid triggering a leave request.
+                channel.Joined.Value = false;
+
+                leaveChannel(channel);
+            });
             chatClient.NewMessages += msgs => chatScheduler.Add(() => addMessages(msgs));
             chatClient.PresenceReceived += () => Schedule(initializeChannels);
             chatClient.RequestPresence();
@@ -698,9 +708,9 @@ namespace osu.Game.Online.Chat
         /// Leave the specified channel. Can be called from any thread.
         /// </summary>
         /// <param name="channel">The channel to leave.</param>
-        public void LeaveChannel(Channel channel) => Schedule(() => leaveChannel(channel, true));
+        public void LeaveChannel(Channel channel) => Schedule(() => leaveChannel(channel));
 
-        private void leaveChannel(Channel channel, bool sendLeaveRequest)
+        private void leaveChannel(Channel channel)
         {
             if (channel == null) return;
 
@@ -723,8 +733,7 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                if (sendLeaveRequest)
-                    api.Queue(new LeaveChannelRequest(channel));
+                api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
         }
