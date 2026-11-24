@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         private const int notch_container_height = 10;
 
-        public IEnumerable<LocalisableString> FilterTerms => flowContent.Children.OfType<IHasFilterTerms>().SelectMany(f => f.FilterTerms);
+        public IEnumerable<LocalisableString> FilterTerms => filterableGroup.FilterTerms;
 
         public bool MatchingFilter
         {
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         public readonly Bindable<double?> SuggestedOffset = new Bindable<double?>();
 
-        private FillFlowContainer flowContent = null!;
+        private SettingsFilterableGroup filterableGroup = null!;
         private Container<Circle> notchContainer = null!;
         private SettingsNote hintNote = null!;
         private RoundedButton applySuggestion = null!;
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = flowContent = new FillFlowContainer
+            InternalChild = filterableGroup = new SettingsFilterableGroup
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
