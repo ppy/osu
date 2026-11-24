@@ -6,6 +6,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
@@ -42,6 +43,37 @@ namespace osu.Game.Tests.Visual.Settings
         {
             AddStep("do nothing", () => { });
             AddToggleStep("toggle visibility", visible => settings.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestFilteringGroupedSettings()
+        {
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
+
+            AddUntilStep("wait for items to load", () => settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
+
+            AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SettingsSearchTextBox>().First().Current.Value = "rename");
+
+            AddAssert("ensure skin dropdown also visible", () => settings.SectionsContainer
+                                                                         .ChildrenOfType<IHasFilterTerms>()
+                                                                         .Any(t =>
+                                                                         {
+                                                                             if (!t.FilterTerms.Select(s => s.ToString()).Contains("Current skin"))
+                                                                                 return false;
+
+                                                                             // ensure visibility the whole way up
+                                                                             Drawable d = (Drawable)t;
+
+                                                                             while (d!.Parent is not SettingsPanel)
+                                                                             {
+                                                                                 if (!d.IsPresent)
+                                                                                     return false;
+
+                                                                                 d = d.Parent;
+                                                                             }
+
+                                                                             return true;
+                                                                         }));
         }
 
         [Test]
