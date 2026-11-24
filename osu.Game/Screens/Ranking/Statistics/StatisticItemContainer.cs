@@ -94,7 +94,12 @@ namespace osu.Game.Screens.Ranking.Statistics
                         ? Empty()
                         : new StatisticItemHeader
                         {
-                            Text = item.Name
+                            Text = item.Name,
+                            Margin = new MarginPadding
+                            {
+                                Horizontal = 12,
+                                Top = 8,
+                            }
                         },
                 }
             };

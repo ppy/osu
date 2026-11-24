@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         private OsuSpriteText spriteText = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider? colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -44,8 +45,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                     AutoSizeAxes = Axes.Both,
                     Margin = new MarginPadding
                     {
-                        Horizontal = 12,
-                        Top = 8,
                         Bottom = 20,
                     },
                     Children = new Drawable[]
@@ -62,7 +61,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Margin = new MarginPadding { Top = 4 },
                             RelativeSizeAxes = Axes.X,
                             Height = 2,
-                            Colour = Color4Extensions.FromHex("#66FFCC")
+                            Colour = colourProvider?.Highlight1 ?? Color4Extensions.FromHex("#66FFCC")
                         }
                     }
                 }

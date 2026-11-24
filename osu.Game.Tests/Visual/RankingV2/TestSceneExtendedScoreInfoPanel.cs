@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Online;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -21,6 +22,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Scoring;
 using osu.Game.Screens.RankingV2.Extended;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.RankingV2
 {
@@ -28,6 +30,9 @@ namespace osu.Game.Tests.Visual.RankingV2
     {
         [Cached(typeof(IBindable<IScoreInfo>))]
         private readonly Bindable<IScoreInfo> score = new Bindable<IScoreInfo>();
+
+        [Cached(typeof(IBindable<ScoreBasedUserStatisticsUpdate>))]
+        private Bindable<ScoreBasedUserStatisticsUpdate?> statisticsUpdate = new Bindable<ScoreBasedUserStatisticsUpdate?>();
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -181,6 +186,25 @@ namespace osu.Game.Tests.Visual.RankingV2
             setUp?.Invoke(newScore);
 
             score.Value = newScore;
+
+            statisticsUpdate.Value = new ScoreBasedUserStatisticsUpdate(newScore,
+                new UserStatistics
+                {
+                    GlobalRank = 38000,
+                    PP = 2134,
+                    RankedScore = 21123849,
+                    Accuracy = 0.985,
+                    TotalScore = 128749597,
+                    MaxCombo = 1233,
+                }, new UserStatistics
+                {
+                    GlobalRank = 36000,
+                    PP = (decimal)2134.5,
+                    RankedScore = 23897015,
+                    Accuracy = 0.984,
+                    TotalScore = 132218497,
+                    MaxCombo = 1233,
+                });
         }
     }
 }

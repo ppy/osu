@@ -92,11 +92,14 @@ namespace osu.Game.Screens.RankingV2.Extended
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        public StatisticValue()
+        {
+            AutoSizeAxes = Axes.Both;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            AutoSizeAxes = Axes.Both;
-
             InternalChildren =
             [
                 new FillFlowContainer
