@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -11,6 +12,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -20,9 +22,18 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
-    public partial class AudioOffsetAdjustControl : CompositeDrawable
+    public partial class AudioOffsetAdjustControl : CompositeDrawable, IFilterable
     {
         private const int notch_container_height = 10;
+
+        public IEnumerable<LocalisableString> FilterTerms => filterableGroup.FilterTerms;
+
+        public bool MatchingFilter
+        {
+            set => this.FadeTo(value ? 1 : 0);
+        }
+
+        public bool FilteringActive { get; set; }
 
         public Bindable<double> Current
         {
@@ -36,6 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         public readonly Bindable<double?> SuggestedOffset = new Bindable<double?>();
 
+        private SettingsFilterableGroup filterableGroup = null!;
         private Container<Circle> notchContainer = null!;
         private SettingsNote hintNote = null!;
         private RoundedButton applySuggestion = null!;
@@ -50,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer
+            InternalChild = filterableGroup = new SettingsFilterableGroup
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
