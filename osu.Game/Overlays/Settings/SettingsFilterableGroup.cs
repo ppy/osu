@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings
     /// </summary>
     public sealed partial class SettingsFilterableGroup : FillFlowContainer, IFilterable
     {
-        public IEnumerable<LocalisableString> FilterTerms => Children.OfType<IHasFilterTerms>().SelectMany(f => f.FilterTerms);
+        public IEnumerable<LocalisableString> FilterTerms => InternalChildren.SelectMany(getFilterTerms);
 
         public bool MatchingFilter
         {
@@ -23,5 +23,18 @@ namespace osu.Game.Overlays.Settings
         }
 
         public bool FilteringActive { get; set; }
+
+        private IEnumerable<LocalisableString> getFilterTerms(Drawable drawable)
+        {
+            var filterTerms = new List<LocalisableString>();
+
+            if (drawable is IContainerEnumerable<Drawable> container)
+                filterTerms.AddRange(container.Children.SelectMany(getFilterTerms));
+
+            if (drawable is IFilterable filterable)
+                filterTerms.AddRange(filterable.FilterTerms);
+
+            return filterTerms.AsEnumerable();
+        }
     }
 }
