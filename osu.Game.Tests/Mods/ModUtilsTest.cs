@@ -9,8 +9,10 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -407,6 +409,138 @@ namespace osu.Game.Tests.Mods
                         }
                     }
                 }
+            });
+        }
+
+        [Test]
+        public void TestInstantiateValidModsForRuleset_ValidInput()
+        {
+            APIMod[] mods =
+            [
+                new APIMod(new OsuModDoubleTime()),
+                new APIMod(new OsuModDifficultyAdjust { CircleSize = { Value = 4 }, ApproachRate = { Value = 5 } }),
+                new APIMod(new OsuModClassic { ClassicHealth = { Value = false, } }),
+                new APIMod(new OsuModBarrelRoll { Direction = { Value = RotationDirection.Counterclockwise, } }),
+                new APIMod
+                {
+                    Acronym = "AD",
+                    Settings =
+                    {
+                        [@"style"] = @"Decelerate3",
+                    },
+                },
+                new APIMod(new OsuModDepth()),
+            ];
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(ModUtils.InstantiateValidModsForRuleset(new OsuRuleset(), mods, out var validMods), Is.True);
+                Assert.That(validMods, Has.Count.EqualTo(6));
+
+                Assert.That(validMods[1], Is.InstanceOf<OsuModDifficultyAdjust>());
+                Assert.That(((OsuModDifficultyAdjust)validMods[1]).CircleSize.Value, Is.EqualTo(4));
+                Assert.That(((OsuModDifficultyAdjust)validMods[1]).ApproachRate.Value, Is.EqualTo(5));
+
+                Assert.That(validMods[2], Is.InstanceOf<OsuModClassic>());
+                Assert.That(((OsuModClassic)validMods[2]).ClassicHealth.Value, Is.False);
+
+                Assert.That(validMods[3], Is.InstanceOf<OsuModBarrelRoll>());
+                Assert.That(((OsuModBarrelRoll)validMods[3]).Direction.Value, Is.EqualTo(RotationDirection.Counterclockwise));
+
+                Assert.That(validMods[4], Is.InstanceOf<OsuModApproachDifferent>());
+                Assert.That(((OsuModApproachDifferent)validMods[4]).Style.Value, Is.EqualTo(OsuModApproachDifferent.AnimationStyle.Decelerate3));
+            });
+        }
+
+        [Test]
+        public void TestInstantiateValidModsForRuleset_UnknownMod()
+        {
+            APIMod[] mods =
+            [
+                new APIMod(new OsuModDoubleTime()),
+                new APIMod { Acronym = "???" },
+            ];
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(ModUtils.InstantiateValidModsForRuleset(new OsuRuleset(), mods, out var validMods), Is.False);
+                Assert.That(validMods, Has.Count.EqualTo(1));
+                Assert.That(validMods[0], Is.InstanceOf<OsuModDoubleTime>());
+            });
+        }
+
+        [Test]
+        public void TestInstantiateValidModsForRuleset_GeneralRulesetMismatch()
+        {
+            APIMod[] mods =
+            [
+                // valid
+                new APIMod(new OsuModDoubleTime()),
+                // invalid - some of these settings don't exist in taiko
+                new APIMod(new OsuModDifficultyAdjust { CircleSize = { Value = 4 }, ApproachRate = { Value = 5 } }),
+                // invalid - mod doesn't exist in taiko at all
+                new APIMod(new OsuModDepth()),
+            ];
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(ModUtils.InstantiateValidModsForRuleset(new TaikoRuleset(), mods, out var validMods), Is.False);
+                Assert.That(validMods, Has.Count.EqualTo(1));
+                Assert.That(validMods[0], Is.InstanceOf<TaikoModDoubleTime>());
+            });
+        }
+
+        [Test]
+        public void TestInstantiateValidModsForRuleset_InvalidSettings()
+        {
+            APIMod[] mods =
+            [
+                new APIMod
+                {
+                    Acronym = "CL",
+                    Settings =
+                    {
+                        // incorrect type of value
+                        [@"classic_health"] = @"bananas",
+                    }
+                },
+                new APIMod
+                {
+                    Acronym = "HD",
+                    Settings =
+                    {
+                        // nonexistent setting
+                        [@"no_setting_found"] = 404,
+                    }
+                },
+                new APIMod(new OsuModDoubleTime { SpeedChange = { Value = 1.4 } }),
+                new APIMod
+                {
+                    Acronym = "DA",
+                    Settings =
+                    {
+                        // setting does not exist in this ruleset
+                        [@"scroll_speed"] = 2.2f,
+                    }
+                },
+                new APIMod
+                {
+                    Acronym = "AD",
+                    Settings =
+                    {
+                        // non-defined enum value, stringified
+                        [@"style"] = @"1337",
+                    }
+                },
+                // non-defined enum value, in target type already
+                new APIMod(new OsuModBarrelRoll { Direction = { Value = (RotationDirection)42069 } }),
+            ];
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(ModUtils.InstantiateValidModsForRuleset(new OsuRuleset(), mods, out var validMods), Is.False);
+                Assert.That(validMods, Has.Count.EqualTo(1));
+                Assert.That(validMods[0], Is.InstanceOf<OsuModDoubleTime>());
             });
         }
 
