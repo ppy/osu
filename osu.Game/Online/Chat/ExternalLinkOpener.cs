@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
@@ -43,28 +42,46 @@ namespace osu.Game.Online.Chat
             externalLinkWarning = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning);
         }
 
-        public void OpenUrlExternally(string url, LinkWarnMode warnMode = LinkWarnMode.Default)
+        public void OpenUrlExternally(string userInput, LinkWarnMode warnMode = LinkWarnMode.Default)
         {
-            bool isTrustedDomain;
+            bool isTrustedDomain = false;
+            var websiteUri = new Uri(api.Endpoints.WebsiteUrl);
 
-            if (url.StartsWith('/'))
-            {
-                url = $"{api.Endpoints.WebsiteUrl}{url}";
-                isTrustedDomain = true;
-            }
-            else
-            {
-                isTrustedDomain = url.StartsWith(api.Endpoints.WebsiteUrl, StringComparison.Ordinal);
-            }
+            // this intentionally handles BOTH root-relative (`/abc`) and absolute paths
+            // using checks such as `userInput.StartsWith('/')` is NOT valid because of protocol-relative URIs (e.g. `//evil.test`)
+            Uri.TryCreate(websiteUri, userInput, out var parsedUri);
 
-            if (!url.CheckIsValidUrl())
+            switch (parsedUri?.Scheme)
             {
-                notificationOverlay?.Post(new SimpleErrorNotification
-                {
-                    Text = NotificationsStrings.UnsupportedOrDangerousUrlProtocol(url),
-                });
+                case @"http":
+                case @"https":
+                    if (!string.IsNullOrEmpty(parsedUri.UserInfo))
+                        goto default;
 
-                return;
+                    // `Uri` normalises case of everything prior to URI path to lowercase
+                    if (string.Equals(parsedUri.Host, websiteUri.Host, StringComparison.Ordinal))
+                    {
+                        if (websiteUri.Port != parsedUri.Port)
+                            goto default;
+
+                        isTrustedDomain = true;
+                    }
+                    else if (!parsedUri.IsDefaultPort)
+                        goto default;
+
+                    break;
+
+                case @"mailto":
+                    // allowed but not trusted
+                    break;
+
+                default:
+                    notificationOverlay?.Post(new SimpleErrorNotification
+                    {
+                        Text = NotificationsStrings.UnsupportedOrDangerousUrlProtocol(userInput),
+                    });
+
+                    return;
             }
 
             bool shouldWarn;
@@ -87,10 +104,12 @@ namespace osu.Game.Online.Chat
                     throw new ArgumentOutOfRangeException(nameof(warnMode), warnMode, null);
             }
 
+            string stringifiedUri = parsedUri.ToString();
+
             if (dialogOverlay != null && shouldWarn)
-                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url), () => game?.CopyToClipboard(url)));
+                dialogOverlay.Push(new ExternalLinkDialog(stringifiedUri, () => host.OpenUrlExternally(stringifiedUri), () => game?.CopyToClipboard(stringifiedUri)));
             else
-                host.OpenUrlExternally(url);
+                host.OpenUrlExternally(stringifiedUri);
         }
 
         public partial class ExternalLinkDialog : PopupDialog

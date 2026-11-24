@@ -3,12 +3,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -17,13 +18,11 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IHandlePresentBeatmap, IOnlinePlaySubScreen, ISongSelect
+    public abstract partial class OnlinePlayFreestyleSelect : SongSelect, IHandlePresentBeatmap, ISongSelect
     {
         private readonly PlaylistItem item;
 
-        public string ShortTitle => "style selection";
-        public override string Title => ShortTitle.Humanize();
-        public bool ShowHeaderLine => false;
+        public override LocalisableString Title => OnlinePlayStrings.StyleSelectionTitle;
 
         protected abstract void StartAction();
 
@@ -35,6 +34,7 @@ namespace osu.Game.Screens.OnlinePlay
             this.item = item;
 
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+            TopPadding = Header.HEIGHT - 10;
 
             SupportScoping = false;
         }
@@ -74,6 +74,13 @@ namespace osu.Game.Screens.OnlinePlay
             criteria.Length.Max = itemLength + 30000;
             criteria.Length.IsLowerInclusive = true;
             criteria.Length.IsUpperInclusive = true;
+
+            // Dismiss the user's config-persisted search criteria (difficulty range, selected collection, converts).
+            // In the context of freestyle selection applying them is counterproductive and can cause no beatmaps to be displayed at all.
+            criteria.UserStarDifficulty.Min = null;
+            criteria.UserStarDifficulty.Max = null;
+            criteria.CollectionBeatmapMD5Hashes = null;
+            criteria.AllowConvertedBeatmaps = true;
         }
 
         private bool isValidForSelection()

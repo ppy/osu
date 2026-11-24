@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             Add(new DangerousSettingsButtonV2
             {
-                Text = GeneralSettingsStrings.ChangeFolderLocation,
+                Text = LocalisableString.Interpolate($@"{GeneralSettingsStrings.ChangeFolderLocation}..."),
                 Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
             });
 

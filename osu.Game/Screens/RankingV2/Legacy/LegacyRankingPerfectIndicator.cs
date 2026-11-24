@@ -16,6 +16,8 @@ namespace osu.Game.Screens.RankingV2.Legacy
     /// <seealso href="https://github.com/peppy/osu-stable-reference/blob/6b3838c41c4b8005cadf7db0b503ae967776d9f9/osu!/GameModes/Ranking/Ranking.cs#L445-L451"/>
     public partial class LegacyRankingPerfectIndicator : CompositeDrawable, ISerialisableDrawable, IAnimatableSkinnable
     {
+        public bool CanBeScaled(Axes axes) => axes == Axes.Both;
+
         private Sprite perfectIndicator = null!;
 
         [Resolved]
@@ -50,16 +52,12 @@ namespace osu.Game.Screens.RankingV2.Legacy
 
         public bool UsesFixedAnchor { get; set; }
 
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the legacy skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
-
         #endregion
 
         #region IAnimatableSkinnable
 
-        [SettingSource(nameof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
-        public BindableInt GroupNumber { get; } = new BindableInt
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
+        public BindableInt GroupNumber { get; } = new BindableInt(1)
         {
             MinValue = 0,
             MaxValue = 10,

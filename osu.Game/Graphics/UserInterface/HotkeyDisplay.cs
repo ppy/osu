@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -63,14 +64,29 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            readableKeyCombinationProvider.KeymapChanged += updateState;
             updateState();
         }
 
         private void updateState()
         {
-            flow.Clear();
-            foreach (string h in hotkey.ResolveKeyCombination(readableKeyCombinationProvider, realmKeyBindingStore, gameHost))
-                flow.Add(new HotkeyBox(h));
+            Scheduler.AddOnce(updateText);
+
+            void updateText()
+            {
+                flow.Clear();
+                foreach (string h in hotkey.ResolveKeyCombination(readableKeyCombinationProvider, realmKeyBindingStore, gameHost))
+                    flow.Add(new HotkeyBox(h));
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (readableKeyCombinationProvider.IsNotNull())
+                readableKeyCombinationProvider.KeymapChanged -= updateState;
         }
 
         private partial class HotkeyBox : CompositeDrawable

@@ -33,8 +33,6 @@ namespace osu.Game.Overlays.Mods
 
             InternalChild = Content = new Container
             {
-                Origin = Anchor.BottomRight,
-                Anchor = Anchor.BottomRight,
                 AutoSizeAxes = Axes.X,
                 Height = ShearedButton.DEFAULT_HEIGHT,
                 Shear = OsuGame.SHEAR,
