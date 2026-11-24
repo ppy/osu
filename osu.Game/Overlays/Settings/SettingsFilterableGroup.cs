@@ -26,15 +26,20 @@ namespace osu.Game.Overlays.Settings
 
         private IEnumerable<LocalisableString> getFilterTerms(Drawable drawable)
         {
+            // Roughly matches how `SearchContainer` works.
+            // See https://github.com/ppy/osu-framework/blob/a8f24f1cdebe84031c71f2e185818455863a08c1/osu.Framework/Graphics/Containers/SearchContainer.cs#L127
             var filterTerms = new List<LocalisableString>();
 
             if (drawable is IContainerEnumerable<Drawable> container)
-                filterTerms.AddRange(container.Children.SelectMany(getFilterTerms));
+            {
+                foreach (var child in container.Children)
+                    filterTerms.AddRange(getFilterTerms(child));
+            }
 
             if (drawable is IFilterable filterable)
                 filterTerms.AddRange(filterable.FilterTerms);
 
-            return filterTerms.AsEnumerable();
+            return filterTerms;
         }
     }
 }

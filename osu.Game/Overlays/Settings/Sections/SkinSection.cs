@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Settings.Sections
                             Caption = SkinSettingsStrings.CurrentSkin,
                             Current = skins.CurrentSkinInfo,
                         }),
-                        new SettingsFilterableGroup
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
