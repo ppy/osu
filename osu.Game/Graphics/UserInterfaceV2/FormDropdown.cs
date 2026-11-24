@@ -292,7 +292,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                ItemsContainer.Padding = new MarginPadding(9);
+                ItemsContainer.Padding = new MarginPadding { Horizontal = 9, Vertical = 9 - FormControlBackground.BORDER_THICKNESS };
 
                 MaskingContainer.BorderThickness = FormControlBackground.BORDER_THICKNESS;
                 MaskingContainer.CornerExponent = FormControlBackground.CORNER_EXPONENT;
