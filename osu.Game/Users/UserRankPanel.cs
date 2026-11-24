@@ -193,7 +193,7 @@ namespace osu.Game.Users
                             new Drawable[]
                             {
                                 globalRankDisplay = new GlobalRankDisplay(),
-                                countryRankDisplay = new ProfileValueDisplay(true)
+                                countryRankDisplay = new ProfileValueDisplay(ProfileValueDisplay.ValueSize.Large)
                                 {
                                     Title = UsersStrings.ShowRankCountrySimple,
                                 }

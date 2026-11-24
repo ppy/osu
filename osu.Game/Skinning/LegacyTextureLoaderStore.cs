@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace osu.Game.Skinning
@@ -24,6 +26,12 @@ namespace osu.Game.Skinning
 
         public TextureUpload Get(string name)
         {
+            switch (name)
+            {
+                case @"button":
+                    return spliceHorizontalSprites(name)!;
+            }
+
             var textureUpload = wrappedStore?.Get(name);
 
             if (textureUpload == null)
@@ -36,6 +44,12 @@ namespace osu.Game.Skinning
 
         public Task<TextureUpload> GetAsync(string name, CancellationToken cancellationToken = new CancellationToken())
         {
+            switch (name)
+            {
+                case @"button":
+                    return Task.Run(() => spliceHorizontalSprites(name), cancellationToken)!;
+            }
+
             var textureUpload = wrappedStore?.Get(name);
 
             if (textureUpload == null)
@@ -69,6 +83,51 @@ namespace osu.Game.Skinning
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Splices <c>left</c>, <c>middle</c>, and <c>right</c> asset for the asset with a given <paramref name="name"/>
+        /// into one sprite which can be used with <see cref="NineSliceSprite"/>.
+        /// </summary>
+        private TextureUpload? spliceHorizontalSprites(string name)
+        {
+            var left = wrappedStore?.Get($@"{name}-left@2x");
+            var middle = wrappedStore?.Get($@"{name}-middle@2x");
+            var right = wrappedStore?.Get($@"{name}-right@2x");
+
+            if (left == null && middle == null && right == null)
+            {
+                left = wrappedStore?.Get($@"{name}-left");
+                middle = wrappedStore?.Get($@"{name}-middle");
+                right = wrappedStore?.Get($@"{name}-right");
+            }
+
+            if (left == null && middle == null && right == null)
+                return null;
+
+            var spliced = new Image<Rgba32>((left?.Width ?? 0) + (middle?.Width ?? 0) + (right?.Width ?? 0), Math.Max(Math.Max(left?.Height ?? 0, middle?.Height ?? 0), right?.Height ?? 0));
+            if (spliced.Width == 0 || spliced.Height == 0)
+                return null;
+
+            if (left != null)
+            {
+                var leftPixels = Image.LoadPixelData(left.Data, left.Width, left.Height);
+                spliced.Mutate(t => t.DrawImage(leftPixels, new Point(), 1));
+            }
+
+            if (middle != null)
+            {
+                var middlePixels = Image.LoadPixelData(middle.Data, middle.Width, middle.Height);
+                spliced.Mutate(t => t.DrawImage(middlePixels, new Point(left?.Width ?? 0, 0), 1));
+            }
+
+            if (right != null)
+            {
+                var rightPixels = Image.LoadPixelData(right.Data, right.Width, right.Height);
+                spliced.Mutate(t => t.DrawImage(rightPixels, new Point((left?.Width ?? 0) + (middle?.Width ?? 0), 0), 1));
+            }
+
+            return new TextureUpload(spliced);
         }
 
         private TextureUpload convertToGrayscale(TextureUpload textureUpload)

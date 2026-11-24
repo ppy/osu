@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -21,6 +22,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Footer;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -33,10 +35,16 @@ namespace osu.Game.Screens.RankingV2.Argon
         /// </summary>
         public const double VIRTUAL_SS_PERCENTAGE = 0.01;
 
+        public const double SWOOSH_PRE_DELAY = 443f;
+
         /// <summary>
         /// Delay before the accuracy circle starts filling.
         /// </summary>
         public const double ACCURACY_TRANSFORM_DELAY = 450;
+
+        public bool CanBeScaled(Axes axes) => false;
+        public bool CanBeMoved => false;
+        public bool CanBePlaced(IEnumerable<ISerialisableDrawable> otherComponents) => !otherComponents.OfType<ArgonScoreRankDisplay>().Any();
 
         private Container gradedCirclesContainer = null!;
         private GradedCirclesV2 gradedCircles = null!;
@@ -66,6 +74,7 @@ namespace osu.Game.Screens.RankingV2.Argon
             Size = new Vector2(640);
             Anchor = Anchor.CentreRight;
             Origin = Anchor.CentreRight;
+            Y = -ScreenFooter.HEIGHT / 2f;
             Masking = true;
 
             InternalChildren =
@@ -190,17 +199,13 @@ namespace osu.Game.Screens.RankingV2.Argon
 
         #region ISerialisableDrawable
 
-        public bool UsesFixedAnchor { get; set; }
-
-        // TODO: temporary to avoid `SkinDeserialisationTest` failures.
-        // Remove when the argon skin supplies a default layout of results with this component included.
-        public bool IsEditable => false;
+        public bool UsesFixedAnchor { get; set; } = true;
 
         #endregion
 
         #region IAnimatableSkinnable
 
-        [SettingSource(nameof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
+        [SettingSource(typeof(SkinnableComponentStrings), nameof(SkinnableComponentStrings.AnimationSequence))]
         public BindableInt GroupNumber { get; } = new BindableInt(2)
         {
             MinValue = 0,
@@ -239,10 +244,9 @@ namespace osu.Game.Screens.RankingV2.Argon
 
             using (BeginAbsoluteSequence(startTime))
             {
-                const double swoosh_pre_delay = 443f;
                 const double swoosh_volume = 0.4f;
 
-                this.Delay(swoosh_pre_delay).Schedule(() =>
+                this.Delay(SWOOSH_PRE_DELAY).Schedule(() =>
                 {
                     swooshUpSound.VolumeTo(swoosh_volume);
                     swooshUpSound.Play();

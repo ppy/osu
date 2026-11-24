@@ -6,11 +6,9 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract partial class OnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
+    public abstract partial class OnlinePlaySubScreen : OsuScreen
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
-
-        public virtual string ShortTitle => Title;
 
         protected sealed override bool PlayExitSound => false;
 
@@ -50,6 +48,6 @@ namespace osu.Game.Screens.OnlinePlay
             this.FadeOut(DISAPPEAR_DURATION, Easing.OutQuint);
         }
 
-        public override string ToString() => Title;
+        public override string ToString() => Title.ToString();
     }
 }

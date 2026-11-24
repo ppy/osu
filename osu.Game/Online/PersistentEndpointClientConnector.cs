@@ -22,7 +22,9 @@ namespace osu.Game.Online
         /// <summary>
         /// The current connection opened by this connector.
         /// </summary>
-        public PersistentEndpointClient? CurrentConnection { get; private set; }
+        public PersistentEndpointClient? CurrentConnection => currentConnection;
+
+        private PersistentEndpointClient? currentConnection;
 
         protected readonly IAPIProvider API;
 
@@ -70,7 +72,6 @@ namespace osu.Game.Online
         {
             switch (apiState.Value)
             {
-                case APIState.Failing:
                 case APIState.Offline:
                     await disconnect(true).ConfigureAwait(true);
                     break;
@@ -84,6 +85,9 @@ namespace osu.Game.Online
 
         private async Task connect()
         {
+            if (isConnected.Value)
+                return;
+
             cancelExistingConnect();
             // reset retry delay to default.
             retryDelay = 3000;
@@ -110,12 +114,12 @@ namespace osu.Game.Online
                     try
                     {
                         // importantly, rebuild the connection each attempt to get an updated access token.
-                        CurrentConnection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
-                        CurrentConnection.Closed += ex => onConnectionClosed(ex, cancellationToken);
+                        currentConnection = await BuildConnectionAsync(cancellationToken).ConfigureAwait(false);
+                        currentConnection.Closed += ex => onConnectionClosed(ex, cancellationToken);
 
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        await CurrentConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
+                        await currentConnection.ConnectAsync(cancellationToken).ConfigureAwait(false);
 
                         Logger.Log($"{ClientName} connected!", LoggingTarget.Network);
                         isConnected.Value = true;
@@ -190,14 +194,14 @@ namespace osu.Game.Online
 
             try
             {
-                if (CurrentConnection != null)
-                    await CurrentConnection.DisposeAsync().ConfigureAwait(false);
+                isConnected.Value = false;
+                var connectionToDispose = Interlocked.Exchange(ref currentConnection, null);
+
+                if (connectionToDispose != null)
+                    await connectionToDispose.DisposeAsync().ConfigureAwait(false);
             }
             finally
             {
-                isConnected.Value = false;
-                CurrentConnection = null;
-
                 if (takeLock)
                     connectionLock.Release();
             }

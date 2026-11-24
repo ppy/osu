@@ -10,6 +10,41 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.OnlinePlay";
 
         /// <summary>
+        /// "Multiplayer"
+        /// </summary>
+        public static LocalisableString MultiplayerScreenTitle => new TranslatableString(getKey(@"multiplayer_screen_title"), @"Multiplayer");
+
+        /// <summary>
+        /// "Playlists"
+        /// </summary>
+        public static LocalisableString PlaylistsScreenTitle => new TranslatableString(getKey(@"playlists_screen_title"), @"Playlists");
+
+        /// <summary>
+        /// "Lounge"
+        /// </summary>
+        public static LocalisableString LoungeTitle => new TranslatableString(getKey(@"lounge_title"), @"Lounge");
+
+        /// <summary>
+        /// "Room"
+        /// </summary>
+        public static LocalisableString RoomTitle => new TranslatableString(getKey(@"room_title"), @"Room");
+
+        /// <summary>
+        /// "Playlist"
+        /// </summary>
+        public static LocalisableString PlaylistTitle => new TranslatableString(getKey(@"playlist_title"), @"Playlist");
+
+        /// <summary>
+        /// "Song Selection"
+        /// </summary>
+        public static LocalisableString SongSelectionTitle => new TranslatableString(getKey(@"song_selection_title"), @"Song Selection");
+
+        /// <summary>
+        /// "Style Selection"
+        /// </summary>
+        public static LocalisableString StyleSelectionTitle => new TranslatableString(getKey(@"style_selection_title"), @"Style Selection");
+
+        /// <summary>
         /// "Playlist durations longer than 2 weeks require an active osu!supporter tag."
         /// </summary>
         public static LocalisableString SupporterOnlyDurationNotice => new TranslatableString(getKey(@"supporter_only_duration_notice"), @"Playlist durations longer than 2 weeks require an active osu!supporter tag.");

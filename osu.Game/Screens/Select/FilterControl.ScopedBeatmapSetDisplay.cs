@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Select
                     content.BypassAutoSizeAxes = Axes.None;
 
                     text.Clear();
-                    text.AddText(SongSelectStrings.TemporarilyShowingAllBeatmapsIn);
+                    text.AddText(SongSelectStrings.TemporarilyShowingAllDifficultiesIn);
                     text.AddText(@" ");
                     text.AddText(ScopedBeatmapSet.Value.Metadata.GetDisplayTitleRomanisable(), t => t.Font = OsuFont.Style.Body.With(weight: FontWeight.Bold));
                 }

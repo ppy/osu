@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -74,13 +72,13 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             HitWindowGreat = HitWindow(HitResult.Great);
         }
 
-        public DifficultyHitObject Previous(int skipCount = 0)
+        public DifficultyHitObject? Previous(int skipCount = 0)
         {
             int index = Index - (skipCount + 1);
             return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;
         }
 
-        public DifficultyHitObject Next(int skipCount = 0)
+        public DifficultyHitObject? Next(int skipCount = 0)
         {
             int index = Index + (skipCount + 1);
             return index >= 0 && index < difficultyHitObjects.Count ? difficultyHitObjects[index] : null;

@@ -63,34 +63,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /*
              * WARNING: DO NOT TOUCH IF YOU DO NOT KNOW WHAT YOU ARE DOING
              *
-             * It so happens that in stable, due to .NET Framework internals, float math would be performed
-             * using x87 registers and opcodes.
-             * .NET (Core) however uses SSE instructions on 32- and 64-bit words.
-             * x87 registers are _80 bits_ wide. Which is notably wider than _both_ float and double.
-             * Therefore, on a significant number of beatmaps, the rounding would not produce correct values.
-             *
-             * Thus, to crudely - but, seemingly *mostly* accurately, after checking across all ranked maps - emulate this,
-             * use `decimal`, which is slow, but has bigger precision than `double`.
-             * At the time of writing, there is _one_ ranked exception to this - namely https://osu.ppy.sh/beatmapsets/1156087#osu/2625853 -
-             * but it is considered an "acceptable casualty", since in that case scores aren't inflated by _that_ much compared to others.
+             * Operations here are performed in extremely specific order,
+             * the choice of using or not using locals is intentional,
+             * and the casts with their ordering are intentional.
+             * Every choice of the above factors is designed such that the generated code matches the code emitted by stable.
+             * Being as close to stable matters for two reasons:
+             * - to be able to provide the best conversion of stable scores into standardised scoring on unified leaderboards
+             * - this function has secondary usage in the performance point algorithm for miss count estimation
              */
 
-            decimal objectToDrainRatio = drainLength != 0
-                ? Math.Clamp((decimal)objectCount / drainLength * 8, 0, 16)
-                : 16;
+            float objectToDrainRatio = drainLength != 0 ? Math.Clamp((float)((double)objectCount / drainLength * 8), 0, 16) : 16;
 
-            /*
-             * Notably, THE `double` CASTS BELOW ARE IMPORTANT AND MUST REMAIN.
-             * Their goal is to trick the compiler / runtime into NOT promoting from single-precision float, as doing so would prompt it
-             * to attempt to "silently" fix the single-precision values when converting to decimal,
-             * which is NOT what the x87 FPU does.
-             */
-
-            decimal drainRate = (decimal)(double)difficulty.DrainRate;
-            decimal overallDifficulty = (decimal)(double)difficulty.OverallDifficulty;
-            decimal circleSize = (decimal)(double)difficulty.CircleSize;
-
-            return (int)Math.Round((drainRate + overallDifficulty + circleSize + objectToDrainRatio) / 38 * 5);
+            return (int)Math.Round(((double)difficulty.DrainRate + difficulty.OverallDifficulty + difficulty.CircleSize + objectToDrainRatio) / 38 * 5);
         }
     }
 }
