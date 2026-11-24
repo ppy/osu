@@ -458,12 +458,12 @@ namespace osu.Game.Tests.Visual.RankedPlay
                         {
                             RawDamage = 1,
                             Damage = 1,
-                            OldLife = 500_000,
-                            NewLife = 500_000 - 1,
+                            OldLife = 1,
+                            NewLife = 0,
                             DirectDamage = 1,
                         };
 
-                        userInfo.Life = 500_000 - 1;
+                        userInfo.Life = 0;
                     }
                     else
                     {

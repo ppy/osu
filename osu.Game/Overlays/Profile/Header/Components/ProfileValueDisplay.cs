@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public ContentText Content { get; }
 
-        public ProfileValueDisplay(bool big = false, int minimumWidth = 60)
+        public ProfileValueDisplay(ValueSize size = ValueSize.Small, int minimumWidth = 60)
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = new FillFlowContainer
@@ -37,7 +38,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     },
                     Content = new ContentText
                     {
-                        Font = OsuFont.GetFont(size: big ? 30 : 20, weight: big ? FontWeight.Regular : FontWeight.Light),
+                        Font = OsuFont.GetFont(
+                            size: size switch
+                            {
+                                ValueSize.Small => 16,
+                                ValueSize.Medium => 20,
+                                ValueSize.Large => 30,
+                                _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
+                            },
+                            weight: size == ValueSize.Small ? FontWeight.Light : FontWeight.Regular
+                        ),
                     },
                     new Container // Add a minimum size to the FillFlowContainer
                     {
@@ -57,6 +67,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
         public partial class ContentText : OsuSpriteText, IHasTooltip
         {
             public LocalisableString TooltipText { get; set; }
+        }
+
+        public enum ValueSize
+        {
+            Small,
+            Medium,
+            Large,
         }
     }
 }

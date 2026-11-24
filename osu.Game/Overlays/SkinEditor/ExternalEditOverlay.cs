@@ -202,9 +202,12 @@ namespace osu.Game.Overlays.SkinEditor
             showSpinner(EditorStrings.ExternalEditCleaningUp);
             await Task.Delay(500).ConfigureAwait(true);
 
+            Live<SkinInfo>? newSkin;
+
             try
             {
-                await editOperation!.Finish().ConfigureAwait(false);
+                newSkin = await editOperation!.Finish().ConfigureAwait(false);
+                ArgumentNullException.ThrowIfNull(newSkin);
             }
             catch (Exception ex)
             {
@@ -220,12 +223,19 @@ namespace osu.Game.Overlays.SkinEditor
             Schedule(() =>
             {
                 var oldSkin = skinManager.CurrentSkin!.Value;
-                var newSkinInfo = oldSkin.SkinInfo.PerformRead(s => s);
 
                 // Create a new skin instance to ensure the skin is reloaded
                 // If there's a better way to reload the skin, this should be replaced with it.
                 setGlobalSkinDisabled(false);
-                skinManager.CurrentSkin.Value = newSkinInfo.CreateInstance(skinManager);
+                skinManager.CurrentSkin.Value = newSkin.PerformRead(s =>
+                {
+                    // Even though we are 100% on an update thread, we need to wait for realm callbacks to fire (to correctly invalidate caches in RealmBackedResourceStore).
+                    // See https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-2483573 for further discussion.
+                    // This is the best we can do for now.
+                    s.Realm!.Refresh();
+
+                    return s.CreateInstance(skinManager);
+                });
 
                 oldSkin.Dispose();
 

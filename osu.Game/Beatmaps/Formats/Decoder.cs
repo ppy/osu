@@ -13,8 +13,9 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class Decoder<TOutput> : Decoder
         where TOutput : new()
     {
-        protected virtual TOutput CreateTemplateObject() => new TOutput();
-
+        /// <summary>
+        /// Create a decoded output, parsing the provided file streams into it.
+        /// </summary>
         public TOutput Decode(LineBufferedReader primaryStream, params LineBufferedReader[] otherStreams)
         {
             var output = CreateTemplateObject();
@@ -22,6 +23,17 @@ namespace osu.Game.Beatmaps.Formats
                 ParseStreamInto(stream, stream == primaryStream, output);
             return output;
         }
+
+        /// <summary>
+        /// Parse the provided file stream into the provided target.
+        /// </summary>
+        public void DecodeInto(LineBufferedReader stream, TOutput target)
+            => ParseStreamInto(stream, true, target);
+
+        /// <summary>
+        /// Create an unpopulated template target ready to accept decoded output.
+        /// </summary>
+        public virtual TOutput CreateTemplateObject() => new TOutput();
 
         protected abstract void ParseStreamInto(LineBufferedReader stream, bool isPrimaryStream, TOutput output);
     }

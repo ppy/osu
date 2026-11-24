@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = info = new ProfileValueDisplay(big: true)
+            InternalChild = info = new ProfileValueDisplay(ProfileValueDisplay.ValueSize.Large)
             {
                 Title = UsersStrings.ShowRankGlobalSimple
             };

@@ -28,6 +28,8 @@ namespace osu.Game.Skinning.Components
     [UsedImplicitly]
     public partial class BeatmapAttributeText : FontAdjustableSkinComponent
     {
+        public const float DEFAULT_TEXT_SIZE = 40;
+
         [SettingSource(typeof(BeatmapAttributeTextStrings), nameof(BeatmapAttributeTextStrings.Attribute))]
         public Bindable<BeatmapAttribute> Attribute { get; } = new Bindable<BeatmapAttribute>(BeatmapAttribute.StarRating);
 
@@ -242,7 +244,7 @@ namespace osu.Game.Skinning.Components
             }
         }
 
-        protected override void SetFont(FontUsage font) => text.Font = font.With(size: 40);
+        protected override void SetFont(FontUsage font) => text.Font = font.With(size: DEFAULT_TEXT_SIZE);
 
         protected override void SetTextColour(Colour4 textColour) => text.Colour = textColour;
 

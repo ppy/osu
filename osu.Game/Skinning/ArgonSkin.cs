@@ -11,10 +11,12 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.RankingV2.Argon;
 using osu.Game.Skinning.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -47,9 +49,14 @@ namespace osu.Game.Skinning
             )
         {
             Resources = resources;
+        }
 
-            Configuration.CustomComboColours = new List<Color4>
-            {
+        protected override void SetDefaultConfiguration()
+        {
+            base.SetDefaultConfiguration();
+
+            Configuration.DefaultComboColours.Clear();
+            Configuration.DefaultComboColours.AddRange(
                 // Standard combo progression order is green - blue - red - yellow.
                 // But for whatever reason, this starts from index 1, not 0.
                 //
@@ -67,8 +74,8 @@ namespace osu.Game.Skinning
                 // Yellow
                 new Color4(232, 235, 0, 255),
                 // Purple
-                new Color4(92, 0, 241, 255),
-            };
+                new Color4(92, 0, 241, 255)
+            );
         }
 
         public override Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
@@ -277,6 +284,31 @@ namespace osu.Game.Skinning
                             };
 
                             return mainHUDComponents;
+
+                        case GlobalSkinnableContainers.Results:
+                            return new DefaultSkinComponentsContainer(container =>
+                            {
+                                var beatmapInfoWedge = container.OfType<ArgonBeatmapInfoPanel>().FirstOrDefault();
+                                var userInfoWedge = container.OfType<ArgonPlayerInfoPanel>().FirstOrDefault();
+                                var totalScoreWedge = container.OfType<ArgonTotalScorePanel>().FirstOrDefault();
+                                var statisticsGrid = container.OfType<ArgonScoreStatisticsGrid>().FirstOrDefault();
+
+                                var leftWedgeBasePosition = new Vector2(-ShearedButton.CORNER_RADIUS);
+                                static Vector2 leftWedgeOffset(float y) => new Vector2(-y * OsuGame.SHEAR.X, y);
+
+                                beatmapInfoWedge?.Position = leftWedgeBasePosition;
+                                userInfoWedge?.Position = leftWedgeBasePosition + leftWedgeOffset(161);
+                                totalScoreWedge?.Position = leftWedgeBasePosition + leftWedgeOffset(233);
+                                statisticsGrid?.Position = new Vector2(20, 354);
+                            })
+                            {
+                                new ArgonScoreRankDisplay(),
+                                new ArgonBeatmapInfoPanel(),
+                                new ArgonPlayerInfoPanel(),
+                                new ArgonTotalScorePanel(),
+                                new ArgonScoreStatisticsGrid(),
+                                new ArgonResultsFooter(),
+                            };
                     }
 
                     return null;

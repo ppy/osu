@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
-        public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
+        public override bool CursorVisible => (screenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? true;
 
         // this is required due to PlayerLoader eventually being pushed to the main stack
         // while leases may be taken out by a subscreen.
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Children = new Drawable[]
                 {
                     screenStack,
-                    new Header(ScreenTitle, screenStack),
+                    new Header(Title, screenStack),
                     ongoingOperationTracker,
                 }
             };
@@ -178,10 +178,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnBackButton()
         {
-            if (!(screenStack.CurrentScreen is IOnlinePlaySubScreen onlineSubScreen))
+            if (!(screenStack.CurrentScreen is IOsuScreen screen))
                 return false;
 
-            if (((Drawable)onlineSubScreen).IsLoaded && onlineSubScreen.AllowUserExit && onlineSubScreen.OnBackButton())
+            if (((Drawable)screen).IsLoaded && screen.AllowUserExit && screen.OnBackButton())
                 return true;
 
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
@@ -222,8 +222,6 @@ namespace osu.Game.Screens.OnlinePlay
             if (newScreen is IOsuScreen newOsuScreen)
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
         }
-
-        protected abstract string ScreenTitle { get; }
 
         protected abstract LoungeSubScreen CreateLounge();
 
