@@ -54,6 +54,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.RankedPlay;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -206,6 +207,7 @@ namespace osu.Game
         public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>(new Dictionary<ModType, IReadOnlyList<Mod>>());
 
         private BeatmapDifficultyCache difficultyCache;
+
         private IBeatmapUpdater beatmapUpdater;
         private OnlineAssetCachingStore onlineAssetStore;
 
@@ -214,6 +216,8 @@ namespace osu.Game
         protected LeaderboardManager LeaderboardManager { get; private set; }
 
         private RulesetConfigCache rulesetConfigCache;
+
+        private RankedPlayDivisionStore rankedPlayDivisionStore;
 
         private SessionAverageHitErrorTracker hitErrorTracker;
 
@@ -355,6 +359,8 @@ namespace osu.Game
 
             dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
+            dependencies.CacheAs<IRankedPlayDivisionStore>(rankedPlayDivisionStore = new RankedPlayDivisionStore());
+
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
                 dependencies.CacheAs(powerStatus);
@@ -389,6 +395,8 @@ namespace osu.Game
             base.Content.Add(metadataClient);
 
             base.Content.Add(rulesetConfigCache);
+
+            base.Content.Add(rankedPlayDivisionStore);
 
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));

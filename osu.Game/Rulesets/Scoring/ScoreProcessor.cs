@@ -209,14 +209,14 @@ namespace osu.Game.Rulesets.Scoring
 
             Accuracy.ValueChanged += _ => updateRank();
 
-            Mods.ValueChanged += mods =>
+            Mods.ValueChanged += _ =>
             {
                 updateScoreMultiplier();
                 updateScore();
                 updateRank();
             };
 
-            Beatmap.ValueChanged += beatmap =>
+            Beatmap.ValueChanged += _ =>
             {
                 updateScoreMultiplier();
             };

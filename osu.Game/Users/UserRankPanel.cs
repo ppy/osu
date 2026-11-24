@@ -99,12 +99,12 @@ namespace osu.Game.Users
                         Masking = true,
                         Children = new Drawable[]
                         {
-                            new UserCoverBackground
+                            new CoverBackground
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                User = User,
+                                Model = User,
                                 Alpha = 0.3f
                             },
                             new GridContainer
@@ -193,7 +193,7 @@ namespace osu.Game.Users
                             new Drawable[]
                             {
                                 globalRankDisplay = new GlobalRankDisplay(),
-                                countryRankDisplay = new ProfileValueDisplay(true)
+                                countryRankDisplay = new ProfileValueDisplay(ProfileValueDisplay.ValueSize.Large)
                                 {
                                     Title = UsersStrings.ShowRankCountrySimple,
                                 }

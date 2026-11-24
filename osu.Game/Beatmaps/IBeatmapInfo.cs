@@ -77,5 +77,10 @@ namespace osu.Game.Beatmaps
         /// Defaults to -1 (meaning not-yet-calculated).
         /// </summary>
         int TotalObjectCount { get; }
+
+        /// <summary>
+        /// The online status of the beatmap.
+        /// </summary>
+        BeatmapOnlineStatus Status { get; }
     }
 }

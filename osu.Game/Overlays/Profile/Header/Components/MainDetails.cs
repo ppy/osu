@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 detailGlobalRank = new GlobalRankDisplay(),
                                 Empty(),
-                                detailCountryRank = new ProfileValueDisplay(true)
+                                detailCountryRank = new ProfileValueDisplay(ProfileValueDisplay.ValueSize.Large)
                                 {
                                     Title = UsersStrings.ShowRankCountrySimple,
                                 },

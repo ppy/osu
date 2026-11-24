@@ -162,8 +162,18 @@ namespace osu.Game.Online.API.Requests.Responses
         IUser IScoreInfo.User => User!;
         DateTimeOffset IScoreInfo.Date => EndedAt;
         long IScoreInfo.LegacyOnlineID => (long?)LegacyScoreId ?? -1;
+
+        // TODO: This passthrough is unsafe because `Beatmap` is not guaranteed to be populated.
+        // An actual beatmap instance should be eventually injected here.
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap!;
-        IRulesetInfo IScoreInfo.Ruleset => Beatmap!.Ruleset;
+
+        // TODO: This passthrough is unsafe because `APIRuleset` does not implement many members.
+        // An actual client-side ruleset instance should be eventually injected here.
+        IRulesetInfo IScoreInfo.Ruleset => new APIBeatmap.APIRuleset { OnlineID = RulesetID };
+
+        IEnumerable<IConfiguredMod> IScoreInfo.Mods => Mods;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.Statistics => Statistics;
+        IReadOnlyDictionary<HitResult, int> IScoreInfo.MaximumStatistics => MaximumStatistics;
 
         #endregion
 

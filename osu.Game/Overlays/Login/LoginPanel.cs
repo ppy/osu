@@ -4,10 +4,12 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -121,15 +123,15 @@ namespace osu.Game.Overlays.Login
                         },
                     };
 
-                    if (!string.IsNullOrEmpty(api.UserFacingOutageMessage.Value))
+                    if (api.UserFacingOutageMessage.Value is LocalisableString userFacingMessage && !LocalisableString.IsNullOrEmpty(userFacingMessage))
                     {
-                        linkFlow.AddText("Server outage in progress".ToUpperInvariant(), s =>
+                        linkFlow.AddText(NotificationsStrings.ServerOutageInProgress.ToUpper(), s =>
                         {
                             s.Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold);
                             s.Colour = Colour4.Orange;
                         });
 
-                        linkFlow.AddParagraph(api.UserFacingOutageMessage.Value, s => s.Font = OsuFont.Style.Caption1);
+                        linkFlow.AddParagraph(userFacingMessage, s => s.Font = OsuFont.Style.Caption1);
                     }
                     else if (state.NewValue == APIState.Failing)
                     {

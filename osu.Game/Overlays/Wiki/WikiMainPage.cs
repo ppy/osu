@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Wiki
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Text = blurbNode.InnerText,
+                    Text = blurbNode!.InnerText,
                     TextAnchor = Anchor.TopCentre,
                 }
             };
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Wiki
 
         private IEnumerable<Drawable[]> createPanels(HtmlDocument html)
         {
-            var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]").ToArray();
+            var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]")!.ToArray();
 
             Debug.Assert(panelsNode.Length > 1);
 

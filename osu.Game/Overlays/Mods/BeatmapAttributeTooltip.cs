@@ -11,6 +11,7 @@ using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Rulesets.Difficulty;
 using osuTK;
 
@@ -126,7 +127,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (!Precision.AlmostEquals(attribute.OriginalValue, attribute.AdjustedValue))
                 {
-                    adjustedByModsText.Text = $"This value is being adjusted by mods ({attribute.OriginalValue:0.0#} → {attribute.AdjustedValue:0.0#}).";
+                    adjustedByModsText.Text = SongSelectStrings.ThisValueIsBeingAdjustedByMods(attribute.OriginalValue, attribute.AdjustedValue);
                     adjustedByModsText.Alpha = 1;
                     shouldShow = true;
                 }

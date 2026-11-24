@@ -11,6 +11,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Utils
 {
@@ -218,9 +219,7 @@ namespace osu.Game.Utils
 
             foreach (var apiMod in proposedMods)
             {
-                var mod = apiMod.ToMod(ruleset);
-
-                if (mod is UnknownMod)
+                if (!apiMod.TryCreateMod(ruleset, out var mod))
                 {
                     proposedWereValid = false;
                     continue;

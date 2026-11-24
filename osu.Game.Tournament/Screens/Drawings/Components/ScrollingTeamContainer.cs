@@ -136,7 +136,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                             closest = stc;
                     }
 
-                    Debug.Assert(closest != null, "closest != null");
+                    Debug.Assert(closest != null);
 
                     offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 

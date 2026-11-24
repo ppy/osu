@@ -1,14 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -28,9 +25,9 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
 
-        private OsuSpriteText selectedText;
-        private OsuSpriteText leaveText;
-        private ChannelList channelList;
+        private OsuSpriteText selectedText = null!;
+        private OsuSpriteText leaveText = null!;
+        private ChannelList channelList = null!;
 
         [SetUp]
         public void SetUp()
@@ -100,8 +97,8 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        [SetUpSteps]
-        public void SetUpSteps()
+        [Test]
+        public void TestBasic()
         {
             AddStep("Add Public Channels", () =>
             {
@@ -122,11 +119,7 @@ namespace osu.Game.Tests.Visual.Online
                 for (int i = 0; i < 2; i++)
                     channelList.AddChannel(createRandomAnnounceChannel());
             });
-        }
 
-        [Test]
-        public void TestVisual()
-        {
             AddStep("Unread Selected", () =>
             {
                 if (validItem)
@@ -155,6 +148,18 @@ namespace osu.Game.Tests.Visual.Online
             {
                 if (validItem)
                     channelList.GetItem(selected.Value).Mentions.Value = 0;
+            });
+        }
+
+        [Test]
+        public void TestManyChannels()
+        {
+            AddStep("Add Public Channels", () =>
+            {
+                for (int i = 0; i < 500; i++)
+                    channelList.AddChannel(createRandomPublicChannel());
+                for (int i = 0; i < 500; i++)
+                    channelList.AddChannel(createRandomPrivateChannel());
             });
         }
 

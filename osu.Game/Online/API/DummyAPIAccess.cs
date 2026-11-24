@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -71,7 +72,7 @@ namespace osu.Game.Online.API
         /// </summary>
         public IBindable<APIState> State => state;
 
-        public IBindable<string?> UserFacingOutageMessage { get; } = new Bindable<string?>();
+        public IBindable<LocalisableString?> UserFacingOutageMessage { get; } = new Bindable<LocalisableString?>();
 
         public virtual void Queue(APIRequest request)
         {

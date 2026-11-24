@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     [Cached(typeof(IOnlinePlayLounge))]
     public abstract partial class LoungeSubScreen : OnlinePlaySubScreen, IOnlinePlayLounge
     {
-        public override string Title => "Lounge";
+        public override LocalisableString Title => OnlinePlayStrings.LoungeTitle;
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
@@ -358,7 +359,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            JoinInternal(room, password, r =>
+            JoinInternal(room, password, _ =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();
@@ -394,7 +395,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
                 r.RoomID = null;
 
-                // Null out dates because end date is not supported client-side and the settings overlay will populate a duration.
+                // Null out these because host and start/end date is not supported client-side and the settings overlay will populate a duration.
+                r.Host = null;
+                r.StartDate = null;
                 r.EndDate = null;
                 r.Duration = null;
 

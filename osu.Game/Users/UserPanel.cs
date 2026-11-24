@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,6 +25,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Metadata;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
@@ -120,12 +123,12 @@ namespace osu.Game.Users
         /// <summary>
         /// Panel background container. Can be null if a panel doesn't want a background under it's layout
         /// </summary>
-        protected virtual Drawable? CreateBackground() => Background = new UserCoverBackground
+        protected virtual Drawable? CreateBackground() => Background = new CoverBackground
         {
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            User = User
+            Model = User
         };
 
         protected OsuSpriteText CreateUsername() => new OsuSpriteText
@@ -199,11 +202,26 @@ namespace osu.Game.Users
 
                     if (canDuelUser())
                     {
-                        items.Add(new OsuMenuItem(ContextMenuStrings.DuelPlayer, MenuItemType.Standard, () =>
+                        // This is done in a blocking manner because:
+                        //   - `QueueController` fetches available pools immediately upon connecting,
+                        //   - the check in `canDuelUser` below ensures that the task completes immediately,
+                        //     meaning that the pools were returned from the local cache instead of being
+                        //     fetched.
+                        var pools = queueController.GetMatchmakingPools().GetResultSafely();
+
+                        if (pools.Count > 0)
                         {
-                            if (canDuelUser())
-                                queueController?.IssueDuel(queueController.SelectedPool.Value!, User.Id);
-                        }));
+                            items.Add(new OsuMenuItem(ContextMenuStrings.DuelPlayer)
+                            {
+                                Items = pools
+                                        .Where(p => p.Type == MatchmakingPoolType.RankedPlay)
+                                        .Select(p => new OsuMenuItem(p.DisplayName, MenuItemType.Standard, () =>
+                                        {
+                                            if (canDuelUser())
+                                                queueController?.IssueDuel(p, User.Id);
+                                        })).ToArray()
+                            });
+                        }
                     }
                 }
 
@@ -212,7 +230,21 @@ namespace osu.Game.Users
                 bool isUserOnline() => metadataClient?.GetPresence(User.OnlineID) != null;
                 bool canInviteUser() => isUserOnline() && multiplayerClient?.Room?.Users.All(u => u.UserID != User.Id) == true && multiplayerClient?.Room?.Settings.MatchType.IsMatchmakingType() != true;
                 bool isUserBlocked() => api.LocalUserState.Blocks.Any(b => b.TargetID == User.OnlineID);
-                bool canDuelUser() => isUserOnline() && queueController?.SelectedPool.Value != null && multiplayerClient?.Room?.Settings.MatchType.IsMatchmakingType() != true;
+
+                [MemberNotNullWhen(true, nameof(queueController))]
+                bool canDuelUser()
+                {
+                    if (queueController == null)
+                        return false;
+
+                    var task = queueController.GetMatchmakingPools();
+
+                    // Don't attempt to show pools in the context menu if for some reason the
+                    // get pools task didn't complete immediately. This is done in order not to
+                    // block it from appearing right after mouse click because of a long-running
+                    // network fetch.
+                    return isUserOnline() && task.IsCompletedSuccessfully && multiplayerClient?.Room?.Settings.MatchType.IsMatchmakingType() != true;
+                }
             }
         }
 

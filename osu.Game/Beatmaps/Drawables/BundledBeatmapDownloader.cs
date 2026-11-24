@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 // Note that this is downloading the beatmaps even if they are already downloaded.
                 // We could rely more on `BeatmapDownloadTracker`'s exposed state to avoid this.
-                beatmapDownloader.Download(beatmapSet);
+                beatmapDownloader.Download(beatmapSet, false);
             }
         }
 

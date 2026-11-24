@@ -11,6 +11,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -30,16 +31,11 @@ namespace osu.Game.Screens
         /// </summary>
         public const float HORIZONTAL_OVERFLOW_PADDING = 50;
 
-        /// <summary>
-        /// A user-facing title for this screen.
-        /// </summary>
-        public virtual string Title => GetType().Name;
+        public virtual LocalisableString Title => GetType().Name;
 
-        public string Description => Title;
+        public virtual string Description => Title.ToString();
 
         public virtual bool AllowUserExit => true;
-
-        public virtual bool ShowFooter => false;
 
         public virtual bool AllowExternalScreenChange => false;
 
@@ -58,14 +54,9 @@ namespace osu.Game.Screens
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
-        /// <summary>
-        /// The initial visibility state of the back button when this screen is entered for the first time.
-        /// </summary>
-        protected virtual bool InitialBackButtonVisibility => AllowUserExit;
+        public readonly Bindable<ScreenFooterContent> FooterContent;
 
-        public readonly Bindable<bool> BackButtonVisibility;
-
-        IBindable<bool> IOsuScreen.BackButtonVisibility => BackButtonVisibility;
+        IBindable<ScreenFooterContent> IOsuScreen.FooterContent => FooterContent;
 
         public virtual bool CursorVisible => true;
 
@@ -167,7 +158,7 @@ namespace osu.Game.Screens
             Origin = Anchor.Centre;
 
             OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
-            BackButtonVisibility = new Bindable<bool>(InitialBackButtonVisibility);
+            FooterContent = new Bindable<ScreenFooterContent>(ScreenFooterContent.Legacy(showBackButton: AllowUserExit));
         }
 
         [BackgroundDependencyLoader(true)]
@@ -318,8 +309,6 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
-
-        public virtual IReadOnlyList<ScreenFooterButton> CreateFooterButtons() => Array.Empty<ScreenFooterButton>();
 
         public virtual bool OnBackButton() => false;
     }

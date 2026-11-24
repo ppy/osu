@@ -1,0 +1,83 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osuTK.Graphics;
+
+namespace osu.Game.Users
+{
+    public partial class CoverBackground : ModelBackedDrawable<IHasCover?>
+    {
+        public new IHasCover? Model
+        {
+            get => base.Model;
+            set => base.Model = value;
+        }
+
+        protected override Drawable CreateDrawable(IHasCover? model) => new Cover(model);
+
+        protected override double LoadDelay => 300;
+
+        /// <summary>
+        /// Delay before the background is unloaded while off-screen.
+        /// </summary>
+        protected virtual double UnloadDelay => 5000;
+
+        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay)
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+        [LongRunningLoad]
+        private partial class Cover : CompositeDrawable
+        {
+            private readonly IHasCover? cover;
+
+            public Cover(IHasCover? cover)
+            {
+                this.cover = cover;
+
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OnlineAssetCachingStore textures)
+            {
+                if (cover?.CoverUrl == null)
+                {
+                    InternalChild = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
+                    };
+                }
+                else
+                {
+                    InternalChild = new Sprite
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Texture = textures.Get(cover.CoverUrl),
+                        FillMode = FillMode.Fill,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre
+                    };
+                }
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                this.FadeInFromZero(400);
+            }
+        }
+    }
+}

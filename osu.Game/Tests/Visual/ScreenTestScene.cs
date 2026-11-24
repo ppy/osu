@@ -37,12 +37,14 @@ namespace osu.Game.Tests.Visual
         [Cached]
         protected ScreenFooter ScreenFooter { get; private set; }
 
+        protected ScalingContainer ScalingContainer { get; private set; }
+
         protected ScreenTestScene()
         {
             ScreenStackFooter screenStackFooter;
             ScreenFooter.BackReceptor backReceptor;
 
-            base.Content.Add(new ScalingContainer(ScalingMode.Everything)
+            base.Content.Add(ScalingContainer = new ScalingContainer(ScalingMode.Everything)
             {
                 Children = new Drawable[]
                 {

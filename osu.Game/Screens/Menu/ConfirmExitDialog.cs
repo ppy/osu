@@ -9,6 +9,7 @@ using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Screens.Menu
 {
@@ -31,30 +32,25 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(INotificationOverlay notifications)
         {
-            HeaderText = DialogStrings.ConfirmExitHeaderText;
-
             Icon = FontAwesome.Solid.ExclamationTriangle;
+            HeaderText = DialogStrings.ConfirmExitHeaderText;
 
             if (notifications.HasOngoingOperations)
             {
                 var ongoingOperations = notifications.OngoingOperations.ToArray();
-                string ongoingOperationsText = ongoingOperations.Take(10).Aggregate(string.Empty, (current, n) =>
+                LocalisableString ongoingOperationsText = ongoingOperations.Take(10).Aggregate<ProgressNotification, LocalisableString>(string.Empty, (current, n) =>
                 {
                     if (n.Progress > 0)
-                        return current + $"{n.Text} ({n.Progress:0%})\n";
+                        return LocalisableString.Interpolate($"{current}\n{n.Text} ({n.Progress:0%})");
 
-                    return current + $"{n.Text}\n";
+                    return LocalisableString.Interpolate($"{current}\n{n.Text}");
                 });
 
-                LocalisableString ongoingOperationsLocalisableString;
+                var dialogText = ongoingOperations.Length > 10
+                    ? DialogStrings.ConfirmExitBodyTextOtherOngoingOperations(ongoingOperationsText, ongoingOperations.Length - 10)
+                    : DialogStrings.ConfirmExitBodyTextOngoingOperations(ongoingOperationsText);
 
-                if (ongoingOperations.Length > 10)
-                    ongoingOperationsLocalisableString = DialogStrings.ConfirmExitBodyTextOtherOngoingOperations(ongoingOperationsText, ongoingOperations.Length - 10);
-                else
-                    ongoingOperationsLocalisableString = DialogStrings.ConfirmExitBodyTextOngoingOperations(ongoingOperationsText);
-
-                BodyText = LocalisableString.Interpolate($"{ongoingOperationsLocalisableString}\n\n{DialogStrings.ConfirmDialogBodyText}");
-
+                BodyText = LocalisableString.Interpolate($"{dialogText}\n\n{DialogStrings.ConfirmDialogBodyText}");
                 Buttons = new PopupDialogButton[]
                 {
                     new PopupDialogDangerousButton
@@ -72,7 +68,6 @@ namespace osu.Game.Screens.Menu
             else
             {
                 BodyText = DialogStrings.ConfirmDialogBodyText;
-
                 Buttons = new PopupDialogButton[]
                 {
                     new PopupDialogOkButton

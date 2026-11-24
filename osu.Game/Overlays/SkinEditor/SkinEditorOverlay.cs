@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.SkinEditor
         private readonly ExternalEditOverlay externalEditOverlay = new ExternalEditOverlay();
 
         [Resolved]
-        private OsuGame game { get; set; } = null!;
+        private OsuGame? game { get; set; }
 
         [Resolved]
         private MusicController music { get; set; } = null!;
@@ -249,16 +249,16 @@ namespace osu.Game.Overlays.SkinEditor
             {
                 Scheduler.AddOnce(updateScreenSizing);
 
-                game.Toolbar.Hide();
+                game?.Toolbar.Hide();
                 if (externalEditOverlay.State.Value != Visibility.Visible)
-                    game.CloseAllOverlays();
+                    game?.CloseAllOverlays();
             }
             else
             {
                 scalingContainer.SetCustomRect(null);
 
                 if (lastTargetScreen?.HideOverlaysOnEnter != true)
-                    game.Toolbar.Show();
+                    game?.Toolbar.Show();
             }
         }
 

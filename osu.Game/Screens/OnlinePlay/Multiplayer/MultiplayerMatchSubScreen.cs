@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Audio;
@@ -30,6 +31,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -74,9 +76,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// </summary>
         private const float row_padding = 10;
 
-        public override string Title { get; }
+        public override string Description { get; }
 
-        public override string ShortTitle => "room";
+        public override LocalisableString Title => OnlinePlayStrings.RoomTitle;
 
         public override bool? ApplyModTrackAdjustments => true;
 
@@ -161,10 +163,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             this.room = room;
 
-            Title = room.RoomID == null ? "New room" : room.Name;
+            Description = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
 
-            Padding = new MarginPadding { Top = Header.HEIGHT };
+            Padding = new MarginPadding
+            {
+                Top = Header.HEIGHT,
+                Horizontal = HORIZONTAL_OVERFLOW_PADDING
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -187,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
-                                Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                                Horizontal = 30,
                                 Bottom = footer_height + footer_padding
                             },
                             Children = new[]
@@ -401,6 +407,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
                             Height = footer_height,
+                            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING },
                             Children = new Drawable[]
                             {
                                 new Box
@@ -957,6 +964,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.UserStyleChanged -= onUserStyleChanged;
                 client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
+                client.MatchEvent -= onMatchEvent;
             }
         }
 

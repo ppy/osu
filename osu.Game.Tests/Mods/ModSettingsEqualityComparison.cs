@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Mods
 {

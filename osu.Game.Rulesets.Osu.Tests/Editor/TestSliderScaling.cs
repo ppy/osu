@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -70,6 +71,41 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("slider length shrunk", () => slider.Path.Distance < distanceBefore);
+        }
+
+        [Test]
+        public void TestScalingMultipleSlidersClampedToEdge()
+        {
+            AddStep("Add slider", () =>
+            {
+                EditorBeatmap.Add(new Slider
+                {
+                    StartTime = EditorClock.CurrentTime,
+                    Position = new Vector2(20, 50),
+                    Path = new SliderPath
+                    (
+                        PathType.LINEAR,
+                        [Vector2.Zero, new Vector2(-20.934783f, 70)]
+                    )
+                });
+                EditorBeatmap.Add(new Slider
+                {
+                    StartTime = EditorClock.CurrentTime,
+                    Position = new Vector2(70, 220),
+                    Path = new SliderPath
+                    (
+                        PathType.LINEAR,
+                        [Vector2.Zero, new Vector2(20, -70)]
+                    )
+                });
+            });
+
+            AddStep("select everything", () => EditorBeatmap.SelectedHitObjects.AddRange(EditorBeatmap.HitObjects));
+
+            AddStep("move mouse to handle", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<SelectionBoxScaleHandle>().Single(h => h.Anchor == Anchor.BottomRight)));
+            AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
+            moveMouse(new Vector2(50, 300));
+            AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         private void moveMouse(Vector2 pos) =>
