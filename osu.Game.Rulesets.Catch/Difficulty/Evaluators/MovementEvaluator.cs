@@ -82,9 +82,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Evaluators
                             relativeTimeDifference = 5.0 * Math.Clamp(relativeTimeDifference, 0, repetitive_timing_cutoff); // We apply only 50% of the penalty for different time interval than the current one.
 
                             if (relativeDifference <= repetitive_spacing_cutoff)
+                            {
                                 repetitiveSpacingWeight += (1 - relativeDifference / repetitive_spacing_cutoff)
-                                                        * (1 - relativeTimeDifference)
-                                                        * DiffUtils.Pow(repetitive_spacing_power, i);
+                                                           * (1 - relativeTimeDifference)
+                                                           * DiffUtils.Pow(repetitive_spacing_power, i);
+                            }
                         }
                     }
                 }
