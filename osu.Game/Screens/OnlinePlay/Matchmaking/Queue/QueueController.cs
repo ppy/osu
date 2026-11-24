@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -55,6 +56,11 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
 
         private bool isBackgrounded = true;
 
+        private IBindable<bool> isConnected = null!;
+
+        private IReadOnlyList<MatchmakingPool>? availablePools { get; set; }
+        private Task poolFetchTask = Task.CompletedTask;
+
         private int? lastDuelUser;
         private MatchmakingPool? lastDuelPool;
 
@@ -69,6 +75,35 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             client.MatchmakingRoomInvited += onMatchmakingRoomInvited;
             client.MatchmakingRoomReady += onMatchmakingRoomReady;
             client.MatchmakingDuelIssued += onMatchmakingDuelIssued;
+
+            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindValueChanged(e => Schedule(() =>
+            {
+                // If we've already fetched the pools during this session (presumably because we've lost
+                // connectivity and now are reconnecting) assume they haven't changed as they should remain
+                // unchanged for the duration of the entire season.
+                if (e.NewValue && availablePools == null)
+                {
+                    poolFetchTask = populateAvailablePools();
+                    poolFetchTask.FireAndForget();
+                }
+            }), true);
+        }
+
+        private async Task populateAvailablePools()
+        {
+            // Currently hardcoded to ranked play as that's what's being used and refactoring
+            // this to allow switching pool types is probably not worth the effort at the
+            // moment.
+            availablePools = await client.GetMatchmakingPoolsOfType(MatchmakingPoolType.RankedPlay).ConfigureAwait(false);
+        }
+
+        public async Task<IReadOnlyList<MatchmakingPool>> GetMatchmakingPools()
+        {
+            await Task.WhenAll(poolFetchTask).ConfigureAwait(false);
+
+            // Return empty list on the off chance the fetch task fails.
+            return availablePools ?? [];
         }
 
         /// <summary>
@@ -91,6 +126,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             lastDuelUser = null;
             lastDuelPool = null;
+            QueueTimer.Stop();
 
             client.MatchmakingLeaveQueue().FireAndForget();
         }
@@ -186,6 +222,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         private void onMatchmakingRoomInvited(MatchmakingRoomInvitationParams invitation) => Scheduler.Add(() =>
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.PendingAccept;
+            QueueTimer.Stop();
 
             postNotification();
             backgroundNotification?.Complete(invitation);
@@ -195,7 +232,13 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             CurrentState.Value = ScreenQueue.MatchmakingScreenState.InRoom;
 
-            client.JoinRoom(new Room { RoomID = roomId }, password).FireAndForget();
+            client.JoinRoom(new Room { RoomID = roomId }, password).FireAndForget(onError: _ => Scheduler.Add(() =>
+            {
+                // TODO: in the future this should allow the user to retry joining the room
+                //       once rejoining is in place
+                CurrentState.Value = ScreenQueue.MatchmakingScreenState.Idle;
+                notifications?.Post(new SimpleErrorNotification { Text = "Failed to join room." });
+            }));
         });
 
         private void onMatchmakingDuelIssued(MatchmakingDuelIssuedParams duel)
@@ -369,7 +412,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
         {
             public DuelNotification(QueueController controller, APIUser user, MatchmakingDuelIssuedParams duel)
             {
-                Text = $"{user.Username} challenged you to a duel ({duel.Pool.DisplayName}). Click to accept.";
+                Text = NotificationsStrings.UserChallengedYouToDuel(user.Username, duel.Pool.DisplayName);
 
                 Activated = () =>
                 {

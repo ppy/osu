@@ -292,11 +292,15 @@ namespace osu.Game.Graphics.UserInterfaceV2
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                ItemsContainer.Padding = new MarginPadding(9);
+                ItemsContainer.Padding = new MarginPadding { Horizontal = 9, Vertical = 9 - FormControlBackground.BORDER_THICKNESS };
 
                 MaskingContainer.BorderThickness = FormControlBackground.BORDER_THICKNESS;
                 MaskingContainer.CornerExponent = FormControlBackground.CORNER_EXPONENT;
                 MaskingContainer.BorderColour = colourProvider.Highlight1;
+
+                ContentContainer.Masking = true;
+                ContentContainer.RelativeSizeAxes = Axes.X;
+                ContentContainer.Margin = new MarginPadding { Top = FormControlBackground.BORDER_THICKNESS };
             }
 
             protected override void AnimateOpen()
@@ -313,6 +317,21 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 base.AnimateClose();
                 this.TransformTo(nameof(Margin), new MarginPadding(), 300, Easing.OutQuint);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                ContentContainer.Height = Math.Max(DrawHeight - FormControlBackground.BORDER_THICKNESS * 2.0f, 0.0f);
+            }
+
+            protected override void UpdateSize(Vector2 newSize)
+            {
+                if (newSize.Y > 0)
+                    newSize.Y = Math.Min(newSize.Y + FormControlBackground.BORDER_THICKNESS * 2.0f, MaxHeight);
+
+                base.UpdateSize(newSize);
             }
         }
     }

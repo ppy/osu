@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,42 +24,22 @@ namespace osu.Game.Overlays.Profile.Header.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = info = new ProfileValueDisplay(minimumWidth: 140)
-            {
-                Title = UsersStrings.ShowStatsPlayTime,
-                Content = { TooltipText = "0 hours", }
-            };
+            InternalChild = info = new ProfileValueDisplay(minimumWidth: 140) { Title = UsersStrings.ShowStatsPlayTime };
 
             User.BindValueChanged(updateTime, true);
         }
 
         private void updateTime(ValueChangedEvent<UserProfileData?> user)
         {
-            int? playTime = user.NewValue?.User.Statistics?.PlayTime;
-            info.Content.TooltipText = (playTime ?? 0) / 3600 + " hours";
-            info.Content.Text = formatTime(playTime);
-        }
+            var playTime = TimeSpan.FromSeconds(user.NewValue?.User.Statistics.PlayTime ?? 0);
 
-        private string formatTime(int? secondsNull)
-        {
-            if (secondsNull == null) return "0h 0m";
+            int totalMinutes = (int)Math.Floor(playTime.TotalMinutes);
+            int totalHours = (int)Math.Round(playTime.TotalHours);
 
-            int seconds = secondsNull.Value;
-            string time = "";
-
-            int days = seconds / 86400;
-            seconds -= days * 86400;
-            if (days > 0)
-                time += days + "d ";
-
-            int hours = seconds / 3600;
-            seconds -= hours * 3600;
-            time += hours + "h ";
-
-            int minutes = seconds / 60;
-            time += minutes + "m";
-
-            return time;
+            info.Content.Text = playTime.ToString(playTime.Days > 0 ? @"d'd 'h'h 'm'm'" : @"h'h 'm'm'");
+            info.Content.TooltipText = totalHours < 2
+                ? CommonStrings.CountMinutes(totalMinutes)
+                : CommonStrings.CountHours(totalHours);
         }
     }
 }

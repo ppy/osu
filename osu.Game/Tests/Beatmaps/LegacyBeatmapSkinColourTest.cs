@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Beatmaps
             {
                 if (hasColours)
                 {
-                    Configuration.CustomComboColours = Colours.ToList();
+                    Configuration.CustomComboColours.AddRange(Colours.ToList());
                     Configuration.CustomColours.Add("HyperDash", HYPER_DASH_COLOUR);
                     Configuration.CustomColours.Add("HyperDashAfterImage", HYPER_DASH_AFTER_IMAGE_COLOUR);
                     Configuration.CustomColours.Add("HyperDashFruit", HYPER_DASH_FRUIT_COLOUR);
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Beatmaps
             {
                 if (hasCustomColours)
                 {
-                    Configuration.CustomComboColours = Colours.ToList();
+                    Configuration.CustomComboColours.AddRange(Colours.ToList());
                     Configuration.CustomColours.Add("HyperDash", HYPER_DASH_COLOUR);
                     Configuration.CustomColours.Add("HyperDashAfterImage", HYPER_DASH_AFTER_IMAGE_COLOUR);
                     Configuration.CustomColours.Add("HyperDashFruit", HYPER_DASH_FRUIT_COLOUR);

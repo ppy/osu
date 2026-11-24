@@ -12,10 +12,16 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -23,6 +29,7 @@ using osu.Game.Overlays.SkinEditor;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Components;
@@ -532,6 +539,159 @@ namespace osu.Game.Tests.Visual.Gameplay
                 => this.ChildrenOfType<Menu.DrawableMenuItem>().First(m => m.Item.Text.ToString() == text);
         }
 
+        [Test]
+        public void TestFlip()
+        {
+            BigBlackBox box1 = null!;
+
+            AddStep("add big black box to top left", () =>
+            {
+                var target = Player.ChildrenOfType<SkinnableContainer>().First();
+                target.Add(box1 = new BigBlackBox
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                });
+            });
+
+            AddAssert("big black box position is 0,0", () => Precision.AlmostEquals(box1.Position, new Vector2()));
+
+            AddStep("click big black box", () =>
+            {
+                InputManager.MoveMouseTo(box1);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("flip horizontally", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(2));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 250,0", () => Precision.AlmostEquals(box1.Position, new Vector2(250, 0)));
+
+            AddStep("flip horizontally", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(2));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 0,0", () => Precision.AlmostEquals(box1.Position, new Vector2()));
+
+            AddStep("flip vertically", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(3));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 0,250", () => Precision.AlmostEquals(box1.Position, new Vector2(0, 250)));
+
+            AddStep("flip vertically", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxButton>().ElementAt(3));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("big black box position is 0,0", () => Precision.AlmostEquals(box1.Position, new Vector2()));
+        }
+
+        [Test]
+        public void TestConstraints()
+        {
+            TestConstrainedBox unselectable = null!, immovable = null!, unscaleable = null!, nonrotatable = null!;
+
+            AddStep("add constrained boxes", () =>
+            {
+                var target = Player.ChildrenOfType<SkinnableContainer>().First();
+                target.Add(unselectable = new TestConstrainedBox
+                {
+                    Text = nameof(unselectable),
+                    CanBeSelected = false,
+                    X = 400,
+                    Y = 200,
+                });
+                target.Add(immovable = new TestConstrainedBox
+                {
+                    Text = nameof(immovable),
+                    CanBeMoved = false,
+                    X = 800,
+                    Y = 200,
+                });
+                target.Add(unscaleable = new TestConstrainedBox
+                {
+                    Text = nameof(unscaleable),
+                    CanBeScaled = false,
+                    X = 400,
+                    Y = 600,
+                });
+                target.Add(nonrotatable = new TestConstrainedBox
+                {
+                    Text = nameof(nonrotatable),
+                    CanBeRotated = false,
+                    X = 800,
+                    Y = 600,
+                });
+            });
+
+            AddStep("click unselectable", () =>
+            {
+                InputManager.MoveMouseTo(unselectable);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("nothing selected", () => skinEditor.SelectedComponents, () => Is.Empty);
+
+            AddStep("start dragging immovable", () =>
+            {
+                InputManager.MoveMouseTo(immovable);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("finish drag", () =>
+            {
+                InputManager.MoveMouseTo(immovable.ScreenSpaceDrawQuad.Centre + new Vector2(300));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddAssert("immovable didn't move", () => immovable.Position, () => Is.EqualTo(new Vector2(800, 200)));
+
+            AddStep("click unscaleable", () =>
+            {
+                InputManager.MoveMouseTo(unscaleable);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("start dragging on bottom right of selection box", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBox>().Single().ScreenSpaceDrawQuad.BottomRight);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddStep("attempt resize", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBox>().Single().ScreenSpaceDrawQuad.BottomRight + new Vector2(200));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddAssert("unscaleable didn't resize", () => unscaleable.Size, () => Is.EqualTo(new Vector2(200)));
+            AddAssert("unscaleable didn't scale", () => unscaleable.Scale, () => Is.EqualTo(Vector2.One));
+            AddStep("attempt flip", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.H);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("unscaleable didn't scale", () => unscaleable.Scale, () => Is.EqualTo(Vector2.One));
+
+            AddStep("click nonrotatable", () =>
+            {
+                InputManager.MoveMouseTo(nonrotatable);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("no rotation handles present", this.ChildrenOfType<SelectionBoxRotationHandle>, () => Is.Empty);
+            AddStep("attempt rotate", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Comma);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("nonrotatable didn't rotate", () => nonrotatable.Rotation, () => Is.Zero);
+        }
+
         private Skin importSkinFromArchives(string filename)
         {
             var imported = skins.Import(new ImportTask(TestResources.OpenResource($@"Archives/{filename}"), filename)).GetResultSafely();
@@ -555,6 +715,44 @@ namespace osu.Game.Tests.Visual.Gameplay
                 byte[] newState = stream.ToArray();
 
                 return newState;
+            }
+        }
+
+        private partial class TestConstrainedBox : CompositeDrawable, ISerialisableDrawable
+        {
+            public bool UsesFixedAnchor { get; set; }
+
+            public required LocalisableString Text { get; init; }
+
+            public bool CanBeSelected { get; init; } = true;
+            public bool CanBeMoved { get; init; } = true;
+            public bool CanBeScaled { get; init; } = true;
+            bool ISerialisableDrawable.CanBeScaled(Axes axes) => CanBeScaled;
+            public bool CanBeRotated { get; init; } = true;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                var backgroundColour = new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1);
+                var foregroundColour = OsuColour.ForegroundTextColourFor(backgroundColour);
+
+                Size = new Vector2(200);
+                InternalChildren =
+                [
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = backgroundColour,
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = Text,
+                        Colour = foregroundColour,
+                        Font = OsuFont.Style.Title,
+                    }
+                ];
             }
         }
     }

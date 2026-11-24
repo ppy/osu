@@ -25,3 +25,4 @@ M:TagLib.File.Create(System.String);TagLib's MIME type detection changes behavio
 M:TagLib.File.Create(TagLib.File.IFileAbstraction);TagLib's MIME type detection changes behaviour depending on CultureInfo.CurrentCulture. Use TagLibUtils.GetTagLibFile() instead.
 M:TagLib.File.Create(System.String,TagLib.ReadStyle);TagLib's MIME type detection changes behaviour depending on CultureInfo.CurrentCulture. Use TagLibUtils.GetTagLibFile() instead.
 M:TagLib.File.Create(TagLib.File.IFileAbstraction,TagLib.ReadStyle);TagLib's MIME type detection changes behaviour depending on CultureInfo.CurrentCulture. Use TagLibUtils.GetTagLibFile() instead.
+F:osu.Game.OsuGameBase.fileImporters;Do not manipulate this field directly. Use runOnImporters() or runOnImportersAsync().

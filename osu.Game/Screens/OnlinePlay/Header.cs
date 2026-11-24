@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -43,18 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private void updateSubScreenTitle()
-        {
-            IOnlinePlaySubScreen? screen = stack?.CurrentScreen as IOnlinePlaySubScreen;
-
-            if (screen?.ShowHeaderLine == true)
-            {
-                title.FadeIn(200, Easing.OutQuint);
-                title.Screen = screen;
-            }
-            else
-                title.FadeOut(200, Easing.OutQuint);
-        }
+        private void updateSubScreenTitle() => title.Screen = stack?.CurrentScreen as IOsuScreen;
 
         private partial class MultiHeaderTitle : CompositeDrawable
         {
@@ -63,11 +51,11 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly OsuSpriteText dot;
             private readonly OsuSpriteText pageTitle;
 
-            public IOnlinePlaySubScreen? Screen
+            public IOsuScreen? Screen
             {
                 set
                 {
-                    pageTitle.Text = value?.ShortTitle.Titleize() ?? default(LocalisableString);
+                    pageTitle.Text = value?.Title ?? default;
                     dot.Alpha = pageTitle.Text == default ? 0 : 1;
                 }
             }

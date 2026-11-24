@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
@@ -248,9 +249,19 @@ namespace osu.Game.Utils
 
             switch (exception)
             {
-                // disk I/O failures, invalid formats, etc.
-
                 case IOException ioe:
+                    // named pipe failures, often due to a user error.
+                    // fires from osu!framework NamedPipeIpcProvider.listen(NamedPipeServerStream pipe)
+                    // see https://github.com/dotnet/runtime/blob/719ca2546bd31a54244731185c55c8fc208204bf/src/libraries/System.IO.Pipes/src/System/IO/Pipes/NamedPipeServerStream.cs#L185
+                    if (ioe.Message == "Pipe is broken.")
+                        return false;
+
+                    // general networking failures which do not have distinct HRESULTs
+                    if (ioe.Message.Contains(@"net_io_readfailure")
+                        || ioe.Message.Contains(@"EOF", StringComparison.OrdinalIgnoreCase))
+                        return false;
+
+                    // disk I/O failures, invalid formats, etc.
                     if (ignored_io_exception_hresults.Contains(ioe.HResult))
                         return false;
 
@@ -280,6 +291,7 @@ namespace osu.Game.Utils
                     // more statuses may need to be blocked as we come across them.
                     return we.Status == WebExceptionStatus.Timeout;
 
+                case HttpRequestException:
                 case WebSocketException:
                 case SocketException:
                     return true;

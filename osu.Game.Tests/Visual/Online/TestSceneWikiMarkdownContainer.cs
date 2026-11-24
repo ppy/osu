@@ -167,7 +167,7 @@ outdated: true  # not sure about the format for ""list of mods"".
         {
             AddStep("set content", () => markdownContainer.Text = @"This text has a footnote[^test].
 
-Here's some more text[^test2] with another footnote!
+Here's some more text[^test2] with two of the same footnote[^test2]!
 
 # Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam efficitur laoreet posuere. Ut accumsan tortor in ipsum tincidunt ultrices. Suspendisse a malesuada tellus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce a sagittis nibh. In et velit sit amet mauris aliquet consectetur quis vehicula lorem. Etiam sit amet tellus ac velit ornare maximus. Donec quis metus eget libero ullamcorper imperdiet id vitae arcu. Vivamus iaculis rhoncus purus malesuada mollis. Vestibulum dictum at nisi sed tincidunt. Suspendisse finibus, ipsum ut dapibus commodo, leo eros porttitor sapien, non scelerisque nisi ligula sed ex. Pellentesque magna orci, hendrerit eu iaculis sit amet, ullamcorper in urna. Vivamus dictum mauris orci, nec facilisis dolor fringilla eu. Sed at porttitor nisi, at venenatis urna. Ut at orci vitae libero semper ullamcorper eu ut risus. Mauris hendrerit varius enim, ut varius nisi feugiat mattis.
 
