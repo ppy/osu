@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     [Cached(typeof(IOnlinePlayLounge))]
     public abstract partial class LoungeSubScreen : OnlinePlaySubScreen, IOnlinePlayLounge
     {
-        public override string Title => "Lounge";
+        public override LocalisableString Title => OnlinePlayStrings.LoungeTitle;
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
