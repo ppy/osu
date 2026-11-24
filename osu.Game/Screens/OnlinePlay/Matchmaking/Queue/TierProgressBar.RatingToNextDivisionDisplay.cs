@@ -85,6 +85,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                         textFlow.AddText(" ");
                         textFlow.AddText(RankedPlayStrings.RatingToNextDivision);
 
+                        // This uses a different set of colours from `OsuColour.ForRankingTier` as trying to replicate
+                        // the exact colour mixing from Figma inside framework ended up being too much of a pain.
                         background.Colour = getColour(division);
                     });
                 });
