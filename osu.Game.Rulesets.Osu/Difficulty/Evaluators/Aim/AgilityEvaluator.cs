@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             double wideAngleBonus = calculateWideAngleBonus(osuCurrObj, osuPrevObj);
 
-            double agilityDifficulty = (1 + wideAngleBonus) * 10_000_000 / DiffUtils.Pow(combinedDelta, 3.1);
+            double agilityDifficulty = (1 + wideAngleBonus) * 30_000_000 / DiffUtils.Pow(combinedDelta, 3.35);
 
             agilityDifficulty += osuCurrObj.SmallCircleBonus * 5.0;
 
