@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const double max_opacity_bonus = 0.4;
             const double hidden_bonus = 0.2;
 
-            const double slider_multiplier = 2.7;
+            const double slider_multiplier = 2.4;
 
             const double min_angle_multiplier = 0.2;
 
@@ -92,17 +92,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrent.BaseObject is Slider osuSlider)
             {
-                // Reward sliders based on velocity independent of circle size.
-                sliderBonus = DiffUtils.Pow(osuCurrent.LazyTravelDistance / scalingFactor / osuCurrent.TravelTime, 0.5);
-
                 // Longer sliders require more memorisation.
-                sliderBonus *= DiffUtils.Pow(osuCurrent.LazyTravelDistance, 0.8);
+                sliderBonus = DiffUtils.Pow(osuCurrent.LazyTravelDistance, 0.8);
 
                 // Scale bonus based on slider velocity.
-                sliderBonus *= DiffUtils.Logistic(osuSlider.Velocity, 1.25, 8.0);
-
-                // Nerf sliders with repeats, as less memorisation is required.
-                sliderBonus /= 0.7 * osuSlider.RepeatCount + 1;
+                sliderBonus *= DiffUtils.Logistic(osuSlider.Velocity, 1.2, 10.0);
             }
 
             flashlightDifficulty += sliderBonus * slider_multiplier;
