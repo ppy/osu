@@ -18,8 +18,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public abstract partial class ProfileHeaderCardSmall : Container
     {
-        protected OsuSpriteText Label { get; private set; }
-        protected OsuSpriteText Value { get; private set; }
+        private const int icon_size = 24;
+        private const int spacing = 4;
+        private const int right_width = 86;
+
+        protected OsuSpriteText Label { get; }
+        protected OsuSpriteText Value { get; }
 
         protected IconUsage Icon
         {
@@ -33,6 +37,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         protected ProfileHeaderCardSmall()
         {
@@ -65,36 +72,41 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     Padding = new MarginPadding { Horizontal = 8, Vertical = 10 },
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        new Container
                         {
                             AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(4),
-                            Children = new Drawable[]
+                            Child = icon = new SpriteIcon
                             {
-                                icon = new SpriteIcon
+                                Size = new Vector2(icon_size),
+                                Colour = Color4.White,
+                            },
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding
+                            {
+                                Left = icon_size + spacing,
+                                Right = spacing + right_width,
+                            },
+                            Child = new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
                                 {
-                                    Size = new Vector2(24),
-                                    Colour = Color4.White,
-                                },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
+                                    Label = new OsuSpriteText
                                     {
-                                        Label = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold),
-                                            Colour = Color4.White,
-                                        },
-                                        Value = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.Style.Caption2,
-                                            Colour = Color4.White,
-                                        },
+                                        Font = OsuFont.Style.Caption2.With(weight: FontWeight.Bold),
+                                    },
+                                    Value = new OsuSpriteText
+                                    {
+                                        Font = OsuFont.Style.Caption2,
                                     },
                                 },
                             },
@@ -102,7 +114,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         content = new Container
                         {
                             RelativeSizeAxes = Axes.Y,
-                            Width = 86,
+                            Width = right_width,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                         },
@@ -112,9 +124,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             background.Colour = colourProvider.Background3;
+
+            Label.Colour = colourProvider.Content1;
+            Value.Colour = colourProvider.Content2;
         }
     }
 }
