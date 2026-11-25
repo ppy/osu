@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Online;
 using osu.Game.Overlays;
@@ -22,6 +23,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Scoring;
 using osu.Game.Screens.RankingV2.Extended;
+using osu.Game.Tests.Visual.Ranking;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.RankingV2
@@ -180,7 +182,8 @@ namespace osu.Game.Tests.Visual.RankingV2
                     [HitResult.SmallTickHit] = 54,
                     [HitResult.LargeBonus] = 13,
                 },
-                Mods = [new OsuModHidden(), new OsuModDoubleTime()]
+                Mods = [new OsuModHidden(), new OsuModDoubleTime()],
+                HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(RNG.NextDouble(-30, 30), RNG.NextDouble(10, 50)),
             };
 
             setUp?.Invoke(newScore);

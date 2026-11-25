@@ -236,6 +236,7 @@ namespace osu.Game.Screens.RankingV2.Extended
                                                 Children =
                                                 [
                                                     new GlobalStatisticsUpdatePanel(),
+                                                    new TimingStatisticsPanel(),
                                                 ]
                                             },
                                             new FillFlowContainer
