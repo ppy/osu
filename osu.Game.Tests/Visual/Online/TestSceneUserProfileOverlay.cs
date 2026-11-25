@@ -304,6 +304,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 IsRanked = true,
                 GlobalRank = 2148,
+                GlobalRankPercent = 0.001f,
                 CountryRank = 1,
                 PP = 4567.89m,
                 PlayTime = 2173671,
@@ -316,6 +317,14 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Mode = @"osu",
                     Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
+                GradesCount = new UserStatistics.Grades
+                {
+                    A = 123,
+                    S = 234,
+                    SPlus = 345,
+                    SS = 456,
+                    SSPlus = 567,
                 },
             },
             TournamentBanners = new[]

@@ -96,6 +96,8 @@ namespace osu.Game.Graphics
         public static IconUsage Wiki => get(OsuIconMapping.Wiki);
         public static IconUsage Add => get(OsuIconMapping.Add);
         public static IconUsage Remove => get(OsuIconMapping.Remove);
+        public static IconUsage Solo => get(OsuIconMapping.Solo);
+        public static IconUsage Multi => get(OsuIconMapping.Multi);
         public static IconUsage EditorHitCircle => get(OsuIconMapping.EditorHitCircle);
         public static IconUsage EditorSlider => get(OsuIconMapping.EditorSlider);
         public static IconUsage EditorSpinner => get(OsuIconMapping.EditorSpinner);
@@ -439,6 +441,12 @@ namespace osu.Game.Graphics
 
             [Description(@"remove")]
             Remove,
+
+            [Description(@"solo")]
+            Solo,
+
+            [Description(@"multi")]
+            Multi,
 
             [Description(@"Editor/hitcircle")]
             EditorHitCircle,
