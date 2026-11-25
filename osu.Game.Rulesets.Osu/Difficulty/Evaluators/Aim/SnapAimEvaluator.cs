@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double calculateWideAngleBonus(OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj,
                                                       double currDistance, double prevDistance, bool withSliderTravelDistance)
         {
-            const double wide_angle_multiplier = 2.2;
+            const double wide_angle_multiplier = 0.65;
 
             if (osuCurrObj.Angle == null || osuLastObj.Angle == null)
                 return 0;
@@ -68,19 +68,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             // Penalize angle repetition. It is important to do it _before_ multiplying by velocity because we compare raw wideness here
             wideAngleBonus *= 0.25 + 0.75 * (1 - Math.Min(wideAngleBonus, DiffUtils.Pow(AngleUtils.CalculateWideness(osuLastObj.Angle.Value), 3)));
 
-            // Rescaling velocity for the wide angle bonus
-            const double wide_angle_time_scale = 1.2;
-
-            double currRescaledVelocity = currDistance / DiffUtils.Pow(osuCurrObj.AdjustedDeltaTime, wide_angle_time_scale);
-            double prevRescaledVelocity = prevDistance / DiffUtils.Pow(osuLastObj.AdjustedDeltaTime, wide_angle_time_scale);
+            double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
+            double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
 
             if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
             {
                 double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
-                currRescaledVelocity = Math.Max(currRescaledVelocity, sliderDistance / DiffUtils.Pow(osuCurrObj.AdjustedDeltaTime, wide_angle_time_scale));
+                currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
             }
 
-            wideAngleBonus *= Math.Min(currRescaledVelocity, prevRescaledVelocity);
+            wideAngleBonus *= Math.Min(currVelocity, prevVelocity);
 
             var osuLast2Obj = (OsuDifficultyHitObject?)osuCurrObj.Previous(2);
 
@@ -105,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
         private static double calculateVelocityChangeBonus(bool withSliderTravelDistance, double prevVelocity, double currVelocity,
                                                            double currDistance, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuLastObj)
         {
-            const double velocity_change_multiplier = 0.85;
+            const double velocity_change_multiplier = 0.9;
 
             if (Math.Max(prevVelocity, currVelocity) == 0)
                 return 0;
