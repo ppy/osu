@@ -27,6 +27,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         /// </summary>
         public static double EvaluateDifficultyOf(DifficultyHitObject current, IReadOnlyList<Mod> mods)
         {
+            if (current.BaseObject is Spinner)
+                return 0;
+
             const double max_opacity_bonus = 0.4;
             const double hidden_bonus = 0.2;
 
