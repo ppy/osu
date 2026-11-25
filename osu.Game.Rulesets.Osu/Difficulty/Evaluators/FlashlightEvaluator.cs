@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 {
@@ -97,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus = DiffUtils.Pow(osuCurrent.LazyTravelDistance, 0.8);
 
                 // Scale bonus based on slider velocity.
-                sliderBonus *= DiffUtils.Logistic(osuSlider.Velocity * ModUtils.CalculateRateWithMods(mods), 1.2, 10.0);
+                sliderBonus *= DiffUtils.Logistic(osuSlider.Velocity * osuCurrent.ClockRate, 1.2, 10.0);
 
                 // Nerf sliders whose movement is easily seen within the Flashlight radius.
                 sliderBonus *= Math.Min(1.0, osuCurrent.LazyTravelDistance / scalingFactor / (osuSlider.RepeatCount + 1) / 75.0);
