@@ -14,12 +14,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuLegacyScoreMissCalculator
     {
-        private readonly ScoreInfo score;
+        private readonly IScoreInfo score;
+        private readonly Mod[] mods;
         private readonly OsuDifficultyAttributes attributes;
 
-        public OsuLegacyScoreMissCalculator(ScoreInfo scoreInfo, OsuDifficultyAttributes attributes)
+        public OsuLegacyScoreMissCalculator(IScoreInfo scoreInfo, Mod[] mods, OsuDifficultyAttributes attributes)
         {
             score = scoreInfo;
+            this.mods = mods;
             this.attributes = attributes;
         }
 
@@ -151,11 +153,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// </remarks>
         private double getLegacyScoreMultiplier()
         {
-            bool scoreV2 = score.Mods.Any(m => m is ModScoreV2);
+            bool scoreV2 = mods.Any(m => m is ModScoreV2);
 
             double multiplier = 1.0;
 
-            foreach (var mod in score.Mods)
+            foreach (var mod in mods)
             {
                 switch (mod)
                 {

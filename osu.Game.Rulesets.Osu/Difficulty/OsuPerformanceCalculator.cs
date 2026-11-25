@@ -72,12 +72,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
+        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes)
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
+            var mods = score.Mods.Select(m => m.ToMod(Ruleset)).ToArray();
 
-            usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
-            usingScoreV2 = score.Mods.Any(m => m is ModScoreV2);
+            usingClassicSliderAccuracy = mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
+            usingScoreV2 = mods.Any(m => m is ModScoreV2);
 
             accuracy = Math.Clamp(score.Accuracy, 0, 1);
             scoreMaxCombo = Math.Clamp(score.MaxCombo, 0, osuAttributes.MaxCombo);
@@ -89,11 +90,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countSliderTickMiss = score.Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
             effectiveMissCount = countMiss;
 
-            var difficulty = score.BeatmapInfo!.Difficulty.Clone();
+            var difficulty = new BeatmapDifficulty(score.Beatmap!.Difficulty);
 
-            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
+            mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
 
-            clockRate = ModUtils.CalculateRateWithMods(score.Mods);
+            clockRate = ModUtils.CalculateRateWithMods(mods);
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(difficulty.OverallDifficulty);
@@ -111,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (usingClassicSliderAccuracy && !usingScoreV2 && score.LegacyTotalScore > 0)
             {
-                var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, osuAttributes);
+                var legacyScoreMissCalculator = new OsuLegacyScoreMissCalculator(score, mods, osuAttributes);
                 scoreBasedEstimatedMissCount = legacyScoreMissCalculator.Calculate();
 
                 effectiveMissCount = scoreBasedEstimatedMissCount.Value;
@@ -134,13 +135,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double multiplier = PERFORMANCE_BASE_MULTIPLIER;
 
-            if (score.Mods.Any(m => m is OsuModNoFail))
+            if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
 
-            if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
+            if (mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
                 multiplier *= 1.0 - DiffUtils.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
 
-            if (score.Mods.Any(h => h is OsuModRelax))
+            if (mods.Any(h => h is OsuModRelax))
             {
                 // https://www.desmos.com/calculator/vspzsop6td
                 // we use OD13.3 as maximum since it's the value at which great hitwidow becomes 0
@@ -154,12 +155,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
-            double aimValue = computeAimValue(score, osuAttributes);
-            double speedValue = computeSpeedValue(score, osuAttributes);
-            double accuracyValue = computeAccuracyValue(score, osuAttributes);
+            double aimValue = computeAimValue(mods, osuAttributes);
+            double speedValue = computeSpeedValue(mods, osuAttributes);
+            double accuracyValue = computeAccuracyValue(mods, osuAttributes);
 
             double readingValue = computeReadingValue(osuAttributes);
-            double flashlightValue = computeFlashlightValue(score, osuAttributes);
+            double flashlightValue = computeFlashlightValue(mods, osuAttributes);
             double cognitionValue = OsuDifficultyCalculator.SumCognitionDifficulty(readingValue, flashlightValue);
 
             double totalValue = DiffUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, cognitionValue) * multiplier;
@@ -181,9 +182,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
-        private double computeAimValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeAimValue(Mod[] mods, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModAutopilot))
+            if (mods.Any(h => h is OsuModAutopilot))
                 return 0.0;
 
             double aimDifficulty = attributes.AimDifficulty;
@@ -223,9 +224,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // TC bonuses are excluded when blinds is present as the increased visual difficulty is unimportant when notes cannot be seen.
-            if (score.Mods.Any(m => m is OsuModBlinds))
+            if (mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * DiffUtils.Pow(accuracy, 16)) * (1 - 0.003 * drainRate * drainRate);
-            else if (score.Mods.Any(m => m is OsuModTraceable))
+            else if (mods.Any(m => m is OsuModTraceable))
             {
                 aimValue *= 1.0 + calculateTraceableBonus(attributes.SliderFactor);
             }
@@ -235,9 +236,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return aimValue;
         }
 
-        private double computeSpeedValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeSpeedValue(Mod[] mods, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModRelax) || speedDeviation == null)
+            if (mods.Any(h => h is OsuModRelax) || speedDeviation == null)
                 return 0.0;
 
             double speedValue = HarmonicSkill.DifficultyToPerformance(attributes.SpeedDifficulty);
@@ -249,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedValue *= calculateMissPenalty(relevantMissCount, attributes.SpeedDifficultStrainCount);
             }
 
-            if (score.Mods.Any(m => m is OsuModBlinds))
+            if (mods.Any(m => m is OsuModBlinds))
             {
                 // Increasing the speed value by object count for Blinds isn't ideal, so the minimum buff is given.
                 speedValue *= 1.12;
@@ -271,9 +272,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return speedValue;
         }
 
-        private double computeAccuracyValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeAccuracyValue(Mod[] mods, OsuDifficultyAttributes attributes)
         {
-            if (score.Mods.Any(h => h is OsuModRelax))
+            if (mods.Any(h => h is OsuModRelax))
                 return 0.0;
 
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
@@ -301,9 +302,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 : DiffUtils.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.1);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
-            if (score.Mods.Any(m => m is OsuModBlinds))
+            if (mods.Any(m => m is OsuModBlinds))
                 accuracyValue *= 1.14;
-            else if (score.Mods.Any(m => m is OsuModTraceable))
+            else if (mods.Any(m => m is OsuModTraceable))
             {
                 // Decrease bonus for AR > 10
                 accuracyValue *= 1 + 0.08 * DiffUtils.ReverseLerp(approachRate, 11.5, 10);
@@ -312,9 +313,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return accuracyValue;
         }
 
-        private double computeFlashlightValue(ScoreInfo score, OsuDifficultyAttributes attributes)
+        private double computeFlashlightValue(Mod[] mods, OsuDifficultyAttributes attributes)
         {
-            if (!score.Mods.Any(h => h is OsuModFlashlight))
+            if (!mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
             Debug.Assert(attributes.FlashlightDifficulty != null);

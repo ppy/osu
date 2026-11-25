@@ -33,6 +33,7 @@ namespace osu.Game.Scoring
         public int MaxCombo => Score.MaxCombo;
         public double Accuracy => Score.Accuracy;
         public long LegacyOnlineID => Score.LegacyOnlineID;
+        public long? LegacyTotalScore => Score.LegacyTotalScore;
         public DateTimeOffset Date => Score.Date;
         public double? PP => Score.PP;
         public IBeatmapInfo? Beatmap => Score.Beatmap;

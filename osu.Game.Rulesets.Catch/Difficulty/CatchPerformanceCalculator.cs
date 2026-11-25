@@ -27,9 +27,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
+        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes)
         {
             var catchAttributes = (CatchDifficultyAttributes)attributes;
+            var mods = score.Mods.Select(m => m.ToMod(Ruleset)).ToArray();
 
             num300 = score.GetCount300() ?? 0; // HitResult.Great
             num100 = score.GetCount100() ?? 0; // HitResult.LargeTickHit
@@ -56,11 +57,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (catchAttributes.MaxCombo > 0)
                 value *= Math.Min(DiffUtils.Pow(scoreMaxCombo, 0.35) / DiffUtils.Pow(catchAttributes.MaxCombo, 0.35), 1.0);
 
-            var difficulty = score.BeatmapInfo!.Difficulty.Clone();
+            var difficulty = new BeatmapDifficulty(score.Beatmap!.Difficulty);
 
-            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
+            mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
 
-            double clockRate = ModUtils.CalculateRateWithMods(score.Mods);
+            double clockRate = ModUtils.CalculateRateWithMods(mods);
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
@@ -77,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             value *= approachRateFactor;
 
-            if (score.Mods.Any(m => m is ModHidden))
+            if (mods.Any(m => m is ModHidden))
             {
                 // Hiddens gives almost nothing on max approach rate, and more the lower it is
                 if (approachRate <= 10.0)
@@ -86,12 +87,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
             }
 
-            if (score.Mods.Any(m => m is ModFlashlight))
+            if (mods.Any(m => m is ModFlashlight))
                 value *= 1.35 * lengthBonus;
 
             value *= DiffUtils.Pow(accuracy(), 5.5);
 
-            if (score.Mods.Any(m => m is ModNoFail))
+            if (mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
 
             return new CatchPerformanceAttributes

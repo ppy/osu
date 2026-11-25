@@ -82,7 +82,7 @@ namespace osu.Game.Online.API.Requests.Responses
         /// Used to preserve the total score for legacy scores.
         /// </summary>
         [JsonProperty("legacy_total_score")]
-        public int? LegacyTotalScore { get; set; }
+        public long? LegacyTotalScore { get; set; }
 
         [JsonProperty("legacy_score_id")]
         public ulong? LegacyScoreId { get; set; }
