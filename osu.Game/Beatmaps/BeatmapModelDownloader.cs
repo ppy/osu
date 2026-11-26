@@ -11,17 +11,25 @@ namespace osu.Game.Beatmaps
 {
     public class BeatmapModelDownloader : ModelDownloader<BeatmapSetInfo, IBeatmapSetInfo>
     {
+        private readonly BeatmapManager? beatmapManager;
+
         protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize) =>
             new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
 
         public override ArchiveDownloadRequest<IBeatmapSetInfo>? GetExistingDownload(IBeatmapSetInfo model)
             => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
 
-        public void DownloadWithSafeties(IBeatmapSetInfo model, bool withoutVideo, BeatmapManager beatmapManager, IDialogOverlay? dialogOverlay = null)
+        public BeatmapModelDownloader(BeatmapManager beatmapImporter, IAPIProvider api)
+            : base(beatmapImporter, api)
+        {
+            beatmapManager = beatmapImporter;
+        }
+
+        public void Download(IBeatmapSetInfo model, bool withoutVideo, IDialogOverlay? dialogOverlay = null)
         {
             if (dialogOverlay != null)
             {
-                BeatmapSetInfo? localModel = model as BeatmapSetInfo ?? beatmapManager.QueryBeatmapSet(s => s.OnlineID == model.OnlineID)?.Value;
+                BeatmapSetInfo? localModel = model as BeatmapSetInfo ?? beatmapManager?.QueryBeatmapSet(s => s.OnlineID == model.OnlineID)?.Value;
 
                 if (localModel?.Status == BeatmapOnlineStatus.LocallyModified)
                 {
@@ -34,19 +42,9 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            Download(model, withoutVideo, null);
-        }
-
-        public void Download(IBeatmapSetInfo model, bool withoutVideo)
-        {
-            Download(model, withoutVideo, null);
+            base.Download(model, withoutVideo, null);
         }
 
         public void DownloadAsUpdate(BeatmapSetInfo originalModel, bool withoutVideo) => Download(originalModel, withoutVideo, originalModel);
-
-        public BeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api)
-            : base(beatmapImporter, api)
-        {
-        }
     }
 }

@@ -47,9 +47,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private BeatmapModelDownloader? downloader { get; set; }
 
         [Resolved]
-        private BeatmapManager beatmaps { get; set; } = null!;
-
-        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
@@ -94,7 +91,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 switch (DownloadTracker.State.Value)
                 {
                     case DownloadState.NotDownloaded:
-                        if (!BeatmapSet.Availability.DownloadDisabled) downloader?.DownloadWithSafeties(BeatmapSet, preferNoVideo.Value, beatmaps, dialogOverlay);
+                        if (!BeatmapSet.Availability.DownloadDisabled)
+                        {
+                            BeatmapModelDownloader tempQualifier = downloader;
+
+                            if (tempQualifier != null)
+                            {
+                                tempQualifier.Download(BeatmapSet, preferNoVideo.Value, dialogOverlay);
+                            }
+                        }
+
                         break;
 
                     case DownloadState.LocallyAvailable:

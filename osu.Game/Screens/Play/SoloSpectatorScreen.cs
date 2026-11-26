@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(beatmap))
                 return;
 
-            beatmapDownloader.DownloadWithSafeties(beatmap.BeatmapSet, preferNoVideo.Value, beatmaps, dialogOverlay);
+            beatmapDownloader.Download(beatmap.BeatmapSet, preferNoVideo.Value, dialogOverlay);
         }
 
         public override bool OnExiting(ScreenExitEvent e)

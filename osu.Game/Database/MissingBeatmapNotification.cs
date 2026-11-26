@@ -40,9 +40,6 @@ namespace osu.Game.Database
         private IDisposable? realmSubscription;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; } = null!;
-
-        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         /// <summary>
@@ -78,7 +75,7 @@ namespace osu.Game.Database
             if (autoDownloadConfig.Value)
             {
                 Text = NotificationsStrings.DownloadingBeatmapForReplay;
-                beatmapDownloader.DownloadWithSafeties(beatmapSetInfo, noVideoSetting.Value, beatmapManager, dialogOverlay);
+                beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value, dialogOverlay);
             }
             else
             {

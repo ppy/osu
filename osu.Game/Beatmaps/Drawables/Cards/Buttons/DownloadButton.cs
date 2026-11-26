@@ -26,9 +26,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         private BeatmapModelDownloader downloader { get; set; } = null!;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; } = null!;
-
-        [Resolved]
         private IDialogOverlay? dialogOverlay { get; set; }
 
         public DownloadButton(APIBeatmapSet beatmapSet)
@@ -81,7 +78,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                         return;
                     }
 
-                    Action = () => downloader.DownloadWithSafeties(beatmapSet, preferNoVideo.Value, beatmapManager, dialogOverlay);
+                    Action = () => downloader.Download(beatmapSet, preferNoVideo.Value, dialogOverlay);
                     this.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
                     SetLoading(false);
 

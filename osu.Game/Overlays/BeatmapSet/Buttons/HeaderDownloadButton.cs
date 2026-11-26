@@ -53,8 +53,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             RelativeSizeAxes = Axes.Y;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, BeatmapModelDownloader downloader, BeatmapManager beatmapManager, [CanBeNull] IDialogOverlay dialogOverlay)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(IAPIProvider api, BeatmapModelDownloader downloader, [CanBeNull] IDialogOverlay dialogOverlay)
         {
             FillFlowContainer textSprites;
 
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                downloader.DownloadWithSafeties(beatmapSet, noVideo, beatmapManager, dialogOverlay);
+                downloader.Download(beatmapSet, noVideo, dialogOverlay);
             };
 
             localUser.BindTo(api.LocalUser);

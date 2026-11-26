@@ -166,7 +166,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     if (beatmaps.IsAvailableLocally(new APIBeatmap { OnlineID = item.BeatmapID }))
                         return;
 
-                    beatmapDownloader.DownloadWithSafeties(beatmapSet, preferNoVideo.Value, beatmaps, dialogOverlay);
+                    beatmapDownloader.Download(beatmapSet, preferNoVideo.Value, dialogOverlay);
                 }));
         }
 

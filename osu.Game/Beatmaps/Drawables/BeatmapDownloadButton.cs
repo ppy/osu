@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapModelDownloader downloader, OsuConfigManager osuConfig, BeatmapManager beatmaps, [CanBeNull] IDialogOverlay dialogOverlay)
+        private void load(OsuGame game, BeatmapModelDownloader downloader, OsuConfigManager osuConfig, [CanBeNull] IDialogOverlay dialogOverlay)
         {
             noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Drawables
                         break;
 
                     default:
-                        downloader.DownloadWithSafeties(beatmapSet, noVideoSetting.Value, beatmaps, dialogOverlay);
+                        downloader.Download(beatmapSet, noVideoSetting.Value, dialogOverlay);
                         break;
                 }
             };

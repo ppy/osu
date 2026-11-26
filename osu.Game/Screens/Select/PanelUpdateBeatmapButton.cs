@@ -159,6 +159,9 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
+            // TODO: See if we can make this code path use the standard Download method.
+            // Right now it isn't because of the final `attachExistingDownload` call needing to fire post-download operation, seemingly.
+
             if (dialogOverlay != null && beatmapSet.Status == BeatmapOnlineStatus.LocallyModified && !updateConfirmed)
             {
                 dialogOverlay.Push(new UpdateLocalConfirmationDialog(() =>

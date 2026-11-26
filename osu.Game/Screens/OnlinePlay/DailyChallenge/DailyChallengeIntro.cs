@@ -340,7 +340,10 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (config.Get<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps))
             {
                 if (!beatmapManager.IsAvailableLocally(beatmap))
-                    beatmapDownloader.DownloadWithSafeties(beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo), beatmapManager, dialogOverlay);
+                {
+                    bool withoutVideo = config.Get<bool>(OsuSetting.PreferNoVideo);
+                    beatmapDownloader.Download(beatmap.BeatmapSet!, withoutVideo, dialogOverlay);
+                }
             }
 
             dateWindupSample = audio.Samples.Get(@"DailyChallenge/date-windup");
