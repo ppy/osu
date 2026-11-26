@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [
             "Hello!!",
             string.Concat(Enumerable.Repeat("Hello ", 100)),
+            "Hello!\nI have multiple\nlines",
 
             //TODO: o!f issue: https://github.com/ppy/osu-framework/issues/5007
             //Enable after o!f fixed
@@ -75,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return tooltip != null && tooltip.Alpha == 1;
             });
 
-            AddAssert("Check tooltip is under width limit", () => tooltip != null && tooltip.Width <= 500);
+            AddAssert("Check tooltip is under width limit", () => tooltip?.Width, () => Is.LessThanOrEqualTo(OsuTooltipContainer.OsuTooltip.MAX_WIDTH));
         }
 
         internal sealed partial class TestTooltipContainer : Container, IHasTooltip
