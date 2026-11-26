@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
@@ -19,10 +20,10 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         public Task<PerformanceAttributes> CalculateAsync(IScoreInfo score, DifficultyAttributes attributes, CancellationToken cancellationToken)
-            => Task.Run(() => CreatePerformanceAttributes(score, attributes), cancellationToken);
+            => Task.Run(() => CreatePerformanceAttributes(score, score.Mods.Select(m => m.ToMod(Ruleset)).ToArray(), attributes), cancellationToken);
 
         public PerformanceAttributes Calculate(IScoreInfo score, DifficultyAttributes attributes)
-            => CreatePerformanceAttributes(score, attributes);
+            => CreatePerformanceAttributes(score, score.Mods.Select(m => m.ToMod(Ruleset)).ToArray(), attributes);
 
         public PerformanceAttributes Calculate(IScoreInfo score, IWorkingBeatmap beatmap)
         {
@@ -34,7 +35,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// Creates <see cref="PerformanceAttributes"/> to describe a score's performance.
         /// </summary>
         /// <param name="score">The score to create the attributes for.</param>
+        /// <param name="mods">The instantiated mods for the score.</param>
         /// <param name="attributes">The difficulty attributes for the beatmap relating to the score.</param>
-        protected abstract PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes);
+        protected abstract PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, Mod[] mods, DifficultyAttributes attributes);
     }
 }

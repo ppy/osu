@@ -225,8 +225,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
             }
 
-            protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes)
-                => new PerformanceAttributes { Total = score.Mods.Select(m => m.ToMod(Ruleset)).OfType<TestMod>().SingleOrDefault()?.Performance.Value ?? 0 };
+            protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, Mod[] mods, DifficultyAttributes attributes)
+                => new PerformanceAttributes { Total = mods.OfType<TestMod>().SingleOrDefault()?.Performance.Value ?? 0 };
         }
 
         private class TestMod : Mod

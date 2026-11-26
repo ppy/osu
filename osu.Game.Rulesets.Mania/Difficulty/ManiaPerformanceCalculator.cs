@@ -26,10 +26,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes)
+        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, Mod[] mods, DifficultyAttributes attributes)
         {
             var maniaAttributes = (ManiaDifficultyAttributes)attributes;
-            var mods = score.Mods.Select(m => m.ToMod(Ruleset)).ToArray();
 
             countPerfect = score.Statistics.GetValueOrDefault(HitResult.Perfect);
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);

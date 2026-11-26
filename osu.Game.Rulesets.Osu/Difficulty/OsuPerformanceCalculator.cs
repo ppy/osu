@@ -72,10 +72,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes)
+        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, Mod[] mods, DifficultyAttributes attributes)
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
-            var mods = score.Mods.Select(m => m.ToMod(Ruleset)).ToArray();
 
             usingClassicSliderAccuracy = mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
             usingScoreV2 = mods.Any(m => m is ModScoreV2);

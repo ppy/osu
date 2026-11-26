@@ -35,10 +35,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes)
+        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, Mod[] mods, DifficultyAttributes attributes)
         {
             var taikoAttributes = (TaikoDifficultyAttributes)attributes;
-            var mods = score.Mods.Select(m => m.ToMod(Ruleset)).ToArray();
 
             countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
             countOk = score.Statistics.GetValueOrDefault(HitResult.Ok);

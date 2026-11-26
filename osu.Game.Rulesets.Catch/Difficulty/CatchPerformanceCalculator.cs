@@ -27,10 +27,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, DifficultyAttributes attributes)
+        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, Mod[] mods, DifficultyAttributes attributes)
         {
             var catchAttributes = (CatchDifficultyAttributes)attributes;
-            var mods = score.Mods.Select(m => m.ToMod(Ruleset)).ToArray();
 
             num300 = score.GetCount300() ?? 0; // HitResult.Great
             num100 = score.GetCount100() ?? 0; // HitResult.LargeTickHit
