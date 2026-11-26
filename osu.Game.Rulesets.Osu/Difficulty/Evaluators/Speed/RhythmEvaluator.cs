@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
 
                 double windowPenalty = Math.Clamp((deltaDifference - deltaDifferenceEpsilon) / deltaDifferenceEpsilon, 0, 1);
 
-                double effectiveDifficulty = getEffectiveDifficulty(deltaDifferenceRatio) * windowPenalty * differenceMultiplier;
+                double effectiveDifficulty = getEffectiveDifficulty(deltaDifferenceRatio);
 
                 // if previous object is a slider it might be easier to tap since you don't have to do a whole tapping motion
                 // while a full deltatime might end up some weird ratio the "unpress->tap" motion might be simple
@@ -99,6 +99,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
                     double sliderEffectiveDifficulty = Math.Min(getEffectiveDifficulty(sliderLazyDeltaDifferenceRatio), getEffectiveDifficulty(sliderRealDeltaDifferenceRatio));
                     effectiveDifficulty = Math.Min(sliderEffectiveDifficulty, effectiveDifficulty);
                 }
+
+                effectiveDifficulty *= windowPenalty * differenceMultiplier;
 
                 if (deltaDifference < deltaDifferenceEpsilon)
                 {
