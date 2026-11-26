@@ -27,16 +27,54 @@ namespace osu.Game.Overlays.Profile
     {
         protected const float FADE_DURATION = 150;
 
+        /// <summary>
+        /// Applies a padding only to the graph displayed by this component.
+        /// </summary>
+        /// <remarks>
+        /// This should be used instead of applying padding directly to the
+        /// root drawable, since doing that would cause the <see cref="Placeholder"/>
+        /// to be positioned off-centre.
+        /// </remarks>
+        public MarginPadding GraphPadding
+        {
+            get => container.Padding;
+            init => container.Padding = value;
+        }
+
+        public LocalisableString Placeholder
+        {
+            get => placeholder.Text;
+            init => placeholder.Text = value;
+        }
+
+        private readonly Container container;
         private readonly UserLineGraph graph;
+        private readonly OsuSpriteText placeholder;
         private KeyValuePair<TKey, TValue>[]? data;
         private int hoveredIndex = -1;
 
         protected UserGraph()
         {
-            Add(graph = new UserLineGraph
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0
+                container = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        graph = new UserLineGraph
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0
+                        },
+                    },
+                },
+                placeholder = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
+                }
             });
 
             graph.OnBallMove += i => hoveredIndex = i;
@@ -113,8 +151,17 @@ namespace osu.Game.Overlays.Profile
         /// <param name="value">Value to convert.</param>
         protected abstract float GetDataPointHeight(TValue value);
 
-        protected virtual void ShowGraph() => graph.FadeIn(FADE_DURATION, Easing.Out);
-        protected virtual void HideGraph() => graph.FadeOut(FADE_DURATION, Easing.Out);
+        protected virtual void ShowGraph()
+        {
+            graph.FadeIn(FADE_DURATION, Easing.Out);
+            placeholder.FadeOut(FADE_DURATION, Easing.Out);
+        }
+
+        protected virtual void HideGraph()
+        {
+            graph.FadeOut(FADE_DURATION, Easing.Out);
+            placeholder.FadeIn(FADE_DURATION, Easing.Out);
+        }
 
         public ITooltip<UserGraphTooltipContent?> GetCustomTooltip() => new UserGraphTooltip();
 

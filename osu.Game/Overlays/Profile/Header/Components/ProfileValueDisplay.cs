@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public LocalisableString Title
         {
+            get => title.Text;
             set => title.Text = value;
         }
 
@@ -46,7 +47,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 ValueSize.Large => 30,
                                 _ => throw new ArgumentOutOfRangeException(nameof(size), size, null)
                             },
-                            weight: size == ValueSize.Small ? FontWeight.Light : FontWeight.Regular
+                            weight: size == ValueSize.Large ? FontWeight.Regular : FontWeight.Light
                         ),
                     },
                     new Container // Add a minimum size to the FillFlowContainer

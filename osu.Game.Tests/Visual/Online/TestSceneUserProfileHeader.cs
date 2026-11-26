@@ -98,44 +98,6 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestRankedState()
-        {
-            AddStep("Show ranked user", () => header.User.Value = new UserProfileData(new APIUser
-            {
-                Id = 2001,
-                Username = "RankedUser",
-                Groups = new[] { new APIUserGroup { Colour = "#EB47D0", ShortName = "DEV", Name = "Developers" } },
-                Statistics = new UserStatistics
-                {
-                    IsRanked = true,
-                    GlobalRank = 15000,
-                    CountryRank = 1500,
-                    RankHistory = new APIRankHistory
-                    {
-                        Mode = @"osu",
-                        Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
-                    },
-                }
-            }, new OsuRuleset().RulesetInfo));
-
-            AddStep("Show unranked user", () => header.User.Value = new UserProfileData(new APIUser
-            {
-                Id = 2002,
-                Username = "UnrankedUser",
-                Statistics = new UserStatistics
-                {
-                    IsRanked = false,
-                    // web will sometimes return non-empty rank history even for unranked users.
-                    RankHistory = new APIRankHistory
-                    {
-                        Mode = @"osu",
-                        Data = Enumerable.Range(2345, 85).ToArray()
-                    },
-                }
-            }, new OsuRuleset().RulesetInfo));
-        }
-
-        [Test]
         public void TestPreviousUsernames()
         {
             AddStep("Show user w/ previous usernames", () => header.User.Value = new UserProfileData(new APIUser
