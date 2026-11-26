@@ -38,13 +38,13 @@ namespace osu.Game.Overlays.Profile
         public MarginPadding GraphPadding
         {
             get => container.Padding;
-            set => container.Padding = value;
+            init => container.Padding = value;
         }
 
         public LocalisableString Placeholder
         {
             get => placeholder.Text;
-            set => placeholder.Text = value;
+            init => placeholder.Text = value;
         }
 
         private readonly Container container;
