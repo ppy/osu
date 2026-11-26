@@ -36,6 +36,9 @@ namespace osu.Game.Graphics.Cursor
 
             private LocalisableString lastContent;
 
+            [Resolved]
+            private OsuColour colour { get; set; } = null!;
+
             public override void SetContent(LocalisableString content)
             {
                 if (content.Equals(lastContent))
@@ -46,7 +49,7 @@ namespace osu.Game.Graphics.Cursor
                 if (IsPresent)
                 {
                     AutoSizeDuration = 250;
-                    background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
+                    background.FlashColour(colour.Gray3, 1000, Easing.OutQuint);
                 }
                 else
                     AutoSizeDuration = 0;
@@ -56,14 +59,14 @@ namespace osu.Game.Graphics.Cursor
 
             public OsuTooltip()
             {
-                AutoSizeEasing = Easing.OutQuint;
+                AutoSizeEasing = Easing.OutPow10;
 
                 CornerRadius = 5;
                 Masking = true;
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(40),
+                    Colour = Color4.Black.Opacity(0.15f),
                     Radius = 5,
                 };
                 Children = new Drawable[]
@@ -75,10 +78,11 @@ namespace osu.Game.Graphics.Cursor
                     },
                     text = new TextFlowContainer(f =>
                     {
-                        f.Font = OsuFont.GetFont(weight: FontWeight.Regular);
+                        f.Font = OsuFont.Style.Caption1;
                     })
                     {
                         Margin = new MarginPadding(5),
+                        ParagraphSpacing = -0.1f,
                         AutoSizeAxes = Axes.Both,
                         MaximumSize = new Vector2(max_width, float.PositiveInfinity),
                     }
@@ -86,9 +90,9 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colour)
+            private void load()
             {
-                background.Colour = colour.Gray3;
+                background.Colour = colour.Gray2;
             }
 
             protected override void PopIn()

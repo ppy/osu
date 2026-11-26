@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [
             "Hello!!",
             string.Concat(Enumerable.Repeat("Hello ", 100)),
+            "Hello!\nI have multiple\nlines",
 
             //TODO: o!f issue: https://github.com/ppy/osu-framework/issues/5007
             //Enable after o!f fixed
