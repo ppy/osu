@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return tooltip != null && tooltip.Alpha == 1;
             });
 
-            AddAssert("Check tooltip is under width limit", () => tooltip != null && tooltip.Width <= 500);
+            AddAssert("Check tooltip is under width limit", () => tooltip?.Width, () => Is.LessThanOrEqualTo(OsuTooltipContainer.OsuTooltip.MAX_WIDTH));
         }
 
         internal sealed partial class TestTooltipContainer : Container, IHasTooltip

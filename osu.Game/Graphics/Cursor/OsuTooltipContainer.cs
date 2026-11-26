@@ -28,7 +28,8 @@ namespace osu.Game.Graphics.Cursor
 
         public partial class OsuTooltip : Tooltip
         {
-            private const float max_width = 500;
+            public const float MAX_WIDTH = 500;
+            private const float padding = 5;
 
             private readonly Box background;
             private readonly TextFlowContainer text;
@@ -81,10 +82,10 @@ namespace osu.Game.Graphics.Cursor
                         f.Font = OsuFont.Style.Caption1;
                     })
                     {
-                        Margin = new MarginPadding(5),
+                        Margin = new MarginPadding(padding),
                         ParagraphSpacing = -0.1f,
                         AutoSizeAxes = Axes.Both,
-                        MaximumSize = new Vector2(max_width, float.PositiveInfinity),
+                        MaximumSize = new Vector2(MAX_WIDTH - 2 * padding, float.PositiveInfinity),
                     }
                 };
             }
