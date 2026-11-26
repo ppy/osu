@@ -101,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio)
+        private void load(RulesetStore rulesets, BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio, IDialogOverlay? dialogOverlay)
         {
             const float horizontal_info_size = 500f;
 
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             if (config.Get<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps))
             {
                 if (!beatmapManager.IsAvailableLocally(beatmap))
-                    beatmapDownloader.Download(beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo));
+                    beatmapDownloader.DownloadWithSafeties(beatmap.BeatmapSet!, config.Get<bool>(OsuSetting.PreferNoVideo), beatmapManager, dialogOverlay);
             }
 
             dateWindupSample = audio.Samples.Get(@"DailyChallenge/date-windup");

@@ -4,6 +4,8 @@
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
 {
@@ -15,7 +17,30 @@ namespace osu.Game.Beatmaps
         public override ArchiveDownloadRequest<IBeatmapSetInfo>? GetExistingDownload(IBeatmapSetInfo model)
             => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
 
-        public bool Download(IBeatmapSetInfo model, bool withoutVideo) => Download(model, withoutVideo, null);
+        public void DownloadWithSafeties(IBeatmapSetInfo model, bool withoutVideo, BeatmapManager beatmapManager, IDialogOverlay? dialogOverlay = null)
+        {
+            if (dialogOverlay != null)
+            {
+                BeatmapSetInfo? localModel = model as BeatmapSetInfo ?? beatmapManager.QueryBeatmapSet(s => s.OnlineID == model.OnlineID)?.Value;
+
+                if (localModel?.Status == BeatmapOnlineStatus.LocallyModified)
+                {
+                    dialogOverlay.Push(new UpdateLocalConfirmationDialog(() =>
+                    {
+                        DownloadAsUpdate(localModel, withoutVideo);
+                    }));
+
+                    return;
+                }
+            }
+
+            Download(model, withoutVideo, null);
+        }
+
+        public void Download(IBeatmapSetInfo model, bool withoutVideo)
+        {
+            Download(model, withoutVideo, null);
+        }
 
         public void DownloadAsUpdate(BeatmapSetInfo originalModel, bool withoutVideo) => Download(originalModel, withoutVideo, originalModel);
 

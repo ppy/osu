@@ -11,6 +11,7 @@ using osu.Game.Configuration;
 using osu.Game.IO.Archives;
 using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 using Realms;
@@ -37,6 +38,12 @@ namespace osu.Game.Database
         private BeatmapCardNano card = null!;
 
         private IDisposable? realmSubscription;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         /// <summary>
         /// Creates a new notification about a missing beatmap that needs to be downloaded to proceed with an action.
@@ -71,7 +78,7 @@ namespace osu.Game.Database
             if (autoDownloadConfig.Value)
             {
                 Text = NotificationsStrings.DownloadingBeatmapForReplay;
-                beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
+                beatmapDownloader.DownloadWithSafeties(beatmapSetInfo, noVideoSetting.Value, beatmapManager, dialogOverlay);
             }
             else
             {

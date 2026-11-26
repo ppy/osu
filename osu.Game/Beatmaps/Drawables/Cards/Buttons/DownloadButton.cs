@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Configuration;
 using osu.Game.Online;
+using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
@@ -22,7 +23,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         private Bindable<bool> preferNoVideo = null!;
 
         [Resolved]
-        private BeatmapModelDownloader beatmaps { get; set; } = null!;
+        private BeatmapModelDownloader downloader { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         public DownloadButton(APIBeatmapSet beatmapSet)
         {
@@ -74,7 +81,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                         return;
                     }
 
-                    Action = () => beatmaps.Download(beatmapSet, preferNoVideo.Value);
+                    Action = () => downloader.DownloadWithSafeties(beatmapSet, preferNoVideo.Value, beatmapManager, dialogOverlay);
                     this.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
                     SetLoading(false);
 

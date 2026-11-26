@@ -13,6 +13,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 {
@@ -23,6 +24,9 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; } = null!;
+
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
@@ -90,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     if (beatmapSet == null)
                         return;
 
-                    beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
+                    beatmapDownloader.DownloadWithSafeties(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo), beatmapManager, dialogOverlay);
                 }));
         }
 

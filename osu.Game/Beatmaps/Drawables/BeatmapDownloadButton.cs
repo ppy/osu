@@ -4,6 +4,7 @@
 #nullable disable
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
 
@@ -68,7 +70,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapModelDownloader beatmaps, OsuConfigManager osuConfig)
+        private void load(OsuGame game, BeatmapModelDownloader downloader, OsuConfigManager osuConfig, BeatmapManager beatmaps, [CanBeNull] IDialogOverlay dialogOverlay)
         {
             noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
@@ -90,7 +92,7 @@ namespace osu.Game.Beatmaps.Drawables
                         break;
 
                     default:
-                        beatmaps.Download(beatmapSet, noVideoSetting.Value);
+                        downloader.DownloadWithSafeties(beatmapSet, noVideoSetting.Value, beatmaps, dialogOverlay);
                         break;
                 }
             };

@@ -48,6 +48,9 @@ namespace osu.Game.Screens.Play
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        [Resolved]
+        private IDialogOverlay? dialogOverlay { get; set; }
+
         private Container beatmapPanelContainer = null!;
         private RoundedButton watchButton = null!;
         private SettingsCheckbox automaticDownload = null!;
@@ -271,7 +274,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(beatmap))
                 return;
 
-            beatmapDownloader.Download(beatmap.BeatmapSet, preferNoVideo.Value);
+            beatmapDownloader.DownloadWithSafeties(beatmap.BeatmapSet, preferNoVideo.Value, beatmaps, dialogOverlay);
         }
 
         public override bool OnExiting(ScreenExitEvent e)
