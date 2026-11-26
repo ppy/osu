@@ -92,14 +92,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     case DownloadState.NotDownloaded:
                         if (!BeatmapSet.Availability.DownloadDisabled)
-                        {
-                            BeatmapModelDownloader tempQualifier = downloader;
-
-                            if (tempQualifier != null)
-                            {
-                                tempQualifier.Download(BeatmapSet, preferNoVideo.Value, dialogOverlay);
-                            }
-                        }
+                            downloader?.Download(BeatmapSet, preferNoVideo.Value, dialogOverlay);
 
                         break;
 
