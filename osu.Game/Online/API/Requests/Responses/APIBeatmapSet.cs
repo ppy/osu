@@ -160,6 +160,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"related_tags")]
         public APITag[]? RelatedTags { get; set; }
 
+        /// <summary>
+        /// The offset in milliseconds applied to all beatmaps in the set via the website.
+        /// </summary>
+        [JsonProperty(@"offset")]
+        public short OnlineOffset { get; set; }
+
         private BeatmapMetadata metadata => new BeatmapMetadata
         {
             Title = Title,
