@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
         {
             Footnotes = true,
             CustomContainers = true,
-            BlockAttributes = true
+            GenericAttributes = true
         };
 
         public string CurrentPath

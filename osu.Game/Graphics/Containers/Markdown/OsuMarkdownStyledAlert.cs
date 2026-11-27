@@ -165,7 +165,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             public bool BlockTitle { get; set; }
             public Func<bool>? FoundAlertTitle { get; set; }
 
-            protected override void AddEmphasis(string text, bool hasBold, bool hasItalic)
+            public override void AddEmphasis(string text, bool hasBold, bool hasItalic)
             {
                 if (hasBold && FoundAlertTitle?.Invoke() == false)
                 {
