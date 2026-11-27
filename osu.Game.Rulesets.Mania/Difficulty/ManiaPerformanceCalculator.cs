@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
+        protected override PerformanceAttributes CreatePerformanceAttributes(IScoreInfo score, Mod[] mods, DifficultyAttributes attributes)
         {
             var maniaAttributes = (ManiaDifficultyAttributes)attributes;
 
@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double multiplier = 1.0;
 
-            if (score.Mods.Any(m => m is ModNoFail))
+            if (mods.Any(m => m is ModNoFail))
                 multiplier *= 0.75;
-            if (score.Mods.Any(m => m is ModEasy))
+            if (mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
             double difficultyValue = computeDifficultyValue(maniaAttributes);
