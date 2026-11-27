@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -19,7 +20,7 @@ namespace osu.Game.Beatmaps
     /// A clock intended to be the single source-of-truth for beatmap timing.
     ///
     /// It provides some functionality:
-    ///  - Optionally applies (and tracks changes of) beatmap, user, and platform offsets (see ctor argument applyOffsets).
+    ///  - Optionally applies (and tracks changes of) online, beatmap, user, and platform offsets (see ctor argument applyOffsets).
     ///  - Adjusts <see cref="Seek"/> operations to account for any applied offsets, seeking in raw "beatmap" time values.
     ///  - Exposes track length.
     ///  - Allows changing the source to a new track (for cases like editor track updating).
@@ -28,8 +29,9 @@ namespace osu.Game.Beatmaps
     {
         private readonly bool applyOffsets;
 
-        private readonly OffsetCorrectionClock? userGlobalOffsetClock;
         private readonly OffsetCorrectionClock? platformOffsetClock;
+        private readonly OffsetCorrectionClock? onlineOffsetClock;
+        private readonly OffsetCorrectionClock? userGlobalOffsetClock;
         private readonly FramedOffsetClock? userBeatmapOffsetClock;
 
         private readonly IFrameBasedClock finalClockSource;
@@ -84,8 +86,10 @@ namespace osu.Game.Beatmaps
             {
                 platformOffsetClock = new OffsetCorrectionClock(interpolatedTrack);
 
+                onlineOffsetClock = new OffsetCorrectionClock(platformOffsetClock);
+
                 // User global offset (set in settings) should also be applied.
-                userGlobalOffsetClock = new OffsetCorrectionClock(platformOffsetClock);
+                userGlobalOffsetClock = new OffsetCorrectionClock(onlineOffsetClock);
 
                 // User per-beatmap offset will be applied to this final clock.
                 finalClockSource = userBeatmapOffsetClock = new FramedOffsetClock(userGlobalOffsetClock);
@@ -103,6 +107,7 @@ namespace osu.Game.Beatmaps
             if (applyOffsets)
             {
                 Debug.Assert(userBeatmapOffsetClock != null);
+                Debug.Assert(onlineOffsetClock != null);
                 Debug.Assert(userGlobalOffsetClock != null);
 
                 userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
@@ -112,12 +117,18 @@ namespace osu.Game.Beatmaps
                 experimentalAudio.BindValueChanged(_ => updatePlatformOffset(), true);
 
                 // TODO: this doesn't update when using ChangeSource() to change beatmap.
-                beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
-                    r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
-                    settings => settings.Offset,
-                    val =>
+                beatmapOffsetSubscription = realm.RegisterForNotifications(
+                    r => r.All<BeatmapInfo>().Where(b => b.ID == beatmap.Value.BeatmapInfo.ID),
+                    (result, _) =>
                     {
-                        userBeatmapOffsetClock.Offset = val;
+                        var beatmapInfo = result.SingleOrDefault();
+
+                        // for reasoning behind minus sign, see https://github.com/peppy/osu-stable-reference/blob/fa1197b286f491fbb80653332234675acd705b67/osu!/Audio/AudioEngine.cs#L825-L836
+                        // the minus sign isn't applied to the user offset because in that case directionality is arbitrary,
+                        // doesn't need to match across clients, and changing it would break existing user settings
+                        onlineOffsetClock.Offset = -beatmapInfo?.BeatmapSet?.OnlineOffset ?? 0;
+
+                        userBeatmapOffsetClock.Offset = beatmapInfo?.UserSettings.Offset ?? 0;
                     });
             }
 
@@ -180,9 +191,10 @@ namespace osu.Game.Beatmaps
 
                 Debug.Assert(userGlobalOffsetClock != null);
                 Debug.Assert(userBeatmapOffsetClock != null);
+                Debug.Assert(onlineOffsetClock != null);
                 Debug.Assert(platformOffsetClock != null);
 
-                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.Offset + platformOffsetClock.RateAdjustedOffset;
+                return userGlobalOffsetClock.RateAdjustedOffset + userBeatmapOffsetClock.Offset + onlineOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
             }
         }
 
@@ -262,8 +274,9 @@ namespace osu.Game.Beatmaps
         {
             return
                 $"originalSource: {output(Source)}\n" +
-                $"userGlobalOffsetClock: {output(userGlobalOffsetClock)}\n" +
                 $"platformOffsetClock: {output(platformOffsetClock)}\n" +
+                $"onlineOffsetClock: {output(onlineOffsetClock)}\n" +
+                $"userGlobalOffsetClock: {output(userGlobalOffsetClock)}\n" +
                 $"userBeatmapOffsetClock: {output(userBeatmapOffsetClock)}\n" +
                 $"interpolatedTrack: {output(interpolatedTrack)}\n" +
                 $"decoupledTrack: {output(decoupledTrack)}\n" +
