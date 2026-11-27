@@ -300,6 +300,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("daily_challenge_user_stats")]
         public APIUserDailyChallengeStatistics DailyChallengeStatistics = new APIUserDailyChallengeStatistics();
 
+        [JsonProperty("current_season_stats")]
+        [CanBeNull]
+        public APISeasonStatistics CurrentSeasonStatistics;
+
         [JsonProperty("matchmaking_stats")]
         public APIUserMatchmakingStatistics[] MatchmakingStatistics = [];
 
