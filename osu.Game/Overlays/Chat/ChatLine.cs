@@ -53,6 +53,8 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float UsernameWidth => 150;
 
+        protected bool UsernameIsClickable { get; init; } = true;
+
         [Resolved]
         private Bindable<Channel?>? currentChannel { get; set; }
 
@@ -204,6 +206,8 @@ namespace osu.Game.Overlays.Chat
                                 Margin = new MarginPadding { Horizontal = Spacing },
                                 AccentColour = UsernameColour ?? colourProvider?.Content2 ?? Colour4.White,
                                 Inverted = !string.IsNullOrEmpty(message.Sender.Colour),
+                                Enabled = { Value = UsernameIsClickable },
+                                MuteSounds = { Value = !UsernameIsClickable },
                             },
                             drawableContentFlow = new LinkFlowContainer(styleMessageContent)
                             {
