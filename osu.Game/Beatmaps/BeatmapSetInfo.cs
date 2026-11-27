@@ -63,6 +63,11 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public bool Protected { get; set; }
 
+        /// <summary>
+        /// The offset in milliseconds applied to all beatmaps in the set via the website.
+        /// </summary>
+        public short OnlineOffset { get; set; }
+
         public double MaxStarDifficulty => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.StarRating);
 
         public double MaxLength => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.Length);

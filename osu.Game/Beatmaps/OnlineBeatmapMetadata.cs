@@ -63,5 +63,10 @@ namespace osu.Game.Beatmaps
         /// The list of tags that users have assigned to this beatmap.
         /// </summary>
         public List<string> UserTags { get; } = [];
+
+        /// <summary>
+        /// The offset in milliseconds applied to all beatmaps in the set via the website.
+        /// </summary>
+        public short OnlineOffset { get; init; }
     }
 }

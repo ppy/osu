@@ -104,12 +104,12 @@ namespace osu.Game.Beatmaps
 
                     switch (getCacheVersion(db))
                     {
-                        case 2:
-                            // can be removed 20260123
-                            return queryCacheVersion2(db, beatmapInfo, out onlineMetadata);
-
+                        // can be removed 20270527
                         case 3:
                             return queryCacheVersion3(db, beatmapInfo, out onlineMetadata);
+
+                        case 4:
+                            return queryCacheVersion4(db, beatmapInfo, out onlineMetadata);
                     }
                 }
 
@@ -302,52 +302,6 @@ namespace osu.Game.Beatmaps
             return file.LastWriteTime;
         }
 
-        private bool queryCacheVersion2(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
-        {
-            Debug.Assert(beatmapInfo.BeatmapSet != null);
-
-            using var cmd = db.CreateCommand();
-
-            cmd.CommandText =
-                """
-                SELECT `b`.`beatmapset_id`, `b`.`beatmap_id`, `b`.`approved`, `b`.`user_id`, `b`.`checksum`, `b`.`last_update`, `s`.`submit_date`, `s`.`approved_date`
-                FROM `osu_beatmaps` AS `b`
-                JOIN `osu_beatmapsets` AS `s` ON `s`.`beatmapset_id` = `b`.`beatmapset_id`
-                WHERE (`b`.`checksum` = @MD5Hash OR `b`.`filename` = @Path)
-                AND `b`.`approved` in (1, 2, 4)
-                """;
-            // approved conditional can theoretically be removed as it was fixed in
-            // https://github.com/ppy/osu-onlinedb-generator/commit/489ac000775c3ff63bc914efb83cad0f6fbde261
-            // but it's also safe to leave it (should not affect performance).
-
-            cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
-            cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
-
-            using var reader = cmd.ExecuteReader();
-
-            if (reader.Read())
-            {
-                logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} (cache version 2).");
-
-                onlineMetadata = new OnlineBeatmapMetadata
-                {
-                    BeatmapSetID = reader.GetInt32(0),
-                    BeatmapID = reader.GetInt32(1),
-                    BeatmapStatus = (BeatmapOnlineStatus)reader.GetByte(2),
-                    BeatmapSetStatus = (BeatmapOnlineStatus)reader.GetByte(2),
-                    AuthorID = reader.GetInt32(3),
-                    MD5Hash = reader.GetString(4),
-                    LastUpdated = reader.GetDateTimeOffset(5),
-                    DateSubmitted = reader.GetDateTimeOffset(6),
-                    DateRanked = reader.GetDateTimeOffset(7),
-                };
-                return true;
-            }
-
-            onlineMetadata = null;
-            return false;
-        }
-
         private bool queryCacheVersion3(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
         {
             Debug.Assert(beatmapInfo.BeatmapSet != null);
@@ -386,6 +340,64 @@ namespace osu.Game.Beatmaps
                         LastUpdated = reader.GetDateTimeOffset(5),
                         DateSubmitted = reader.GetDateTimeOffset(6),
                         DateRanked = reader.GetDateTimeOffset(7),
+                    };
+                }
+            }
+
+            using (var tagsCommand = db.CreateCommand())
+            {
+                tagsCommand.CommandText = "SELECT `name` FROM `tags` WHERE `id` IN (SELECT `tag_id` FROM `beatmap_tags` WHERE `beatmap_id` = @BeatmapID)";
+                tagsCommand.Parameters.Add(new SqliteParameter(@"@BeatmapID", onlineMetadata.BeatmapID));
+
+                using (var tagsReader = tagsCommand.ExecuteReader())
+                {
+                    while (tagsReader.Read())
+                        onlineMetadata.UserTags.Add(tagsReader.GetString(0));
+                }
+            }
+
+            return true;
+        }
+
+        private bool queryCacheVersion4(SqliteConnection db, BeatmapInfo beatmapInfo, out OnlineBeatmapMetadata? onlineMetadata)
+        {
+            Debug.Assert(beatmapInfo.BeatmapSet != null);
+
+            using (var cmd = db.CreateCommand())
+            {
+                cmd.CommandText =
+                    """
+                    SELECT `b`.`beatmapset_id`, `b`.`beatmap_id`, `b`.`approved`, `b`.`user_id`, `b`.`checksum`, `b`.`last_update`, `s`.`submit_date`, `s`.`approved_date`, `s`.`offset`
+                    FROM `osu_beatmaps` AS `b`
+                    JOIN `osu_beatmapsets` AS `s` ON `s`.`beatmapset_id` = `b`.`beatmapset_id`
+                    WHERE (`b`.`checksum` = @MD5Hash OR `b`.`filename` = @Path)
+                    """;
+
+                cmd.Parameters.Add(new SqliteParameter(@"@MD5Hash", beatmapInfo.MD5Hash));
+                cmd.Parameters.Add(new SqliteParameter(@"@Path", beatmapInfo.Path));
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (!reader.Read())
+                    {
+                        onlineMetadata = null;
+                        return false;
+                    }
+
+                    logForModel(beatmapInfo.BeatmapSet, $@"Cached local retrieval for {beatmapInfo} (cache version 3).");
+
+                    onlineMetadata = new OnlineBeatmapMetadata
+                    {
+                        BeatmapSetID = reader.GetInt32(0),
+                        BeatmapID = reader.GetInt32(1),
+                        BeatmapStatus = (BeatmapOnlineStatus)reader.GetByte(2),
+                        BeatmapSetStatus = (BeatmapOnlineStatus)reader.GetByte(2),
+                        AuthorID = reader.GetInt32(3),
+                        MD5Hash = reader.GetString(4),
+                        LastUpdated = reader.GetDateTimeOffset(5),
+                        DateSubmitted = reader.GetDateTimeOffset(6),
+                        DateRanked = reader.GetDateTimeOffset(7),
+                        OnlineOffset = reader.GetInt16(8),
                     };
                 }
             }

@@ -102,8 +102,9 @@ namespace osu.Game.Database
         /// 50   2025-07-11    Add UserTags to BeatmapMetadata.
         /// 51   2025-07-22    Add ScoreInfo.Pauses.
         /// 52   2026-07-28    Add RealmOnlineAsset.
+        /// 53   2026-11-27    Add BeatmapSetInfo.OnlineOffset.
         /// </summary>
-        private const int schema_version = 52;
+        private const int schema_version = 53;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
