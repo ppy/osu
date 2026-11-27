@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public partial class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
+    public partial class RankingsOverlayHeader : PagedTabControlOverlayHeader<RankingsScope>
     {
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
