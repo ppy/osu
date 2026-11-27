@@ -148,6 +148,11 @@ namespace osu.Game.Skinning
 
             switch (maniaLookup.Lookup)
             {
+                case LegacyManiaSkinConfigurationLookups.ColumnStart:
+                    if (existing.ColumnStart == null) return null;
+
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnStart.Value));
+
                 case LegacyManiaSkinConfigurationLookups.ColumnWidth:
                     Debug.Assert(maniaLookup.ColumnIndex != null);
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.ColumnWidth[maniaLookup.ColumnIndex.Value]));
@@ -405,7 +410,7 @@ namespace osu.Game.Skinning
                                         combo.Origin = Anchor.BottomLeft;
                                         combo.Scale = new Vector2(1.28f);
 
-                                        pos += new Vector2(10, -(combo.DrawHeight * 1.56f + 20) * combo.Scale.X);
+                                        pos += new Vector2(10, -((combo.DrawHeight * 1.56f) + 20) * combo.Scale.X);
                                     }
 
                                     if (spectatorList != null)
@@ -591,7 +596,7 @@ namespace osu.Game.Skinning
                     if (getJudgementAnimation(resultComponent.Component) != null)
                     {
                         // TODO: this should be inside the judgement pieces.
-                        Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component).AsNonNull();
+                        Drawable createDrawable() => getJudgementAnimation(resultComponent.Component).AsNonNull();
 
                         var particle = getParticleTexture(resultComponent.Component);
 
@@ -698,7 +703,9 @@ namespace osu.Game.Skinning
             IEnumerable<string> lookupNames;
 
             if (sampleInfo is HitSampleInfo hitSample)
+            {
                 lookupNames = getLegacyLookupNames(hitSample);
+            }
             else
             {
                 lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackSampleNames);
