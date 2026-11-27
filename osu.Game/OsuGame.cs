@@ -1079,7 +1079,7 @@ namespace osu.Game
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First().Value);
 
             BeatmapDownloader.PresentDialog = d => dialogOverlay.Push(d);
-            LocalConfig.BindWith(OsuSetting.PreferNoVideo, BeatmapDownloader.MinimiseDownloadSize);
+            LocalConfig.BindWith(OsuSetting.PreferNoVideo, BeatmapDownloader.PreferNoVideo);
 
             BeatmapDownloader.PostNotification = n => Notifications.Post(n);
             ScoreDownloader.PostNotification = n => Notifications.Post(n);

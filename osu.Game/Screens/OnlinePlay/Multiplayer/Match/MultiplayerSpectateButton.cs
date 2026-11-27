@@ -55,13 +55,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             void endOperation() => clickOperation.Dispose();
         }
 
-        private Bindable<bool> preferNoVideo = null!;
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
-
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
             operationInProgress.BindValueChanged(_ => updateState());
 

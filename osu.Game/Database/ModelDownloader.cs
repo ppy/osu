@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Humanizer;
-using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
@@ -24,8 +23,6 @@ namespace osu.Game.Database
         public Action<Notification>? PostNotification { protected get; set; }
 
         public Action<PopupDialog>? PresentDialog { protected get; set; }
-
-        public readonly Bindable<bool> MinimiseDownloadSize = new Bindable<bool>();
 
         public event Action<ArchiveDownloadRequest<T>>? DownloadBegan;
 

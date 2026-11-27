@@ -117,7 +117,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
 
             protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set)
-                => new BundledBeatmapDownloadRequest(set, MinimiseDownloadSize.Value);
+                => new BundledBeatmapDownloadRequest(set, PreferNoVideo.Value);
 
             public class BundledBeatmapDownloadRequest : DownloadBeatmapSetRequest
             {
