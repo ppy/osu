@@ -41,5 +41,10 @@ namespace osu.Game.Beatmaps
         /// The maximum BPM of all beatmaps in this set.
         /// </summary>
         double MaxBPM { get; }
+
+        /// <summary>
+        /// The offset in milliseconds applied to all beatmaps in the set via the website.
+        /// </summary>
+        short OnlineOffset { get; }
     }
 }

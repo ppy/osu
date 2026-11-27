@@ -68,6 +68,9 @@ namespace osu.Game.Overlays.BeatmapSet
             else
             {
                 bpm.Value = beatmapInfo.BPM.ToLocalisableString(@"0.##");
+                bpm.TooltipText = beatmapSet != null && beatmapSet.OnlineOffset != 0
+                    ? LocalisableString.Interpolate($@"{BeatmapsetsStrings.ShowStatsBpm} ({BeatmapsetsStrings.ShowStatsOffset(beatmapSet!.OnlineOffset.ToString(@"N0"))})")
+                    : BeatmapsetsStrings.ShowStatsBpm;
 
                 length.Value = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToFormattedDuration();
 
@@ -96,7 +99,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     bpm = new Statistic(BeatmapStatisticsIconType.Bpm)
                     {
                         Width = 0.25f,
-                        TooltipText = BeatmapsetsStrings.ShowStatsBpm
                     },
                     circleCount = new Statistic(BeatmapStatisticsIconType.Circles)
                     {
