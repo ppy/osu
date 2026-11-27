@@ -86,6 +86,9 @@ namespace osu.Game.Screens.Select
                 if (dbBeatmapSet.Status != onlineBeatmapSet.Status && dbBeatmapSet.Status != BeatmapOnlineStatus.LocallyModified)
                     dbBeatmapSet.Status = onlineBeatmapSet.Status;
 
+                if (dbBeatmapSet.OnlineOffset != onlineBeatmapSet.OnlineOffset)
+                    dbBeatmapSet.OnlineOffset = onlineBeatmapSet.OnlineOffset;
+
                 foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
                 {
                     if (onlineBeatmaps.TryGetValue(dbBeatmap.OnlineID, out var onlineBeatmap))
