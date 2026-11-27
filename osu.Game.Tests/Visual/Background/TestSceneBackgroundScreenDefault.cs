@@ -248,6 +248,19 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [Test]
+        public void TestBackgroundScalingModeSwitch()
+        {
+            setSupporter(true);
+            setSourceMode(BackgroundSource.Beatmap);
+
+            setScalingMode(BackgroundScalingMode.ScaleToFill);
+            AddUntilStep("sprite fill mode changed to fill", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fill);
+
+            setScalingMode(BackgroundScalingMode.ScaleToFit);
+            AddUntilStep("sprite fill mode changed to fit", () => getCurrentBackground()?.Sprite.FillMode == FillMode.Fit);
+        }
+
+        [Test]
         public void TestTogglingSupporterTogglesBeatmapBackground()
         {
             setSourceMode(BackgroundSource.Beatmap);
@@ -289,6 +302,9 @@ namespace osu.Game.Tests.Visual.Background
 
         private void setSourceMode(BackgroundSource source) =>
             AddStep($"set background mode to {source}", () => config.SetValue(OsuSetting.MenuBackgroundSource, source));
+
+        private void setScalingMode(BackgroundScalingMode scalingMode) =>
+            AddStep($"set background scaling mode to {scalingMode}", () => config.SetValue(OsuSetting.BackgroundScalingMode, scalingMode));
 
         private void setSupporter(bool isSupporter) =>
             AddStep($"set supporter {isSupporter}", () => ((DummyAPIAccess)API).LocalUser.Value = new APIUser
