@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
 using osu.Game.Localisation.Mania;
+using osu.Game.Online.Placeholders;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
@@ -41,6 +42,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Screens.RankingV2.Extended;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -446,6 +448,41 @@ namespace osu.Game.Rulesets.Mania
                 }
             }, true)
         };
+
+        public override ExtendedRankingRulesetContent CreateStatisticsForResults(IScoreInfo score, IBeatmap playableBeatmap)
+        {
+            IEnumerable<Drawable> leftColumn()
+            {
+                if (score is IScoreWithReplayData scoreWithReplayData)
+                    yield return new TimingStatisticsPanel(scoreWithReplayData);
+
+                // TODO: performance breakdown
+            }
+
+            IEnumerable<Drawable> rightColumn()
+            {
+                if (score is not IScoreWithReplayData scoreWithReplayData || scoreWithReplayData.HitEvents.Count == 0)
+                {
+                    yield return new MessagePlaceholder(ResultsScreenStrings.NoReplayDataPlaceholder);
+
+                    yield break;
+                }
+
+                yield return new StatisticItemPanel("Timing Distribution")
+                {
+                    Child = new HitEventTimingDistributionGraph(scoreWithReplayData.HitEvents)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 200,
+                    },
+                };
+                // TODO: health graph
+            }
+
+            return new ExtendedRankingRulesetContent(
+                LeftColumn: leftColumn,
+                RightColumn: rightColumn);
+        }
 
         /// <seealso cref="ManiaHitWindows"/>
         public override BeatmapDifficulty GetAdjustedDisplayDifficulty(IBeatmapInfo beatmapInfo, IReadOnlyCollection<Mod> mods)

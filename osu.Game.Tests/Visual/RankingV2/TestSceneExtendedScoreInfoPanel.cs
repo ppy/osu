@@ -3,14 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -25,11 +29,18 @@ using osu.Game.Scoring;
 using osu.Game.Screens.RankingV2.Extended;
 using osu.Game.Tests.Visual.Ranking;
 using osu.Game.Users;
+using Realms;
 
 namespace osu.Game.Tests.Visual.RankingV2
 {
     public partial class TestSceneExtendedScoreInfoPanel : OsuTestScene
     {
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
         [Cached(typeof(IBindable<IScoreInfo>))]
         private readonly Bindable<IScoreInfo> score = new Bindable<IScoreInfo>();
 
@@ -41,10 +52,28 @@ namespace osu.Game.Tests.Visual.RankingV2
 
         private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
 
+        private ScoreInfoPanel panel = null!;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager configManager)
         {
             configManager.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
+            Dependencies.Cache(Realm);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            realm.Run(r =>
+            {
+                var beatmapInfo = r.All<BeatmapInfo>()
+                                   .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0 AND {nameof(BeatmapInfo.StatusInt)} = 1", 0)
+                                   .FirstOrDefault();
+
+                if (beatmapInfo != null)
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+            });
         }
 
         [SetUpSteps]
@@ -61,7 +90,7 @@ namespace osu.Game.Tests.Visual.RankingV2
                 Origin = Anchor.Centre,
                 Children =
                 [
-                    new ScoreInfoPanel()
+                    panel = new ScoreInfoPanel()
                 ],
             });
         }
@@ -73,7 +102,15 @@ namespace osu.Game.Tests.Visual.RankingV2
             {
                 scoringMode.Value = b ? ScoringMode.Classic : ScoringMode.Standardised;
             });
-            AddStep("osu! ruleset", () => setScore(new OsuRuleset().RulesetInfo));
+            AddToggleStep("toggle global statistics", b =>
+            {
+                if (panel.IsNotNull())
+                    panel.ShowGlobalStatistics.Value = b;
+            });
+            AddStep("osu! ruleset", () => setScore(new OsuRuleset().RulesetInfo, s =>
+            {
+                s.HitEvents = TestSceneStatisticsPanel.CreatePositionDistributedHitEvents();
+            }));
             AddStep("taiko ruleset", () => setScore(new TaikoRuleset().RulesetInfo, s =>
             {
                 s.Statistics = new Dictionary<HitResult, int>
@@ -126,6 +163,7 @@ namespace osu.Game.Tests.Visual.RankingV2
                 };
             }));
 
+            AddStep("no hit events", () => setScore(new OsuRuleset().RulesetInfo, s => s.HitEvents = []));
             AddStep("no mods", () => setScore(new OsuRuleset().RulesetInfo, s => s.Mods = []));
             AddStep("mods with settings", () => setScore(new OsuRuleset().RulesetInfo, s => s.Mods = new Mod[]
             {
@@ -140,7 +178,7 @@ namespace osu.Game.Tests.Visual.RankingV2
                 new OsuModFlashlight(),
                 new OsuModStrictTracking(),
                 new OsuModSpunOut(),
-                new OsuModRandom(),
+                new OsuModRandom { Seed = { Value = 1337 } },
                 new OsuModSingleTap(),
                 new OsuModBubbles(),
                 new OsuModDeflate(),

@@ -31,6 +31,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Screens.RankingV2.Extended;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using osuTK;
@@ -367,6 +368,9 @@ namespace osu.Game.Rulesets
         /// <param name="playableBeatmap">The <see cref="IBeatmap"/>, converted for this <see cref="Ruleset"/> with all relevant <see cref="Mod"/>s applied.</param>
         /// <returns>The <see cref="StatisticItem"/>s to display.</returns>
         public virtual StatisticItem[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticItem>();
+
+        public virtual ExtendedRankingRulesetContent CreateStatisticsForResults(IScoreInfo score, IBeatmap playableBeatmap)
+            => new ExtendedRankingRulesetContent(Array.Empty<Drawable>, Array.Empty<Drawable>);
 
         /// <summary>
         /// Get all <see cref="HitResult"/>s for this ruleset which are important enough to displayed to the end user.

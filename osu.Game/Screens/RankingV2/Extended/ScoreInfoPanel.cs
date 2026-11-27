@@ -2,8 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -11,8 +14,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
@@ -30,6 +35,8 @@ namespace osu.Game.Screens.RankingV2.Extended
 {
     public partial class ScoreInfoPanel : CompositeDrawable
     {
+        public BindableBool ShowGlobalStatistics { get; } = new BindableBool(true);
+
         private Sprite rankSprite = null!;
         private OsuSpriteText totalScoreText = null!;
         private FillFlowContainer modsFlow = null!;
@@ -38,8 +45,17 @@ namespace osu.Game.Screens.RankingV2.Extended
         private FillFlowContainer<StatisticValue> basicHitStatisticsFlow = null!;
         private FillFlowContainer<StatisticValue> nonBasicHitStatisticsFlow = null!;
         private FillFlowContainer modMultiplierFlow = null!;
+        private LoadingLayer loadingLayer = null!;
+        private FillFlowContainer leftStatisticsColumn = null!;
+        private FillFlowContainer rightStatisticsColumn = null!;
+        private GlobalStatisticsUpdatePanel globalStatistics = null!;
+
+        private CancellationTokenSource? loadCancellation;
 
         private Bindable<ScoringMode> scoringMode { get; } = new Bindable<ScoringMode>();
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
 
         [Resolved]
         private IBindable<IScoreInfo> score { get; set; } = null!;
@@ -51,7 +67,7 @@ namespace osu.Game.Screens.RankingV2.Extended
         private OsuColour colours { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuConfigManager configManager)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours, OsuConfigManager configManager)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -218,16 +234,16 @@ namespace osu.Game.Screens.RankingV2.Extended
                                     AutoSizeAxes = Axes.Y,
                                     ColumnDimensions =
                                     [
-                                        new Dimension(GridSizeMode.Absolute, 350),
+                                        new Dimension(GridSizeMode.Absolute, 300),
                                         new Dimension(GridSizeMode.Absolute, 10),
                                         new Dimension(),
                                     ],
                                     RowDimensions = [new Dimension(GridSizeMode.AutoSize)],
                                     Content = new[]
                                     {
-                                        new Drawable[]
+                                        new[]
                                         {
-                                            new FillFlowContainer
+                                            leftStatisticsColumn = new FillFlowContainer
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
@@ -235,20 +251,25 @@ namespace osu.Game.Screens.RankingV2.Extended
                                                 Direction = FillDirection.Vertical,
                                                 Children =
                                                 [
-                                                    new GlobalStatisticsUpdatePanel(),
-                                                    new TimingStatisticsPanel(),
+                                                    globalStatistics = new GlobalStatisticsUpdatePanel(),
                                                 ]
                                             },
-                                            new FillFlowContainer
+                                            Empty(),
+                                            rightStatisticsColumn = new FillFlowContainer
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Spacing = new Vector2(10),
+                                                Spacing = new Vector2(0, 10),
                                                 Direction = FillDirection.Full,
                                             },
                                         },
-                                    }
-                                }
+                                    },
+                                },
+                                loadingLayer = new LoadingLayer(dimBackground: true)
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    State = { Value = Visibility.Hidden },
+                                },
                             ]
                         }
                     ],
@@ -263,10 +284,11 @@ namespace osu.Game.Screens.RankingV2.Extended
             base.LoadComplete();
 
             scoringMode.BindValueChanged(_ => updateTotalScore());
-            score.BindValueChanged(_ => updateState(), true);
+            score.BindValueChanged(_ => updateScore(), true);
+            ShowGlobalStatistics.BindValueChanged(val => globalStatistics.Alpha = val.NewValue ? 1 : 0, true);
         }
 
-        private void updateState()
+        private void updateScore()
         {
             rankSprite.Texture = skins.DefaultClassicSkin.GetTexture(DrawableRank.GetLegacyRankTextureName(score.Value.Rank));
             updateTotalScore();
@@ -304,6 +326,58 @@ namespace osu.Game.Screens.RankingV2.Extended
                     Origin = Anchor.BottomRight,
                 });
             }
+
+            loadingLayer.Show();
+
+            loadCancellation?.Cancel();
+            loadCancellation = new CancellationTokenSource();
+            Task.Run(() => beatmap.Value.GetPlayableBeatmap(score.Value.Ruleset, mods), loadCancellation.Token).ContinueWith(task => Schedule(() =>
+            {
+                var playableBeatmap = task.GetResultSafely();
+                var rulesetContent = rulesetInstance.CreateStatisticsForResults(score.Value, playableBeatmap);
+
+                int loadsCompleted = 0;
+
+                var leftStatistics = rulesetContent.LeftColumn.Invoke().ToArray();
+                var rightStatistics = rulesetContent.RightColumn.Invoke().ToArray();
+
+                if (leftStatistics.Length > 0)
+                {
+                    LoadComponentsAsync(leftStatistics, loaded =>
+                    {
+                        leftStatisticsColumn.RemoveAll(r => r is not GlobalStatisticsUpdatePanel, true);
+                        leftStatisticsColumn.AddRange(loaded);
+                        completeLoad();
+                    });
+                }
+                else
+                {
+                    leftStatisticsColumn.RemoveAll(r => r is not GlobalStatisticsUpdatePanel, true);
+                    completeLoad();
+                }
+
+                if (rightStatistics.Length > 0)
+                {
+                    LoadComponentsAsync(rightStatistics, loaded =>
+                    {
+                        rightStatisticsColumn.Clear();
+                        rightStatisticsColumn.AddRange(loaded);
+                        completeLoad();
+                    });
+                }
+                else
+                {
+                    rightStatisticsColumn.Clear();
+                    completeLoad();
+                }
+
+                void completeLoad()
+                {
+                    // ReSharper disable once AccessToModifiedClosure
+                    if (Interlocked.Increment(ref loadsCompleted) == 2)
+                        loadingLayer.Hide();
+                }
+            }), TaskContinuationOptions.OnlyOnRanToCompletion);
 
             ScheduleAfterChildren(() =>
             {

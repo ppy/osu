@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,12 +18,12 @@ namespace osu.Game.Screens.RankingV2.Extended
         private StatisticValue averageHitErrorText = null!;
         private StatisticValue unstableRateText = null!;
 
-        [Resolved]
-        private IBindable<IScoreInfo> score { get; set; } = null!;
+        private readonly IScoreWithReplayData score;
 
-        public TimingStatisticsPanel()
+        public TimingStatisticsPanel(IScoreWithReplayData score)
             : base(ResultsScreenStrings.TimingStatisticsPanelHeader)
         {
+            this.score = score;
         }
 
         [BackgroundDependencyLoader]
@@ -48,24 +47,8 @@ namespace osu.Game.Screens.RankingV2.Extended
                     }
                 ],
             };
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            score.BindValueChanged(_ => updateState(), true);
-        }
-
-        private void updateState()
-        {
-            if (score.Value is not IScoreWithReplayData scoreWithReplayData)
-            {
-                Alpha = 0;
-                return;
-            }
-
-            var hitEvents = scoreWithReplayData.HitEvents;
+            var hitEvents = score.HitEvents;
 
             double? averageHitError = hitEvents.CalculateAverageHitError();
             var unstableRate = hitEvents.CalculateUnstableRate();
