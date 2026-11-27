@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using Newtonsoft.Json;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -50,6 +51,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                     // Passwords are explicitly not copied between rooms.
                     apiRoom.Password = createRoomRequest.Room.Password;
+
+                    apiRoom.StartDate ??= DateTimeOffset.Now;
 
                     AddServerSideRoom(apiRoom, localUser);
 
@@ -234,6 +237,19 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     });
                     return true;
                 }
+
+                case ClosePlaylistRequest closePlaylistRequest:
+                    var roomToClose = ServerSideRooms.FirstOrDefault(r => r.RoomID == closePlaylistRequest.RoomId);
+
+                    if (roomToClose == null)
+                    {
+                        closePlaylistRequest.TriggerFailure(new APIException("Not found", null, HttpStatusCode.NotFound));
+                        return true;
+                    }
+
+                    roomToClose.EndDate = DateTimeOffset.UtcNow;
+                    closePlaylistRequest.TriggerSuccess();
+                    return true;
             }
 
             List<APIBeatmap> createResponseBeatmaps(params int[] beatmapIds)
