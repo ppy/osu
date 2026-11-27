@@ -11,6 +11,7 @@ using osu.Framework.Logging;
 using osu.Game.Extensions;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Database
@@ -20,6 +21,8 @@ namespace osu.Game.Database
         where T : class
     {
         public Action<Notification>? PostNotification { protected get; set; }
+
+        public Action<PopupDialog>? PresentDialog { protected get; set; }
 
         public event Action<ArchiveDownloadRequest<T>>? DownloadBegan;
 
@@ -40,15 +43,14 @@ namespace osu.Game.Database
         /// Creates the download request for this <typeparamref name="T"/>.
         /// </summary>
         /// <param name="model">The <typeparamref name="T"/> to be downloaded.</param>
-        /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
-        protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model, bool minimiseDownloadSize);
+        protected abstract ArchiveDownloadRequest<T> CreateDownloadRequest(T model);
 
-        protected bool Download(T model, bool minimiseDownloadSize, TModel? originalModel)
+        protected bool Download(T model, TModel? originalModel)
         {
             if (!canDownload(model)) return false;
 
-            var request = CreateDownloadRequest(model, minimiseDownloadSize);
+            var request = CreateDownloadRequest(model);
 
             DownloadNotification notification = new DownloadNotification
             {

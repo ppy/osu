@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -30,7 +29,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
-        private Bindable<bool> noVideoSetting;
 
         protected readonly BeatmapDownloadTracker DownloadTracker;
 
@@ -68,10 +66,8 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapModelDownloader beatmaps, OsuConfigManager osuConfig)
+        private void load(OsuGame game, BeatmapModelDownloader downloader)
         {
-            noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
-
             button.Action = () =>
             {
                 switch (DownloadTracker.State.Value)
@@ -90,7 +86,7 @@ namespace osu.Game.Beatmaps.Drawables
                         break;
 
                     default:
-                        beatmaps.Download(beatmapSet, noVideoSetting.Value);
+                        downloader.Download(beatmapSet);
                         break;
                 }
             };

@@ -22,7 +22,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         private Bindable<bool> preferNoVideo = null!;
 
         [Resolved]
-        private BeatmapModelDownloader beatmaps { get; set; } = null!;
+        private BeatmapModelDownloader downloader { get; set; } = null!;
 
         public DownloadButton(APIBeatmapSet beatmapSet)
         {
@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                         return;
                     }
 
-                    Action = () => beatmaps.Download(beatmapSet, preferNoVideo.Value);
+                    Action = () => downloader.Download(beatmapSet);
                     this.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
                     SetLoading(false);
 

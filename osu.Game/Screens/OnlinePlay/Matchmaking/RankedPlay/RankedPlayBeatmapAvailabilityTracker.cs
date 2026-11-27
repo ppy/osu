@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -26,9 +25,6 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
-
-        [Resolved]
-        private OsuConfigManager config { get; set; } = null!;
 
         private BeatmapModelDownloader beatmapDownloader { get; set; } = null!;
 
@@ -90,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     if (beatmapSet == null)
                         return;
 
-                    beatmapDownloader.Download(beatmapSet, config.Get<bool>(OsuSetting.PreferNoVideo));
+                    beatmapDownloader.Download(beatmapSet, isAutomaticDownload: true);
                 }));
         }
 

@@ -15,11 +15,11 @@ namespace osu.Game.Scoring
         {
         }
 
-        protected override ArchiveDownloadRequest<IScoreInfo> CreateDownloadRequest(IScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
+        protected override ArchiveDownloadRequest<IScoreInfo> CreateDownloadRequest(IScoreInfo score) => new DownloadReplayRequest(score);
 
         public override ArchiveDownloadRequest<IScoreInfo>? GetExistingDownload(IScoreInfo model)
             => CurrentDownloads.Find(r => r.Model.MatchesOnlineID(model));
 
-        public bool Download(IScoreInfo model) => Download(model, false, null);
+        public bool Download(IScoreInfo model) => Download(model, null);
     }
 }

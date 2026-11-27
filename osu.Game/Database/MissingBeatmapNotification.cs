@@ -33,7 +33,6 @@ namespace osu.Game.Database
         private readonly string beatmapHash;
 
         private Bindable<bool> autoDownloadConfig = null!;
-        private Bindable<bool> noVideoSetting = null!;
         private BeatmapCardNano card = null!;
 
         private IDisposable? realmSubscription;
@@ -59,7 +58,6 @@ namespace osu.Game.Database
                 realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
             autoDownloadConfig = config.GetBindable<bool>(OsuSetting.AutomaticallyDownloadMissingBeatmaps);
-            noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             Content.Add(card = new BeatmapCardNano(beatmapSetInfo));
         }
@@ -71,7 +69,7 @@ namespace osu.Game.Database
             if (autoDownloadConfig.Value)
             {
                 Text = NotificationsStrings.DownloadingBeatmapForReplay;
-                beatmapDownloader.Download(beatmapSetInfo, noVideoSetting.Value);
+                beatmapDownloader.Download(beatmapSetInfo);
             }
             else
             {

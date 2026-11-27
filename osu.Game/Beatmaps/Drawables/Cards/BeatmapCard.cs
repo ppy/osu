@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -37,14 +36,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected readonly BeatmapDownloadTracker DownloadTracker;
 
-        private readonly Bindable<bool> preferNoVideo = new BindableBool();
         private InputManager? containingInputManager;
 
         [Resolved]
         private BeatmapSetOverlay? beatmapSetOverlay { get; set; }
 
         [Resolved]
-        private BeatmapModelDownloader? beatmaps { get; set; }
+        private BeatmapModelDownloader? downloader { get; set; }
 
         [Resolved]
         private OsuGame? game { get; set; }
@@ -60,10 +58,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager configManager)
+        private void load()
         {
-            configManager.BindWith(OsuSetting.PreferNoVideo, preferNoVideo);
-
             AddInternal(DownloadTracker);
         }
 
@@ -88,7 +84,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 switch (DownloadTracker.State.Value)
                 {
                     case DownloadState.NotDownloaded:
-                        if (!BeatmapSet.Availability.DownloadDisabled) beatmaps?.Download(BeatmapSet, preferNoVideo.Value);
+                        if (!BeatmapSet.Availability.DownloadDisabled)
+                            downloader?.Download(BeatmapSet);
+
                         break;
 
                     case DownloadState.LocallyAvailable:

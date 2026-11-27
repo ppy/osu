@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -61,14 +59,10 @@ namespace osu.Game.Screens.Select
             Height = 22f;
         }
 
-        private Bindable<bool> preferNoVideo = null!;
-
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             const float icon_size = 12;
-
-            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
 
             Content.Anchor = Anchor.Centre;
             Content.Origin = Anchor.Centre;
@@ -159,6 +153,9 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
+            // TODO: See if we can make this code path use the standard Download method.
+            // Right now it isn't because of the final `attachExistingDownload` call needing to fire post-download operation, seemingly.
+
             if (dialogOverlay != null && beatmapSet.Status == BeatmapOnlineStatus.LocallyModified && !updateConfirmed)
             {
                 dialogOverlay.Push(new UpdateLocalConfirmationDialog(() =>
@@ -172,7 +169,7 @@ namespace osu.Game.Screens.Select
 
             updateConfirmed = false;
 
-            beatmapDownloader.DownloadAsUpdate(beatmapSet, preferNoVideo.Value);
+            beatmapDownloader.DownloadAsUpdate(beatmapSet);
             attachExistingDownload();
         }
 

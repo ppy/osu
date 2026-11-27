@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -92,7 +91,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 // Note that this is downloading the beatmaps even if they are already downloaded.
                 // We could rely more on `BeatmapDownloadTracker`'s exposed state to avoid this.
-                beatmapDownloader.Download(beatmapSet, false);
+                beatmapDownloader.Download(beatmapSet, isAutomaticDownload: true);
             }
         }
 
@@ -112,13 +111,13 @@ namespace osu.Game.Beatmaps.Drawables
 
         private class BundledBeatmapModelDownloader : BeatmapModelDownloader
         {
-            public BundledBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api)
+            public BundledBeatmapModelDownloader(BeatmapManager beatmapImporter, IAPIProvider api)
                 : base(beatmapImporter, api)
             {
             }
 
-            protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
-                => new BundledBeatmapDownloadRequest(set, minimiseDownloadSize);
+            protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set)
+                => new BundledBeatmapDownloadRequest(set, PreferNoVideo.Value);
 
             public class BundledBeatmapDownloadRequest : DownloadBeatmapSetRequest
             {
