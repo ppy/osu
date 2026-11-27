@@ -105,6 +105,11 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"Always play first combo break sound");
 
         /// <summary>
+        /// "Legacy break overlay"
+        /// </summary>
+        public static LocalisableString LegacyBreakOverlay => new TranslatableString(getKey(@"break_overlay_style"), @"Legacy break overlay");
+
+        /// <summary>
         /// "Score display mode"
         /// </summary>
         public static LocalisableString ScoreDisplayMode => new TranslatableString(getKey(@"score_display_mode"), @"Score display mode");
