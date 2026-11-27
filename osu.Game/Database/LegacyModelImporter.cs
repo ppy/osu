@@ -44,7 +44,7 @@ namespace osu.Game.Database
 
         public Task<int> GetAvailableCount(StableStorage stableStorage) => Task.Run(() => GetStableImportPaths(PrepareStableStorage(stableStorage)).Count());
 
-        public Task ImportFromStableAsync(StableStorage stableStorage)
+        public Task ImportFromStableAsync(StableStorage stableStorage, bool preferHardLinks, bool preferCopyOnWrite)
         {
             var storage = PrepareStableStorage(stableStorage);
 
@@ -61,7 +61,7 @@ namespace osu.Game.Database
             {
                 var tasks = GetStableImportPaths(storage).Select(p => new ImportTask(p)).ToArray();
 
-                await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = true }).ConfigureAwait(false);
+                await Importer.Import(tasks, new ImportParameters { Batch = true, PreferHardLinks = preferHardLinks, PreferCopyOnWrite = preferCopyOnWrite }).ConfigureAwait(false);
             });
         }
 
