@@ -5,15 +5,22 @@ using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract partial class CreateRoomButton : PurpleRoundedButton, IKeyBindingHandler<PlatformAction>
+    public abstract partial class CreateRoomButton : ShearedButtonWithIcon, IKeyBindingHandler<PlatformAction>
     {
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            SpriteText.Font = SpriteText.Font.With(size: 14);
+            Width = 220;
+
+            DarkerColour = colours.Blue3;
+            LighterColour = colours.Blue1;
+
+            Icon = OsuIcon.Add;
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)

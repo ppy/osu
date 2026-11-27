@@ -89,7 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             api.Queue(request);
         }
 
-        protected override OsuButton CreateNewRoomButton() => new CreatePlaylistsRoomButton();
+        protected override ShearedButton CreateNewRoomButton() => new CreatePlaylistsRoomButton();
 
         protected override Room CreateNewRoom()
         {
