@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select
 
             updateConfirmed = false;
 
-            beatmapDownloader.DownloadAsUpdate(beatmapSet, preferNoVideo.Value);
+            beatmapDownloader.DownloadAsUpdate(beatmapSet);
             attachExistingDownload();
         }
 

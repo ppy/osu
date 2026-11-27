@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -48,9 +47,6 @@ namespace osu.Game.Screens.Play
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        [Resolved]
-        private IDialogOverlay? dialogOverlay { get; set; }
-
         private Container beatmapPanelContainer = null!;
         private RoundedButton watchButton = null!;
         private SettingsCheckbox automaticDownload = null!;
@@ -73,13 +69,9 @@ namespace osu.Game.Screens.Play
             this.targetUser = targetUser;
         }
 
-        private Bindable<bool> preferNoVideo = null!;
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            preferNoVideo = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
-
             InternalChild = new Container
             {
                 Masking = true,
@@ -274,7 +266,7 @@ namespace osu.Game.Screens.Play
             if (beatmaps.IsAvailableLocally(beatmap))
                 return;
 
-            beatmapDownloader.Download(beatmap.BeatmapSet, preferNoVideo.Value, dialogOverlay);
+            beatmapDownloader.Download(beatmap.BeatmapSet);
         }
 
         public override bool OnExiting(ScreenExitEvent e)

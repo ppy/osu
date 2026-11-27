@@ -16,7 +16,6 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -113,9 +112,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        [Resolved]
-        private IDialogOverlay? dialogOverlay { get; set; }
-
         private Bindable<bool> automaticallyDownload = null!;
 
         private CancellationTokenSource? downloadCheckCancellation;
@@ -166,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     if (beatmaps.IsAvailableLocally(new APIBeatmap { OnlineID = item.BeatmapID }))
                         return;
 
-                    beatmapDownloader.Download(beatmapSet, preferNoVideo.Value, dialogOverlay);
+                    beatmapDownloader.Download(beatmapSet);
                 }));
         }
 

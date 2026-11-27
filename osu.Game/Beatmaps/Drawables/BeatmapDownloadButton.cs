@@ -4,18 +4,15 @@
 #nullable disable
 
 using System;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays;
 using osu.Game.Resources.Localisation.Web;
 using CommonStrings = osu.Game.Localisation.CommonStrings;
 
@@ -32,7 +29,6 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly ShakeContainer shakeContainer;
         private readonly DownloadButton button;
-        private Bindable<bool> noVideoSetting;
 
         protected readonly BeatmapDownloadTracker DownloadTracker;
 
@@ -70,10 +66,8 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, BeatmapModelDownloader downloader, OsuConfigManager osuConfig, [CanBeNull] IDialogOverlay dialogOverlay)
+        private void load(OsuGame game, BeatmapModelDownloader downloader)
         {
-            noVideoSetting = osuConfig.GetBindable<bool>(OsuSetting.PreferNoVideo);
-
             button.Action = () =>
             {
                 switch (DownloadTracker.State.Value)
@@ -92,7 +86,7 @@ namespace osu.Game.Beatmaps.Drawables
                         break;
 
                     default:
-                        downloader.Download(beatmapSet, noVideoSetting.Value, dialogOverlay);
+                        downloader.Download(beatmapSet);
                         break;
                 }
             };

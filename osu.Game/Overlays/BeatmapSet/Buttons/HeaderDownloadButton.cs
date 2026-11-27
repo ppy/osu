@@ -3,7 +3,6 @@
 
 #nullable disable
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -54,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(IAPIProvider api, BeatmapModelDownloader downloader, [CanBeNull] IDialogOverlay dialogOverlay)
+        private void load(IAPIProvider api, BeatmapModelDownloader downloader)
         {
             FillFlowContainer textSprites;
 
@@ -111,7 +110,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                downloader.Download(beatmapSet, noVideo, dialogOverlay);
+                downloader.Download(beatmapSet);
             };
 
             localUser.BindTo(api.LocalUser);

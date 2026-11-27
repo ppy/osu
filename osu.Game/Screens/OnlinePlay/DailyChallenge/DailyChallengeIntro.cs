@@ -101,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
         protected override BackgroundScreen CreateBackground() => new DailyChallengeIntroBackgroundScreen(colourProvider);
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio, IDialogOverlay? dialogOverlay)
+        private void load(RulesetStore rulesets, BeatmapDifficultyCache difficultyCache, BeatmapModelDownloader beatmapDownloader, OsuConfigManager config, AudioManager audio)
         {
             const float horizontal_info_size = 500f;
 
@@ -341,8 +341,7 @@ namespace osu.Game.Screens.OnlinePlay.DailyChallenge
             {
                 if (!beatmapManager.IsAvailableLocally(beatmap))
                 {
-                    bool withoutVideo = config.Get<bool>(OsuSetting.PreferNoVideo);
-                    beatmapDownloader.Download(beatmap.BeatmapSet!, withoutVideo, dialogOverlay);
+                    beatmapDownloader.Download(beatmap.BeatmapSet!);
                 }
             }
 

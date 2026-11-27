@@ -4,7 +4,6 @@
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
@@ -13,8 +12,8 @@ namespace osu.Game.Beatmaps
     {
         private readonly BeatmapManager? beatmapManager;
 
-        protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize) =>
-            new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
+        protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set) =>
+            new DownloadBeatmapSetRequest(set, MinimiseDownloadSize.Value);
 
         public override ArchiveDownloadRequest<IBeatmapSetInfo>? GetExistingDownload(IBeatmapSetInfo model)
             => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
@@ -25,26 +24,26 @@ namespace osu.Game.Beatmaps
             beatmapManager = beatmapImporter;
         }
 
-        public void Download(IBeatmapSetInfo model, bool withoutVideo, IDialogOverlay? dialogOverlay = null)
+        public void Download(IBeatmapSetInfo model)
         {
-            if (dialogOverlay != null)
+            if (PresentDialog != null)
             {
                 BeatmapSetInfo? localModel = model as BeatmapSetInfo ?? beatmapManager?.QueryBeatmapSet(s => s.OnlineID == model.OnlineID)?.Value.Detach();
 
                 if (localModel?.Status == BeatmapOnlineStatus.LocallyModified)
                 {
-                    dialogOverlay.Push(new UpdateLocalConfirmationDialog(() =>
+                    PresentDialog(new UpdateLocalConfirmationDialog(() =>
                     {
-                        DownloadAsUpdate(localModel, withoutVideo);
+                        DownloadAsUpdate(localModel);
                     }));
 
                     return;
                 }
             }
 
-            base.Download(model, withoutVideo, null);
+            base.Download(model, null);
         }
 
-        public void DownloadAsUpdate(BeatmapSetInfo originalModel, bool withoutVideo) => Download(originalModel, withoutVideo, originalModel);
+        public void DownloadAsUpdate(BeatmapSetInfo originalModel) => Download(originalModel, originalModel);
     }
 }

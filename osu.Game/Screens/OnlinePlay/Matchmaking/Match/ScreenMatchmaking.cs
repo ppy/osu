@@ -319,8 +319,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Match
                     if (beatmapSet == null)
                         return;
 
-                    bool withoutVideo = config.Get<bool>(OsuSetting.PreferNoVideo);
-                    beatmapDownloader.Download(beatmapSet, withoutVideo, dialogOverlay);
+                    beatmapDownloader.Download(beatmapSet);
                 }));
         }
 
