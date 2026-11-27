@@ -105,7 +105,24 @@ namespace osu.Game.Storyboards
                 foreach (var l in LoopingGroups)
                     latestEndTime = Math.Max(latestEndTime, l.StartTime + l.Duration * l.TotalIterations);
 
+                var alphaCommands = Commands.Alpha.Select(command => (command, displayEndTime: command.EndTime))
+                                            .Concat(LoopingGroups.SelectMany(loop => loop.Alpha.Select(command => (command, displayEndTime: command.EndTime + loop.Duration * (loop.TotalIterations - 1)))))
+                                            .ToList();
+
+                if (alphaCommands.Count > 0)
+                {
+                    // Mirror StartTime: cap lifetime at the last visible alpha, ignoring trailing invisible transforms.
+                    var lastAlpha = alphaCommands.MaxBy(c => c.displayEndTime);
+                    var visibleAlphaCommands = alphaCommands.Where(c => visibleAtStartOrEnd(c.command)).ToList();
+                    var lastRealAlpha = visibleAlphaCommands.Count > 0 ? visibleAlphaCommands.MaxBy(c => c.displayEndTime) : default;
+
+                    if (lastAlpha.command.EndValue == 0 && lastRealAlpha.command != null)
+                        return lastRealAlpha.displayEndTime;
+                }
+
                 return latestEndTime;
+
+                bool visibleAtStartOrEnd(StoryboardCommand<float> command) => command.StartValue > 0 || command.EndValue > 0;
             }
         }
 
