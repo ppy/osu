@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected override Color4 GetBodyAccentColour(ISkinSource skin, Color4 hitObjectAccentColour)
             // legacy skins use a constant value for slider track alpha, regardless of the source colour.
-            => (skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? hitObjectAccentColour).Opacity(0.7f);
+            => base.GetBodyAccentColour(skin, hitObjectAccentColour).Opacity(0.7f);
 
         private partial class LegacyDrawableSliderPath : DrawableSliderPath
         {
