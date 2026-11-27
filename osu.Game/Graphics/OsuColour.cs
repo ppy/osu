@@ -280,7 +280,7 @@ namespace osu.Game.Graphics
                     return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"A8F0EF"), Color4Extensions.FromHex(@"52E0DF"));
 
                 case RankingTier.Rhodium:
-                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"D9F8D3"), Color4Extensions.FromHex(@"A0CF96"));
+                    return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"ADFFB6"), Color4Extensions.FromHex(@"6DB566"));
 
                 case RankingTier.Radiant:
                     return ColourInfo.GradientVertical(Color4Extensions.FromHex(@"97DCFF"), Color4Extensions.FromHex(@"ED82FF"));

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -114,17 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
                 });
             }
 
-            protected override ColourInfo GetColour() => Division.Tier switch
-            {
-                RankingTier.Bronze => ColourInfo.GradientVertical(Colour4.FromHex(@"#B88F7A"), Colour4.FromHex(@"#855C47")),
-                RankingTier.Silver => ColourInfo.GradientVertical(Colour4.FromHex(@"#E0E0EB"), Colour4.FromHex(@"#A3A3C2")),
-                RankingTier.Gold => ColourInfo.GradientVertical(Colour4.FromHex(@"#FFEE99"), Colour4.FromHex(@"#FFDD33")),
-                RankingTier.Platinum => ColourInfo.GradientVertical(Colour4.FromHex(@"#A8F0EF"), Colour4.FromHex(@"#52E0DF")),
-                RankingTier.Rhodium => ColourInfo.GradientVertical(Colour4.FromHex(@"#ADFFB6"), Colour4.FromHex(@"#6DB566")),
-                RankingTier.Radiant => ColourInfo.GradientVertical(Colour4.FromHex(@"#97DCFF"), Colour4.FromHex(@"#ED82FF")),
-                RankingTier.Lustrous => ColourInfo.GradientVertical(Colour4.FromHex(@"#FFE600"), Colour4.FromHex(@"#ED82FF")),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            protected override ColourInfo GetColour() => OsuColour.ForRankingTier(Division.Tier);
 
             protected override void LoadComplete()
             {
