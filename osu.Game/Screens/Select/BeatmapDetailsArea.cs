@@ -72,6 +72,9 @@ namespace osu.Game.Screens.Select
         {
             if (currentContent != null)
             {
+                if (currentContent is BeatmapLeaderboardWedge)
+                    header.SetDisplayedScopeOverride(null);
+
                 currentContent.Hide();
                 currentContent.Expire();
             }
@@ -84,12 +87,16 @@ namespace osu.Game.Screens.Select
                     break;
 
                 case Header.Selection.Ranking:
-                    currentContent = new BeatmapLeaderboardWedge
+                    var leaderboardWedge = new BeatmapLeaderboardWedge
                     {
                         Scope = { BindTarget = header.Scope },
                         Sorting = { BindTarget = header.Sorting },
                         FilterBySelectedMods = { BindTarget = header.FilterBySelectedMods },
+                        ManualScopeChangeCounter = { BindTarget = header.ManualScopeChangeCounter },
                     };
+
+                    leaderboardWedge.DisplayedScopeOverride.BindValueChanged(scope => header.SetDisplayedScopeOverride(scope.NewValue), true);
+                    currentContent = leaderboardWedge;
 
                     break;
             }
