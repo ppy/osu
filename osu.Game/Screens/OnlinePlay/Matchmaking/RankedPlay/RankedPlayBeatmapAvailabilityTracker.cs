@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay
                     if (beatmapSet == null)
                         return;
 
-                    beatmapDownloader.Download(beatmapSet);
+                    beatmapDownloader.Download(beatmapSet, isAutomaticDownload: true);
                 }));
         }
 

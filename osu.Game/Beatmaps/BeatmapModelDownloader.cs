@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Beatmaps
@@ -24,7 +26,7 @@ namespace osu.Game.Beatmaps
             beatmapManager = beatmapImporter;
         }
 
-        public void Download(IBeatmapSetInfo model)
+        public void Download(IBeatmapSetInfo model, bool isAutomaticDownload = false)
         {
             if (PresentDialog != null)
             {
@@ -32,10 +34,21 @@ namespace osu.Game.Beatmaps
 
                 if (localModel?.Status == BeatmapOnlineStatus.LocallyModified)
                 {
-                    PresentDialog(new UpdateLocalConfirmationDialog(() =>
+                    if (isAutomaticDownload)
                     {
-                        DownloadAsUpdate(localModel);
-                    }));
+                        PostNotification?.Invoke(new SimpleNotification
+                        {
+                            Text = "Automatic download was aborted because local changes exist for the requested beatmap. Please check and start a manual download.",
+                            Icon = FontAwesome.Solid.ExclamationTriangle,
+                        });
+                    }
+                    else
+                    {
+                        PresentDialog(new UpdateLocalConfirmationDialog(() =>
+                        {
+                            DownloadAsUpdate(localModel);
+                        }));
+                    }
 
                     return;
                 }

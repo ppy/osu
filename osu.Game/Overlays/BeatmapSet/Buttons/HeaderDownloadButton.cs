@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             RelativeSizeAxes = Axes.Y;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader]
         private void load(IAPIProvider api, BeatmapModelDownloader downloader)
         {
             FillFlowContainer textSprites;
