@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
         {
             if (dialogOverlay != null)
             {
-                BeatmapSetInfo? localModel = model as BeatmapSetInfo ?? beatmapManager?.QueryBeatmapSet(s => s.OnlineID == model.OnlineID)?.Value;
+                BeatmapSetInfo? localModel = model as BeatmapSetInfo ?? beatmapManager?.QueryBeatmapSet(s => s.OnlineID == model.OnlineID)?.Value.Detach();
 
                 if (localModel?.Status == BeatmapOnlineStatus.LocallyModified)
                 {
