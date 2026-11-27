@@ -27,6 +27,11 @@ namespace osu.Game.Rulesets.Objects
         public Bindable<T> Bindable => backingBindable ??= new Bindable<T>(defaultValue) { Value = backingValue };
 
         /// <summary>
+        /// Whether the backing bindable has already been created.
+        /// </summary>
+        public bool BindableCreated => backingBindable != null;
+
+        /// <summary>
         /// The current value, derived from and delegated to <see cref="Bindable"/> if initialised, or a temporary field otherwise.
         /// </summary>
         public T Value
