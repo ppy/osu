@@ -5,15 +5,15 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public partial class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public partial class DrawableStoryboardSprite : ColouredDimmableSprite, IFlippable, IVectorScalable
     {
         public StoryboardSprite Sprite { get; }
 

@@ -75,6 +75,11 @@ namespace osu.Game.Graphics.Containers
             UserDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             LightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
             DimWhenUserSettingsIgnored.ValueChanged += _ => UpdateVisuals();
@@ -82,11 +87,7 @@ namespace osu.Game.Graphics.Containers
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
             UpdateVisuals();
         }
 

@@ -33,6 +33,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 }),
+                new SettingsItemV2(new FormSliderBar<double>
+                {
+                    Caption = GameplaySettingsStrings.BackgroundDimColour,
+                    Current = config.GetBindable<double>(OsuSetting.DimColour),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                }),
                 new SettingsItemV2(new FormCheckBox
                 {
                     Caption = GameplaySettingsStrings.LightenDuringBreaks,
