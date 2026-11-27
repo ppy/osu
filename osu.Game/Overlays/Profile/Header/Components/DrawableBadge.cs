@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
@@ -14,11 +15,16 @@ using osuTK;
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     [LongRunningLoad]
-    public partial class DrawableBadge : OsuClickableContainer
+    public partial class DrawableBadge : OsuClickableContainer, IHasCustomTooltip<DrawableBadgeTooltipData>
     {
         public static readonly Vector2 DRAWABLE_BADGE_SIZE = new Vector2(86, 40);
 
         private readonly Badge badge;
+
+        public DrawableBadgeTooltipData? TooltipContent { get; set; }
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public DrawableBadge(Badge badge)
         {
@@ -40,6 +46,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             if (!string.IsNullOrEmpty(badge.Url))
                 Action = () => linkHandler?.HandleLink(badge.Url);
+
+            TooltipContent = new DrawableBadgeTooltipData(colourProvider, badge);
         }
 
         protected override void LoadComplete()
@@ -48,6 +56,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             this.FadeInFromZero(200);
         }
 
-        public override LocalisableString TooltipText => badge.Description;
+        public override LocalisableString TooltipText => string.Empty;
+
+        public ITooltip<DrawableBadgeTooltipData> GetCustomTooltip() => new DrawableBadgeTooltip();
     }
 }
