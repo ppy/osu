@@ -87,7 +87,12 @@ namespace osu.Game.Screens.Select
                     dbBeatmapSet.Status = onlineBeatmapSet.Status;
 
                 if (dbBeatmapSet.OnlineOffset != onlineBeatmapSet.OnlineOffset)
+                {
                     dbBeatmapSet.OnlineOffset = onlineBeatmapSet.OnlineOffset;
+
+                    foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
+                        dbBeatmap.UserSettings.Offset = 0;
+                }
 
                 foreach (var dbBeatmap in dbBeatmapSet.Beatmaps)
                 {

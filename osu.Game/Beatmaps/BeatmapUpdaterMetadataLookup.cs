@@ -91,7 +91,14 @@ namespace osu.Game.Beatmaps
                 beatmapSet.Status = representative.BeatmapSetStatus ?? BeatmapOnlineStatus.None;
                 beatmapSet.DateRanked = representative.DateRanked;
                 beatmapSet.DateSubmitted = representative.DateSubmitted;
-                beatmapSet.OnlineOffset = representative.OnlineOffset;
+
+                if (beatmapSet.OnlineOffset != representative.OnlineOffset)
+                {
+                    beatmapSet.OnlineOffset = representative.OnlineOffset;
+
+                    foreach (var beatmap in beatmapSet.Beatmaps)
+                        beatmap.UserSettings.Offset = 0;
+                }
             }
         }
 
