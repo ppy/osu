@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             const double max_opacity_bonus = 0.4;
             const double hidden_bonus = 0.2;
 
-            const double slider_multiplier = 2.4;
+            const double slider_multiplier = 2.5;
 
             const double min_angle_multiplier = 0.2;
 
@@ -95,6 +95,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (osuCurrent.BaseObject is Slider osuSlider)
             {
+                double pixelTravelDistance = osuCurrent.LazyTravelDistance / scalingFactor / (osuSlider.RepeatCount + 1);
+
                 // Longer sliders require more memorisation.
                 sliderBonus = DiffUtils.Pow(osuCurrent.LazyTravelDistance, 0.8);
 
@@ -102,7 +104,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 sliderBonus *= DiffUtils.Logistic(osuSlider.Velocity * osuCurrent.ClockRate, 1.2, 10.0);
 
                 // Nerf sliders whose movement is easily seen within the Flashlight radius.
-                sliderBonus *= Math.Min(1.0, osuCurrent.LazyTravelDistance / scalingFactor / (osuSlider.RepeatCount + 1) / 75.0);
+                sliderBonus *= Math.Min(1.0, pixelTravelDistance / 150.0);
+
+                // Nerf sliders whose lazy distance is much shorter than the path distance.
+                if (osuSlider.Path.Distance > 0)
+                    sliderBonus *= Math.Min(1.0, 2.0 * pixelTravelDistance / osuSlider.Path.Distance);
+
+                // Nerf sliders with repeats, as less memorisation is required.
+                if (osuSlider.RepeatCount > 0)
+                    sliderBonus /= 0.1 * osuSlider.RepeatCount + 1;
             }
 
             flashlightDifficulty += sliderBonus * slider_multiplier;
