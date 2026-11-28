@@ -19,14 +19,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         protected override int SectionLength => 750;
 
-        public Movement(Mod[] mods)
+        private readonly double circleSize;
+
+        public Movement(Mod[] mods, double circleSize)
             : base(mods)
         {
+            this.circleSize = circleSize;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
-            return MovementEvaluator.EvaluateDifficultyOf(current);
+            return MovementEvaluator.EvaluateDifficultyOf(current, circleSize);
         }
 
         public override double DifficultyValue()
